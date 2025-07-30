@@ -1,4 +1,4 @@
-import { db } from '@/lib/db'
+import { getDb } from '@/lib/db'
 import { recipes, recipeSections, sectionIngredients, units } from '@/lib/db/schema'
 import { uploadFile } from '@/lib/s3.server'
 import { createServerFn } from '@tanstack/react-start'
@@ -36,7 +36,7 @@ export const createRecipe = createServerFn({
     const { image, sections, name, steps } = data
     const imageKey = await uploadFile(image)
 
-    await db.transaction(async (tx) => {
+    await getDb().transaction(async (tx) => {
       const [createdRecipe] = await tx
         .insert(recipes)
         .values({

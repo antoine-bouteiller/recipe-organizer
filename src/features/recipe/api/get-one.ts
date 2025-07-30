@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { db } from '@/lib/db'
+import { getDb } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { recipes } from '@/lib/db/schema'
 
@@ -10,7 +10,7 @@ export const getRecipe = createServerFn({
 })
   .validator(z.number())
   .handler(async ({ data }) => {
-    const result = await db.query.recipes.findFirst({
+    const result = await getDb().query.recipes.findFirst({
       where: eq(recipes.id, data),
       with: {
         sections: {
