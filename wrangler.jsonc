@@ -5,14 +5,14 @@
   "compatibility_date": "2025-07-29",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": ".output/public"
+    "directory": ".output/public",
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "vars": {
     "S3_URL": "https://yopxuvxdkhqtxudgowlk.supabase.co/storage/v1/s3",
     "VITE_BUCKET_URL": "https://yopxuvxdkhqtxudgowlk.supabase.co/storage/v1/object/public/images//",
-    "S3_BUCKET": "images"
-  }
+    "S3_BUCKET": "images",
+  },
 }

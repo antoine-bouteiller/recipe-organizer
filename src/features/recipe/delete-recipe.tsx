@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -7,30 +7,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { deleteRecipe } from "@/features/recipe/api/delete";
-import { useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { Trash2 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+} from '@/components/ui/dialog'
+import { deleteRecipe } from '@/features/recipe/api/delete'
+import { useRouter } from '@tanstack/react-router'
+import { useServerFn } from '@tanstack/react-start'
+import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   const handleDelete = useServerFn(async () => {
     try {
-      await deleteRecipe({ data: recipeId });
-      setIsOpen(false);
-      toast.success("Recette supprimée avec succès");
-      router.invalidate({ filter: (route) => route.fullPath === "/" });
+      await deleteRecipe({ data: recipeId })
+      setIsOpen(false)
+      toast.success('Recette supprimée avec succès')
+      router.invalidate({ filter: (route) => route.fullPath === '/' })
     } catch {
-      toast.error(
-        "Une erreur est survenue lors de la suppression de la recette"
-      );
+      toast.error('Une erreur est survenue lors de la suppression de la recette')
     }
-  });
+  })
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -38,8 +36,8 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
         <DialogTrigger
           asChild
           onClick={(event) => {
-            event.preventDefault();
-            setIsOpen(true);
+            event.preventDefault()
+            setIsOpen(true)
           }}
         >
           <Button variant="ghost" className="absolute top-2 right-2">
@@ -48,9 +46,7 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              Êtes-vous sûr de vouloir supprimer cette recette ?
-            </DialogTitle>
+            <DialogTitle>Êtes-vous sûr de vouloir supprimer cette recette ?</DialogTitle>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
@@ -63,5 +59,5 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

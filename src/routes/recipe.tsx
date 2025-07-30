@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { Button } from '@/components/ui/button'
+import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
+import { ArrowLeft } from 'lucide-react'
 
-export const Route = createFileRoute("/recipe")({
+export const Route = createFileRoute('/recipe')({
   component: RecipeLayout,
-});
+})
 
 function RecipeLayout() {
   return (
@@ -21,5 +21,5 @@ function RecipeLayout() {
         <Outlet />
       </div>
     </div>
-  );
+  )
 }

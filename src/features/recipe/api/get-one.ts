@@ -1,12 +1,12 @@
-import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
-import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
-import { recipes } from "@/lib/db/schema";
+import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
+import { db } from '@/lib/db'
+import { eq } from 'drizzle-orm'
+import { recipes } from '@/lib/db/schema'
 
 export const getRecipe = createServerFn({
-  method: "GET",
-  response: "data",
+  method: 'GET',
+  response: 'data',
 })
   .validator(z.number())
   .handler(async ({ data }) => {
@@ -24,6 +24,6 @@ export const getRecipe = createServerFn({
           },
         },
       },
-    });
-    return result;
-  });
+    })
+    return result
+  })

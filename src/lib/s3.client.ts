@@ -1,5 +1,5 @@
-import { env } from "@/config/env.client";
+import { env } from '@/config/env.client'
 
 export function getFileUrl(key: string) {
-  return `${env.VITE_BUCKET_URL}/${key}`;
+  return `${env.VITE_BUCKET_URL}/${key}`
 }

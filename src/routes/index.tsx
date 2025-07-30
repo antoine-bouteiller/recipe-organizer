@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { getAllRecipes } from "@/features/recipe/api/get-all";
-import RecipeCard from "@/features/recipe/recipe-card";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from '@/components/ui/button'
+import { getAllRecipes } from '@/features/recipe/api/get-all'
+import RecipeCard from '@/features/recipe/recipe-card'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
   component: Home,
   loader: async () => await getAllRecipes(),
-});
+})
 
 export default function Home() {
-  const recipes = Route.useLoaderData();
+  const recipes = Route.useLoaderData()
 
   return (
     <div className="min-h-screen p-8">
@@ -28,5 +28,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  );
+  )
 }

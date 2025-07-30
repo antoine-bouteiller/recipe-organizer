@@ -1,0 +1,61 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "unicorn"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "commonjs": true,
+    "node": true,
+    "shared-node-browser": true
+  },
+  "ignorePatterns": [
+    "**/*.js",
+    "**/dist/**",
+    "**/routeTree.gen.ts",
+    "**/build/**",
+    "**/.adonisjs/api.ts",
+    "**/.adonisjs/prisma.ts",
+    "**/.prisma/client/**",
+    "**/*.d.ts"
+  ],
+  "overrides": [
+    {
+      "files": ["**/*.{mjs,cjs}", "**/*.config.ts"],
+      "rules": {
+        "typescript/no-require-imports": "off"
+      }
+    }
+  ],
+  "rules": {
+    "typescript/ban-ts-comment": [
+      "error",
+      {
+        "minimumDescriptionLength": 10
+      }
+    ],
+    "no-console": "error",
+    "no-unused-vars": "error",
+    "no-unused-expressions": "error",
+    "no-explicit-any": "error",
+    "react-in-jsx-scope": "off",
+    "no-unneeded-ternary": "off",
+    "react/style-prop-object": "off",
+    "jsx-curly-brace-presence": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "cases": {
+          "kebabCase": true,
+          "snakeCase": true
+        },
+        "ignore": "\\[.+\\]\\.tsx"
+      }
+    ]
+  }
+}
