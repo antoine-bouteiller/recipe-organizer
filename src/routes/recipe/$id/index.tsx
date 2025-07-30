@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRecipe } from "@/features/recipe/api/get-one";
-import { getFileUrl } from "@/lib/s3-client";
+import { getFileUrl } from "@/lib/s3.client";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod";
 

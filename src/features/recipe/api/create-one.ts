@@ -5,7 +5,7 @@ import {
   sectionIngredients,
   units,
 } from "@/lib/db/schema";
-import { uploadFile } from "@/lib/s3-server";
+import { uploadFile } from "@/lib/s3.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
