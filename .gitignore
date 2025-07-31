@@ -8,7 +8,6 @@ count.txt
 .nitro
 .tanstack
 .output
-/src/generated/prisma
 
-# Drizzle
-/src/lib/db/migrations/*
+# Cloudflare
+.wrangler

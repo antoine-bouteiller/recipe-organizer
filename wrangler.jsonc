@@ -12,7 +12,18 @@
   },
   "vars": {
     "S3_URL": "https://yopxuvxdkhqtxudgowlk.supabase.co/storage/v1/s3",
-    "VITE_BUCKET_URL": "https://yopxuvxdkhqtxudgowlk.supabase.co/storage/v1/object/public/images//",
-    "S3_BUCKET": "images",
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "recipe-organizer",
+      "database_id": "9525737e-71fb-4c65-8784-dd1c956b6977",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "recipe-organizer",
+    },
+  ],
 }

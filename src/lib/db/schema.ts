@@ -1,40 +1,32 @@
-import { pgTable, serial, varchar, timestamp, integer, real, pgEnum } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
+import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-export const units = pgEnum('unit', ['kg', 'l', 'CàC', 'CàS'])
-
-export const ingredients = pgTable('ingredients', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  pluralName: varchar('plural_name', { length: 255 }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const ingredients = sqliteTable('ingredients', {
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
+  pluralName: text('plural_name'),
 })
 
-export const recipes = pgTable('recipes', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  image: varchar('image', { length: 255 }).notNull(),
-  steps: varchar('steps').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+export const recipes = sqliteTable('recipes', {
+  id: integer('id').primaryKey(),
+  name: text('name', { length: 255 }).notNull(),
+  image: text('image', { length: 255 }).notNull(),
+  steps: text('steps').notNull(),
 })
 
-export const recipeSections = pgTable('recipe_sections', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 255 }),
+export const recipeSections = sqliteTable('recipe_sections', {
+  id: integer('id').primaryKey(),
+  name: text('name', { length: 255 }),
   recipeId: integer('recipe_id')
     .references(() => recipes.id, { onDelete: 'cascade' })
     .notNull(),
   subRecipeId: integer('sub_recipe_id').references(() => recipes.id, {
     onDelete: 'cascade',
   }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
-export const sectionIngredients = pgTable('section_ingredients', {
-  id: serial('id').primaryKey(),
+export const sectionIngredients = sqliteTable('section_ingredients', {
+  id: integer('id').primaryKey(),
   sectionId: integer('section_id')
     .references(() => recipeSections.id, { onDelete: 'cascade' })
     .notNull(),
@@ -42,7 +34,7 @@ export const sectionIngredients = pgTable('section_ingredients', {
     .references(() => ingredients.id, { onDelete: 'cascade' })
     .notNull(),
   quantity: real('quantity').notNull(),
-  unit: units('unit'),
+  unit: text('unit'),
 })
 
 export const ingredientsRelations = relations(ingredients, ({ many }) => ({

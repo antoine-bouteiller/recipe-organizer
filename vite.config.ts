@@ -8,11 +8,14 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   server: {
     port: 3000,
+    watch: {
+      ignored: ['.wrangler/**/*'],
+    },
   },
   plugins: [
     tsConfigPaths(),
     tanstackStart({ customViteReactPlugin: true, target: 'cloudflare-module' }),
-    viteReact(),
+    viteReact({ exclude: ['**/.wrangler/**/*'] }),
     tailwindcss(),
   ],
 })

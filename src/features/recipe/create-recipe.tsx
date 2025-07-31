@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormLabel } from '@/components/ui/form'
 import { createRecipe, recipeSchema } from '@/features/recipe/api/create-one'
-import { units } from '@/lib/db/schema'
 import type { Ingredient } from '@/types/ingredient'
+import { units } from '@/types/units'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from '@tanstack/react-router'
@@ -24,7 +24,7 @@ interface CreateRecipeProps {
   ingredients: Ingredient[]
 }
 
-const unitsOptions = units.enumValues.map((unit) => ({
+const unitsOptions = units.map((unit) => ({
   label: unit,
   value: unit,
 }))

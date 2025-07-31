@@ -1,5 +1,3 @@
-import { env } from '@/config/env.client'
-
 export function getFileUrl(key: string) {
-  return `${env.VITE_BUCKET_URL}/${key}`
+  return `${import.meta.env.VITE_PUBLIC_R2_URL}/${key}`
 }
