@@ -46,26 +46,28 @@ export const createRecipe = createServerFn({
       })
       .returning({ id: recipes.id })
 
-    sections.map(async (section) => {
-      const [createdSection] = await getDb()
-        .insert(recipeSections)
-        .values({
-          recipeId: createdRecipe.id,
-          name: section.name,
-        })
-        .returning()
+    await Promise.all(
+      sections.map(async (section) => {
+        const [createdSection] = await getDb()
+          .insert(recipeSections)
+          .values({
+            recipeId: createdRecipe.id,
+            name: section.name,
+          })
+          .returning()
 
-      if (section.ingredients.length > 0) {
-        await getDb()
-          .insert(sectionIngredients)
-          .values(
-            section.ingredients.map((ingredient) => ({
-              sectionId: createdSection.id,
-              ingredientId: ingredient.id,
-              quantity: ingredient.quantity,
-              unit: ingredient.unit,
-            }))
-          )
-      }
-    })
+        if (section.ingredients.length > 0) {
+          await getDb()
+            .insert(sectionIngredients)
+            .values(
+              section.ingredients.map((ingredient) => ({
+                sectionId: createdSection.id,
+                ingredientId: ingredient.id,
+                quantity: ingredient.quantity,
+                unit: ingredient.unit,
+              }))
+            )
+        }
+      })
+    )
   })
