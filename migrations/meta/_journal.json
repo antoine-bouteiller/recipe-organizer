@@ -10,10 +10,24 @@
       "breakpoints": true
     },
     {
-      "idx": 0,
+      "idx": 1,
       "version": "6",
       "when": 1753967043071,
       "tag": "0001_seed_ingredients",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1754158407612,
+      "tag": "0002_supreme_joseph",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1755607622545,
+      "tag": "0003_steady_captain_cross",
       "breakpoints": true
     }
   ]

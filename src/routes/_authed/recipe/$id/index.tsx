@@ -1,22 +1,30 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getRecipe } from '@/features/recipe/api/get-one'
-import { getFileUrl } from '@/lib/s3.client'
+import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
 import { z } from 'zod'
 
-export const Route = createFileRoute('/recipe/$id/')({
+export const Route = createFileRoute('/_authed/recipe/$id/')({
   component: RecipePage,
-  loader: async ({ params }) => {
+  loader: async ({ params, context }) => {
     const { id } = z.object({ id: z.coerce.number() }).parse(params)
 
-    const recipe = await getRecipe({ data: id })
-
-    return { recipe }
+    await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
   },
 })
 
 export default function RecipePage() {
-  const { recipe } = Route.useLoaderData()
+  const { id } = Route.useParams()
+  const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </div>
+    )
+  }
 
   if (!recipe) {
     return notFound()
@@ -26,7 +34,7 @@ export default function RecipePage() {
     <>
       <div className="mb-8 w-full">
         <div className="mb-6 h-64 w-full overflow-hidden rounded-lg md:h-80 flex items-center justify-center">
-          <img src={getFileUrl(recipe.image)} alt={recipe.name} className="object-cover w-full " />
+          <img src={recipe.image} alt={recipe.name} className="object-cover w-full " />
         </div>
         <h1 className="text-center text-3xl font-bold md:text-4xl">{recipe.name}</h1>
       </div>

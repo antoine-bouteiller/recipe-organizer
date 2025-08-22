@@ -9,6 +9,6 @@ export const deleteRecipe = createServerFn({
   response: 'data',
 })
   .validator(z.number())
-  .handler(async ({ data }) => {
-    return await getDb().delete(recipes).where(eq(recipes.id, data)).returning()
-  })
+  .handler(
+    async ({ data }) => await getDb().delete(recipes).where(eq(recipes.id, data)).returning()
+  )

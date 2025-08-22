@@ -31,7 +31,7 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
   })
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div onClick={(event) => event.stopPropagation()}>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger
           asChild

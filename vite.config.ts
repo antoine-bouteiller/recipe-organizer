@@ -5,7 +5,7 @@ import viteReact from '@vitejs/plugin-react-oxc'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
 
-export default defineConfig({
+const viteConfig = defineConfig({
   server: {
     port: 3000,
     watch: {
@@ -19,3 +19,5 @@ export default defineConfig({
     tailwindcss(),
   ],
 })
+
+export default viteConfig

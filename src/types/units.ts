@@ -1,3 +1,3 @@
-export const units = ['kg', 'l', 'CàC', 'CàS'] as const
+export const units = ['kg', 'g', 'l', 'ml', 'CàC', 'CàS'] as const
 
 export type Unit = (typeof units)[number]

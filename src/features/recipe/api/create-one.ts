@@ -1,31 +1,41 @@
 import { getDb } from '@/lib/db'
 import { recipes, recipeSections, sectionIngredients } from '@/lib/db/schema'
-import { uploadFile } from '@/lib/s3.server'
+import { uploadFile } from '@/lib/r2'
 import { units } from '@/types/units'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-export const recipeSchema = z.object({
+const recipeSchema = z.object({
   name: z.string().min(2, {
     message: 'Le nom de la recette doit contenir au moins 2 caractères.',
   }),
   steps: z.string(),
   sections: z.array(
-    z.object({
-      name: z.string().optional(),
-      ingredients: z.array(
-        z.object({
-          id: z.coerce.number().min(1, { message: "L'ingrédient est requis" }),
-          quantity: z.number().min(1, { message: 'La quantité est requise' }),
-          unit: z.enum(units).optional(),
-        })
-      ),
-    })
+    z.union([
+      z.object({
+        name: z.string().optional(),
+        ingredients: z.array(
+          z.object({
+            id: z.coerce.number().min(1, { message: "L'ingrédient est requis" }),
+            quantity: z.number().positive({ message: 'La quantité est requise' }),
+            unit: z.enum(units).optional(),
+          })
+        ),
+      }),
+      z.object({
+        name: z.string().optional(),
+        recipeId: z.coerce.number().optional(),
+        ratio: z.number().positive({ message: 'Le ratio est requis' }),
+      }),
+    ])
   ),
   image: z.instanceof(File, { message: "L'image est requise" }),
 })
 
-export const createRecipe = createServerFn({
+type RecipeFormValues = z.infer<typeof recipeSchema>
+type RecipeFormInput = z.input<typeof recipeSchema>
+
+const createRecipe = createServerFn({
   method: 'POST',
 })
   .validator((formData: FormData) => {
@@ -47,27 +57,39 @@ export const createRecipe = createServerFn({
       .returning({ id: recipes.id })
 
     await Promise.all(
-      sections.map(async (section) => {
-        const [createdSection] = await getDb()
-          .insert(recipeSections)
-          .values({
+      sections.map(async (section, index) => {
+        if ('recipeId' in section) {
+          await getDb().insert(recipeSections).values({
             recipeId: createdRecipe.id,
+            subRecipeId: section.recipeId,
             name: section.name,
+            ratio: section.ratio,
           })
-          .returning()
+        } else if ('ingredients' in section) {
+          const [createdSection] = await getDb()
+            .insert(recipeSections)
+            .values({
+              recipeId: createdRecipe.id,
+              name: section.name,
+              isDefault: index === 0,
+            })
+            .returning()
 
-        if (section.ingredients.length > 0) {
-          await getDb()
-            .insert(sectionIngredients)
-            .values(
-              section.ingredients.map((ingredient) => ({
-                sectionId: createdSection.id,
-                ingredientId: ingredient.id,
-                quantity: ingredient.quantity,
-                unit: ingredient.unit,
-              }))
-            )
+          if (section.ingredients.length > 0) {
+            await getDb()
+              .insert(sectionIngredients)
+              .values(
+                section.ingredients.map((ingredient) => ({
+                  sectionId: createdSection.id,
+                  ingredientId: ingredient.id,
+                  quantity: ingredient.quantity,
+                  unit: ingredient.unit,
+                }))
+              )
+          }
         }
       })
     )
   })
+
+export { recipeSchema, createRecipe, type RecipeFormValues, type RecipeFormInput }

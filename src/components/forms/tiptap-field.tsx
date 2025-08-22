@@ -1,13 +1,13 @@
-'use client'
-
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { cn } from '@/lib/utils'
 import { TextStyleKit } from '@tiptap/extension-text-style'
-import { type Editor, EditorContent, useEditor, useEditorState } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
+import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
+import { StarterKit } from '@tiptap/starter-kit'
 import { BoldIcon, ItalicIcon, ListIcon, Redo2Icon, Undo2Icon, WrapTextIcon } from 'lucide-react'
-import { type Control, type FieldPath, type FieldValues, useController } from 'react-hook-form'
+import type { Control, FieldPath, FieldValues } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -21,20 +21,18 @@ interface TiptapProps<
   disabled?: boolean
 }
 
-function MenuBar({ editor }: { editor: Editor }) {
+const MenuBar = ({ editor }: { editor: Editor }) => {
   const editorState = useEditorState({
     editor,
-    selector: (ctx) => {
-      return {
-        isBold: ctx.editor.isActive('bold') ?? false,
-        canBold: ctx.editor.can().chain().toggleBold().run() ?? false,
-        isItalic: ctx.editor.isActive('italic') ?? false,
-        canItalic: ctx.editor.can().chain().toggleItalic().run() ?? false,
-        isBulletList: ctx.editor.isActive('bulletList') ?? false,
-        canUndo: ctx.editor.can().chain().undo().run() ?? false,
-        canRedo: ctx.editor.can().chain().redo().run() ?? false,
-      }
-    },
+    selector: (ctx) => ({
+      isBold: ctx.editor.isActive('bold') ?? false,
+      canBold: ctx.editor.can().chain().toggleBold().run() ?? false,
+      isItalic: ctx.editor.isActive('italic') ?? false,
+      canItalic: ctx.editor.can().chain().toggleItalic().run() ?? false,
+      isBulletList: ctx.editor.isActive('bulletList') ?? false,
+      canUndo: ctx.editor.can().chain().undo().run() ?? false,
+      canRedo: ctx.editor.can().chain().redo().run() ?? false,
+    }),
   })
 
   return (

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>Recipe Organizer — Connexion</title>
+    <style>
+      /* Better defaults for email clients */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f6f9fc;
+        color: #0f172a;
+      }
+      a {
+        color: #000000;
+        text-decoration: none;
+      }
+      .btn {
+        display: inline-block;
+        background-color: #000000;
+        color: #ffffff !important;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .btn:hover {
+        background-color: #000000;
+      }
+      .container {
+        width: 100%;
+      }
+      .content {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .card {
+        background-color: #ffffff;
+        border-radius: 14px;
+        padding: 28px;
+        border: 1px solid #e5e7eb;
+      }
+      .muted {
+        color: #475569;
+      }
+      .center {
+        text-align: center;
+      }
+      .hr {
+        border: 0;
+        border-top: 1px solid #e5e7eb;
+        margin: 24px 0;
+      }
+      .preheader {
+        display: none !important;
+        visibility: hidden;
+        opacity: 0;
+        color: transparent;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #0b1220;
+          color: #e2e8f0;
+        }
+        .card {
+          background-color: #0f172a;
+          border-color: #1f2937;
+        }
+        .muted {
+          color: #94a3b8;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="preheader">Votre lien de connexion pour Recipe Organizer.</div>
+    <table role="presentation" class="container" cellpadding="0" cellspacing="0">
+      <tr>
+        <td>
+          <div class="content">
+            <div class="center" style="margin: 8px 0 16px; font-size: 20px; font-weight: 700">
+              Recipe Organizer
+            </div>
+            <div class="card">
+              <p class="muted" style="margin: 0 0 20px">Voici votre lien de connexion.</p>
+              <div class="center" style="margin: 24px 0">
+                <a href="${loginUrl}" class="btn" target="_blank" rel="noopener">Se connecter</a>
+              </div>
+              <p class="muted" style="font-size: 14px; margin: 0 0 8px">
+                Ou copiez/collez ce lien dans votre navigateur&nbsp;:
+              </p>
+              <p style="word-break: break-all; margin: 0 0 16px">
+                <a href="${loginUrl}" target="_blank" rel="noopener">${loginUrl}</a>
+              </p>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

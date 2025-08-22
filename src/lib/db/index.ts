@@ -1,7 +1,5 @@
 import { getBindings } from '@/lib/bindings'
 import { drizzle } from 'drizzle-orm/d1'
-import * as schema from './schema'
+import schema from './schema'
 
-export function getDb() {
-  return drizzle(getBindings().DB, { schema })
-}
+export const getDb = () => drizzle(getBindings().DB, { schema })

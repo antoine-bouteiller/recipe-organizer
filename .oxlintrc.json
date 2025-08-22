@@ -4,7 +4,9 @@
   "categories": {
     "correctness": "error",
     "suspicious": "error",
-    "perf": "error"
+    "perf": "error",
+    "pedantic": "error",
+    "style": "error"
   },
   "env": {
     "builtin": true,
@@ -32,22 +34,37 @@
     }
   ],
   "rules": {
-    "typescript/ban-ts-comment": [
-      "error",
-      {
-        "minimumDescriptionLength": 10
-      }
-    ],
+    "no-children-prop": "off",
+
+    // restrictions
+    "default-case": "error",
+    "no-empty": "error",
+    "no-empty-function": "error",
     "no-console": "error",
     "no-unused-vars": "error",
     "no-unused-expressions": "error",
     "no-explicit-any": "error",
+    "no-non-null-assertion": "error",
+    "no-array-for-each": "error",
+    "prefer-modern-math-apis": "error",
+    "prefer-number-properties": "error",
+
+    //suspicious
     "react-in-jsx-scope": "off",
     "no-unneeded-ternary": "off",
-    "react/style-prop-object": "off",
+    "style-prop-object": "off",
+
+    // pedantic
+    "max-lines": "off",
+    "max-lines-per-function": "off",
+    "max-classes-per-file": "off",
+    "radix": "off",
+    "no-useless-undefined": "off",
+
+    //style
+    "prefer-template": "error",
     "jsx-curly-brace-presence": "error",
-    "react-hooks/rules-of-hooks": "error",
-    "unicorn/filename-case": [
+    "filename-case": [
       "error",
       {
         "cases": {
@@ -56,6 +73,12 @@
         },
         "ignore": "\\[.+\\]\\.tsx"
       }
-    ]
+    ],
+    "prefer-default-export": "off",
+    "no-magic-numbers": "off",
+    "sort-imports": "off",
+    "sort-keys": "off",
+    "no-ternary": "off",
+    "no-duplicate-imports": "off"
   }
 }

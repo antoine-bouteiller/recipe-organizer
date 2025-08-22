@@ -1,11 +1,6 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { NumberInput } from '@/components/ui/number-input'
-import {
-  type Control,
-  type ControllerRenderProps,
-  type FieldPath,
-  type FieldValues,
-} from 'react-hook-form'
+import type { Control, ControllerRenderProps, FieldPath, FieldValues } from 'react-hook-form'
 
 interface NumberFieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -21,7 +16,7 @@ interface NumberFieldProps<
   decimalScale?: number
 }
 
-export function NumberField<
+export const NumberField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
@@ -33,29 +28,27 @@ export function NumberField<
   min,
   max,
   decimalScale,
-}: NumberFieldProps<TFieldValues, TName>) {
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }: { field: ControllerRenderProps<TFieldValues, TName> }) => (
-        <FormItem>
-          {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
-          <FormControl>
-            <NumberInput
-              className="text-base"
-              placeholder={placeholder}
-              min={min}
-              max={max}
-              decimalScale={decimalScale}
-              onValueChange={field.onChange}
-              value={field.value}
-              disabled={disabled}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  )
-}
+}: NumberFieldProps<TFieldValues, TName>) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }: { field: ControllerRenderProps<TFieldValues, TName> }) => (
+      <FormItem>
+        {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
+        <FormControl>
+          <NumberInput
+            className="text-base"
+            placeholder={placeholder}
+            min={min}
+            max={max}
+            decimalScale={decimalScale}
+            onValueChange={field.onChange}
+            value={field.value}
+            disabled={disabled}
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+)

@@ -2,9 +2,11 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { NumericFormat, type NumericFormatProps } from 'react-number-format'
+import type { ComponentProps } from 'react'
+import { NumericFormat } from 'react-number-format'
+import type { NumericFormatProps } from 'react-number-format'
 
-export interface NumberInputProps extends Omit<NumericFormatProps, 'value' | 'onValueChange'> {
+interface NumberInputProps extends Omit<NumericFormatProps, 'value' | 'onValueChange'> {
   stepper?: number
   thousandSeparator?: string
   placeholder?: string
@@ -19,7 +21,7 @@ export interface NumberInputProps extends Omit<NumericFormatProps, 'value' | 'on
   decimalScale?: number
 }
 
-export const NumberInput = ({
+const NumberInput = ({
   stepper,
   thousandSeparator,
   placeholder,
@@ -48,20 +50,20 @@ export const NumberInput = ({
   }, [stepper, min])
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (document.activeElement === (ref as React.RefObject<HTMLInputElement>).current) {
-        if (e.key === 'ArrowUp') {
+        if (event.key === 'ArrowUp') {
           handleIncrement()
-        } else if (e.key === 'ArrowDown') {
+        } else if (event.key === 'ArrowDown') {
           handleDecrement()
         }
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    globalThis.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      globalThis.removeEventListener('keydown', handleKeyDown)
     }
   }, [handleIncrement, handleDecrement, ref])
 
@@ -83,10 +85,16 @@ export const NumberInput = ({
     if (value !== undefined) {
       if (value < min) {
         setValue(min)
-        ;(ref as React.RefObject<HTMLInputElement>).current!.value = String(min)
+
+        if (ref.current) {
+          ref.current.value = String(min)
+        }
       } else if (value > max) {
         setValue(max)
-        ;(ref as React.RefObject<HTMLInputElement>).current!.value = String(max)
+
+        if (ref.current) {
+          ref.current.value = String(max)
+        }
       }
     }
   }
@@ -138,18 +146,19 @@ export const NumberInput = ({
   )
 }
 
-function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        'relative flex h-9 w-full min-w-0 [appearance:textfield] rounded-md rounded-r-none border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-        'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-        'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
-        className
-      )}
-      {...props}
-    />
-  )
-}
+const Input = ({ className, type, ...props }: ComponentProps<'input'>) => (
+  <input
+    type={type}
+    data-slot="input"
+    className={cn(
+      'relative flex h-9 w-full min-w-0 [appearance:textfield] rounded-md rounded-r-none border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+      'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+      'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+      className
+    )}
+    {...props}
+  />
+)
+
+export type { NumberInputProps }
+export { NumberInput }

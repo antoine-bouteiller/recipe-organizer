@@ -3,7 +3,8 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { cn } from '@/lib/utils'
 import { CommandIcon, UploadIcon } from 'lucide-react'
 import { useCallback, useEffect, useId, useState } from 'react'
-import { type Control, type FieldPath, type FieldValues, useController } from 'react-hook-form'
+import type { Control, FieldPath, FieldValues } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 
 interface ImageFieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -30,11 +31,16 @@ const isImageUrl = (url: string): boolean => {
   }
 }
 
-export function ImageField<
+export const ImageField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({ control, name, label, disabled }: ImageFieldProps<TFieldValues, TName>) {
-  const [preview, setPreview] = useState<string | null>(null)
+>({
+  control,
+  name,
+  label,
+  disabled,
+}: ImageFieldProps<TFieldValues, TName>) => {
+  const [preview, setPreview] = useState<string>()
   const [isMac, setIsMac] = useState(false)
 
   const { field } = useController({ control, name })
@@ -62,19 +68,23 @@ export function ImageField<
 
   const handlePaste = useCallback(
     async (event: ClipboardEvent) => {
-      const activeElement = document.activeElement
+      const { activeElement } = document
       const isTextInput =
         activeElement &&
         (activeElement.tagName === 'INPUT' ||
           activeElement.tagName === 'TEXTAREA' ||
           activeElement.hasAttribute('contenteditable'))
 
-      if (isTextInput) return
+      if (isTextInput) {
+        return
+      }
 
-      const clipboardData = event.clipboardData
-      if (!clipboardData) return
+      const { clipboardData } = event
+      if (!clipboardData) {
+        return
+      }
 
-      const files = Array.from(clipboardData.files)
+      const files = [...clipboardData.files]
       const imageFile = files.find((file) => file.type.startsWith('image/'))
 
       if (imageFile) {
@@ -98,7 +108,9 @@ export function ImageField<
             field.onChange(file)
             setPreview(URL.createObjectURL(file))
           }
-        } catch {}
+        } catch {
+          // do nothing
+        }
       }
     },
     [field]

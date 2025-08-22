@@ -1,12 +1,10 @@
-type Env = {
+interface Env {
   DB: D1Database
-  S3_ACCESS_KEY: string
-  S3_SECRET_KEY: string
-  S3_URL: string
   R2_BUCKET: R2Bucket
+  RESEND_API_KEY: string
 }
 
-let cachedEnv: Env | null = null
+let cachedEnv: Env | undefined = undefined
 
 // This gets called once at startup when running locally
 const initDevEnv = async () => {
@@ -23,7 +21,7 @@ if (import.meta.env.DEV) {
  * Will only work when being accessed on the server. Obviously, CF bindings are not available in the browser.
  * @returns
  */
-export function getBindings(): Env {
+export const getBindings = (): Env => {
   if (import.meta.env.DEV) {
     if (!cachedEnv) {
       throw new Error('Dev bindings not initialized yet. Call initDevEnv() first.')

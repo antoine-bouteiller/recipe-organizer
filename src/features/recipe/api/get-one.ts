@@ -3,8 +3,11 @@ import { z } from 'zod'
 import { getDb } from '@/lib/db'
 import { eq } from 'drizzle-orm'
 import { recipes } from '@/lib/db/schema'
+import { getFileUrl } from '@/lib/r2'
+import { notFound } from '@tanstack/react-router'
+import { queryOptions } from '@tanstack/react-query'
 
-export const getRecipe = createServerFn({
+const getRecipe = createServerFn({
   method: 'GET',
   response: 'data',
 })
@@ -25,5 +28,21 @@ export const getRecipe = createServerFn({
         },
       },
     })
-    return result
+
+    if (!result) {
+      throw notFound()
+    }
+
+    return {
+      ...result,
+      image: getFileUrl(result.image),
+    }
   })
+
+const getRecipeQueryOptions = (id: string | number) =>
+  queryOptions({
+    queryKey: ['recipes', id.toString()],
+    queryFn: () => getRecipe({ data: typeof id === 'string' ? Number.parseInt(id) : id }),
+  })
+
+export { getRecipe, getRecipeQueryOptions }

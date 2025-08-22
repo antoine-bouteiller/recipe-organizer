@@ -1,14 +1,37 @@
 /// <reference types="vite/client" />
 import { Toaster } from '@/components/ui/sonner'
-import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import type { QueryClient } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from '@tanstack/react-router'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
+import type { User } from 'better-auth'
 import appCss from '../styles/app.css?url'
+import { getAuthUser } from '@/features/auth/api/get-auth-user'
 
-export const Route = createRootRoute({
+const RootComponent = () => (
+  <html lang="fr">
+    <head>
+      <HeadContent />
+    </head>
+    <body>
+      <Toaster />
+      <Outlet />
+      <TanStackRouterDevtools position="bottom-right" />
+      <ReactQueryDevtools buttonPosition="bottom-left" />
+      <Scripts />
+    </body>
+  </html>
+)
+
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+  authUser: User | undefined
+}>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: 'utf8',
       },
       {
         name: 'viewport',
@@ -20,21 +43,10 @@ export const Route = createRootRoute({
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
   }),
+  beforeLoad: async () => {
+    const authUser = await getAuthUser()
+    return { authUser }
+  },
   component: RootComponent,
   notFoundComponent: () => <div>Not found</div>,
 })
-
-function RootComponent() {
-  return (
-    <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <Toaster />
-        <Outlet />
-        <Scripts />
-      </body>
-    </html>
-  )
-}
