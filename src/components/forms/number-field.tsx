@@ -33,7 +33,7 @@ export const NumberField = <
     control={control}
     name={name}
     render={({ field }: { field: ControllerRenderProps<TFieldValues, TName> }) => (
-      <FormItem>
+      <FormItem className="flex-1 w-full">
         {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
         <FormControl>
           <NumberInput

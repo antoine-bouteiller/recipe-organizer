@@ -100,7 +100,7 @@ export default function RecipeSection({
                   <TrashIcon className="h-4 w-4" />
                 </Button>
               </div>
-              <Separator />
+              <Separator className="md:hidden" />
             </Fragment>
           ))}
           <Button

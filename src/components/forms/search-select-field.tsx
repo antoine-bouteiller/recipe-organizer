@@ -31,12 +31,16 @@ const SearchSelectField = <
     control={control}
     name={name}
     render={({ field, fieldState }) => (
-      <FormItem className="w-full">
+      <FormItem className="flex-1 w-full">
         <SearchSelect
           options={options}
           value={field.value}
           onChange={(option) => {
-            field.onChange(option.value)
+            if (option.value === field.value) {
+              field.onChange(undefined)
+            } else {
+              field.onChange(option.value)
+            }
           }}
           error={fieldState.error?.message}
         />
