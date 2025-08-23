@@ -32,15 +32,17 @@ export default function RecipePage() {
 
   return (
     <>
-      <div className="mb-8 w-full">
-        <div className="mb-6 h-64 w-full overflow-hidden rounded-lg md:h-80 flex items-center justify-center">
-          <img src={recipe.image} alt={recipe.name} className="object-cover w-full " />
+      <CardHeader className="p-0">
+        <div className="mb-6 w-full overflow-hidden md:rounded-t-lg flex items-center justify-center aspect-16/6">
+          <img src={recipe.image} alt={recipe.name} className="object-cover w-full" />
         </div>
-        <h1 className="text-center text-3xl font-bold md:text-4xl">{recipe.name}</h1>
-      </div>
+        <div className="px-6">
+          <h1 className="text-3xl font-bold md:text-4xl">{recipe.name}</h1>
+        </div>
+      </CardHeader>
 
-      <div className="grid gap-8 md:grid-cols-3">
-        <Card>
+      <CardContent className="grid md:grid-cols-3 gap-4 md:gap-8">
+        <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="text-xl">Ingrédients</CardTitle>
           </CardHeader>
@@ -53,13 +55,15 @@ export default function RecipePage() {
                   {section.sectionIngredients.length > 0 && (
                     <ul className="space-y-2">
                       {section.sectionIngredients.map((sectionIngredient) => (
-                        <li key={sectionIngredient.id} className="flex items-center gap-2">
-                          <span className="font-medium">
+                        <li
+                          key={sectionIngredient.id}
+                          className="flex items-center gap-2 justify-between"
+                        >
+                          <div>{sectionIngredient.ingredient.name}</div>
+                          <div className="font-medium">
                             {sectionIngredient.quantity}
                             {sectionIngredient.unit && ` ${sectionIngredient.unit}`}
-                          </span>
-                          <span className="text-muted-foreground">•</span>
-                          <span>{sectionIngredient.ingredient.name}</span>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -79,7 +83,7 @@ export default function RecipePage() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 shadow-none">
           <CardHeader>
             <CardTitle className="text-xl">Préparation</CardTitle>
           </CardHeader>
@@ -90,7 +94,7 @@ export default function RecipePage() {
             />
           </CardContent>
         </Card>
-      </div>
+      </CardContent>
     </>
   )
 }

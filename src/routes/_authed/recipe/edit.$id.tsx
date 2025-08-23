@@ -2,30 +2,19 @@ import { ImageField } from '@/components/forms/image-field'
 import { TextField } from '@/components/forms/text-field'
 import TiptapField from '@/components/forms/tiptap-field'
 import { Button } from '@/components/ui/button'
-import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormLabel } from '@/components/ui/form'
-import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { FormLabel } from '@/components/ui/form'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
-import type { RecipeFormValues } from '@/features/recipe/api/create'
-import { createRecipe, recipeSchema } from '@/features/recipe/api/create'
-import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import { recipeSchema, type RecipeFormValues, createRecipe } from '@/features/recipe/api/create'
 import RecipeSection from '@/features/recipe/recipe-section'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Loader2, PlusIcon } from 'lucide-react'
-import { useCallback, useTransition } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { PlusIcon, Loader2 } from 'lucide-react'
+import { useTransition, useCallback } from 'react'
+import { useForm, useFieldArray, Form } from 'react-hook-form'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/_authed/recipe/new')({
-  component: NewRecipePage,
-  loader: ({ context }) => {
-    context.queryClient.ensureQueryData(getAllIngredientsQueryOptions())
-    context.queryClient.ensureQueryData(getAllRecipesQueryOptions())
-  },
-})
-
-export default function NewRecipePage() {
+const EditRecipePage = () => {
   const router = useRouter()
   const [isLoading, startTransition] = useTransition()
 
@@ -80,8 +69,8 @@ export default function NewRecipePage() {
   })
 
   return (
-    <>
-      <CardHeader className="text-center pt-6">
+    <Card className="shadow-xl">
+      <CardHeader className="text-center">
         <CardTitle className="text-3xl font-bold">Nouvelle Recette</CardTitle>
         <CardDescription className="text-lg">
           Ajoutez votre délicieuse recette à la collection
@@ -168,6 +157,10 @@ export default function NewRecipePage() {
           </form>
         </Form>
       </CardContent>
-    </>
+    </Card>
   )
 }
+
+export const Route = createFileRoute('/_authed/recipe/edit/$id')({
+  component: EditRecipePage,
+})

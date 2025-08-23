@@ -24,6 +24,8 @@ export const auth = betterAuth({
             message: "Vous n'avez pas accès à cette application.",
           })
         }
+
+        console.log('sendMagicLink', email, url)
         const html = formatEmail(verifyEmail, { loginUrl: url })
         await sendEmail(email, 'Connexion à votre compte', html)
       },

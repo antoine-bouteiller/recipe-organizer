@@ -60,6 +60,7 @@
     "max-classes-per-file": "off",
     "radix": "off",
     "no-useless-undefined": "off",
+    "id-length": "off",
 
     //style
     "prefer-template": "error",

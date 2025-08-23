@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import DeleteRecipe from '@/features/recipe/delete-recipe'
 import type { Recipe } from '@/types/recipe'
 import { Link } from '@tanstack/react-router'
 
@@ -18,7 +17,6 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           <div className="relative h-36 w-full overflow-hidden">
             <img src={recipe.image} alt={recipe.name} className="object-cover" />
           </div>
-          <DeleteRecipe recipeId={recipe.id} />
         </CardHeader>
         <CardContent className="px-6 pb-2">
           <CardTitle className="mb-2 line-clamp-2 text-xl font-bold">{recipe.name}</CardTitle>
