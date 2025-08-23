@@ -24,4 +24,7 @@
       "bucket_name": "recipe-organizer",
     },
   ],
+  "images": {
+    "binding": "IMAGES",
+  },
 }

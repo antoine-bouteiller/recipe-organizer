@@ -114,7 +114,7 @@ export default function NewRecipePage() {
                   onDelete={index === 0 ? undefined : () => remove(index)}
                 />
               ))}
-              <div className="flex w-full gap-2">
+              <div className="flex w-full gap-2 md:flex-row flex-col">
                 <Button
                   type="button"
                   variant="outline"
@@ -126,7 +126,7 @@ export default function NewRecipePage() {
                     })
                   }}
                   size="sm"
-                  className="flex-1"
+                  className="md:flex-1"
                 >
                   Ajouter une section <PlusIcon className="h-4 w-4" />
                 </Button>

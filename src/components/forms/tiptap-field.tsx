@@ -42,34 +42,34 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
         disabled={!editorState.canBold}
         type="button"
       >
-        <BoldIcon className="h-4 w-4" />
+        <BoldIcon className="md:size-4 size-3" />
       </Button>
       <Button
         onClick={editor.chain().focus().toggleItalic().run}
         disabled={!editorState.canItalic}
         type="button"
       >
-        <ItalicIcon className="h-4 w-4" />
+        <ItalicIcon className="md:size-4 size-3" />
       </Button>
       <Button onClick={editor.chain().focus().setParagraph().run} type="button">
-        <WrapTextIcon className="h-4 w-4" />
+        <WrapTextIcon className="md:size-4 size-3" />
       </Button>
       <Button onClick={editor.chain().focus().toggleBulletList().run} type="button">
-        <ListIcon className="h-4 w-4" />
+        <ListIcon className="md:size-4 size-3" />
       </Button>
       <Button
         onClick={editor.chain().focus().undo().run}
         disabled={!editorState.canUndo}
         type="button"
       >
-        <Undo2Icon className="h-4 w-4" />
+        <Undo2Icon className="md:size-4 size-3" />
       </Button>
       <Button
         onClick={editor.chain().focus().redo().run}
         disabled={!editorState.canRedo}
         type="button"
       >
-        <Redo2Icon className="h-4 w-4" />
+        <Redo2Icon className="md:size-4 size-3" />
       </Button>
     </div>
   )

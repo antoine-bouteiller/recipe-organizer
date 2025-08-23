@@ -31,7 +31,7 @@ const SearchSelectField = <
     control={control}
     name={name}
     render={({ field, fieldState }) => (
-      <FormItem>
+      <FormItem className="w-full">
         <SearchSelect
           options={options}
           value={field.value}

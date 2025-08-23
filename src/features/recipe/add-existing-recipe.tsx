@@ -35,7 +35,7 @@ export default function AddExistingRecipe({ onSelect }: AddExistingRecipeProps) 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className="flex-1">
+        <Button type="button" variant="outline" size="sm" className="md:flex-1">
           Ajouter une recette existante
         </Button>
       </DialogTrigger>

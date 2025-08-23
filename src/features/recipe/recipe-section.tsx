@@ -2,12 +2,13 @@ import { NumberField } from '@/components/forms/number-field'
 import { SearchSelectField } from '@/components/forms/search-select-field'
 import { TextField } from '@/components/forms/text-field'
 import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
 import type { RecipeFormInput, RecipeFormValues } from '@/features/recipe/api/create-one'
 import { units } from '@/types/units'
 import { useQuery } from '@tanstack/react-query'
 import { PlusIcon, TrashIcon } from 'lucide-react'
-import { useMemo } from 'react'
+import { Fragment, useMemo } from 'react'
 import { useFieldArray } from 'react-hook-form'
 import type { UseFormReturn } from 'react-hook-form'
 
@@ -72,32 +73,35 @@ export default function RecipeSection({
       ) : (
         <div className="flex flex-col gap-2 pt-2">
           {fields.map((field, ingredientIndex) => (
-            <div key={field.id} className="flex w-full items-start justify-between gap-2">
-              <SearchSelectField
-                control={form.control}
-                name={`sections.${index}.ingredients.${ingredientIndex}.id`}
-                options={ingredientsOptions}
-              />
-              <NumberField
-                control={form.control}
-                name={`sections.${index}.ingredients.${ingredientIndex}.quantity`}
-                min={0}
-                decimalScale={1}
-              />
-              <SearchSelectField
-                control={form.control}
-                name={`sections.${index}.ingredients.${ingredientIndex}.unit`}
-                options={unitsOptions}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => remove(ingredientIndex)}
-              >
-                <TrashIcon className="h-4 w-4" />
-              </Button>
-            </div>
+            <Fragment key={field.id}>
+              <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col">
+                <SearchSelectField
+                  control={form.control}
+                  name={`sections.${index}.ingredients.${ingredientIndex}.id`}
+                  options={ingredientsOptions}
+                />
+                <NumberField
+                  control={form.control}
+                  name={`sections.${index}.ingredients.${ingredientIndex}.quantity`}
+                  min={0}
+                  decimalScale={1}
+                />
+                <SearchSelectField
+                  control={form.control}
+                  name={`sections.${index}.ingredients.${ingredientIndex}.unit`}
+                  options={unitsOptions}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => remove(ingredientIndex)}
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </Button>
+              </div>
+              <Separator />
+            </Fragment>
           ))}
           <Button
             type="button"

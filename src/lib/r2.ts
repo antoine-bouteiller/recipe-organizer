@@ -4,9 +4,20 @@ import { randomUUID } from 'node:crypto'
 const uploadFile = async (file: File) => {
   const key = randomUUID()
 
-  const arrayBuffer = await file.arrayBuffer()
+  const imageStream = file.stream()
 
-  await getBindings().R2_BUCKET.put(key, arrayBuffer)
+  const optimizedImage = await getBindings()
+    .IMAGES.input(imageStream)
+    .transform({
+      width: 1024,
+    })
+    .output({ format: 'image/webp', quality: 80 })
+
+  // R2 requires known-length bodies for uploads; convert to ArrayBuffer
+  const optimizedBuffer = await optimizedImage.response().arrayBuffer()
+  await getBindings().R2_BUCKET.put(key, optimizedBuffer, {
+    httpMetadata: { contentType: optimizedImage.contentType() },
+  })
 
   return key
 }
