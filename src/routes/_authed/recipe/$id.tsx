@@ -5,7 +5,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { z } from 'zod'
 
-export const Route = createFileRoute('/_authed/recipe/$id/')({
+export const Route = createFileRoute('/_authed/recipe/$id')({
   component: RecipePage,
   loader: async ({ params, context }) => {
     const { id } = z.object({ id: z.coerce.number() }).parse(params)

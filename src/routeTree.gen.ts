@@ -16,7 +16,8 @@ import { Route as AuthedIndexRouteImport } from './routes/_authed/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthedRecipeRouteImport } from './routes/_authed/recipe'
 import { Route as AuthedRecipeNewRouteImport } from './routes/_authed/recipe/new'
-import { Route as AuthedRecipeIdIndexRouteImport } from './routes/_authed/recipe/$id/index'
+import { Route as AuthedRecipeIdRouteImport } from './routes/_authed/recipe/$id'
+import { ServerRoute as ApiImageIdServerRouteImport } from './routes/api/image/$id'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -45,10 +46,15 @@ const AuthedRecipeNewRoute = AuthedRecipeNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AuthedRecipeRoute,
 } as any)
-const AuthedRecipeIdIndexRoute = AuthedRecipeIdIndexRouteImport.update({
-  id: '/$id/',
-  path: '/$id/',
+const AuthedRecipeIdRoute = AuthedRecipeIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
   getParentRoute: () => AuthedRecipeRoute,
+} as any)
+const ApiImageIdServerRoute = ApiImageIdServerRouteImport.update({
+  id: '/api/image/$id',
+  path: '/api/image/$id',
+  getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
@@ -60,15 +66,15 @@ export interface FileRoutesByFullPath {
   '/recipe': typeof AuthedRecipeRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/': typeof AuthedIndexRoute
+  '/recipe/$id': typeof AuthedRecipeIdRoute
   '/recipe/new': typeof AuthedRecipeNewRoute
-  '/recipe/$id': typeof AuthedRecipeIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/recipe': typeof AuthedRecipeRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/': typeof AuthedIndexRoute
+  '/recipe/$id': typeof AuthedRecipeIdRoute
   '/recipe/new': typeof AuthedRecipeNewRoute
-  '/recipe/$id': typeof AuthedRecipeIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,22 +82,22 @@ export interface FileRoutesById {
   '/_authed/recipe': typeof AuthedRecipeRouteWithChildren
   '/auth/login': typeof AuthLoginRoute
   '/_authed/': typeof AuthedIndexRoute
+  '/_authed/recipe/$id': typeof AuthedRecipeIdRoute
   '/_authed/recipe/new': typeof AuthedRecipeNewRoute
-  '/_authed/recipe/$id/': typeof AuthedRecipeIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/recipe' | '/auth/login' | '/' | '/recipe/new' | '/recipe/$id'
+  fullPaths: '/recipe' | '/auth/login' | '/' | '/recipe/$id' | '/recipe/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/recipe' | '/auth/login' | '/' | '/recipe/new' | '/recipe/$id'
+  to: '/recipe' | '/auth/login' | '/' | '/recipe/$id' | '/recipe/new'
   id:
     | '__root__'
     | '/_authed'
     | '/_authed/recipe'
     | '/auth/login'
     | '/_authed/'
+    | '/_authed/recipe/$id'
     | '/_authed/recipe/new'
-    | '/_authed/recipe/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,24 +106,28 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/image/$id': typeof ApiImageIdServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/image/$id': typeof ApiImageIdServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/image/$id': typeof ApiImageIdServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/auth/$'
+  fullPaths: '/api/auth/$' | '/api/image/$id'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/auth/$'
-  id: '__root__' | '/api/auth/$'
+  to: '/api/auth/$' | '/api/image/$id'
+  id: '__root__' | '/api/auth/$' | '/api/image/$id'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
+  ApiImageIdServerRoute: typeof ApiImageIdServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -157,17 +167,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRecipeNewRouteImport
       parentRoute: typeof AuthedRecipeRoute
     }
-    '/_authed/recipe/$id/': {
-      id: '/_authed/recipe/$id/'
+    '/_authed/recipe/$id': {
+      id: '/_authed/recipe/$id'
       path: '/$id'
       fullPath: '/recipe/$id'
-      preLoaderRoute: typeof AuthedRecipeIdIndexRouteImport
+      preLoaderRoute: typeof AuthedRecipeIdRouteImport
       parentRoute: typeof AuthedRecipeRoute
     }
   }
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/api/image/$id': {
+      id: '/api/image/$id'
+      path: '/api/image/$id'
+      fullPath: '/api/image/$id'
+      preLoaderRoute: typeof ApiImageIdServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -179,13 +196,13 @@ declare module '@tanstack/react-start/server' {
 }
 
 interface AuthedRecipeRouteChildren {
+  AuthedRecipeIdRoute: typeof AuthedRecipeIdRoute
   AuthedRecipeNewRoute: typeof AuthedRecipeNewRoute
-  AuthedRecipeIdIndexRoute: typeof AuthedRecipeIdIndexRoute
 }
 
 const AuthedRecipeRouteChildren: AuthedRecipeRouteChildren = {
+  AuthedRecipeIdRoute: AuthedRecipeIdRoute,
   AuthedRecipeNewRoute: AuthedRecipeNewRoute,
-  AuthedRecipeIdIndexRoute: AuthedRecipeIdIndexRoute,
 }
 
 const AuthedRecipeRouteWithChildren = AuthedRecipeRoute._addFileChildren(
@@ -214,6 +231,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
+  ApiImageIdServerRoute: ApiImageIdServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)
