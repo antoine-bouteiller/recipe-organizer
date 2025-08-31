@@ -16,6 +16,7 @@ export const ServerRoute = createServerFileRoute('/api/image/$id').methods({
     return new Response(file.body, {
       headers: {
         'Content-Type': file.httpMetadata?.contentType ?? 'image/webp',
+        'Cache-Control': 'public, max-age=31536000, immutable',
       },
     })
   },
