@@ -1,53 +1,39 @@
-import { FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { FormItem, FormMessage } from '@/components/forms/form'
 import { SearchSelect } from '@/components/ui/searchselect'
-import type { Control, FieldPath, FieldValues } from 'react-hook-form'
+import { useFieldContext } from '@/hooks/use-form-context'
 
 interface Option {
   label: string
   value: string
 }
 
-interface SearchSelectFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>
-  name: TName
+interface SearchSelectFieldProps {
   label?: string
   placeholder?: string
   disabled?: boolean
   options: Option[]
 }
 
-const SearchSelectField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  control,
-  name,
-  options,
-}: SearchSelectFieldProps<TFieldValues, TName>) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field, fieldState }) => (
-      <FormItem className="flex-1 w-full">
-        <SearchSelect
-          options={options}
-          value={field.value}
-          onChange={(option) => {
-            if (option.value === field.value) {
-              field.onChange(undefined)
-            } else {
-              field.onChange(option.value)
-            }
-          }}
-          error={fieldState.error?.message}
-        />
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-)
+const SearchSelectField = ({ options }: SearchSelectFieldProps) => {
+  const field = useFieldContext<string | undefined>()
+
+  return (
+    <FormItem className="flex-1 w-full">
+      <SearchSelect
+        options={options}
+        value={field.store.state.value}
+        onChange={(option) => {
+          if (option.value === field.store.state.value) {
+            field.handleChange(undefined)
+          } else {
+            field.handleChange(option.value)
+          }
+        }}
+        error={field.errors.length > 0 ? field.errors[0].message : undefined}
+      />
+      <FormMessage />
+    </FormItem>
+  )
+}
 
 export { SearchSelectField, type Option, type SearchSelectFieldProps }

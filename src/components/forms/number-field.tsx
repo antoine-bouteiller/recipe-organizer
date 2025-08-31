@@ -1,13 +1,8 @@
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
 import { NumberInput } from '@/components/ui/number-input'
-import type { Control, ControllerRenderProps, FieldPath, FieldValues } from 'react-hook-form'
+import { useFieldContext } from '@/hooks/use-form-context'
 
-interface NumberFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>
-  name: TName
+interface NumberFieldProps {
   label?: string
   placeholder?: string
   disabled?: boolean
@@ -16,39 +11,32 @@ interface NumberFieldProps<
   decimalScale?: number
 }
 
-export const NumberField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  control,
-  name,
+export const NumberField = ({
   label,
   placeholder,
   disabled,
   min,
   max,
   decimalScale,
-}: NumberFieldProps<TFieldValues, TName>) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field }: { field: ControllerRenderProps<TFieldValues, TName> }) => (
-      <FormItem className="flex-1 w-full">
-        {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
-        <FormControl>
-          <NumberInput
-            className="text-base"
-            placeholder={placeholder}
-            min={min}
-            max={max}
-            decimalScale={decimalScale}
-            onValueChange={field.onChange}
-            value={field.value}
-            disabled={disabled}
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-)
+}: NumberFieldProps) => {
+  const { state, handleChange } = useFieldContext<number | undefined>()
+
+  return (
+    <FormItem className="flex-1 w-full">
+      {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
+      <FormControl>
+        <NumberInput
+          className="text-base"
+          placeholder={placeholder}
+          min={min}
+          max={max}
+          decimalScale={decimalScale}
+          onValueChange={handleChange}
+          value={state.value}
+          disabled={disabled}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )
+}

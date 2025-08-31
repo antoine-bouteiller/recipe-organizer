@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { getDb } from '@/lib/db'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { recipes } from '@/lib/db/schema'
 import { getFileUrl } from '@/lib/r2'
 import { notFound } from '@tanstack/react-router'
@@ -23,8 +23,21 @@ const getRecipe = createServerFn({
                 ingredient: true,
               },
             },
-            subRecipe: true,
+            subRecipe: {
+              with: {
+                sections: {
+                  with: {
+                    sectionIngredients: {
+                      with: {
+                        ingredient: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
+          orderBy: (table) => [desc(table.isDefault)],
         },
       },
     })
@@ -38,6 +51,9 @@ const getRecipe = createServerFn({
       image: getFileUrl(result.image),
     }
   })
+
+export type Recipe = Awaited<ReturnType<typeof getRecipe>>
+export type RecipeSection = Recipe['sections'][number]
 
 const getRecipeQueryOptions = (id: string | number) =>
   queryOptions({

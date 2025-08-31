@@ -1,20 +1,16 @@
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
+import DeleteRecipe from '@/features/recipe/delete-recipe'
+import { RecipeSectionIngredients } from '@/features/recipe/recipe-section'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, notFound } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
+import { createFileRoute, Link, notFound } from '@tanstack/react-router'
+import { EllipsisVerticalIcon, Loader2, PencilIcon } from 'lucide-react'
+import { Fragment } from 'react/jsx-runtime'
 import { z } from 'zod'
 
-export const Route = createFileRoute('/_authed/recipe/$id')({
-  component: RecipePage,
-  loader: async ({ params, context }) => {
-    const { id } = z.object({ id: z.coerce.number() }).parse(params)
-
-    await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
-  },
-})
-
-export default function RecipePage() {
+const RecipePage = () => {
   const { id } = Route.useParams()
   const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
 
@@ -32,6 +28,24 @@ export default function RecipePage() {
 
   return (
     <>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
+            <EllipsisVerticalIcon className="w-4 h-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto flex flex-col gap-2 p-2">
+          <Button variant="ghost" asChild>
+            <Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }}>
+              <PencilIcon className="w-4 h-4" />
+              Modifier
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <DeleteRecipe recipeId={recipe.id} />
+          </Button>
+        </PopoverContent>
+      </Popover>
       <CardHeader className="p-0">
         <div className="mb-6 w-full overflow-hidden md:rounded-t-lg flex items-center justify-center aspect-16/6">
           <img src={recipe.image} alt={recipe.name} className="object-cover w-full" />
@@ -47,37 +61,19 @@ export default function RecipePage() {
             <CardTitle className="text-xl">Ingrédients</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div className="space-y-3">
               {recipe.sections.map((section) => (
-                <div key={section.id}>
-                  {section.name && <h3 className="mb-3 text-lg font-semibold">{section.name}</h3>}
+                <Fragment key={section.id}>
+                  {section.name && <h3 className="mb-1 text-md font-semibold">{section.name}</h3>}
 
-                  {section.sectionIngredients.length > 0 && (
-                    <ul className="space-y-2">
-                      {section.sectionIngredients.map((sectionIngredient) => (
-                        <li
-                          key={sectionIngredient.id}
-                          className="flex items-center gap-2 justify-between"
-                        >
-                          <div>{sectionIngredient.ingredient.name}</div>
-                          <div className="font-medium">
-                            {sectionIngredient.quantity}
-                            {sectionIngredient.unit && ` ${sectionIngredient.unit}`}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <RecipeSectionIngredients sectionIngredients={section.sectionIngredients} />
 
                   {section.subRecipe && (
-                    <div className="mt-3 rounded-md bg-muted p-3">
-                      <span className="text-sm font-medium">Sous-recette :</span>
-                      <div className="mt-1">
-                        <span className="text-sm">{section.subRecipe.name}</span>
-                      </div>
-                    </div>
+                    <RecipeSectionIngredients
+                      sectionIngredients={section.subRecipe.sections[0].sectionIngredients}
+                    />
                   )}
-                </div>
+                </Fragment>
               ))}
             </div>
           </CardContent>
@@ -98,3 +94,12 @@ export default function RecipePage() {
     </>
   )
 }
+
+export const Route = createFileRoute('/_authed/recipe/$id')({
+  component: RecipePage,
+  loader: async ({ params, context }) => {
+    const { id } = z.object({ id: z.coerce.number() }).parse(params)
+
+    await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
+  },
+})

@@ -80,6 +80,7 @@
     "sort-imports": "off",
     "sort-keys": "off",
     "no-ternary": "off",
-    "no-duplicate-imports": "off"
+    "no-duplicate-imports": "off",
+    "jsx-handler-names": "off"
   }
 }

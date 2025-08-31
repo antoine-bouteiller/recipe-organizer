@@ -6,7 +6,7 @@ import type { ComponentProps } from 'react'
 import { NumericFormat } from 'react-number-format'
 import type { NumericFormatProps } from 'react-number-format'
 
-interface NumberInputProps extends Omit<NumericFormatProps, 'value' | 'onValueChange'> {
+type NumberInputProps = {
   stepper?: number
   thousandSeparator?: string
   placeholder?: string
@@ -19,7 +19,7 @@ interface NumberInputProps extends Omit<NumericFormatProps, 'value' | 'onValueCh
   onValueChange?: (value: number | undefined) => void
   fixedDecimalScale?: boolean
   decimalScale?: number
-}
+} & Omit<NumericFormatProps, 'value' | 'onValueChange'>
 
 const NumberInput = ({
   stepper,

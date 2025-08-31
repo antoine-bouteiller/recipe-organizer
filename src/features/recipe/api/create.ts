@@ -16,15 +16,15 @@ const recipeSchema = z.object({
         name: z.string().optional(),
         ingredients: z.array(
           z.object({
-            id: z.coerce.number().min(1, { message: "L'ingrédient est requis" }),
-            quantity: z.number().positive({ message: 'La quantité est requise' }),
+            id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
+            quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
             unit: z.enum(units).optional(),
           })
         ),
       }),
       z.object({
         name: z.string().optional(),
-        recipeId: z.coerce.number().optional(),
+        recipeId: z.coerce.number().positive({ message: 'La recette est requise' }),
         ratio: z.number().positive({ message: 'Le ratio est requis' }),
       }),
     ])
@@ -33,7 +33,8 @@ const recipeSchema = z.object({
 })
 
 type RecipeFormValues = z.infer<typeof recipeSchema>
-type RecipeFormInput = z.input<typeof recipeSchema>
+type RecipeFormInput = Partial<z.input<typeof recipeSchema>>
+export type RecipeSectionFormInput = NonNullable<RecipeFormInput['sections']>[number]
 
 const createRecipe = createServerFn({
   method: 'POST',

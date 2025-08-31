@@ -25,7 +25,6 @@ export const auth = betterAuth({
           })
         }
 
-        console.log('sendMagicLink', email, url)
         const html = formatEmail(verifyEmail, { loginUrl: url })
         await sendEmail(email, 'Connexion à votre compte', html)
       },

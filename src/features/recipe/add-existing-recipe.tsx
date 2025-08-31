@@ -15,9 +15,10 @@ import { DialogClose } from '@radix-ui/react-dialog'
 
 interface AddExistingRecipeProps {
   onSelect: (selectedRecipe: { recipeId: number; name: string; ratio: number }) => void
+  disabled?: boolean
 }
 
-export default function AddExistingRecipe({ onSelect }: AddExistingRecipeProps) {
+export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRecipeProps) {
   const { data: recipes } = useQuery(getAllRecipesQueryOptions())
 
   const recipesOptions =
@@ -35,7 +36,7 @@ export default function AddExistingRecipe({ onSelect }: AddExistingRecipeProps) 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className="md:flex-1">
+        <Button type="button" variant="outline" size="sm" className="md:flex-1" disabled={disabled}>
           Ajouter une recette existante
         </Button>
       </DialogTrigger>
@@ -45,6 +46,7 @@ export default function AddExistingRecipe({ onSelect }: AddExistingRecipeProps) 
         </DialogHeader>
         <SearchSelect
           options={recipesOptions}
+          value={selectedRecipe?.recipeId.toString()}
           onChange={(option) => {
             setSelectedRecipe({
               recipeId: Number.parseInt(option.value),

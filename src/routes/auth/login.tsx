@@ -1,20 +1,9 @@
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+import { useAppForm } from '@/hooks/use-app-form'
 import { useAuth } from '@/hooks/use-auth'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { revalidateLogic } from '@tanstack/react-form'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -26,12 +15,24 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState<string>()
   const { signInWithMagicLink } = useAuth()
 
-  const form = useForm({
-    resolver: zodResolver(loginSchema),
+  const { state, handleSubmit, AppField, FormSubmit, AppForm } = useAppForm({
+    validators: {
+      onDynamic: loginSchema,
+    },
+    validationLogic: revalidateLogic(),
     defaultValues: { email: '' },
+    onSubmit: async (data) => {
+      setErrorMessage(undefined)
+      const response = await signInWithMagicLink(data.value.email)
+      if (response.error) {
+        setErrorMessage('Identifiants invalides. Veuillez réessayer.')
+      } else {
+        navigate({ to: '/' })
+      }
+    },
   })
 
-  if (form.formState.isSubmitted) {
+  if (state.isSubmitted && !errorMessage) {
     return (
       <div className="min-h-screen grid place-items-center p-4">
         <Card className="w-full max-w-sm">
@@ -55,51 +56,23 @@ const LoginPage = () => {
           <CardDescription>Connectez-vous pour accéder à vos recettes.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(async ({ email }) => {
-                setErrorMessage(undefined)
-                const response = await signInWithMagicLink(email)
-                if (response.error) {
-                  setErrorMessage('Identifiants invalides. Veuillez réessayer.')
-                } else {
-                  navigate({ to: '/' })
-                }
-              })}
-            >
-              <div className="grid gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          autoComplete="email"
-                          disabled={form.formState.isSubmitting}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {errorMessage && (
-                  <p role="alert" className="text-sm text-destructive">
-                    {errorMessage}
-                  </p>
-                )}
-                <Button type="submit" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Se connecter
-                </Button>
-              </div>
-            </form>
-          </Form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSubmit()
+            }}
+            className="grid gap-4"
+          >
+            <AppField name="email" children={({ TextField }) => <TextField label="Email" />} />
+            {errorMessage && (
+              <p role="alert" className="text-sm text-destructive">
+                {errorMessage}
+              </p>
+            )}
+            <AppForm>
+              <FormSubmit label="Se connecter" />
+            </AppForm>
+          </form>
         </CardContent>
       </Card>
     </div>

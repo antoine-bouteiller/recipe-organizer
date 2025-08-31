@@ -1,19 +1,14 @@
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
 import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { useFieldContext } from '@/hooks/use-form-context'
 import { cn } from '@/lib/utils'
 import { CommandIcon, UploadIcon } from 'lucide-react'
-import { useCallback, useEffect, useId, useState } from 'react'
-import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { useController } from 'react-hook-form'
+import { useCallback, useEffect, useState } from 'react'
 
-interface ImageFieldProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>
-  name: TName
+interface ImageFieldProps {
   label: string
   disabled?: boolean
+  initialPreview?: string
 }
 
 const isImageUrl = (url: string): boolean => {
@@ -31,21 +26,11 @@ const isImageUrl = (url: string): boolean => {
   }
 }
 
-export const ImageField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  control,
-  name,
-  label,
-  disabled,
-}: ImageFieldProps<TFieldValues, TName>) => {
-  const [preview, setPreview] = useState<string>()
+export const ImageField = ({ label, disabled, initialPreview }: ImageFieldProps) => {
+  const [preview, setPreview] = useState<string | undefined>(initialPreview)
   const [isMac, setIsMac] = useState(false)
 
-  const { field } = useController({ control, name })
-
-  const id = useId()
+  const { handleChange } = useFieldContext<File>()
 
   useEffect(() => {
     setIsMac(navigator.userAgent.toLowerCase().includes('mac'))
@@ -55,7 +40,7 @@ export const ImageField = <
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0]
       if (file) {
-        field.onChange(file)
+        handleChange(file)
         const reader = new FileReader()
         reader.onloadend = () => {
           setPreview(reader.result as string)
@@ -63,7 +48,7 @@ export const ImageField = <
         reader.readAsDataURL(file)
       }
     },
-    [field]
+    [handleChange]
   )
 
   const handlePaste = useCallback(
@@ -88,7 +73,7 @@ export const ImageField = <
       const imageFile = files.find((file) => file.type.startsWith('image/'))
 
       if (imageFile) {
-        field.onChange(imageFile)
+        handleChange(imageFile)
         const reader = new FileReader()
         reader.onloadend = () => {
           setPreview(reader.result as string)
@@ -105,7 +90,7 @@ export const ImageField = <
             const blob = await response.blob()
             const fileName = text.split('/').pop() || 'image.jpg'
             const file = new File([blob], fileName, { type: blob.type })
-            field.onChange(file)
+            handleChange(file)
             setPreview(URL.createObjectURL(file))
           }
         } catch {
@@ -113,7 +98,7 @@ export const ImageField = <
         }
       }
     },
-    [field]
+    [handleChange]
   )
 
   useEffect(() => {
@@ -124,61 +109,49 @@ export const ImageField = <
   }, [handlePaste])
 
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ fieldState }) => (
-        <FormItem>
-          <FormLabel className="text-base font-semibold">{label}</FormLabel>
-          <FormControl>
-            <div className="flex w-full items-center justify-center">
-              <label
-                className={cn(
-                  'flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30',
-                  'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40'
-                )}
-                aria-invalid={!!fieldState.error}
-                htmlFor={id}
-              >
-                {preview ? (
-                  <div className="relative h-full w-full overflow-hidden flex items-center justify-center">
-                    <img src={preview} alt="Aperçu" className="rounded-lg object-cover" />
-                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black opacity-0 transition-opacity hover:opacity-50">
-                      <p className="font-medium">Cliquer pour changer</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <UploadIcon className="mb-3 h-8 w-8" />
-                    <p className="mb-2 text-sm">
-                      <span className="font-semibold">Cliquez pour télécharger</span> ou
-                      glissez-déposez
-                    </p>
-                    <p className="text-xs">PNG, JPG ou WEBP (MAX. 10MB)</p>
-                    <div className="flex items-center justify-center gap-2 pt-2">
-                      <Button variant="outline" size="icon" className="size-8">
-                        {isMac ? <CommandIcon className="size-3" /> : 'Ctrl'}
-                      </Button>
-                      <Button variant="outline" size="icon" className="size-8">
-                        V
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  disabled={disabled}
-                  id={id}
-                />
-              </label>
+    <FormItem>
+      <FormLabel className="text-base font-semibold">{label}</FormLabel>
+      <FormLabel
+        className={cn(
+          'flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30',
+          'data-[error=true]:border-destructive data-[error=true]:ring-destructive/20 dark:data-[error=true]:ring-destructive/40 data-[error=true]:text-foreground'
+        )}
+      >
+        {preview ? (
+          <div className="relative h-full w-full overflow-hidden flex items-center justify-center">
+            <img src={preview} alt="Aperçu" className="rounded-lg object-cover" />
+            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black opacity-0 transition-opacity hover:opacity-50">
+              <p className="font-medium">Cliquer pour changer</p>
             </div>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <UploadIcon className="mb-3 h-8 w-8" />
+            <p className="mb-2 text-sm">
+              <span className="font-semibold">Cliquez pour télécharger</span> ou glissez-déposez
+            </p>
+            <p className="text-xs">PNG, JPG ou WEBP (MAX. 10MB)</p>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <Button variant="outline" size="icon" className="size-8">
+                {isMac ? <CommandIcon className="size-3" /> : 'Ctrl'}
+              </Button>
+              <Button variant="outline" size="icon" className="size-8">
+                V
+              </Button>
+            </div>
+          </div>
+        )}
+      </FormLabel>
+      <FormControl>
+        <input
+          type="file"
+          className="hidden"
+          accept="image/*"
+          onChange={handleImageChange}
+          disabled={disabled}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
   )
 }

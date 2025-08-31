@@ -24,7 +24,7 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
       await deleteRecipe({ data: recipeId })
       setIsOpen(false)
       toast.success('Recette supprimée avec succès')
-      router.invalidate({ filter: (route) => route.fullPath === '/' })
+      router.navigate({ to: '/' })
     } catch {
       toast.error('Une erreur est survenue lors de la suppression de la recette')
     }
@@ -40,8 +40,9 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
             setIsOpen(true)
           }}
         >
-          <Button variant="ghost" className="absolute top-2 right-2">
-            <Trash2 className="h-4 w-4 text-destructive" />
+          <Button variant="ghost">
+            <Trash2 className="h-4 w-4" />
+            Supprimer
           </Button>
         </DialogTrigger>
         <DialogContent>

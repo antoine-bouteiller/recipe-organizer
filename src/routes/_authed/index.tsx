@@ -6,13 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { PlusIcon, SearchIcon } from 'lucide-react'
 
-export const Route = createFileRoute('/_authed/')({
-  component: Home,
-  loader: async ({ context }) =>
-    await context.queryClient.prefetchQuery(getAllRecipesQueryOptions()),
-})
-
-export default function Home() {
+const Home = () => {
   const { data: recipes } = useQuery(getAllRecipesQueryOptions())
 
   return (
@@ -41,3 +35,9 @@ export default function Home() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authed/')({
+  component: Home,
+  loader: async ({ context }) =>
+    await context.queryClient.prefetchQuery(getAllRecipesQueryOptions()),
+})

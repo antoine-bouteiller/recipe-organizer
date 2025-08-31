@@ -4,14 +4,12 @@ import { Resend } from 'resend'
 const resend = new Resend(getBindings().RESEND_API_KEY)
 
 const sendEmail = async (to: string, subject: string, html: string) => {
-  const response = await resend.emails.send({
+  await resend.emails.send({
     from: 'no-reply@antoinebouteiller.fr',
     to,
     subject,
     html,
   })
-
-  console.log('sendEmail', response.error, response.data)
 }
 
 const formatEmail = (html: string, args: Record<string, string>) => {

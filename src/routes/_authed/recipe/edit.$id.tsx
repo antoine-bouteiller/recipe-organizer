@@ -1,166 +1,128 @@
-import { ImageField } from '@/components/forms/image-field'
-import { TextField } from '@/components/forms/text-field'
-import TiptapField from '@/components/forms/tiptap-field'
 import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { FormLabel } from '@/components/ui/form'
-import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
-import { recipeSchema, type RecipeFormValues, createRecipe } from '@/features/recipe/api/create'
-import RecipeSection from '@/features/recipe/recipe-section'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { PlusIcon, Loader2 } from 'lucide-react'
-import { useTransition, useCallback } from 'react'
-import { useForm, useFieldArray, Form } from 'react-hook-form'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { editRecipe, editRecipeSchema, type EditRecipeFormInput } from '@/features/recipe/api/edit'
+import { getRecipeQueryOptions, type RecipeSection } from '@/features/recipe/api/get-one'
+import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
+import { useAppForm } from '@/hooks/use-app-form'
+import { isUnit } from '@/types/units'
+import { revalidateLogic } from '@tanstack/react-form'
+import { useQuery } from '@tanstack/react-query'
+import { createFileRoute, notFound, useRouter } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { z } from 'zod'
+
+const formatSection = (sections: RecipeSection) => {
+  if (sections.subRecipeId) {
+    return {
+      name: sections.name ?? '',
+      ratio: sections.ratio ?? 1,
+      recipeId: sections.subRecipeId.toString(),
+    }
+  }
+  return {
+    name: sections.name ?? '',
+    ingredients: sections.sectionIngredients.map((ingredient) => ({
+      id: ingredient.ingredient.id.toString(),
+      quantity: ingredient.quantity,
+      unit: isUnit(ingredient.unit) ? ingredient.unit : undefined,
+    })),
+  }
+}
 
 const EditRecipePage = () => {
+  const { id } = Route.useParams()
+  const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
   const router = useRouter()
-  const [isLoading, startTransition] = useTransition()
 
-  const form = useForm({
-    resolver: zodResolver(recipeSchema),
-    defaultValues: {
-      name: '',
-      steps: '',
-      sections: [
-        {
-          ingredients: [
-            {
-              id: undefined,
-              quantity: 0,
-              unit: undefined,
-            },
-          ],
-        },
-      ],
+  const initialValues: EditRecipeFormInput = recipe
+    ? {
+        id: recipe.id,
+        name: recipe.name,
+        steps: recipe.steps,
+        sections: recipe.sections.map(formatSection),
+      }
+    : {}
+
+  const form = useAppForm({
+    validators: {
+      onDynamic: editRecipeSchema,
     },
-  })
-
-  const onSubmit = useCallback(
-    (data: RecipeFormValues) => {
-      startTransition(async () => {
-        try {
-          const formData = new FormData()
-          formData.append('image', data.image)
-          formData.append('name', data.name)
-          formData.append('steps', data.steps)
-          formData.append('sections', JSON.stringify(data.sections))
-          await createRecipe({ data: formData })
-
-          router.navigate({ to: '/' })
-        } catch (error) {
-          toast.error('Une erreur est survenue lors de la création de la recette', {
-            description: error instanceof Error ? error.message : JSON.stringify(error),
-          })
+    validationLogic: revalidateLogic(),
+    defaultValues: initialValues,
+    onSubmit: async (data) => {
+      try {
+        const parsedData = editRecipeSchema.parse(data.value)
+        const formData = new FormData()
+        if (parsedData.image) {
+          formData.append('image', parsedData.image)
         }
-      })
-    },
-    [router]
-  )
+        formData.append('name', parsedData.name)
+        formData.append('steps', parsedData.steps)
+        formData.append('sections', JSON.stringify(parsedData.sections))
+        formData.append('id', parsedData.id.toString())
+        await editRecipe({ data: formData })
 
-  const {
-    fields: sectionFields,
-    append,
-    remove,
-  } = useFieldArray({
-    control: form.control,
-    name: 'sections',
+        router.navigate({ to: '/' })
+      } catch (error) {
+        toast.error('Une erreur est survenue lors de la création de la recette', {
+          description: error instanceof Error ? error.message : JSON.stringify(error),
+        })
+      }
+    },
   })
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-10 h-10 animate-spin" />
+      </div>
+    )
+  }
+
+  if (!recipe) {
+    return notFound()
+  }
 
   return (
-    <Card className="shadow-xl">
-      <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold">Nouvelle Recette</CardTitle>
-        <CardDescription className="text-lg">
-          Ajoutez votre délicieuse recette à la collection
-        </CardDescription>
+    <>
+      <CardHeader className="text-center pt-6">
+        <CardTitle className="text-3xl font-bold">Modifier la recette</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <TextField
-              control={form.control}
-              name="name"
-              label="Nom de la recette"
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            form.handleSubmit()
+          }}
+          className="space-y-6"
+        >
+          <RecipeForm form={form} fields={recipeFormFields} imagePreview={recipe.image} />
+          <div className="flex gap-4 pt-6">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={() => router.navigate({ to: '/' })}
               disabled={isLoading}
-            />
-            <ImageField
-              control={form.control}
-              name="image"
-              label="Photo de la recette"
-              disabled={isLoading}
-            />
-
-            <div className="flex flex-col gap-2 pt-2">
-              <FormLabel className="text-base font-semibold">Ingrédients</FormLabel>
-              {sectionFields.map((field, index) => (
-                <RecipeSection
-                  key={field.id}
-                  form={form}
-                  index={index}
-                  canAddName={index !== 0}
-                  onDelete={index === 0 ? undefined : () => remove(index)}
-                />
-              ))}
-              <div className="flex w-full gap-2 md:flex-row flex-col">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    append({
-                      recipeId: undefined,
-                      name: undefined,
-                      ratio: 1,
-                    })
-                  }}
-                  size="sm"
-                  className="md:flex-1"
-                >
-                  Ajouter une section <PlusIcon className="h-4 w-4" />
-                </Button>
-                <AddExistingRecipe
-                  onSelect={(selectedRecipe) => {
-                    append({
-                      recipeId: selectedRecipe.recipeId,
-                      name: selectedRecipe.name,
-                      ratio: 1,
-                    })
-                  }}
-                />
-              </div>
-            </div>
-
-            <TiptapField control={form.control} name="steps" label="Étapes" disabled={isLoading} />
-
-            <div className="flex gap-4 pt-6">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => router.navigate({ to: '/' })}
-                disabled={isLoading}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" className="flex-1" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Création en cours...
-                  </>
-                ) : (
-                  'Créer la recette'
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
+            >
+              Annuler
+            </Button>
+            <form.AppForm>
+              <form.FormSubmit label="Modifier la recette" />
+            </form.AppForm>
+          </div>
+        </form>
       </CardContent>
-    </Card>
+    </>
   )
 }
 
 export const Route = createFileRoute('/_authed/recipe/edit/$id')({
   component: EditRecipePage,
+  loader: async ({ params, context }) => {
+    const { id } = z.object({ id: z.coerce.number() }).parse(params)
+
+    await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
+  },
 })

@@ -1,22 +1,16 @@
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
 import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { useFieldContext } from '@/hooks/use-form-context'
 import { cn } from '@/lib/utils'
 import { TextStyleKit } from '@tiptap/extension-text-style'
-import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import type { Editor } from '@tiptap/react'
+import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
 import { BoldIcon, ItalicIcon, ListIcon, Redo2Icon, Undo2Icon, WrapTextIcon } from 'lucide-react'
-import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { useController } from 'react-hook-form'
 
 const extensions = [TextStyleKit, StarterKit]
 
-interface TiptapProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> {
-  control: Control<TFieldValues>
-  name: TName
+interface TiptapProps {
   label?: string
   disabled?: boolean
 }
@@ -75,20 +69,12 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
   )
 }
 
-const TiptapField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  control,
-  name,
-  label,
-  disabled,
-}: TiptapProps<TFieldValues, TName>) => {
-  const { field } = useController({ control, name })
+const TiptapField = ({ label, disabled }: TiptapProps) => {
+  const { state, handleChange } = useFieldContext<string>()
 
   const editor = useEditor({
     extensions: extensions,
-    content: field.value,
+    content: state.value,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -101,31 +87,25 @@ const TiptapField = <
       },
     },
     onUpdate: ({ editor }) => {
-      field.onChange(editor.getHTML())
+      handleChange(editor.getHTML())
     },
   })
 
+  if (!editor) {
+    return undefined
+  }
+
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={() =>
-        editor ? (
-          <FormItem>
-            <FormLabel className="text-base font-semibold">{label}</FormLabel>
-            <FormControl>
-              <div className="flex flex-col gap-2">
-                <MenuBar editor={editor} />
-                <EditorContent editor={editor} disabled={disabled} />
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        ) : (
-          <div />
-        )
-      }
-    />
+    <FormItem>
+      <FormLabel className="text-base font-semibold">{label}</FormLabel>
+      <FormControl>
+        <div className="flex flex-col gap-2">
+          <MenuBar editor={editor} />
+          <EditorContent editor={editor} disabled={disabled} />
+        </div>
+      </FormControl>
+      <FormMessage />
+    </FormItem>
   )
 }
 
