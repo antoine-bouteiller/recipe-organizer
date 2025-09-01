@@ -7,7 +7,7 @@ import { useAppForm } from '@/hooks/use-app-form'
 import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, notFound, useRouter } from '@tanstack/react-router'
+import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -118,8 +118,13 @@ const EditRecipePage = () => {
   )
 }
 
-export const Route = createFileRoute('/_authed/recipe/edit/$id')({
+export const Route = createFileRoute('/recipe/edit/$id')({
   component: EditRecipePage,
+  beforeLoad: ({ context }) => {
+    if (!context.authUser) {
+      throw redirect({ to: '/auth/login' })
+    }
+  },
   loader: async ({ params, context }) => {
     const { id } = z.object({ id: z.coerce.number() }).parse(params)
 

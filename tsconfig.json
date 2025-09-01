@@ -1,8 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "@tsconfig/vite-react/tsconfig.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "webworker"],
+    "types": ["./worker-configuration.d.ts"]
+  },
+  "include": ["src/**/*"]
 }

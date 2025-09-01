@@ -6,7 +6,7 @@ import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import { recipeDefaultValues, RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 const NewRecipePage = () => {
@@ -71,8 +71,13 @@ const NewRecipePage = () => {
   )
 }
 
-export const Route = createFileRoute('/_authed/recipe/new')({
+export const Route = createFileRoute('/recipe/new')({
   component: NewRecipePage,
+  beforeLoad: ({ context }) => {
+    if (!context.authUser) {
+      throw redirect({ to: '/auth/login' })
+    }
+  },
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(getAllIngredientsQueryOptions())
     context.queryClient.ensureQueryData(getAllRecipesQueryOptions())

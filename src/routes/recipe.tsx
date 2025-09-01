@@ -16,6 +16,6 @@ const RecipeLayout = () => (
   </div>
 )
 
-export const Route = createFileRoute('/_authed/recipe')({
+export const Route = createFileRoute('/recipe')({
   component: RecipeLayout,
 })

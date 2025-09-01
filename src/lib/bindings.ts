@@ -1,17 +1,10 @@
-interface Env {
-  DB: D1Database
-  R2_BUCKET: R2Bucket
-  RESEND_API_KEY: string
-  IMAGES: ImagesBinding
-}
-
 let cachedEnv: Env | undefined = undefined
 
 // This gets called once at startup when running locally
 const initDevEnv = async () => {
   const { getPlatformProxy } = await import('wrangler')
-  const proxy = await getPlatformProxy()
-  cachedEnv = proxy.env as unknown as Env
+  const proxy = await getPlatformProxy<Env>()
+  cachedEnv = proxy.env
 }
 
 if (import.meta.env.DEV) {
@@ -30,5 +23,5 @@ export const getBindings = (): Env => {
     return cachedEnv
   }
 
-  return process.env as unknown as Env
+  return process.env
 }

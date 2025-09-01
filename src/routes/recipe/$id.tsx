@@ -13,6 +13,7 @@ import { z } from 'zod'
 const RecipePage = () => {
   const { id } = Route.useParams()
   const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
+  const { authUser } = Route.useRouteContext()
 
   if (isLoading) {
     return (
@@ -28,24 +29,26 @@ const RecipePage = () => {
 
   return (
     <>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
-            <EllipsisVerticalIcon className="w-4 h-4" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto flex flex-col gap-2 p-2">
-          <Button variant="ghost" asChild>
-            <Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }}>
-              <PencilIcon className="w-4 h-4" />
-              Modifier
-            </Link>
-          </Button>
-          <Button variant="ghost" asChild>
-            <DeleteRecipe recipeId={recipe.id} />
-          </Button>
-        </PopoverContent>
-      </Popover>
+      {authUser && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
+              <EllipsisVerticalIcon className="w-4 h-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto flex flex-col gap-2 p-2">
+            <Button variant="ghost" asChild>
+              <Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }}>
+                <PencilIcon className="w-4 h-4" />
+                Modifier
+              </Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <DeleteRecipe recipeId={recipe.id} />
+            </Button>
+          </PopoverContent>
+        </Popover>
+      )}
       <CardHeader className="p-0">
         <div className="mb-6 w-full overflow-hidden md:rounded-t-lg flex items-center justify-center aspect-16/6">
           <img src={recipe.image} alt={recipe.name} className="object-cover w-full" />
@@ -95,11 +98,13 @@ const RecipePage = () => {
   )
 }
 
-export const Route = createFileRoute('/_authed/recipe/$id')({
+export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
   loader: async ({ params, context }) => {
     const { id } = z.object({ id: z.coerce.number() }).parse(params)
 
     await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
+
+    return context.authUser
   },
 })
