@@ -42,6 +42,7 @@ const Home = () => {
 
 export const Route = createFileRoute('/')({
   component: Home,
-  loader: async ({ context }) =>
-    await context.queryClient.prefetchQuery(getAllRecipesQueryOptions()),
+  loader: async ({ context }) => {
+    await context.queryClient.prefetchQuery(getAllRecipesQueryOptions())
+  },
 })

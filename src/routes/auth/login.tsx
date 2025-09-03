@@ -27,7 +27,7 @@ const LoginPage = () => {
       if (response.error) {
         setErrorMessage('Identifiants invalides. Veuillez réessayer.')
       } else {
-        navigate({ to: '/' })
+        await navigate({ to: '/' })
       }
     },
   })
@@ -59,7 +59,7 @@ const LoginPage = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              handleSubmit()
+              void handleSubmit()
             }}
             className="grid gap-4"
           >

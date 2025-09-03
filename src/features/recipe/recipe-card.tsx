@@ -15,11 +15,13 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       >
         <CardHeader className="relative p-0">
           <div className="relative h-36 w-full overflow-hidden">
-            <img src={recipe.image} alt={recipe.name} className="object-cover" />
+            <img src={recipe.image} alt={recipe.name} className="object-cover h-full w-full" />
           </div>
         </CardHeader>
         <CardContent className="px-6 pb-2">
-          <CardTitle className="mb-2 line-clamp-2 text-xl font-bold">{recipe.name}</CardTitle>
+          <CardTitle className="mb-2 line-clamp-2 text-xl font-bold text-nowrap text-ellipsis">
+            {recipe.name}
+          </CardTitle>
         </CardContent>
       </Card>
     </Link>

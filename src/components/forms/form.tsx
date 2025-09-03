@@ -39,7 +39,7 @@ const FormControl = ({ ...props }: ComponentProps<typeof Slot>) => {
       data-slot="form-control"
       id={formItemId}
       aria-describedby={
-        errors.length === 0 ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`
+        errors.length === 0 ? formDescriptionId : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={errors.length > 0}
       {...props}

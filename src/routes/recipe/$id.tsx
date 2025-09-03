@@ -58,8 +58,8 @@ const RecipePage = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="grid md:grid-cols-3 gap-4 md:gap-8">
-        <Card className="shadow-none">
+      <CardContent className="grid md:grid-cols-5 gap-4 md:gap-8">
+        <Card className="shadow-none md:col-span-2">
           <CardHeader>
             <CardTitle className="text-xl">Ingrédients</CardTitle>
           </CardHeader>
@@ -82,7 +82,7 @@ const RecipePage = () => {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 shadow-none">
+        <Card className="md:col-span-3 shadow-none">
           <CardHeader>
             <CardTitle className="text-xl">Préparation</CardTitle>
           </CardHeader>

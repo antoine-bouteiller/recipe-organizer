@@ -28,7 +28,7 @@ const NewRecipePage = () => {
         formData.append('sections', JSON.stringify(parsedData.sections))
         await createRecipe({ data: formData })
 
-        router.navigate({ to: '/' })
+        await router.navigate({ to: '/' })
       } catch (error) {
         toast.error('Une erreur est survenue lors de la création de la recette', {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -46,7 +46,7 @@ const NewRecipePage = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault()
-            form.handleSubmit()
+            void form.handleSubmit()
           }}
           className="space-y-6"
         >
@@ -78,8 +78,8 @@ export const Route = createFileRoute('/recipe/new')({
       throw redirect({ to: '/auth/login' })
     }
   },
-  loader: ({ context }) => {
-    context.queryClient.ensureQueryData(getAllIngredientsQueryOptions())
-    context.queryClient.ensureQueryData(getAllRecipesQueryOptions())
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(getAllIngredientsQueryOptions())
+    await context.queryClient.ensureQueryData(getAllRecipesQueryOptions())
   },
 })

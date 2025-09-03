@@ -133,7 +133,9 @@ export const RecipeForm = withFieldGroup({
                                 }) => (
                                   <div className="flex flex-col gap-2 pt-2">
                                     {ingredientsState.value?.map((ingredient, ingredientIndex) => (
-                                      <Fragment key={`ingredient-${ingredient.id}-${sectionIndex}`}>
+                                      <Fragment
+                                        key={`ingredient-${JSON.stringify(ingredient.id)}-${sectionIndex}`}
+                                      >
                                         <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col">
                                           <AppField
                                             name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].id`}

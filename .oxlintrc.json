@@ -81,6 +81,16 @@
     "sort-keys": "off",
     "no-ternary": "off",
     "no-duplicate-imports": "off",
-    "jsx-handler-names": "off"
+    "jsx-handler-names": "off",
+
+    // type-aware
+    "only-throw-error": "off",
+    "no-misused-promises": "off",
+    "no-confusing-void-expression": "off",
+    "unbound-method": "off",
+    "no-unsafe-type-assertion": "off",
+    "no-unsafe-assignment": "off",
+    "no-unsafe-member-access": "off",
+    "no-unsafe-return": "off"
   }
 }

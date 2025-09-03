@@ -24,7 +24,7 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
       await deleteRecipe({ data: recipeId })
       setIsOpen(false)
       toast.success('Recette supprimée avec succès')
-      router.navigate({ to: '/' })
+      await router.navigate({ to: '/' })
     } catch {
       toast.error('Une erreur est survenue lors de la suppression de la recette')
     }

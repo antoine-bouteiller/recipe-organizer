@@ -63,7 +63,7 @@ const EditRecipePage = () => {
         formData.append('id', parsedData.id.toString())
         await editRecipe({ data: formData })
 
-        router.navigate({ to: '/' })
+        await router.navigate({ to: '/' })
       } catch (error) {
         toast.error('Une erreur est survenue lors de la création de la recette', {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -93,7 +93,7 @@ const EditRecipePage = () => {
         <form
           onSubmit={(event) => {
             event.preventDefault()
-            form.handleSubmit()
+            void form.handleSubmit()
           }}
           className="space-y-6"
         >

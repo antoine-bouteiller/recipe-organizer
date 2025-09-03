@@ -21,7 +21,11 @@ const editRecipe = createServerFn({
 })
   .validator((formData: FormData) => {
     const rawData = Object.fromEntries(formData.entries())
-    rawData.sections = JSON.parse(rawData.sections as string)
+
+    if (typeof rawData.sections !== 'string') {
+      throw new TypeError('Invalid input format')
+    }
+    rawData.sections = JSON.parse(rawData.sections)
     return editRecipeSchema.parse(rawData)
   })
   .handler(async ({ data }) => {

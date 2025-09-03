@@ -9,13 +9,13 @@ export const useAuth = () => {
 
   const signInWithMagicLink = async (email: string) => {
     const response = await authClient.signIn.magicLink({ email })
-    router.invalidate()
+    await router.invalidate()
     return response
   }
 
   const signOut = async () => {
     const response = await authClient.signOut()
-    router.invalidate()
+    await router.invalidate()
     return response
   }
 
