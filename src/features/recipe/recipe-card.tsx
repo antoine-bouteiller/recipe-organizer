@@ -11,11 +11,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
     <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
       <Card
         key={recipe.id}
-        className="cursor-pointer gap-2 py-0 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+        className="cursor-pointer gap-2 py-0 transition-all duration-300 hover:scale-105 hover:shadow-lg "
       >
         <CardHeader className="relative p-0">
           <div className="relative h-36 w-full overflow-hidden">
-            <img src={recipe.image} alt={recipe.name} className="object-cover h-full w-full" />
+            <img src={recipe.image} alt={recipe.name} className="object-cover w-full h-full" />
           </div>
         </CardHeader>
         <CardContent className="px-6 pb-2">

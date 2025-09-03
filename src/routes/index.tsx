@@ -30,7 +30,7 @@ const Home = () => {
             </Button>
           )}
         </div>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
+        <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
           {recipes?.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}
