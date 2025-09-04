@@ -61,6 +61,7 @@
     "radix": "off",
     "no-useless-undefined": "off",
     "id-length": "off",
+    "explicit-length-check": "off",
 
     //style
     "prefer-template": "error",

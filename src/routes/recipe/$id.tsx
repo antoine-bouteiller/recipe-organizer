@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader } from '@/components/ui/card'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/delete-recipe'
-import { RecipeSectionIngredients } from '@/features/recipe/recipe-section'
+import { RecipeSections } from '@/features/recipe/recipe-section'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { EllipsisVerticalIcon, Loader2, PencilIcon } from 'lucide-react'
-import { Fragment } from 'react/jsx-runtime'
 import { z } from 'zod'
 
 const RecipePage = () => {
@@ -58,41 +58,40 @@ const RecipePage = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="grid md:grid-cols-5 gap-4 md:gap-8">
-        <Card className="shadow-none md:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-xl">Ingrédients</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recipe.sections.map((section) => (
-                <Fragment key={section.id}>
-                  {section.name && <h3 className="mb-1 text-md font-semibold">{section.name}</h3>}
+      <CardContent className="px-8 md:hidden">
+        <Tabs defaultValue="ingredients">
+          <TabsList className="w-full">
+            <TabsTrigger value="ingredients">Ingrédients</TabsTrigger>
+            <TabsTrigger value="preparation">Préparation</TabsTrigger>
+          </TabsList>
+          <TabsContent value="ingredients" className="space-y-3 px-2">
+            <RecipeSections sections={recipe.sections} />
+          </TabsContent>
 
-                  <RecipeSectionIngredients sectionIngredients={section.sectionIngredients} />
-
-                  {section.subRecipe && (
-                    <RecipeSectionIngredients
-                      sectionIngredients={section.subRecipe.sections[0].sectionIngredients}
-                    />
-                  )}
-                </Fragment>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-3 shadow-none">
-          <CardHeader>
-            <CardTitle className="text-xl">Préparation</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <TabsContent value="preparation" className="px-2">
             <div
               className="prose prose-sm max-w-none text-foreground"
               dangerouslySetInnerHTML={{ __html: recipe.steps }}
             />
-          </CardContent>
-        </Card>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+
+      <CardContent className="grid-cols-5 gap-8 hidden md:grid">
+        <div className="col-span-2 border rounded-xl p-8 space-y-4">
+          <div className="text-xl font-semibold">Ingrédients</div>
+          <div className="space-y-3">
+            <RecipeSections sections={recipe.sections} />
+          </div>
+        </div>
+
+        <div className="col-span-3 border rounded-xl p-8 space-y-4">
+          <div className="text-xl font-semibold">Préparation</div>
+          <div
+            className="prose prose-sm max-w-none text-foreground"
+            dangerouslySetInnerHTML={{ __html: recipe.steps }}
+          />
+        </div>
       </CardContent>
     </>
   )

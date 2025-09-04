@@ -1,12 +1,12 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
-import { Button } from '@/components/ui/button'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { cn } from '@/lib/utils'
 import { TextStyleKit } from '@tiptap/extension-text-style'
 import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
-import { BoldIcon, ItalicIcon, ListIcon, Redo2Icon, Undo2Icon, WrapTextIcon } from 'lucide-react'
+import { BoldIcon, ItalicIcon, ListIcon, Redo2Icon, Undo2Icon } from 'lucide-react'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -30,42 +30,47 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
   })
 
   return (
-    <div className="flex flex-row flex-wrap gap-2">
-      <Button
+    <ToggleGroup type="multiple">
+      <ToggleGroupItem
+        value="bold"
         onClick={editor.chain().focus().toggleBold().run}
         disabled={!editorState.canBold}
         type="button"
       >
         <BoldIcon className="md:size-4 size-3" />
-      </Button>
-      <Button
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="italic"
         onClick={editor.chain().focus().toggleItalic().run}
         disabled={!editorState.canItalic}
         type="button"
       >
         <ItalicIcon className="md:size-4 size-3" />
-      </Button>
-      <Button onClick={editor.chain().focus().setParagraph().run} type="button">
-        <WrapTextIcon className="md:size-4 size-3" />
-      </Button>
-      <Button onClick={editor.chain().focus().toggleBulletList().run} type="button">
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="bulletList"
+        onClick={editor.chain().focus().toggleBulletList().run}
+        type="button"
+      >
         <ListIcon className="md:size-4 size-3" />
-      </Button>
-      <Button
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="undo"
         onClick={editor.chain().focus().undo().run}
         disabled={!editorState.canUndo}
         type="button"
       >
         <Undo2Icon className="md:size-4 size-3" />
-      </Button>
-      <Button
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="redo"
         onClick={editor.chain().focus().redo().run}
         disabled={!editorState.canRedo}
         type="button"
       >
         <Redo2Icon className="md:size-4 size-3" />
-      </Button>
-    </div>
+      </ToggleGroupItem>
+    </ToggleGroup>
   )
 }
 
