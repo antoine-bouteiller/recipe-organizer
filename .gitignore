@@ -12,3 +12,7 @@ count.txt
 # Cloudflare
 .wrangler
 .dev.vars
+
+# Serwist
+public/sw*
+public/swe-worker*

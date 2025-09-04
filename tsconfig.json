@@ -6,7 +6,7 @@
       "@/*": ["./src/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable", "webworker"],
-    "types": ["./worker-configuration.d.ts"]
+    "types": ["./worker-configuration.d.ts", "@serwist/vite/typings"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "sw-generate.ts", "./vite.config.ts"]
 }

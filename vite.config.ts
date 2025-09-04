@@ -4,6 +4,7 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react-oxc'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
+import { workboxGeneratePlugin } from './sw-generate'
 
 const viteConfig = defineConfig({
   server: {
@@ -17,6 +18,7 @@ const viteConfig = defineConfig({
     tanstackStart({ customViteReactPlugin: true, target: 'cloudflare-module' }),
     viteReact({ exclude: ['**/.wrangler/**/*'] }),
     tailwindcss(),
+    workboxGeneratePlugin(),
   ],
 })
 
