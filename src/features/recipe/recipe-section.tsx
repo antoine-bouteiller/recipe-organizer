@@ -32,5 +32,11 @@ export const RecipeSections = ({ sections }: RecipeSectionsProps) =>
       {section.name && <h3 className="mb-1 text-md font-semibold">{section.name}</h3>}
 
       <RecipeSectionIngredients sectionIngredients={section.sectionIngredients} />
+
+      {section.subRecipe && (
+        <RecipeSectionIngredients
+          sectionIngredients={section.subRecipe.sections[0].sectionIngredients}
+        />
+      )}
     </Fragment>
   ))
