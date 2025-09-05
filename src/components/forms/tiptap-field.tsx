@@ -7,6 +7,7 @@ import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import { StarterKit } from '@tiptap/starter-kit'
 import { BoldIcon, ItalicIcon, ListIcon, Redo2Icon, Undo2Icon } from 'lucide-react'
+import { useRef } from 'react'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -77,11 +78,20 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
 const TiptapField = ({ label, disabled }: TiptapProps) => {
   const { state, handleChange } = useFieldContext<string>()
 
+  const ref = useRef<HTMLDivElement>(null)
+
   const editor = useEditor({
     extensions: extensions,
     content: state.value,
     immediatelyRender: false,
     editorProps: {
+      handleScrollToSelection(this, view) {
+        if ('focused' in view && !view.focused) {
+          return true
+        }
+
+        return false
+      },
       attributes: {
         class: cn(
           'min-h-40 w-full min-w-0 rounded-md border border-input bg-transparent p-3 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30',
@@ -106,7 +116,7 @@ const TiptapField = ({ label, disabled }: TiptapProps) => {
       <FormControl>
         <div className="flex flex-col gap-2">
           <MenuBar editor={editor} />
-          <EditorContent editor={editor} disabled={disabled} />
+          <EditorContent editor={editor} disabled={disabled} ref={ref} autoFocus={false} />
         </div>
       </FormControl>
       <FormMessage />

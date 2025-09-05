@@ -12,9 +12,11 @@ import {
 import { Button } from '@/components/ui/button'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import type { User } from 'better-auth'
-import { HomeIcon, SearchIcon, SettingsIcon, ShoppingCartIcon } from 'lucide-react'
+import { HomeIcon, Icon, SearchIcon, SettingsIcon, ShoppingCartIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import appCss from '../styles/app.css?url'
+import { homeFilled } from '@/components/icons/home-filed'
+import { settingsFilled } from '@/components/icons/settings-filled'
 
 const RootComponent = () => {
   useEffect(() => {
@@ -39,7 +41,13 @@ const RootComponent = () => {
           <div className="shrink-0 p-2 flex justify-around md:hidden">
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
               <Link to="/">
-                <HomeIcon className="size-6" />
+                {({ isActive }) =>
+                  isActive ? (
+                    <Icon className="size-6" iconNode={homeFilled} />
+                  ) : (
+                    <HomeIcon className="size-6" />
+                  )
+                }
               </Link>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
@@ -49,12 +57,20 @@ const RootComponent = () => {
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
               <Link to="/cart">
-                <ShoppingCartIcon className="size-6" />
+                {({ isActive }) => (
+                  <ShoppingCartIcon className="size-6" fill={isActive ? 'currentColor' : 'none'} />
+                )}
               </Link>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
               <Link to="/settings">
-                <SettingsIcon className="size-6" />
+                {({ isActive }) =>
+                  isActive ? (
+                    <Icon className="size-6" iconNode={settingsFilled} />
+                  ) : (
+                    <SettingsIcon className="size-6" />
+                  )
+                }
               </Link>
             </Button>
           </div>

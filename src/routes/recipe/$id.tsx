@@ -58,7 +58,7 @@ const RecipePage = () => {
         </div>
       </CardHeader>
 
-      <div className="h-full prose prose-sm max-w-none text-foreground">
+      <div className="flex-1 prose prose-sm max-w-none text-foreground flex flex-col">
         <CardContent className="px-8 md:hidden">
           <Tabs defaultValue="ingredients" className="gap-0">
             <TabsList className="w-full">
@@ -75,7 +75,7 @@ const RecipePage = () => {
           </Tabs>
         </CardContent>
 
-        <CardContent className="grid-cols-5 gap-8 hidden md:grid h-full">
+        <CardContent className="grid-cols-5 gap-8 hidden md:grid flex-1">
           <div className="col-span-2 border rounded-xl p-8">
             <div className="text-xl font-semibold">Ingrédients</div>
             <div className="space-y-3">

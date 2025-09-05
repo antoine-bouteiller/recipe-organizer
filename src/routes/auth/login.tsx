@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAppForm } from '@/hooks/use-app-form'
 import { useAuth } from '@/hooks/use-auth'
-import { revalidateLogic } from '@tanstack/react-form'
+import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
@@ -14,7 +14,7 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState<string>()
   const { signInWithMagicLink } = useAuth()
 
-  const { state, handleSubmit, AppField, FormSubmit, AppForm } = useAppForm({
+  const { handleSubmit, AppField, FormSubmit, AppForm, store } = useAppForm({
     validators: {
       onDynamic: loginSchema,
     },
@@ -29,7 +29,9 @@ const LoginPage = () => {
     },
   })
 
-  if (state.isSubmitted && !errorMessage) {
+  const isSubmitted = useStore(store, (state) => state.isSubmitted)
+
+  if (isSubmitted && !errorMessage) {
     return (
       <div className="h-full grid place-items-center p-4">
         <Card className="w-full max-w-sm">
