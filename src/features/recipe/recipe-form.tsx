@@ -95,9 +95,14 @@ export const RecipeForm = withFieldGroup({
               <>
                 {sectionsState.value?.map((_, sectionIndex) => (
                   <AppField name={`sections[${sectionIndex}]`} key={`section-${sectionIndex}`}>
-                    {({ state, FormControl, FormItem, FormMessage }) => (
-                      <FormItem>
-                        <FormControl>
+                    {({
+                      FormItem: SectionFormItem,
+                      FormControl: SectionFormControl,
+                      FormMessage: SectionFormMessage,
+                      state: sectionState,
+                    }) => (
+                      <SectionFormItem>
+                        <SectionFormControl>
                           <div className="p-4 border rounded-xl relative">
                             {sectionIndex !== 0 && (
                               <>
@@ -120,13 +125,12 @@ export const RecipeForm = withFieldGroup({
                               </>
                             )}
 
-                            {hasSubRecipe(state.value) ? (
+                            {hasSubRecipe(sectionState.value) ? (
                               <div />
                             ) : (
-                              <Field
-                                name={`sections[${sectionIndex}].ingredients`}
-                                mode="array"
-                                children={({
+                              <AppField name={`sections[${sectionIndex}].ingredients`} mode="array">
+                                {({
+                                  FormMessage: IngredientFormMessage,
                                   state: ingredientsState,
                                   removeValue: removeIngredient,
                                   pushValue: addIngredient,
@@ -178,6 +182,7 @@ export const RecipeForm = withFieldGroup({
                                         <Separator className="md:hidden" />
                                       </Fragment>
                                     ))}
+                                    <IngredientFormMessage />
                                     <Button
                                       type="button"
                                       variant="outline"
@@ -194,12 +199,12 @@ export const RecipeForm = withFieldGroup({
                                     </Button>
                                   </div>
                                 )}
-                              />
+                              </AppField>
                             )}
-                            <FormMessage />
+                            <SectionFormMessage />
                           </div>
-                        </FormControl>
-                      </FormItem>
+                        </SectionFormControl>
+                      </SectionFormItem>
                     )}
                   </AppField>
                 ))}

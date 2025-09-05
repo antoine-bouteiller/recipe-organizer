@@ -14,13 +14,15 @@ const recipeSchema = z.object({
     z.union([
       z.object({
         name: z.string().optional(),
-        ingredients: z.array(
-          z.object({
-            id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
-            quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
-            unit: z.enum(units).optional(),
-          })
-        ),
+        ingredients: z
+          .array(
+            z.object({
+              id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
+              quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
+              unit: z.enum(units).optional(),
+            })
+          )
+          .min(1, { message: 'Au moins un ingrédient est requis' }),
       }),
       z.object({
         name: z.string().optional(),
