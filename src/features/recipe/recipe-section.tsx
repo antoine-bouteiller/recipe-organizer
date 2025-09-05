@@ -7,7 +7,7 @@ interface RecipeSectionIngredientsProps {
 
 const RecipeSectionIngredients = ({ sectionIngredients }: RecipeSectionIngredientsProps) =>
   sectionIngredients.length > 0 && (
-    <ul className="list-disc list-outside space-y-2 pl-4">
+    <ul className="space-y-2 pr-4 md:pr-2">
       {sectionIngredients.map((sectionIngredient) => (
         <li key={sectionIngredient.id}>
           <div className="flex items-center justify-between gap-2 text-nowrap text-ellipsis">

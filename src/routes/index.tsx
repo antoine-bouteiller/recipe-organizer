@@ -37,7 +37,7 @@ const Home = () => {
 
   return (
     <div className="p-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto max-w-5xl">
         <div className="flex justify-between gap-4">
           <div className="relative flex-1">
             <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
@@ -57,7 +57,7 @@ const Home = () => {
             </Button>
           )}
         </div>
-        <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-4">
+        <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 mt-4">
           {recipes?.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ))}

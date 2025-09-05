@@ -58,41 +58,37 @@ const RecipePage = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="px-8 md:hidden">
-        <Tabs defaultValue="ingredients">
-          <TabsList className="w-full">
-            <TabsTrigger value="ingredients">Ingrédients</TabsTrigger>
-            <TabsTrigger value="preparation">Préparation</TabsTrigger>
-          </TabsList>
-          <TabsContent value="ingredients" className="space-y-3 px-2">
-            <RecipeSections sections={recipe.sections} />
-          </TabsContent>
+      <div className="h-full prose prose-sm max-w-none text-foreground">
+        <CardContent className="px-8 md:hidden">
+          <Tabs defaultValue="ingredients" className="gap-0">
+            <TabsList className="w-full">
+              <TabsTrigger value="ingredients">Ingrédients</TabsTrigger>
+              <TabsTrigger value="preparation">Préparation</TabsTrigger>
+            </TabsList>
+            <TabsContent value="ingredients" className=" px-2">
+              <RecipeSections sections={recipe.sections} />
+            </TabsContent>
 
-          <TabsContent value="preparation" className="px-2">
-            <div
-              className="prose prose-sm max-w-none text-foreground"
-              dangerouslySetInnerHTML={{ __html: recipe.steps }}
-            />
-          </TabsContent>
-        </Tabs>
-      </CardContent>
+            <TabsContent value="preparation" className="px-2">
+              <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
 
-      <CardContent className="grid-cols-5 gap-8 hidden md:grid">
-        <div className="col-span-2 border rounded-xl p-8 space-y-4">
-          <div className="text-xl font-semibold">Ingrédients</div>
-          <div className="space-y-3">
-            <RecipeSections sections={recipe.sections} />
+        <CardContent className="grid-cols-5 gap-8 hidden md:grid h-full">
+          <div className="col-span-2 border rounded-xl p-8">
+            <div className="text-xl font-semibold">Ingrédients</div>
+            <div className="space-y-3">
+              <RecipeSections sections={recipe.sections} />
+            </div>
           </div>
-        </div>
 
-        <div className="col-span-3 border rounded-xl p-8 space-y-4">
-          <div className="text-xl font-semibold">Préparation</div>
-          <div
-            className="prose prose-sm max-w-none text-foreground"
-            dangerouslySetInnerHTML={{ __html: recipe.steps }}
-          />
-        </div>
-      </CardContent>
+          <div className="col-span-3 border rounded-xl p-8">
+            <div className="text-xl font-semibold">Préparation</div>
+            <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
+          </div>
+        </CardContent>
+      </div>
     </>
   )
 }
