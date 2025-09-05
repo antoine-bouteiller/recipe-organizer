@@ -11,7 +11,9 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipeRouteImport } from './routes/recipe'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipeNewRouteImport } from './routes/recipe/new'
 import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
@@ -22,9 +24,19 @@ import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/
 
 const rootServerRouteImport = createServerRootRoute()
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RecipeRoute = RecipeRouteImport.update({
   id: '/recipe',
   path: '/recipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -65,7 +77,9 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
   '/recipe': typeof RecipeRouteWithChildren
+  '/settings': typeof SettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -73,7 +87,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
   '/recipe': typeof RecipeRouteWithChildren
+  '/settings': typeof SettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -82,7 +98,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/cart': typeof CartRoute
   '/recipe': typeof RecipeRouteWithChildren
+  '/settings': typeof SettingsRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -92,7 +110,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cart'
     | '/recipe'
+    | '/settings'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -100,7 +120,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cart'
     | '/recipe'
+    | '/settings'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -108,7 +130,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/cart'
     | '/recipe'
+    | '/settings'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -117,7 +141,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CartRoute: typeof CartRoute
   RecipeRoute: typeof RecipeRouteWithChildren
+  SettingsRoute: typeof SettingsRoute
   AuthLoginRoute: typeof AuthLoginRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -148,11 +174,25 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/recipe': {
       id: '/recipe'
       path: '/recipe'
       fullPath: '/recipe'
       preLoaderRoute: typeof RecipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -228,7 +268,9 @@ const RecipeRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CartRoute: CartRoute,
   RecipeRoute: RecipeRouteWithChildren,
+  SettingsRoute: SettingsRoute,
   AuthLoginRoute: AuthLoginRoute,
 }
 export const routeTree = rootRouteImport

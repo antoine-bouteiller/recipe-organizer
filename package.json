@@ -61,6 +61,8 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250831.0",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@prettier/plugin-oxc": "^0.0.4",
     "@serwist/vite": "^9.2.1",
     "@serwist/window": "^9.2.1",
@@ -77,6 +79,7 @@
     "@typescript/native-preview": "7.0.0-dev.20250728.1",
     "@vitejs/plugin-react-oxc": "^0.4.1",
     "jsdom": "^26.1.0",
+    "lefthook": "^1.12.3",
     "oxlint": "^1.12.0",
     "oxlint-tsgolint": "^0.1.5",
     "prettier": "^3.6.2",
@@ -90,5 +93,10 @@
     "vite-tsconfig-paths": "^5.1.4",
     "workbox-build": "^7.3.0",
     "wrangler": "^4.32.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }

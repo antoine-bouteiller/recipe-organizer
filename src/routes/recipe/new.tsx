@@ -75,7 +75,7 @@ export const Route = createFileRoute('/recipe/new')({
   component: NewRecipePage,
   beforeLoad: ({ context }) => {
     if (!context.authUser) {
-      throw redirect({ to: '/auth/login' })
+      throw redirect({ to: '/auth/login', from: '/recipe/new' })
     }
   },
   loader: async ({ context }) => {

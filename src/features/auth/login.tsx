@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAppForm } from '@/hooks/use-app-form'
 import { useAuth } from '@/hooks/use-auth'
 import { revalidateLogic } from '@tanstack/react-form'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
 
@@ -10,7 +10,8 @@ const loginSchema = z.object({
   email: z.email('Email invalide'),
 })
 
-const LoginPage = () => {
+export const Login = () => {
+  const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState<string>()
   const { signInWithMagicLink } = useAuth()
 
@@ -25,6 +26,8 @@ const LoginPage = () => {
       const response = await signInWithMagicLink(data.value.email)
       if (response.error) {
         setErrorMessage('Identifiants invalides. Veuillez réessayer.')
+      } else {
+        await navigate({ to: '/' })
       }
     },
   })
@@ -75,12 +78,3 @@ const LoginPage = () => {
     </div>
   )
 }
-
-export const Route = createFileRoute('/auth/login')({
-  beforeLoad: ({ context }) => {
-    if (context.authUser) {
-      throw redirect({ to: '/' })
-    }
-  },
-  component: LoginPage,
-})
