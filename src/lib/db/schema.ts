@@ -1,75 +1,75 @@
 import { relations } from 'drizzle-orm'
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-const ingredients = sqliteTable('ingredients', {
+const ingredient = sqliteTable('ingredients', {
   id: integer('id').primaryKey(),
   name: text('name').notNull(),
   pluralName: text('plural_name'),
 })
 
-const recipes = sqliteTable('recipes', {
+const recipe = sqliteTable('recipes', {
   id: integer('id').primaryKey(),
   name: text('name', { length: 255 }).notNull(),
   image: text('image', { length: 255 }).notNull(),
   steps: text('steps').notNull(),
 })
 
-const recipeSections = sqliteTable('recipe_sections', {
+const recipeIngredientsSection = sqliteTable('recipe_ingredients_sections', {
   id: integer('id').primaryKey(),
   name: text('name', { length: 255 }),
   recipeId: integer('recipe_id')
-    .references(() => recipes.id, { onDelete: 'cascade' })
+    .references(() => recipe.id, { onDelete: 'cascade' })
     .notNull(),
-  subRecipeId: integer('sub_recipe_id').references(() => recipes.id, {
+  subRecipeId: integer('sub_recipe_id').references(() => recipe.id, {
     onDelete: 'cascade',
   }),
   ratio: real('ratio'),
   isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
 })
 
-const sectionIngredients = sqliteTable('section_ingredients', {
+const sectionIngredient = sqliteTable('section_ingredients', {
   id: integer('id').primaryKey(),
   sectionId: integer('section_id')
-    .references(() => recipeSections.id, { onDelete: 'cascade' })
+    .references(() => recipeIngredientsSection.id, { onDelete: 'cascade' })
     .notNull(),
   ingredientId: integer('ingredient_id')
-    .references(() => ingredients.id, { onDelete: 'cascade' })
+    .references(() => ingredient.id, { onDelete: 'cascade' })
     .notNull(),
   quantity: real('quantity').notNull(),
   unit: text('unit'),
 })
 
-const ingredientsRelations = relations(ingredients, ({ many }) => ({
-  sectionIngredients: many(sectionIngredients),
+const ingredientsRelation = relations(ingredient, ({ many }) => ({
+  sectionIngredients: many(sectionIngredient),
 }))
 
-const recipesRelations = relations(recipes, ({ many }) => ({
-  sections: many(recipeSections, { relationName: 'section' }),
-  subRecipes: many(recipeSections, { relationName: 'subRecipe' }),
+const recipesRelation = relations(recipe, ({ many }) => ({
+  sections: many(recipeIngredientsSection, { relationName: 'section' }),
+  subRecipes: many(recipeIngredientsSection, { relationName: 'subRecipe' }),
 }))
 
-const recipeSectionsRelations = relations(recipeSections, ({ one, many }) => ({
-  recipe: one(recipes, {
-    fields: [recipeSections.recipeId],
-    references: [recipes.id],
+const recipeIngredientsSectionsRelation = relations(recipeIngredientsSection, ({ one, many }) => ({
+  recipe: one(recipe, {
+    fields: [recipeIngredientsSection.recipeId],
+    references: [recipe.id],
     relationName: 'section',
   }),
-  subRecipe: one(recipes, {
-    fields: [recipeSections.subRecipeId],
-    references: [recipes.id],
+  subRecipe: one(recipe, {
+    fields: [recipeIngredientsSection.subRecipeId],
+    references: [recipe.id],
     relationName: 'subRecipe',
   }),
-  sectionIngredients: many(sectionIngredients),
+  sectionIngredients: many(sectionIngredient),
 }))
 
-const sectionIngredientsRelations = relations(sectionIngredients, ({ one }) => ({
-  section: one(recipeSections, {
-    fields: [sectionIngredients.sectionId],
-    references: [recipeSections.id],
+const sectionIngredientsRelation = relations(sectionIngredient, ({ one }) => ({
+  section: one(recipeIngredientsSection, {
+    fields: [sectionIngredient.sectionId],
+    references: [recipeIngredientsSection.id],
   }),
-  ingredient: one(ingredients, {
-    fields: [sectionIngredients.ingredientId],
-    references: [ingredients.id],
+  ingredient: one(ingredient, {
+    fields: [sectionIngredient.ingredientId],
+    references: [ingredient.id],
   }),
 }))
 
@@ -137,34 +137,34 @@ const verification = sqliteTable('verification', {
   ),
 })
 
-const schema = {
-  ingredients,
-  recipes,
-  recipeSections,
-  sectionIngredients,
+export const schema = {
+  ingredient,
+  recipe,
+  recipeIngredientsSection,
+  sectionIngredient,
   user,
   session,
   account,
   verification,
-  ingredientsRelations,
-  recipesRelations,
-  recipeSectionsRelations,
-  sectionIngredientsRelations,
+  ingredientsRelation,
+  recipesRelation,
+  recipeIngredientsSectionsRelation,
+  sectionIngredientsRelation,
 }
 
 export default schema
 
 export {
-  ingredients,
-  recipes,
-  recipeSections,
-  sectionIngredients,
+  ingredient,
+  recipe,
+  recipeIngredientsSection,
+  sectionIngredient,
   user,
   session,
   account,
   verification,
-  ingredientsRelations,
-  recipesRelations,
-  recipeSectionsRelations,
-  sectionIngredientsRelations,
+  ingredientsRelation,
+  recipesRelation,
+  recipeIngredientsSectionsRelation,
+  sectionIngredientsRelation,
 }

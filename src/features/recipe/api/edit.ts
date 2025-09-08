@@ -1,6 +1,6 @@
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
-import { recipes, recipeSections, sectionIngredients } from '@/lib/db/schema'
+import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { deleteFile, uploadFile } from '@/lib/r2'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
@@ -31,8 +31,8 @@ const editRecipe = createServerFn({
   .handler(async ({ data }) => {
     const { image, sections, name, steps, id } = data
 
-    const currentRecipe = await getDb().query.recipes.findFirst({
-      where: eq(recipes.id, id),
+    const currentRecipe = await getDb().query.recipe.findFirst({
+      where: eq(recipe.id, id),
     })
 
     if (!currentRecipe) {
@@ -48,22 +48,22 @@ const editRecipe = createServerFn({
 
     await getDb().batch([
       getDb()
-        .update(recipes)
+        .update(recipe)
         .set({
           name,
           image: imageKey,
           steps,
         })
-        .where(eq(recipes.id, id))
-        .returning({ id: recipes.id }),
+        .where(eq(recipe.id, id))
+        .returning({ id: recipe.id }),
 
-      getDb().delete(recipeSections).where(eq(recipeSections.recipeId, id)),
+      getDb().delete(recipeIngredientsSection).where(eq(recipeIngredientsSection.recipeId, id)),
     ])
 
     await Promise.all(
       sections.map(async (section, index) => {
         if ('recipeId' in section) {
-          await getDb().insert(recipeSections).values({
+          await getDb().insert(recipeIngredientsSection).values({
             recipeId: currentRecipe.id,
             subRecipeId: section.recipeId,
             name: section.name,
@@ -71,7 +71,7 @@ const editRecipe = createServerFn({
           })
         } else if ('ingredients' in section) {
           const [updatedSection] = await getDb()
-            .insert(recipeSections)
+            .insert(recipeIngredientsSection)
             .values({
               recipeId: currentRecipe.id,
               name: section.name,
@@ -81,7 +81,7 @@ const editRecipe = createServerFn({
 
           if (section.ingredients.length > 0) {
             await getDb()
-              .insert(sectionIngredients)
+              .insert(sectionIngredient)
               .values(
                 section.ingredients.map((ingredient) => ({
                   sectionId: updatedSection.id,

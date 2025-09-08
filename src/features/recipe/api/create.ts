@@ -1,5 +1,5 @@
 import { getDb } from '@/lib/db'
-import { recipes, recipeSections, sectionIngredients } from '@/lib/db/schema'
+import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { uploadFile } from '@/lib/r2'
 import { units } from '@/types/units'
 import { createServerFn } from '@tanstack/react-start'
@@ -54,18 +54,18 @@ const createRecipe = createServerFn({
     const imageKey = await uploadFile(image)
 
     const [createdRecipe] = await getDb()
-      .insert(recipes)
+      .insert(recipe)
       .values({
         name,
         image: imageKey,
         steps,
       })
-      .returning({ id: recipes.id })
+      .returning({ id: recipe.id })
 
     await Promise.all(
       sections.map(async (section, index) => {
         if ('recipeId' in section) {
-          await getDb().insert(recipeSections).values({
+          await getDb().insert(recipeIngredientsSection).values({
             recipeId: createdRecipe.id,
             subRecipeId: section.recipeId,
             name: section.name,
@@ -73,7 +73,7 @@ const createRecipe = createServerFn({
           })
         } else if ('ingredients' in section) {
           const [createdSection] = await getDb()
-            .insert(recipeSections)
+            .insert(recipeIngredientsSection)
             .values({
               recipeId: createdRecipe.id,
               name: section.name,
@@ -83,7 +83,7 @@ const createRecipe = createServerFn({
 
           if (section.ingredients.length > 0) {
             await getDb()
-              .insert(sectionIngredients)
+              .insert(sectionIngredient)
               .values(
                 section.ingredients.map((ingredient) => ({
                   sectionId: createdSection.id,

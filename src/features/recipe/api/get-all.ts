@@ -1,5 +1,5 @@
 import { getDb } from '@/lib/db'
-import { recipes } from '@/lib/db/schema'
+import { recipe } from '@/lib/db/schema'
 import { getFileUrl } from '@/lib/r2'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
@@ -18,8 +18,8 @@ const getAllRecipes = createServerFn({
   .handler(async ({ data }) => {
     const allRecipes = await getDb()
       .select()
-      .from(recipes)
-      .where(like(recipes.name, `%${data.search}%`))
+      .from(recipe)
+      .where(like(recipe.name, `%${data.search}%`))
 
     return allRecipes.map((recipe) => ({
       ...recipe,
