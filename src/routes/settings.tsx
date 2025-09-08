@@ -8,9 +8,9 @@ const RouteComponent = () => {
   const auth = useAuth()
   return (
     <div className="flex flex-col gap-4 items-center p-4">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="text-2xl font-bold">Paramètres</h1>
       <p>{authUser?.email}</p>
-      <Button onClick={() => auth.signOut()}>Sign out</Button>
+      <Button onClick={() => auth.signOut()}>Se déconnecter</Button>
     </div>
   )
 }

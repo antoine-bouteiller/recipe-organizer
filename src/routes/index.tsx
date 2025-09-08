@@ -36,32 +36,30 @@ const Home = () => {
   }, [routeSearch.search, navigate])
 
   return (
-    <div className="p-8">
-      <div className="mx-auto max-w-5xl">
-        <div className="flex justify-between gap-4">
-          <div className="relative flex-1">
-            <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
-            <Input
-              placeholder="Rechercher une recette"
-              className="pl-8"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              ref={inputRef}
-            />
-          </div>
-          {authUser && (
-            <Button asChild variant="outline" size="icon" className="rounded-full">
-              <Link to="/recipe/new">
-                <PlusIcon />
-              </Link>
-            </Button>
-          )}
+    <div className="mx-auto max-w-5xl">
+      <div className="sticky top-0 z-10 bg-background flex justify-between gap-4 pb-2 pt-3 px-4 border-b border-border">
+        <div className="relative flex-1">
+          <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
+          <Input
+            placeholder="Rechercher une recette"
+            className="pl-8"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            ref={inputRef}
+          />
         </div>
-        <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-          {recipes?.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
+        {authUser && (
+          <Button asChild variant="outline" size="icon" className="rounded-full">
+            <Link to="/recipe/new">
+              <PlusIcon />
+            </Link>
+          </Button>
+        )}
+      </div>
+      <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 mt-4 px-4 pb-2">
+        {recipes?.map((recipe) => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
+        ))}
       </div>
     </div>
   )

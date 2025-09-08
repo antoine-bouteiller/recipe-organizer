@@ -38,7 +38,7 @@ const RootComponent = () => {
           <div className="flex-1 overflow-y-auto scroll-smooth">
             <Outlet />
           </div>
-          <div className="shrink-0 p-2 flex justify-around md:hidden">
+          <div className="shrink-0 p-2 flex justify-around md:hidden border-t border-border">
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
               <Link to="/">
                 {({ isActive }) =>
@@ -75,8 +75,6 @@ const RootComponent = () => {
             </Button>
           </div>
         </div>
-        {/* <TanStackRouterDevtools position="bottom-right" />
-        <ReactQueryDevtools buttonPosition="bottom-left" /> */}
         <Scripts />
       </body>
     </html>
