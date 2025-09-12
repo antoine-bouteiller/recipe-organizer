@@ -8,7 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { deleteRecipe } from '@/features/recipe/api/delete'
+import { deleteRecipeMutationQueryOptions } from '@/features/recipe/api/delete'
+import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { Trash2 } from 'lucide-react'
@@ -17,6 +18,7 @@ import { toast } from 'sonner'
 
 export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
   const [isOpen, setIsOpen] = useState(false)
+  const { mutateAsync: deleteRecipe } = useMutation(deleteRecipeMutationQueryOptions)
   const router = useRouter()
 
   const handleDelete = useServerFn(async () => {

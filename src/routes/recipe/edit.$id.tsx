@@ -1,12 +1,16 @@
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { editRecipe, editRecipeSchema, type EditRecipeFormInput } from '@/features/recipe/api/edit'
+import {
+  editRecipeMutationQueryOptions,
+  editRecipeSchema,
+  type EditRecipeFormInput,
+} from '@/features/recipe/api/edit'
 import { getRecipeQueryOptions, type RecipeSection } from '@/features/recipe/api/get-one'
 import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -33,6 +37,7 @@ const formatSection = (sections: RecipeSection) => {
 const EditRecipePage = () => {
   const { id } = Route.useParams()
   const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
+  const { mutateAsync: editRecipe } = useMutation(editRecipeMutationQueryOptions)
   const router = useRouter()
 
   const initialValues: EditRecipeFormInput = recipe

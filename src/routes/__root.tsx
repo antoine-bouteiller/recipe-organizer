@@ -17,6 +17,7 @@ import { useEffect } from 'react'
 import appCss from '../styles/app.css?url'
 import { homeFilled } from '@/components/icons/home-filed'
 import { settingsFilled } from '@/components/icons/settings-filled'
+import { wrapCreateRootRouteWithSentry } from '@sentry/tanstackstart-react'
 
 const RootComponent = () => {
   useEffect(() => {
@@ -81,10 +82,12 @@ const RootComponent = () => {
   )
 }
 
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
-  authUser: User | undefined
-}>()({
+export const Route = wrapCreateRootRouteWithSentry(
+  createRootRouteWithContext<{
+    queryClient: QueryClient
+    authUser: User | undefined
+  }>()
+)({
   head: () => ({
     meta: [
       {

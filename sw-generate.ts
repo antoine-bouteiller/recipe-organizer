@@ -18,11 +18,7 @@ const workboxGenerate = async (context: PluginContext) => {
     clientsClaim: true,
     cleanupOutdatedCaches: true,
     globIgnores: ['sw.js', '**/*.map'],
-    globPatterns: [
-      '**/*.{html,js,css}',
-      '**/*.{png,svg,ico,webp,avif,jpg,jpeg}',
-      '**/*.{woff,woff2,ttf,otf}',
-    ],
+    globPatterns: ['**/*.{html,js,css}', '**/*.{png,svg,ico,webp,avif,jpg,jpeg}'],
     swDest,
   })
 

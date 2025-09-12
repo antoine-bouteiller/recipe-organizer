@@ -11,7 +11,7 @@ const getAllIngredients = createServerFn({
 const getAllIngredientsQueryOptions = () =>
   queryOptions({
     queryKey: ['ingredients'],
-    queryFn: () => getAllIngredients(),
+    queryFn: getAllIngredients,
   })
 
 export { getAllIngredients, getAllIngredientsQueryOptions }

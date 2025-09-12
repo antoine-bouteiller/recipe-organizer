@@ -1,5 +1,5 @@
 import { getBindings } from '@/lib/bindings'
-import { CloudflareCache } from '@/lib/cloudflare_cache'
+import { CloudflareCache } from '@/lib/cloudflare-cache'
 import { notFound } from '@tanstack/react-router'
 import { createServerFileRoute } from '@tanstack/react-start/server'
 import { z } from 'zod'

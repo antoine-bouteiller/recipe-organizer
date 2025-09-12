@@ -1,12 +1,18 @@
 import { ErrorComponent, Link, rootRouteId, useMatch, useRouter } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import * as Sentry from '@sentry/tanstackstart-react'
 
-export const DefaultCatchBoundary = ({ error }: ErrorComponentProps) => {
+export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
   const router = useRouter()
   const isRoot = useMatch({
     strict: false,
     select: (state) => state.id === rootRouteId,
   })
+
+  useEffect(() => {
+    Sentry.captureException(error)
+  }, [error])
 
   return (
     <div className="min-w-0 flex-1 p-4 flex flex-col items-center justify-center gap-6">

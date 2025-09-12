@@ -1,10 +1,10 @@
 // src/router.tsx
-import { createRouter as createTanStackRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
-import { QueryClient } from '@tanstack/react-query'
+import { DefaultErrorComponent } from '@/components/default-error-component'
 import { NotFound } from '@/components/not-found'
-import { DefaultCatchBoundary } from '@/components/default-catch-boundary'
+import { QueryClient } from '@tanstack/react-query'
+import { createRouter as createTanStackRouter } from '@tanstack/react-router'
 import { routerWithQueryClient } from '@tanstack/react-router-with-query'
+import { routeTree } from './routeTree.gen'
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -19,7 +19,7 @@ export const createRouter = () => {
     createTanStackRouter({
       routeTree,
       notFoundMode: 'root',
-      defaultErrorComponent: DefaultCatchBoundary,
+      defaultErrorComponent: DefaultErrorComponent,
       defaultNotFoundComponent: NotFound,
       context: {
         queryClient,
