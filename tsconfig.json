@@ -8,5 +8,5 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable", "webworker"],
     "types": ["./worker-configuration.d.ts"]
   },
-  "include": ["src/**/*", "sw-generate.ts", "./vite.config.ts"]
+  "include": ["src/**/*", "sw-generate.ts", "./vite.config.ts", "./prisma.config.ts"]
 }

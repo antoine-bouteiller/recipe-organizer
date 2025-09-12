@@ -1,12 +1,19 @@
 import { getDb } from '@/lib/db'
-import { ingredient } from '@/lib/db/schema'
+import { withServerErrorCapture } from '@/lib/error-handler'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { asc } from 'drizzle-orm'
 
 const getAllIngredients = createServerFn({
   method: 'GET',
-}).handler(() => getDb().select().from(ingredient).orderBy(asc(ingredient.name)))
+}).handler(
+  withServerErrorCapture(() =>
+    getDb().ingredient.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    })
+  )
+)
 
 const getAllIngredientsQueryOptions = () =>
   queryOptions({

@@ -45,7 +45,7 @@ const EditRecipePage = () => {
         id: recipe.id,
         name: recipe.name,
         steps: recipe.steps,
-        sections: recipe.sections.map(formatSection),
+        ingredientsSections: recipe.ingredientsSections.map(formatSection),
       }
     : {}
 
@@ -64,7 +64,7 @@ const EditRecipePage = () => {
         }
         formData.append('name', parsedData.name)
         formData.append('steps', parsedData.steps)
-        formData.append('sections', JSON.stringify(parsedData.sections))
+        formData.append('sections', JSON.stringify(parsedData.ingredientsSections))
         formData.append('id', parsedData.id.toString())
         await editRecipe({ data: formData })
 

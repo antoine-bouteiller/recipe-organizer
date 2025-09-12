@@ -1,6 +1,6 @@
 import { getDb } from '@/lib/db'
-import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { uploadFile } from '@/lib/r2'
+import { withServerErrorCapture } from '@/lib/error-handler'
 import { units } from '@/types/units'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
@@ -11,7 +11,7 @@ const recipeSchema = z.object({
     message: 'Le nom de la recette doit contenir au moins 2 caractères.',
   }),
   steps: z.string(),
-  sections: z.array(
+  ingredientsSections: z.array(
     z.union([
       z.object({
         name: z.string().optional(),
@@ -37,7 +37,7 @@ const recipeSchema = z.object({
 
 type RecipeFormValues = z.infer<typeof recipeSchema>
 type RecipeFormInput = Partial<z.input<typeof recipeSchema>>
-export type RecipeSectionFormInput = NonNullable<RecipeFormInput['sections']>[number]
+export type RecipeSectionFormInput = NonNullable<RecipeFormInput['ingredientsSections']>[number]
 
 const createRecipe = createServerFn({
   method: 'POST',
@@ -50,62 +50,62 @@ const createRecipe = createServerFn({
     rawData.sections = JSON.parse(rawData.sections)
     return recipeSchema.parse(rawData)
   })
-  .handler(async ({ data }) => {
-    const { image, sections, name, steps } = data
-    const imageKey = await uploadFile(image)
+  .handler(
+    withServerErrorCapture(async ({ data }) => {
+      const { image, ingredientsSections: sections, name, steps } = data
+      const imageKey = await uploadFile(image)
 
-    const [createdRecipe] = await getDb()
-      .insert(recipe)
-      .values({
-        name,
-        image: imageKey,
-        steps,
+      const createdRecipe = await getDb().recipe.create({
+        data: {
+          name,
+          image: imageKey,
+          steps,
+        },
       })
-      .returning({ id: recipe.id })
 
-    await Promise.all(
-      sections.map(async (section, index) => {
-        if ('recipeId' in section) {
-          await getDb().insert(recipeIngredientsSection).values({
-            recipeId: createdRecipe.id,
-            subRecipeId: section.recipeId,
-            name: section.name,
-            ratio: section.ratio,
-          })
-        } else if ('ingredients' in section) {
-          const [createdSection] = await getDb()
-            .insert(recipeIngredientsSection)
-            .values({
-              recipeId: createdRecipe.id,
-              name: section.name,
-              isDefault: index === 0,
+      await Promise.all(
+        sections.map(async (section, index) => {
+          if ('recipeId' in section) {
+            await getDb().recipeIngredientsSection.create({
+              data: {
+                recipeId: createdRecipe.id,
+                subRecipeId: section.recipeId,
+                name: section.name,
+                ratio: section.ratio,
+              },
             })
-            .returning()
+          } else if ('ingredients' in section) {
+            const updatedSection = await getDb().recipeIngredientsSection.create({
+              data: {
+                recipeId: createdRecipe.id,
+                name: section.name,
+                isDefault: index === 0,
+              },
+            })
 
-          if (section.ingredients.length > 0) {
-            await getDb()
-              .insert(sectionIngredient)
-              .values(
-                section.ingredients.map((ingredient) => ({
-                  sectionId: createdSection.id,
+            if (section.ingredients.length > 0) {
+              await getDb().sectionIngredient.createMany({
+                data: section.ingredients.map((ingredient) => ({
+                  sectionId: updatedSection.id,
                   ingredientId: ingredient.id,
                   quantity: ingredient.quantity,
                   unit: ingredient.unit,
-                }))
-              )
+                })),
+              })
+            }
           }
-        }
-      })
-    )
-  })
+        })
+      )
+    })
+  )
 
 const createRecipeMutationQueryOptions = mutationOptions({
   mutationFn: createRecipe,
 })
 
 export {
-  recipeSchema,
   createRecipeMutationQueryOptions,
-  type RecipeFormValues,
+  recipeSchema,
   type RecipeFormInput,
+  type RecipeFormValues,
 }

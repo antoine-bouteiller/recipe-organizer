@@ -1,0 +1,57 @@
+model Account {
+    id                    String  @id
+    accountId             String  @map("account_id")
+    providerId            String  @map("provider_id")
+    userId                String  @map("user_id")
+    accessToken           String? @map("access_token")
+    refreshToken          String? @map("refresh_token")
+    idToken               String? @map("id_token")
+    accessTokenExpiresAt  Int?    @map("access_token_expires_at")
+    refreshTokenExpiresAt Int?    @map("refresh_token_expires_at")
+    scope                 String?
+    password              String?
+    createdAt             Int     @map("created_at")
+    updatedAt             Int     @map("updated_at")
+    user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@map("account")
+}
+
+model Session {
+    id        String  @id
+    expiresAt Int     @map("expires_at")
+    token     String  @unique(map: "session_token_unique")
+    createdAt Int     @map("created_at")
+    updatedAt Int     @map("updated_at")
+    ipAddress String? @map("ip_address")
+    userAgent String? @map("user_agent")
+    userId    String  @map("user_id")
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+    @@map("session")
+}
+
+model User {
+    id            String    @id
+    name          String
+    email         String    @unique(map: "user_email_unique")
+    emailVerified Int       @map("email_verified")
+    image         String?
+    createdAt     Int       @map("created_at")
+    updatedAt     Int       @map("updated_at")
+    account       Account[]
+    session       Session[]
+
+    @@map("user")
+}
+
+model Verification {
+    id         String @id
+    identifier String
+    value      String
+    expiresAt  Int    @map("expires_at")
+    createdAt  Int?   @map("created_at")
+    updatedAt  Int?   @map("updated_at")
+
+    @@map("verification")
+}

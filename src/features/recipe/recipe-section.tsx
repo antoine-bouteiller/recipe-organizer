@@ -23,7 +23,7 @@ const RecipeSectionIngredients = ({ sectionIngredients }: RecipeSectionIngredien
   )
 
 interface RecipeSectionsProps {
-  sections: Recipe['sections']
+  sections: Recipe['ingredientsSections']
 }
 
 export const RecipeSections = ({ sections }: RecipeSectionsProps) =>
@@ -35,7 +35,7 @@ export const RecipeSections = ({ sections }: RecipeSectionsProps) =>
 
       {section.subRecipe && (
         <RecipeSectionIngredients
-          sectionIngredients={section.subRecipe.sections[0].sectionIngredients}
+          sectionIngredients={section.subRecipe.ingredientsSections[0].sectionIngredients}
         />
       )}
     </Fragment>

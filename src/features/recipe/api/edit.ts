@@ -1,13 +1,11 @@
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
-import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
-import { withServerErrorCapture } from '@/lib/error-handler'
 import { deleteFile, uploadFile } from '@/lib/r2'
 import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { withServerErrorCapture } from '@/lib/error-handler'
 
 const editRecipeSchema = z.object({
   ...recipeSchema.shape,
@@ -24,18 +22,20 @@ const editRecipe = createServerFn({
   .validator((formData: FormData) => {
     const rawData = Object.fromEntries(formData.entries())
 
-    if (typeof rawData.sections !== 'string') {
+    if (typeof rawData.ingredientsSections !== 'string') {
       throw new TypeError('Invalid input format')
     }
-    rawData.sections = JSON.parse(rawData.sections)
+    rawData.ingredientsSections = JSON.parse(rawData.ingredientsSections)
     return editRecipeSchema.parse(rawData)
   })
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const { image, sections, name, steps, id } = data
+      const { image, ingredientsSections, name, steps, id } = data
 
-      const currentRecipe = await getDb().query.recipe.findFirst({
-        where: eq(recipe.id, id),
+      const currentRecipe = await getDb().recipe.findFirst({
+        where: {
+          id,
+        },
       })
 
       if (!currentRecipe) {
@@ -49,57 +49,59 @@ const editRecipe = createServerFn({
         imageKey = await uploadFile(image)
       }
 
-      await getDb().batch([
-        getDb()
-          .update(recipe)
-          .set({
+      await Promise.all([
+        getDb().recipe.update({
+          where: {
+            id,
+          },
+          data: {
             name,
             image: imageKey,
             steps,
-          })
-          .where(eq(recipe.id, id))
-          .returning({ id: recipe.id }),
-
-        getDb().delete(recipeIngredientsSection).where(eq(recipeIngredientsSection.recipeId, id)),
+          },
+        }),
+        getDb().recipeIngredientsSection.deleteMany({
+          where: {
+            recipeId: id,
+          },
+        }),
       ])
 
       await Promise.all(
-        sections.map(async (section, index) => {
+        ingredientsSections.map(async (section, index) => {
           if ('recipeId' in section) {
-            await getDb().insert(recipeIngredientsSection).values({
-              recipeId: currentRecipe.id,
-              subRecipeId: section.recipeId,
-              name: section.name,
-              ratio: section.ratio,
+            await getDb().recipeIngredientsSection.create({
+              data: {
+                recipeId: currentRecipe.id,
+                subRecipeId: section.recipeId,
+                name: section.name,
+                ratio: section.ratio,
+              },
             })
           } else if ('ingredients' in section) {
-            const [updatedSection] = await getDb()
-              .insert(recipeIngredientsSection)
-              .values({
+            const updatedSection = await getDb().recipeIngredientsSection.create({
+              data: {
                 recipeId: currentRecipe.id,
                 name: section.name,
                 isDefault: index === 0,
-              })
-              .returning()
+              },
+            })
 
             if (section.ingredients.length > 0) {
-              await getDb()
-                .insert(sectionIngredient)
-                .values(
-                  section.ingredients.map((ingredient) => ({
-                    sectionId: updatedSection.id,
-                    ingredientId: ingredient.id,
-                    quantity: ingredient.quantity,
-                    unit: ingredient.unit,
-                  }))
-                )
+              await getDb().sectionIngredient.createMany({
+                data: section.ingredients.map((ingredient) => ({
+                  sectionId: updatedSection.id,
+                  ingredientId: ingredient.id,
+                  quantity: ingredient.quantity,
+                  unit: ingredient.unit,
+                })),
+              })
             }
           }
         })
       )
     })
   )
-
 const editRecipeMutationQueryOptions = mutationOptions({
   mutationFn: editRecipe,
 })

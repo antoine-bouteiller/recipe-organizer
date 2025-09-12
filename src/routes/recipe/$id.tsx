@@ -66,7 +66,7 @@ const RecipePage = () => {
               <TabsTrigger value="preparation">Préparation</TabsTrigger>
             </TabsList>
             <TabsContent value="ingredients" className=" px-2">
-              <RecipeSections sections={recipe.sections} />
+              <RecipeSections sections={recipe.ingredientsSections} />
             </TabsContent>
 
             <TabsContent value="preparation" className="px-2">
@@ -79,7 +79,7 @@ const RecipePage = () => {
           <div className="col-span-2 border rounded-xl p-8">
             <div className="text-xl font-semibold">Ingrédients</div>
             <div className="space-y-3">
-              <RecipeSections sections={recipe.sections} />
+              <RecipeSections sections={recipe.ingredientsSections} />
             </div>
           </div>
 

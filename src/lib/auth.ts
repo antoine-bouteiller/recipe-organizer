@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { APIError } from 'better-auth/api'
-import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { reactStartCookies } from 'better-auth/react-start'
 import { getDb } from './db'
 
@@ -12,7 +12,7 @@ import verifyEmail from '@/emails/verify-email.html?raw'
 const ALLOWED_USERS = new Set(['anto.bouteiller@gmail.com', 'elisebayraktar@gmail.com'])
 
 export const auth = betterAuth({
-  database: drizzleAdapter(getDb(), {
+  database: prismaAdapter(getDb(), {
     provider: 'sqlite',
   }),
   plugins: [

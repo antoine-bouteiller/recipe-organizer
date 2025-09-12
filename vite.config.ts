@@ -27,6 +27,9 @@ const viteConfig = defineConfig({
       target: 'cloudflare-module',
     }),
     tailwindcss(),
+    react({
+      exclude: ['**/.wrangler/**/*'],
+    }),
     workboxGeneratePlugin(),
     sentryRollupPlugin({
       authToken: process.env.SENTRY_AUTH_TOKEN,

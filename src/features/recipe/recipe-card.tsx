@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Recipe } from '@/types/recipe'
+import type { Recipe } from '@/generated/prisma/client'
 import { Link } from '@tanstack/react-router'
 
 interface RecipeCardProps {

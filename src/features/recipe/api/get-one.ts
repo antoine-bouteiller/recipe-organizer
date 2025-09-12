@@ -1,12 +1,10 @@
+import { getDb } from '@/lib/db'
+import { withServerErrorCapture } from '@/lib/error-handler'
+import { getFileUrl } from '@/lib/r2'
+import { queryOptions } from '@tanstack/react-query'
+import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { getDb } from '@/lib/db'
-import { desc, eq } from 'drizzle-orm'
-import { recipe } from '@/lib/db/schema'
-import { getFileUrl } from '@/lib/r2'
-import { notFound } from '@tanstack/react-router'
-import { queryOptions } from '@tanstack/react-query'
-import { withServerErrorCapture } from '@/lib/error-handler'
 
 const getRecipe = createServerFn({
   method: 'GET',
@@ -15,22 +13,24 @@ const getRecipe = createServerFn({
   .validator(z.number())
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const result = await getDb().query.recipe.findFirst({
-        where: eq(recipe.id, data),
-        with: {
-          sections: {
-            with: {
+      const result = await getDb().recipe.findFirst({
+        where: {
+          id: data,
+        },
+        include: {
+          ingredientsSections: {
+            include: {
               sectionIngredients: {
-                with: {
+                include: {
                   ingredient: true,
                 },
               },
               subRecipe: {
-                with: {
-                  sections: {
-                    with: {
+                include: {
+                  ingredientsSections: {
+                    include: {
                       sectionIngredients: {
-                        with: {
+                        include: {
                           ingredient: true,
                         },
                       },
@@ -39,7 +39,9 @@ const getRecipe = createServerFn({
                 },
               },
             },
-            orderBy: (table) => [desc(table.isDefault)],
+            orderBy: {
+              isDefault: 'desc',
+            },
           },
         },
       })
@@ -56,7 +58,7 @@ const getRecipe = createServerFn({
   )
 
 export type Recipe = Awaited<ReturnType<typeof getRecipe>>
-export type RecipeSection = Recipe['sections'][number]
+export type RecipeSection = Recipe['ingredientsSections'][number]
 
 const getRecipeQueryOptions = (id: string | number) =>
   queryOptions({

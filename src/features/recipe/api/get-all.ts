@@ -1,10 +1,8 @@
 import { getDb } from '@/lib/db'
-import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { getFileUrl } from '@/lib/r2'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { like } from 'drizzle-orm'
 import z from 'zod'
 
 const getAllRecipes = createServerFn({
@@ -18,10 +16,13 @@ const getAllRecipes = createServerFn({
   )
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const allRecipes = await getDb()
-        .select()
-        .from(recipe)
-        .where(like(recipe.name, `%${data.search}%`))
+      const allRecipes = await getDb().recipe.findMany({
+        where: {
+          name: {
+            contains: data.search,
+          },
+        },
+      })
 
       return allRecipes.map((recipe) => ({
         ...recipe,

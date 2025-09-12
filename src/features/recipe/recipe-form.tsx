@@ -20,7 +20,7 @@ export const recipeDefaultValues: RecipeFormInput = {
   name: '',
   steps: '',
   image: undefined,
-  sections: [
+  ingredientsSections: [
     {
       ingredients: [
         {
@@ -32,8 +32,9 @@ export const recipeDefaultValues: RecipeFormInput = {
   ],
 }
 
-const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) =>
-  section && 'recipeId' in section && !!section.recipeId
+const hasSubRecipe = (
+  section: NonNullable<RecipeFormInput['ingredientsSections']>[number] | undefined
+) => section && 'recipeId' in section && !!section.recipeId
 
 export const recipeFormFields = createFieldMap(recipeDefaultValues)
 
@@ -85,7 +86,7 @@ export const RecipeForm = withFieldGroup({
         <div className="flex flex-col gap-2 pt-2">
           <div className="text-base font-semibold">Ingrédients</div>
           <Field
-            name="sections"
+            name="ingredientsSections"
             mode="array"
             children={({
               state: sectionsState,
@@ -94,7 +95,10 @@ export const RecipeForm = withFieldGroup({
             }) => (
               <>
                 {sectionsState.value?.map((_, sectionIndex) => (
-                  <AppField name={`sections[${sectionIndex}]`} key={`section-${sectionIndex}`}>
+                  <AppField
+                    name={`ingredientsSections[${sectionIndex}]`}
+                    key={`section-${sectionIndex}`}
+                  >
                     {({
                       FormItem: SectionFormItem,
                       FormControl: SectionFormControl,
@@ -107,7 +111,7 @@ export const RecipeForm = withFieldGroup({
                             {sectionIndex !== 0 && (
                               <>
                                 <AppField
-                                  name={`sections[${sectionIndex}].name`}
+                                  name={`ingredientsSections[${sectionIndex}].name`}
                                   children={({ TextField }) => (
                                     <TextField label="Nom" disabled={isSubmitting} />
                                   )}
@@ -128,7 +132,10 @@ export const RecipeForm = withFieldGroup({
                             {hasSubRecipe(sectionState.value) ? (
                               <div />
                             ) : (
-                              <AppField name={`sections[${sectionIndex}].ingredients`} mode="array">
+                              <AppField
+                                name={`ingredientsSections[${sectionIndex}].ingredients`}
+                                mode="array"
+                              >
                                 {({
                                   FormMessage: IngredientFormMessage,
                                   state: ingredientsState,
@@ -142,7 +149,7 @@ export const RecipeForm = withFieldGroup({
                                       >
                                         <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col">
                                           <AppField
-                                            name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].id`}
+                                            name={`ingredientsSections[${sectionIndex}].ingredients[${ingredientIndex}].id`}
                                             children={({ SearchSelectField }) => (
                                               <SearchSelectField
                                                 options={ingredientsOptions}
@@ -151,7 +158,7 @@ export const RecipeForm = withFieldGroup({
                                             )}
                                           />
                                           <AppField
-                                            name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].quantity`}
+                                            name={`ingredientsSections[${sectionIndex}].ingredients[${ingredientIndex}].quantity`}
                                             children={({ NumberField }) => (
                                               <NumberField
                                                 min={0}
@@ -161,7 +168,7 @@ export const RecipeForm = withFieldGroup({
                                             )}
                                           />
                                           <AppField
-                                            name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unit`}
+                                            name={`ingredientsSections[${sectionIndex}].ingredients[${ingredientIndex}].unit`}
                                             children={({ SearchSelectField }) => (
                                               <SearchSelectField
                                                 options={unitsOptions}

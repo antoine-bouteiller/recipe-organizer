@@ -27,7 +27,7 @@ const NewRecipePage = () => {
         formData.append('image', parsedData.image)
         formData.append('name', parsedData.name)
         formData.append('steps', parsedData.steps)
-        formData.append('sections', JSON.stringify(parsedData.sections))
+        formData.append('sections', JSON.stringify(parsedData.ingredientsSections))
         await createRecipe({ data: formData })
 
         await router.navigate({ to: '/' })
