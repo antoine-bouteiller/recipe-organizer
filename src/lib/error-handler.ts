@@ -7,6 +7,6 @@ export const withServerErrorCapture =
       return await handler(ctx)
     } catch (error) {
       Sentry.captureException(error)
-      throw new Error('Une erreur est survenue')
+      throw new Error('Une erreur est survenue', { cause: error })
     }
   }

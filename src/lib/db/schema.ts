@@ -12,6 +12,7 @@ const recipe = sqliteTable('recipes', {
   name: text('name', { length: 255 }).notNull(),
   image: text('image', { length: 255 }).notNull(),
   steps: text('steps').notNull(),
+  quantity: integer('quantity').notNull(),
 })
 
 const recipeIngredientsSection = sqliteTable('recipe_ingredients_sections', {

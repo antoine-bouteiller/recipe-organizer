@@ -20,6 +20,7 @@ export const recipeDefaultValues: RecipeFormInput = {
   name: '',
   steps: '',
   image: undefined,
+  quantity: 4,
   sections: [
     {
       ingredients: [
@@ -69,6 +70,11 @@ export const RecipeForm = withFieldGroup({
           children={(field) => (
             <field.TextField label="Nom de la recette" disabled={isSubmitting} />
           )}
+        />
+
+        <AppField
+          name="quantity"
+          children={({ NumberField }) => <NumberField min={0} disabled={isSubmitting} />}
         />
 
         <AppField

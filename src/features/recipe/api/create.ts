@@ -11,6 +11,7 @@ const recipeSchema = z.object({
     message: 'Le nom de la recette doit contenir au moins 2 caractères.',
   }),
   steps: z.string(),
+  quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
   sections: z.array(
     z.union([
       z.object({
@@ -51,7 +52,7 @@ const createRecipe = createServerFn({
     return recipeSchema.parse(rawData)
   })
   .handler(async ({ data }) => {
-    const { image, sections, name, steps } = data
+    const { image, sections, name, steps, quantity } = data
     const imageKey = await uploadFile(image)
 
     const [createdRecipe] = await getDb()
@@ -60,6 +61,7 @@ const createRecipe = createServerFn({
         name,
         image: imageKey,
         steps,
+        quantity,
       })
       .returning({ id: recipe.id })
 

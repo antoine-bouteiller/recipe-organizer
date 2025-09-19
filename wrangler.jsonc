@@ -14,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "recipe-organizer",
-      "database_id": "9525737e-71fb-4c65-8784-dd1c956b6977",
+      "database_id": "723806f3-417e-447b-9ac0-13d6bb1b0757",
       "migrations_dir": "migrations",
     },
   ],

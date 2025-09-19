@@ -45,6 +45,7 @@ const EditRecipePage = () => {
         id: recipe.id,
         name: recipe.name,
         steps: recipe.steps,
+        quantity: recipe.quantity,
         sections: recipe.sections.map(formatSection),
       }
     : {}
