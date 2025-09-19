@@ -4,16 +4,19 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/delete-recipe'
-import { RecipeSections } from '@/features/recipe/recipe-section'
+import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
-import { EllipsisVerticalIcon, Loader2, PencilIcon } from 'lucide-react'
+import { EllipsisVerticalIcon, Loader2, MinusIcon, PencilIcon, PlusIcon } from 'lucide-react'
+import { useState } from 'react'
 import { z } from 'zod'
 
 const RecipePage = () => {
   const { id } = Route.useParams()
   const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
   const { authUser } = Route.useRouteContext()
+
+  const [quantity, setQuantity] = useState(recipe?.quantity ?? 0)
 
   if (isLoading) {
     return (
@@ -58,6 +61,15 @@ const RecipePage = () => {
         </div>
       </CardHeader>
 
+      <div className="flex items-center gap-2 justify-center w-full py-2 md:justify-start px-8">
+        <Button variant="outline" size="icon" onClick={() => setQuantity(quantity - 1)}>
+          <MinusIcon />
+        </Button>
+        {quantity}
+        <Button variant="outline" size="icon" onClick={() => setQuantity(quantity + 1)}>
+          <PlusIcon />
+        </Button>
+      </div>
       <div className="flex-1 prose prose-sm max-w-none text-foreground flex flex-col">
         <CardContent className="px-8 md:hidden">
           <Tabs defaultValue="ingredients" className="gap-0">
@@ -65,8 +77,12 @@ const RecipePage = () => {
               <TabsTrigger value="ingredients">Ingrédients</TabsTrigger>
               <TabsTrigger value="preparation">Préparation</TabsTrigger>
             </TabsList>
-            <TabsContent value="ingredients" className=" px-2">
-              <RecipeSections sections={recipe.sections} />
+            <TabsContent value="ingredients" className="px-2">
+              <RecipeIngredientsSections
+                sections={recipe.sections}
+                quantity={quantity}
+                baseQuantity={recipe.quantity}
+              />
             </TabsContent>
 
             <TabsContent value="preparation" className="px-2">
@@ -79,7 +95,11 @@ const RecipePage = () => {
           <div className="col-span-2 border rounded-xl p-8">
             <div className="text-xl font-semibold">Ingrédients</div>
             <div className="space-y-3">
-              <RecipeSections sections={recipe.sections} />
+              <RecipeIngredientsSections
+                sections={recipe.sections}
+                quantity={quantity}
+                baseQuantity={recipe.quantity}
+              />
             </div>
           </div>
 
