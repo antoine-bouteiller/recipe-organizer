@@ -6,7 +6,11 @@ import { asc } from 'drizzle-orm'
 
 const getAllIngredients = createServerFn({
   method: 'GET',
-}).handler(() => getDb().select().from(ingredient).orderBy(asc(ingredient.name)))
+}).handler(() =>
+  getDb().query.ingredient.findMany({
+    orderBy: asc(ingredient.name),
+  })
+)
 
 const getAllIngredientsQueryOptions = () =>
   queryOptions({

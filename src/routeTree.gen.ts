@@ -11,9 +11,9 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShoppingListRouteImport } from './routes/shopping-list'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RecipeRouteImport } from './routes/recipe'
-import { Route as CartRouteImport } from './routes/cart'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipeNewRouteImport } from './routes/recipe/new'
 import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
@@ -24,6 +24,11 @@ import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/
 
 const rootServerRouteImport = createServerRootRoute()
 
+const ShoppingListRoute = ShoppingListRouteImport.update({
+  id: '/shopping-list',
+  path: '/shopping-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -32,11 +37,6 @@ const SettingsRoute = SettingsRouteImport.update({
 const RecipeRoute = RecipeRouteImport.update({
   id: '/recipe',
   path: '/recipe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -77,9 +77,9 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/cart': typeof CartRoute
   '/recipe': typeof RecipeRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/shopping-list': typeof ShoppingListRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -87,20 +87,20 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cart': typeof CartRoute
   '/recipe': typeof RecipeRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/shopping-list': typeof ShoppingListRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
+  '__root__': typeof rootRouteImport
   '/': typeof IndexRoute
-  '/cart': typeof CartRoute
   '/recipe': typeof RecipeRouteWithChildren
   '/settings': typeof SettingsRoute
+  '/shopping-list': typeof ShoppingListRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -110,9 +110,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/cart'
     | '/recipe'
     | '/settings'
+    | '/shopping-list'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -120,9 +120,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/cart'
     | '/recipe'
     | '/settings'
+    | '/shopping-list'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -130,9 +130,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/cart'
     | '/recipe'
     | '/settings'
+    | '/shopping-list'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -141,9 +141,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CartRoute: typeof CartRoute
   RecipeRoute: typeof RecipeRouteWithChildren
   SettingsRoute: typeof SettingsRoute
+  ShoppingListRoute: typeof ShoppingListRoute
   AuthLoginRoute: typeof AuthLoginRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -155,7 +155,7 @@ export interface FileServerRoutesByTo {
   '/api/image/$id': typeof ApiImageIdServerRoute
 }
 export interface FileServerRoutesById {
-  __root__: typeof rootServerRouteImport
+  '__root__': typeof rootServerRouteImport
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/image/$id': typeof ApiImageIdServerRoute
 }
@@ -174,6 +174,13 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shopping-list': {
+      id: '/shopping-list'
+      path: '/shopping-list'
+      fullPath: '/shopping-list'
+      preLoaderRoute: typeof ShoppingListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -186,13 +193,6 @@ declare module '@tanstack/react-router' {
       path: '/recipe'
       fullPath: '/recipe'
       preLoaderRoute: typeof RecipeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -263,14 +263,13 @@ const RecipeRouteChildren: RecipeRouteChildren = {
   RecipeEditIdRoute: RecipeEditIdRoute,
 }
 
-const RecipeRouteWithChildren =
-  RecipeRoute._addFileChildren(RecipeRouteChildren)
+const RecipeRouteWithChildren = RecipeRoute._addFileChildren(RecipeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CartRoute: CartRoute,
   RecipeRoute: RecipeRouteWithChildren,
   SettingsRoute: SettingsRoute,
+  ShoppingListRoute: ShoppingListRoute,
   AuthLoginRoute: AuthLoginRoute,
 }
 export const routeTree = rootRouteImport
