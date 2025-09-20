@@ -48,7 +48,7 @@ export const useShopingListStore = () => {
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,
-    quantity: recipesQuantities[recipe.id],
+    wantedQuantity: recipesQuantities[recipe.id],
   }))
 
   const shoppingListIngredients = useMemo(
@@ -60,11 +60,12 @@ export const useShopingListStore = () => {
               (accIngredient) => accIngredient.id === ingredient.ingredient.id
             )
             if (existingIngredient) {
-              existingIngredient.quantity += ingredient.quantity
+              existingIngredient.quantity +=
+                (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity
             } else {
               acc.push({
                 ...ingredient.ingredient,
-                quantity: ingredient.quantity,
+                quantity: (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity,
                 unit: ingredient.unit,
                 checked: false,
               })

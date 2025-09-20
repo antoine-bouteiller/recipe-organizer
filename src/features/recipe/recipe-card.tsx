@@ -9,26 +9,14 @@ interface RecipeCardProps {
   recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
 }
 
+const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButtonElement>) => {
+  event.preventDefault()
+  event.stopPropagation()
+  callback()
+}
+
 export default function RecipeCard({ recipe }: RecipeCardProps) {
   const { setRecipesQuantities, recipesQuantities } = useShopingListStore()
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setRecipesQuantities(recipe.id, recipe.quantity)
-  }
-
-  const handleIncrement = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setRecipesQuantities(recipe.id, recipesQuantities[recipe.id] + 1)
-  }
-
-  const handleDecrement = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setRecipesQuantities(recipe.id, recipesQuantities[recipe.id] - 1)
-  }
 
   const isInShoppingCart = recipesQuantities[recipe.id]
 
@@ -49,16 +37,37 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
           </CardTitle>
           {isInShoppingCart ? (
             <div className="flex items-center gap-2">
-              <Button onClick={handleDecrement} variant="outline" size="icon">
+              <Button
+                onClick={handleClick(() =>
+                  setRecipesQuantities(recipe.id, recipesQuantities[recipe.id] - 1)
+                )}
+                variant="outline"
+                size="icon"
+              >
                 <MinusIcon />
               </Button>
               <span>{recipesQuantities[recipe.id]}</span>
-              <Button onClick={handleIncrement} variant="outline" size="icon">
+              <Button
+                onClick={handleClick(() =>
+                  setRecipesQuantities(recipe.id, recipesQuantities[recipe.id] + 1)
+                )}
+                variant="outline"
+                size="icon"
+              >
                 <PlusIcon />
+              </Button>
+              <Button
+                onClick={handleClick(() => setRecipesQuantities(recipe.id, 0))}
+                variant="outline"
+              >
+                Supprimer de la liste
               </Button>
             </div>
           ) : (
-            <Button onClick={handleClick} variant="outline">
+            <Button
+              onClick={handleClick(() => setRecipesQuantities(recipe.id, recipe.quantity))}
+              variant="outline"
+            >
               Ajouter à la liste de courses
             </Button>
           )}
