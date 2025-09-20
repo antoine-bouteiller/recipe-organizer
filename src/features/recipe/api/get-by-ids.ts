@@ -4,22 +4,22 @@ import { withServerErrorCapture } from '@/lib/error-handler'
 import { getFileUrl } from '@/lib/r2'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { like } from 'drizzle-orm'
+import { inArray } from 'drizzle-orm'
 import z from 'zod'
 
-const getAllRecipes = createServerFn({
+const getRecipesByIds = createServerFn({
   method: 'GET',
   response: 'data',
 })
   .validator(
     z.object({
-      search: z.string().optional(),
+      ids: z.array(z.number()),
     })
   )
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const allRecipes = await getDb().query.recipe.findMany({
-        where: like(recipe.name, `%${data.search}%`),
+      const recipes = await getDb().query.recipe.findMany({
+        where: inArray(recipe.id, data.ids),
         with: {
           sections: {
             with: {
@@ -33,17 +33,17 @@ const getAllRecipes = createServerFn({
         },
       })
 
-      return allRecipes.map((recipe) => ({
+      return recipes.map((recipe) => ({
         ...recipe,
         image: getFileUrl(recipe.image),
       }))
     })
   )
 
-const getAllRecipesQueryOptions = (search?: string) =>
+const getRecipesByIdsQueryOptions = (ids: number[]) =>
   queryOptions({
-    queryKey: ['recipes', search],
-    queryFn: () => getAllRecipes({ data: { search } }),
+    queryKey: ['recipes', ids],
+    queryFn: () => getRecipesByIds({ data: { ids } }),
   })
 
-export { getAllRecipes, getAllRecipesQueryOptions }
+export { getRecipesByIds, getRecipesByIdsQueryOptions }

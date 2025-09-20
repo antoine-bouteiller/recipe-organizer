@@ -57,7 +57,7 @@ const RootComponent = () => {
               </Link>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
-              <Link to="/cart">
+              <Link to="/shopping-list">
                 {({ isActive }) => (
                   <ShoppingCartIcon className="size-6" fill={isActive ? 'currentColor' : 'none'} />
                 )}
