@@ -1,10 +1,14 @@
+import type { Unit } from '@/types/units'
 import { relations } from 'drizzle-orm'
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 const ingredient = sqliteTable('ingredients', {
   id: integer('id').primaryKey(),
   name: text('name').notNull(),
-  pluralName: text('plural_name'),
+  allowedUnits: text('allowed_units', { mode: 'json' }).$type<Unit[]>().default([]),
+  category: text('category').notNull().default('supermarket'),
+  vegan: integer('vegan', { mode: 'boolean' }).notNull().default(false),
+  parentId: integer('parent_id'),
 })
 
 const recipe = sqliteTable('recipes', {
@@ -13,6 +17,7 @@ const recipe = sqliteTable('recipes', {
   image: text('image', { length: 255 }).notNull(),
   steps: text('steps').notNull(),
   quantity: integer('quantity').notNull(),
+  tags: text('tags', { mode: 'json' }).$type<string[]>().default([]),
 })
 
 const recipeIngredientsSection = sqliteTable('recipe_ingredients_sections', {
@@ -49,7 +54,14 @@ const recipesRelation = relations(recipe, ({ many }) => ({
   subRecipes: many(recipeIngredientsSection, { relationName: 'subRecipe' }),
 }))
 
-const recipeIngredientsSectionsRelation = relations(recipeIngredientsSection, ({ one, many }) => ({
+const subIngredientRelation = relations(ingredient, ({ one }) => ({
+  parent: one(ingredient, {
+    fields: [ingredient.parentId],
+    references: [ingredient.id],
+  }),
+}))
+
+const recipeIngredientSectionRelation = relations(recipeIngredientsSection, ({ one, many }) => ({
   recipe: one(recipe, {
     fields: [recipeIngredientsSection.recipeId],
     references: [recipe.id],
@@ -145,11 +157,12 @@ export const schema = {
   sectionIngredient,
   user,
   session,
+  subIngredientRelation,
   account,
   verification,
   ingredientsRelation,
   recipesRelation,
-  recipeIngredientsSectionsRelation,
+  recipeIngredientsSectionsRelation: recipeIngredientSectionRelation,
   sectionIngredientsRelation,
 }
 
@@ -162,10 +175,11 @@ export {
   sectionIngredient,
   user,
   session,
+  subIngredientRelation,
   account,
   verification,
   ingredientsRelation,
   recipesRelation,
-  recipeIngredientsSectionsRelation,
+  recipeIngredientSectionRelation as recipeIngredientsSectionsRelation,
   sectionIngredientsRelation,
 }

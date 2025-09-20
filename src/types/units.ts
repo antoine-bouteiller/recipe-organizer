@@ -1,9 +1,7 @@
 export const units = [
   'g',
-  'kg',
   'mL',
   'cL',
-  'L',
   'CàC',
   'CàS',
   'cube(s)',
