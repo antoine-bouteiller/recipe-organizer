@@ -6,11 +6,13 @@ import { withServerErrorCapture } from '@/lib/error-handler'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { authGuard } from '@/features/auth/auth-guard'
 
 const deleteRecipe = createServerFn({
   method: 'POST',
   response: 'data',
 })
+  .middleware([authGuard])
   .validator(z.number())
   .handler(
     withServerErrorCapture(async ({ data }) => {

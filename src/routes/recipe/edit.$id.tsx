@@ -8,6 +8,8 @@ import {
 import { getRecipeQueryOptions, type RecipeSection } from '@/features/recipe/api/get-one'
 import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
+import { objectToFormData } from '@/lib/form-data'
+import { getFileUrl } from '@/lib/utils'
 import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -59,14 +61,8 @@ const EditRecipePage = () => {
     onSubmit: async (data) => {
       try {
         const parsedData = editRecipeSchema.parse(data.value)
-        const formData = new FormData()
-        if (parsedData.image) {
-          formData.append('image', parsedData.image)
-        }
-        formData.append('name', parsedData.name)
-        formData.append('steps', parsedData.steps)
-        formData.append('sections', JSON.stringify(parsedData.sections))
-        formData.append('id', parsedData.id.toString())
+        const formData = objectToFormData(parsedData)
+
         await editRecipe({ data: formData })
 
         await router.navigate({ to: '/' })
@@ -103,7 +99,11 @@ const EditRecipePage = () => {
           }}
           className="space-y-6"
         >
-          <RecipeForm form={form} fields={recipeFormFields} imagePreview={recipe.image} />
+          <RecipeForm
+            form={form}
+            fields={recipeFormFields}
+            initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }}
+          />
           <div className="flex gap-4 pt-6">
             <Button
               type="button"

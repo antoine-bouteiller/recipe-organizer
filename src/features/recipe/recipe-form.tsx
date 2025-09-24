@@ -3,6 +3,7 @@ import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-al
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
 import { withFieldGroup } from '@/hooks/use-app-form'
+import type { FileMetadata } from '@/hooks/use-file-upload'
 import { units } from '@/types/units'
 import { Separator } from '@radix-ui/react-separator'
 import { createFieldMap, useStore } from '@tanstack/react-form'
@@ -39,15 +40,13 @@ const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] 
 export const recipeFormFields = createFieldMap(recipeDefaultValues)
 
 interface RecipeFormProps extends Record<string, unknown> {
-  imagePreview?: string
+  initialImage?: FileMetadata
 }
 
 export const RecipeForm = withFieldGroup({
   defaultValues: recipeDefaultValues,
-  props: {
-    imagePreview: '' as string | undefined,
-  } as RecipeFormProps,
-  render: function Render({ group, imagePreview }) {
+  props: {} as RecipeFormProps,
+  render: function Render({ group, initialImage }) {
     const { data: ingredients } = useQuery(getAllIngredientsQueryOptions())
 
     const ingredientsOptions = useMemo(
@@ -74,7 +73,9 @@ export const RecipeForm = withFieldGroup({
 
         <AppField
           name="quantity"
-          children={({ NumberField }) => <NumberField min={0} disabled={isSubmitting} />}
+          children={({ NumberField }) => (
+            <NumberField min={0} disabled={isSubmitting} label="Quantité" />
+          )}
         />
 
         <AppField
@@ -83,7 +84,7 @@ export const RecipeForm = withFieldGroup({
             <ImageField
               label="Photo de la recette"
               disabled={isSubmitting}
-              initialPreview={imagePreview}
+              initialImage={initialImage}
             />
           )}
         />

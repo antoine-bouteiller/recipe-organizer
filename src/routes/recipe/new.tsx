@@ -5,6 +5,7 @@ import { createRecipeMutationQueryOptions, recipeSchema } from '@/features/recip
 import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import { recipeDefaultValues, RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
+import { objectToFormData } from '@/lib/form-data'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
@@ -23,11 +24,7 @@ const NewRecipePage = () => {
     onSubmit: async (data) => {
       try {
         const parsedData = recipeSchema.parse(data.value)
-        const formData = new FormData()
-        formData.append('image', parsedData.image)
-        formData.append('name', parsedData.name)
-        formData.append('steps', parsedData.steps)
-        formData.append('sections', JSON.stringify(parsedData.sections))
+        const formData = objectToFormData(parsedData)
         await createRecipe({ data: formData })
 
         await router.navigate({ to: '/' })

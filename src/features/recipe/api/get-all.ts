@@ -1,7 +1,7 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { getFileUrl } from '@/lib/r2'
+import { getFileUrl } from '@/lib/utils'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { like } from 'drizzle-orm'
@@ -18,24 +18,19 @@ const getAllRecipes = createServerFn({
   )
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const allRecipes = await getDb().query.recipe.findMany({
-        where: like(recipe.name, `%${data.search}%`),
-        with: {
-          sections: {
-            with: {
-              sectionIngredients: {
-                with: {
-                  ingredient: true,
-                },
-              },
-            },
-          },
-        },
-      })
+      const rows = await getDb()
+        .select({
+          id: recipe.id,
+          name: recipe.name,
+          image: recipe.image,
+          quantity: recipe.quantity,
+        })
+        .from(recipe)
+        .where(data.search ? like(recipe.name, `%${data.search}%`) : undefined)
 
-      return allRecipes.map((recipe) => ({
-        ...recipe,
-        image: getFileUrl(recipe.image),
+      return rows.map((row) => ({
+        ...row,
+        image: getFileUrl(row.image),
       }))
     })
   )

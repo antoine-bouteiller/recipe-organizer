@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/delete-recipe'
 import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
+import { getFileUrl } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { EllipsisVerticalIcon, Loader2, MinusIcon, PencilIcon, PlusIcon } from 'lucide-react'
@@ -54,7 +55,7 @@ const RecipePage = () => {
       )}
       <CardHeader className="p-0">
         <div className="mb-6 w-full overflow-hidden md:rounded-t-lg flex items-center justify-center aspect-16/6">
-          <img src={recipe.image} alt={recipe.name} className="object-cover w-full" />
+          <img src={getFileUrl(recipe.image)} alt={recipe.name} className="object-cover w-full" />
         </div>
         <div className="px-6">
           <h1 className="text-3xl font-bold md:text-4xl">{recipe.name}</h1>

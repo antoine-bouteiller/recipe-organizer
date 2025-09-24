@@ -1,11 +1,11 @@
 import { betterAuth } from 'better-auth'
-import { APIError } from 'better-auth/api'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { APIError } from 'better-auth/api'
 import { reactStartCookies } from 'better-auth/react-start'
 import { getDb } from './db'
 
-import { magicLink } from 'better-auth/plugins'
 import { formatEmail, sendEmail } from '@/lib/email-send'
+import { magicLink } from 'better-auth/plugins'
 
 import verifyEmail from '@/emails/verify-email.html?raw'
 

@@ -1,12 +1,11 @@
-import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
 import { getDb } from '@/lib/db'
-import { desc, eq } from 'drizzle-orm'
 import { recipe } from '@/lib/db/schema'
-import { getFileUrl } from '@/lib/r2'
-import { notFound } from '@tanstack/react-router'
-import { queryOptions } from '@tanstack/react-query'
 import { withServerErrorCapture } from '@/lib/error-handler'
+import { queryOptions } from '@tanstack/react-query'
+import { notFound } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { desc, eq } from 'drizzle-orm'
+import { z } from 'zod'
 
 const getRecipe = createServerFn({
   method: 'GET',
@@ -50,7 +49,7 @@ const getRecipe = createServerFn({
 
       return {
         ...result,
-        image: getFileUrl(result.image),
+        image: result.image,
       }
     })
   )

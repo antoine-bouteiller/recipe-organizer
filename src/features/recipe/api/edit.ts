@@ -1,7 +1,9 @@
 import { recipeSchema } from '@/features/recipe/api/create'
+import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
+import { parseFormData } from '@/lib/form-data'
 import { deleteFile, uploadFile } from '@/lib/r2'
 import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
@@ -12,7 +14,6 @@ import { z } from 'zod'
 const editRecipeSchema = z.object({
   ...recipeSchema.shape,
   id: z.coerce.number(),
-  image: z.instanceof(File, { message: "L'image est requise" }).optional(),
 })
 
 type EditRecipeFormValues = z.infer<typeof editRecipeSchema>
@@ -21,15 +22,8 @@ type EditRecipeFormInput = Partial<z.input<typeof editRecipeSchema>>
 const editRecipe = createServerFn({
   method: 'POST',
 })
-  .validator((formData: FormData) => {
-    const rawData = Object.fromEntries(formData.entries())
-
-    if (typeof rawData.sections !== 'string') {
-      throw new TypeError('Invalid input format')
-    }
-    rawData.sections = JSON.parse(rawData.sections)
-    return editRecipeSchema.parse(rawData)
-  })
+  .middleware([authGuard])
+  .validator((formData: FormData) => editRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const { image, sections, name, steps, id } = data
@@ -44,7 +38,7 @@ const editRecipe = createServerFn({
 
       let imageKey = currentRecipe.image
 
-      if (image) {
+      if (image instanceof File) {
         await deleteFile(imageKey)
         imageKey = await uploadFile(image)
       }

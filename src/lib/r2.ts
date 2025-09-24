@@ -26,6 +26,4 @@ const deleteFile = async (key: string) => {
   await getBindings().R2_BUCKET.delete(key)
 }
 
-const getFileUrl = (key: string) => `/api/image/${key}`
-
-export { uploadFile, deleteFile, getFileUrl }
+export { deleteFile, uploadFile }

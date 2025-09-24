@@ -1,10 +1,16 @@
+import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
+import { parseFormData } from '@/lib/form-data'
 import { uploadFile } from '@/lib/r2'
 import { units } from '@/types/units'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+
+const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })], {
+  message: "L'image est requise",
+})
 
 const recipeSchema = z.object({
   name: z.string().min(2, {
@@ -33,7 +39,7 @@ const recipeSchema = z.object({
       }),
     ])
   ),
-  image: z.instanceof(File, { message: "L'image est requise" }),
+  image: fileSchema,
 })
 
 type RecipeFormValues = z.infer<typeof recipeSchema>
@@ -43,17 +49,11 @@ export type RecipeSectionFormInput = NonNullable<RecipeFormInput['sections']>[nu
 const createRecipe = createServerFn({
   method: 'POST',
 })
-  .validator((formData: FormData) => {
-    const rawData = Object.fromEntries(formData.entries())
-    if (typeof rawData.sections !== 'string') {
-      throw new TypeError('Invalid input format')
-    }
-    rawData.sections = JSON.parse(rawData.sections)
-    return recipeSchema.parse(rawData)
-  })
+  .middleware([authGuard])
+  .validator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data }) => {
     const { image, sections, name, steps, quantity } = data
-    const imageKey = await uploadFile(image)
+    const imageKey = image instanceof File ? await uploadFile(image) : image.id
 
     const [createdRecipe] = await getDb()
       .insert(recipe)

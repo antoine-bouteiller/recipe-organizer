@@ -1,7 +1,6 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { getFileUrl } from '@/lib/r2'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { inArray } from 'drizzle-orm'
@@ -35,7 +34,7 @@ const getRecipesByIds = createServerFn({
 
       return recipes.map((recipe) => ({
         ...recipe,
-        image: getFileUrl(recipe.image),
+        image: `/api/image/${recipe.image}`,
       }))
     })
   )
