@@ -1,12 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "recipe-organizer",
-  "main": ".output/server/index.mjs",
+  "main": "src/server.ts",
   "compatibility_date": "2025-07-29",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "directory": ".output/public",
-  },
   "observability": {
     "enabled": true,
   },

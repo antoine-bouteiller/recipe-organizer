@@ -8,9 +8,8 @@ import z from 'zod'
 
 const getRecipesByIds = createServerFn({
   method: 'GET',
-  response: 'data',
 })
-  .validator(
+  .inputValidator(
     z.object({
       ids: z.array(z.number()),
     })

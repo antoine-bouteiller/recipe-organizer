@@ -1,11 +1,11 @@
 // vite.config.ts
+import { cloudflare } from '@cloudflare/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import { workboxGeneratePlugin } from './sw-generate'
-import { sentryRollupPlugin } from '@sentry/rollup-plugin'
-import react from '@vitejs/plugin-react'
 
 const viteConfig = defineConfig({
   server: {
@@ -14,28 +14,19 @@ const viteConfig = defineConfig({
       ignored: ['.wrangler/**/*'],
     },
   },
-  build: {
-    sourcemap: true,
-  },
   plugins: [
     tsConfigPaths(),
     react({
       exclude: ['**/.wrangler/**/*'],
     }),
-    tanstackStart({
-      customViteReactPlugin: true,
-      target: 'cloudflare-module',
+    tanstackStart(),
+    cloudflare({
+      viteEnvironment: {
+        name: 'ssr',
+      },
     }),
     tailwindcss(),
     workboxGeneratePlugin(),
-    sentryRollupPlugin({
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: 'antoine-bouteiller',
-      project: 'recipe-orgnanizer',
-      sourcemaps: {
-        filesToDeleteAfterUpload: ['.tanstack/start/build/client-dist/**/*.map'],
-      },
-    }),
   ],
 })
 

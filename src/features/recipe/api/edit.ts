@@ -23,7 +23,7 @@ const editRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard])
-  .validator((formData: FormData) => editRecipeSchema.parse(parseFormData(formData)))
+  .inputValidator((formData: FormData) => editRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const { image, sections, name, steps, id } = data

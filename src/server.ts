@@ -1,5 +1,4 @@
-import { createStartHandler, defaultStreamHandler } from '@tanstack/react-start/server'
-import { createRouter } from './router'
+import handler from '@tanstack/react-start/server-entry'
 import * as Sentry from '@sentry/tanstackstart-react'
 
 Sentry.init({
@@ -13,6 +12,8 @@ Sentry.init({
   enabled: import.meta.env.PROD,
 })
 
-export default createStartHandler({
-  createRouter,
-})(defaultStreamHandler)
+export default {
+  fetch(request: Request) {
+    return handler.fetch(request)
+  },
+}

@@ -5,10 +5,7 @@ import type { PluginOption } from 'vite'
 import { generateSW } from 'workbox-build'
 
 const workboxGenerate = async (context: PluginContext) => {
-  const clientDist = resolve(
-    dirname(fileURLToPath(import.meta.url)),
-    '.tanstack/start/build/client-dist'
-  )
+  const clientDist = resolve(dirname(fileURLToPath(import.meta.url)), 'dist/client')
   const swDest = resolve(clientDist, 'sw.js')
 
   const { count, size, warnings } = await generateSW({

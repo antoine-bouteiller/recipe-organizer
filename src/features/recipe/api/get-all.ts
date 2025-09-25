@@ -7,15 +7,14 @@ import { createServerFn } from '@tanstack/react-start'
 import { like } from 'drizzle-orm'
 import z from 'zod'
 
+const getAllRecipesSchema = z.object({
+  search: z.string().optional(),
+})
+
 const getAllRecipes = createServerFn({
   method: 'GET',
-  response: 'data',
 })
-  .validator(
-    z.object({
-      search: z.string().optional(),
-    })
-  )
+  .inputValidator(getAllRecipesSchema)
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const rows = await getDb()

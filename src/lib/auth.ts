@@ -4,10 +4,10 @@ import { APIError } from 'better-auth/api'
 import { reactStartCookies } from 'better-auth/react-start'
 import { getDb } from './db'
 
-import { formatEmail, sendEmail } from '@/lib/email-send'
+import { sendEmail } from '@/lib/email-send'
 import { magicLink } from 'better-auth/plugins'
 
-import verifyEmail from '@/emails/verify-email.html?raw'
+import { getVerifyEmail } from '@/emails/verify-email'
 
 const ALLOWED_USERS = new Set(['anto.bouteiller@gmail.com', 'elisebayraktar@gmail.com'])
 
@@ -25,8 +25,7 @@ export const auth = betterAuth({
           })
         }
 
-        const html = formatEmail(verifyEmail, { loginUrl: url })
-        await sendEmail(email, 'Connexion à votre compte', html)
+        await sendEmail(email, 'Connexion à votre compte', await getVerifyEmail(url))
       },
     }),
   ],

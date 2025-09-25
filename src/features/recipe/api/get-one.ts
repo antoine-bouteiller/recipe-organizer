@@ -9,9 +9,8 @@ import { z } from 'zod'
 
 const getRecipe = createServerFn({
   method: 'GET',
-  response: 'data',
 })
-  .validator(z.number())
+  .inputValidator(z.number())
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const result = await getDb().query.recipe.findFirst({

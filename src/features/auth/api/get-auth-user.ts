@@ -1,11 +1,11 @@
 import { auth } from '@/lib/auth'
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { createServerFn } from '@tanstack/react-start'
-import { getWebRequest } from '@tanstack/react-start/server'
+import { getRequest } from '@tanstack/react-start/server'
 
 export const getAuthUser = createServerFn({ method: 'GET' }).handler(
   withServerErrorCapture(async () => {
-    const request = getWebRequest()
+    const request = getRequest()
     if (!request?.headers) {
       return undefined
     }

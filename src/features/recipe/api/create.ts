@@ -50,7 +50,7 @@ const createRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard])
-  .validator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
+  .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data }) => {
     const { image, sections, name, steps, quantity } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id

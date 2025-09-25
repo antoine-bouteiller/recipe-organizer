@@ -10,10 +10,9 @@ import { authGuard } from '@/features/auth/auth-guard'
 
 const deleteRecipe = createServerFn({
   method: 'POST',
-  response: 'data',
 })
   .middleware([authGuard])
-  .validator(z.number())
+  .inputValidator(z.number())
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const deletedRecipe = await getDb().delete(recipe).where(eq(recipe.id, data)).returning()
