@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import { Toaster } from '@/components/ui/sonner'
 import type { QueryClient } from '@tanstack/react-query'
 import {
@@ -9,23 +8,27 @@ import {
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 
+import { homeFilled } from '@/components/icons/home-filed'
+import { settingsFilled } from '@/components/icons/settings-filled'
 import { Button } from '@/components/ui/button'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import type { User } from 'better-auth'
 import { HomeIcon, Icon, SearchIcon, SettingsIcon, ShoppingCartIcon } from 'lucide-react'
 import { useEffect } from 'react'
+import { getSerwist } from 'virtual:serwist'
 import appCss from '../styles/app.css?url'
-import { homeFilled } from '@/components/icons/home-filed'
-import { settingsFilled } from '@/components/icons/settings-filled'
-import { wrapCreateRootRouteWithSentry } from '@sentry/tanstackstart-react'
+
+const loadSerwist = async () => {
+  if ('serviceWorker' in navigator) {
+    const serwist = await getSerwist()
+
+    void serwist?.register()
+  }
+}
 
 const RootComponent = () => {
   useEffect(() => {
-    if ('serviceWorker' in navigator && import.meta.env.PROD) {
-      const swUrl = new URL(`/sw.js`, globalThis.location.href).toString()
-
-      void navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL })
-    }
+    loadSerwist()
   }, [])
 
   return (
@@ -82,12 +85,10 @@ const RootComponent = () => {
   )
 }
 
-export const Route = wrapCreateRootRouteWithSentry(
-  createRootRouteWithContext<{
-    queryClient: QueryClient
-    authUser: User | undefined
-  }>()
-)({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+  authUser: User | undefined
+}>()({
   head: () => ({
     meta: [
       {

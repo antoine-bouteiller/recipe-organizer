@@ -1,11 +1,11 @@
 // vite.config.ts
-import { cloudflare } from '@cloudflare/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
-import { workboxGeneratePlugin } from './sw-generate'
+import { serwist } from '@serwist/vite'
+import { cloudflare } from '@cloudflare/vite-plugin'
 
 const viteConfig = defineConfig({
   server: {
@@ -16,17 +16,16 @@ const viteConfig = defineConfig({
   },
   plugins: [
     tsConfigPaths(),
-    react({
-      exclude: ['**/.wrangler/**/*'],
-    }),
+    react(),
     tanstackStart(),
-    cloudflare({
-      viteEnvironment: {
-        name: 'ssr',
-      },
-    }),
     tailwindcss(),
-    workboxGeneratePlugin(),
+    serwist({
+      swSrc: 'src/sw.ts',
+      swDest: 'sw.js',
+      globDirectory: 'dist',
+      injectionPoint: 'self.__SW_MANIFEST',
+    }),
+    cloudflare(),
   ],
 })
 
