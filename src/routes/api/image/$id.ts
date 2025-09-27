@@ -1,43 +1,27 @@
-import { env } from 'cloudflare:workers'
-import { CloudflareCache } from '@/lib/cache'
+import { cache } from '@/lib/cache-manager'
 import { createFileRoute, notFound } from '@tanstack/react-router'
+import { env } from 'cloudflare:workers'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/api/image/$id')({
   server: {
     handlers: {
-      GET: async ({ params, request }) => {
+      GET: ({ params, request }) => {
         const { id } = z.object({ id: z.string() }).parse(params)
 
-        const cache = new CloudflareCache()
-        const cachedResponse = await cache.get(request.url)
+        return cache.getWithCache(request.url)(async () => {
+          const file = await env.R2_BUCKET.get(id)
 
-        if (cachedResponse) {
-          return new Response(cachedResponse.body, {
+          if (!file) {
+            throw notFound()
+          }
+
+          return new Response(file.body, {
             headers: {
-              'Content-Type': cachedResponse.headers.get('Content-Type') ?? 'image/webp',
-              'Cache-Control': 'public, max-age=31536000, immutable',
-              'CF-Cache-Status': 'HIT',
+              'Content-Type': file.httpMetadata?.contentType ?? 'image/webp',
             },
           })
-        }
-        const file = await env.R2_BUCKET.get(id)
-
-        if (!file) {
-          throw notFound()
-        }
-
-        const response = new Response(file.body, {
-          headers: {
-            'Content-Type': file.httpMetadata?.contentType ?? 'image/webp',
-            'Cache-Control': 'public, max-age=31536000, immutable',
-            'CF-Cache-Status': 'MISS',
-          },
         })
-
-        await cache.put(request.url, response.clone())
-
-        return response
       },
     },
   },

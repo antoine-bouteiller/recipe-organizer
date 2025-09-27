@@ -53,27 +53,29 @@ export const useShopingListStore = () => {
 
   const shoppingListIngredients = useMemo(
     () =>
-      recipesWithQuantities?.reduce<IngredientWithQuantity[]>((acc, recipe) => {
-        for (const section of recipe.sections) {
-          for (const ingredient of section.sectionIngredients) {
-            const existingIngredient = acc.find(
-              (accIngredient) => accIngredient.id === ingredient.ingredient.id
-            )
-            if (existingIngredient) {
-              existingIngredient.quantity +=
-                (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity
-            } else {
-              acc.push({
-                ...ingredient.ingredient,
-                quantity: (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity,
-                unit: ingredient.unit,
-                checked: false,
-              })
+      recipesWithQuantities
+        ?.filter((recipe) => recipe.wantedQuantity > 0)
+        .reduce<IngredientWithQuantity[]>((acc, recipe) => {
+          for (const section of recipe.sections) {
+            for (const ingredient of section.sectionIngredients) {
+              const existingIngredient = acc.find(
+                (accIngredient) => accIngredient.id === ingredient.ingredient.id
+              )
+              if (existingIngredient) {
+                existingIngredient.quantity +=
+                  (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity
+              } else {
+                acc.push({
+                  ...ingredient.ingredient,
+                  quantity: (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity,
+                  unit: ingredient.unit,
+                  checked: false,
+                })
+              }
             }
           }
-        }
-        return acc
-      }, []) || [],
+          return acc
+        }, []) || [],
     [recipesWithQuantities]
   )
 

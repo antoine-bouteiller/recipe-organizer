@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useShopingListStore } from '@/stores/shoping-cart.store'
+import { useShopingListStore } from '@/stores/shoping-list.store'
 import type { Recipe } from '@/types/recipe'
 import { Link } from '@tanstack/react-router'
 import { MinusIcon, PlusIcon } from 'lucide-react'
