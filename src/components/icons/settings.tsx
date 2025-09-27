@@ -1,4 +1,4 @@
-import type { IconNode } from 'lucide-react'
+import { Icon, LucideSettings, type IconNode } from 'lucide-react'
 
 export const settingsFilled: IconNode = [
   [
@@ -11,3 +11,10 @@ export const settingsFilled: IconNode = [
     },
   ],
 ]
+
+export const SettingsIcon = ({ className, filled }: { className?: string; filled?: boolean }) => {
+  if (filled) {
+    return <Icon name="settings" className={className} iconNode={settingsFilled} />
+  }
+  return <LucideSettings name="settings" className={className} />
+}

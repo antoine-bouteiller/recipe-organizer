@@ -1,5 +1,5 @@
-import { getBindings } from '@/lib/bindings'
-import { CloudflareCache } from '@/lib/cloudflare-cache'
+import { env } from 'cloudflare:workers'
+import { CloudflareCache } from '@/lib/cache'
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { z } from 'zod'
 
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/api/image/$id')({
             },
           })
         }
-        const file = await getBindings().R2_BUCKET.get(id)
+        const file = await env.R2_BUCKET.get(id)
 
         if (!file) {
           throw notFound()

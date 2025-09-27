@@ -96,7 +96,7 @@ export interface FileRoutesByTo {
   '/recipe/edit/$id': typeof RecipeEditIdRoute
 }
 export interface FileRoutesById {
-  '__root__': typeof rootRouteImport
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/recipe': typeof RecipeRouteWithChildren
   '/settings': typeof SettingsRoute
@@ -244,7 +244,8 @@ const RecipeRouteChildren: RecipeRouteChildren = {
   RecipeEditIdRoute: RecipeEditIdRoute,
 }
 
-const RecipeRouteWithChildren = RecipeRoute._addFileChildren(RecipeRouteChildren)
+const RecipeRouteWithChildren =
+  RecipeRoute._addFileChildren(RecipeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,

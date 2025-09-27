@@ -9,11 +9,14 @@ import { magicLink } from 'better-auth/plugins'
 
 import { getVerifyEmail } from '@/emails/verify-email'
 
+import * as schema from '@/lib/db/schema'
+
 const ALLOWED_USERS = new Set(['anto.bouteiller@gmail.com', 'elisebayraktar@gmail.com'])
 
 export const auth = betterAuth({
   database: drizzleAdapter(getDb(), {
     provider: 'sqlite',
+    schema,
   }),
   plugins: [
     reactStartCookies(),

@@ -1,7 +1,7 @@
-import { getBindings } from '@/lib/bindings'
+import { env } from 'cloudflare:workers'
 import { Resend } from 'resend'
 
-const resend = new Resend(getBindings().RESEND_API_KEY)
+const resend = new Resend(env.RESEND_API_KEY)
 
 const sendEmail = async (to: string, subject: string, html: string) => {
   await resend.emails.send({

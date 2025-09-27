@@ -1,19 +1,19 @@
 import { Toaster } from '@/components/ui/sonner'
 import type { QueryClient } from '@tanstack/react-query'
 import {
+  createRootRouteWithContext,
   HeadContent,
   Link,
   Outlet,
   Scripts,
-  createRootRouteWithContext,
 } from '@tanstack/react-router'
 
-import { homeFilled } from '@/components/icons/home-filed'
-import { settingsFilled } from '@/components/icons/settings-filled'
+import { HomeIcon } from '@/components/icons/home'
+import { SettingsIcon } from '@/components/icons/settings'
 import { Button } from '@/components/ui/button'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import type { User } from 'better-auth'
-import { HomeIcon, Icon, SearchIcon, SettingsIcon, ShoppingCartIcon } from 'lucide-react'
+import { SearchIcon, ShoppingCartIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { getSerwist } from 'virtual:serwist'
 import appCss from '../styles/app.css?url'
@@ -45,13 +45,7 @@ const RootComponent = () => {
           <div className="shrink-0 p-2 flex justify-around md:hidden border-t border-border">
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
               <Link to="/">
-                {({ isActive }) =>
-                  isActive ? (
-                    <Icon className="size-6" iconNode={homeFilled} />
-                  ) : (
-                    <HomeIcon className="size-6" />
-                  )
-                }
+                {({ isActive }) => <HomeIcon className="size-6" filled={isActive} />}
               </Link>
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
@@ -68,13 +62,7 @@ const RootComponent = () => {
             </Button>
             <Button variant="ghost" size="icon" className="rounded-full" asChild>
               <Link to="/settings">
-                {({ isActive }) =>
-                  isActive ? (
-                    <Icon className="size-6" iconNode={settingsFilled} />
-                  ) : (
-                    <SettingsIcon className="size-6" />
-                  )
-                }
+                {({ isActive }) => <SettingsIcon className="size-6" filled={isActive} />}
               </Link>
             </Button>
           </div>

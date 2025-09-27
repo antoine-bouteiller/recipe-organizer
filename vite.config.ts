@@ -10,14 +10,16 @@ import { cloudflare } from '@cloudflare/vite-plugin'
 const viteConfig = defineConfig({
   server: {
     port: 3000,
-    watch: {
-      ignored: ['.wrangler/**/*'],
-    },
   },
   plugins: [
-    tsConfigPaths(),
-    react(),
+    tsConfigPaths({
+      projects: ['./tsconfig.json'],
+    }),
+    cloudflare({
+      viteEnvironment: { name: 'ssr' },
+    }),
     tanstackStart(),
+    react(),
     tailwindcss(),
     serwist({
       swSrc: 'src/sw.ts',
@@ -25,7 +27,6 @@ const viteConfig = defineConfig({
       globDirectory: 'dist',
       injectionPoint: 'self.__SW_MANIFEST',
     }),
-    cloudflare(),
   ],
 })
 

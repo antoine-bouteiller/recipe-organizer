@@ -1,12 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "recipe-organizer",
-  "main": "src/server.ts",
+  "main": "@tanstack/react-start/server-entry",
   "compatibility_date": "2025-07-29",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": true,
   },
+  "env": {},
   "d1_databases": [
     {
       "binding": "DB",

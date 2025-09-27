@@ -9,7 +9,8 @@
     "typecheck": "tsgo --noEmit",
     "format": "prettier --write .",
     "serve": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -30,7 +31,7 @@
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-router": "^1.132.7",
     "@tanstack/react-router-ssr-query": "^1.132.7",
-    "@tanstack/react-start": "^1.132.9",
+    "@tanstack/react-start": "^1.132.13",
     "@tanstack/router-plugin": "^1.132.7",
     "@tiptap/extension-text-style": "^3.6.1",
     "@tiptap/react": "^3.6.1",
@@ -40,7 +41,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "dotenv": "^17.2.2",
-    "drizzle-kit": "^0.31.4",
+    "drizzle-kit": "^0.31.5",
     "drizzle-orm": "^0.44.5",
     "immer": "^10.1.3",
     "ky": "^1.10.0",
@@ -57,8 +58,20 @@
     "zod": "^4.1.11",
     "zustand": "^5.0.8"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "lefthook",
+      "prisma",
+      "sharp",
+      "workerd"
+    ]
+  },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.13.6",
+    "@cloudflare/vite-plugin": "^1.13.7",
     "@commitlint/cli": "^20.0.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@prettier/plugin-oxc": "^0.0.4",
@@ -67,29 +80,26 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.13",
     "@tanstack/react-query-devtools": "^5.90.2",
-    "@tanstack/react-router-devtools": "^1.132.7",
+    "@tanstack/react-router-devtools": "^1.132.11",
     "@tsconfig/vite-react": "^7.0.1",
     "@types/node": "^24.5.2",
-    "@types/react": "^19.1.13",
+    "@types/react": "^19.1.14",
     "@types/react-dom": "^19.1.9",
     "@typescript/native-preview": "7.0.0-dev.20250728.1",
     "@vitejs/plugin-react": "^5.0.3",
-    "jsdom": "^27.0.0",
     "lefthook": "^1.13.4",
     "oxlint": "^1.18.0",
     "oxlint-tsgolint": "^0.2.0",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "rolldown": "1.0.0-beta.34",
     "serwist": "^9.2.1",
+    "sqlite": "^5.1.1",
     "tailwindcss": "^4.1.13",
-    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.2",
-    "vite": "npm:rolldown-vite@latest",
-    "vite-bundle-analyzer": "^1.2.3",
+    "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4",
     "workbox-build": "^7.3.0",
-    "wrangler": "^4.40.1"
+    "wrangler": "^4.40.2"
   },
   "packageManager": "pnpm@10.17.1",
   "commitlint": {

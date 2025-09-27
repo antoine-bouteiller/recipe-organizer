@@ -1,4 +1,4 @@
-import { getBindings } from '@/lib/bindings'
+import { env } from 'cloudflare:workers'
 import { randomUUID } from 'node:crypto'
 
 const uploadFile = async (file: File) => {
@@ -6,8 +6,7 @@ const uploadFile = async (file: File) => {
 
   const imageStream = file.stream()
 
-  const optimizedImage = await getBindings()
-    .IMAGES.input(imageStream)
+  const optimizedImage = await env.IMAGES.input(imageStream)
     .transform({
       width: 1024,
     })
@@ -15,7 +14,7 @@ const uploadFile = async (file: File) => {
 
   // R2 requires known-length bodies for uploads; convert to ArrayBuffer
   const optimizedBuffer = await optimizedImage.response().arrayBuffer()
-  await getBindings().R2_BUCKET.put(key, optimizedBuffer, {
+  await env.R2_BUCKET.put(key, optimizedBuffer, {
     httpMetadata: { contentType: optimizedImage.contentType() },
   })
 
@@ -23,7 +22,7 @@ const uploadFile = async (file: File) => {
 }
 
 const deleteFile = async (key: string) => {
-  await getBindings().R2_BUCKET.delete(key)
+  await env.R2_BUCKET.delete(key)
 }
 
 export { deleteFile, uploadFile }
