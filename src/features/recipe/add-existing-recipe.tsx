@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { SearchSelect } from '@/components/ui/searchselect'
+import { Combobox } from '@/components/ui/combobox'
 import { useQuery } from '@tanstack/react-query'
 import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import { useState } from 'react'
@@ -44,7 +44,7 @@ export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRec
         <DialogHeader>
           <DialogTitle>Ajouter une recette existante</DialogTitle>
         </DialogHeader>
-        <SearchSelect
+        <Combobox
           options={recipesOptions}
           value={selectedRecipe?.recipeId.toString()}
           onChange={(option) => {

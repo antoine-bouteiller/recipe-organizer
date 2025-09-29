@@ -28,7 +28,7 @@ const loadSerwist = async () => {
 
 const RootComponent = () => {
   useEffect(() => {
-    loadSerwist()
+    void loadSerwist()
   }, [])
 
   return (

@@ -26,7 +26,6 @@ export const NumberField = ({
       {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
       <FormControl>
         <NumberInput
-          className="text-base"
           placeholder={placeholder}
           min={min}
           max={max}

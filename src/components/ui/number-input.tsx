@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ComponentProps } from 'react'
-import { NumericFormat } from 'react-number-format'
 import type { NumericFormatProps } from 'react-number-format'
+import { NumericFormat } from 'react-number-format'
 
 type NumberInputProps = {
   stepper?: number
@@ -100,7 +99,7 @@ const NumberInput = ({
   }
 
   return (
-    <div className="flex items-center">
+    <div className="relative flex items-center h-8.5">
       <NumericFormat
         value={value}
         onValueChange={handleChange}
@@ -120,45 +119,33 @@ const NumberInput = ({
         {...props}
       />
 
-      <div className="flex flex-col">
+      <div className="absolute right-[2px] flex flex-col w-9 border-l border-input">
         <Button
           aria-label="Increase value"
-          className="h-[18px] rounded-l-none rounded-br-none border-b-[0.5px] border-l-0 border-input px-2 focus-visible:relative"
-          variant="outline"
+          className="flex-1 h-auto rounded-l-none rounded-br-none border-b-[0.5px] border-l-0 border-input px-2 focus-visible:relative p-0 -mb-[0.5px]"
+          variant="ghost"
           type="button"
+          size="icon"
           onClick={handleIncrement}
           disabled={value === max}
         >
-          <ChevronUp size={15} />
+          <ChevronUp size={13} />
         </Button>
         <Button
           aria-label="Decrease value"
-          className="h-[18px] rounded-l-none rounded-tr-none border-t-[0.5px] border-l-0 border-input px-2 focus-visible:relative"
-          variant="outline"
+          className="flex-1 h-auto rounded-l-none rounded-tr-none border-t-[0.5px] border-l-0 border-input px-2 focus-visible:relative -mt-[0.5px]"
+          variant="ghost"
+          size="icon"
           type="button"
           onClick={handleDecrement}
           disabled={value === min}
         >
-          <ChevronDown size={15} />
+          <ChevronDown size={13} />
         </Button>
       </div>
     </div>
   )
 }
 
-const Input = ({ className, type, ...props }: ComponentProps<'input'>) => (
-  <input
-    type={type}
-    data-slot="input"
-    className={cn(
-      'relative flex h-9 w-full min-w-0 [appearance:textfield] rounded-md rounded-r-none border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-      'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
-      'aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
-      className
-    )}
-    {...props}
-  />
-)
-
-export type { NumberInputProps }
 export { NumberInput }
+export type { NumberInputProps }

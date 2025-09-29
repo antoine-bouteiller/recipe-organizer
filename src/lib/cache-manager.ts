@@ -34,7 +34,7 @@ class CacheManager {
       }
       const response = await getItem()
 
-      this.put(key, response.clone())
+      await this.put(key, response.clone())
 
       return new Response(response.body, {
         headers: {

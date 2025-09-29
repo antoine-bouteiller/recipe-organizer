@@ -5,7 +5,7 @@ import { type RecipeFormInput } from '@/features/recipe/api/create'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { units } from '@/types/units'
-import { Separator } from '@radix-ui/react-separator'
+import { Separator } from '@/components/ui/separator'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
 import { PlusIcon, TrashIcon } from 'lucide-react'
@@ -150,8 +150,8 @@ export const RecipeForm = withFieldGroup({
                                         <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col">
                                           <AppField
                                             name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].id`}
-                                            children={({ SearchSelectField }) => (
-                                              <SearchSelectField
+                                            children={({ ComboboxField }) => (
+                                              <ComboboxField
                                                 options={ingredientsOptions}
                                                 disabled={isSubmitting}
                                               />
@@ -162,15 +162,15 @@ export const RecipeForm = withFieldGroup({
                                             children={({ NumberField }) => (
                                               <NumberField
                                                 min={0}
-                                                decimalScale={1}
                                                 disabled={isSubmitting}
+                                                placeholder="Quantité"
                                               />
                                             )}
                                           />
                                           <AppField
                                             name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unit`}
-                                            children={({ SearchSelectField }) => (
-                                              <SearchSelectField
+                                            children={({ ComboboxField }) => (
+                                              <ComboboxField
                                                 options={unitsOptions}
                                                 disabled={isSubmitting}
                                               />

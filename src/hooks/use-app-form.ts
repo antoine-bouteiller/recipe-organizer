@@ -8,7 +8,7 @@ import {
 } from '@/components/forms/form'
 import { ImageField } from '@/components/forms/image-field'
 import { NumberField } from '@/components/forms/number-field'
-import { SearchSelectField } from '@/components/forms/search-select-field'
+import { ComboboxField } from '@/components/forms/combobox-field'
 import { TextField } from '@/components/forms/text-field'
 import TiptapField from '@/components/forms/tiptap-field'
 import { fieldContext, formContext } from '@/hooks/use-form-context'
@@ -27,7 +27,7 @@ const { useAppForm, withForm, withFieldGroup } = createFormHook({
     NumberField,
     ImageField,
     TiptapField,
-    SearchSelectField,
+    ComboboxField,
   },
   formComponents: {
     FormSubmit,

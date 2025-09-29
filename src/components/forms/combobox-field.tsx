@@ -1,5 +1,5 @@
 import { FormItem, FormMessage } from '@/components/forms/form'
-import { SearchSelect } from '@/components/ui/searchselect'
+import { Combobox } from '@/components/ui/combobox'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface Option {
@@ -7,19 +7,19 @@ interface Option {
   value: string
 }
 
-interface SearchSelectFieldProps {
+interface ComboboxFieldProps {
   label?: string
   placeholder?: string
   disabled?: boolean
   options: Option[]
 }
 
-const SearchSelectField = ({ options }: SearchSelectFieldProps) => {
+const ComboboxField = ({ options }: ComboboxFieldProps) => {
   const field = useFieldContext<string | undefined>()
 
   return (
     <FormItem className="flex-1 w-full">
-      <SearchSelect
+      <Combobox
         options={options}
         value={field.store.state.value}
         onChange={(option) => {
@@ -36,4 +36,4 @@ const SearchSelectField = ({ options }: SearchSelectFieldProps) => {
   )
 }
 
-export { SearchSelectField, type Option, type SearchSelectFieldProps }
+export { ComboboxField, type Option, type ComboboxFieldProps }
