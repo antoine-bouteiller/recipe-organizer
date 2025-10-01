@@ -48,7 +48,7 @@ export const Tiptap = ({
     extensions: extensions,
     immediatelyRender: false,
     content,
-    autofocus: 'all',
+    autofocus: false,
     editorProps: {
       handleScrollToSelection(this, view) {
         if ('focused' in view && !view.focused) {

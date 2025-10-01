@@ -76,7 +76,7 @@ const Combobox = ({
                 {options.map((option) => (
                   <CommandItem
                     key={option.value}
-                    value={option.value}
+                    value={option.label}
                     onSelect={() => {
                       onChange?.(option)
                       setOpen(false)
@@ -90,7 +90,7 @@ const Combobox = ({
             </ScrollArea>
           </CommandList>
           <CommandSeparator />
-          {addNewOptionLabel && (
+          {addNewOptionOnClick && (
             <CommandGroup>
               <Button
                 variant="ghost"
