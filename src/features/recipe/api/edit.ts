@@ -26,7 +26,7 @@ const editRecipe = createServerFn({
   .inputValidator((formData: FormData) => editRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const { image, sections, name, steps, id } = data
+      const { image, sections, name, steps, id, quantity } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, id),
@@ -50,6 +50,7 @@ const editRecipe = createServerFn({
             name,
             image: imageKey,
             steps,
+            quantity,
           })
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),
