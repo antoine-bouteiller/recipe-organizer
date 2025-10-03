@@ -20,7 +20,12 @@ type CommandDialogProps = DialogProps & { className?: string }
 
 const CommandDialog = ({ children, className, ...props }: CommandDialogProps) => (
   <Dialog {...props}>
-    <DialogContent className={cn('overflow-hidden p-0 shadow-lg', className)}>
+    <DialogContent
+      className={cn(
+        'rounded-xl border-none bg-clip-padding p-2 pb-11 shadow-2xl ring-4 ring-neutral-200/80 dark:bg-neutral-900 dark:ring-neutral-800',
+        className
+      )}
+    >
       <DialogTitle className="hidden" />
       <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
         {children}
@@ -128,6 +133,16 @@ const CommandCheck = ({ icon: Icon = Check, className, ...props }: ButtonArrowPr
   />
 )
 
+const CommandMenuKbd = ({ className, ...props }: React.ComponentProps<'kbd'>) => (
+  <kbd
+    className={cn(
+      "bg-background text-muted-foreground pointer-events-none flex h-5 items-center justify-center gap-1 rounded border px-1 font-sans text-[0.7rem] font-medium select-none [&_svg:not([class*='size-'])]:size-3",
+      className
+    )}
+    {...props}
+  />
+)
+
 export {
   Command,
   CommandCheck,
@@ -139,4 +154,5 @@ export {
   CommandList,
   CommandSeparator,
   CommandShortcut,
+  CommandMenuKbd,
 }

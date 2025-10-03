@@ -2,21 +2,20 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/recipe-card'
-import { useDebounce } from '@/hooks/use-debounce'
+import { useSearchStore } from '@/stores/search.store'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { PlusIcon, SearchIcon } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { z } from 'zod'
 
 const Home = () => {
-  const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
-  const debouncedSearch = useDebounce(search, 300)
+  const { search, setSearch } = useSearchStore()
 
-  const { data: recipes } = useQuery(getAllRecipesQueryOptions(debouncedSearch))
+  const { data: recipes } = useQuery(getAllRecipesQueryOptions(search))
 
   const { authUser } = Route.useRouteContext()
   const routeSearch = Route.useSearch()
@@ -37,7 +36,7 @@ const Home = () => {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="sticky top-0 z-10 bg-background flex justify-between gap-4 pb-2 pt-3 px-4 border-b border-border">
+      <div className="sticky top-0 z-10 bg-background flex justify-between gap-4 pb-2 pt-3 px-4 border-b border-border md:hidden">
         <div className="relative flex-1">
           <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
           <Input

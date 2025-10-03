@@ -8,15 +8,15 @@ import {
   Scripts,
 } from '@tanstack/react-router'
 
-import { HomeIcon } from '@/components/icons/home'
-import { SettingsIcon } from '@/components/icons/settings'
+import { menuItems, Navbar } from '@/components/navbar'
+import { ThemeProvider } from '@/features/theme/theme-provider'
 import { Button } from '@/components/ui/button'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import type { User } from 'better-auth'
-import { SearchIcon, ShoppingCartIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { getSerwist } from 'virtual:serwist'
 import appCss from '../styles/app.css?url'
+import { getTheme } from '@/features/theme/api/theme'
 
 const loadSerwist = async () => {
   if ('serviceWorker' in navigator) {
@@ -31,44 +31,44 @@ const RootComponent = () => {
     void loadSerwist()
   }, [])
 
+  const theme = Route.useLoaderData()
+
   return (
-    <html lang="fr">
+    <html lang="fr" className={theme}>
       <head>
         <HeadContent />
       </head>
-      <body className="h-dvh">
-        <Toaster />
-        <div className="flex flex-col h-dvh max-h-screen overflow-hidden">
-          <div className="flex-1 overflow-y-auto scroll-smooth">
-            <Outlet />
+      <ThemeProvider theme={theme}>
+        <body className="h-dvh">
+          <Toaster />
+          <div className="flex flex-col h-dvh max-h-screen overflow-hidden">
+            <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
+              <Navbar />
+            </header>
+            <div className="flex-1 overflow-y-auto">
+              <Outlet />
+            </div>
+            <div className="shrink-0 p-2 flex justify-around md:hidden border-t border-border">
+              {menuItems
+                .filter((item) => item.display !== 'desktop')
+                .map((item) => (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    asChild
+                    key={item.label}
+                  >
+                    <Link {...item.linkProps}>
+                      {({ isActive }) => <item.icon className="size-6" filled={isActive} />}
+                    </Link>
+                  </Button>
+                ))}
+            </div>
           </div>
-          <div className="shrink-0 p-2 flex justify-around md:hidden border-t border-border">
-            <Button variant="ghost" size="icon" className="rounded-full" asChild>
-              <Link to="/">
-                {({ isActive }) => <HomeIcon className="size-6" filled={isActive} />}
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full" asChild>
-              <Link to="/" search={{ search: true }}>
-                <SearchIcon className="size-6" />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full" asChild>
-              <Link to="/shopping-list">
-                {({ isActive }) => (
-                  <ShoppingCartIcon className="size-6" fill={isActive ? 'currentColor' : 'none'} />
-                )}
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full" asChild>
-              <Link to="/settings">
-                {({ isActive }) => <SettingsIcon className="size-6" filled={isActive} />}
-              </Link>
-            </Button>
-          </div>
-        </div>
-        <Scripts />
-      </body>
+          <Scripts />
+        </body>
+      </ThemeProvider>
     </html>
   )
 }
@@ -101,6 +101,7 @@ export const Route = createRootRouteWithContext<{
     const authUser = await getAuthUser()
     return { authUser }
   },
+  loader: () => getTheme(),
   component: RootComponent,
   notFoundComponent: () => <div>Not found</div>,
 })

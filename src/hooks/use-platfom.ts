@@ -1,24 +1,37 @@
+import { createIsomorphicFn } from '@tanstack/react-start'
+import { getRequestHeader } from '@tanstack/react-start/server'
 import { useState, useEffect } from 'react'
 
 type Platform = 'macOS' | 'Windows' | 'Android' | 'iOS' | 'Unknown'
 
+const getPlatform = createIsomorphicFn()
+  .server(() => getPlatformFromUserAgent(getRequestHeader('user-agent')))
+  .client(() => getPlatformFromUserAgent(navigator.userAgent))
+
+const getPlatformFromUserAgent = (userAgent: string | undefined) => {
+  if (!userAgent) {
+    return 'Unknown'
+  }
+  if (/Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)) {
+    return 'macOS'
+  }
+  if (/Windows NT/.test(userAgent)) {
+    return 'Windows'
+  }
+  if (/Android/.test(userAgent)) {
+    return 'Android'
+  }
+  if (/iPhone|iPad|iPod/.test(userAgent)) {
+    return 'iOS'
+  }
+  return 'Unknown'
+}
+
 export const usePlatform = () => {
-  const [platform, setPlatform] = useState<Platform>('Unknown')
+  const [platform, setPlatform] = useState<Platform>(getPlatform())
 
   useEffect(() => {
-    const { userAgent } = navigator
-
-    if (/Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)) {
-      setPlatform('macOS')
-    } else if (/Windows NT/.test(userAgent)) {
-      setPlatform('Windows')
-    } else if (/Android/.test(userAgent)) {
-      setPlatform('Android')
-    } else if (/iPhone|iPad|iPod/.test(userAgent)) {
-      setPlatform('iOS')
-    } else {
-      setPlatform('Unknown')
-    }
+    setPlatform(getPlatform())
   }, [])
 
   return platform

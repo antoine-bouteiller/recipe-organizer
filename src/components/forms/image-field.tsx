@@ -1,10 +1,10 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
-import { Kbd } from '@/components/ui/kbd'
+import { CommandMenuKbd } from '@/components/ui/command'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platfom'
 import { cn } from '@/lib/utils'
-import { CommandIcon, ImageUpIcon, XIcon } from 'lucide-react'
+import { ImageUpIcon, XIcon } from 'lucide-react'
 
 interface ImageFieldProps {
   label: string
@@ -53,12 +53,10 @@ export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) =
             <p className="mb-1.5 text-sm font-medium">
               Déposez votre image ou cliquez pour parcourir
             </p>
-            {platform === 'macOS' && (
-              <Kbd>
-                <CommandIcon /> +V
-              </Kbd>
-            )}
-            {platform === 'Windows' && <Kbd>Ctrl+V</Kbd>}
+            <div className="hidden md:flex items-center gap-1">
+              <CommandMenuKbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</CommandMenuKbd>
+              <CommandMenuKbd className="aspect-square">V</CommandMenuKbd>
+            </div>
           </div>
         )}
         {previewUrl && (

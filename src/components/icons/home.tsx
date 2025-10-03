@@ -1,6 +1,6 @@
 import { Icon, LucideHome, type IconNode } from 'lucide-react'
 
-export const homeFilled: IconNode = [
+export const homeFilledNode: IconNode = [
   [
     'path',
     {
@@ -13,7 +13,7 @@ export const homeFilled: IconNode = [
 
 export const HomeIcon = ({ className, filled }: { className?: string; filled?: boolean }) => {
   if (filled) {
-    return <Icon name="home" className={className} iconNode={homeFilled} />
+    return <Icon name="home" className={className} iconNode={homeFilledNode} />
   }
   return <LucideHome name="home" className={className} />
 }
