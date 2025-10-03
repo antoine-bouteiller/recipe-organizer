@@ -49,6 +49,10 @@ const EditRecipePage = () => {
         steps: recipe.steps,
         quantity: recipe.quantity,
         sections: recipe.sections.map(formatSection),
+        image: {
+          id: recipe.image,
+          url: getFileUrl(recipe.image),
+        },
       }
     : {}
 
