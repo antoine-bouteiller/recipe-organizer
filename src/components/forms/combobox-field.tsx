@@ -12,9 +12,10 @@ interface ComboboxFieldProps {
   placeholder?: string
   disabled?: boolean
   options: Option[]
+  addNewOptionOnClick?: () => void
 }
 
-const ComboboxField = ({ options }: ComboboxFieldProps) => {
+const ComboboxField = ({ options, ...props }: ComboboxFieldProps) => {
   const field = useFieldContext<string | undefined>()
 
   return (
@@ -30,6 +31,7 @@ const ComboboxField = ({ options }: ComboboxFieldProps) => {
           }
         }}
         error={field.errors.length > 0 ? field.errors[0].message : undefined}
+        {...props}
       />
       <FormMessage />
     </FormItem>

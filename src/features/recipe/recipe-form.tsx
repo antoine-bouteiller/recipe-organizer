@@ -164,6 +164,7 @@ export const RecipeForm = withFieldGroup({
                                                 min={0}
                                                 disabled={isSubmitting}
                                                 placeholder="Quantité"
+                                                decimalScale={3}
                                               />
                                             )}
                                           />
