@@ -22,10 +22,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
   return (
     <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
-      <Card
-        key={recipe.id}
-        className="cursor-pointer gap-2 pt-0 pb-2 transition-all duration-300 hover:scale-105 hover:shadow-lg "
-      >
+      <Card key={recipe.id} className="cursor-pointer gap-2 pt-0 pb-2 hover:shadow-lg">
         <CardHeader className="relative p-0">
           <div className="relative h-36 w-full overflow-hidden">
             <img src={recipe.image} alt={recipe.name} className="object-cover w-full h-full" />

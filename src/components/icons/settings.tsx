@@ -1,6 +1,6 @@
 import { Icon, LucideSettings, type IconNode } from 'lucide-react'
 
-export const settingsFillednode: IconNode = [
+const settingsFillednode: IconNode = [
   [
     'path',
     {

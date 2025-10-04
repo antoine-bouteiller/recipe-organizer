@@ -54,12 +54,11 @@ const RootComponent = () => {
                 .map((item) => (
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="rounded-full"
+                    className="rounded-full text-primary "
                     asChild
                     key={item.label}
                   >
-                    <Link {...item.linkProps}>
+                    <Link {...item.linkProps} activeProps={{ className: 'bg-accent' }}>
                       {({ isActive }) => <item.icon className="size-6" filled={isActive} />}
                     </Link>
                   </Button>

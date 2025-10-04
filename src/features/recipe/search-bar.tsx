@@ -35,8 +35,8 @@ export const SearchBar = () => {
   return (
     <>
       <Button
-        variant="secondary"
-        className="bg-surface text-surface-foreground/60 dark:bg-card relative h-8 w-full justify-start pl-2.5 font-normal shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64"
+        variant="ghost"
+        className="bg-card text-card-foreground/60 relative h-8 w-full justify-start pl-2.5 font-normal shadow-none sm:pr-12 md:w-40 lg:w-56 xl:w-64"
         onClick={() => setOpen(true)}
       >
         <span className="hidden lg:inline-flex">Search documentation...</span>

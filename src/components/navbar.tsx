@@ -1,5 +1,6 @@
 import { ShoppingCartIcon } from '@/components/icons/cart'
 import { HomeIcon } from '@/components/icons/home'
+import { SearchIcon } from '@/components/icons/search'
 import { SettingsIcon } from '@/components/icons/settings'
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
@@ -12,7 +13,6 @@ import {
 import { SearchBar } from '@/features/recipe/search-bar'
 import { useTheme } from '@/features/theme/theme-provider'
 import { Link, type LinkProps } from '@tanstack/react-router'
-import { SearchIcon } from 'lucide-react'
 
 interface MenuItem {
   label: string
@@ -33,10 +33,7 @@ export const menuItems: MenuItem[] = [
     label: 'Rechercher',
     icon: SearchIcon,
     linkProps: {
-      to: '/',
-      search: {
-        search: true,
-      },
+      to: '/search',
     },
     display: 'mobile',
   },
@@ -68,7 +65,9 @@ export const Navbar = () => {
             .map((item) => (
               <NavigationMenuItem key={item.label}>
                 <NavigationMenuLink asChild>
-                  <Link {...item.linkProps}>{item.label}</Link>
+                  <Link {...item.linkProps} activeProps={{ className: 'bg-accent' }}>
+                    {item.label}
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
