@@ -178,3 +178,11 @@
     @apply opacity-60 md:opacity-100;
   }
 }
+
+@custom-variant hover {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @slot;
+    }
+  }
+}
