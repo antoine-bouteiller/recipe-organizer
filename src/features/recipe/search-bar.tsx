@@ -12,12 +12,14 @@ import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
 import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 export const SearchBar = () => {
   const [open, setOpen] = useState(false)
 
   const platform = usePlatform()
+  const navigate = useNavigate()
 
   const { data: recipes } = useQuery(getAllRecipesQueryOptions())
 
@@ -52,7 +54,18 @@ export const SearchBar = () => {
           <CommandEmpty>Aucun résultats trouvé.</CommandEmpty>
           <CommandGroup>
             {recipes?.map((recipe) => (
-              <CommandItem key={recipe.id}>{recipe.name}</CommandItem>
+              <CommandItem
+                key={recipe.id}
+                onSelect={() => {
+                  setOpen(false)
+                  void navigate({
+                    to: '/recipe/$id',
+                    params: { id: recipe.id.toString() },
+                  })
+                }}
+              >
+                {recipe.name}
+              </CommandItem>
             ))}
           </CommandGroup>
         </CommandList>

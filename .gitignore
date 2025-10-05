@@ -12,6 +12,7 @@ count.txt
 # Cloudflare
 .wrangler
 .dev.vars
+database.sql
 
 # Serwist
 public/sw*

@@ -38,13 +38,13 @@ const RecipePage = () => {
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
-              <DotsThreeVerticalIcon className="w-4 h-4" />
+              <DotsThreeVerticalIcon className="size-4" weight="bold" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto flex flex-col gap-2 p-2 items-start">
             <Button variant="ghost" asChild>
               <Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }}>
-                <PencilSimpleIcon className="w-4 h-4" />
+                <PencilSimpleIcon className="size-4" />
                 Modifier
               </Link>
             </Button>
