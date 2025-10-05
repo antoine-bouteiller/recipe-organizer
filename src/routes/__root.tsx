@@ -49,7 +49,7 @@ const RootComponent = () => {
             <div className="flex-1 overflow-y-auto">
               <Outlet />
             </div>
-            <div className="shrink-0 p-2 flex justify-around md:hidden border-t border-border">
+            <div className="shrink-0 p-2 flex justify-around md:hidden bg-secondary/5">
               {menuItems
                 .filter((item) => item.display !== 'desktop')
                 .map((item) => (
