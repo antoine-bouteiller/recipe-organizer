@@ -82,17 +82,21 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   authUser: User | undefined
 }>()({
-  head: () => ({
+  head: ({ loaderData }) => ({
     meta: [
       {
         charSet: 'utf8',
       },
       {
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1, viewport-fit=cover',
+        content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
       },
       {
         title: 'Recipe Organizer',
+      },
+      {
+        name: 'theme-color',
+        content: loaderData === 'dark' ? '#0d0a0e' : '#fdf6fb',
       },
     ],
     links: [

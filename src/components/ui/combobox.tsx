@@ -55,9 +55,9 @@ const Combobox = ({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'w-full justify-between text-ellipsis',
+            'w-full justify-between text-ellipsis bg-transparent border-input',
             error &&
-              'border border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
+              'border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
           )}
         >
           <span className={cn('truncate')}>

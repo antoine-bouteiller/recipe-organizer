@@ -122,7 +122,7 @@ const NumberInput = ({
       <div className="absolute right-[2px] flex flex-col w-9 border-l border-input">
         <Button
           aria-label="Increase value"
-          className="flex-1 h-auto rounded-l-none rounded-br-none border-b-[0.5px] border-l-0 border-input px-2 focus-visible:relative p-0 -mb-[0.5px]"
+          className="flex-1 h-auto rounded-l-none rounded-br-none border-b-[0.5px] border-l-0 border-input px-2 focus-visible:relative p-0"
           variant="ghost"
           type="button"
           size="icon"
@@ -133,7 +133,7 @@ const NumberInput = ({
         </Button>
         <Button
           aria-label="Decrease value"
-          className="flex-1 h-auto rounded-l-none rounded-tr-none border-t-[0.5px] border-l-0 border-input px-2 focus-visible:relative -mt-[0.5px]"
+          className="flex-1 h-auto rounded-l-none rounded-tr-none border-t-[0.5px] border-l-0 border-input px-2 focus-visible:relative"
           variant="ghost"
           size="icon"
           type="button"
