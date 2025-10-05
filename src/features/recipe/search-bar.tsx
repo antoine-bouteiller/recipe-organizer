@@ -10,7 +10,7 @@ import {
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
-import { ArrowDownLeftIcon } from '@phosphor-icons/react'
+import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
@@ -59,7 +59,7 @@ export const SearchBar = () => {
         <div className="text-muted-foreground absolute inset-x-0 bottom-0 z-20 flex h-10 items-center gap-2 rounded-b-xl border-t border-t-neutral-100 bg-neutral-50 px-4 text-xs font-medium dark:border-t-neutral-700 dark:bg-neutral-800">
           <div className="flex items-center gap-2">
             <Kbd>
-              <ArrowDownLeftIcon />
+              <ArrowElbowDownLeftIcon />
             </Kbd>{' '}
             Rejoindre la page
           </div>
