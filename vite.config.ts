@@ -23,8 +23,8 @@ const viteConfig = defineConfig({
     tailwindcss(),
     serwist({
       swSrc: 'src/sw.ts',
-      swDest: 'sw.js',
-      globDirectory: 'dist',
+      swDest: 'dist/client/sw.js',
+      globDirectory: 'dist/client',
       injectionPoint: 'self.__SW_MANIFEST',
     }),
   ],

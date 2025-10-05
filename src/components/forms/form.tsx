@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { FormItemContext, useFieldContext, useFormContext } from '@/hooks/use-form-context'
 import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
 import { useId, type ComponentProps } from 'react'
+import { Spinner } from '@/components/ui/spinner'
 
 const FormItem = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const id = useId()
@@ -85,7 +85,7 @@ const FormSubmit = ({ label }: { label: string }) => {
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
         <Button type="submit" disabled={isSubmitting} className="flex-1">
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isSubmitting && <Spinner />}
           {label}
         </Button>
       )}

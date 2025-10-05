@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Spinner } from '@/components/ui/spinner'
 import {
   editRecipeMutationQueryOptions,
   editRecipeSchema,
@@ -14,7 +15,6 @@ import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -81,7 +81,7 @@ const EditRecipePage = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-10 h-10 animate-spin" />
+        <Spinner />
       </div>
     )
   }

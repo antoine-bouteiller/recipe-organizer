@@ -20,5 +20,5 @@
   "registries": {
     "@reui": "https://reui.io/r/{name}.json"
   },
-  "iconLibrary": "lucide"
+  "iconLibrary": "phosphor"
 }

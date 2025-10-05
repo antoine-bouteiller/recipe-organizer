@@ -12,7 +12,7 @@ import { deleteRecipeMutationQueryOptions } from '@/features/recipe/api/delete'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { Trash2 } from 'lucide-react'
+import { TrashIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -43,7 +43,7 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
           }}
         >
           <Button variant="ghost">
-            <Trash2 className="h-4 w-4" />
+            <TrashIcon className="h-4 w-4" />
             Supprimer
           </Button>
         </DialogTrigger>

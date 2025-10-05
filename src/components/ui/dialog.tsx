@@ -9,7 +9,7 @@ import {
   Title as DialogTitlePrimitive,
   Description as DialogDescriptionPrimitive,
 } from '@radix-ui/react-dialog'
-import { XIcon } from 'lucide-react'
+import { XIcon } from '@phosphor-icons/react'
 
 import { cn } from '@/lib/utils'
 

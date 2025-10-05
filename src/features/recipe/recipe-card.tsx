@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useShopingListStore } from '@/stores/shoping-list.store'
 import type { Recipe } from '@/types/recipe'
 import { Link } from '@tanstack/react-router'
-import { MinusIcon, PlusIcon } from 'lucide-react'
+import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 
 interface RecipeCardProps {
   recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>

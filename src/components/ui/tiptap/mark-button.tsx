@@ -1,6 +1,6 @@
 import { ToggleGroupItem } from '@/components/ui/toggle-group'
+import { TextBIcon, TextItalicIcon, TextUnderlineIcon, type Icon } from '@phosphor-icons/react'
 import { EditorContext, useEditorState } from '@tiptap/react'
-import { BoldIcon, ItalicIcon, UnderlineIcon, type LucideIcon } from 'lucide-react'
 import { useCallback, useContext } from 'react'
 
 interface MarkButtonProps {
@@ -9,10 +9,10 @@ interface MarkButtonProps {
 
 export type Mark = 'bold' | 'italic' | 'underline'
 
-const markIcons: Record<Mark, LucideIcon> = {
-  bold: BoldIcon,
-  italic: ItalicIcon,
-  underline: UnderlineIcon,
+const markIcons: Record<Mark, Icon> = {
+  bold: TextBIcon,
+  italic: TextItalicIcon,
+  underline: TextUnderlineIcon,
 }
 
 export const MarkButton = ({ type }: MarkButtonProps) => {

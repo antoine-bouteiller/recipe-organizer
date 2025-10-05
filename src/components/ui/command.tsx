@@ -3,8 +3,7 @@ import { cn } from '@/lib/utils'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { type DialogProps } from '@radix-ui/react-dialog'
 import { Command as CommandPrimitive } from 'cmdk'
-import type { LucideIcon } from 'lucide-react'
-import { Check, Search } from 'lucide-react'
+import { CheckIcon, MagnifyingGlassIcon, type Icon } from '@phosphor-icons/react'
 
 const Command = ({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) => (
   <CommandPrimitive
@@ -43,7 +42,7 @@ const CommandInput = ({
     cmdk-input-wrapper=""
     data-slot="command-input"
   >
-    <Search className="me-2 h-4 w-4 shrink-0 opacity-50" />
+    <MagnifyingGlassIcon className="me-2 h-4 w-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       className={cn(
         'flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
@@ -121,24 +120,14 @@ const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanE
 )
 
 interface ButtonArrowProps extends React.SVGProps<SVGSVGElement> {
-  icon?: LucideIcon // Allows passing any Lucide icon
+  icon?: Icon // Allows passing any Lucide icon
 }
 
-const CommandCheck = ({ icon: Icon = Check, className, ...props }: ButtonArrowProps) => (
+const CommandCheck = ({ icon: Icon = CheckIcon, className, ...props }: ButtonArrowProps) => (
   <Icon
     data-slot="command-check"
     data-check="true"
     className={cn('size-4 ms-auto text-primary', className)}
-    {...props}
-  />
-)
-
-const CommandMenuKbd = ({ className, ...props }: React.ComponentProps<'kbd'>) => (
-  <kbd
-    className={cn(
-      "bg-background text-muted-foreground pointer-events-none flex h-5 items-center justify-center gap-1 rounded border px-1 font-sans text-[0.7rem] font-medium select-none [&_svg:not([class*='size-'])]:size-3",
-      className
-    )}
     {...props}
   />
 )
@@ -154,5 +143,4 @@ export {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-  CommandMenuKbd,
 }

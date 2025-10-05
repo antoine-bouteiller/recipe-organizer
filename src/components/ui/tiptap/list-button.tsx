@@ -1,15 +1,15 @@
 import { ToggleGroupItem } from '@/components/ui/toggle-group'
 
 import { EditorContext, useEditorState, type Editor } from '@tiptap/react'
-import { ListIcon, ListOrderedIcon, ListTodoIcon, type LucideIcon } from 'lucide-react'
+import { ListBulletsIcon, ListChecksIcon, type Icon, ListNumbersIcon } from '@phosphor-icons/react'
 import { useCallback, useContext } from 'react'
 
 export type ListType = 'bulletList' | 'orderedList' | 'taskList'
 
-const listIcons: Record<ListType, LucideIcon> = {
-  bulletList: ListIcon,
-  orderedList: ListOrderedIcon,
-  taskList: ListTodoIcon,
+const listIcons: Record<ListType, Icon> = {
+  bulletList: ListBulletsIcon,
+  orderedList: ListNumbersIcon,
+  taskList: ListChecksIcon,
 }
 
 export const canToggleList = (editor: Editor | null, type: ListType): boolean => {

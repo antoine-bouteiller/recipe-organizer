@@ -12,7 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { ChevronDownIcon, Plus } from 'lucide-react'
+import { CaretDownIcon, PlusIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 interface Option {
@@ -63,7 +63,7 @@ const Combobox = ({
           <span className={cn('truncate')}>
             {value ? options.find((option) => option.value === value)?.label : placeholder}
           </span>
-          <ChevronDownIcon />
+          <CaretDownIcon />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-(--radix-popper-anchor-width) p-0">
@@ -98,7 +98,7 @@ const Combobox = ({
                 className="w-full justify-start font-normal px-1.5"
                 onClick={addNewOptionOnClick}
               >
-                <Plus className="size-4" aria-hidden="true" />
+                <PlusIcon className="size-4" aria-hidden="true" />
                 {addNewOptionLabel}
               </Button>
             </CommandGroup>

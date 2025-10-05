@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
 import { useShopingListStore, type IngredientWithQuantity } from '@/stores/shoping-list.store'
 import { createFileRoute } from '@tanstack/react-router'
-import { RotateCwIcon } from 'lucide-react'
+import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
@@ -41,7 +41,7 @@ const CartPage = () => {
         <div className=" py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Liste de courses</h1>
           <Button variant="outline" size="icon" onClick={reset}>
-            <RotateCwIcon className="h-4 w-4" />
+            <ArrowCounterClockwiseIcon className="h-4 w-4" />
           </Button>
         </div>
         <div className="flex flex-col gap-2">

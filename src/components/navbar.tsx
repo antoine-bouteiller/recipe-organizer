@@ -1,7 +1,3 @@
-import { ShoppingCartIcon } from '@/components/icons/cart'
-import { HomeIcon } from '@/components/icons/home'
-import { SearchIcon } from '@/components/icons/search'
-import { SettingsIcon } from '@/components/icons/settings'
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,43 +8,64 @@ import {
 } from '@/components/ui/navigation-menu'
 import { SearchBar } from '@/features/recipe/search-bar'
 import { useTheme } from '@/features/theme/theme-provider'
+import {
+  GearIcon,
+  HouseIcon,
+  MagnifyingGlassIcon,
+  ShoppingCartSimpleIcon,
+  type Icon,
+  type IconProps,
+} from '@phosphor-icons/react'
 import { Link, type LinkProps } from '@tanstack/react-router'
 
 interface MenuItem {
   label: string
-  icon: React.ElementType
+  icon: Icon
   linkProps: LinkProps
   display?: 'desktop' | 'mobile'
+  iconFilledProps?: IconProps
 }
 
 export const menuItems: MenuItem[] = [
   {
     label: 'Accueil',
-    icon: HomeIcon,
+    icon: HouseIcon,
     linkProps: {
       to: '/',
+    },
+    iconFilledProps: {
+      weight: 'fill',
     },
   },
   {
     label: 'Rechercher',
-    icon: SearchIcon,
+    icon: MagnifyingGlassIcon,
     linkProps: {
       to: '/search',
     },
     display: 'mobile',
+    iconFilledProps: {
+      weight: 'bold',
+    },
   },
   {
     label: 'Liste de courses',
-    icon: ShoppingCartIcon,
+    icon: ShoppingCartSimpleIcon,
     linkProps: {
       to: '/shopping-list',
+    },
+    iconFilledProps: {
+      weight: 'fill',
     },
   },
   {
     label: 'Paramètres',
-    icon: SettingsIcon,
+    icon: GearIcon,
     linkProps: {
       to: '/settings',
+    },
+    iconFilledProps: {
+      weight: 'fill',
     },
   },
 ]

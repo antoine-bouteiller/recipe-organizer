@@ -8,9 +8,10 @@ import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
 import { getFileUrl } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
-import { EllipsisVerticalIcon, Loader2, MinusIcon, PencilIcon, PlusIcon } from 'lucide-react'
+import { DotsThreeVerticalIcon, MinusIcon, PencilIcon, PlusIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { z } from 'zod'
+import { Spinner } from '@/components/ui/spinner'
 
 const RecipePage = () => {
   const { id } = Route.useParams()
@@ -22,7 +23,7 @@ const RecipePage = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-10 h-10 animate-spin" />
+        <Spinner />
       </div>
     )
   }
@@ -37,7 +38,7 @@ const RecipePage = () => {
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
-              <EllipsisVerticalIcon className="w-4 h-4" />
+              <DotsThreeVerticalIcon className="w-4 h-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto flex flex-col gap-2 p-2">

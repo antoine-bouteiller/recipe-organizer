@@ -8,7 +8,7 @@ import { units } from '@/types/units'
 import { Separator } from '@/components/ui/separator'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
-import { PlusIcon, TrashIcon } from 'lucide-react'
+import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 

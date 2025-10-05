@@ -3,7 +3,7 @@ import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/recipe-card'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { PlusIcon } from 'lucide-react'
+import { PlusIcon } from '@phosphor-icons/react'
 import { z } from 'zod'
 
 const Home = () => {

@@ -17,6 +17,7 @@ import { useEffect } from 'react'
 import { getSerwist } from 'virtual:serwist'
 import appCss from '../styles/app.css?url'
 import { getTheme } from '@/features/theme/api/theme'
+import { cn } from '@/lib/utils'
 
 const loadSerwist = async () => {
   if ('serviceWorker' in navigator) {
@@ -54,12 +55,17 @@ const RootComponent = () => {
                 .map((item) => (
                   <Button
                     variant="ghost"
-                    className="rounded-full text-primary "
+                    className="rounded-full text-primary hover:text-primary"
                     asChild
                     key={item.label}
                   >
-                    <Link {...item.linkProps} activeProps={{ className: 'bg-accent' }}>
-                      {({ isActive }) => <item.icon className="size-6" filled={isActive} />}
+                    <Link to={item.linkProps.to} activeProps={{ className: 'bg-accent' }}>
+                      {({ isActive }) => (
+                        <item.icon
+                          className={cn('size-6')}
+                          {...(isActive ? item.iconFilledProps : {})}
+                        />
+                      )}
                     </Link>
                   </Button>
                 ))}

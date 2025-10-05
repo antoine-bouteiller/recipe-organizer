@@ -1,13 +1,13 @@
 import { ToggleGroupItem } from '@/components/ui/toggle-group'
+import { ArrowUUpLeftIcon, ArrowUUpRightIcon, type Icon } from '@phosphor-icons/react'
 import { EditorContext } from '@tiptap/react'
-import { Redo2Icon, Undo2Icon, type LucideIcon } from 'lucide-react'
 import { useCallback, useContext } from 'react'
 
 type UndoRedoAction = 'undo' | 'redo'
 
-const undoRedoIcons: Record<UndoRedoAction, LucideIcon> = {
-  undo: Undo2Icon,
-  redo: Redo2Icon,
+const undoRedoIcons: Record<UndoRedoAction, Icon> = {
+  undo: ArrowUUpLeftIcon,
+  redo: ArrowUUpRightIcon,
 }
 
 interface UndoRedoButtonProps {

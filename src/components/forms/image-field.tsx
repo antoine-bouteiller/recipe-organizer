@@ -1,10 +1,10 @@
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
-import { CommandMenuKbd } from '@/components/ui/command'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platfom'
 import { cn } from '@/lib/utils'
-import { ImageUpIcon, XIcon } from 'lucide-react'
+import { ImageIcon, XIcon } from '@phosphor-icons/react'
 
 interface ImageFieldProps {
   label: string
@@ -48,15 +48,15 @@ export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) =
               className="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border"
               aria-hidden="true"
             >
-              <ImageUpIcon className="size-4 opacity-60" />
+              <ImageIcon className="size-4 opacity-60" />
             </div>
             <p className="mb-1.5 text-sm font-medium">
               Déposez votre image ou cliquez pour parcourir
             </p>
-            <div className="hidden md:flex items-center gap-1">
-              <CommandMenuKbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</CommandMenuKbd>
-              <CommandMenuKbd className="aspect-square">V</CommandMenuKbd>
-            </div>
+            <KbdGroup className="hidden md:flex items-center gap-1">
+              <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
+              <Kbd className="aspect-square">V</Kbd>
+            </KbdGroup>
           </div>
         )}
         {previewUrl && (
