@@ -40,7 +40,7 @@ const RootComponent = () => {
         <HeadContent />
       </head>
       <ThemeProvider theme={theme}>
-        <body className="h-dvh">
+        <body className="h-vh">
           <Toaster />
           <div className="flex flex-col h-dvh max-h-screen overflow-hidden">
             <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
@@ -49,7 +49,7 @@ const RootComponent = () => {
             <div className="flex-1 overflow-y-auto">
               <Outlet />
             </div>
-            <div className="shrink-0 p-2 flex justify-around md:hidden border-t border-border">
+            <div className="shrink-0 flex justify-around md:hidden h-(--tabbar-height) items-center">
               {menuItems
                 .filter((item) => item.display !== 'desktop')
                 .map((item) => (
@@ -89,7 +89,8 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: 'viewport',
-        content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
+        content:
+          'width=device-width, initial-scale=1, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no',
       },
       {
         title: 'Recipe Organizer',

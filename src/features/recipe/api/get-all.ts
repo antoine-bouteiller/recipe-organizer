@@ -4,7 +4,7 @@ import { withServerErrorCapture } from '@/lib/error-handler'
 import { getFileUrl } from '@/lib/utils'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { like } from 'drizzle-orm'
+import { asc, like } from 'drizzle-orm'
 import z from 'zod'
 
 const getAllRecipesSchema = z.object({
@@ -25,6 +25,7 @@ const getAllRecipes = createServerFn({
           quantity: recipe.quantity,
         })
         .from(recipe)
+        .orderBy(asc(recipe.name))
         .where(data.search ? like(recipe.name, `%${data.search}%`) : undefined)
 
       return rows.map((row) => ({

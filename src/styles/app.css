@@ -52,6 +52,8 @@
   --color-code-number: var(--code-number);
   --color-selection: var(--selection);
   --color-selection-foreground: var(--selection-foreground);
+
+  --tabbar-height: calc(var(--spacing) * 12);
 }
 
 :root {

@@ -20,7 +20,8 @@ export const useSearchStore = () => {
   const debouncedSearch = useDebounce(search, 300)
 
   return {
-    search: debouncedSearch,
+    search,
+    debouncedSearch,
     setSearch,
   }
 }
