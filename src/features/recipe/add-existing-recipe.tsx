@@ -1,17 +1,17 @@
-import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogContent,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from '@/components/ui/responsive-dialog'
+import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
-import { useQuery } from '@tanstack/react-query'
 import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { DialogClose } from '@radix-ui/react-dialog'
 
 interface AddExistingRecipeProps {
   onSelect: (selectedRecipe: { recipeId: number; name: string; ratio: number }) => void
@@ -34,50 +34,49 @@ export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRec
   }>()
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <ResponsiveDialog>
+      <ResponsiveDialogTrigger asChild>
         <Button type="button" variant="outline" size="sm" className="md:flex-1" disabled={disabled}>
           Ajouter une recette existante
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Ajouter une recette existante</DialogTitle>
-        </DialogHeader>
-        <Combobox
-          options={recipesOptions}
-          value={selectedRecipe?.recipeId.toString()}
-          onChange={(option) => {
-            setSelectedRecipe({
-              recipeId: Number.parseInt(option.value),
-              name: option.label,
-              ratio: 1,
-            })
-          }}
-        />
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="outline" size="sm">
-              Annuler
-            </Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button
-              type="button"
-              disabled={!selectedRecipe}
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (selectedRecipe) {
-                  onSelect(selectedRecipe)
-                }
-              }}
-            >
-              Ajouter
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Ajouter une recette existante</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
+        <div className="p-4">
+          <Combobox
+            label="Recette"
+            placeholder="Rechercher une recette"
+            options={recipesOptions}
+            onChange={(option) =>
+              setSelectedRecipe({
+                recipeId: Number.parseInt(option.value),
+                name: option.label,
+                ratio: 1,
+              })
+            }
+          />
+        </div>
+        <ResponsiveDialogFooter>
+          <ResponsiveDialogClose asChild>
+            <Button variant="outline">Annuler</Button>
+          </ResponsiveDialogClose>
+          <Button
+            variant="default"
+            disabled={!selectedRecipe}
+            onClick={() => {
+              if (selectedRecipe) {
+                onSelect(selectedRecipe)
+                return true
+              }
+              return false
+            }}
+          >
+            Ajouter
+          </Button>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

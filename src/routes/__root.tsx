@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{
       {
         name: 'viewport',
         content:
-          'width=device-width, initial-scale=1, interactive-widget=resizes-content, maximum-scale=1.0, user-scalable=no',
+          'width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content',
       },
       {
         title: 'Recipe Organizer',

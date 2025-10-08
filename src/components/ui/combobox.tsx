@@ -9,10 +9,12 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command'
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  ResponsivePopover,
+  ResponsivePopoverContent,
+  ResponsivePopoverTrigger,
+} from '@/components/ui/responsive-popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useMediaQuery } from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils'
 import { CaretDownIcon, PlusIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
@@ -46,46 +48,10 @@ const Combobox = ({
   searchPlaceholder = 'Rechercher une option',
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
-  const isMobile = useMediaQuery('(max-width: 768px)')
-
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className={cn(
-              'w-full justify-between text-ellipsis bg-transparent border-input',
-              error &&
-                'border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
-            )}
-          >
-            <span className={cn('truncate')}>
-              {value ? options.find((option) => option.value === value)?.label : placeholder}
-            </span>
-            <CaretDownIcon />
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent>
-          <ComboboxContent
-            setOpen={setOpen}
-            options={options}
-            value={value}
-            onChange={onChange}
-            addNewOptionOnClick={addNewOptionOnClick}
-            searchPlaceholder={searchPlaceholder}
-            addNewOptionLabel={addNewOptionLabel}
-          />
-        </DrawerContent>
-      </Drawer>
-    )
-  }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+    <ResponsivePopover open={open} onOpenChange={setOpen}>
+      <ResponsivePopoverTrigger asChild>
         <Button
           variant="outline"
           role="combobox"
@@ -101,8 +67,8 @@ const Combobox = ({
           </span>
           <CaretDownIcon />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-(--radix-popper-anchor-width) p-0">
+      </ResponsivePopoverTrigger>
+      <ResponsivePopoverContent className="w-(--radix-popper-anchor-width) p-0">
         <ComboboxContent
           setOpen={setOpen}
           options={options}
@@ -112,8 +78,8 @@ const Combobox = ({
           searchPlaceholder={searchPlaceholder}
           addNewOptionLabel={addNewOptionLabel}
         />
-      </PopoverContent>
-    </Popover>
+      </ResponsivePopoverContent>
+    </ResponsivePopover>
   )
 }
 

@@ -1,6 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader } from '@/components/ui/card'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  ResponsivePopover,
+  ResponsivePopoverContent,
+  ResponsivePopoverTrigger,
+} from '@/components/ui/responsive-popover'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
@@ -35,24 +39,22 @@ const RecipePage = () => {
   return (
     <>
       {authUser && (
-        <Popover>
-          <PopoverTrigger asChild>
+        <ResponsivePopover>
+          <ResponsivePopoverTrigger asChild>
             <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
               <DotsThreeVerticalIcon className="size-4" weight="bold" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto flex flex-col gap-2 p-2 items-start">
+          </ResponsivePopoverTrigger>
+          <ResponsivePopoverContent className="w-auto flex flex-col gap-2 p-2 items-start">
             <Button variant="ghost" asChild>
               <Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }}>
                 <PencilSimpleIcon className="size-4" />
                 Modifier
               </Link>
             </Button>
-            <Button variant="ghost" asChild>
-              <DeleteRecipe recipeId={recipe.id} />
-            </Button>
-          </PopoverContent>
-        </Popover>
+            <DeleteRecipe recipeId={recipe.id} />
+          </ResponsivePopoverContent>
+        </ResponsivePopover>
       )}
       <CardHeader className="p-0">
         <div className="mb-6 w-full overflow-hidden md:rounded-t-lg flex items-center justify-center aspect-16/6">
