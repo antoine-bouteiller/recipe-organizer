@@ -7,19 +7,18 @@ import {
 } from '@/components/ui/responsive-popover'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getRecipeQueryOptions } from '@/features/recipe/api/get-one'
+import { getRecipeQueryOptions, useGetRecipe } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/delete-recipe'
 import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
 import { getFileUrl } from '@/lib/utils'
 import { DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
 
 const RecipePage = () => {
   const { id } = Route.useParams()
-  const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
+  const { data: recipe, isLoading } = useGetRecipe(id)
   const { authUser } = Route.useRouteContext()
 
   const [quantity, setQuantity] = useState(recipe?.quantity ?? 0)

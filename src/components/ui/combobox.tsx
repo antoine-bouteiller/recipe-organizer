@@ -34,7 +34,8 @@ interface ComboboxProps {
   options: Option[]
   error?: string
   addNewOptionLabel?: string
-  addNewOptionOnClick?: () => void
+  addNewOptionOnClick?: (label: string) => void
+  noResultsLabel?: string
 }
 
 const Combobox = ({
@@ -46,6 +47,7 @@ const Combobox = ({
   addNewOptionLabel = 'Créer une nouvelle option :',
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
+  noResultsLabel = 'Aucun résultat trouvé',
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
@@ -77,6 +79,7 @@ const Combobox = ({
           addNewOptionOnClick={addNewOptionOnClick}
           searchPlaceholder={searchPlaceholder}
           addNewOptionLabel={addNewOptionLabel}
+          noResultsLabel={noResultsLabel}
         />
       </ResponsivePopoverContent>
     </ResponsivePopover>
@@ -87,10 +90,11 @@ interface ComboboxContentProps {
   options: Option[]
   value?: string
   onChange?: (option: Option) => void
-  addNewOptionOnClick?: () => void
+  addNewOptionOnClick?: (value: string) => void
   searchPlaceholder: string
   setOpen: (open: boolean) => void
   addNewOptionLabel: string
+  noResultsLabel: string
 }
 
 const ComboboxContent = ({
@@ -101,6 +105,7 @@ const ComboboxContent = ({
   searchPlaceholder,
   setOpen,
   addNewOptionLabel,
+  noResultsLabel,
 }: ComboboxContentProps) => {
   const [inputValue, setInputValue] = useState('')
   return (
@@ -113,15 +118,19 @@ const ComboboxContent = ({
       <CommandList>
         <ScrollArea viewportClassName="max-h-[300px] [&>div]:block!">
           <CommandEmpty>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start font-normal px-1.5"
-              onClick={addNewOptionOnClick}
-            >
-              <PlusIcon className="size-4" aria-hidden="true" />
-              {addNewOptionLabel} {inputValue}
-            </Button>
+            {addNewOptionOnClick ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start font-normal px-1.5"
+                onClick={() => addNewOptionOnClick(inputValue)}
+              >
+                <PlusIcon className="size-4" aria-hidden="true" />
+                {addNewOptionLabel} {inputValue}
+              </Button>
+            ) : (
+              noResultsLabel
+            )}
           </CommandEmpty>
           <CommandGroup>
             {options.map((option) => (
@@ -146,4 +155,4 @@ const ComboboxContent = ({
 }
 
 export { Combobox }
-export type { Option }
+export type { Option, ComboboxProps }

@@ -4,7 +4,7 @@ import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/sc
 import { parseFormData } from '@/lib/form-data'
 import { uploadFile } from '@/lib/r2'
 import { units } from '@/types/units'
-import { mutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
@@ -101,13 +101,9 @@ const createRecipe = createServerFn({
     )
   })
 
-const createRecipeMutationQueryOptions = mutationOptions({
-  mutationFn: createRecipe,
-})
+const useCreateRecipeMutation = () =>
+  useMutation({
+    mutationFn: createRecipe,
+  })
 
-export {
-  recipeSchema,
-  createRecipeMutationQueryOptions,
-  type RecipeFormValues,
-  type RecipeFormInput,
-}
+export { recipeSchema, useCreateRecipeMutation, type RecipeFormInput, type RecipeFormValues }

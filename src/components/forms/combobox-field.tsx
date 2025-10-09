@@ -1,21 +1,8 @@
 import { FormItem, FormMessage } from '@/components/forms/form'
-import { Combobox } from '@/components/ui/combobox'
+import { Combobox, type ComboboxProps } from '@/components/ui/combobox'
 import { useFieldContext } from '@/hooks/use-form-context'
 
-interface Option {
-  label: string
-  value: string
-}
-
-interface ComboboxFieldProps {
-  label?: string
-  placeholder?: string
-  disabled?: boolean
-  options: Option[]
-  addNewOptionOnClick?: () => void
-}
-
-const ComboboxField = ({ options, ...props }: ComboboxFieldProps) => {
+const ComboboxField = ({ options, ...props }: ComboboxProps) => {
   const field = useFieldContext<string | undefined>()
 
   return (
@@ -38,4 +25,4 @@ const ComboboxField = ({ options, ...props }: ComboboxFieldProps) => {
   )
 }
 
-export { ComboboxField, type Option, type ComboboxFieldProps }
+export { ComboboxField }

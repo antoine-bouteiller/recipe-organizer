@@ -1,11 +1,11 @@
-import { recipeSchema } from '@/features/recipe/api/create'
 import { authGuard } from '@/features/auth/auth-guard'
+import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { parseFormData } from '@/lib/form-data'
 import { deleteFile, uploadFile } from '@/lib/r2'
-import { mutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
@@ -95,13 +95,14 @@ const editRecipe = createServerFn({
     })
   )
 
-const editRecipeMutationQueryOptions = mutationOptions({
-  mutationFn: editRecipe,
-})
+const useEditRecipeMutation = () =>
+  useMutation({
+    mutationFn: editRecipe,
+  })
 
 export {
-  editRecipeMutationQueryOptions,
   editRecipeSchema,
+  useEditRecipeMutation,
   type EditRecipeFormInput,
   type EditRecipeFormValues,
 }

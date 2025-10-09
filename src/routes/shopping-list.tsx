@@ -2,9 +2,9 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
-import { useShopingListStore, type IngredientWithQuantity } from '@/stores/shoping-list.store'
-import { createFileRoute } from '@tanstack/react-router'
+import { useShoppingListStore, type IngredientWithQuantity } from '@/stores/shopping-list.store'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
@@ -33,7 +33,7 @@ const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
 }
 
 const CartPage = () => {
-  const { shoppingListIngredients, reset } = useShopingListStore()
+  const { shoppingListIngredients, reset } = useShoppingListStore()
 
   return (
     <div className="md:min-h-full max-w-5xl mx-auto relative md:p-8 flex flex-col px-8">

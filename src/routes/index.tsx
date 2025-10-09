@@ -1,13 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import { useGetAllRecipes, getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/recipe-card'
 import { PlusIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
 const Home = () => {
-  const { data: recipes } = useQuery(getAllRecipesQueryOptions())
+  const { data: recipes } = useGetAllRecipes()
 
   const { authUser } = Route.useRouteContext()
 
@@ -20,9 +19,9 @@ const Home = () => {
       </div>
 
       {authUser && (
-        <Button asChild size="icon" className="absolute bottom-16 md:bottom-4 right-4">
+        <Button asChild size="icon" className="absolute bottom-16 md:bottom-4 right-4 p-5">
           <Link to="/recipe/new">
-            <PlusIcon />
+            <PlusIcon className="size-4" />
           </Link>
         </Button>
       )}

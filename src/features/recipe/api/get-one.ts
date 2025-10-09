@@ -1,7 +1,7 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { desc, eq } from 'drizzle-orm'
@@ -62,4 +62,6 @@ const getRecipeQueryOptions = (id: string | number) =>
     queryFn: () => getRecipe({ data: typeof id === 'string' ? Number.parseInt(id) : id }),
   })
 
-export { getRecipe, getRecipeQueryOptions }
+const useGetRecipe = (id: string | number) => useQuery(getRecipeQueryOptions(id))
+
+export { getRecipe, getRecipeQueryOptions, useGetRecipe }

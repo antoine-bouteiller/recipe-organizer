@@ -8,15 +8,14 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { deleteRecipeMutationQueryOptions } from '@/features/recipe/api/delete'
+import { useDeleteRecipeMutation } from '@/features/recipe/api/delete'
 import { TrashIcon } from '@phosphor-icons/react'
-import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { toast } from 'sonner'
 
 export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
-  const { mutateAsync: deleteRecipe } = useMutation(deleteRecipeMutationQueryOptions)
+  const { mutateAsync: deleteRecipe } = useDeleteRecipeMutation()
   const router = useRouter()
 
   const handleDelete = useServerFn(async () => {

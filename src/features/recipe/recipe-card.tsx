@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useShopingListStore } from '@/stores/shoping-list.store'
+import { useShoppingListStore } from '@/stores/shopping-list.store'
 import type { Recipe } from '@/types/recipe'
 import { Link } from '@tanstack/react-router'
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
@@ -16,7 +16,7 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
 }
 
 export default function RecipeCard({ recipe }: RecipeCardProps) {
-  const { setRecipesQuantities, recipesQuantities } = useShopingListStore()
+  const { setRecipesQuantities, recipesQuantities } = useShoppingListStore()
 
   const isInShoppingCart = recipesQuantities[recipe.id]
 

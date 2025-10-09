@@ -1,19 +1,18 @@
-import { getRecipesByIdsQueryOptions } from '@/features/recipe/api/get-by-ids'
+import { useGetRecipesByIds } from '@/features/recipe/api/get-by-ids'
 import type { Ingredient } from '@/types/ingredient'
-import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useStore } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { createStore } from 'zustand/vanilla'
 
-interface ShopingListStore {
+interface ShoppingListStore {
   recipesQuantities: Record<number, number>
   setRecipesQuantities: (key: number, value: number) => void
   reset: () => void
 }
 
-const shopingListStore = createStore<ShopingListStore>()(
+const shoppingListStore = createStore<ShoppingListStore>()(
   persist(
     immer((set) => ({
       recipesQuantities: {},
@@ -39,12 +38,10 @@ export interface IngredientWithQuantity extends Ingredient {
   checked: boolean
 }
 
-export const useShopingListStore = () => {
-  const { recipesQuantities, setRecipesQuantities, reset } = useStore(shopingListStore)
+export const useShoppingListStore = () => {
+  const { recipesQuantities, setRecipesQuantities, reset } = useStore(shoppingListStore)
 
-  const { data: recipes } = useQuery({
-    ...getRecipesByIdsQueryOptions(Object.keys(recipesQuantities).map(Number)),
-  })
+  const { data: recipes } = useGetRecipesByIds(Object.keys(recipesQuantities).map(Number))
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,

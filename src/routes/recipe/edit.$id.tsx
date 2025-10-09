@@ -1,22 +1,26 @@
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
+import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
 import {
-  editRecipeMutationQueryOptions,
   editRecipeSchema,
+  useEditRecipeMutation,
   type EditRecipeFormInput,
 } from '@/features/recipe/api/edit'
-import { getRecipeQueryOptions, type RecipeSection } from '@/features/recipe/api/get-one'
+import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import {
+  getRecipeQueryOptions,
+  useGetRecipe,
+  type RecipeSection,
+} from '@/features/recipe/api/get-one'
 import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/lib/form-data'
 import { getFileUrl } from '@/lib/utils'
 import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
 const formatSection = (sections: RecipeSection) => {
   if (sections.subRecipeId) {
@@ -38,8 +42,8 @@ const formatSection = (sections: RecipeSection) => {
 
 const EditRecipePage = () => {
   const { id } = Route.useParams()
-  const { data: recipe, isLoading } = useQuery(getRecipeQueryOptions(id))
-  const { mutateAsync: editRecipe } = useMutation(editRecipeMutationQueryOptions)
+  const { data: recipe, isLoading } = useGetRecipe(id)
+  const { mutateAsync: editRecipe } = useEditRecipeMutation()
   const router = useRouter()
 
   const initialValues: EditRecipeFormInput = recipe
@@ -136,8 +140,8 @@ export const Route = createFileRoute('/recipe/edit/$id')({
     }
   },
   loader: async ({ params, context }) => {
-    const { id } = z.object({ id: z.coerce.number() }).parse(params)
-
-    await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
+    await context.queryClient.prefetchQuery(getRecipeQueryOptions(params.id))
+    await context.queryClient.ensureQueryData(getAllIngredientsQueryOptions)
+    await context.queryClient.ensureQueryData(getAllRecipesQueryOptions())
   },
 })

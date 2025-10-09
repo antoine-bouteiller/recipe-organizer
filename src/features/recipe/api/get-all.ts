@@ -2,7 +2,7 @@ import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { getFileUrl } from '@/lib/utils'
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { asc, like } from 'drizzle-orm'
 import z from 'zod'
@@ -41,4 +41,9 @@ const getAllRecipesQueryOptions = (search?: string) =>
     queryFn: () => getAllRecipes({ data: { search } }),
   })
 
-export { getAllRecipes, getAllRecipesQueryOptions }
+const useGetAllRecipes = (search?: string) =>
+  useQuery({
+    ...getAllRecipesQueryOptions(search),
+  })
+
+export { getAllRecipes, getAllRecipesQueryOptions, useGetAllRecipes }

@@ -1,16 +1,16 @@
 import { Button } from '@/components/ui/button'
-import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
+import { Separator } from '@/components/ui/separator'
+import { useGetAllIngredients } from '@/features/ingredients/api/get-all'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { units } from '@/types/units'
-import { Separator } from '@/components/ui/separator'
-import { createFieldMap, useStore } from '@tanstack/react-form'
-import { useQuery } from '@tanstack/react-query'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
+import { useCreateIngredientMutation } from '../ingredients/api/add-one'
 
 const unitsOptions = units.map((unit) => ({
   label: unit,
@@ -47,7 +47,7 @@ export const RecipeForm = withFieldGroup({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
   render: function Render({ group, initialImage }) {
-    const { data: ingredients } = useQuery(getAllIngredientsQueryOptions())
+    const { data: ingredients } = useGetAllIngredients()
 
     const ingredientsOptions = useMemo(
       () =>
@@ -61,6 +61,8 @@ export const RecipeForm = withFieldGroup({
     const { AppField, Field } = group
 
     const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
+
+    const { mutateAsync: createIngredient } = useCreateIngredientMutation()
 
     return (
       <>
@@ -154,6 +156,12 @@ export const RecipeForm = withFieldGroup({
                                               <ComboboxField
                                                 options={ingredientsOptions}
                                                 disabled={isSubmitting}
+                                                addNewOptionLabel="Nouvel ingrédient:"
+                                                placeholder="Sélectionner un ingrédient"
+                                                searchPlaceholder="Rechercher un ingrédient"
+                                                addNewOptionOnClick={async (value: string) => {
+                                                  await createIngredient({ data: { name: value } })
+                                                }}
                                               />
                                             )}
                                           />
@@ -174,6 +182,9 @@ export const RecipeForm = withFieldGroup({
                                               <ComboboxField
                                                 options={unitsOptions}
                                                 disabled={isSubmitting}
+                                                placeholder="Sélectionner une unité"
+                                                searchPlaceholder="Rechercher une unité"
+                                                noResultsLabel="Aucune unité trouvée"
                                               />
                                             )}
                                           />

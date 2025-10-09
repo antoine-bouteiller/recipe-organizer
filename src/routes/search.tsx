@@ -1,16 +1,15 @@
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import { useGetAllRecipes } from '@/features/recipe/api/get-all'
 import { useSearchStore } from '@/stores/search.store'
 import { ArrowRightIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Fragment } from 'react/jsx-runtime'
 
 const RouteComponent = () => {
   const { search, setSearch, debouncedSearch } = useSearchStore()
-  const { data: recipes } = useQuery(getAllRecipesQueryOptions(debouncedSearch))
+  const { data: recipes } = useGetAllRecipes(debouncedSearch)
   return (
     <div className="flex flex-col justify-end h-full">
       <ScrollArea className="px-4">

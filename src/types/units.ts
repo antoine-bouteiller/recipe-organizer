@@ -1,13 +1,14 @@
 export const units = [
   'g',
   'mL',
-  'cL',
   'CàC',
   'CàS',
   'cube(s)',
   'bouteille(s)',
   'feuille(s)',
   'boite(s)',
+  'conserver(s)',
+  'cm',
 ] as const
 
 export type Unit = (typeof units)[number]

@@ -1,19 +1,18 @@
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
-import { createRecipeMutationQueryOptions, recipeSchema } from '@/features/recipe/api/create'
+import { recipeSchema, useCreateRecipeMutation } from '@/features/recipe/api/create'
 import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
 import { recipeDefaultValues, RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/lib/form-data'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 const NewRecipePage = () => {
   const router = useRouter()
-  const { mutateAsync: createRecipe } = useMutation(createRecipeMutationQueryOptions)
+  const { mutateAsync: createRecipe } = useCreateRecipeMutation()
 
   const form = useAppForm({
     validators: {
@@ -78,7 +77,7 @@ export const Route = createFileRoute('/recipe/new')({
     }
   },
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(getAllIngredientsQueryOptions())
+    await context.queryClient.ensureQueryData(getAllIngredientsQueryOptions)
     await context.queryClient.ensureQueryData(getAllRecipesQueryOptions())
   },
 })
