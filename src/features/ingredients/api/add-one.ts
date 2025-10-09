@@ -21,8 +21,8 @@ const useCreateIngredientMutation = () => {
   const client = useQueryClient()
   return useMutation({
     mutationFn: createIngredient,
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: ['ingredients'] })
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['ingredients'] })
     },
   })
 }
