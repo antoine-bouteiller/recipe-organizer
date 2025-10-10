@@ -1,46 +1,29 @@
-import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
+import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator } from '@/components/ui/item'
 import { useGetAllRecipes } from '@/features/recipe/api/get-all'
 import { useSearchStore } from '@/stores/search.store'
-import { ArrowRightIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { ArrowRightIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Fragment } from 'react/jsx-runtime'
 
 const RouteComponent = () => {
-  const { search, setSearch, debouncedSearch } = useSearchStore()
+  const { debouncedSearch } = useSearchStore()
   const { data: recipes } = useGetAllRecipes(debouncedSearch)
   return (
-    <div className="flex flex-col justify-end h-full">
-      <ScrollArea className="px-4">
-        {recipes?.map((recipe, index) => (
-          <Fragment key={recipe.id}>
-            <Link
-              to="/recipe/$id"
-              params={{ id: recipe.id.toString() }}
-              className="w-full justify-between flex py-4 items-center px-4"
-            >
-              {recipe.name}
-              <ArrowRightIcon />
+    <ItemGroup className="flex-1 px-4 justify-end">
+      {recipes?.map((recipe, index) => (
+        <Fragment key={recipe.id}>
+          <Item asChild>
+            <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
+              <ItemContent>{recipe.name}</ItemContent>
+              <ItemMedia>
+                <ArrowRightIcon />
+              </ItemMedia>
             </Link>
-            {index !== recipes.length - 1 && <Separator />}
-          </Fragment>
-        ))}
-      </ScrollArea>
-      <div className="px-4 pb-1 pt-2 relative">
-        <div className="relative">
-          <Input
-            placeholder="Rechercher une recette"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-            autoFocus
-          />
-
-          <MagnifyingGlassIcon className="absolute top-1/2 left-4 -translate-y-1/2" />
-        </div>
-      </div>
-    </div>
+          </Item>
+          {index !== recipes.length - 1 && <ItemSeparator />}
+        </Fragment>
+      ))}
+    </ItemGroup>
   )
 }
 

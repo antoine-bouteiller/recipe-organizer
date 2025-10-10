@@ -1,3 +1,4 @@
+import { CardLayout } from '@/components/card-layout'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader } from '@/components/ui/card'
 import {
@@ -36,7 +37,7 @@ const RecipePage = () => {
   }
 
   return (
-    <>
+    <CardLayout>
       {authUser && (
         <ResponsivePopover>
           <ResponsivePopoverTrigger asChild>
@@ -112,7 +113,7 @@ const RecipePage = () => {
           </div>
         </CardContent>
       </div>
-    </>
+    </CardLayout>
   )
 }
 

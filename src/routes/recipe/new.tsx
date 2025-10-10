@@ -1,3 +1,4 @@
+import { CardLayout } from '@/components/card-layout'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
@@ -36,7 +37,7 @@ const NewRecipePage = () => {
   })
 
   return (
-    <>
+    <CardLayout>
       <CardHeader className="text-center pt-6">
         <CardTitle className="text-3xl font-bold">Nouvelle Recette</CardTitle>
       </CardHeader>
@@ -65,7 +66,7 @@ const NewRecipePage = () => {
           </div>
         </form>
       </CardContent>
-    </>
+    </CardLayout>
   )
 }
 

@@ -1,3 +1,4 @@
+import { CardLayout } from '@/components/card-layout'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
@@ -95,7 +96,7 @@ const EditRecipePage = () => {
   }
 
   return (
-    <>
+    <CardLayout>
       <CardHeader className="text-center pt-6">
         <CardTitle className="text-3xl font-bold">Modifier la recette</CardTitle>
       </CardHeader>
@@ -128,7 +129,7 @@ const EditRecipePage = () => {
           </div>
         </form>
       </CardContent>
-    </>
+    </CardLayout>
   )
 }
 

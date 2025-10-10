@@ -1,23 +1,16 @@
 import { Toaster } from '@/components/ui/sonner'
 import type { QueryClient } from '@tanstack/react-query'
-import {
-  createRootRouteWithContext,
-  HeadContent,
-  Link,
-  Outlet,
-  Scripts,
-} from '@tanstack/react-router'
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 
-import { menuItems, Navbar } from '@/components/navbar'
-import { ThemeProvider } from '@/features/theme/theme-provider'
-import { Button } from '@/components/ui/button'
+import { Navbar } from '@/components/navbar'
+import { TabBar } from '@/components/tabbar'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
+import { getTheme } from '@/features/theme/api/theme'
+import { ThemeProvider } from '@/features/theme/theme-provider'
 import type { User } from 'better-auth'
 import { useEffect } from 'react'
 import { getSerwist } from 'virtual:serwist'
 import appCss from '../styles/app.css?url'
-import { getTheme } from '@/features/theme/api/theme'
-import { cn } from '@/lib/utils'
 
 const loadSerwist = async () => {
   if ('serviceWorker' in navigator) {
@@ -40,40 +33,20 @@ const RootComponent = () => {
         <HeadContent />
       </head>
       <ThemeProvider theme={theme}>
-        <body className="h-vh">
-          <Toaster />
-          <div className="flex flex-col h-dvh max-h-screen overflow-hidden">
-            <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
-              <Navbar />
-            </header>
-            <div className="flex-1 overflow-y-auto">
-              <Outlet />
-            </div>
-            <div className="shrink-0 flex justify-around md:hidden h-(--tabbar-height) items-center">
-              {menuItems
-                .filter((item) => item.display !== 'desktop')
-                .map((item) => (
-                  <Button
-                    variant="ghost"
-                    className="rounded-full text-primary hover:text-primary"
-                    asChild
-                    key={item.label}
-                  >
-                    <Link to={item.linkProps.to} activeProps={{ className: 'bg-accent' }}>
-                      {({ isActive }) => (
-                        <item.icon
-                          className={cn('size-6')}
-                          {...(isActive ? item.iconFilledProps : {})}
-                        />
-                      )}
-                    </Link>
-                  </Button>
-                ))}
-            </div>
+        <body className="flex flex-col min-h-dvh">
+          <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
+            <Navbar />
+          </header>
+          <div className="flex-1">
+            <Outlet />
           </div>
-          <Scripts />
+          <div className="w-full md:hidden sticky bottom-0">
+            <TabBar />
+          </div>
         </body>
       </ThemeProvider>
+      <Toaster />
+      <Scripts />
     </html>
   )
 }
