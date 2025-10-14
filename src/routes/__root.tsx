@@ -9,20 +9,15 @@ import { getTheme } from '@/features/theme/api/theme'
 import { ThemeProvider } from '@/features/theme/theme-provider'
 import type { User } from 'better-auth'
 import { useEffect } from 'react'
-import { getSerwist } from 'virtual:serwist'
 import appCss from '../styles/app.css?url'
-
-const loadSerwist = async () => {
-  if ('serviceWorker' in navigator) {
-    const serwist = await getSerwist()
-
-    void serwist?.register()
-  }
-}
 
 const RootComponent = () => {
   useEffect(() => {
-    void loadSerwist()
+    if ('serviceWorker' in navigator && import.meta.env.PROD) {
+      const swUrl = new URL(`/sw.js`, globalThis.location.href).toString()
+
+      void navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL })
+    }
   }, [])
 
   const theme = Route.useLoaderData()

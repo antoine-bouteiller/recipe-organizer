@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import { cloudflare } from '@cloudflare/vite-plugin'
+import { workboxGeneratePlugin } from './service-worker-generate'
 
 const viteConfig = defineConfig({
   server: {
@@ -25,6 +26,7 @@ const viteConfig = defineConfig({
     tanstackStart(),
     react(),
     tailwindcss(),
+    workboxGeneratePlugin(),
   ],
 })
 
