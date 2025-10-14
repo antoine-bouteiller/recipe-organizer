@@ -6,7 +6,7 @@ pre-commit:
   parallel: true
   jobs:
     - name: check-lockfile
-      run: pnpm i --frozen-lockfile --silent
+      run: bun i --frozen-lockfile --silent
     - name: check
       glob: '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx}'
       run: pnpm dlx oxlint {staged_files} --fix
