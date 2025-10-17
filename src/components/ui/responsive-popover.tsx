@@ -1,10 +1,26 @@
-import { createContext, useContext, type ComponentProps } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 
-import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+  type DrawerTriggerProps,
+} from '@/components/ui/drawer'
+import {
+  Popover,
+  PopoverContent,
+  PopoverPositioner,
+  PopoverTrigger,
+  type PopoverPositionerProps,
+  type PopoverTriggerProps,
+} from '@/components/ui/popover'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
-const ResponsivePopoverContext = createContext<{ isMobile: boolean }>({
+interface ResponsivePopoverContextValue {
+  isMobile: boolean
+}
+
+const ResponsivePopoverContext = createContext<ResponsivePopoverContextValue>({
   isMobile: false,
 })
 
@@ -18,29 +34,65 @@ const useResponsivePopoverContext = () => {
   return context
 }
 
-const ResponsivePopover = ({ ...props }: ComponentProps<typeof Popover>) => {
+interface ResponsivePopoverProps {
+  children?: ReactNode
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  modal?: boolean
+}
+
+const ResponsivePopover = ({ onOpenChange, modal, ...props }: ResponsivePopoverProps) => {
   const isMobile = useIsMobile()
-  const Root = isMobile ? Drawer : Popover
+
+  if (isMobile) {
+    return (
+      <ResponsivePopoverContext.Provider value={{ isMobile: true }}>
+        <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
+      </ResponsivePopoverContext.Provider>
+    )
+  }
+
   return (
-    <ResponsivePopoverContext.Provider value={{ isMobile }}>
-      <Root {...props} />
+    <ResponsivePopoverContext.Provider value={{ isMobile: false }}>
+      <Popover onOpenChange={onOpenChange} {...props} />
     </ResponsivePopoverContext.Provider>
   )
 }
 
-const ResponsivePopoverTrigger = ({ ...props }: ComponentProps<typeof PopoverTrigger>) => {
+const ResponsivePopoverTrigger = ({
+  children,
+  ...props
+}: PopoverTriggerProps & DrawerTriggerProps) => {
   const { isMobile } = useResponsivePopoverContext()
-  const Trigger = isMobile ? DrawerTrigger : PopoverTrigger
-  return <Trigger {...props} />
+
+  if (isMobile) {
+    return <DrawerTrigger {...props}>{children}</DrawerTrigger>
+  }
+
+  return <PopoverTrigger {...props}>{children}</PopoverTrigger>
+}
+
+interface ResponsivePopoverContentProps extends Omit<PopoverPositionerProps, 'className'> {
+  className?: string
 }
 
 const ResponsivePopoverContent = ({
+  children,
   className,
   ...props
-}: ComponentProps<typeof PopoverContent>) => {
+}: ResponsivePopoverContentProps) => {
   const { isMobile } = useResponsivePopoverContext()
-  const Content = isMobile ? DrawerContent : PopoverContent
-  return <Content className={className} {...props} />
+
+  if (isMobile) {
+    return <DrawerContent className={className} children={children} />
+  }
+
+  return (
+    <PopoverPositioner {...props}>
+      <PopoverContent className={className} children={children} />
+    </PopoverPositioner>
+  )
 }
 
 export { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger }

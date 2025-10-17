@@ -20,7 +20,6 @@ export const getRouter = () => {
     notFoundMode: 'root',
     defaultErrorComponent: DefaultErrorComponent,
     defaultNotFoundComponent: NotFound,
-    scrollRestoration: true,
     context: {
       queryClient,
       authUser: undefined,

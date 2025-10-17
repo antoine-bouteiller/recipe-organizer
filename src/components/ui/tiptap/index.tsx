@@ -13,11 +13,11 @@ const extensions = [TextStyleKit, StarterKit]
 
 const MenuBar = () => (
   <div className="flex gap-2">
-    <ToggleGroup type="multiple" variant="outline">
+    <ToggleGroup variant="outline">
       <UndoRedoButton action="undo" />
       <UndoRedoButton action="redo" />
     </ToggleGroup>
-    <ToggleGroup type="multiple" variant="outline">
+    <ToggleGroup variant="outline">
       <MarkButton type="bold" />
       <MarkButton type="italic" />
       <MarkButton type="underline" />

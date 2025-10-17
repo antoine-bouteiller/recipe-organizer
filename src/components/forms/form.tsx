@@ -1,11 +1,11 @@
-import { Slot } from '@radix-ui/react-slot'
+import { useRender } from '@base-ui-components/react/use-render'
 
-import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { FormItemContext, useFieldContext, useFormContext } from '@/hooks/use-form-context'
 import { cn } from '@/lib/utils'
-import { useId, type ComponentProps } from 'react'
-import { Spinner } from '@/components/ui/spinner'
+import { useId } from 'react'
+import { Button } from '../ui/button'
+import { Spinner } from '../ui/spinner'
 
 const FormItem = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const id = useId()
@@ -17,13 +17,13 @@ const FormItem = ({ className, ...props }: React.ComponentProps<'div'>) => {
   )
 }
 
-const FormLabel = ({ className, ...props }: React.ComponentProps<typeof Label>) => {
-  const { formItemId, errors } = useFieldContext()
+const FieldLabel = ({ className, ...props }: React.ComponentProps<typeof Label>) => {
+  const { formItemId, isValid } = useFieldContext()
 
   return (
     <Label
-      data-slot="form-label"
-      data-error={errors.length > 0}
+      data-slot="field-label"
+      data-error={!isValid}
       className={cn('data-[error=true]:text-destructive', className)}
       htmlFor={formItemId}
       {...props}
@@ -31,28 +31,28 @@ const FormLabel = ({ className, ...props }: React.ComponentProps<typeof Label>) 
   )
 }
 
-const FormControl = ({ ...props }: ComponentProps<typeof Slot>) => {
-  const { errors, formItemId, formDescriptionId, formMessageId } = useFieldContext()
+const FieldControl = ({ children = <div /> }: { children?: useRender.RenderProp }) => {
+  const { formItemId, isValid, formDescriptionId, formMessageId } = useFieldContext()
 
-  return (
-    <Slot
-      data-slot="form-control"
-      id={formItemId}
-      aria-describedby={
-        errors.length === 0 ? formDescriptionId : `${formDescriptionId} ${formMessageId}`
-      }
-      aria-invalid={errors.length > 0}
-      {...props}
-    />
-  )
+  return useRender({
+    render: children,
+    props: {
+      'data-slot': 'field-control',
+      'id': formItemId,
+      'aria-describedby': isValid
+        ? `${formDescriptionId}`
+        : `${formDescriptionId} ${formMessageId}`,
+      'aria-invalid': !isValid,
+    },
+  })
 }
 
-const FormDescription = ({ className, ...props }: React.ComponentProps<'p'>) => {
+const FieldDescription = ({ className, ...props }: React.ComponentProps<'p'>) => {
   const { formDescriptionId } = useFieldContext()
 
   return (
     <p
-      data-slot="form-description"
+      data-slot="field-description"
       id={formDescriptionId}
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
@@ -60,16 +60,24 @@ const FormDescription = ({ className, ...props }: React.ComponentProps<'p'>) => 
   )
 }
 
-const FormMessage = ({ className, ...props }: React.ComponentProps<'p'>) => {
-  const { errors, formMessageId } = useFieldContext()
-  const body = errors.length > 0 ? String(errors.at(0)?.message ?? '') : props.children
+const FieldMessage = ({ className, ...props }: React.ComponentProps<'p'>) => {
+  const { formMessageId, isValid, errors } = useFieldContext()
+
+  if (props.children) {
+    return props.children
+  }
+
+  const body = isValid
+    ? props.children
+    : String(errors.map((error) => error.message).join(', ') ?? '')
+
   if (!body) {
     return undefined
   }
 
   return (
     <p
-      data-slot="form-message"
+      data-slot="field-message"
       id={formMessageId}
       className={cn('text-destructive text-sm', className)}
       {...props}
@@ -93,4 +101,4 @@ const FormSubmit = ({ label }: { label: string }) => {
   )
 }
 
-export { FormControl, FormDescription, FormItem, FormLabel, FormMessage, FormSubmit }
+export { FieldControl, FieldDescription, FieldLabel, FieldMessage, FormItem, FormSubmit }

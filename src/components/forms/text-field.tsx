@@ -1,4 +1,4 @@
-import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
+import { FieldControl, FormItem, FieldLabel, FieldMessage } from '@/components/forms/form'
 import { Input } from '@/components/ui/input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
@@ -13,8 +13,8 @@ export const TextField = ({ label, placeholder, disabled }: TextFieldProps) => {
 
   return (
     <FormItem>
-      {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
-      <FormControl>
+      {label && <FieldLabel className="text-base font-semibold">{label}</FieldLabel>}
+      <FieldControl>
         <Input
           className="text-base"
           placeholder={placeholder}
@@ -22,8 +22,8 @@ export const TextField = ({ label, placeholder, disabled }: TextFieldProps) => {
           value={state.value}
           onChange={(e) => handleChange(e.target.value)}
         />
-      </FormControl>
-      <FormMessage />
+      </FieldControl>
+      <FieldMessage />
     </FormItem>
   )
 }

@@ -75,16 +75,16 @@ export const Navbar = () => {
 
   return (
     <div className="3xl:fixed:container flex h-14 items-center gap-2 **:data-[slot=separator]:!h-4 px-6">
-      <NavigationMenu viewport={false}>
+      <NavigationMenu>
         <NavigationMenuList>
           {menuItems
             .filter((item) => item.display !== 'mobile')
             .map((item) => (
               <NavigationMenuItem key={item.label}>
-                <NavigationMenuLink asChild>
-                  <Link {...item.linkProps} activeProps={{ className: 'bg-accent' }}>
-                    {item.label}
-                  </Link>
+                <NavigationMenuLink
+                  render={<Link {...item.linkProps} activeProps={{ className: 'bg-accent' }} />}
+                >
+                  {item.label}
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}

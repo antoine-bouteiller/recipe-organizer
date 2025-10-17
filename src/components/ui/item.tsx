@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
+import { useRender } from '@base-ui-components/react/use-render'
+import { mergeProps } from '@base-ui-components/react/merge-props'
 
 const ItemGroup = ({ className, ...props }: React.ComponentProps<'div'>) => (
   <div
@@ -48,20 +49,23 @@ const Item = ({
   className,
   variant = 'default',
   size = 'default',
-  asChild = false,
+  render,
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof itemVariants> & { asChild?: boolean }) => {
-  const Comp = asChild ? Slot : 'div'
-  return (
-    <Comp
-      data-slot="item"
-      data-variant={variant}
-      data-size={size}
-      className={cn(itemVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
-}
+}: React.ComponentProps<'div'> &
+  VariantProps<typeof itemVariants> & { render?: useRender.RenderProp }) =>
+  useRender({
+    defaultTagName: 'div',
+    render,
+    props: mergeProps(
+      {
+        'data-slot': 'item',
+        'data-variant': variant,
+        'data-size': size,
+        'className': cn(itemVariants({ variant, size, className })),
+      },
+      props
+    ),
+  })
 
 const itemMediaVariants = cva(
   'flex shrink-0 items-center justify-center gap-2 group-has-[[data-slot=item-description]]/item:self-start [&_svg]:pointer-events-none group-has-[[data-slot=item-description]]/item:translate-y-0.5',

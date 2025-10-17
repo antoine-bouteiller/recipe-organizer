@@ -12,8 +12,14 @@ import { getRecipeQueryOptions, useGetRecipe } from '@/features/recipe/api/get-o
 import DeleteRecipe from '@/features/recipe/delete-recipe'
 import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
 import { getFileUrl } from '@/lib/utils'
-import { DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
-import { createFileRoute, Link, notFound } from '@tanstack/react-router'
+import {
+  ArrowLeftIcon,
+  DotsThreeVerticalIcon,
+  MinusIcon,
+  PencilSimpleIcon,
+  PlusIcon,
+} from '@phosphor-icons/react'
+import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
 
@@ -21,6 +27,8 @@ const RecipePage = () => {
   const { id } = Route.useParams()
   const { data: recipe, isLoading } = useGetRecipe(id)
   const { authUser } = Route.useRouteContext()
+
+  const router = useRouter()
 
   const [quantity, setQuantity] = useState(recipe?.quantity ?? 0)
 
@@ -38,19 +46,37 @@ const RecipePage = () => {
 
   return (
     <CardLayout>
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute top-4 left-4 rounded-full"
+        onClick={() => router.history.back()}
+      >
+        <ArrowLeftIcon className="size-4" />
+      </Button>
       {authUser && (
         <ResponsivePopover>
-          <ResponsivePopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="absolute top-4 right-4 rounded-full">
-              <DotsThreeVerticalIcon className="size-4" weight="bold" />
-            </Button>
+          <ResponsivePopoverTrigger
+            render={
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute top-4 right-4 rounded-full"
+              />
+            }
+          >
+            <DotsThreeVerticalIcon className="size-4" weight="bold" />
           </ResponsivePopoverTrigger>
-          <ResponsivePopoverContent className="w-auto flex flex-col gap-2 p-2 items-start">
-            <Button variant="ghost" asChild>
-              <Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }}>
-                <PencilSimpleIcon className="size-4" />
-                Modifier
-              </Link>
+          <ResponsivePopoverContent
+            className="w-auto flex flex-col gap-2 p-2 items-start"
+            align="end"
+          >
+            <Button
+              variant="ghost"
+              render={<Link to="/recipe/edit/$id" params={{ id: recipe.id.toString() }} />}
+            >
+              <PencilSimpleIcon className="size-4" />
+              Modifier
             </Button>
             <DeleteRecipe recipeId={recipe.id} />
           </ResponsivePopoverContent>

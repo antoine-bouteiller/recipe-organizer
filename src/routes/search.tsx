@@ -12,13 +12,11 @@ const RouteComponent = () => {
     <ItemGroup className="flex-1 px-4 justify-end">
       {recipes?.map((recipe, index) => (
         <Fragment key={recipe.id}>
-          <Item asChild>
-            <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
-              <ItemContent>{recipe.name}</ItemContent>
-              <ItemMedia>
-                <ArrowRightIcon />
-              </ItemMedia>
-            </Link>
+          <Item render={<Link to="/recipe/$id" params={{ id: recipe.id.toString() }} />}>
+            <ItemContent>{recipe.name}</ItemContent>
+            <ItemMedia>
+              <ArrowRightIcon />
+            </ItemMedia>
           </Item>
           {index !== recipes.length - 1 && <ItemSeparator />}
         </Fragment>

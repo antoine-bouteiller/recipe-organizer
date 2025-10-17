@@ -1,4 +1,4 @@
-import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
+import { FieldControl, FieldLabel, FormItem, FieldMessage } from '@/components/forms/form'
 import { Tiptap } from '@/components/ui/tiptap'
 import { useFieldContext } from '@/hooks/use-form-context'
 
@@ -12,11 +12,11 @@ const TiptapField = ({ label, disabled }: TiptapProps) => {
 
   return (
     <FormItem>
-      <FormLabel className="text-base font-semibold">{label}</FormLabel>
-      <FormControl>
+      <FieldLabel className="text-base font-semibold">{label}</FieldLabel>
+      <FieldControl>
         <Tiptap disabled={disabled} onChange={handleChange} content={state.value} />
-      </FormControl>
-      <FormMessage />
+      </FieldControl>
+      <FieldMessage />
     </FormItem>
   )
 }

@@ -1,8 +1,8 @@
 import {
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
+  FieldControl,
+  FieldLabel,
+  FieldDescription,
+  FieldMessage,
   FormItem,
   FormSubmit,
 } from '@/components/forms/form'
@@ -18,10 +18,10 @@ const { useAppForm, withForm, withFieldGroup } = createFormHook({
   fieldContext: fieldContext,
   formContext: formContext,
   fieldComponents: {
-    FormLabel,
-    FormControl,
-    FormDescription,
-    FormMessage,
+    FormLabel: FieldLabel,
+    FormControl: FieldControl,
+    FormDescription: FieldDescription,
+    FormMessage: FieldMessage,
     FormItem,
     TextField,
     NumberField,

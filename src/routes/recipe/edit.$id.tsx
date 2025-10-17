@@ -74,7 +74,7 @@ const EditRecipePage = () => {
 
         await editRecipe({ data: formData })
 
-        await router.navigate({ to: '/' })
+        await router.navigate({ to: '/recipe/$id', params: { id }, replace: true })
       } catch (error) {
         toast.error('Une erreur est survenue lors de la création de la recette', {
           description: error instanceof Error ? error.message : JSON.stringify(error),

@@ -1,4 +1,4 @@
-import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
+import { FieldControl, FormItem, FieldLabel, FieldMessage } from '@/components/forms/form'
 import { NumberInput } from '@/components/ui/number-input'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { useMemo } from 'react'
@@ -40,8 +40,8 @@ export const NumberField = ({
 
   return (
     <FormItem className="flex-1 w-full">
-      {label && <FormLabel className="text-base font-semibold">{label}</FormLabel>}
-      <FormControl>
+      {label && <FieldLabel className="text-base font-semibold">{label}</FieldLabel>}
+      <FieldControl>
         <NumberInput
           placeholder={placeholder}
           min={min}
@@ -52,8 +52,8 @@ export const NumberField = ({
           value={state.value}
           disabled={disabled}
         />
-      </FormControl>
-      <FormMessage />
+      </FieldControl>
+      <FieldMessage />
     </FormItem>
   )
 }

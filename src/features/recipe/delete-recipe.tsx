@@ -32,11 +32,9 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
 
   return (
     <ResponsiveDialog>
-      <ResponsiveDialogTrigger asChild>
-        <Button variant="ghost">
-          <TrashIcon className="h-4 w-4" />
-          Supprimer
-        </Button>
+      <ResponsiveDialogTrigger render={<Button variant="ghost" />}>
+        <TrashIcon className="h-4 w-4" />
+        Supprimer
       </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
@@ -45,8 +43,8 @@ export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
           </ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
         <ResponsiveDialogFooter>
-          <ResponsiveDialogClose asChild>
-            <Button variant="outline">Annuler</Button>
+          <ResponsiveDialogClose render={<Button variant="outline" />}>
+            Annuler
           </ResponsiveDialogClose>
           <Button variant="destructive" onClick={handleDelete}>
             Supprimer

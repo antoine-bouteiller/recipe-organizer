@@ -17,9 +17,13 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { useIsMobile } from '@/hooks/use-is-mobile'
-import { createContext, useContext, type ComponentProps } from 'react'
+import { createContext, useContext, type ReactNode, type ComponentPropsWithoutRef } from 'react'
 
-const ResponsiveDialogContext = createContext<{ isMobile: boolean }>({ isMobile: false })
+interface ResponsiveDialogContextValue {
+  isMobile: boolean
+}
+
+const ResponsiveDialogContext = createContext<ResponsiveDialogContextValue>({ isMobile: false })
 
 const useResponsiveDialogContext = () => {
   const context = useContext(ResponsiveDialogContext)
@@ -29,50 +33,155 @@ const useResponsiveDialogContext = () => {
   return context
 }
 
-const ResponsiveDialog = ({ ...props }: ComponentProps<typeof Dialog>) => {
+interface ResponsiveDialogProps {
+  children?: ReactNode
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  modal?: boolean
+}
+
+const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogProps) => {
   const isMobile = useIsMobile()
-  const Root = isMobile ? Drawer : Dialog
+
+  if (isMobile) {
+    return (
+      <ResponsiveDialogContext.Provider value={{ isMobile: true }}>
+        <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
+      </ResponsiveDialogContext.Provider>
+    )
+  }
+
+  let dialogModal: boolean | 'trap-focus' = 'trap-focus'
+  if (modal === true) {
+    dialogModal = true
+  } else if (modal === false) {
+    dialogModal = false
+  }
+
   return (
-    <ResponsiveDialogContext.Provider value={{ isMobile }}>
-      <Root {...props} />
+    <ResponsiveDialogContext.Provider value={{ isMobile: false }}>
+      <Dialog
+        onOpenChange={
+          onOpenChange
+            ? (open, _eventDetails) => {
+                onOpenChange(open)
+              }
+            : undefined
+        }
+        modal={dialogModal}
+        {...props}
+      />
     </ResponsiveDialogContext.Provider>
   )
 }
 
-const ResponsiveDialogTrigger = ({ className, ...props }: ComponentProps<typeof DialogTrigger>) => {
-  const { isMobile } = useResponsiveDialogContext()
-  const Trigger = isMobile ? DrawerTrigger : DialogTrigger
-  return <Trigger className={className} {...props} />
+interface ResponsiveDialogTriggerProps {
+  children?: ReactNode
+  className?: string
+  render?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-const ResponsiveDialogContent = ({ className, ...props }: ComponentProps<typeof DialogContent>) => {
+const ResponsiveDialogTrigger = ({ children, render, ...props }: ResponsiveDialogTriggerProps) => {
   const { isMobile } = useResponsiveDialogContext()
-  const Content = isMobile ? DrawerContent : DialogContent
-  return <Content className={className} {...props} />
+
+  if (isMobile) {
+    return <DrawerTrigger {...props}>{children}</DrawerTrigger>
+  }
+
+  if (render) {
+    return (
+      <DialogTrigger render={render} {...props}>
+        {children}
+      </DialogTrigger>
+    )
+  }
+
+  return <DialogTrigger {...props}>{children}</DialogTrigger>
 }
 
-const ResponsiveDialogHeader = ({ className, ...props }: ComponentProps<typeof DialogHeader>) => {
-  const { isMobile } = useResponsiveDialogContext()
-  const Header = isMobile ? DrawerHeader : DialogHeader
-  return <Header className={className} {...props} />
+interface ResponsiveDialogContentProps {
+  children?: ReactNode
+  className?: string
 }
 
-const ResponsiveDialogTitle = ({ className, ...props }: ComponentProps<typeof DialogTitle>) => {
+const ResponsiveDialogContent = ({ ...props }: ResponsiveDialogContentProps) => {
   const { isMobile } = useResponsiveDialogContext()
-  const Title = isMobile ? DrawerTitle : DialogTitle
-  return <Title className={className} {...props} />
+
+  if (isMobile) {
+    return <DrawerContent {...props} />
+  }
+
+  return <DialogContent {...props} />
 }
 
-const ResponsiveDialogFooter = ({ className, ...props }: ComponentProps<typeof DialogFooter>) => {
-  const { isMobile } = useResponsiveDialogContext()
-  const Footer = isMobile ? DrawerFooter : DialogFooter
-  return <Footer className={className} {...props} />
+interface ResponsiveDialogHeaderProps {
+  children?: ReactNode
+  className?: string
 }
 
-const ResponsiveDialogClose = ({ className, ...props }: ComponentProps<typeof DialogClose>) => {
+const ResponsiveDialogHeader = ({ ...props }: ResponsiveDialogHeaderProps) => {
   const { isMobile } = useResponsiveDialogContext()
-  const Close = isMobile ? DrawerClose : DialogClose
-  return <Close className={className} {...props} />
+
+  if (isMobile) {
+    return <DrawerHeader {...props} />
+  }
+
+  return <DialogHeader {...props} />
+}
+
+interface ResponsiveDialogTitleProps {
+  children?: ReactNode
+  className?: string
+}
+
+const ResponsiveDialogTitle = ({ ...props }: ResponsiveDialogTitleProps) => {
+  const { isMobile } = useResponsiveDialogContext()
+
+  if (isMobile) {
+    return <DrawerTitle {...props} />
+  }
+
+  return <DialogTitle {...props} />
+}
+
+interface ResponsiveDialogFooterProps {
+  children?: ReactNode
+  className?: string
+}
+
+const ResponsiveDialogFooter = ({ ...props }: ResponsiveDialogFooterProps) => {
+  const { isMobile } = useResponsiveDialogContext()
+
+  if (isMobile) {
+    return <DrawerFooter {...props} />
+  }
+
+  return <DialogFooter {...props} />
+}
+
+interface ResponsiveDialogCloseProps {
+  children?: ReactNode
+  className?: string
+  render?: ComponentPropsWithoutRef<typeof DialogClose>['render']
+}
+
+const ResponsiveDialogClose = ({ children, render, ...props }: ResponsiveDialogCloseProps) => {
+  const { isMobile } = useResponsiveDialogContext()
+
+  if (isMobile) {
+    return <DrawerClose {...props}>{children}</DrawerClose>
+  }
+
+  if (render) {
+    return (
+      <DialogClose render={render} {...props}>
+        {children}
+      </DialogClose>
+    )
+  }
+
+  return <DialogClose {...props}>{children}</DialogClose>
 }
 
 export {

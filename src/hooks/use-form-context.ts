@@ -1,4 +1,4 @@
-import { createFormHookContexts, useStore } from '@tanstack/react-form'
+import { createFormHookContexts } from '@tanstack/react-form'
 import { createContext, useContext } from 'react'
 
 interface FormItemContextValue {
@@ -18,9 +18,8 @@ const useFieldContext = <T>() => {
   const { id } = useContext(FormItemContext)
   const { name, store, state, ...fieldContext } = useFormFieldContext<T>()
 
-  const errors = useStore(store, (state) => state.meta.errors)
   if (!fieldContext) {
-    throw new Error('useFieldContext should be used within <FormItem>')
+    throw new Error('useFormField should be used within <field.Container>')
   }
 
   return {
@@ -29,11 +28,11 @@ const useFieldContext = <T>() => {
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
     formMessageId: `${id}-form-item-message`,
-    errors,
     store,
     state,
+    ...state.meta,
     ...fieldContext,
   }
 }
 
-export { fieldContext, formContext, useFormContext, useFieldContext, useFormFieldContext }
+export { fieldContext, formContext, useFieldContext, useFormContext, useFormFieldContext }

@@ -1,4 +1,4 @@
-import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/forms/form'
+import { FieldControl, FormItem, FieldLabel, FieldMessage } from '@/components/forms/form'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'
 import { useFieldContext } from '@/hooks/use-form-context'
@@ -30,8 +30,8 @@ export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) =
 
   return (
     <FormItem>
-      <FormLabel className="text-base font-semibold">{label}</FormLabel>
-      <FormLabel
+      <FieldLabel className="text-base font-semibold">{label}</FieldLabel>
+      <FieldLabel
         data-dragging={isDragging || undefined}
         className={cn(
           'border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:ring-[3px]',
@@ -75,11 +75,11 @@ export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) =
             </button>
           </div>
         )}
-      </FormLabel>
-      <FormControl>
+      </FieldLabel>
+      <FieldControl>
         <input type="file" className="hidden" disabled={disabled} {...getInputProps()} />
-      </FormControl>
-      <FormMessage />
+      </FieldControl>
+      <FieldMessage />
     </FormItem>
   )
 }

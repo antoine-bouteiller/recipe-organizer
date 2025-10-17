@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import {
   Command,
-  CommandCheck,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -16,7 +15,7 @@ import {
 } from '@/components/ui/responsive-popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { CaretDownIcon, PlusIcon } from '@phosphor-icons/react'
+import { CaretDownIcon, CheckIcon, PlusIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 interface Option {
@@ -53,24 +52,26 @@ const Combobox = ({
 
   return (
     <ResponsivePopover open={open} onOpenChange={setOpen}>
-      <ResponsivePopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            'w-full justify-between text-ellipsis bg-transparent border-input',
-            error &&
-              'border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
-          )}
-        >
-          <span className={cn('truncate')}>
-            {value ? options.find((option) => option.value === value)?.label : placeholder}
-          </span>
-          <CaretDownIcon />
-        </Button>
+      <ResponsivePopoverTrigger
+        render={
+          <Button
+            variant="outline"
+            role="button"
+            aria-expanded={open}
+            className={cn(
+              'w-full justify-between text-ellipsis bg-transparent border-input',
+              error &&
+                'border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
+            )}
+          />
+        }
+      >
+        <span className={cn('truncate')}>
+          {value ? options.find((option) => option.value === value)?.label : placeholder}
+        </span>
+        <CaretDownIcon />
       </ResponsivePopoverTrigger>
-      <ResponsivePopoverContent className="w-(--radix-popper-anchor-width) p-0">
+      <ResponsivePopoverContent className="w-(--anchor-width) p-0">
         <ComboboxContent
           setOpen={setOpen}
           options={options}
@@ -116,7 +117,7 @@ const ComboboxContent = ({
         onValueChange={setInputValue}
       />
       <CommandList>
-        <ScrollArea viewportClassName="max-h-[300px] [&>div]:block!">
+        <ScrollArea>
           <CommandEmpty>
             {addNewOptionOnClick ? (
               <Button
@@ -143,7 +144,7 @@ const ComboboxContent = ({
                 }}
               >
                 <span className="truncate">{option.label}</span>
-                {value === option.value && <CommandCheck />}
+                {value === option.value && <CheckIcon />}
               </CommandItem>
             ))}
           </CommandGroup>
@@ -155,4 +156,4 @@ const ComboboxContent = ({
 }
 
 export { Combobox }
-export type { Option, ComboboxProps }
+export type { ComboboxProps, Option }

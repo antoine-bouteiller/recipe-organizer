@@ -1,9 +1,11 @@
+'use client'
+
 import * as React from 'react'
-import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group'
+import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui-components/react/toggle-group'
 import { type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
-import { toggleVariants } from '@/components/ui/toggle'
+import { Toggle, toggleVariants } from '@/components/ui/toggle'
 
 const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants>>({
   size: 'default',
@@ -16,9 +18,8 @@ const ToggleGroup = ({
   size,
   children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
-  VariantProps<typeof toggleVariants>) => (
-  <ToggleGroupPrimitive.Root
+}: React.ComponentProps<typeof ToggleGroupPrimitive> & VariantProps<typeof toggleVariants>) => (
+  <ToggleGroupPrimitive
     data-slot="toggle-group"
     data-variant={variant}
     data-size={size}
@@ -29,7 +30,7 @@ const ToggleGroup = ({
     {...props}
   >
     <ToggleGroupContext.Provider value={{ variant, size }}>{children}</ToggleGroupContext.Provider>
-  </ToggleGroupPrimitive.Root>
+  </ToggleGroupPrimitive>
 )
 
 const ToggleGroupItem = ({
@@ -38,12 +39,11 @@ const ToggleGroupItem = ({
   variant,
   size,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof toggleVariants>) => {
+}: React.ComponentProps<typeof Toggle> & VariantProps<typeof toggleVariants>) => {
   const context = React.useContext(ToggleGroupContext)
 
   return (
-    <ToggleGroupPrimitive.Item
+    <Toggle
       data-slot="toggle-group-item"
       data-variant={context.variant || variant}
       data-size={context.size || size}
@@ -58,7 +58,7 @@ const ToggleGroupItem = ({
       {...props}
     >
       {children}
-    </ToggleGroupPrimitive.Item>
+    </Toggle>
   )
 }
 

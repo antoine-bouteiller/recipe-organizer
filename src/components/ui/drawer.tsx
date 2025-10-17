@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Drawer as DrawerPrimitive } from 'vaul'
+import { Drawer as DrawerPrimitive } from 'vaul-base'
 
 import { cn } from '@/lib/utils'
 
@@ -7,7 +7,9 @@ const Drawer = ({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Root>)
   <DrawerPrimitive.Root data-slot="drawer" {...props} />
 )
 
-const DrawerTrigger = ({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Trigger>) => (
+export type DrawerTriggerProps = React.ComponentProps<typeof DrawerPrimitive.Trigger>
+
+const DrawerTrigger = ({ ...props }: DrawerTriggerProps) => (
   <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />
 )
 

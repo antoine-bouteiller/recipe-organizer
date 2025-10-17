@@ -34,10 +34,18 @@ export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRec
 
   return (
     <ResponsiveDialog>
-      <ResponsiveDialogTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className="md:flex-1" disabled={disabled}>
-          Ajouter une recette existante
-        </Button>
+      <ResponsiveDialogTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="md:flex-1"
+            disabled={disabled}
+          />
+        }
+      >
+        Ajouter une recette existante
       </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
@@ -60,8 +68,8 @@ export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRec
           />
         </div>
         <ResponsiveDialogFooter>
-          <ResponsiveDialogClose asChild>
-            <Button variant="outline">Annuler</Button>
+          <ResponsiveDialogClose render={<Button variant="outline" />}>
+            Annuler
           </ResponsiveDialogClose>
           <Button
             variant="default"

@@ -36,7 +36,6 @@
   "rules": {
     "no-children-prop": "off",
 
-    // restrictions
     "default-case": "error",
     "no-empty": "error",
     "no-empty-function": "error",
@@ -49,12 +48,10 @@
     "prefer-modern-math-apis": "error",
     "prefer-number-properties": "error",
 
-    //suspicious
     "react-in-jsx-scope": "off",
     "no-unneeded-ternary": "off",
     "style-prop-object": "off",
 
-    // pedantic
     "max-lines": "off",
     "max-lines-per-function": "off",
     "max-classes-per-file": "off",
@@ -63,7 +60,6 @@
     "id-length": "off",
     "explicit-length-check": "off",
 
-    //style
     "prefer-template": "error",
     "jsx-curly-brace-presence": "error",
     "filename-case": [
@@ -84,7 +80,6 @@
     "no-duplicate-imports": "off",
     "jsx-handler-names": "off",
 
-    // type-aware
     "only-throw-error": "off",
     "no-misused-promises": "off",
     "no-confusing-void-expression": "off",

@@ -1,4 +1,4 @@
-import { FormItem, FormMessage } from '@/components/forms/form'
+import { FormItem, FieldMessage } from '@/components/forms/form'
 import { Combobox, type ComboboxProps } from '@/components/ui/combobox'
 import { useFieldContext } from '@/hooks/use-form-context'
 
@@ -20,7 +20,7 @@ const ComboboxField = ({ options, ...props }: ComboboxProps) => {
         error={field.errors.length > 0 ? field.errors[0].message : undefined}
         {...props}
       />
-      <FormMessage />
+      <FieldMessage />
     </FormItem>
   )
 }

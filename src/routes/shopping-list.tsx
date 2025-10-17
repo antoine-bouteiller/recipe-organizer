@@ -22,7 +22,7 @@ const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
         <Checkbox
           id={`ingredient-${ingredient.id}`}
           checked={isChecked}
-          onCheckedChange={(checked) => setIsChecked(checked === 'indeterminate' ? false : checked)}
+          onCheckedChange={(checked) => setIsChecked(checked)}
         />
         <label htmlFor={`ingredient-${ingredient.id}`}>{ingredient.name}</label>
       </div>

@@ -36,15 +36,18 @@ export const TabBar = () => {
             <Button
               variant="ghost"
               className="rounded-full text-primary hover:text-primary"
-              asChild
+              render={
+                <Link to={item.linkProps.to} activeProps={{ className: 'bg-accent' }}>
+                  {({ isActive }) => (
+                    <item.icon
+                      className={cn('size-6')}
+                      {...(isActive ? item.iconFilledProps : {})}
+                    />
+                  )}
+                </Link>
+              }
               key={item.label}
-            >
-              <Link to={item.linkProps.to} activeProps={{ className: 'bg-accent' }}>
-                {({ isActive }) => (
-                  <item.icon className={cn('size-6')} {...(isActive ? item.iconFilledProps : {})} />
-                )}
-              </Link>
-            </Button>
+            />
           ))}
       </div>
     </div>

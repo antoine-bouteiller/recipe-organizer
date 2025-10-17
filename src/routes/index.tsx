@@ -21,10 +21,8 @@ const Home = () => {
       </div>
       {authUser && (
         <div className="flex w-full sticky bottom-16 md:bottom-4 px-4 justify-end">
-          <Button asChild size="icon" className="p-5">
-            <Link to="/recipe/new">
-              <PlusIcon className="size-4" />
-            </Link>
+          <Button render={<Link to="/recipe/new" />} size="icon" className="p-5">
+            <PlusIcon className="size-4" />
           </Button>
         </div>
       )}
