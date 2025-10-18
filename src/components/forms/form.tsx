@@ -39,9 +39,7 @@ const FieldControl = ({ children = <div /> }: { children?: useRender.RenderProp 
     props: {
       'data-slot': 'field-control',
       'id': formItemId,
-      'aria-describedby': isValid
-        ? `${formDescriptionId}`
-        : `${formDescriptionId} ${formMessageId}`,
+      'aria-describedby': isValid ? formDescriptionId : `${formDescriptionId} ${formMessageId}`,
       'aria-invalid': !isValid,
     },
   })

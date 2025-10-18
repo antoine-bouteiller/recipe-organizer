@@ -3,8 +3,8 @@ import { DefaultErrorComponent } from '@/components/default-error-component'
 import { NotFound } from '@/components/not-found'
 import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
-import { routeTree } from './routeTree.gen'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { routeTree } from './routeTree.gen'
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -20,9 +20,9 @@ export const getRouter = () => {
     notFoundMode: 'root',
     defaultErrorComponent: DefaultErrorComponent,
     defaultNotFoundComponent: NotFound,
+    defaultPreload: 'intent',
     context: {
       queryClient,
-      authUser: undefined,
     },
   })
 

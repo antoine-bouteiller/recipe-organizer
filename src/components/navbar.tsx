@@ -7,7 +7,7 @@ import {
   NavigationMenuList,
 } from '@/components/ui/navigation-menu'
 import { SearchBar } from '@/features/recipe/search-bar'
-import { useTheme } from '@/features/theme/theme-provider'
+import { toggleTheme } from '@/lib/theme'
 import {
   GearIcon,
   HouseIcon,
@@ -16,7 +16,7 @@ import {
   type Icon,
   type IconProps,
 } from '@phosphor-icons/react'
-import { Link, type LinkProps } from '@tanstack/react-router'
+import { Link, useRouter, type LinkProps } from '@tanstack/react-router'
 
 interface MenuItem {
   label: string
@@ -71,7 +71,7 @@ export const menuItems: MenuItem[] = [
 ]
 
 export const Navbar = () => {
-  const { toggleTheme } = useTheme()
+  const router = useRouter()
 
   return (
     <div className="3xl:fixed:container flex h-14 items-center gap-2 **:data-[slot=separator]:!h-4 px-6">
@@ -92,7 +92,14 @@ export const Navbar = () => {
       </NavigationMenu>
       <div className="flex items-center gap-2 flex-1 justify-end">
         <SearchBar />
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={async () => {
+            await toggleTheme()
+            await router.invalidate()
+          }}
+        >
           <ThemeIcon className="size-6" />
         </Button>
       </div>

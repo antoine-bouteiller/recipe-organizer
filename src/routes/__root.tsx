@@ -5,11 +5,9 @@ import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanst
 import { Navbar } from '@/components/navbar'
 import { TabBar } from '@/components/tabbar'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
-import { getTheme } from '@/features/theme/api/theme'
-import { ThemeProvider } from '@/features/theme/theme-provider'
-import type { User } from 'better-auth'
 import { useEffect } from 'react'
 import appCss from '../styles/app.css?url'
+import { getTheme } from '@/lib/theme'
 
 const RootComponent = () => {
   useEffect(() => {
@@ -20,26 +18,24 @@ const RootComponent = () => {
     }
   }, [])
 
-  const theme = Route.useLoaderData()
+  const { theme } = Route.useRouteContext()
 
   return (
     <html lang="fr" className={theme}>
       <head>
         <HeadContent />
       </head>
-      <ThemeProvider theme={theme}>
-        <body className="flex flex-col min-h-dvh">
-          <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
-            <Navbar />
-          </header>
-          <div className="flex-1">
-            <Outlet />
-          </div>
-          <div className="w-full md:hidden sticky bottom-0">
-            <TabBar />
-          </div>
-        </body>
-      </ThemeProvider>
+      <body className="flex flex-col min-h-dvh">
+        <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
+          <Navbar />
+        </header>
+        <div className="flex-1">
+          <Outlet />
+        </div>
+        <div className="w-full md:hidden sticky bottom-0">
+          <TabBar />
+        </div>
+      </body>
       <Toaster />
       <Scripts />
     </html>
@@ -48,7 +44,6 @@ const RootComponent = () => {
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
-  authUser: User | undefined
 }>()({
   head: ({ loaderData }) => ({
     meta: [
@@ -77,9 +72,9 @@ export const Route = createRootRouteWithContext<{
   }),
   beforeLoad: async () => {
     const authUser = await getAuthUser()
-    return { authUser }
+    const theme = await getTheme()
+    return { authUser, theme }
   },
-  loader: () => getTheme(),
   component: RootComponent,
   notFoundComponent: () => <div>Not found</div>,
 })
