@@ -82,19 +82,11 @@ interface ResponsiveDialogTriggerProps {
   render?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-const ResponsiveDialogTrigger = ({ children, render, ...props }: ResponsiveDialogTriggerProps) => {
+const ResponsiveDialogTrigger = ({ children, ...props }: ResponsiveDialogTriggerProps) => {
   const { isMobile } = useResponsiveDialogContext()
 
   if (isMobile) {
     return <DrawerTrigger {...props}>{children}</DrawerTrigger>
-  }
-
-  if (render) {
-    return (
-      <DialogTrigger render={render} {...props}>
-        {children}
-      </DialogTrigger>
-    )
   }
 
   return <DialogTrigger {...props}>{children}</DialogTrigger>
