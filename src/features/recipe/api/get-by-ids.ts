@@ -1,10 +1,11 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { inArray } from 'drizzle-orm'
 import z from 'zod'
+import { recipesQueryKeys } from './query-keys'
 
 const getRecipesByIds = createServerFn({
   method: 'GET',
@@ -38,10 +39,10 @@ const getRecipesByIds = createServerFn({
     })
   )
 
-const useGetRecipesByIds = (ids: number[]) =>
-  useQuery({
-    queryKey: ['recipes', ids],
+const getRecipeByIdsOptions = (ids: number[]) =>
+  queryOptions({
+    queryKey: recipesQueryKeys.listByIds(ids),
     queryFn: () => getRecipesByIds({ data: { ids } }),
   })
 
-export { getRecipesByIds, useGetRecipesByIds }
+export { getRecipeByIdsOptions }

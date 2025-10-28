@@ -4,9 +4,10 @@ import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/sc
 import { parseFormData } from '@/lib/form-data'
 import { uploadFile } from '@/lib/r2'
 import { units } from '@/types/units'
-import { useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { recipesQueryKeys } from './query-keys'
 
 const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })], {
   message: "L'image est requise",
@@ -101,9 +102,12 @@ const createRecipe = createServerFn({
     )
   })
 
-const useCreateRecipeMutation = () =>
-  useMutation({
+const createRecipeOptions = () =>
+  mutationOptions({
     mutationFn: createRecipe,
+    onSuccess: (_data, _variables, _result, context) => {
+      context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
+    },
   })
 
-export { recipeSchema, useCreateRecipeMutation, type RecipeFormInput, type RecipeFormValues }
+export { createRecipeOptions, recipeSchema, type RecipeFormInput, type RecipeFormValues }

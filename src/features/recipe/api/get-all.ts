@@ -2,10 +2,11 @@ import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { getFileUrl } from '@/lib/utils'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { asc, like } from 'drizzle-orm'
 import z from 'zod'
+import { recipesQueryKeys } from './query-keys'
 
 const getAllRecipesSchema = z.object({
   search: z.string().optional(),
@@ -35,15 +36,10 @@ const getAllRecipes = createServerFn({
     })
   )
 
-const getAllRecipesQueryOptions = (search?: string) =>
+const getRecipeListOptions = (search?: string) =>
   queryOptions({
-    queryKey: ['recipes', search],
+    queryKey: recipesQueryKeys.list(search),
     queryFn: () => getAllRecipes({ data: { search } }),
   })
 
-const useGetAllRecipes = (search?: string) =>
-  useQuery({
-    ...getAllRecipesQueryOptions(search),
-  })
-
-export { getAllRecipes, getAllRecipesQueryOptions, useGetAllRecipes }
+export { getAllRecipes, getRecipeListOptions }

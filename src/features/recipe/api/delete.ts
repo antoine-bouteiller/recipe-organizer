@@ -3,10 +3,11 @@ import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { deleteFile } from '@/lib/r2'
-import { useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { recipesQueryKeys } from './query-keys'
 
 const deleteRecipe = createServerFn({
   method: 'POST',
@@ -20,9 +21,12 @@ const deleteRecipe = createServerFn({
     })
   )
 
-const useDeleteRecipeMutation = () =>
-  useMutation({
+const deleteRecipeOptions = () =>
+  mutationOptions({
     mutationFn: deleteRecipe,
+    onSuccess: (_data, _variables, _result, context) => {
+      context.client.invalidateQueries({ queryKey: recipesQueryKeys.all })
+    },
   })
 
-export { useDeleteRecipeMutation }
+export { deleteRecipeOptions }

@@ -1,11 +1,12 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { recipesQueryKeys } from './query-keys'
 
 const getRecipe = createServerFn({
   method: 'GET',
@@ -56,12 +57,10 @@ const getRecipe = createServerFn({
 export type Recipe = Awaited<ReturnType<typeof getRecipe>>
 export type RecipeSection = Recipe['sections'][number]
 
-const getRecipeQueryOptions = (id: string | number) =>
+const getRecipeDetailsOptions = (id: number) =>
   queryOptions({
-    queryKey: ['recipes', id.toString()],
-    queryFn: () => getRecipe({ data: typeof id === 'string' ? Number.parseInt(id) : id }),
+    queryKey: recipesQueryKeys.detail(id),
+    queryFn: () => getRecipe({ data: id }),
   })
 
-const useGetRecipe = (id: string | number) => useQuery(getRecipeQueryOptions(id))
-
-export { getRecipe, getRecipeQueryOptions, useGetRecipe }
+export { getRecipe, getRecipeDetailsOptions }

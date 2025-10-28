@@ -1,13 +1,14 @@
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator } from '@/components/ui/item'
-import { useGetAllRecipes } from '@/features/recipe/api/get-all'
+import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { useSearchStore } from '@/stores/search.store'
 import { ArrowRightIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Fragment } from 'react/jsx-runtime'
 
 const RouteComponent = () => {
   const { debouncedSearch } = useSearchStore()
-  const { data: recipes } = useGetAllRecipes(debouncedSearch)
+  const { data: recipes } = useQuery(getRecipeListOptions(debouncedSearch))
   return (
     <ItemGroup className="flex-1 px-4 justify-end">
       {recipes?.map((recipe, index) => (

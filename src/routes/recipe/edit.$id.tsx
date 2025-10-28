@@ -2,26 +2,24 @@ import { CardLayout } from '@/components/card-layout'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { getAllIngredientsQueryOptions } from '@/features/ingredients/api/get-all'
+import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import {
+  editRecipeOptions,
   editRecipeSchema,
-  useEditRecipeMutation,
   type EditRecipeFormInput,
 } from '@/features/recipe/api/edit'
-import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
-import {
-  getRecipeQueryOptions,
-  useGetRecipe,
-  type RecipeSection,
-} from '@/features/recipe/api/get-one'
+import { getRecipeListOptions } from '@/features/recipe/api/get-all'
+import { getRecipeDetailsOptions, type RecipeSection } from '@/features/recipe/api/get-one'
 import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/lib/form-data'
 import { getFileUrl } from '@/lib/utils'
 import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import z from 'zod'
 
 const formatSection = (sections: RecipeSection) => {
   if (sections.subRecipeId) {
@@ -42,9 +40,9 @@ const formatSection = (sections: RecipeSection) => {
 }
 
 const EditRecipePage = () => {
-  const { id } = Route.useParams()
-  const { data: recipe, isLoading } = useGetRecipe(id)
-  const { mutateAsync: editRecipe } = useEditRecipeMutation()
+  const { id } = Route.useLoaderData()
+  const { data: recipe, isLoading } = useQuery(getRecipeDetailsOptions(id))
+  const { mutateAsync: editRecipe } = useMutation(editRecipeOptions())
   const router = useRouter()
 
   const initialValues: EditRecipeFormInput = recipe
@@ -74,7 +72,7 @@ const EditRecipePage = () => {
 
         await editRecipe({ data: formData })
 
-        await router.navigate({ to: '/recipe/$id', params: { id }, replace: true })
+        await router.navigate({ to: '/recipe/$id', params: { id: id.toString() }, replace: true })
       } catch (error) {
         toast.error('Une erreur est survenue lors de la création de la recette', {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -141,8 +139,11 @@ export const Route = createFileRoute('/recipe/edit/$id')({
     }
   },
   loader: async ({ params, context }) => {
-    await context.queryClient.prefetchQuery(getRecipeQueryOptions(params.id))
-    await context.queryClient.ensureQueryData(getAllIngredientsQueryOptions)
-    await context.queryClient.ensureQueryData(getAllRecipesQueryOptions())
+    const { id } = z.object({ id: z.coerce.number() }).parse(params)
+    await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
+    await context.queryClient.ensureQueryData(getIngredientListOptions())
+    await context.queryClient.ensureQueryData(getRecipeListOptions())
+
+    return { id }
   },
 })

@@ -9,7 +9,8 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { useGetAllRecipes } from '@/features/recipe/api/get-all'
+import { getRecipeListOptions } from '@/features/recipe/api/get-all'
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 interface AddExistingRecipeProps {
@@ -18,7 +19,7 @@ interface AddExistingRecipeProps {
 }
 
 export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRecipeProps) {
-  const { data: recipes } = useGetAllRecipes()
+  const { data: recipes } = useQuery(getRecipeListOptions())
 
   const recipesOptions =
     recipes?.map((recipe) => ({

@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { useGetAllIngredients } from '@/features/ingredients/api/get-all'
+import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
 import { withFieldGroup } from '@/hooks/use-app-form'
@@ -8,9 +8,10 @@ import type { FileMetadata } from '@/hooks/use-file-upload'
 import { units } from '@/types/units'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
-import { useCreateIngredientMutation } from '../ingredients/api/add-one'
+import { createIngredientOptions } from '../ingredients/api/add-one'
 
 const unitsOptions = units.map((unit) => ({
   label: unit,
@@ -47,7 +48,7 @@ export const RecipeForm = withFieldGroup({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
   render: function Render({ group, initialImage }) {
-    const { data: ingredients } = useGetAllIngredients()
+    const { data: ingredients } = useQuery(getIngredientListOptions())
 
     const ingredientsOptions = useMemo(
       () =>
@@ -62,45 +63,32 @@ export const RecipeForm = withFieldGroup({
 
     const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
 
-    const { mutateAsync: createIngredient } = useCreateIngredientMutation()
+    const { mutateAsync: createIngredient } = useMutation(createIngredientOptions())
 
     return (
       <>
-        <AppField
-          name="name"
-          children={(field) => (
-            <field.TextField label="Nom de la recette" disabled={isSubmitting} />
-          )}
-        />
+        <AppField name="name">
+          {({ TextField }) => <TextField label="Nom de la recette" disabled={isSubmitting} />}
+        </AppField>
 
-        <AppField
-          name="quantity"
-          children={({ NumberField }) => (
-            <NumberField min={0} disabled={isSubmitting} label="Quantité" />
-          )}
-        />
+        <AppField name="quantity">
+          {({ NumberField }) => <NumberField min={0} disabled={isSubmitting} label="Quantité" />}
+        </AppField>
 
-        <AppField
-          name="image"
-          children={({ ImageField }) => (
+        <AppField name="image">
+          {({ ImageField }) => (
             <ImageField
               label="Photo de la recette"
               disabled={isSubmitting}
               initialImage={initialImage}
             />
           )}
-        />
+        </AppField>
 
         <div className="flex flex-col gap-2 pt-2">
           <div className="text-base font-semibold">Ingrédients</div>
-          <Field
-            name="sections"
-            mode="array"
-            children={({
-              state: sectionsState,
-              removeValue: removeSection,
-              pushValue: addSection,
-            }) => (
+          <Field name="sections" mode="array">
+            {({ state: sectionsState, removeValue: removeSection, pushValue: addSection }) => (
               <>
                 {sectionsState.value?.map((_, sectionIndex) => (
                   <AppField name={`sections[${sectionIndex}]`} key={`section-${sectionIndex}`}>
@@ -115,12 +103,11 @@ export const RecipeForm = withFieldGroup({
                           <div className="p-4 border rounded-xl relative">
                             {sectionIndex !== 0 && (
                               <>
-                                <AppField
-                                  name={`sections[${sectionIndex}].name`}
-                                  children={({ TextField }) => (
+                                <AppField name={`sections[${sectionIndex}].name`}>
+                                  {({ TextField }) => (
                                     <TextField label="Nom" disabled={isSubmitting} />
                                   )}
-                                />
+                                </AppField>
                                 <Button
                                   type="button"
                                   variant="outline"
@@ -152,7 +139,8 @@ export const RecipeForm = withFieldGroup({
                                         <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col">
                                           <AppField
                                             name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].id`}
-                                            children={({ ComboboxField }) => (
+                                          >
+                                            {({ ComboboxField }) => (
                                               <ComboboxField
                                                 options={ingredientsOptions}
                                                 disabled={isSubmitting}
@@ -164,10 +152,11 @@ export const RecipeForm = withFieldGroup({
                                                 }}
                                               />
                                             )}
-                                          />
+                                          </AppField>
                                           <AppField
                                             name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].quantity`}
-                                            children={({ NumberField }) => (
+                                          >
+                                            {({ NumberField }) => (
                                               <NumberField
                                                 min={0}
                                                 disabled={isSubmitting}
@@ -175,10 +164,11 @@ export const RecipeForm = withFieldGroup({
                                                 decimalScale={3}
                                               />
                                             )}
-                                          />
+                                          </AppField>
                                           <AppField
                                             name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unit`}
-                                            children={({ ComboboxField }) => (
+                                          >
+                                            {({ ComboboxField }) => (
                                               <ComboboxField
                                                 options={unitsOptions}
                                                 disabled={isSubmitting}
@@ -187,7 +177,7 @@ export const RecipeForm = withFieldGroup({
                                                 noResultsLabel="Aucune unité trouvée"
                                               />
                                             )}
-                                          />
+                                          </AppField>
                                           <Button
                                             type="button"
                                             variant="outline"
@@ -258,13 +248,12 @@ export const RecipeForm = withFieldGroup({
                 </div>
               </>
             )}
-          />
+          </Field>
         </div>
 
-        <AppField
-          name="steps"
-          children={({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
-        />
+        <AppField name="steps">
+          {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
+        </AppField>
       </>
     )
   },

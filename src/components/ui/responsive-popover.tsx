@@ -85,12 +85,12 @@ const ResponsivePopoverContent = ({
   const { isMobile } = useResponsivePopoverContext()
 
   if (isMobile) {
-    return <DrawerContent className={className} children={children} />
+    return <DrawerContent className={className}>{children}</DrawerContent>
   }
 
   return (
     <PopoverPositioner {...props}>
-      <PopoverContent className={className} children={children} />
+      <PopoverContent className={className}>{children}</PopoverContent>
     </PopoverPositioner>
   )
 }

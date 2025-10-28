@@ -5,11 +5,12 @@ import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/sc
 import { withServerErrorCapture } from '@/lib/error-handler'
 import { parseFormData } from '@/lib/form-data'
 import { deleteFile, uploadFile } from '@/lib/r2'
-import { useMutation } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { recipesQueryKeys } from './query-keys'
 
 const editRecipeSchema = z.object({
   ...recipeSchema.shape,
@@ -92,17 +93,18 @@ const editRecipe = createServerFn({
           }
         })
       )
+
+      return id
     })
   )
 
-const useEditRecipeMutation = () =>
-  useMutation({
+const editRecipeOptions = () =>
+  mutationOptions({
     mutationFn: editRecipe,
+    onSuccess: (data, _variables, _result, context) => {
+      context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
+      context.client.invalidateQueries({ queryKey: recipesQueryKeys.detail(data) })
+    },
   })
 
-export {
-  editRecipeSchema,
-  useEditRecipeMutation,
-  type EditRecipeFormInput,
-  type EditRecipeFormValues,
-}
+export { editRecipeOptions, editRecipeSchema, type EditRecipeFormInput, type EditRecipeFormValues }

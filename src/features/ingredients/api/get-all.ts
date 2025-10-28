@@ -1,10 +1,11 @@
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { asc } from 'drizzle-orm'
+import { ingredientsQueryKeys } from './query-keys'
 
-const getAllIngredients = createServerFn({
+const getIngredientsList = createServerFn({
   method: 'GET',
 }).handler(() =>
   getDb().query.ingredient.findMany({
@@ -12,11 +13,10 @@ const getAllIngredients = createServerFn({
   })
 )
 
-const getAllIngredientsQueryOptions = queryOptions({
-  queryKey: ['ingredients'],
-  queryFn: getAllIngredients,
-})
+const getIngredientListOptions = () =>
+  queryOptions({
+    queryKey: ingredientsQueryKeys.list(),
+    queryFn: getIngredientsList,
+  })
 
-const useGetAllIngredients = () => useQuery(getAllIngredientsQueryOptions)
-
-export { getAllIngredients, getAllIngredientsQueryOptions, useGetAllIngredients }
+export { getIngredientListOptions, getIngredientsList }

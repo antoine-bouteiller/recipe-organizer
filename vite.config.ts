@@ -11,11 +11,6 @@ const viteConfig = defineConfig({
   server: {
     port: 3000,
   },
-  build: {
-    rollupOptions: {
-      external: ['virtual:serwist'],
-    },
-  },
   plugins: [
     tsConfigPaths({
       projects: ['./tsconfig.json'],

@@ -62,7 +62,7 @@ const LoginPage = () => {
             }}
             className="grid gap-4"
           >
-            <AppField name="email" children={({ TextField }) => <TextField label="Email" />} />
+            <AppField name="email">{({ TextField }) => <TextField label="Email" />}</AppField>
             {errorMessage && (
               <p role="alert" className="text-sm text-destructive">
                 {errorMessage}

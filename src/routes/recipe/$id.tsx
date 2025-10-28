@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/responsive-popover'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { getRecipeQueryOptions, useGetRecipe } from '@/features/recipe/api/get-one'
+import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/delete-recipe'
 import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
 import { getFileUrl } from '@/lib/utils'
@@ -19,13 +19,14 @@ import {
   PencilSimpleIcon,
   PlusIcon,
 } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 import { z } from 'zod'
 
 const RecipePage = () => {
-  const { id } = Route.useParams()
-  const { data: recipe, isLoading } = useGetRecipe(id)
+  const { id } = Route.useLoaderData()
+  const { data: recipe, isLoading } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
 
   const router = useRouter()
@@ -148,8 +149,8 @@ export const Route = createFileRoute('/recipe/$id')({
   loader: async ({ params, context }) => {
     const { id } = z.object({ id: z.coerce.number() }).parse(params)
 
-    await context.queryClient.prefetchQuery(getRecipeQueryOptions(id))
+    await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
 
-    return context.authUser
+    return { id }
   },
 })

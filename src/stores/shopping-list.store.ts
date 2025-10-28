@@ -1,5 +1,6 @@
-import { useGetRecipesByIds } from '@/features/recipe/api/get-by-ids'
+import { getRecipeByIdsOptions } from '@/features/recipe/api/get-by-ids'
 import type { Ingredient } from '@/types/ingredient'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useStore } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -41,7 +42,9 @@ export interface IngredientWithQuantity extends Ingredient {
 export const useShoppingListStore = () => {
   const { recipesQuantities, setRecipesQuantities, reset } = useStore(shoppingListStore)
 
-  const { data: recipes } = useGetRecipesByIds(Object.keys(recipesQuantities).map(Number))
+  const { data: recipes } = useQuery(
+    getRecipeByIdsOptions(Object.keys(recipesQuantities).map(Number))
+  )
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,

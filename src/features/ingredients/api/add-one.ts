@@ -1,8 +1,9 @@
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { ingredientsQueryKeys } from './query-keys'
 
 const ingredientSchema = z.object({
   name: z.string().min(2),
@@ -17,14 +18,12 @@ const createIngredient = createServerFn()
     })
   })
 
-const useCreateIngredientMutation = () => {
-  const client = useQueryClient()
-  return useMutation({
+const createIngredientOptions = () =>
+  mutationOptions({
     mutationFn: createIngredient,
-    onSuccess: async () => {
-      await client.invalidateQueries({ queryKey: ['ingredients'] })
+    onSuccess: async (_data, _variables, _result, context) => {
+      await context.client.invalidateQueries({ queryKey: ingredientsQueryKeys.list() })
     },
   })
-}
 
-export { useCreateIngredientMutation }
+export { createIngredientOptions }

@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button'
-import { useGetAllRecipes, getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/recipe-card'
 import { PlusIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
 const Home = () => {
-  const { data: recipes } = useGetAllRecipes()
+  const { data: recipes } = useQuery(getRecipeListOptions())
 
   const { authUser } = Route.useRouteContext()
 
@@ -36,6 +37,6 @@ export const Route = createFileRoute('/')({
     search: z.boolean().optional(),
   }),
   loader: async ({ context }) => {
-    await context.queryClient.prefetchQuery(getAllRecipesQueryOptions())
+    await context.queryClient.prefetchQuery(getRecipeListOptions())
   },
 })

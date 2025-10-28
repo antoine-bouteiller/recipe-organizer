@@ -8,7 +8,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
-import { getAllRecipesQueryOptions } from '@/features/recipe/api/get-all'
+import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
 import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
@@ -21,7 +21,7 @@ export const SearchBar = () => {
   const platform = usePlatform()
   const navigate = useNavigate()
 
-  const { data: recipes } = useQuery(getAllRecipesQueryOptions())
+  const { data: recipes } = useQuery(getRecipeListOptions())
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
