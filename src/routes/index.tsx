@@ -13,7 +13,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-5xl">
+      <div className="md:mx-auto md:max-w-5xl">
         <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 mt-4 px-4 pb-2">
           {recipes?.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
