@@ -1,77 +1,49 @@
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAppForm } from '@/hooks/use-app-form'
 import { useAuth } from '@/hooks/use-auth'
-import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useState } from 'react'
-import { z } from 'zod'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
+import z from 'zod'
 
-const loginSchema = z.object({
-  email: z.email('Email invalide'),
-})
+const getErrorMessage = (error: string) => {
+  switch (error) {
+    case 'signup_disabled': {
+      return "Veuillez contacter l'administrateur pour vous inscrire"
+    }
+    default: {
+      return 'Une erreur est survenue'
+    }
+  }
+}
 
 const LoginPage = () => {
-  const [errorMessage, setErrorMessage] = useState<string>()
-  const { signInWithMagicLink } = useAuth()
+  const { signInWithGoogle } = useAuth()
 
-  const { handleSubmit, AppField, FormSubmit, AppForm, store } = useAppForm({
-    validators: {
-      onDynamic: loginSchema,
-    },
-    validationLogic: revalidateLogic(),
-    defaultValues: { email: '' },
-    onSubmit: async (data) => {
-      setErrorMessage(undefined)
-      const response = await signInWithMagicLink(data.value.email)
-      if (response.error) {
-        setErrorMessage('Identifiants invalides. Veuillez réessayer.')
-      }
-    },
-  })
+  const { error } = Route.useSearch()
 
-  const isSubmitted = useStore(store, (state) => state.isSubmitted)
-
-  if (isSubmitted && !errorMessage) {
-    return (
-      <div className="h-full grid place-items-center p-4">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Connexion</CardTitle>
-            <CardDescription>
-              Un lien de connexion a été envoyé à votre email. Veuillez cliquer sur le lien pour
-              vous connecter.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(getErrorMessage(error))
+    }
+  }, [error])
 
   return (
-    <div className="h-full grid place-items-center p-4">
+    <div className="flex-1 grid place-items-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Connexion</CardTitle>
-          <CardDescription>Connectez-vous pour accéder à vos recettes.</CardDescription>
+          <CardDescription>Connectez-vous pour accéder au portail administrateur</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              void handleSubmit()
-            }}
-            className="grid gap-4"
-          >
-            <AppField name="email">{({ TextField }) => <TextField label="Email" />}</AppField>
-            {errorMessage && (
-              <p role="alert" className="text-sm text-destructive">
-                {errorMessage}
-              </p>
-            )}
-            <AppForm>
-              <FormSubmit label="Se connecter" />
-            </AppForm>
-          </form>
+        <CardContent className="flex-1">
+          <Button variant="outline" className="w-full" onClick={signInWithGoogle}>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg"
+              alt="Google"
+              className="h-4"
+            />
+            Connexion avec Google
+          </Button>
         </CardContent>
       </Card>
     </div>
@@ -84,5 +56,6 @@ export const Route = createFileRoute('/auth/login')({
       throw redirect({ to: '/' })
     }
   },
+  validateSearch: z.object({ error: z.string().optional() }),
   component: LoginPage,
 })

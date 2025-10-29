@@ -5,9 +5,9 @@ import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanst
 import { Navbar } from '@/components/navbar'
 import { TabBar } from '@/components/tabbar'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
+import { getTheme } from '@/lib/theme'
 import { useEffect } from 'react'
 import appCss from '../styles/app.css?url'
-import { getTheme } from '@/lib/theme'
 
 const RootComponent = () => {
   useEffect(() => {
@@ -29,7 +29,7 @@ const RootComponent = () => {
         <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
           <Navbar />
         </header>
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col">
           <Outlet />
         </div>
         <div className="w-full md:hidden sticky bottom-0">

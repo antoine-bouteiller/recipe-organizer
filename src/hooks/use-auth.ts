@@ -1,5 +1,5 @@
 import { authClient } from '@/lib/auth-client'
-import { useRouter, useParentMatches } from '@tanstack/react-router'
+import { useParentMatches, useRouter } from '@tanstack/react-router'
 
 export const useAuth = () => {
   const router = useRouter()
@@ -19,9 +19,19 @@ export const useAuth = () => {
     return response
   }
 
+  const signInWithGoogle = async () => {
+    const response = await authClient.signIn.social({
+      provider: 'google',
+      errorCallbackURL: '/auth/login',
+    })
+    await router.invalidate()
+    return response
+  }
+
   return {
     currentUser,
     signOut,
     signInWithMagicLink,
+    signInWithGoogle,
   }
 }
