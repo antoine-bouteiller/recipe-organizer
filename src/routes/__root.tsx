@@ -35,8 +35,8 @@ const RootComponent = () => {
         <div className="w-full md:hidden sticky bottom-0">
           <TabBar />
         </div>
+        <Toaster />
       </body>
-      <Toaster />
       <Scripts />
     </html>
   )
