@@ -25,7 +25,7 @@ const deleteRecipeOptions = () =>
   mutationOptions({
     mutationFn: deleteRecipe,
     onSuccess: (_data, _variables, _result, context) => {
-      context.client.invalidateQueries({ queryKey: recipesQueryKeys.all })
+      void context.client.invalidateQueries({ queryKey: recipesQueryKeys.all })
     },
   })
 

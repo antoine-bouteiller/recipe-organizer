@@ -1,21 +1,16 @@
 import { useDebounce } from '@/hooks/use-debounce'
-import { createStore, useStore } from 'zustand'
+import { Store, useStore } from '@tanstack/react-store'
 
-interface SearchStore {
-  search: string
-}
-
-interface SearchStoreActions {
-  setSearch: (search: string) => void
-}
-
-const searchStore = createStore<SearchStore & SearchStoreActions>((set) => ({
+const searchStore = new Store({
   search: '',
-  setSearch: (search) => set({ search }),
-}))
+})
 
 export const useSearchStore = () => {
-  const { search, setSearch } = useStore(searchStore)
+  const { search } = useStore(searchStore)
+
+  const setSearch = (newSearch: string) => {
+    searchStore.setState({ search: newSearch })
+  }
 
   const debouncedSearch = useDebounce(search, 300)
 

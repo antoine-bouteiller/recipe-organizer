@@ -1,37 +1,44 @@
 import { getRecipeByIdsOptions } from '@/features/recipe/api/get-by-ids'
+import { getCookie, setCookie } from '@/lib/cookie'
 import type { Ingredient } from '@/types/ingredient'
+import { useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
+import { Store } from '@tanstack/react-store'
 import { useMemo } from 'react'
-import { useStore } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
-import { createStore } from 'zustand/vanilla'
 
-interface ShoppingListStore {
+const storageKey = 'shopping-list'
+
+interface ShoppingListState {
   recipesQuantities: Record<number, number>
-  setRecipesQuantities: (key: number, value: number) => void
-  reset: () => void
 }
 
-const shoppingListStore = createStore<ShoppingListStore>()(
-  persist(
-    immer((set) => ({
-      recipesQuantities: {},
-      setRecipesQuantities: (key, value) =>
-        set((state) => {
-          state.recipesQuantities[key] = value
-        }),
-      reset: () =>
-        set((state) => {
-          state.recipesQuantities = {}
-        }),
-    })),
-    {
-      name: 'shoping-cart',
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-)
+const defaultState: ShoppingListState = {
+  recipesQuantities: {},
+}
+
+export const initShoppingListState = () => {
+  const state = getCookie(storageKey)
+
+  const parsedState: ShoppingListState = state ? JSON.parse(state) : defaultState
+
+  return parsedState
+}
+
+export const shoppingListStore = new Store(initShoppingListState(), {
+  onUpdate: () => {
+    setCookie(storageKey, JSON.stringify(shoppingListStore.state))
+  },
+})
+
+const setRecipesQuantities = (recipeId: number, quantity: number) => {
+  shoppingListStore.setState(({ recipesQuantities }) => ({
+    recipesQuantities: { ...recipesQuantities, [recipeId]: quantity },
+  }))
+}
+
+const reset = () => {
+  shoppingListStore.setState({ recipesQuantities: {} })
+}
 
 export interface IngredientWithQuantity extends Ingredient {
   quantity: number
@@ -40,7 +47,7 @@ export interface IngredientWithQuantity extends Ingredient {
 }
 
 export const useShoppingListStore = () => {
-  const { recipesQuantities, setRecipesQuantities, reset } = useStore(shoppingListStore)
+  const { recipesQuantities } = useStore(shoppingListStore)
 
   const { data: recipes } = useQuery(
     getRecipeByIdsOptions(Object.keys(recipesQuantities).map(Number))
@@ -48,7 +55,7 @@ export const useShoppingListStore = () => {
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,
-    wantedQuantity: recipesQuantities[recipe.id],
+    wantedQuantity: recipesQuantities[recipe.id] ?? 0,
   }))
 
   const shoppingListIngredients = useMemo(

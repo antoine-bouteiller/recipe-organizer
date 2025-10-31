@@ -106,7 +106,7 @@ const createRecipeOptions = () =>
   mutationOptions({
     mutationFn: createRecipe,
     onSuccess: (_data, _variables, _result, context) => {
-      context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
+      void context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
     },
   })
 

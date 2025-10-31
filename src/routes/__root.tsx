@@ -6,6 +6,7 @@ import { Navbar } from '@/components/navbar'
 import { TabBar } from '@/components/tabbar'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
+import { initShoppingListState, shoppingListStore } from '@/stores/shopping-list.store'
 import { useEffect } from 'react'
 import appCss from '../styles/app.css?url'
 
@@ -72,7 +73,10 @@ export const Route = createRootRouteWithContext<{
   }),
   beforeLoad: async () => {
     const authUser = await getAuthUser()
-    const theme = await getTheme()
+    const theme = getTheme()
+
+    shoppingListStore.setState(initShoppingListState())
+
     return { authUser, theme }
   },
   component: RootComponent,

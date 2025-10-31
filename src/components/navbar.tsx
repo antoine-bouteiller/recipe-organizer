@@ -96,7 +96,7 @@ export const Navbar = () => {
           variant="ghost"
           size="icon"
           onClick={async () => {
-            await toggleTheme()
+            toggleTheme()
             await router.invalidate()
           }}
         >

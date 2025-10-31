@@ -2,8 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
 import type { Recipe } from '@/types/recipe'
-import { Link } from '@tanstack/react-router'
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
 
 interface RecipeCardProps {
   recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
