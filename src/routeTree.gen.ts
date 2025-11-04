@@ -13,6 +13,8 @@ import { Route as ShoppingListRouteImport } from './routes/shopping-list'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
 import { Route as RecipeNewRouteImport } from './routes/recipe/new'
 import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
@@ -39,6 +41,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsIngredientsRoute = SettingsIngredientsRouteImport.update({
+  id: '/ingredients',
+  path: '/ingredients',
+  getParentRoute: () => SettingsRoute,
 } as any)
 const RecipeNewRoute = RecipeNewRouteImport.update({
   id: '/recipe/new',
@@ -74,11 +86,13 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/shopping-list': typeof ShoppingListRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
+  '/settings/ingredients': typeof SettingsIngredientsRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
@@ -86,11 +100,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
-  '/settings': typeof SettingsRoute
   '/shopping-list': typeof ShoppingListRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
+  '/settings/ingredients': typeof SettingsIngredientsRoute
+  '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
@@ -99,11 +114,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
-  '/settings': typeof SettingsRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/shopping-list': typeof ShoppingListRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
+  '/settings/ingredients': typeof SettingsIngredientsRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
@@ -118,6 +135,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
+    | '/settings/ingredients'
+    | '/settings/'
     | '/api/auth/$'
     | '/api/image/$id'
     | '/recipe/edit/$id'
@@ -125,11 +144,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/search'
-    | '/settings'
     | '/shopping-list'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
+    | '/settings/ingredients'
+    | '/settings'
     | '/api/auth/$'
     | '/api/image/$id'
     | '/recipe/edit/$id'
@@ -142,6 +162,8 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
+    | '/settings/ingredients'
+    | '/settings/'
     | '/api/auth/$'
     | '/api/image/$id'
     | '/recipe/edit/$id'
@@ -150,7 +172,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SearchRoute: typeof SearchRoute
-  SettingsRoute: typeof SettingsRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   ShoppingListRoute: typeof ShoppingListRoute
   AuthLoginRoute: typeof AuthLoginRoute
   RecipeIdRoute: typeof RecipeIdRoute
@@ -189,6 +211,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/ingredients': {
+      id: '/settings/ingredients'
+      path: '/ingredients'
+      fullPath: '/settings/ingredients'
+      preLoaderRoute: typeof SettingsIngredientsRouteImport
+      parentRoute: typeof SettingsRoute
     }
     '/recipe/new': {
       id: '/recipe/new'
@@ -235,10 +271,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SettingsRouteChildren {
+  SettingsIngredientsRoute: typeof SettingsIngredientsRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsIngredientsRoute: SettingsIngredientsRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SearchRoute: SearchRoute,
-  SettingsRoute: SettingsRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   ShoppingListRoute: ShoppingListRoute,
   AuthLoginRoute: AuthLoginRoute,
   RecipeIdRoute: RecipeIdRoute,

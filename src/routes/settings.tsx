@@ -1,16 +1,28 @@
-import { Button } from '@/components/ui/button'
-import { useAuth } from '@/hooks/use-auth'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Link, Outlet, createFileRoute, redirect, useMatchRoute } from '@tanstack/react-router'
 
 const RouteComponent = () => {
-  const { authUser } = Route.useRouteContext()
+  const matchRoute = useMatchRoute()
+  const isIngredientsPage = matchRoute({ to: '/settings/ingredients' })
 
-  const auth = useAuth()
   return (
-    <div className="flex flex-col gap-4 items-center p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold">Paramètres</h1>
-      <p>{authUser?.email}</p>
-      <Button onClick={() => auth.signOut()}>Se déconnecter</Button>
+
+      <Tabs value={isIngredientsPage ? 'ingredients' : 'account'} className="w-full">
+        <TabsList>
+          <Link to="/settings" activeOptions={{ exact: true }}>
+            <TabsTrigger value="account">Compte</TabsTrigger>
+          </Link>
+          <Link to="/settings/ingredients">
+            <TabsTrigger value="ingredients">Ingrédients</TabsTrigger>
+          </Link>
+        </TabsList>
+      </Tabs>
+
+      <div className="mt-4">
+        <Outlet />
+      </div>
     </div>
   )
 }
