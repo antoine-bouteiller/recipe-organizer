@@ -73,7 +73,7 @@ const RouteComponent = () => {
   )
 }
 
-export const Route = createFileRoute('/settings')({
+export const Route = createFileRoute('/settings/')({
   component: RouteComponent,
   beforeLoad: ({ context }) => {
     if (!context.authUser) {
