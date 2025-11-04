@@ -2,16 +2,28 @@ import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
+import { Button } from '@/components/ui/button'
+import { ArrowLeftIcon } from '@phosphor-icons/react'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Gestion des ingrédients</h2>
+    <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto">
+      <div className="flex items-center gap-2">
+        <Link to="/settings">
+          <Button variant="ghost" size="icon">
+            <ArrowLeftIcon className="h-5 w-5" />
+          </Button>
+        </Link>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold">Ingrédients</h1>
+          <p className="text-muted-foreground text-sm">
+            Gérez la liste des ingrédients disponibles
+          </p>
+        </div>
         <AddIngredient />
       </div>
 
@@ -24,7 +36,7 @@ const IngredientsManagement = () => {
           ingredients.map((ingredient) => (
             <div
               key={ingredient.id}
-              className="flex justify-between items-center p-3 border rounded-lg"
+              className="flex justify-between items-center p-4 border rounded-lg"
             >
               <div className="flex-1">
                 <p className="font-medium">{ingredient.name}</p>
