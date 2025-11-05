@@ -21,12 +21,7 @@ const settingsSections = [
 
 const RouteComponent = () => (
   <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto">
-    <div>
-      <h1 className="text-2xl font-bold">Paramètres</h1>
-      <p className="text-muted-foreground mt-1">
-        Gérez vos préférences et paramètres de l&apos;application
-      </p>
-    </div>
+    <h1 className="text-2xl font-bold">Paramètres</h1>
 
     <div className="grid gap-4 md:grid-cols-2">
       {settingsSections.map((section) => {

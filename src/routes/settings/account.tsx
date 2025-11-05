@@ -16,10 +16,7 @@ const RouteComponent = () => {
             <ArrowLeftIcon className="h-5 w-5" />
           </Button>
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold">Compte</h1>
-          <p className="text-muted-foreground text-sm">Gérez vos informations de compte</p>
-        </div>
+        <h1 className="text-2xl font-bold">Compte</h1>
       </div>
 
       <Card className="p-6">
