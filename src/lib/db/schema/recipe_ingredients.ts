@@ -1,5 +1,6 @@
 import { ingredient } from '@/lib/db/schema/ingredient'
 import { recipe } from '@/lib/db/schema/recipe'
+import { unit } from '@/lib/db/schema/unit'
 import { relations } from 'drizzle-orm'
 import { integer, sqliteTable, text, real } from 'drizzle-orm/sqlite-core'
 
@@ -25,7 +26,7 @@ const sectionIngredient = sqliteTable('section_ingredients', {
     .references(() => ingredient.id, { onDelete: 'cascade' })
     .notNull(),
   quantity: real('quantity').notNull(),
-  unit: text('unit'),
+  unitId: integer('unit_id').references(() => unit.id, { onDelete: 'set null' }),
 })
 
 const ingredientsRelation = relations(ingredient, ({ many }) => ({
@@ -59,6 +60,10 @@ const sectionIngredientsRelation = relations(sectionIngredient, ({ one }) => ({
   ingredient: one(ingredient, {
     fields: [sectionIngredient.ingredientId],
     references: [ingredient.id],
+  }),
+  unit: one(unit, {
+    fields: [sectionIngredient.unitId],
+    references: [unit.id],
   }),
 }))
 

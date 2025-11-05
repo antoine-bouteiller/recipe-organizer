@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card'
-import { CaretRightIcon, CookieIcon, UserIcon } from '@phosphor-icons/react'
+import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon } from '@phosphor-icons/react'
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 
 const settingsSections = [
@@ -16,6 +16,13 @@ const settingsSections = [
     description: 'Gérer la liste des ingrédients disponibles',
     icon: CookieIcon,
     path: '/settings/ingredients',
+  },
+  {
+    id: 'units',
+    title: 'Unités de mesure',
+    description: 'Gérer les unités de mesure disponibles',
+    icon: ScalesIcon,
+    path: '/settings/units',
   },
 ]
 

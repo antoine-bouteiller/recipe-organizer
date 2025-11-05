@@ -7,18 +7,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { createIngredientOptions } from '@/features/ingredients/api/add-one'
-import { IngredientForm } from '@/features/ingredients/ingredient-form'
+import { createUnitOptions } from '@/features/units/api/add-one'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
+import { UnitForm } from '@/features/units/unit-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-export const AddIngredient = () => {
+export const AddUnit = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const createMutation = useMutation(createIngredientOptions())
+  const createMutation = useMutation(createUnitOptions())
   const { data: units } = useSuspenseQuery(getUnitsListOptions())
 
-  const handleSubmit = (data: { name: string; unitIds: number[]; category: string }) => {
+  const handleSubmit = (data: {
+    name: string
+    symbol: string
+    parentId: number | null
+    factor: number | null
+  }) => {
     createMutation.mutate(
       { data },
       {
@@ -31,13 +36,13 @@ export const AddIngredient = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button />}>Ajouter un ingrédient</DialogTrigger>
+      <DialogTrigger render={<Button />}>Ajouter une unité</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ajouter un ingrédient</DialogTitle>
-          <DialogDescription>Créez un nouvel ingrédient pour vos recettes</DialogDescription>
+          <DialogTitle>Ajouter une unité</DialogTitle>
+          <DialogDescription>Créez une nouvelle unité de mesure</DialogDescription>
         </DialogHeader>
-        <IngredientForm units={units} onSubmit={handleSubmit} onCancel={() => setIsOpen(false)} />
+        <UnitForm units={units} onSubmit={handleSubmit} onCancel={() => setIsOpen(false)} />
       </DialogContent>
     </Dialog>
   )

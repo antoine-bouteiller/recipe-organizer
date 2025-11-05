@@ -7,37 +7,37 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { updateIngredientOptions } from '@/features/ingredients/api/update'
-import { IngredientForm } from '@/features/ingredients/ingredient-form'
+import { updateUnitOptions } from '@/features/units/api/update'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
+import { UnitForm } from '@/features/units/unit-form'
+import type { SelectUnit } from '@/lib/db/schema'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
-interface EditIngredientProps {
-  ingredient: {
-    id: number
-    name: string
-    category: string
-    ingredientUnits?: Array<{
-      unitId: number
-    }>
-  }
+interface EditUnitProps {
+  unit: SelectUnit
 }
 
-export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
+export const EditUnit = ({ unit }: EditUnitProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const updateMutation = useMutation(updateIngredientOptions())
+  const updateMutation = useMutation(updateUnitOptions())
   const { data: units } = useSuspenseQuery(getUnitsListOptions())
 
-  const handleSubmit = (data: { name: string; unitIds: number[]; category: string }) => {
+  const handleSubmit = (data: {
+    name: string
+    symbol: string
+    parentId: number | null
+    factor: number | null
+  }) => {
     updateMutation.mutate(
       {
         data: {
-          id: ingredient.id,
+          id: unit.id,
           name: data.name,
-          unitIds: data.unitIds,
-          category: data.category,
+          symbol: data.symbol,
+          parentId: data.parentId,
+          factor: data.factor,
         },
       },
       {
@@ -55,11 +55,11 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Modifier l&apos;ingrédient</DialogTitle>
-          <DialogDescription>Modifiez les informations de l&apos;ingrédient</DialogDescription>
+          <DialogTitle>Modifier l&apos;unité</DialogTitle>
+          <DialogDescription>Modifiez les informations de l&apos;unité</DialogDescription>
         </DialogHeader>
-        <IngredientForm
-          ingredient={ingredient}
+        <UnitForm
+          unit={unit}
           units={units}
           onSubmit={handleSubmit}
           onCancel={() => setIsOpen(false)}

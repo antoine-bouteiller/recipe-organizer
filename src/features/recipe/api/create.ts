@@ -3,7 +3,6 @@ import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { parseFormData } from '@/lib/form-data'
 import { uploadFile } from '@/lib/r2'
-import { units } from '@/types/units'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
@@ -28,7 +27,7 @@ const recipeSchema = z.object({
             z.object({
               id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
               quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
-              unit: z.enum(units).optional(),
+              unitId: z.coerce.number().positive().optional(),
             })
           )
           .min(1, { message: 'Au moins un ingrédient est requis' }),
@@ -93,7 +92,7 @@ const createRecipe = createServerFn({
                   sectionId: createdSection.id,
                   ingredientId: ingredient.id,
                   quantity: ingredient.quantity,
-                  unit: ingredient.unit,
+                  unitId: ingredient.unitId ?? null,
                 }))
               )
           }

@@ -11,10 +11,10 @@ import {
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeSection } from '@/features/recipe/api/get-one'
 import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
+import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/lib/form-data'
 import { getFileUrl } from '@/lib/utils'
-import { isUnit } from '@/types/units'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
@@ -34,7 +34,7 @@ const formatSection = (sections: RecipeSection) => {
     ingredients: sections.sectionIngredients.map((ingredient) => ({
       id: ingredient.ingredient.id.toString(),
       quantity: ingredient.quantity,
-      unit: isUnit(ingredient.unit) ? ingredient.unit : undefined,
+      unitId: ingredient.unit?.id.toString(),
     })),
   }
 }
@@ -143,6 +143,7 @@ export const Route = createFileRoute('/recipe/edit/$id')({
     await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())
+    await context.queryClient.ensureQueryData(getUnitsListOptions())
 
     return { id }
   },
