@@ -12,7 +12,6 @@ import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { ArrowLeftIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -29,12 +28,7 @@ const IngredientsManagement = () => {
     return ingredients.filter(
       (ingredient) =>
         ingredient.name.toLowerCase().includes(query) ||
-        ingredient.category.toLowerCase().includes(query) ||
-        ingredient.ingredientUnits?.some(
-          (iu) =>
-            iu.unit.name.toLowerCase().includes(query) ||
-            iu.unit.symbol.toLowerCase().includes(query)
-        )
+        ingredient.category.toLowerCase().includes(query)
     )
   }, [ingredients, searchQuery])
 
@@ -75,15 +69,7 @@ const IngredientsManagement = () => {
             <Item key={ingredient.id} variant="outline">
               <ItemContent>
                 <ItemTitle>{ingredient.name}</ItemTitle>
-                <ItemDescription>
-                  Catégorie: {ingredient.category}
-                  {ingredient.ingredientUnits && ingredient.ingredientUnits.length > 0 && (
-                    <>
-                      {' '}
-                      • Unités: {ingredient.ingredientUnits.map((iu) => iu.unit.symbol).join(', ')}
-                    </>
-                  )}
-                </ItemDescription>
+                <ItemDescription>Catégorie: {ingredient.category}</ItemDescription>
               </ItemContent>
               <ItemActions>
                 <EditIngredient ingredient={ingredient} />
@@ -101,9 +87,5 @@ const RouteComponent = () => <IngredientsManagement />
 
 export const Route = createFileRoute('/settings/ingredients')({
   component: RouteComponent,
-  loader: ({ context }) =>
-    Promise.all([
-      context.queryClient.ensureQueryData(getIngredientListOptions()),
-      context.queryClient.ensureQueryData(getUnitsListOptions()),
-    ]),
+  loader: ({ context }) => context.queryClient.ensureQueryData(getIngredientListOptions()),
 })

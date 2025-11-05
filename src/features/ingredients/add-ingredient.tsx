@@ -9,16 +9,14 @@ import {
 } from '@/components/ui/dialog'
 import { createIngredientOptions } from '@/features/ingredients/api/add-one'
 import { IngredientForm } from '@/features/ingredients/ingredient-form'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
 export const AddIngredient = () => {
   const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createIngredientOptions())
-  const { data: units } = useSuspenseQuery(getUnitsListOptions())
 
-  const handleSubmit = (data: { name: string; unitIds: number[]; category: string }) => {
+  const handleSubmit = (data: { name: string; category: string }) => {
     createMutation.mutate(
       { data },
       {
@@ -37,7 +35,7 @@ export const AddIngredient = () => {
           <DialogTitle>Ajouter un ingrédient</DialogTitle>
           <DialogDescription>Créez un nouvel ingrédient pour vos recettes</DialogDescription>
         </DialogHeader>
-        <IngredientForm units={units} onSubmit={handleSubmit} onCancel={() => setIsOpen(false)} />
+        <IngredientForm onSubmit={handleSubmit} onCancel={() => setIsOpen(false)} />
       </DialogContent>
     </Dialog>
   )

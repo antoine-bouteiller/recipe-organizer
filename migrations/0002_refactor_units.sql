@@ -9,16 +9,6 @@ CREATE TABLE `units` (
 );
 
 --> statement-breakpoint
--- Create ingredient_units junction table
-CREATE TABLE `ingredient_units` (
-  `id` integer PRIMARY KEY NOT NULL,
-  `ingredient_id` integer NOT NULL,
-  `unit_id` integer NOT NULL,
-  FOREIGN KEY (`ingredient_id`) REFERENCES `ingredients`(`id`) ON UPDATE no action ON DELETE cascade,
-  FOREIGN KEY (`unit_id`) REFERENCES `units`(`id`) ON UPDATE no action ON DELETE cascade
-);
-
---> statement-breakpoint
 -- Add unit_id column to section_ingredients
 ALTER TABLE `section_ingredients` ADD `unit_id` integer REFERENCES `units`(`id`) ON UPDATE no action ON DELETE set null;
 
@@ -42,21 +32,6 @@ INSERT INTO `units` (`id`, `name`, `symbol`, `parent_id`, `factor`) VALUES
 INSERT INTO `units` (`id`, `name`, `symbol`, `parent_id`, `factor`) VALUES
   (11, 'Kilogramme', 'kg', 1, 1000),
   (12, 'Litre', 'L', 2, 1000);
-
---> statement-breakpoint
--- Migrate data: Populate ingredient_units from allowed_units JSON
--- This creates a row in ingredient_units for each unit in the JSON array
-INSERT INTO `ingredient_units` (`ingredient_id`, `unit_id`)
-SELECT
-  i.id,
-  u.id
-FROM
-  `ingredients` i,
-  json_each(i.allowed_units) AS allowed_unit
-  JOIN `units` u ON u.symbol = allowed_unit.value
-WHERE
-  i.allowed_units IS NOT NULL
-  AND i.allowed_units != '[]';
 
 --> statement-breakpoint
 -- Migrate data: Update section_ingredients.unit_id based on existing unit text

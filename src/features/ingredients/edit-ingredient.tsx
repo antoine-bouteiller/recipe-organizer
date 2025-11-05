@@ -9,34 +9,25 @@ import {
 } from '@/components/ui/dialog'
 import { updateIngredientOptions } from '@/features/ingredients/api/update'
 import { IngredientForm } from '@/features/ingredients/ingredient-form'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
+import type { Ingredient } from '@/types/ingredient'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
 interface EditIngredientProps {
-  ingredient: {
-    id: number
-    name: string
-    category: string
-    ingredientUnits?: Array<{
-      unitId: number
-    }>
-  }
+  ingredient: Ingredient
 }
 
 export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const updateMutation = useMutation(updateIngredientOptions())
-  const { data: units } = useSuspenseQuery(getUnitsListOptions())
 
-  const handleSubmit = (data: { name: string; unitIds: number[]; category: string }) => {
+  const handleSubmit = (data: { name: string; category: string }) => {
     updateMutation.mutate(
       {
         data: {
           id: ingredient.id,
           name: data.name,
-          unitIds: data.unitIds,
           category: data.category,
         },
       },
@@ -60,7 +51,6 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
         </DialogHeader>
         <IngredientForm
           ingredient={ingredient}
-          units={units}
           onSubmit={handleSubmit}
           onCancel={() => setIsOpen(false)}
           submitLabel="Mettre à jour"

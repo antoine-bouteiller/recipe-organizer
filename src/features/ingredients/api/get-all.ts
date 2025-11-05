@@ -10,13 +10,6 @@ const getIngredientsList = createServerFn({
 }).handler(() =>
   getDb().query.ingredient.findMany({
     orderBy: asc(ingredient.name),
-    with: {
-      ingredientUnits: {
-        with: {
-          unit: true,
-        },
-      },
-    },
   })
 )
 

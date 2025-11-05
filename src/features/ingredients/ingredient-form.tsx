@@ -1,28 +1,16 @@
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { SelectUnit } from '@/lib/db/schema'
+import type { Ingredient } from '@/types/ingredient'
 import { useState } from 'react'
 
 type IngredientFormData = {
   name: string
-  unitIds: number[]
   category: string
-}
-
-type IngredientWithUnits = {
-  id: number
-  name: string
-  category: string
-  ingredientUnits?: Array<{
-    unitId: number
-  }>
 }
 
 interface IngredientFormProps {
-  ingredient?: IngredientWithUnits
-  units: SelectUnit[]
+  ingredient?: Ingredient
   onSubmit: (data: IngredientFormData) => void
   onCancel: () => void
   submitLabel?: string
@@ -30,29 +18,18 @@ interface IngredientFormProps {
 
 export const IngredientForm = ({
   ingredient,
-  units,
   onSubmit,
   onCancel,
   submitLabel = 'Ajouter',
 }: IngredientFormProps) => {
   const [formData, setFormData] = useState<IngredientFormData>({
     name: ingredient?.name || '',
-    unitIds: ingredient?.ingredientUnits?.map((iu) => iu.unitId) || [],
     category: ingredient?.category || 'supermarket',
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit(formData)
-  }
-
-  const toggleUnit = (unitId: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      unitIds: prev.unitIds.includes(unitId)
-        ? prev.unitIds.filter((id) => id !== unitId)
-        : [...prev.unitIds, unitId],
-    }))
   }
 
   return (
@@ -77,27 +54,6 @@ export const IngredientForm = ({
           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
           placeholder="Ex: supermarket"
         />
-      </div>
-
-      <div className="space-y-2">
-        <Label>Unités autorisées</Label>
-        <div className="grid grid-cols-2 gap-2">
-          {units.map((unit) => (
-            <div key={unit.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`unit-${unit.id}`}
-                checked={formData.unitIds.includes(unit.id)}
-                onCheckedChange={() => toggleUnit(unit.id)}
-              />
-              <label
-                htmlFor={`unit-${unit.id}`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {unit.symbol}
-              </label>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="flex gap-2 justify-end">
