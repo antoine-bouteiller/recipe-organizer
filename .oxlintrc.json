@@ -68,8 +68,7 @@
       "error",
       {
         "cases": {
-          "kebabCase": true,
-          "snakeCase": true
+          "kebabCase": true
         },
         "ignore": "\\[.+\\]\\.tsx"
       }
