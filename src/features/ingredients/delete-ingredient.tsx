@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { deleteIngredientOptions } from '@/features/ingredients/api/delete'
+import { TrashSimpleIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -34,7 +35,9 @@ export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredi
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button variant="destructive" size="sm" />}>Supprimer</DialogTrigger>
+      <DialogTrigger render={<Button variant="destructive" size="sm" />}>
+        <TrashSimpleIcon />
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Supprimer l&apos;ingrédient</DialogTitle>

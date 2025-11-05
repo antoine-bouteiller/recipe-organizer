@@ -1,17 +1,17 @@
+import { Button } from '@/components/ui/button'
 import { AddIngredient } from '@/features/ingredients/add-ingredient'
+import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
-import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import { Button } from '@/components/ui/button'
 import { ArrowLeftIcon } from '@phosphor-icons/react'
-import { Link, createFileRoute } from '@tanstack/react-router'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link, createFileRoute } from '@tanstack/react-router'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
 
   return (
-    <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto w-full">
       <div className="flex items-center gap-2">
         <Link to="/settings">
           <Button variant="ghost" size="icon">

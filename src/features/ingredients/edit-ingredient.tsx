@@ -10,6 +10,7 @@ import {
 import { updateIngredientOptions } from '@/features/ingredients/api/update'
 import { IngredientForm } from '@/features/ingredients/ingredient-form'
 import type { Ingredient } from '@/types/ingredient'
+import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
@@ -41,7 +42,9 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button variant="outline" size="sm" />}>Modifier</DialogTrigger>
+      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+        <PencilSimpleIcon />
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Modifier l&apos;ingrédient</DialogTitle>

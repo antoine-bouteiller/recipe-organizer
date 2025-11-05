@@ -9,7 +9,7 @@ const RouteComponent = () => {
   const auth = useAuth()
 
   return (
-    <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto w-full">
       <div className="flex items-center gap-2">
         <Link to="/settings">
           <Button variant="ghost" size="icon">
@@ -36,7 +36,7 @@ const RouteComponent = () => {
 
           <div className="border-t pt-6">
             <h2 className="text-lg font-semibold mb-4">Actions</h2>
-            <Button onClick={() => auth.signOut()} variant="destructive">
+            <Button onClick={() => auth.signOut()} variant="outline">
               Se déconnecter
             </Button>
           </div>
