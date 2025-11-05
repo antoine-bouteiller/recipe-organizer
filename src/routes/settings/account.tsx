@@ -25,7 +25,7 @@ const RouteComponent = () => {
             <h2 className="text-lg font-semibold mb-4">Informations du compte</h2>
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Email</label>
+                <p className="text-sm font-medium text-muted-foreground">Email</p>
                 <p className="text-sm mt-1">{authUser?.email}</p>
               </div>
             </div>
