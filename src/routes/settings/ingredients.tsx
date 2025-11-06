@@ -9,9 +9,9 @@ import {
   ItemTitle,
 } from '@/components/ui/item'
 import { AddIngredient } from '@/features/ingredients/add-ingredient'
+import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
-import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { ArrowLeftIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -22,7 +22,9 @@ const IngredientsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredIngredients = useMemo(() => {
-    if (!searchQuery.trim()) return ingredients
+    if (!searchQuery.trim()) {
+      return ingredients
+    }
 
     const query = searchQuery.toLowerCase()
     return ingredients.filter(

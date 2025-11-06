@@ -22,7 +22,7 @@ const UnitsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredUnits = useMemo(() => {
-    if (!searchQuery.trim()) return units
+    if (!searchQuery.trim()) {return units}
 
     const query = searchQuery.toLowerCase()
     return units.filter(

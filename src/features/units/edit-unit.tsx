@@ -7,8 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { updateUnitOptions } from '@/features/units/api/update'
 import { type Unit, getUnitsListOptions } from '@/features/units/api/get-all'
+import { updateUnitOptions } from '@/features/units/api/update'
 import { UnitForm } from '@/features/units/unit-form'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
@@ -26,8 +26,8 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
   const handleSubmit = (data: {
     name: string
     symbol: string
-    parentId: number | null
-    factor: number | null
+    parentId: number | undefined
+    factor: number | undefined
   }) => {
     updateMutation.mutate(
       {

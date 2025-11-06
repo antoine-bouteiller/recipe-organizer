@@ -2,7 +2,7 @@ import { ingredient } from '@/lib/db/schema/ingredient'
 import { recipe } from '@/lib/db/schema/recipe'
 import { unit } from '@/lib/db/schema/unit'
 import { relations } from 'drizzle-orm'
-import { integer, sqliteTable, text, real } from 'drizzle-orm/sqlite-core'
+import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 const recipeIngredientsSection = sqliteTable('recipe_ingredients_sections', {
   id: integer('id').primaryKey(),
@@ -68,10 +68,10 @@ const sectionIngredientsRelation = relations(sectionIngredient, ({ one }) => ({
 }))
 
 export {
-  recipeIngredientsSection,
-  sectionIngredient,
   ingredientsRelation,
-  recipesRelation,
   recipeIngredientSectionRelation,
+  recipeIngredientsSection,
+  recipesRelation,
+  sectionIngredient,
   sectionIngredientsRelation,
 }

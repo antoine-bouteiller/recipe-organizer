@@ -25,6 +25,7 @@ const getRecipesByIds = createServerFn({
               sectionIngredients: {
                 with: {
                   ingredient: true,
+                  unit: true,
                 },
               },
             },

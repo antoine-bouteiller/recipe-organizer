@@ -42,7 +42,7 @@ const reset = () => {
 
 export interface IngredientWithQuantity extends Ingredient {
   quantity: number
-  unit: string | null
+  unit: string | undefined
   checked: boolean
 }
 
@@ -75,7 +75,7 @@ export const useShoppingListStore = () => {
                 acc.push({
                   ...ingredient.ingredient,
                   quantity: (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity,
-                  unit: ingredient.unit,
+                  unit: ingredient.unit?.name,
                   checked: false,
                 })
               }

@@ -122,6 +122,8 @@ Core entities:
 
 ### Linting Rules (oxlint)
 
+**IMPORTANT** Always lint your code before committing using `bun lint`.
+
 This project enforces strict code quality via oxlint configured in `.oxlintrc.json`:
 - No `console` statements allowed (use proper logging)
 - No `any` types or non-null assertions

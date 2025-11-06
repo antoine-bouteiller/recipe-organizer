@@ -92,7 +92,7 @@ const createRecipe = createServerFn({
                   sectionId: createdSection.id,
                   ingredientId: ingredient.id,
                   quantity: ingredient.quantity,
-                  unitId: ingredient.unitId ?? null,
+                  unitId: ingredient.unitId ?? undefined,
                 }))
               )
           }

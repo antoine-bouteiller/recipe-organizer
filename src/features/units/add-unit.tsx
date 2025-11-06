@@ -21,8 +21,8 @@ export const AddUnit = () => {
   const handleSubmit = (data: {
     name: string
     symbol: string
-    parentId: number | null
-    factor: number | null
+    parentId: number | undefined
+    factor: number | undefined
   }) => {
     createMutation.mutate(
       { data },

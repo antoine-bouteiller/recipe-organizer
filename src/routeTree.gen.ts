@@ -13,6 +13,7 @@ import { Route as ShoppingListRouteImport } from './routes/shopping-list'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsUnitsRouteImport } from './routes/settings/units'
 import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
 import { Route as SettingsAccountRouteImport } from './routes/settings/account'
 import { Route as RecipeNewRouteImport } from './routes/recipe/new'
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/settings/',
   path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsUnitsRoute = SettingsUnitsRouteImport.update({
+  id: '/settings/units',
+  path: '/settings/units',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIngredientsRoute = SettingsIngredientsRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/recipe/new': typeof RecipeNewRoute
   '/settings/account': typeof SettingsAccountRoute
   '/settings/ingredients': typeof SettingsIngredientsRoute
+  '/settings/units': typeof SettingsUnitsRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/recipe/new': typeof RecipeNewRoute
   '/settings/account': typeof SettingsAccountRoute
   '/settings/ingredients': typeof SettingsIngredientsRoute
+  '/settings/units': typeof SettingsUnitsRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/recipe/new': typeof RecipeNewRoute
   '/settings/account': typeof SettingsAccountRoute
   '/settings/ingredients': typeof SettingsIngredientsRoute
+  '/settings/units': typeof SettingsUnitsRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/recipe/new'
     | '/settings/account'
     | '/settings/ingredients'
+    | '/settings/units'
     | '/settings'
     | '/api/auth/$'
     | '/api/image/$id'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/recipe/new'
     | '/settings/account'
     | '/settings/ingredients'
+    | '/settings/units'
     | '/settings'
     | '/api/auth/$'
     | '/api/image/$id'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/recipe/new'
     | '/settings/account'
     | '/settings/ingredients'
+    | '/settings/units'
     | '/settings/'
     | '/api/auth/$'
     | '/api/image/$id'
@@ -180,6 +192,7 @@ export interface RootRouteChildren {
   RecipeNewRoute: typeof RecipeNewRoute
   SettingsAccountRoute: typeof SettingsAccountRoute
   SettingsIngredientsRoute: typeof SettingsIngredientsRoute
+  SettingsUnitsRoute: typeof SettingsUnitsRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiImageIdRoute: typeof ApiImageIdRoute
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/units': {
+      id: '/settings/units'
+      path: '/settings/units'
+      fullPath: '/settings/units'
+      preLoaderRoute: typeof SettingsUnitsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/ingredients': {
@@ -284,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipeNewRoute: RecipeNewRoute,
   SettingsAccountRoute: SettingsAccountRoute,
   SettingsIngredientsRoute: SettingsIngredientsRoute,
+  SettingsUnitsRoute: SettingsUnitsRoute,
   SettingsIndexRoute: SettingsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiImageIdRoute: ApiImageIdRoute,

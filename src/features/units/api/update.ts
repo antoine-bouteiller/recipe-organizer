@@ -23,8 +23,8 @@ const updateUnit = createServerFn()
       .set({
         name,
         symbol,
-        parentId: parentId ?? null,
-        factor: factor ?? null,
+        parentId: parentId ?? undefined,
+        factor: factor ?? undefined,
       })
       .where(eq(unit.id, id))
   })

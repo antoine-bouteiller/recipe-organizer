@@ -19,8 +19,8 @@ const createUnit = createServerFn()
     await getDb().insert(unit).values({
       name,
       symbol,
-      parentId: parentId ?? null,
-      factor: factor ?? null,
+      parentId: parentId ?? undefined,
+      factor: factor ?? undefined,
     })
   })
 

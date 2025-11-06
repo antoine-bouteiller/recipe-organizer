@@ -11,11 +11,11 @@ import {
 import type { Unit } from '@/features/units/api/get-all'
 import { useState } from 'react'
 
-type UnitFormData = {
+interface UnitFormData {
   name: string
   symbol: string
-  parentId: number | null
-  factor: number | null
+  parentId: number | undefined
+  factor: number | undefined
 }
 
 interface UnitFormProps {
@@ -36,8 +36,8 @@ export const UnitForm = ({
   const [formData, setFormData] = useState<UnitFormData>({
     name: unit?.name || '',
     symbol: unit?.symbol || '',
-    parentId: unit?.parentId || null,
-    factor: unit?.factor || null,
+    parentId: unit?.parentId || undefined,
+    factor: unit?.factor || undefined,
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +80,7 @@ export const UnitForm = ({
           onValueChange={(value) =>
             setFormData({
               ...formData,
-              parentId: value === 'none' ? null : Number(value),
+              parentId: value === 'none' ? undefined : Number(value),
             })
           }
         >
@@ -112,7 +112,7 @@ export const UnitForm = ({
             onChange={(e) =>
               setFormData({
                 ...formData,
-                factor: e.target.value ? Number(e.target.value) : null,
+                factor: e.target.value ? Number(e.target.value) : undefined,
               })
             }
             placeholder="Ex: 1000 (pour 1000 g dans 1 kg)"

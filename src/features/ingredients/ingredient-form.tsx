@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label'
 import type { Ingredient } from '@/types/ingredient'
 import { useState } from 'react'
 
-type IngredientFormData = {
+interface IngredientFormData {
   name: string
   category: string
 }
