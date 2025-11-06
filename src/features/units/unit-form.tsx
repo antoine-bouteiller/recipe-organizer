@@ -1,132 +1,113 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import type { Unit } from '@/features/units/api/get-all'
-import { useState } from 'react'
+import { withFieldGroup } from '@/hooks/use-app-form'
+import { useStore } from '@tanstack/react-form'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { getUnitsListOptions } from './api/get-all'
 
-interface UnitFormData {
+export interface UnitFormInput {
   name: string
   symbol: string
-  parentId: number | undefined
+  parentId: string | undefined
   factor: number | undefined
 }
 
-interface UnitFormProps {
+export const unitDefaultValues: UnitFormInput = {
+  name: '',
+  symbol: '',
+  parentId: undefined,
+  factor: undefined,
+}
+
+interface UnitFormProps extends Record<string, unknown> {
   unit?: Unit
-  units: Unit[]
-  onSubmit: (data: UnitFormData) => void
   onCancel: () => void
-  submitLabel?: string
 }
 
-export const UnitForm = ({
-  unit,
-  units,
-  onSubmit,
-  onCancel,
-  submitLabel = 'Ajouter',
-}: UnitFormProps) => {
-  const [formData, setFormData] = useState<UnitFormData>({
-    name: unit?.name || '',
-    symbol: unit?.symbol || '',
-    parentId: unit?.parentId || undefined,
-    factor: unit?.factor || undefined,
-  })
+export const UnitForm = withFieldGroup({
+  defaultValues: unitDefaultValues,
+  props: {} as UnitFormProps,
+  render: function Render({ group, unit, onCancel }) {
+    const { data: units } = useQuery(getUnitsListOptions())
+    const { AppField } = group
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(formData)
-  }
+    const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
 
-  const availableParentUnits = units.filter((u) => u.id !== unit?.id)
+    const availableParentUnits = useMemo(() => {
+      const filtered = units?.filter((u) => u.id !== unit?.id) ?? []
+      return [
+        { label: 'Aucune', value: '' },
+        ...filtered.map((u) => ({
+          label: `${u.name} (${u.symbol})`,
+          value: u.id.toString(),
+        })),
+      ]
+    }, [units, unit?.id])
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Nom de l&apos;unité</Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Ex: Gramme"
-          required
-          minLength={2}
-        />
-      </div>
+    return (
+      <>
+        <AppField name="name">
+          {({ TextField }) => (
+            <TextField
+              label="Nom de l'unité"
+              placeholder="Ex: Gramme"
+              disabled={isSubmitting}
+              minLength={2}
+            />
+          )}
+        </AppField>
 
-      <div className="space-y-2">
-        <Label htmlFor="symbol">Symbole</Label>
-        <Input
-          id="symbol"
-          value={formData.symbol}
-          onChange={(e) => setFormData({ ...formData, symbol: e.target.value })}
-          placeholder="Ex: g"
-          required
-          minLength={1}
-        />
-      </div>
+        <AppField name="symbol">
+          {({ TextField }) => (
+            <TextField
+              label="Symbole"
+              placeholder="Ex: g"
+              disabled={isSubmitting}
+              minLength={1}
+            />
+          )}
+        </AppField>
 
-      <div className="space-y-2">
-        <Label htmlFor="parent">Unité parente (optionnel)</Label>
-        <Select
-          value={formData.parentId?.toString() || 'none'}
-          onValueChange={(value) =>
-            setFormData({
-              ...formData,
-              parentId: value === 'none' ? undefined : Number(value),
-            })
-          }
-        >
-          <SelectTrigger id="parent">
-            <SelectValue placeholder="Sélectionner une unité parente" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Aucune</SelectItem>
-            {availableParentUnits.map((u) => (
-              <SelectItem key={u.id} value={u.id.toString()}>
-                {u.name} ({u.symbol})
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+        <AppField name="parentId">
+          {({ ComboboxField, state }) => (
+            <>
+              <ComboboxField
+                label="Unité parente (optionnel)"
+                options={availableParentUnits}
+                disabled={isSubmitting}
+                placeholder="Sélectionner une unité parente"
+                searchPlaceholder="Rechercher une unité"
+                noResultsLabel="Aucune unité trouvée"
+              />
 
-      {formData.parentId && (
-        <div className="space-y-2">
-          <Label htmlFor="factor">
-            Facteur de conversion (combien de cette unité dans l&apos;unité parente)
-          </Label>
-          <Input
-            id="factor"
-            type="number"
-            step="0.01"
-            min="0.01"
-            value={formData.factor || ''}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                factor: e.target.value ? Number(e.target.value) : undefined,
-              })
-            }
-            placeholder="Ex: 1000 (pour 1000 g dans 1 kg)"
-            required
-          />
+              {state.value && state.value !== '' && (
+                <AppField name="factor">
+                  {({ NumberField }) => (
+                    <NumberField
+                      label="Facteur de conversion (combien de cette unité dans l'unité parente)"
+                      placeholder="Ex: 1000 (pour 1000 g dans 1 kg)"
+                      min={0.01}
+                      step={0.01}
+                      disabled={isSubmitting}
+                      decimalScale={2}
+                    />
+                  )}
+                </AppField>
+              )}
+            </>
+          )}
+        </AppField>
+
+        <div className="flex gap-2 justify-end">
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+            Annuler
+          </Button>
+          <group.form.AppForm>
+            <group.form.FormSubmit label={unit ? 'Mettre à jour' : 'Ajouter'} />
+          </group.form.AppForm>
         </div>
-      )}
-
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
-        </Button>
-        <Button type="submit">{submitLabel}</Button>
-      </div>
-    </form>
-  )
-}
+      </>
+    )
+  },
+})

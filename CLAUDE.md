@@ -111,6 +111,98 @@ Core entities:
 - **Cookie persistence**: Shopping list persisted in cookies using `@/lib/cookie`
 - **React Query**: Server state management, data fetching, caching
 
+### Form Management
+
+**CRITICAL: All forms in this project MUST use TanStack Form. Never use manual state management (useState) for forms.**
+
+This project uses TanStack Form (`@tanstack/react-form`) for all form handling. The form architecture is built around the `use-app-form.ts` hook.
+
+#### Form Pattern (REQUIRED)
+
+**For feature forms** (creating/editing entities like recipes, units, ingredients):
+
+1. **Define form input types and default values:**
+```typescript
+export interface UnitFormInput {
+  name: string
+  symbol: string
+  parentId: string | undefined
+  factor: number | undefined
+}
+
+export const unitDefaultValues: UnitFormInput = {
+  name: '',
+  symbol: '',
+  parentId: undefined,
+  factor: undefined,
+}
+```
+
+2. **Create form component using `withFieldGroup`:**
+```typescript
+import { withFieldGroup } from '@/hooks/use-app-form'
+
+export const UnitForm = withFieldGroup({
+  defaultValues: unitDefaultValues,
+  props: {} as UnitFormProps,
+  render: function Render({ group, ...props }) {
+    const { AppField } = group
+    const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
+
+    return (
+      <>
+        <AppField name="name">
+          {({ TextField }) => (
+            <TextField label="Nom" placeholder="..." disabled={isSubmitting} />
+          )}
+        </AppField>
+        {/* More fields... */}
+        <group.form.AppForm>
+          <group.form.FormSubmit label="Submit" />
+        </group.form.AppForm>
+      </>
+    )
+  },
+})
+```
+
+3. **Use the form in route/dialog components with `useAppForm`:**
+```typescript
+import { useAppForm } from '@/hooks/use-app-form'
+import { revalidateLogic } from '@tanstack/react-form'
+
+const form = useAppForm({
+  validators: { onDynamic: myZodSchema },
+  validationLogic: revalidateLogic(),
+  defaultValues: unitDefaultValues,
+  onSubmit: async (data) => {
+    const parsedData = myZodSchema.parse(data.value)
+    await mutation.mutateAsync({ data: parsedData })
+  },
+})
+
+// In JSX:
+<form onSubmit={(e) => { e.preventDefault(); void form.handleSubmit() }}>
+  <UnitForm form={form} {...props} />
+</form>
+```
+
+#### Available Field Components
+
+The `AppField` component provides these field types:
+- `TextField` - Text inputs
+- `NumberField` - Numeric inputs with decimal support
+- `ComboboxField` - Searchable select with custom options
+- `ImageField` - Image upload with preview
+- `TiptapField` - Rich text editor
+
+**NEVER use Base UI Select components directly in forms** - always use `ComboboxField` through `AppField`.
+
+#### Examples
+
+- **Recipe forms**: `src/features/recipe/recipe-form.tsx`, `src/routes/recipe/new.tsx`
+- **Unit forms**: `src/features/units/unit-form.tsx`, `src/features/units/add-unit.tsx`
+
 ### Authentication
 
 - Better Auth with Drizzle adapter
