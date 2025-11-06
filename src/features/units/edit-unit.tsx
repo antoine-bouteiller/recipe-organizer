@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { type Unit } from '@/features/units/api/get-all'
 import { updateUnitOptions } from '@/features/units/api/update'
-import { type UnitFormInput, UnitForm } from '@/features/units/unit-form'
+import { type UnitFormInput, unitFormFields, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
@@ -88,7 +88,7 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
           }}
           className="space-y-4"
         >
-          <UnitForm form={form} unit={unit} onCancel={() => setIsOpen(false)} />
+          <UnitForm form={form} fields={unitFormFields} unit={unit} onCancel={() => setIsOpen(false)} />
         </form>
       </DialogContent>
     </Dialog>

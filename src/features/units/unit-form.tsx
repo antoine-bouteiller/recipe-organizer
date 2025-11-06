@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import type { Unit } from '@/features/units/api/get-all'
 import { withFieldGroup } from '@/hooks/use-app-form'
-import { useStore } from '@tanstack/react-form'
+import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { getUnitsListOptions } from './api/get-all'
@@ -19,6 +19,8 @@ export const unitDefaultValues: UnitFormInput = {
   parentId: undefined,
   factor: undefined,
 }
+
+export const unitFormFields = createFieldMap(unitDefaultValues)
 
 interface UnitFormProps extends Record<string, unknown> {
   unit?: Unit

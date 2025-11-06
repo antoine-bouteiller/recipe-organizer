@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { createUnitOptions } from '@/features/units/api/add-one'
-import { unitDefaultValues, UnitForm } from '@/features/units/unit-form'
+import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
@@ -76,7 +76,7 @@ export const AddUnit = () => {
           }}
           className="space-y-4"
         >
-          <UnitForm form={form} onCancel={() => setIsOpen(false)} />
+          <UnitForm form={form} fields={unitFormFields} onCancel={() => setIsOpen(false)} />
         </form>
       </DialogContent>
     </Dialog>
