@@ -8,15 +8,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { updateUnitOptions } from '@/features/units/api/update'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
+import { type Unit, getUnitsListOptions } from '@/features/units/api/get-all'
 import { UnitForm } from '@/features/units/unit-form'
-import type { SelectUnit } from '@/lib/db/schema'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 interface EditUnitProps {
-  unit: SelectUnit
+  unit: Unit
 }
 
 export const EditUnit = ({ unit }: EditUnitProps) => {

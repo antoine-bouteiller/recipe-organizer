@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { SelectUnit } from '@/lib/db/schema'
+import type { Unit } from '@/features/units/api/get-all'
 import { useState } from 'react'
 
 type UnitFormData = {
@@ -19,8 +19,8 @@ type UnitFormData = {
 }
 
 interface UnitFormProps {
-  unit?: SelectUnit
-  units: SelectUnit[]
+  unit?: Unit
+  units: Unit[]
   onSubmit: (data: UnitFormData) => void
   onCancel: () => void
   submitLabel?: string

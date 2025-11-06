@@ -1,4 +1,4 @@
-import { type InferSelectModel, relations } from 'drizzle-orm'
+import { relations } from 'drizzle-orm'
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const unit = sqliteTable('units', {
@@ -15,6 +15,4 @@ export const unitRelations = relations(unit, ({ one }) => ({
     references: [unit.id],
   }),
 }))
-
-export type SelectUnit = InferSelectModel<typeof unit>
 

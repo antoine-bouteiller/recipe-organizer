@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsgo && vite build",
+    "build": "vite build && tsgo",
     "dev": "vite",
     "lint": "oxlint --fix --type-aware",
     "typecheck": "tsgo --noEmit",

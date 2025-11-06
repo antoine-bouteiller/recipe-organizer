@@ -16,6 +16,8 @@ const getUnitsList = createServerFn({
   })
 )
 
+export type Unit = Awaited<ReturnType<typeof getUnitsList>>[number]
+
 const getUnitsListOptions = () =>
   queryOptions({
     queryKey: unitKeys.list(''),
