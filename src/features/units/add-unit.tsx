@@ -20,8 +20,8 @@ import { z } from 'zod'
 const unitSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
   symbol: z.string().min(1, 'Le symbole est requis'),
-  parentId: z.string().optional(),
-  factor: z.number().positive('Le facteur doit être positif').optional(),
+  parentId: z.string().nullish(),
+  factor: z.number().positive('Le facteur doit être positif').nullish(),
 })
 
 export const AddUnit = () => {
@@ -44,8 +44,8 @@ export const AddUnit = () => {
             symbol: parsedData.symbol,
             parentId: parsedData.parentId && parsedData.parentId !== ''
               ? Number(parsedData.parentId)
-              : undefined,
-            factor: parsedData.factor,
+              : null,
+            factor: parsedData.factor ?? null,
           },
         })
 

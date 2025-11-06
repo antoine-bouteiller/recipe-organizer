@@ -9,8 +9,8 @@ import { getUnitsListOptions } from './api/get-all'
 export interface UnitFormInput {
   name: string
   symbol: string
-  parentId: string | undefined
-  factor: number | undefined
+  parentId?: string | null
+  factor?: number | null
 }
 
 export const unitDefaultValues: UnitFormInput = {
