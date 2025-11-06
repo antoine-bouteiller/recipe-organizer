@@ -24,13 +24,12 @@ export const unitFormFields = createFieldMap(unitDefaultValues)
 
 interface UnitFormProps extends Record<string, unknown> {
   unit?: Unit
-  onCancel: () => void
 }
 
 export const UnitForm = withFieldGroup({
   defaultValues: unitDefaultValues,
   props: {} as UnitFormProps,
-  render: function Render({ group, unit, onCancel }) {
+  render: function Render({ group, unit }) {
     const { data: units } = useQuery(getUnitsListOptions())
     const { AppField } = group
 
@@ -55,7 +54,6 @@ export const UnitForm = withFieldGroup({
               label="Nom de l'unité"
               placeholder="Ex: Gramme"
               disabled={isSubmitting}
-              minLength={2}
             />
           )}
         </AppField>
@@ -66,7 +64,6 @@ export const UnitForm = withFieldGroup({
               label="Symbole"
               placeholder="Ex: g"
               disabled={isSubmitting}
-              minLength={1}
             />
           )}
         </AppField>
@@ -90,7 +87,6 @@ export const UnitForm = withFieldGroup({
                       label="Facteur de conversion (combien de cette unité dans l'unité parente)"
                       placeholder="Ex: 1000 (pour 1000 g dans 1 kg)"
                       min={0.01}
-                      step={0.01}
                       disabled={isSubmitting}
                       decimalScale={2}
                     />
@@ -100,15 +96,6 @@ export const UnitForm = withFieldGroup({
             </>
           )}
         </AppField>
-
-        <div className="flex gap-2 justify-end">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-            Annuler
-          </Button>
-          <group.form.AppForm>
-            <group.form.FormSubmit label={unit ? 'Mettre à jour' : 'Ajouter'} />
-          </group.form.AppForm>
-        </div>
       </>
     )
   },
