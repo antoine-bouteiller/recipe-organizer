@@ -1,7 +1,7 @@
 commit-msg:
   commands:
     lint-commit-msg:
-      run: pnpm dlx commitlint --edit
+      run: bunx commitlint --edit
 pre-commit:
   parallel: true
   jobs:
@@ -9,11 +9,11 @@ pre-commit:
       run: bun i --frozen-lockfile --silent
     - name: check
       glob: '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx}'
-      run: pnpm dlx oxlint {staged_files} --fix
+      run: bunx oxlint {staged_files} --fix
       stage_fixed: true
     - name: format
       glob: '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}'
-      run: pnpm dlx prettier {staged_files} --write --log-level silent
+      run: bunx prettier {staged_files} --write --log-level silent
       stage_fixed: true
     - name: type-check
-      run: pnpm typecheck
+      run: bun typecheck
