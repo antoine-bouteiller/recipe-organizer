@@ -121,8 +121,10 @@ This project uses TanStack Form (`@tanstack/react-form`) for all form handling. 
 
 **For feature forms** (creating/editing entities like recipes, units, ingredients):
 
-1. **Define form input types and default values:**
+1. **Define form input types, default values, and create field map:**
 ```typescript
+import { createFieldMap } from '@tanstack/react-form'
+
 export interface UnitFormInput {
   name: string
   symbol: string
@@ -136,6 +138,9 @@ export const unitDefaultValues: UnitFormInput = {
   parentId: undefined,
   factor: undefined,
 }
+
+// REQUIRED: Create field map for TanStack Form
+export const unitFormFields = createFieldMap(unitDefaultValues)
 ```
 
 2. **Create form component using `withFieldGroup`:**
@@ -170,6 +175,7 @@ export const UnitForm = withFieldGroup({
 ```typescript
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
+import { unitDefaultValues, unitFormFields, UnitForm } from './unit-form'
 
 const form = useAppForm({
   validators: { onDynamic: myZodSchema },
@@ -181,9 +187,9 @@ const form = useAppForm({
   },
 })
 
-// In JSX:
+// In JSX: IMPORTANT - must pass both form AND fields props
 <form onSubmit={(e) => { e.preventDefault(); void form.handleSubmit() }}>
-  <UnitForm form={form} {...props} />
+  <UnitForm form={form} fields={unitFormFields} {...props} />
 </form>
 ```
 
