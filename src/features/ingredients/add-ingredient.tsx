@@ -43,7 +43,7 @@ export const AddIngredient = ({
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? controlledOnOpenChange! : setInternalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
 
   const form = useAppForm({
     validators: {
