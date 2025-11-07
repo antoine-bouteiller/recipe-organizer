@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import { CreateIngredientDialog } from '@/features/ingredients/create-ingredient-dialog'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
+import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
-import { CreateUnitDialog } from '@/features/units/create-unit-dialog'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
@@ -270,14 +270,14 @@ export const RecipeForm = withFieldGroup({
           {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
         </AppField>
 
-        <CreateIngredientDialog
-          isOpen={isCreateIngredientDialogOpen}
+        <AddIngredient
+          open={isCreateIngredientDialogOpen}
           onOpenChange={setIsCreateIngredientDialogOpen}
           initialName={initialIngredientName}
         />
 
-        <CreateUnitDialog
-          isOpen={isCreateUnitDialogOpen}
+        <AddUnit
+          open={isCreateUnitDialogOpen}
           onOpenChange={setIsCreateUnitDialogOpen}
           initialSymbol={initialUnitSymbol}
         />

@@ -16,7 +16,7 @@ import { useAppForm } from '@/hooks/use-app-form'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -25,9 +25,25 @@ const ingredientSchema = z.object({
   category: z.string().min(1, "La catégorie est requise"),
 })
 
-export const AddIngredient = () => {
-  const [isOpen, setIsOpen] = useState(false)
+interface AddIngredientProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  initialName?: string
+  onSuccess?: () => void
+}
+
+export const AddIngredient = ({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  initialName,
+  onSuccess,
+}: AddIngredientProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false)
   const createMutation = useMutation(createIngredientOptions())
+
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
+  const setIsOpen = isControlled ? controlledOnOpenChange! : setInternalOpen
 
   const form = useAppForm({
     validators: {
@@ -48,6 +64,7 @@ export const AddIngredient = () => {
 
         setIsOpen(false)
         form.reset()
+        onSuccess?.()
       } catch (error) {
         toast.error("Une erreur est survenue lors de la création de l'ingrédient", {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -56,11 +73,20 @@ export const AddIngredient = () => {
     },
   })
 
+  // Update form when initialName changes
+  useEffect(() => {
+    if (isOpen && initialName) {
+      form.setFieldValue('name', initialName)
+    }
+  }, [isOpen, initialName, form])
+
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
-        <PlusIcon />
-      </ResponsiveDialogTrigger>
+      {!isControlled && (
+        <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
+          <PlusIcon />
+        </ResponsiveDialogTrigger>
+      )}
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter un ingrédient</ResponsiveDialogTitle>

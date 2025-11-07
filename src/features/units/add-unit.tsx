@@ -12,7 +12,7 @@ import { useAppForm } from '@/hooks/use-app-form'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -23,9 +23,25 @@ const unitSchema = z.object({
   factor: z.number().positive('Le facteur doit être positif').nullish(),
 })
 
-export const AddUnit = () => {
-  const [isOpen, setIsOpen] = useState(false)
+interface AddUnitProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  initialSymbol?: string
+  onSuccess?: () => void
+}
+
+export const AddUnit = ({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  initialSymbol,
+  onSuccess,
+}: AddUnitProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false)
   const createMutation = useMutation(createUnitOptions())
+
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
+  const setIsOpen = isControlled ? controlledOnOpenChange! : setInternalOpen
 
   const form = useAppForm({
     validators: {
@@ -50,6 +66,7 @@ export const AddUnit = () => {
 
         setIsOpen(false)
         form.reset()
+        onSuccess?.()
       } catch (error) {
         toast.error("Une erreur est survenue lors de la création de l'unité", {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -58,11 +75,20 @@ export const AddUnit = () => {
     },
   })
 
+  // Update form when initialSymbol changes
+  useEffect(() => {
+    if (isOpen && initialSymbol) {
+      form.setFieldValue('symbol', initialSymbol)
+    }
+  }, [isOpen, initialSymbol, form])
+
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
-        <PlusIcon />
-      </ResponsiveDialogTrigger>
+      {!isControlled && (
+        <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
+          <PlusIcon />
+        </ResponsiveDialogTrigger>
+      )}
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
