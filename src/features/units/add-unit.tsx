@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from '@/components/ui/responsive-dialog'
 import { createUnitOptions } from '@/features/units/api/add-one'
 import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -60,15 +59,14 @@ export const AddUnit = () => {
   })
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button variant="default" size="sm" />}>
+    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
+      <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
         <PlusIcon />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Ajouter une unité</DialogTitle>
-          <DialogDescription>Ajoutez une nouvelle unité de mesure</DialogDescription>
-        </DialogHeader>
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
         <form
           onSubmit={(event) => {
             event.preventDefault()
@@ -86,7 +84,7 @@ export const AddUnit = () => {
             </form.AppForm>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

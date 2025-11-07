@@ -1,17 +1,18 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
+import { CreateIngredientDialog } from '@/features/ingredients/create-ingredient-dialog'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
+import { CreateUnitDialog } from '@/features/units/create-unit-dialog'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { Fragment } from 'react/jsx-runtime'
-import { createIngredientOptions } from '../ingredients/api/add-one'
 
 export const recipeDefaultValues: RecipeFormInput = {
   name: '',
@@ -46,6 +47,11 @@ export const RecipeForm = withFieldGroup({
     const { data: ingredients } = useQuery(getIngredientListOptions())
     const { data: units } = useQuery(getUnitsListOptions())
 
+    const [isCreateIngredientDialogOpen, setIsCreateIngredientDialogOpen] = useState(false)
+    const [initialIngredientName, setInitialIngredientName] = useState<string | undefined>()
+    const [isCreateUnitDialogOpen, setIsCreateUnitDialogOpen] = useState(false)
+    const [initialUnitSymbol, setInitialUnitSymbol] = useState<string | undefined>()
+
     const ingredientsOptions = useMemo(
       () =>
         ingredients?.map((ingredient) => ({
@@ -67,8 +73,6 @@ export const RecipeForm = withFieldGroup({
     const { AppField, Field } = group
 
     const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
-
-    const { mutateAsync: createIngredient } = useMutation(createIngredientOptions())
 
     return (
       <>
@@ -152,8 +156,9 @@ export const RecipeForm = withFieldGroup({
                                                 addNewOptionLabel="Nouvel ingrédient:"
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                addNewOptionOnClick={async (value: string) => {
-                                                  await createIngredient({ data: { name: value } })
+                                                addNewOptionOnClick={(value: string) => {
+                                                  setInitialIngredientName(value)
+                                                  setIsCreateIngredientDialogOpen(true)
                                                 }}
                                               />
                                             )}
@@ -179,6 +184,11 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
+                                                addNewOptionLabel="Nouvelle unité:"
+                                                addNewOptionOnClick={(value: string) => {
+                                                  setInitialUnitSymbol(value)
+                                                  setIsCreateUnitDialogOpen(true)
+                                                }}
                                                 noResultsLabel="Aucune unité trouvée"
                                               />
                                             )}
@@ -259,6 +269,18 @@ export const RecipeForm = withFieldGroup({
         <AppField name="steps">
           {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
         </AppField>
+
+        <CreateIngredientDialog
+          isOpen={isCreateIngredientDialogOpen}
+          onOpenChange={setIsCreateIngredientDialogOpen}
+          initialName={initialIngredientName}
+        />
+
+        <CreateUnitDialog
+          isOpen={isCreateUnitDialogOpen}
+          onOpenChange={setIsCreateUnitDialogOpen}
+          initialSymbol={initialUnitSymbol}
+        />
       </>
     )
   },

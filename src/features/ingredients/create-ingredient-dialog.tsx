@@ -4,7 +4,6 @@ import {
   ResponsiveDialogContent,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
-  ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { createIngredientOptions } from '@/features/ingredients/api/add-one'
 import {
@@ -13,10 +12,9 @@ import {
   IngredientForm,
 } from '@/features/ingredients/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
-import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -25,8 +23,19 @@ const ingredientSchema = z.object({
   category: z.string().min(1, "La catégorie est requise"),
 })
 
-export const AddIngredient = () => {
-  const [isOpen, setIsOpen] = useState(false)
+interface CreateIngredientDialogProps {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  initialName?: string
+  onSuccess?: () => void
+}
+
+export const CreateIngredientDialog = ({
+  isOpen,
+  onOpenChange,
+  initialName,
+  onSuccess,
+}: CreateIngredientDialogProps) => {
   const createMutation = useMutation(createIngredientOptions())
 
   const form = useAppForm({
@@ -46,8 +55,9 @@ export const AddIngredient = () => {
           },
         })
 
-        setIsOpen(false)
+        onOpenChange(false)
         form.reset()
+        onSuccess?.()
       } catch (error) {
         toast.error("Une erreur est survenue lors de la création de l'ingrédient", {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -56,11 +66,15 @@ export const AddIngredient = () => {
     },
   })
 
+  // Update form when initialName changes
+  useEffect(() => {
+    if (isOpen && initialName) {
+      form.setFieldValue('name', initialName)
+    }
+  }, [isOpen, initialName, form])
+
   return (
-    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
-        <PlusIcon />
-      </ResponsiveDialogTrigger>
+    <ResponsiveDialog open={isOpen} onOpenChange={onOpenChange}>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter un ingrédient</ResponsiveDialogTitle>
@@ -77,7 +91,7 @@ export const AddIngredient = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onClick={() => onOpenChange(false)}
               disabled={form.state.isSubmitting}
             >
               Annuler
