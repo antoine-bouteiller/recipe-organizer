@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from '@/components/ui/responsive-dialog'
 import { type Unit } from '@/features/units/api/get-all'
 import { updateUnitOptions } from '@/features/units/api/update'
 import { type UnitFormInput, unitFormFields, UnitForm } from '@/features/units/unit-form'
@@ -72,15 +71,14 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
   })
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
+      <ResponsiveDialogTrigger render={<Button variant="outline" size="sm" />}>
         <PencilSimpleIcon />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Modifier l&apos;unité</DialogTitle>
-          <DialogDescription>Modifiez les informations de l&apos;unité</DialogDescription>
-        </DialogHeader>
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Modifier l&apos;unité</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
         <form
           onSubmit={(event) => {
             event.preventDefault()
@@ -98,7 +96,7 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
             </form.AppForm>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

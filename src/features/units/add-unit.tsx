@@ -1,19 +1,18 @@
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from '@/components/ui/responsive-dialog'
 import { createUnitOptions } from '@/features/units/api/add-one'
 import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -24,9 +23,25 @@ const unitSchema = z.object({
   factor: z.number().positive('Le facteur doit être positif').nullish(),
 })
 
-export const AddUnit = () => {
-  const [isOpen, setIsOpen] = useState(false)
+interface AddUnitProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  initialSymbol?: string
+  onSuccess?: () => void
+}
+
+export const AddUnit = ({
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  initialSymbol,
+  onSuccess,
+}: AddUnitProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false)
   const createMutation = useMutation(createUnitOptions())
+
+  const isControlled = controlledOpen !== undefined
+  const isOpen = isControlled ? controlledOpen : internalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
 
   const form = useAppForm({
     validators: {
@@ -51,6 +66,7 @@ export const AddUnit = () => {
 
         setIsOpen(false)
         form.reset()
+        onSuccess?.()
       } catch (error) {
         toast.error("Une erreur est survenue lors de la création de l'unité", {
           description: error instanceof Error ? error.message : JSON.stringify(error),
@@ -59,16 +75,24 @@ export const AddUnit = () => {
     },
   })
 
+  // Update form when initialSymbol changes
+  useEffect(() => {
+    if (isOpen && initialSymbol) {
+      form.setFieldValue('symbol', initialSymbol)
+    }
+  }, [isOpen, initialSymbol, form])
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button variant="default" size="sm" />}>
-        <PlusIcon />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Ajouter une unité</DialogTitle>
-          <DialogDescription>Ajoutez une nouvelle unité de mesure</DialogDescription>
-        </DialogHeader>
+    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
+      {!isControlled && (
+        <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
+          <PlusIcon />
+        </ResponsiveDialogTrigger>
+      )}
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
         <form
           onSubmit={(event) => {
             event.preventDefault()
@@ -86,7 +110,7 @@ export const AddUnit = () => {
             </form.AppForm>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

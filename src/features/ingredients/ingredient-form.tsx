@@ -1,67 +1,53 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import type { Ingredient } from '@/types/ingredient'
-import { useState } from 'react'
+import { withFieldGroup } from '@/hooks/use-app-form'
+import { createFieldMap, useStore } from '@tanstack/react-form'
 
-interface IngredientFormData {
+export interface IngredientFormInput {
   name: string
   category: string
 }
 
-interface IngredientFormProps {
+export const ingredientDefaultValues: IngredientFormInput = {
+  name: '',
+  category: 'supermarket',
+}
+
+export const ingredientFormFields = createFieldMap(ingredientDefaultValues)
+
+interface IngredientFormProps extends Record<string, unknown> {
   ingredient?: Ingredient
-  onSubmit: (data: IngredientFormData) => void
-  onCancel: () => void
-  submitLabel?: string
 }
 
-export const IngredientForm = ({
-  ingredient,
-  onSubmit,
-  onCancel,
-  submitLabel = 'Ajouter',
-}: IngredientFormProps) => {
-  const [formData, setFormData] = useState<IngredientFormData>({
-    name: ingredient?.name || '',
-    category: ingredient?.category || 'supermarket',
-  })
+export const IngredientForm = withFieldGroup({
+  defaultValues: ingredientDefaultValues,
+  props: {} as IngredientFormProps,
+  render: function Render({ group }) {
+    const { AppField } = group
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(formData)
-  }
+    const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">Nom de l&apos;ingrédient</Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Ex: Tomate"
-          required
-          minLength={2}
-        />
-      </div>
+    return (
+      <>
+        <AppField name="name">
+          {({ TextField }) => (
+            <TextField
+              label="Nom de l'ingrédient"
+              placeholder="Ex: Tomate"
+              disabled={isSubmitting}
+            />
+          )}
+        </AppField>
 
-      <div className="space-y-2">
-        <Label htmlFor="category">Catégorie</Label>
-        <Input
-          id="category"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          placeholder="Ex: supermarket"
-        />
-      </div>
-
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
-        </Button>
-        <Button type="submit">{submitLabel}</Button>
-      </div>
-    </form>
-  )
-}
+        <AppField name="category">
+          {({ TextField }) => (
+            <TextField
+              label="Catégorie"
+              placeholder="Ex: supermarket"
+              disabled={isSubmitting}
+            />
+          )}
+        </AppField>
+      </>
+    )
+  },
+})
