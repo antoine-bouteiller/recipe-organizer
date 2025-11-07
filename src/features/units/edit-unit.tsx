@@ -57,8 +57,8 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
             symbol: parsedData.symbol,
             parentId: parsedData.parentId && parsedData.parentId !== ''
               ? Number(parsedData.parentId)
-              : null,
-            factor: parsedData.factor ?? null,
+              : undefined,
+            factor: parsedData.factor ?? undefined,
           },
         })
 
