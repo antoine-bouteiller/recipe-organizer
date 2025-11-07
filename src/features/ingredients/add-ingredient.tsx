@@ -16,9 +16,9 @@ export const AddIngredient = () => {
   const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createIngredientOptions())
 
-  const handleSubmit = (data: { name: string; allowedUnits: string[]; category: string }) => {
+  const handleSubmit = (data: { name: string; category: string }) => {
     createMutation.mutate(
-      { data: { name: data.name } },
+      { data },
       {
         onSuccess: () => {
           setIsOpen(false)

@@ -5,6 +5,7 @@ import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { recipeDefaultValues, RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
+import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/lib/form-data'
 import { revalidateLogic } from '@tanstack/react-form'
@@ -81,5 +82,6 @@ export const Route = createFileRoute('/recipe/new')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())
+    await context.queryClient.ensureQueryData(getUnitsListOptions())
   },
 })

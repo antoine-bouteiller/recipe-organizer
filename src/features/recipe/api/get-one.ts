@@ -22,6 +22,7 @@ const getRecipe = createServerFn({
               sectionIngredients: {
                 with: {
                   ingredient: true,
+                  unit: true,
                 },
               },
               subRecipe: {
@@ -31,6 +32,7 @@ const getRecipe = createServerFn({
                       sectionIngredients: {
                         with: {
                           ingredient: true,
+                          unit: true,
                         },
                       },
                     },

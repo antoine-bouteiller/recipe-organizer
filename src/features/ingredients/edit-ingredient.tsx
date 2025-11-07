@@ -22,13 +22,12 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const updateMutation = useMutation(updateIngredientOptions())
 
-  const handleSubmit = (data: { name: string; allowedUnits: string[]; category: string }) => {
+  const handleSubmit = (data: { name: string; category: string }) => {
     updateMutation.mutate(
       {
         data: {
           id: ingredient.id,
           name: data.name,
-          allowedUnits: data.allowedUnits,
           category: data.category,
         },
       },

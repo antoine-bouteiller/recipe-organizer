@@ -1,10 +1,17 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemTitle,
+} from '@/components/ui/item'
 import { AddIngredient } from '@/features/ingredients/add-ingredient'
+import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
-import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemTitle } from '@/components/ui/item'
 import { ArrowLeftIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -15,14 +22,15 @@ const IngredientsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredIngredients = useMemo(() => {
-    if (!searchQuery.trim()) return ingredients
+    if (!searchQuery.trim()) {
+      return ingredients
+    }
 
     const query = searchQuery.toLowerCase()
     return ingredients.filter(
       (ingredient) =>
         ingredient.name.toLowerCase().includes(query) ||
-        ingredient.category.toLowerCase().includes(query) ||
-        ingredient.allowedUnits?.some((unit) => unit.toLowerCase().includes(query))
+        ingredient.category.toLowerCase().includes(query)
     )
   }, [ingredients, searchQuery])
 
@@ -63,12 +71,7 @@ const IngredientsManagement = () => {
             <Item key={ingredient.id} variant="outline">
               <ItemContent>
                 <ItemTitle>{ingredient.name}</ItemTitle>
-                <ItemDescription>
-                  Catégorie: {ingredient.category}
-                  {ingredient.allowedUnits && ingredient.allowedUnits.length > 0 && (
-                    <> • Unités: {ingredient.allowedUnits.join(', ')}</>
-                  )}
-                </ItemDescription>
+                <ItemDescription>Catégorie: {ingredient.category}</ItemDescription>
               </ItemContent>
               <ItemActions>
                 <EditIngredient ingredient={ingredient} />

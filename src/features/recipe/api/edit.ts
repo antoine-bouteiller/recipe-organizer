@@ -86,7 +86,7 @@ const editRecipe = createServerFn({
                     sectionId: updatedSection.id,
                     ingredientId: ingredient.id,
                     quantity: ingredient.quantity,
-                    unit: ingredient.unit,
+                    unitId: ingredient.unitId ?? undefined,
                   }))
                 )
             }

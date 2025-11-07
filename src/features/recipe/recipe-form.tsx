@@ -3,20 +3,15 @@ import { Separator } from '@/components/ui/separator'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
+import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
-import { units } from '@/types/units'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { createIngredientOptions } from '../ingredients/api/add-one'
-
-const unitsOptions = units.map((unit) => ({
-  label: unit,
-  value: unit,
-}))
 
 export const recipeDefaultValues: RecipeFormInput = {
   name: '',
@@ -49,6 +44,7 @@ export const RecipeForm = withFieldGroup({
   props: {} as RecipeFormProps,
   render: function Render({ group, initialImage }) {
     const { data: ingredients } = useQuery(getIngredientListOptions())
+    const { data: units } = useQuery(getUnitsListOptions())
 
     const ingredientsOptions = useMemo(
       () =>
@@ -57,6 +53,15 @@ export const RecipeForm = withFieldGroup({
           value: ingredient.id.toString(),
         })) ?? [],
       [ingredients]
+    )
+
+    const unitsOptions = useMemo(
+      () =>
+        units?.map((unit) => ({
+          label: unit.symbol,
+          value: unit.id.toString(),
+        })) ?? [],
+      [units]
     )
 
     const { AppField, Field } = group
@@ -166,7 +171,7 @@ export const RecipeForm = withFieldGroup({
                                             )}
                                           </AppField>
                                           <AppField
-                                            name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unit`}
+                                            name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unitId`}
                                           >
                                             {({ ComboboxField }) => (
                                               <ComboboxField

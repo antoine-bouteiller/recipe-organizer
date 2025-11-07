@@ -7,14 +7,17 @@ import { ingredientsQueryKeys } from './query-keys'
 
 const ingredientSchema = z.object({
   name: z.string().min(2),
+  category: z.string().optional(),
 })
 
 const createIngredient = createServerFn()
   .inputValidator(ingredientSchema)
   .handler(async ({ data }) => {
-    const { name } = data
+    const { name, category } = data
+
     await getDb().insert(ingredient).values({
       name,
+      category: category || 'supermarket',
     })
   })
 

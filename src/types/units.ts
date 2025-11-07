@@ -1,17 +1,4 @@
-export const units = [
-  'g',
-  'mL',
-  'CàC',
-  'CàS',
-  'cube(s)',
-  'bouteille(s)',
-  'feuille(s)',
-  'boite(s)',
-  'conserver(s)',
-  'cm',
-] as const
+import type { unit } from '@/lib/db/schema'
+import type { InferSelectModel } from 'drizzle-orm'
 
-export type Unit = (typeof units)[number]
-
-export const isUnit = (unit: string | undefined | null): unit is Unit =>
-  units.includes(unit as Unit)
+export type Unit = InferSelectModel<typeof unit>

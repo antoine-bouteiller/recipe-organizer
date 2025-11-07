@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsgo && vite build",
+    "build": "vite build && tsgo",
     "dev": "vite",
     "lint": "oxlint --fix --type-aware",
     "typecheck": "tsgo --noEmit",
@@ -12,7 +12,8 @@
     "test": "vitest run",
     "cf-typegen": "wrangler types",
     "database:dump": "rm -f database.sql && wrangler d1 export recipe-organizer --output=./database.sql --no-schema",
-    "database:import": "wrangler d1 execute recipe-organizer --file ./database.sql"
+    "database:import": "wrangler d1 execute recipe-organizer --file ./database.sql",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@base-ui-components/react": "^1.0.0-beta.4",
@@ -45,6 +46,7 @@
     "drizzle-kit": "^0.31.6",
     "drizzle-orm": "^0.44.7",
     "lodash.throttle": "^4.1.1",
+    "lucide-react": "^0.552.0",
     "motion": "^12.23.24",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
