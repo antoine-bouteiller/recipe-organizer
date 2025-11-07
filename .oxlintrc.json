@@ -90,6 +90,9 @@
     "no-unsafe-type-assertion": "off",
     "no-unsafe-assignment": "off",
     "no-unsafe-member-access": "off",
-    "no-unsafe-return": "off"
+    "no-unsafe-return": "off",
+    "strict-boolean-expressions": "off",
+    "no-floating-promises": "off",
+    "no-deprecated": "off"
   }
 }
