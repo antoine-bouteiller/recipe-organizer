@@ -35,7 +35,7 @@ interface ComboboxProps {
   addNewOptionLabel?: string
   addNewOptionOnClick?: (label: string) => void
   noResultsLabel?: string
-  emptyContent?: ReactNode
+  emptyContent?: (inputValue: string) => ReactNode
 }
 
 const Combobox = ({
@@ -99,7 +99,7 @@ interface ComboboxContentProps {
   setOpen: (open: boolean) => void
   addNewOptionLabel: string
   noResultsLabel: string
-  emptyContent?: ReactNode
+  emptyContent?: (inputValue: string) => ReactNode
 }
 
 const ComboboxContent = ({
@@ -125,7 +125,7 @@ const ComboboxContent = ({
         <ScrollArea>
           <CommandEmpty>
             {emptyContent ? (
-              emptyContent
+              emptyContent(inputValue)
             ) : addNewOptionOnClick ? (
               <Button
                 variant="ghost"

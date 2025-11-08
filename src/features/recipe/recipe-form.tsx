@@ -153,14 +153,22 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                emptyContent={
+                                                emptyContent={(inputValue) => (
                                                   <AddIngredient
                                                     key={ingredientKey}
+                                                    defaultValue={inputValue}
                                                     onSuccess={() => setIngredientKey((k) => k + 1)}
                                                   >
-                                                    <div />
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="w-full justify-start font-normal px-1.5"
+                                                    >
+                                                      <PlusIcon className="size-4" aria-hidden="true" />
+                                                      Nouvel ingrédient: {inputValue}
+                                                    </Button>
                                                   </AddIngredient>
-                                                }
+                                                )}
                                               />
                                             )}
                                           </AppField>
@@ -186,14 +194,22 @@ export const RecipeForm = withFieldGroup({
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
                                                 noResultsLabel="Aucune unité trouvée"
-                                                emptyContent={
+                                                emptyContent={(inputValue) => (
                                                   <AddUnit
                                                     key={unitKey}
+                                                    defaultValue={inputValue}
                                                     onSuccess={() => setUnitKey((k) => k + 1)}
                                                   >
-                                                    <div />
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="w-full justify-start font-normal px-1.5"
+                                                    >
+                                                      <PlusIcon className="size-4" aria-hidden="true" />
+                                                      Nouvelle unité: {inputValue}
+                                                    </Button>
                                                   </AddUnit>
-                                                }
+                                                )}
                                               />
                                             )}
                                           </AppField>
