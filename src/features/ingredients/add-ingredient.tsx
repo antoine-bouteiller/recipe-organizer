@@ -17,7 +17,7 @@ import { noop } from '@/lib/utils'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -27,19 +27,13 @@ const ingredientSchema = z.object({
 })
 
 interface AddIngredientProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  initialName?: string
+  defaultValue?: string
   onSuccess?: () => void
+  children?: ReactNode
 }
 
-export const AddIngredient = ({
-  open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
-  initialName,
-  onSuccess,
-}: AddIngredientProps = {}) => {
-  const [internalOpen, setInternalOpen] = useState(false)
+export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps = {}) => {
+  const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createIngredientOptions())
 
   const isControlled = controlledOpen !== undefined
@@ -51,7 +45,10 @@ export const AddIngredient = ({
       onDynamic: ingredientSchema,
     },
     validationLogic: revalidateLogic(),
-    defaultValues: ingredientDefaultValues,
+    defaultValues: {
+      ...ingredientDefaultValues,
+      name: defaultValue ?? ingredientDefaultValues.name,
+    },
     onSubmit: async (data) => {
       try {
         const parsedData = ingredientSchema.parse(data.value)
@@ -74,16 +71,11 @@ export const AddIngredient = ({
     },
   })
 
-  // Update form when initialName changes
-  useEffect(() => {
-    if (isOpen && initialName) {
-      form.setFieldValue('name', initialName)
-    }
-  }, [isOpen, initialName, form])
-
   return (
-    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      {!isControlled && (
+    <ResponsiveDialog key={defaultValue} open={isOpen} onOpenChange={setIsOpen}>
+      {children ? (
+        <ResponsiveDialogTrigger>{children}</ResponsiveDialogTrigger>
+      ) : (
         <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
           <PlusIcon />
         </ResponsiveDialogTrigger>
@@ -92,28 +84,30 @@ export const AddIngredient = ({
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter un ingrédient</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            form.handleSubmit()
-          }}
-          className="space-y-4"
-        >
-          <IngredientForm form={form} fields={ingredientFormFields} />
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={form.state.isSubmitting}
-            >
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Ajouter" />
-            </form.AppForm>
-          </div>
-        </form>
+        <div className="px-4 md:px-0">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              form.handleSubmit()
+            }}
+            className="space-y-4"
+          >
+            <IngredientForm form={form} fields={ingredientFormFields} />
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                disabled={form.state.isSubmitting}
+              >
+                Annuler
+              </Button>
+              <form.AppForm>
+                <form.FormSubmit label="Ajouter" />
+              </form.AppForm>
+            </div>
+          </form>
+        </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   )

@@ -75,28 +75,30 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Modifier l&apos;ingrédient</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            form.handleSubmit()
-          }}
-          className="space-y-4"
-        >
-          <IngredientForm form={form} fields={ingredientFormFields} ingredient={ingredient} />
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={form.state.isSubmitting}
-            >
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Mettre à jour" />
-            </form.AppForm>
-          </div>
-        </form>
+        <div className="px-4 md:px-0">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              form.handleSubmit()
+            }}
+            className="space-y-4"
+          >
+            <IngredientForm form={form} fields={ingredientFormFields} ingredient={ingredient} />
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+                disabled={form.state.isSubmitting}
+              >
+                Annuler
+              </Button>
+              <form.AppForm>
+                <form.FormSubmit label="Mettre à jour" />
+              </form.AppForm>
+            </div>
+          </form>
+        </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   )

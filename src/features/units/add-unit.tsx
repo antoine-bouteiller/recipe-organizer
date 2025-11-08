@@ -13,7 +13,7 @@ import { noop } from '@/lib/utils'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -25,19 +25,13 @@ const unitSchema = z.object({
 })
 
 interface AddUnitProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  initialSymbol?: string
+  defaultValue?: string
   onSuccess?: () => void
+  children?: ReactNode
 }
 
-export const AddUnit = ({
-  open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
-  initialSymbol,
-  onSuccess,
-}: AddUnitProps = {}) => {
-  const [internalOpen, setInternalOpen] = useState(false)
+export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps = {}) => {
+  const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createUnitOptions())
 
   const isControlled = controlledOpen !== undefined
@@ -49,7 +43,10 @@ export const AddUnit = ({
       onDynamic: unitSchema,
     },
     validationLogic: revalidateLogic(),
-    defaultValues: unitDefaultValues,
+    defaultValues: {
+      ...unitDefaultValues,
+      symbol: defaultValue ?? unitDefaultValues.symbol,
+    },
     onSubmit: async (data) => {
       try {
         const parsedData = unitSchema.parse(data.value)
@@ -76,16 +73,11 @@ export const AddUnit = ({
     },
   })
 
-  // Update form when initialSymbol changes
-  useEffect(() => {
-    if (isOpen && initialSymbol) {
-      form.setFieldValue('symbol', initialSymbol)
-    }
-  }, [isOpen, initialSymbol, form])
-
   return (
-    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      {!isControlled && (
+    <ResponsiveDialog key={defaultValue} open={isOpen} onOpenChange={setIsOpen}>
+      {children ? (
+        <ResponsiveDialogTrigger>{children}</ResponsiveDialogTrigger>
+      ) : (
         <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
           <PlusIcon />
         </ResponsiveDialogTrigger>
@@ -94,23 +86,25 @@ export const AddUnit = ({
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            form.handleSubmit()
-          }}
-          className="space-y-4"
-        >
-          <UnitForm form={form} fields={unitFormFields} />
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={form.state.isSubmitting}>
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Ajouter" />
-            </form.AppForm>
-          </div>
-        </form>
+        <div className="px-4 md:px-0">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              form.handleSubmit()
+            }}
+            className="space-y-4"
+          >
+            <UnitForm form={form} fields={unitFormFields} />
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={form.state.isSubmitting}>
+                Annuler
+              </Button>
+              <form.AppForm>
+                <form.FormSubmit label="Ajouter" />
+              </form.AppForm>
+            </div>
+          </form>
+        </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   )

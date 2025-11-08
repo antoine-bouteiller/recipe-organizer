@@ -47,9 +47,7 @@ export const RecipeForm = withFieldGroup({
     const { data: ingredients } = useQuery(getIngredientListOptions())
     const { data: units } = useQuery(getUnitsListOptions())
 
-    const [isCreateIngredientDialogOpen, setIsCreateIngredientDialogOpen] = useState(false)
     const [initialIngredientName, setInitialIngredientName] = useState<string | undefined>()
-    const [isCreateUnitDialogOpen, setIsCreateUnitDialogOpen] = useState(false)
     const [initialUnitSymbol, setInitialUnitSymbol] = useState<string | undefined>()
 
     const ingredientsOptions = useMemo(
@@ -158,7 +156,6 @@ export const RecipeForm = withFieldGroup({
                                                 searchPlaceholder="Rechercher un ingrédient"
                                                 addNewOptionOnClick={(value: string) => {
                                                   setInitialIngredientName(value)
-                                                  setIsCreateIngredientDialogOpen(true)
                                                 }}
                                               />
                                             )}
@@ -187,7 +184,6 @@ export const RecipeForm = withFieldGroup({
                                                 addNewOptionLabel="Nouvelle unité:"
                                                 addNewOptionOnClick={(value: string) => {
                                                   setInitialUnitSymbol(value)
-                                                  setIsCreateUnitDialogOpen(true)
                                                 }}
                                                 noResultsLabel="Aucune unité trouvée"
                                               />
@@ -270,17 +266,9 @@ export const RecipeForm = withFieldGroup({
           {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
         </AppField>
 
-        <AddIngredient
-          open={isCreateIngredientDialogOpen}
-          onOpenChange={setIsCreateIngredientDialogOpen}
-          initialName={initialIngredientName}
-        />
+        <AddIngredient defaultValue={initialIngredientName} />
 
-        <AddUnit
-          open={isCreateUnitDialogOpen}
-          onOpenChange={setIsCreateUnitDialogOpen}
-          initialSymbol={initialUnitSymbol}
-        />
+        <AddUnit defaultValue={initialUnitSymbol} />
       </>
     )
   },
