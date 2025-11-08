@@ -20,6 +20,10 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+const noop = () => {
+  // Intentionally empty - used as fallback for controlled components without onOpenChange
+}
+
 const ingredientSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   category: z.string().min(1, "La catégorie est requise"),
@@ -43,7 +47,7 @@ export const AddIngredient = ({
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
 
   const form = useAppForm({
     validators: {

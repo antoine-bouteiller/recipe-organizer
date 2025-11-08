@@ -16,6 +16,10 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+const noop = () => {
+  // Intentionally empty - used as fallback for controlled components without onOpenChange
+}
+
 const unitSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
   symbol: z.string().min(1, 'Le symbole est requis'),
@@ -41,7 +45,7 @@ export const AddUnit = ({
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
 
   const form = useAppForm({
     validators: {
