@@ -29,10 +29,10 @@ const ingredientSchema = z.object({
 interface AddIngredientProps {
   defaultValue?: string
   onSuccess?: () => void
-  children?: ReactNode
+  children: ReactNode
 }
 
-export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps = {}) => {
+export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createIngredientOptions())
 
@@ -73,13 +73,7 @@ export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredie
 
   return (
     <ResponsiveDialog key={defaultValue} open={isOpen} onOpenChange={setIsOpen}>
-      {children ? (
-        <ResponsiveDialogTrigger>{children}</ResponsiveDialogTrigger>
-      ) : (
-        <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
-          <PlusIcon />
-        </ResponsiveDialogTrigger>
-      )}
+      <ResponsiveDialogTrigger render={children} />
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter un ingrédient</ResponsiveDialogTitle>

@@ -9,14 +9,13 @@ import {
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { deleteIngredientOptions } from '@/features/ingredients/api/delete'
-import { TrashSimpleIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 
 interface DeleteIngredientProps {
   ingredientId: number
   ingredientName: string
-  children?: ReactNode
+  children: ReactNode
 }
 
 export const DeleteIngredient = ({
@@ -40,13 +39,7 @@ export const DeleteIngredient = ({
 
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      {children ? (
-        <ResponsiveDialogTrigger>{children}</ResponsiveDialogTrigger>
-      ) : (
-        <ResponsiveDialogTrigger render={<Button variant="destructive" size="sm" />}>
-          <TrashSimpleIcon />
-        </ResponsiveDialogTrigger>
-      )}
+      <ResponsiveDialogTrigger render={children} />
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Supprimer l&apos;ingrédient</ResponsiveDialogTitle>

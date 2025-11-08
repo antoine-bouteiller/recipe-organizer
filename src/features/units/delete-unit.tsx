@@ -9,14 +9,13 @@ import {
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { deleteUnitOptions } from '@/features/units/api/delete'
-import { TrashSimpleIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 
 interface DeleteUnitProps {
   unitId: number
   unitName: string
-  children?: ReactNode
+  children: ReactNode
 }
 
 export const DeleteUnit = ({ unitId, unitName, children }: DeleteUnitProps) => {
@@ -36,13 +35,7 @@ export const DeleteUnit = ({ unitId, unitName, children }: DeleteUnitProps) => {
 
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      {children ? (
-        <ResponsiveDialogTrigger>{children}</ResponsiveDialogTrigger>
-      ) : (
-        <ResponsiveDialogTrigger render={<Button variant="destructive" size="sm" />}>
-          <TrashSimpleIcon />
-        </ResponsiveDialogTrigger>
-      )}
+      <ResponsiveDialogTrigger render={children} />
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Supprimer l&apos;unité</ResponsiveDialogTitle>

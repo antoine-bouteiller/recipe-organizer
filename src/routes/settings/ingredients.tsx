@@ -14,7 +14,7 @@ import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
-import { ArrowLeftIcon, MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon, TrashSimpleIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
@@ -47,7 +47,11 @@ const IngredientsManagement = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Ingrédients</h1>
         </div>
-        <AddIngredient />
+        <AddIngredient>
+          <Button variant="default" size="sm">
+            <PlusIcon />
+          </Button>
+        </AddIngredient>
       </div>
 
       <div className="relative">

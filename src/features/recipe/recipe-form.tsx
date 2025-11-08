@@ -1,17 +1,17 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
+import { IngredientFormContent } from '@/features/ingredients/ingredient-form-content'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
-import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
+import { UnitFormContent } from '@/features/units/unit-form-content'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 
 export const recipeDefaultValues: RecipeFormInput = {
@@ -46,9 +46,6 @@ export const RecipeForm = withFieldGroup({
   render: function Render({ group, initialImage }) {
     const { data: ingredients } = useQuery(getIngredientListOptions())
     const { data: units } = useQuery(getUnitsListOptions())
-
-    const [initialIngredientName, setInitialIngredientName] = useState<string | undefined>()
-    const [initialUnitSymbol, setInitialUnitSymbol] = useState<string | undefined>()
 
     const ingredientsOptions = useMemo(
       () =>
@@ -151,12 +148,9 @@ export const RecipeForm = withFieldGroup({
                                               <ComboboxField
                                                 options={ingredientsOptions}
                                                 disabled={isSubmitting}
-                                                addNewOptionLabel="Nouvel ingrédient:"
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                addNewOptionOnClick={(value: string) => {
-                                                  setInitialIngredientName(value)
-                                                }}
+                                                emptyContent={<IngredientFormContent />}
                                               />
                                             )}
                                           </AppField>
@@ -181,10 +175,7 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
-                                                addNewOptionLabel="Nouvelle unité:"
-                                                addNewOptionOnClick={(value: string) => {
-                                                  setInitialUnitSymbol(value)
-                                                }}
+                                                emptyContent={<UnitFormContent />}
                                                 noResultsLabel="Aucune unité trouvée"
                                               />
                                             )}
@@ -265,10 +256,6 @@ export const RecipeForm = withFieldGroup({
         <AppField name="steps">
           {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
         </AppField>
-
-        <AddIngredient defaultValue={initialIngredientName} />
-
-        <AddUnit defaultValue={initialUnitSymbol} />
       </>
     )
   },

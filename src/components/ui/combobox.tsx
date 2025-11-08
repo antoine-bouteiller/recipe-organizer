@@ -16,7 +16,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { CaretDownIcon, CheckIcon, PlusIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 
 interface Option {
   label: string
@@ -35,6 +35,7 @@ interface ComboboxProps {
   addNewOptionLabel?: string
   addNewOptionOnClick?: (label: string) => void
   noResultsLabel?: string
+  emptyContent?: ReactNode
 }
 
 const Combobox = ({
@@ -47,6 +48,7 @@ const Combobox = ({
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
+  emptyContent,
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
@@ -81,6 +83,7 @@ const Combobox = ({
           searchPlaceholder={searchPlaceholder}
           addNewOptionLabel={addNewOptionLabel}
           noResultsLabel={noResultsLabel}
+          emptyContent={emptyContent}
         />
       </ResponsivePopoverContent>
     </ResponsivePopover>
@@ -96,6 +99,7 @@ interface ComboboxContentProps {
   setOpen: (open: boolean) => void
   addNewOptionLabel: string
   noResultsLabel: string
+  emptyContent?: ReactNode
 }
 
 const ComboboxContent = ({
@@ -107,6 +111,7 @@ const ComboboxContent = ({
   setOpen,
   addNewOptionLabel,
   noResultsLabel,
+  emptyContent,
 }: ComboboxContentProps) => {
   const [inputValue, setInputValue] = useState('')
   return (
@@ -119,7 +124,9 @@ const ComboboxContent = ({
       <CommandList>
         <ScrollArea>
           <CommandEmpty>
-            {addNewOptionOnClick ? (
+            {emptyContent ? (
+              emptyContent
+            ) : addNewOptionOnClick ? (
               <Button
                 variant="ghost"
                 size="sm"
