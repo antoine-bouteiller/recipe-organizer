@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -6,6 +7,7 @@ import {
   ItemContent,
   ItemDescription,
   ItemGroup,
+  ItemSeparator,
   ItemTitle,
 } from '@/components/ui/item'
 import { AddIngredient } from '@/features/ingredients/add-ingredient'
@@ -66,18 +68,21 @@ const IngredientsManagement = () => {
             : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
         </p>
       ) : (
-        <ItemGroup className="gap-4">
-          {filteredIngredients.map((ingredient) => (
-            <Item key={ingredient.id} variant="outline">
-              <ItemContent>
-                <ItemTitle>{ingredient.name}</ItemTitle>
-                <ItemDescription>Catégorie: {ingredient.category}</ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <EditIngredient ingredient={ingredient} />
-                <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
-              </ItemActions>
-            </Item>
+        <ItemGroup>
+          {filteredIngredients.map((ingredient, index) => (
+            <React.Fragment key={ingredient.id}>
+              <Item>
+                <ItemContent>
+                  <ItemTitle>{ingredient.name}</ItemTitle>
+                  <ItemDescription>Catégorie: {ingredient.category}</ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <EditIngredient ingredient={ingredient} />
+                  <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
+                </ItemActions>
+              </Item>
+              {index !== filteredIngredients.length - 1 && <ItemSeparator />}
+            </React.Fragment>
           ))}
         </ItemGroup>
       )}

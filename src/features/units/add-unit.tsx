@@ -9,6 +9,7 @@ import {
 import { createUnitOptions } from '@/features/units/api/add-one'
 import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
+import { noop } from '@/lib/utils'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
@@ -41,7 +42,7 @@ export const AddUnit = ({
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
 
   const form = useAppForm({
     validators: {

@@ -218,6 +218,24 @@ The `AppField` component provides these field types:
 
 ## Code Quality Standards
 
+### Code Factorization and DRY Principles
+
+**CRITICAL: Always prefer code factorization over duplication.**
+
+When writing code, follow these principles:
+- **No code duplication**: If you find yourself writing the same code twice, extract it into a shared utility, hook, or component
+- **Centralize utilities**: Common helper functions should be placed in `src/lib/utils.ts` or appropriate feature-specific utility files
+- **Reuse components**: Extract common UI patterns into reusable components in `src/components/`
+- **Share types**: Define types once in `src/types/` or co-located with their primary usage, then import elsewhere
+- **Extract hooks**: Shared logic should be extracted into custom hooks in `src/hooks/`
+
+**Before adding new code, always check if:**
+1. A similar function/component already exists that you can reuse or extend
+2. The code you're writing appears elsewhere and should be extracted
+3. A utility function would make the code more maintainable
+
+**Example**: Instead of defining the same `noop` function in multiple files, it should be defined once in `src/lib/utils.ts` and imported where needed.
+
 ### Linting Rules (oxlint)
 
 **IMPORTANT** Always lint your code before committing using `bun lint`.

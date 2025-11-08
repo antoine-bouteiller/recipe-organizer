@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -6,6 +7,7 @@ import {
   ItemContent,
   ItemDescription,
   ItemGroup,
+  ItemSeparator,
   ItemTitle,
 } from '@/components/ui/item'
 import { AddUnit } from '@/features/units/add-unit'
@@ -66,28 +68,31 @@ const UnitsManagement = () => {
             : 'Aucune unité trouvée. Ajoutez-en une pour commencer.'}
         </p>
       ) : (
-        <ItemGroup className="gap-4">
-          {filteredUnits.map((unit) => (
-            <Item key={unit.id} variant="outline">
-              <ItemContent>
-                <ItemTitle>
-                  {unit.name} ({unit.symbol})
-                </ItemTitle>
-                <ItemDescription>
-                  {unit.parentId && unit.parent && unit.factor ? (
-                    <>
-                      1 {unit.parent.symbol} = {unit.factor} {unit.symbol}
-                    </>
-                  ) : (
-                    'Unité de base'
-                  )}
-                </ItemDescription>
-              </ItemContent>
-              <ItemActions>
-                <EditUnit unit={unit} />
-                <DeleteUnit unitId={unit.id} unitName={unit.name} />
-              </ItemActions>
-            </Item>
+        <ItemGroup>
+          {filteredUnits.map((unit, index) => (
+            <React.Fragment key={unit.id}>
+              <Item>
+                <ItemContent>
+                  <ItemTitle>
+                    {unit.name} ({unit.symbol})
+                  </ItemTitle>
+                  <ItemDescription>
+                    {unit.parentId && unit.parent && unit.factor ? (
+                      <>
+                        1 {unit.parent.symbol} = {unit.factor} {unit.symbol}
+                      </>
+                    ) : (
+                      'Unité de base'
+                    )}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <EditUnit unit={unit} />
+                  <DeleteUnit unitId={unit.id} unitName={unit.name} />
+                </ItemActions>
+              </Item>
+              {index !== filteredUnits.length - 1 && <ItemSeparator />}
+            </React.Fragment>
           ))}
         </ItemGroup>
       )}

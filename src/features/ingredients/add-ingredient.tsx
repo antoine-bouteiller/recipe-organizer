@@ -13,6 +13,7 @@ import {
   IngredientForm,
 } from '@/features/ingredients/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
+import { noop } from '@/lib/utils'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
@@ -43,7 +44,7 @@ export const AddIngredient = ({
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? (() => {})) : setInternalOpen
+  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
 
   const form = useAppForm({
     validators: {
