@@ -9,16 +9,13 @@ import {
 import { createUnitOptions } from '@/features/units/api/add-one'
 import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
+import { noop } from '@/lib/utils'
 import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { z } from 'zod'
-
-const noop = () => {
-  // Intentionally empty - used as fallback for controlled components without onOpenChange
-}
 
 const unitSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
