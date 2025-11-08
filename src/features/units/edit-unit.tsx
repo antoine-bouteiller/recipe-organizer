@@ -8,21 +8,13 @@ import {
 } from '@/components/ui/responsive-dialog'
 import { type Unit } from '@/features/units/api/get-all'
 import { updateUnitOptions } from '@/features/units/api/update'
-import { type UnitFormInput, unitFormFields, UnitForm } from '@/features/units/unit-form'
+import { type UnitFormInput, unitFormFields, unitFormSchema, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-const unitSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  symbol: z.string().min(1, 'Le symbole est requis'),
-  parentId: z.string().nullish(),
-  factor: z.number().positive('Le facteur doit être positif').nullish(),
-})
 
 interface EditUnitProps {
   unit: Unit
@@ -41,13 +33,13 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
 
   const form = useAppForm({
     validators: {
-      onDynamic: unitSchema,
+      onDynamic: unitFormSchema,
     },
     validationLogic: revalidateLogic(),
     defaultValues: initialValues,
     onSubmit: async (data) => {
       try {
-        const parsedData = unitSchema.parse(data.value)
+        const parsedData = unitFormSchema.parse(data.value)
 
         await updateMutation.mutateAsync({
           data: {

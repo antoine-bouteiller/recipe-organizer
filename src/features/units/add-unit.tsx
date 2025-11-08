@@ -7,10 +7,8 @@ import {
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { createUnitOptions } from '@/features/units/api/add-one'
-import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
+import { unitDefaultValues, unitFormFields, unitFormSchema, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
-import { noop } from '@/lib/utils'
-import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
@@ -26,13 +24,9 @@ export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => 
   const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createUnitOptions())
 
-  const isControlled = controlledOpen !== undefined
-  const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
-
   const form = useAppForm({
     validators: {
-      onDynamic: unitSchema,
+      onDynamic: unitFormSchema,
     },
     validationLogic: revalidateLogic(),
     defaultValues: {
@@ -41,7 +35,7 @@ export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => 
     },
     onSubmit: async (data) => {
       try {
-        const parsedData = unitSchema.parse(data.value)
+        const parsedData = unitFormSchema.parse(data.value)
 
         await createMutation.mutateAsync({
           data: {

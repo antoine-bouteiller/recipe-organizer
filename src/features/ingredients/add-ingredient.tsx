@@ -6,15 +6,13 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { createIngredientOptions } from '@/features/ingredients/api/add-one'
+import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/add-one'
 import {
   ingredientDefaultValues,
   ingredientFormFields,
   IngredientForm,
 } from '@/features/ingredients/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
-import { noop } from '@/lib/utils'
-import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
@@ -29,10 +27,6 @@ interface AddIngredientProps {
 export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createIngredientOptions())
-
-  const isControlled = controlledOpen !== undefined
-  const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
 
   const form = useAppForm({
     validators: {

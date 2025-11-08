@@ -6,7 +6,8 @@ import { useMemo } from 'react'
 import { z } from 'zod'
 import { getUnitsListOptions } from './api/get-all'
 
-export const unitSchema = z.object({
+// Form-specific validation schema (accepts string for parentId from combobox)
+export const unitFormSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
   symbol: z.string().min(1, 'Le symbole est requis'),
   parentId: z.string().nullish(),

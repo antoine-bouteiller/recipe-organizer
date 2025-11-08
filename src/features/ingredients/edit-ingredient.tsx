@@ -6,6 +6,7 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
+import { ingredientSchema } from '@/features/ingredients/api/add-one'
 import { updateIngredientOptions } from '@/features/ingredients/api/update'
 import {
   type IngredientFormInput,
@@ -19,12 +20,6 @@ import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-const ingredientSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  category: z.string().min(1, "La catégorie est requise"),
-})
 
 interface EditIngredientProps {
   ingredient: Ingredient
