@@ -18,13 +18,6 @@ import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
-const ingredientSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  category: z.string().min(1, "La catégorie est requise"),
-})
 
 interface AddIngredientProps {
   defaultValue?: string
@@ -34,7 +27,6 @@ interface AddIngredientProps {
 
 export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const createMutation = useMutation(createIngredientOptions())
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen

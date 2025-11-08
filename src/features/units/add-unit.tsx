@@ -14,15 +14,6 @@ import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
-import { toast } from 'sonner'
-import { z } from 'zod'
-
-const unitSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  symbol: z.string().min(1, 'Le symbole est requis'),
-  parentId: z.string().nullish(),
-  factor: z.number().positive('Le facteur doit être positif').nullish(),
-})
 
 interface AddUnitProps {
   defaultValue?: string
@@ -32,7 +23,6 @@ interface AddUnitProps {
 
 export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const createMutation = useMutation(createUnitOptions())
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen

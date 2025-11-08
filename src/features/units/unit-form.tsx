@@ -3,7 +3,15 @@ import { withFieldGroup } from '@/hooks/use-app-form'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import { z } from 'zod'
 import { getUnitsListOptions } from './api/get-all'
+
+export const unitSchema = z.object({
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  symbol: z.string().min(1, 'Le symbole est requis'),
+  parentId: z.string().nullish(),
+  factor: z.number().positive('Le facteur doit être positif').nullish(),
+})
 
 export interface UnitFormInput {
   name: string
