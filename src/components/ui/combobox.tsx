@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/responsive-popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { CaretDownIcon, CheckIcon, PlusIcon } from '@phosphor-icons/react'
+import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 
 interface Option {
@@ -32,8 +32,6 @@ interface ComboboxProps {
   value?: string
   options: Option[]
   error?: string
-  addNewOptionLabel?: string
-  addNewOptionOnClick?: (label: string) => void
   noResultsLabel?: string
   emptyContent?: (inputValue: string) => ReactNode
 }
@@ -43,8 +41,6 @@ const Combobox = ({
   value,
   onChange,
   error,
-  addNewOptionOnClick,
-  addNewOptionLabel = 'Créer une nouvelle option :',
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
@@ -79,9 +75,7 @@ const Combobox = ({
           options={options}
           value={value}
           onChange={onChange}
-          addNewOptionOnClick={addNewOptionOnClick}
           searchPlaceholder={searchPlaceholder}
-          addNewOptionLabel={addNewOptionLabel}
           noResultsLabel={noResultsLabel}
           emptyContent={emptyContent}
         />
@@ -94,10 +88,8 @@ interface ComboboxContentProps {
   options: Option[]
   value?: string
   onChange?: (option: Option) => void
-  addNewOptionOnClick?: (value: string) => void
   searchPlaceholder: string
   setOpen: (open: boolean) => void
-  addNewOptionLabel: string
   noResultsLabel: string
   emptyContent?: (inputValue: string) => ReactNode
 }
@@ -106,10 +98,8 @@ const ComboboxContent = ({
   options,
   value,
   onChange,
-  addNewOptionOnClick,
   searchPlaceholder,
   setOpen,
-  addNewOptionLabel,
   noResultsLabel,
   emptyContent,
 }: ComboboxContentProps) => {
@@ -123,23 +113,7 @@ const ComboboxContent = ({
       />
       <CommandList>
         <ScrollArea>
-          <CommandEmpty>
-            {emptyContent ? (
-              emptyContent(inputValue)
-            ) : addNewOptionOnClick ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start font-normal px-1.5"
-                onClick={() => addNewOptionOnClick(inputValue)}
-              >
-                <PlusIcon className="size-4" aria-hidden="true" />
-                {addNewOptionLabel} {inputValue}
-              </Button>
-            ) : (
-              noResultsLabel
-            )}
-          </CommandEmpty>
+          <CommandEmpty>{emptyContent ? emptyContent(inputValue) : noResultsLabel}</CommandEmpty>
           <CommandGroup>
             {options.map((option) => (
               <CommandItem

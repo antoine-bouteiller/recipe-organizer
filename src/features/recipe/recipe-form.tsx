@@ -11,7 +11,7 @@ import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 
 export const recipeDefaultValues: RecipeFormInput = {
@@ -46,9 +46,6 @@ export const RecipeForm = withFieldGroup({
   render: function Render({ group, initialImage }) {
     const { data: ingredients } = useQuery(getIngredientListOptions())
     const { data: units } = useQuery(getUnitsListOptions())
-
-    const [ingredientKey, setIngredientKey] = useState(0)
-    const [unitKey, setUnitKey] = useState(0)
 
     const ingredientsOptions = useMemo(
       () =>
@@ -155,9 +152,8 @@ export const RecipeForm = withFieldGroup({
                                                 searchPlaceholder="Rechercher un ingrédient"
                                                 emptyContent={(inputValue) => (
                                                   <AddIngredient
-                                                    key={ingredientKey}
+                                                    key={inputValue}
                                                     defaultValue={inputValue}
-                                                    onSuccess={() => setIngredientKey((k) => k + 1)}
                                                   >
                                                     <Button
                                                       variant="ghost"
@@ -195,11 +191,7 @@ export const RecipeForm = withFieldGroup({
                                                 searchPlaceholder="Rechercher une unité"
                                                 noResultsLabel="Aucune unité trouvée"
                                                 emptyContent={(inputValue) => (
-                                                  <AddUnit
-                                                    key={unitKey}
-                                                    defaultValue={inputValue}
-                                                    onSuccess={() => setUnitKey((k) => k + 1)}
-                                                  >
+                                                  <AddUnit key={inputValue} defaultValue={inputValue}>
                                                     <Button
                                                       variant="ghost"
                                                       size="sm"
