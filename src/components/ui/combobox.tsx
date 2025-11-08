@@ -33,7 +33,7 @@ interface ComboboxProps {
   options: Option[]
   error?: string
   noResultsLabel?: string
-  emptyContent?: (inputValue: string) => ReactNode
+  addNew?: (inputValue: string) => ReactNode
 }
 
 const Combobox = ({
@@ -44,7 +44,7 @@ const Combobox = ({
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
-  emptyContent,
+  addNew,
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
@@ -77,7 +77,7 @@ const Combobox = ({
           onChange={onChange}
           searchPlaceholder={searchPlaceholder}
           noResultsLabel={noResultsLabel}
-          emptyContent={emptyContent}
+          addNew={addNew}
         />
       </ResponsivePopoverContent>
     </ResponsivePopover>
@@ -91,7 +91,7 @@ interface ComboboxContentProps {
   searchPlaceholder: string
   setOpen: (open: boolean) => void
   noResultsLabel: string
-  emptyContent?: (inputValue: string) => ReactNode
+  addNew?: (inputValue: string) => ReactNode
 }
 
 const ComboboxContent = ({
@@ -101,7 +101,7 @@ const ComboboxContent = ({
   searchPlaceholder,
   setOpen,
   noResultsLabel,
-  emptyContent,
+  addNew,
 }: ComboboxContentProps) => {
   const [inputValue, setInputValue] = useState('')
   return (
@@ -113,7 +113,7 @@ const ComboboxContent = ({
       />
       <CommandList>
         <ScrollArea>
-          <CommandEmpty>{emptyContent ? emptyContent(inputValue) : noResultsLabel}</CommandEmpty>
+          <CommandEmpty>{addNew ? addNew(inputValue) : noResultsLabel}</CommandEmpty>
           <CommandGroup>
             {options.map((option) => (
               <CommandItem
@@ -128,6 +128,7 @@ const ComboboxContent = ({
                 {value === option.value && <CheckIcon />}
               </CommandItem>
             ))}
+            {addNew && addNew(inputValue)}
           </CommandGroup>
         </ScrollArea>
       </CommandList>

@@ -150,7 +150,7 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                emptyContent={(inputValue) => (
+                                                addNew={(inputValue) => (
                                                   <AddIngredient
                                                     key={inputValue}
                                                     defaultValue={inputValue}
@@ -190,7 +190,7 @@ export const RecipeForm = withFieldGroup({
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
                                                 noResultsLabel="Aucune unité trouvée"
-                                                emptyContent={(inputValue) => (
+                                                addNew={(inputValue) => (
                                                   <AddUnit key={inputValue} defaultValue={inputValue}>
                                                     <Button
                                                       variant="ghost"
