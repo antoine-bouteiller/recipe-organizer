@@ -1,17 +1,17 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import { IngredientFormContent } from '@/features/ingredients/ingredient-form-content'
 import AddExistingRecipe from '@/features/recipe/add-existing-recipe'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
+import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
-import { UnitFormContent } from '@/features/units/unit-form-content'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 
 export const recipeDefaultValues: RecipeFormInput = {
@@ -46,6 +46,9 @@ export const RecipeForm = withFieldGroup({
   render: function Render({ group, initialImage }) {
     const { data: ingredients } = useQuery(getIngredientListOptions())
     const { data: units } = useQuery(getUnitsListOptions())
+
+    const [ingredientKey, setIngredientKey] = useState(0)
+    const [unitKey, setUnitKey] = useState(0)
 
     const ingredientsOptions = useMemo(
       () =>
@@ -150,7 +153,14 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                emptyContent={<IngredientFormContent />}
+                                                emptyContent={
+                                                  <AddIngredient
+                                                    key={ingredientKey}
+                                                    onSuccess={() => setIngredientKey((k) => k + 1)}
+                                                  >
+                                                    <div />
+                                                  </AddIngredient>
+                                                }
                                               />
                                             )}
                                           </AppField>
@@ -175,8 +185,15 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
-                                                emptyContent={<UnitFormContent />}
                                                 noResultsLabel="Aucune unité trouvée"
+                                                emptyContent={
+                                                  <AddUnit
+                                                    key={unitKey}
+                                                    onSuccess={() => setUnitKey((k) => k + 1)}
+                                                  >
+                                                    <div />
+                                                  </AddUnit>
+                                                }
                                               />
                                             )}
                                           </AppField>

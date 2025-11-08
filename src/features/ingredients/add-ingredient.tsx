@@ -18,6 +18,7 @@ import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
+import { toast } from 'sonner'
 
 interface AddIngredientProps {
   defaultValue?: string
@@ -27,6 +28,7 @@ interface AddIngredientProps {
 
 export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
+  const createMutation = useMutation(createIngredientOptions())
 
   const isControlled = controlledOpen !== undefined
   const isOpen = isControlled ? controlledOpen : internalOpen
