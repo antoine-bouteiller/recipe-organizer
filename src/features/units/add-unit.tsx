@@ -11,8 +11,7 @@ import { unitDefaultValues, unitFormFields, unitFormSchema, UnitForm } from '@/f
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import type React from 'react'
-import { useState } from 'react'
+import { useState, type JSX } from 'react'
 import { toast } from 'sonner'
 
 interface AddUnitProps {
