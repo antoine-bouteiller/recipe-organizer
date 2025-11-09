@@ -15,7 +15,7 @@ import { useState, type ReactElement } from 'react'
 interface DeleteUnitProps {
   unitId: number
   unitName: string
-  children: ReactElement<any>
+  children: ReactElement<Record<string, unknown>>
 }
 
 export const DeleteUnit = ({ unitId, unitName, children }: DeleteUnitProps) => {

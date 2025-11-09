@@ -15,7 +15,7 @@ import { useState, type ReactElement } from 'react'
 interface DeleteIngredientProps {
   ingredientId: number
   ingredientName: string
-  children: ReactElement<any>
+  children: ReactElement<Record<string, unknown>>
 }
 
 export const DeleteIngredient = ({
