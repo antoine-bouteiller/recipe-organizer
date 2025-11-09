@@ -21,7 +21,7 @@ import { toast } from 'sonner'
 interface AddIngredientProps {
   defaultValue?: string
   onSuccess?: () => void
-  children: ReactElement
+  children: ReactElement<any>
 }
 
 export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps) => {

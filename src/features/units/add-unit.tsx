@@ -17,7 +17,7 @@ import { toast } from 'sonner'
 interface AddUnitProps {
   defaultValue?: string
   onSuccess?: () => void
-  children: ReactElement
+  children: ReactElement<any>
 }
 
 export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => {
