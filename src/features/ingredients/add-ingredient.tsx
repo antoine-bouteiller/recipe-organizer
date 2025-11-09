@@ -15,13 +15,13 @@ import {
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type ReactNode } from 'react'
+import { useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
 
 interface AddIngredientProps {
   defaultValue?: string
   onSuccess?: () => void
-  children: ReactNode
+  children: ReactElement
 }
 
 export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredientProps) => {
