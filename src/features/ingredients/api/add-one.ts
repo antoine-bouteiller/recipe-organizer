@@ -6,8 +6,8 @@ import { z } from 'zod'
 import { ingredientsQueryKeys } from './query-keys'
 
 const ingredientSchema = z.object({
-  name: z.string().min(2),
-  category: z.string().optional(),
+  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  category: z.string().min(1, "La catégorie est requise"),
 })
 
 const createIngredient = createServerFn()
@@ -17,7 +17,7 @@ const createIngredient = createServerFn()
 
     await getDb().insert(ingredient).values({
       name,
-      category: category || 'supermarket',
+      category,
     })
   })
 
@@ -29,4 +29,4 @@ const createIngredientOptions = () =>
     },
   })
 
-export { createIngredientOptions }
+export { createIngredientOptions, ingredientSchema }

@@ -11,7 +11,7 @@ import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 
 export const recipeDefaultValues: RecipeFormInput = {
@@ -46,11 +46,6 @@ export const RecipeForm = withFieldGroup({
   render: function Render({ group, initialImage }) {
     const { data: ingredients } = useQuery(getIngredientListOptions())
     const { data: units } = useQuery(getUnitsListOptions())
-
-    const [isCreateIngredientDialogOpen, setIsCreateIngredientDialogOpen] = useState(false)
-    const [initialIngredientName, setInitialIngredientName] = useState<string | undefined>()
-    const [isCreateUnitDialogOpen, setIsCreateUnitDialogOpen] = useState(false)
-    const [initialUnitSymbol, setInitialUnitSymbol] = useState<string | undefined>()
 
     const ingredientsOptions = useMemo(
       () =>
@@ -153,13 +148,23 @@ export const RecipeForm = withFieldGroup({
                                               <ComboboxField
                                                 options={ingredientsOptions}
                                                 disabled={isSubmitting}
-                                                addNewOptionLabel="Nouvel ingrédient:"
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                addNewOptionOnClick={(value: string) => {
-                                                  setInitialIngredientName(value)
-                                                  setIsCreateIngredientDialogOpen(true)
-                                                }}
+                                                addNew={(inputValue) => (
+                                                  <AddIngredient
+                                                    key={inputValue}
+                                                    defaultValue={inputValue}
+                                                  >
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="w-full justify-start font-normal px-1.5"
+                                                    >
+                                                      <PlusIcon className="size-4" aria-hidden="true" />
+                                                      Nouvel ingrédient: {inputValue}
+                                                    </Button>
+                                                  </AddIngredient>
+                                                )}
                                               />
                                             )}
                                           </AppField>
@@ -184,12 +189,19 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
-                                                addNewOptionLabel="Nouvelle unité:"
-                                                addNewOptionOnClick={(value: string) => {
-                                                  setInitialUnitSymbol(value)
-                                                  setIsCreateUnitDialogOpen(true)
-                                                }}
                                                 noResultsLabel="Aucune unité trouvée"
+                                                addNew={(inputValue) => (
+                                                  <AddUnit key={inputValue} defaultValue={inputValue}>
+                                                    <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      className="w-full justify-start font-normal px-1.5"
+                                                    >
+                                                      <PlusIcon className="size-4" aria-hidden="true" />
+                                                      Nouvelle unité: {inputValue}
+                                                    </Button>
+                                                  </AddUnit>
+                                                )}
                                               />
                                             )}
                                           </AppField>
@@ -269,18 +281,6 @@ export const RecipeForm = withFieldGroup({
         <AppField name="steps">
           {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
         </AppField>
-
-        <AddIngredient
-          open={isCreateIngredientDialogOpen}
-          onOpenChange={setIsCreateIngredientDialogOpen}
-          initialName={initialIngredientName}
-        />
-
-        <AddUnit
-          open={isCreateUnitDialogOpen}
-          onOpenChange={setIsCreateUnitDialogOpen}
-          initialSymbol={initialUnitSymbol}
-        />
       </>
     )
   },

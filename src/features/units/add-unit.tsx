@@ -7,52 +7,35 @@ import {
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { createUnitOptions } from '@/features/units/api/add-one'
-import { unitDefaultValues, unitFormFields, UnitForm } from '@/features/units/unit-form'
+import { unitDefaultValues, unitFormFields, unitFormSchema, UnitForm } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
-import { noop } from '@/lib/utils'
-import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState, type JSX } from 'react'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-const unitSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  symbol: z.string().min(1, 'Le symbole est requis'),
-  parentId: z.string().nullish(),
-  factor: z.number().positive('Le facteur doit être positif').nullish(),
-})
 
 interface AddUnitProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  initialSymbol?: string
+  defaultValue?: string
   onSuccess?: () => void
+  children: JSX.Element
 }
 
-export const AddUnit = ({
-  open: controlledOpen,
-  onOpenChange: controlledOnOpenChange,
-  initialSymbol,
-  onSuccess,
-}: AddUnitProps = {}) => {
-  const [internalOpen, setInternalOpen] = useState(false)
+export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => {
+  const [isOpen, setIsOpen] = useState(false)
   const createMutation = useMutation(createUnitOptions())
-
-  const isControlled = controlledOpen !== undefined
-  const isOpen = isControlled ? controlledOpen : internalOpen
-  const setIsOpen = isControlled ? (controlledOnOpenChange ?? noop) : setInternalOpen
 
   const form = useAppForm({
     validators: {
-      onDynamic: unitSchema,
+      onDynamic: unitFormSchema,
     },
     validationLogic: revalidateLogic(),
-    defaultValues: unitDefaultValues,
+    defaultValues: {
+      ...unitDefaultValues,
+      symbol: defaultValue ?? unitDefaultValues.symbol,
+    },
     onSubmit: async (data) => {
       try {
-        const parsedData = unitSchema.parse(data.value)
+        const parsedData = unitFormSchema.parse(data.value)
 
         await createMutation.mutateAsync({
           data: {
@@ -76,41 +59,32 @@ export const AddUnit = ({
     },
   })
 
-  // Update form when initialSymbol changes
-  useEffect(() => {
-    if (isOpen && initialSymbol) {
-      form.setFieldValue('symbol', initialSymbol)
-    }
-  }, [isOpen, initialSymbol, form])
-
   return (
-    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      {!isControlled && (
-        <ResponsiveDialogTrigger render={<Button variant="default" size="sm" />}>
-          <PlusIcon />
-        </ResponsiveDialogTrigger>
-      )}
+    <ResponsiveDialog key={defaultValue} open={isOpen} onOpenChange={setIsOpen}>
+      <ResponsiveDialogTrigger render={children} />
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            form.handleSubmit()
-          }}
-          className="space-y-4"
-        >
-          <UnitForm form={form} fields={unitFormFields} />
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={form.state.isSubmitting}>
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Ajouter" />
-            </form.AppForm>
-          </div>
-        </form>
+        <div className="px-4 md:px-0">
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              form.handleSubmit()
+            }}
+            className="space-y-4"
+          >
+            <UnitForm form={form} fields={unitFormFields} />
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={form.state.isSubmitting}>
+                Annuler
+              </Button>
+              <form.AppForm>
+                <form.FormSubmit label="Ajouter" />
+              </form.AppForm>
+            </div>
+          </form>
+        </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
   )

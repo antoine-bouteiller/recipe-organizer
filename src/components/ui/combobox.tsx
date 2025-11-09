@@ -15,8 +15,8 @@ import {
 } from '@/components/ui/responsive-popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { CaretDownIcon, CheckIcon, PlusIcon } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
+import { type ReactNode, useState } from 'react'
 
 interface Option {
   label: string
@@ -32,9 +32,8 @@ interface ComboboxProps {
   value?: string
   options: Option[]
   error?: string
-  addNewOptionLabel?: string
-  addNewOptionOnClick?: (label: string) => void
   noResultsLabel?: string
+  addNew?: (inputValue: string) => ReactNode
 }
 
 const Combobox = ({
@@ -42,11 +41,10 @@ const Combobox = ({
   value,
   onChange,
   error,
-  addNewOptionOnClick,
-  addNewOptionLabel = 'Créer une nouvelle option :',
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
+  addNew,
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
@@ -77,10 +75,9 @@ const Combobox = ({
           options={options}
           value={value}
           onChange={onChange}
-          addNewOptionOnClick={addNewOptionOnClick}
           searchPlaceholder={searchPlaceholder}
-          addNewOptionLabel={addNewOptionLabel}
           noResultsLabel={noResultsLabel}
+          addNew={addNew}
         />
       </ResponsivePopoverContent>
     </ResponsivePopover>
@@ -91,22 +88,20 @@ interface ComboboxContentProps {
   options: Option[]
   value?: string
   onChange?: (option: Option) => void
-  addNewOptionOnClick?: (value: string) => void
   searchPlaceholder: string
   setOpen: (open: boolean) => void
-  addNewOptionLabel: string
   noResultsLabel: string
+  addNew?: (inputValue: string) => ReactNode
 }
 
 const ComboboxContent = ({
   options,
   value,
   onChange,
-  addNewOptionOnClick,
   searchPlaceholder,
   setOpen,
-  addNewOptionLabel,
   noResultsLabel,
+  addNew,
 }: ComboboxContentProps) => {
   const [inputValue, setInputValue] = useState('')
   return (
@@ -118,21 +113,7 @@ const ComboboxContent = ({
       />
       <CommandList>
         <ScrollArea>
-          <CommandEmpty>
-            {addNewOptionOnClick ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start font-normal px-1.5"
-                onClick={() => addNewOptionOnClick(inputValue)}
-              >
-                <PlusIcon className="size-4" aria-hidden="true" />
-                {addNewOptionLabel} {inputValue}
-              </Button>
-            ) : (
-              noResultsLabel
-            )}
-          </CommandEmpty>
+          <CommandEmpty>{addNew ? addNew(inputValue) : noResultsLabel}</CommandEmpty>
           <CommandGroup>
             {options.map((option) => (
               <CommandItem
@@ -147,6 +128,7 @@ const ComboboxContent = ({
                 {value === option.value && <CheckIcon />}
               </CommandItem>
             ))}
+            {addNew?.(inputValue)}
           </CommandGroup>
         </ScrollArea>
       </CommandList>

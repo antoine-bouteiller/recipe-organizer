@@ -2,6 +2,8 @@ import type { Ingredient } from '@/types/ingredient'
 import { withFieldGroup } from '@/hooks/use-app-form'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 
+export { ingredientSchema } from './api/add-one'
+
 export interface IngredientFormInput {
   name: string
   category: string

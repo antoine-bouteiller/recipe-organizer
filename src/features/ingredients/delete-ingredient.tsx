@@ -1,24 +1,28 @@
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogContent,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from '@/components/ui/responsive-dialog'
 import { deleteIngredientOptions } from '@/features/ingredients/api/delete'
-import { TrashSimpleIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, type JSX } from 'react'
 
 interface DeleteIngredientProps {
   ingredientId: number
   ingredientName: string
+  children: JSX.Element
 }
 
-export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredientProps) => {
+export const DeleteIngredient = ({
+  ingredientId,
+  ingredientName,
+  children,
+}: DeleteIngredientProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const deleteMutation = useMutation(deleteIngredientOptions())
 
@@ -34,27 +38,25 @@ export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredi
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger render={<Button variant="destructive" size="sm" />}>
-        <TrashSimpleIcon />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Supprimer l&apos;ingrédient</DialogTitle>
-          <DialogDescription>
-            Êtes-vous sûr de vouloir supprimer &quot;{ingredientName}&quot; ? Cette action est
-            irréversible.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+    <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
+      <ResponsiveDialogTrigger render={children} />
+      <ResponsiveDialogContent>
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Supprimer l&apos;ingrédient</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
+        <div className="px-4 md:px-0 text-sm text-muted-foreground">
+          Êtes-vous sûr de vouloir supprimer &quot;{ingredientName}&quot; ? Cette action est
+          irréversible.
+        </div>
+        <ResponsiveDialogFooter>
+          <ResponsiveDialogClose render={<Button variant="outline" />}>
             Annuler
-          </Button>
+          </ResponsiveDialogClose>
           <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
             {deleteMutation.isPending ? 'Suppression...' : 'Supprimer'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }
