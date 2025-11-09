@@ -128,7 +128,7 @@ const ComboboxContent = ({
                 {value === option.value && <CheckIcon />}
               </CommandItem>
             ))}
-            {addNew && addNew(inputValue)}
+            {addNew?.(inputValue)}
           </CommandGroup>
         </ScrollArea>
       </CommandList>
