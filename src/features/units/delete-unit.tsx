@@ -10,12 +10,12 @@ import {
 } from '@/components/ui/responsive-dialog'
 import { deleteUnitOptions } from '@/features/units/api/delete'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type ReactElement } from 'react'
+import { useState } from 'react'
 
 interface DeleteUnitProps {
   unitId: number
   unitName: string
-  children: ReactElement<Record<string, unknown>>
+  children: JSX.Element
 }
 
 export const DeleteUnit = ({ unitId, unitName, children }: DeleteUnitProps) => {

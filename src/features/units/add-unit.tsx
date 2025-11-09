@@ -11,13 +11,13 @@ import { unitDefaultValues, unitFormFields, unitFormSchema, UnitForm } from '@/f
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type ReactElement } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface AddUnitProps {
   defaultValue?: string
   onSuccess?: () => void
-  children: ReactElement<Record<string, unknown>>
+  children: JSX.Element
 }
 
 export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => {

@@ -10,12 +10,12 @@ import {
 } from '@/components/ui/responsive-dialog'
 import { deleteIngredientOptions } from '@/features/ingredients/api/delete'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type ReactElement } from 'react'
+import { useState } from 'react'
 
 interface DeleteIngredientProps {
   ingredientId: number
   ingredientName: string
-  children: ReactElement<Record<string, unknown>>
+  children: JSX.Element
 }
 
 export const DeleteIngredient = ({
