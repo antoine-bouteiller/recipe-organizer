@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/responsive-dialog'
 import { deleteUnitOptions } from '@/features/units/api/delete'
 import { useMutation } from '@tanstack/react-query'
+import type React from 'react'
 import { useState } from 'react'
 
 interface DeleteUnitProps {

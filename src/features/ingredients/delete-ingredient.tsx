@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/responsive-dialog'
 import { deleteIngredientOptions } from '@/features/ingredients/api/delete'
 import { useMutation } from '@tanstack/react-query'
+import type React from 'react'
 import { useState } from 'react'
 
 interface DeleteIngredientProps {
