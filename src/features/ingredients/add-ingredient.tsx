@@ -7,11 +7,12 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/add-one'
+import { createIngredientOptions } from '@/features/ingredients/api/add-one'
 import {
   ingredientDefaultValues,
   IngredientForm,
   ingredientFormFields,
+  ingredientFormSchema,
 } from '@/features/ingredients/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
@@ -31,7 +32,7 @@ export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredie
 
   const form = useAppForm({
     validators: {
-      onDynamic: ingredientSchema,
+      onDynamic: ingredientFormSchema,
     },
     validationLogic: revalidateLogic(),
     defaultValues: {
@@ -40,12 +41,14 @@ export const AddIngredient = ({ defaultValue, onSuccess, children }: AddIngredie
     },
     onSubmit: async (data) => {
       try {
-        const parsedData = ingredientSchema.parse(data.value)
+        const parsedData = ingredientFormSchema.parse(data.value)
 
         await createMutation.mutateAsync({
           data: {
             name: parsedData.name,
             category: parsedData.category,
+            parentId: parsedData.parentId ? Number.parseInt(parsedData.parentId) : null,
+            factor: parsedData.factor ?? null,
           },
         })
 

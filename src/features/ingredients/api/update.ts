@@ -10,18 +10,22 @@ const updateIngredientSchema = z.object({
   id: z.number(),
   name: z.string().min(2),
   category: z.string().optional(),
+  parentId: z.number().nullish(),
+  factor: z.number().positive('Le facteur doit être positif').nullish(),
 })
 
 const updateIngredient = createServerFn()
   .inputValidator(updateIngredientSchema)
   .handler(async ({ data }) => {
-    const { id, name, category } = data
+    const { id, name, category, parentId, factor } = data
 
     await getDb()
       .update(ingredient)
       .set({
         name,
         category,
+        parentId: parentId ?? null,
+        factor: factor ?? null,
       })
       .where(eq(ingredient.id, id))
   })

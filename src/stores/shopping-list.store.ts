@@ -58,8 +58,9 @@ export const useShoppingListStore = () => {
     wantedQuantity: recipesQuantities[recipe.id] ?? 0,
   }))
 
-  const shoppingListIngredients = useMemo(
-    () =>
+  const shoppingListIngredients = useMemo(() => {
+    // Step 1: Aggregate all ingredients normally
+    const aggregatedIngredients =
       recipesWithQuantities
         ?.filter((recipe) => recipe.wantedQuantity > 0)
         .reduce<IngredientWithQuantity[]>((acc, recipe) => {
@@ -82,9 +83,61 @@ export const useShoppingListStore = () => {
             }
           }
           return acc
-        }, []) || [],
-    [recipesWithQuantities]
-  )
+        }, []) || []
+
+    // Step 2: Handle parent-child ingredient relationships
+    // Group ingredients by parentId
+    const childrenByParent = new Map<number, IngredientWithQuantity[]>()
+    const childIds = new Set<number>()
+
+    for (const ingredient of aggregatedIngredients) {
+      if (ingredient.parentId && ingredient.factor) {
+        const children = childrenByParent.get(ingredient.parentId) ?? []
+        children.push(ingredient)
+        childrenByParent.set(ingredient.parentId, children)
+        childIds.add(ingredient.id)
+      }
+    }
+
+    // Step 3: Convert children quantities to parent equivalents and aggregate
+    const result: IngredientWithQuantity[] = []
+
+    for (const ingredient of aggregatedIngredients) {
+      // Skip child ingredients as they'll be aggregated into parent
+      if (childIds.has(ingredient.id)) {
+        continue
+      }
+
+      // Check if this ingredient has children
+      const children = childrenByParent.get(ingredient.id)
+
+      if (children && children.length > 0) {
+        // Calculate parent-equivalent quantity for each child
+        // For egg example: 5 yolks (factor=1) -> 5 eggs, 3 whites (factor=1) -> 3 eggs
+        const childEquivalents = children.map((child) => {
+          // child.quantity * child.factor gives the parent equivalent
+          // e.g., if we need 5 yolks and factor is 1, we need 5 eggs
+          return child.quantity * (child.factor ?? 1)
+        })
+
+        // Take the maximum of all child equivalents
+        // For egg: max(5 yolks, 3 whites) = max(5, 3) = 5 eggs
+        const maxChildEquivalent = Math.max(...childEquivalents)
+
+        // Add parent's direct quantity to the max child equivalent
+        // For egg: 5 (from children) + 2 (direct) = 7 eggs
+        result.push({
+          ...ingredient,
+          quantity: ingredient.quantity + maxChildEquivalent,
+        })
+      } else {
+        // No children, add as-is
+        result.push(ingredient)
+      }
+    }
+
+    return result
+  }, [recipesWithQuantities])
 
   return {
     shoppingListIngredients,

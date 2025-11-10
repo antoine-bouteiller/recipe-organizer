@@ -8,16 +8,20 @@ import { ingredientsQueryKeys } from './query-keys'
 const ingredientSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
   category: z.string().min(1, "La catégorie est requise"),
+  parentId: z.number().nullish(),
+  factor: z.number().positive('Le facteur doit être positif').nullish(),
 })
 
 const createIngredient = createServerFn()
   .inputValidator(ingredientSchema)
   .handler(async ({ data }) => {
-    const { name, category } = data
+    const { name, category, parentId, factor } = data
 
     await getDb().insert(ingredient).values({
       name,
       category,
+      parentId: parentId ?? null,
+      factor: factor ?? null,
     })
   })
 

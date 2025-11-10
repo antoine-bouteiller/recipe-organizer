@@ -7,12 +7,12 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { ingredientSchema } from '@/features/ingredients/api/add-one'
 import { updateIngredientOptions } from '@/features/ingredients/api/update'
 import {
   IngredientForm,
   type IngredientFormInput,
   ingredientFormFields,
+  ingredientFormSchema,
 } from '@/features/ingredients/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import type { Ingredient } from '@/types/ingredient'
@@ -33,23 +33,27 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const initialValues: IngredientFormInput = {
     name: ingredient.name,
     category: ingredient.category,
+    parentId: ingredient.parentId ? ingredient.parentId.toString() : undefined,
+    factor: ingredient.factor ?? undefined,
   }
 
   const form = useAppForm({
     validators: {
-      onDynamic: ingredientSchema,
+      onDynamic: ingredientFormSchema,
     },
     validationLogic: revalidateLogic(),
     defaultValues: initialValues,
     onSubmit: async (data) => {
       try {
-        const parsedData = ingredientSchema.parse(data.value)
+        const parsedData = ingredientFormSchema.parse(data.value)
 
         await updateMutation.mutateAsync({
           data: {
             id: ingredient.id,
             name: parsedData.name,
             category: parsedData.category,
+            parentId: parsedData.parentId ? Number.parseInt(parsedData.parentId) : null,
+            factor: parsedData.factor ?? null,
           },
         })
 
