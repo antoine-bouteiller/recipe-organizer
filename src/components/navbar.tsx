@@ -31,7 +31,7 @@ export const menuItems: MenuItem[] = [
     label: 'Accueil',
     icon: HouseIcon,
     linkProps: {
-      to: '/',
+      to: '/recipe',
     },
     iconFilledProps: {
       weight: 'fill',
@@ -74,7 +74,7 @@ export const Navbar = () => {
   const router = useRouter()
 
   return (
-    <div className="3xl:fixed:container flex h-14 items-center gap-2 **:data-[slot=separator]:!h-4 px-6">
+    <div className="3xl:fixed:container flex h-14 items-center gap-2 **:data-[slot=separator]:h-4! px-6">
       <NavigationMenu>
         <NavigationMenuList>
           {menuItems

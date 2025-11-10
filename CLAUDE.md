@@ -18,6 +18,16 @@ Recipe Organizer is a full-stack recipe management application built with TanSta
 - **Testing**: Vitest
 - **Git Hooks**: Lefthook with commitlint (conventional commits)
 
+## Package Manager
+
+**IMPORTANT: This project uses Bun as the package manager.**
+
+- **DO NOT use npm or yarn commands**
+- **ALWAYS use `bun` commands** for all package management and script execution
+- The lockfile is `bun.lock` (NOT `package-lock.json` or `yarn.lock`)
+- If you need to install dependencies, use `bun install`
+- To run scripts, use `bun <script-name>` (e.g., `bun dev`, `bun build`)
+
 ## Development Commands
 
 ```bash
