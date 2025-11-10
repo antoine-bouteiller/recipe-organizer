@@ -1,15 +1,42 @@
 import { ListButton } from '@/components/ui/tiptap/list-button'
 import { MarkButton } from '@/components/ui/tiptap/mark-button'
+import { MagimixProgramButton } from '@/components/ui/tiptap/magimix-program-button'
+import { MagimixProgramNode } from '@/components/ui/tiptap/magimix-program-node'
 import { UndoRedoButton } from '@/components/ui/tiptap/undo-redo-button'
 import { ToggleGroup } from '@/components/ui/toggle-group'
 import { cn } from '@/utils/cn'
-import { TextStyleKit } from '@tiptap/extension-text-style'
+import Bold from '@tiptap/extension-bold'
+import BulletList from '@tiptap/extension-bullet-list'
+import Document from '@tiptap/extension-document'
+import Dropcursor from '@tiptap/extension-dropcursor'
+import Gapcursor from '@tiptap/extension-gapcursor'
+import HardBreak from '@tiptap/extension-hard-break'
+import History from '@tiptap/extension-history'
+import Italic from '@tiptap/extension-italic'
+import ListItem from '@tiptap/extension-list-item'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+import Underline from '@tiptap/extension-underline'
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
 import { useMemo, useRef } from 'react'
 
-const extensions = [TextStyleKit, StarterKit]
+// Import only the extensions we actually use (instead of StarterKit)
+const extensions = [
+  Document,
+  Text,
+  Paragraph,
+  HardBreak,
+  Bold,
+  Italic,
+  Underline,
+  BulletList,
+  ListItem,
+  History,
+  Gapcursor,
+  Dropcursor,
+  MagimixProgramNode,
+]
 
 const MenuBar = () => (
   <div className="flex gap-2">
@@ -22,6 +49,9 @@ const MenuBar = () => (
       <MarkButton type="italic" />
       <MarkButton type="underline" />
       <ListButton type="bulletList" />
+    </ToggleGroup>
+    <ToggleGroup variant="outline">
+      <MagimixProgramButton />
     </ToggleGroup>
   </div>
 )
