@@ -90,7 +90,7 @@ const FormSubmit = ({ label }: { label: string }) => {
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button type="submit" disabled={isSubmitting} className="flex-1">
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Spinner />}
           {label}
         </Button>

@@ -111,11 +111,10 @@ const EditRecipePage = () => {
             fields={recipeFormFields}
             initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }}
           />
-          <div className="flex gap-4 pt-6">
+          <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
               onClick={() => router.navigate({ to: '/' })}
               disabled={isLoading}
             >

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
+  ResponsiveDialogFooter,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
@@ -9,12 +10,12 @@ import {
 import { ingredientSchema } from '@/features/ingredients/api/add-one'
 import { updateIngredientOptions } from '@/features/ingredients/api/update'
 import {
+  IngredientForm,
   type IngredientFormInput,
   ingredientFormFields,
-  IngredientForm,
 } from '@/features/ingredients/ingredient-form'
-import type { Ingredient } from '@/types/ingredient'
 import { useAppForm } from '@/hooks/use-app-form'
+import type { Ingredient } from '@/types/ingredient'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
@@ -66,35 +67,34 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
       <ResponsiveDialogTrigger render={<Button variant="outline" size="sm" />}>
         <PencilSimpleIcon />
       </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent>
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Modifier l&apos;ingrédient</ResponsiveDialogTitle>
-        </ResponsiveDialogHeader>
-        <div className="px-4 md:px-0">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              form.handleSubmit()
-            }}
-            className="space-y-4"
-          >
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          form.handleSubmit()
+        }}
+      >
+        <ResponsiveDialogContent>
+          <ResponsiveDialogHeader>
+            <ResponsiveDialogTitle>Modifier l&apos;ingrédient</ResponsiveDialogTitle>
+          </ResponsiveDialogHeader>
+          <div className="flex flex-col gap-4 px-4 md:px-0">
             <IngredientForm form={form} fields={ingredientFormFields} ingredient={ingredient} />
-            <div className="flex gap-2 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsOpen(false)}
-                disabled={form.state.isSubmitting}
-              >
-                Annuler
-              </Button>
-              <form.AppForm>
-                <form.FormSubmit label="Mettre à jour" />
-              </form.AppForm>
-            </div>
-          </form>
-        </div>
-      </ResponsiveDialogContent>
+          </div>
+          <ResponsiveDialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+              disabled={form.state.isSubmitting}
+            >
+              Annuler
+            </Button>
+            <form.AppForm>
+              <form.FormSubmit label="Mettre à jour" />
+            </form.AppForm>
+          </ResponsiveDialogFooter>
+        </ResponsiveDialogContent>
+      </form>
     </ResponsiveDialog>
   )
 }

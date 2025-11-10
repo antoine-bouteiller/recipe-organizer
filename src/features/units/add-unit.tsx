@@ -2,12 +2,18 @@ import { Button } from '@/components/ui/button'
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
+  ResponsiveDialogFooter,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { createUnitOptions } from '@/features/units/api/add-one'
-import { unitDefaultValues, unitFormFields, unitFormSchema, UnitForm } from '@/features/units/unit-form'
+import {
+  unitDefaultValues,
+  UnitForm,
+  unitFormFields,
+  unitFormSchema,
+} from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
@@ -41,9 +47,10 @@ export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => 
           data: {
             name: parsedData.name,
             symbol: parsedData.symbol,
-            parentId: parsedData.parentId && parsedData.parentId !== ''
-              ? Number(parsedData.parentId)
-              : undefined,
+            parentId:
+              parsedData.parentId && parsedData.parentId !== ''
+                ? Number(parsedData.parentId)
+                : undefined,
             factor: parsedData.factor ?? undefined,
           },
         })
@@ -62,30 +69,35 @@ export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => 
   return (
     <ResponsiveDialog key={defaultValue} open={isOpen} onOpenChange={setIsOpen}>
       <ResponsiveDialogTrigger render={children} />
-      <ResponsiveDialogContent>
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
-        </ResponsiveDialogHeader>
-        <div className="px-4 md:px-0">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              form.handleSubmit()
-            }}
-            className="space-y-4"
-          >
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          form.handleSubmit()
+        }}
+      >
+        <ResponsiveDialogContent>
+          <ResponsiveDialogHeader>
+            <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
+          </ResponsiveDialogHeader>
+
+          <div className="flex flex-col gap-4 px-4 md:px-0">
             <UnitForm form={form} fields={unitFormFields} />
-            <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={form.state.isSubmitting}>
-                Annuler
-              </Button>
-              <form.AppForm>
-                <form.FormSubmit label="Ajouter" />
-              </form.AppForm>
-            </div>
-          </form>
-        </div>
-      </ResponsiveDialogContent>
+          </div>
+          <ResponsiveDialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+              disabled={form.state.isSubmitting}
+            >
+              Annuler
+            </Button>
+            <form.AppForm>
+              <form.FormSubmit label="Ajouter" />
+            </form.AppForm>
+          </ResponsiveDialogFooter>
+        </ResponsiveDialogContent>
+      </form>
     </ResponsiveDialog>
   )
 }
