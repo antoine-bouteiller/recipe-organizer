@@ -90,7 +90,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
     return {
       program: {
         default: MagimixProgram.COOKING,
-        parseHTML: (element) => element.getAttribute('data-program'),
+        parseHTML: (element) => element.dataset.program,
         renderHTML: (attributes) => ({
           'data-program': attributes.program as string,
         }),
@@ -98,7 +98,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
       time: {
         default: 'auto',
         parseHTML: (element) => {
-          const time = element.getAttribute('data-time')
+          const time = element.dataset.time
           if (time === 'auto') return 'auto'
           const parsed = Number.parseInt(time ?? '0', 10)
           return Number.isNaN(parsed) ? 'auto' : parsed
@@ -110,7 +110,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
       temperature: {
         default: undefined,
         parseHTML: (element) => {
-          const temp = element.getAttribute('data-temperature')
+          const temp = element.dataset.temperature
           if (!temp) return undefined
           const parsed = Number.parseInt(temp, 10)
           return Number.isNaN(parsed) ? undefined : parsed
