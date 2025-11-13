@@ -9,7 +9,7 @@ jobs:
   quality-checks:
     name: Quality Checks
     secrets: inherit
-    uses: ./.github/workflows/reusable-quality-checks.yaml
+    uses: ./.github/workflows/quality-checks.yaml
 
   deploy-production:
     name: Deploy to Production
