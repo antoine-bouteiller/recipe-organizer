@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/hooks/use-auth'
+import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import z from 'zod'
@@ -18,8 +19,6 @@ const getErrorMessage = (error: string) => {
 }
 
 const LoginPage = () => {
-  const { signInWithGoogle } = useAuth()
-
   const { error } = Route.useSearch()
 
   useEffect(() => {
@@ -27,6 +26,8 @@ const LoginPage = () => {
       toast.error(getErrorMessage(error))
     }
   }, [error])
+
+  const login = useServerFn(initiateGoogleAuth)
 
   return (
     <div className="flex-1 grid place-items-center p-4">
@@ -36,7 +37,7 @@ const LoginPage = () => {
           <CardDescription>Connectez-vous pour accéder au portail administrateur</CardDescription>
         </CardHeader>
         <CardContent className="flex-1">
-          <Button variant="outline" className="w-full" onClick={signInWithGoogle}>
+          <Button variant="outline" className="w-full" onClick={() => login()}>
             <img
               src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg"
               alt="Google"

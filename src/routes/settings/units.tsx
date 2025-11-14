@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -11,20 +10,30 @@ import {
   ItemTitle,
 } from '@/components/ui/item'
 import { AddUnit } from '@/features/units/add-unit'
+import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { DeleteUnit } from '@/features/units/delete-unit'
 import { EditUnit } from '@/features/units/edit-unit'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
-import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon, TrashSimpleIcon } from '@phosphor-icons/react'
+import {
+  ArrowLeftIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  TrashSimpleIcon,
+} from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import * as React from 'react'
 import { useMemo, useState } from 'react'
 
 const UnitsManagement = () => {
   const { data: units } = useSuspenseQuery(getUnitsListOptions())
   const [searchQuery, setSearchQuery] = useState('')
 
+  const { isAdmin } = Route.useRouteContext()
+
   const filteredUnits = useMemo(() => {
-    if (!searchQuery.trim()) {return units}
+    if (!searchQuery.trim()) {
+      return units
+    }
 
     const query = searchQuery.toLowerCase()
     return units.filter(
@@ -90,14 +99,16 @@ const UnitsManagement = () => {
                     )}
                   </ItemDescription>
                 </ItemContent>
-                <ItemActions>
-                  <EditUnit unit={unit} />
-                  <DeleteUnit unitId={unit.id} unitName={unit.name}>
-                    <Button variant="destructive" size="sm">
-                      <TrashSimpleIcon />
-                    </Button>
-                  </DeleteUnit>
-                </ItemActions>
+                {isAdmin && (
+                  <ItemActions>
+                    <EditUnit unit={unit} />
+                    <DeleteUnit unitId={unit.id} unitName={unit.name}>
+                      <Button variant="destructive" size="sm">
+                        <TrashSimpleIcon />
+                      </Button>
+                    </DeleteUnit>
+                  </ItemActions>
+                )}
               </Item>
               {index !== filteredUnits.length - 1 && <ItemSeparator />}
             </React.Fragment>

@@ -23,6 +23,8 @@ export const getRouter = () => {
     defaultPreload: 'intent',
     context: {
       queryClient,
+      authUser: undefined,
+      theme: 'light' as const,
     },
   })
 

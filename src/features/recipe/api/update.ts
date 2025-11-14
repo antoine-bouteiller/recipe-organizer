@@ -12,19 +12,19 @@ import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { recipesQueryKeys } from './query-keys'
 
-const editRecipeSchema = z.object({
+const updateRecipeSchema = z.object({
   ...recipeSchema.shape,
   id: z.coerce.number(),
 })
 
-type EditRecipeFormValues = z.infer<typeof editRecipeSchema>
-type EditRecipeFormInput = Partial<z.input<typeof editRecipeSchema>>
+type UpdateRecipeFormValues = z.infer<typeof updateRecipeSchema>
+type UpdateRecipeFormInput = Partial<z.input<typeof updateRecipeSchema>>
 
-const editRecipe = createServerFn({
+const updateRecipe = createServerFn({
   method: 'POST',
 })
-  .middleware([authGuard])
-  .inputValidator((formData: FormData) => editRecipeSchema.parse(parseFormData(formData)))
+  .middleware([authGuard()])
+  .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const { image, sections, name, steps, id, quantity } = data
@@ -98,13 +98,18 @@ const editRecipe = createServerFn({
     })
   )
 
-const editRecipeOptions = () =>
+const updateRecipeOptions = () =>
   mutationOptions({
-    mutationFn: editRecipe,
+    mutationFn: updateRecipe,
     onSuccess: (data, _variables, _result, context) => {
       void context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
       void context.client.invalidateQueries({ queryKey: recipesQueryKeys.detail(data) })
     },
   })
 
-export { editRecipeOptions, editRecipeSchema, type EditRecipeFormInput, type EditRecipeFormValues }
+export {
+  updateRecipeOptions,
+  updateRecipeSchema,
+  type UpdateRecipeFormInput,
+  type UpdateRecipeFormValues,
+}

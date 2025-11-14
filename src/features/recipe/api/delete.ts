@@ -12,7 +12,7 @@ import { recipesQueryKeys } from './query-keys'
 const deleteRecipe = createServerFn({
   method: 'POST',
 })
-  .middleware([authGuard])
+  .middleware([authGuard('admin')])
   .inputValidator(z.number())
   .handler(
     withServerErrorCapture(async ({ data }) => {

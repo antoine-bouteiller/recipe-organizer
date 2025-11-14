@@ -1,3 +1,4 @@
+import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { mutationOptions } from '@tanstack/react-query'
@@ -13,15 +14,18 @@ const unitSchema = z.object({
 })
 
 const createUnit = createServerFn()
+  .middleware([authGuard('admin')])
   .inputValidator(unitSchema)
   .handler(async ({ data }) => {
     const { name, symbol, parentId, factor } = data
-    await getDb().insert(unit).values({
-      name,
-      symbol,
-      parentId: parentId ?? undefined,
-      factor: factor ?? undefined,
-    })
+    await getDb()
+      .insert(unit)
+      .values({
+        name,
+        symbol,
+        parentId: parentId ?? undefined,
+        factor: factor ?? undefined,
+      })
   })
 
 const createUnitOptions = () =>

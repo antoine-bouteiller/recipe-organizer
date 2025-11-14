@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -14,14 +13,22 @@ import { AddIngredient } from '@/features/ingredients/add-ingredient'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { DeleteIngredient } from '@/features/ingredients/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/edit-ingredient'
-import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon, TrashSimpleIcon } from '@phosphor-icons/react'
+import {
+  ArrowLeftIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  TrashSimpleIcon,
+} from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import * as React from 'react'
 import { useMemo, useState } from 'react'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
   const [searchQuery, setSearchQuery] = useState('')
+
+  const { isAdmin } = Route.useRouteContext()
 
   const filteredIngredients = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -80,14 +87,16 @@ const IngredientsManagement = () => {
                   <ItemTitle>{ingredient.name}</ItemTitle>
                   <ItemDescription>Catégorie: {ingredient.category}</ItemDescription>
                 </ItemContent>
-                <ItemActions>
-                  <EditIngredient ingredient={ingredient} />
-                  <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name}>
-                    <Button variant="destructive" size="sm">
-                      <TrashSimpleIcon />
-                    </Button>
-                  </DeleteIngredient>
-                </ItemActions>
+                {isAdmin && (
+                  <ItemActions>
+                    <EditIngredient ingredient={ingredient} />
+                    <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name}>
+                      <Button variant="destructive" size="sm">
+                        <TrashSimpleIcon />
+                      </Button>
+                    </DeleteIngredient>
+                  </ItemActions>
+                )}
               </Item>
               {index !== filteredIngredients.length - 1 && <ItemSeparator />}
             </React.Fragment>

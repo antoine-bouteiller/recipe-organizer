@@ -3,13 +3,13 @@ import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import {
-  editRecipeOptions,
-  editRecipeSchema,
-  type EditRecipeFormInput,
-} from '@/features/recipe/api/edit'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeSection } from '@/features/recipe/api/get-one'
+import {
+  updateRecipeOptions,
+  updateRecipeSchema,
+  type UpdateRecipeFormInput,
+} from '@/features/recipe/api/update'
 import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -42,10 +42,10 @@ const formatSection = (sections: RecipeSection) => {
 const EditRecipePage = () => {
   const { id } = Route.useLoaderData()
   const { data: recipe, isLoading } = useQuery(getRecipeDetailsOptions(id))
-  const { mutateAsync: editRecipe } = useMutation(editRecipeOptions())
+  const { mutateAsync: updateRecipe } = useMutation(updateRecipeOptions())
   const router = useRouter()
 
-  const initialValues: EditRecipeFormInput = recipe
+  const initialValues: UpdateRecipeFormInput = recipe
     ? {
         id: recipe.id,
         name: recipe.name,
@@ -61,16 +61,16 @@ const EditRecipePage = () => {
 
   const form = useAppForm({
     validators: {
-      onDynamic: editRecipeSchema,
+      onDynamic: updateRecipeSchema,
     },
     validationLogic: revalidateLogic(),
     defaultValues: initialValues,
     onSubmit: async (data) => {
       try {
-        const parsedData = editRecipeSchema.parse(data.value)
+        const parsedData = updateRecipeSchema.parse(data.value)
         const formData = objectToFormData(parsedData)
 
-        await editRecipe({ data: formData })
+        await updateRecipe({ data: formData })
 
         await router.navigate({ to: '/recipe/$id', params: { id: id.toString() }, replace: true })
       } catch (error) {

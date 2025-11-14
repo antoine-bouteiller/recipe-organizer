@@ -1,8 +1,8 @@
-import type { Ingredient } from '@/types/ingredient'
 import { withFieldGroup } from '@/hooks/use-app-form'
+import type { Ingredient } from '@/types/ingredient'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 
-export { ingredientSchema } from './api/add-one'
+export { ingredientSchema } from './api/create'
 
 export interface IngredientFormInput {
   name: string
@@ -42,11 +42,7 @@ export const IngredientForm = withFieldGroup({
 
         <AppField name="category">
           {({ TextField }) => (
-            <TextField
-              label="Catégorie"
-              placeholder="Ex: supermarket"
-              disabled={isSubmitting}
-            />
+            <TextField label="Catégorie" placeholder="Ex: supermarket" disabled={isSubmitting} />
           )}
         </AppField>
       </>
