@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - src/**/*
-      - quality-checks.yaml
+      - .github/workflows/quality-checks.yaml
     branches:
       - main
   workflow_call:
