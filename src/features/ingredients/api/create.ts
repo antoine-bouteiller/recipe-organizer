@@ -1,3 +1,4 @@
+import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { mutationOptions } from '@tanstack/react-query'
@@ -6,11 +7,12 @@ import { z } from 'zod'
 import { ingredientsQueryKeys } from './query-keys'
 
 const ingredientSchema = z.object({
-  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
-  category: z.string().min(1, "La catégorie est requise"),
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  category: z.string().min(1, 'La catégorie est requise'),
 })
 
 const createIngredient = createServerFn()
+  .middleware([authGuard()])
   .inputValidator(ingredientSchema)
   .handler(async ({ data }) => {
     const { name, category } = data

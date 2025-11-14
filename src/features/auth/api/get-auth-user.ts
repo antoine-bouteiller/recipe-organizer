@@ -1,17 +1,26 @@
-import { auth } from '@/lib/auth'
+import { getDb } from '@/lib/db'
+import { user } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
+import { useAppSession } from '@/lib/session'
 import { createServerFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
+import { eq } from 'drizzle-orm'
 
 export const getAuthUser = createServerFn({ method: 'GET' }).handler(
   withServerErrorCapture(async () => {
-    const request = getRequest()
-    if (!request?.headers) {
+    const session = await useAppSession()
+
+    if (!session?.data?.userId) {
       return undefined
     }
-    const session = await auth.api.getSession({
-      headers: request.headers,
+
+    const authUser = await getDb().query.user.findFirst({
+      where: eq(user.id, session.data?.userId),
     })
-    return session?.user
+
+    if (!authUser) {
+      return undefined
+    }
+
+    return authUser
   })
 )

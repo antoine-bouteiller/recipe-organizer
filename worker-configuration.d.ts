@@ -12,6 +12,7 @@ declare namespace Cloudflare {
 		IMAGES: ImagesBinding;
 		GOOGLE_CLIENT_ID: string;
 		GOOGLE_CLIENT_SECRET: string;
+		SESSION_SECRET: string;
 	}
 }
 interface Env extends Cloudflare.Env {}

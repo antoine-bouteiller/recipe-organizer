@@ -1,3 +1,4 @@
+import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { mutationOptions } from '@tanstack/react-query'
@@ -11,6 +12,7 @@ const deleteIngredientSchema = z.object({
 })
 
 const deleteIngredient = createServerFn()
+  .middleware([authGuard('admin')])
   .inputValidator(deleteIngredientSchema)
   .handler(async ({ data }) => {
     const { id } = data

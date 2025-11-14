@@ -7,7 +7,7 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/add-one'
+import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/create'
 import {
   ingredientDefaultValues,
   IngredientForm,

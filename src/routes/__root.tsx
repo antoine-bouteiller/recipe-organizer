@@ -10,6 +10,9 @@ import { initShoppingListState, shoppingListStore } from '@/stores/shopping-list
 import { useEffect } from 'react'
 import appCss from '../styles/app.css?url'
 
+type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
+type Theme = ReturnType<typeof getTheme>
+
 const RootComponent = () => {
   useEffect(() => {
     if ('serviceWorker' in navigator && import.meta.env.PROD) {
@@ -45,6 +48,8 @@ const RootComponent = () => {
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
+  authUser: AuthUser
+  theme: Theme
 }>()({
   head: ({ loaderData }) => ({
     meta: [
@@ -77,7 +82,7 @@ export const Route = createRootRouteWithContext<{
 
     shoppingListStore.setState(initShoppingListState())
 
-    return { authUser, theme }
+    return { authUser, theme, isAdmin: authUser?.role === 'admin' }
   },
   component: RootComponent,
   notFoundComponent: () => <div>Not found</div>,

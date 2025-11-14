@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card'
 import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon } from '@phosphor-icons/react'
-import { Link, createFileRoute, redirect } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 
 const settingsSections = [
   {
@@ -58,9 +58,4 @@ const RouteComponent = () => (
 
 export const Route = createFileRoute('/settings/')({
   component: RouteComponent,
-  beforeLoad: ({ context }) => {
-    if (!context.authUser) {
-      throw redirect({ to: '/auth/login', from: '/settings' })
-    }
-  },
 })

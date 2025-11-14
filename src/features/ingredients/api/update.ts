@@ -1,3 +1,4 @@
+import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { mutationOptions } from '@tanstack/react-query'
@@ -13,6 +14,7 @@ const updateIngredientSchema = z.object({
 })
 
 const updateIngredient = createServerFn()
+  .middleware([authGuard()])
   .inputValidator(updateIngredientSchema)
   .handler(async ({ data }) => {
     const { id, name, category } = data

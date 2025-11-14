@@ -49,7 +49,7 @@ export type RecipeSectionFormInput = NonNullable<RecipeFormInput['sections']>[nu
 const createRecipe = createServerFn({
   method: 'POST',
 })
-  .middleware([authGuard])
+  .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data }) => {
     const { image, sections, name, steps, quantity } = data
