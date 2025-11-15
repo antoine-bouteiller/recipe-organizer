@@ -93,16 +93,7 @@
     'Geist Mono', 'Geist Mono Fallback', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
 
-  --radius: 1rem;
-
-  --shadow-2xs: 0px 1px 3px 0px oklch(0 0 0 / 0.01);
-  --shadow-xs: 0px 1px 3px 0px oklch(0 0 0 / 0.01);
-  --shadow-sm: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 1px 2px -1px oklch(0 0 0 / 0.01);
-  --shadow: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 1px 2px -1px oklch(0 0 0 / 0.01);
-  --shadow-md: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 2px 4px -1px oklch(0 0 0 / 0.01);
-  --shadow-lg: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 4px 6px -1px oklch(0 0 0 / 0.01);
-  --shadow-xl: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 8px 10px -1px oklch(0 0 0 / 0.01);
-  --shadow-2xl: 0px 1px 3px 0px oklch(0 0 0 / 0.03);
+  --radius: 1.5rem;
 }
 
 .dark {
@@ -138,14 +129,7 @@
   --sidebar-border: oklch(0.35 0.01 319.53 / 30%);
   --sidebar-ring: oklch(0.59 0.11 225.82);
 
-  --shadow-2xs: 0px 1px 3px 0px oklch(0 0 0 / 0.01);
-  --shadow-xs: 0px 1px 3px 0px oklch(0 0 0 / 0.01);
-  --shadow-sm: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 1px 2px -1px oklch(0 0 0 / 0.01);
-  --shadow: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 1px 2px -1px oklch(0 0 0 / 0.01);
-  --shadow-md: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 2px 4px -1px oklch(0 0 0 / 0.01);
-  --shadow-lg: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 4px 6px -1px oklch(0 0 0 / 0.01);
-  --shadow-xl: 0px 1px 3px 0px oklch(0 0 0 / 0.01), 0px 8px 10px -1px oklch(0 0 0 / 0.01);
-  --shadow-2xl: 0px 1px 3px 0px oklch(0 0 0 / 0.03);
+  --inset-shadow-md: inset 1px 1px 1px rgb(0 0 0 / 0.05);
 }
 
 @layer base {
@@ -185,4 +169,8 @@
       @slot;
     }
   }
+}
+
+@utility blurred-box {
+  @apply border-none bg-white/50 shadow-2xs inset-shadow-2xs backdrop-blur-md;
 }

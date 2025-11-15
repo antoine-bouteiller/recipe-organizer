@@ -8,67 +8,8 @@ import {
 } from '@/components/ui/navigation-menu'
 import { SearchBar } from '@/features/recipe/search-bar'
 import { toggleTheme } from '@/lib/theme'
-import {
-  GearIcon,
-  HouseIcon,
-  MagnifyingGlassIcon,
-  ShoppingCartSimpleIcon,
-  type Icon,
-  type IconProps,
-} from '@phosphor-icons/react'
-import { Link, useRouter, type LinkProps } from '@tanstack/react-router'
-
-interface MenuItem {
-  label: string
-  icon: Icon
-  linkProps: LinkProps
-  display?: 'desktop' | 'mobile'
-  iconFilledProps?: IconProps
-}
-
-export const menuItems: MenuItem[] = [
-  {
-    label: 'Accueil',
-    icon: HouseIcon,
-    linkProps: {
-      to: '/recipe',
-    },
-    iconFilledProps: {
-      weight: 'fill',
-    },
-  },
-  {
-    label: 'Rechercher',
-    icon: MagnifyingGlassIcon,
-    linkProps: {
-      to: '/search',
-    },
-    display: 'mobile',
-    iconFilledProps: {
-      weight: 'bold',
-    },
-  },
-  {
-    label: 'Liste de courses',
-    icon: ShoppingCartSimpleIcon,
-    linkProps: {
-      to: '/shopping-list',
-    },
-    iconFilledProps: {
-      weight: 'fill',
-    },
-  },
-  {
-    label: 'Paramètres',
-    icon: GearIcon,
-    linkProps: {
-      to: '/settings',
-    },
-    iconFilledProps: {
-      weight: 'fill',
-    },
-  },
-]
+import { Link, useRouter } from '@tanstack/react-router'
+import { menuItems } from './constants'
 
 export const Navbar = () => {
   const router = useRouter()
@@ -82,6 +23,7 @@ export const Navbar = () => {
             .map((item) => (
               <NavigationMenuItem key={item.label}>
                 <NavigationMenuLink
+                  className="px-4"
                   render={<Link {...item.linkProps} activeProps={{ className: 'bg-accent' }} />}
                 >
                   {item.label}

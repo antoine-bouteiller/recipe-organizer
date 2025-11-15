@@ -5,7 +5,7 @@ const Card = ({ className, ...props }: ComponentProps<'div'>) => (
   <div
     data-slot="card"
     className={cn(
-      'flex flex-col gap-6 overflow-hidden rounded-xl border bg-card py-6 text-card-foreground shadow-sm',
+      'flex flex-col gap-6 overflow-hidden rounded-md border bg-card py-6 text-card-foreground shadow-sm',
       className
     )}
     {...props}
@@ -55,4 +55,4 @@ const CardFooter = ({ className, ...props }: ComponentProps<'div'>) => (
   />
 )
 
-export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent }
+export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }

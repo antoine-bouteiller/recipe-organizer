@@ -2,8 +2,8 @@ import { Toaster } from '@/components/ui/sonner'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 
-import { Navbar } from '@/components/navbar'
-import { TabBar } from '@/components/tabbar'
+import { Navbar } from '@/components/navigation/navbar'
+import { TabBar } from '@/components/navigation/tabbar'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
 import { initShoppingListState, shoppingListStore } from '@/stores/shopping-list.store'
@@ -33,10 +33,10 @@ const RootComponent = () => {
         <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
           <Navbar />
         </header>
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col pb-14 md:pb-0">
           <Outlet />
         </div>
-        <div className="w-full md:hidden sticky bottom-0">
+        <div className="w-full md:hidden fixed bottom-0">
           <TabBar />
         </div>
         <Toaster />
