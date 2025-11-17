@@ -110,11 +110,11 @@ const createRecipeOptions = () =>
       void context.client.invalidateQueries({
         queryKey: recipesQueryKeys.lists(),
       })
-      const title = z.string().safeParse(variables.data.get('title'))
+      const { data: title } = z.string().safeParse(variables.data.get('title'))
       toast.success(`Recette ${title} créée `)
     },
     onError: (error, variables, _context) => {
-      const title = z.string().safeParse(variables.data.get('title'))
+      const { data: title } = z.string().safeParse(variables.data.get('title'))
       toastError(`Erreur lors de la création de la recette ${title}`, error)
     },
   })

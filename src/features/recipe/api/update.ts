@@ -110,11 +110,11 @@ const updateRecipeOptions = () =>
       void context.client.invalidateQueries({
         queryKey: recipesQueryKeys.detail(data),
       })
-      const title = z.string().safeParse(variables.data.get('title'))
+      const { data: title } = z.string().safeParse(variables.data.get('title'))
       toast.success(`Recette ${title} mise à jour`)
     },
     onError: (error, variables) => {
-      const title = z.string().safeParse(variables.data.get('title'))
+      const { data: title } = z.string().safeParse(variables.data.get('title'))
       toastError(`Erreur lors de la mise à jour de la recette ${title}`, error)
     },
   })
