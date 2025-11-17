@@ -79,7 +79,7 @@ const RecipePage = () => {
               <PencilSimpleIcon className="size-4" />
               Modifier
             </Button>
-            <DeleteRecipe recipeId={recipe.id} />
+            <DeleteRecipe recipeId={recipe.id} recipeName={recipe.name} />
           </ResponsivePopoverContent>
         </ResponsivePopover>
       )}

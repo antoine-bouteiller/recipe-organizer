@@ -1,13 +1,8 @@
 import { withFieldGroup } from '@/hooks/use-app-form'
-import type { Ingredient } from '@/types/ingredient'
 import { createFieldMap, useStore } from '@tanstack/react-form'
+import type { IngredientFormInput } from './api/create'
 
 export { ingredientSchema } from './api/create'
-
-export interface IngredientFormInput {
-  name: string
-  category: string
-}
 
 export const ingredientDefaultValues: IngredientFormInput = {
   name: '',
@@ -16,13 +11,8 @@ export const ingredientDefaultValues: IngredientFormInput = {
 
 export const ingredientFormFields = createFieldMap(ingredientDefaultValues)
 
-interface IngredientFormProps extends Record<string, unknown> {
-  ingredient?: Ingredient
-}
-
 export const IngredientForm = withFieldGroup({
   defaultValues: ingredientDefaultValues,
-  props: {} as IngredientFormProps,
   render: function Render({ group }) {
     const { AppField } = group
 

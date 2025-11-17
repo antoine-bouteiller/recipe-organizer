@@ -11,7 +11,6 @@ import { objectToFormData } from '@/lib/form-data'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { toast } from 'sonner'
 
 const NewRecipePage = () => {
   const router = useRouter()
@@ -23,18 +22,11 @@ const NewRecipePage = () => {
     },
     validationLogic: revalidateLogic(),
     defaultValues: recipeDefaultValues,
-    onSubmit: async (data) => {
-      try {
-        const parsedData = recipeSchema.parse(data.value)
-        const formData = objectToFormData(parsedData)
-        await createRecipe({ data: formData })
+    onSubmit: async ({ value }) => {
+      const formData = objectToFormData(value)
+      await createRecipe({ data: formData })
 
-        await router.navigate({ to: '/' })
-      } catch (error) {
-        toast.error('Une erreur est survenue lors de la création de la recette', {
-          description: error instanceof Error ? error.message : JSON.stringify(error),
-        })
-      }
+      await router.navigate({ to: '/' })
     },
   })
 

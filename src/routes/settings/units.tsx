@@ -13,12 +13,7 @@ import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { DeleteUnit } from '@/features/units/delete-unit'
 import { EditUnit } from '@/features/units/edit-unit'
-import {
-  ArrowLeftIcon,
-  MagnifyingGlassIcon,
-  PlusIcon,
-  TrashSimpleIcon,
-} from '@phosphor-icons/react'
+import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
@@ -102,11 +97,7 @@ const UnitsManagement = () => {
                 {isAdmin && (
                   <ItemActions>
                     <EditUnit unit={unit} />
-                    <DeleteUnit unitId={unit.id} unitName={unit.name}>
-                      <Button variant="destructive" size="sm">
-                        <TrashSimpleIcon />
-                      </Button>
-                    </DeleteUnit>
+                    <DeleteUnit unitId={unit.id} unitName={unit.name} />
                   </ItemActions>
                 )}
               </Item>

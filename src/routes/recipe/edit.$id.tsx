@@ -18,7 +18,6 @@ import { getFileUrl } from '@/lib/utils'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
-import { toast } from 'sonner'
 import z from 'zod'
 
 const formatSection = (sections: RecipeSection) => {
@@ -65,19 +64,16 @@ const EditRecipePage = () => {
     },
     validationLogic: revalidateLogic(),
     defaultValues: initialValues,
-    onSubmit: async (data) => {
-      try {
-        const parsedData = updateRecipeSchema.parse(data.value)
-        const formData = objectToFormData(parsedData)
+    onSubmit: async ({ value }) => {
+      const formData = objectToFormData(value)
 
-        await updateRecipe({ data: formData })
+      await updateRecipe({ data: formData })
 
-        await router.navigate({ to: '/recipe/$id', params: { id: id.toString() }, replace: true })
-      } catch (error) {
-        toast.error('Une erreur est survenue lors de la création de la recette', {
-          description: error instanceof Error ? error.message : JSON.stringify(error),
-        })
-      }
+      await router.navigate({
+        to: '/recipe/$id',
+        params: { id: id.toString() },
+        replace: true,
+      })
     },
   })
 

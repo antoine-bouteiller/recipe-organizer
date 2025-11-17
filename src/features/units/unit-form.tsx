@@ -3,23 +3,8 @@ import { withFieldGroup } from '@/hooks/use-app-form'
 import { createFieldMap, useStore } from '@tanstack/react-form'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { z } from 'zod'
+import type { UnitFormInput } from './api/create'
 import { getUnitsListOptions } from './api/get-all'
-
-// Form-specific validation schema (accepts string for parentId from combobox)
-export const unitFormSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  symbol: z.string().min(1, 'Le symbole est requis'),
-  parentId: z.string().nullish(),
-  factor: z.number().positive('Le facteur doit être positif').nullish(),
-})
-
-export interface UnitFormInput {
-  name: string
-  symbol: string
-  parentId?: string | null
-  factor?: number | null
-}
 
 export const unitDefaultValues: UnitFormInput = {
   name: '',
@@ -30,7 +15,7 @@ export const unitDefaultValues: UnitFormInput = {
 
 export const unitFormFields = createFieldMap(unitDefaultValues)
 
-interface UnitFormProps extends Record<string, unknown> {
+export interface UnitFormProps extends Record<string, unknown> {
   unit?: Unit
 }
 
@@ -80,7 +65,7 @@ export const UnitForm = withFieldGroup({
                 noResultsLabel="Aucune unité trouvée"
               />
 
-              {state.value && state.value !== '' && (
+              {state.value && (
                 <AppField name="factor">
                   {({ NumberField }) => (
                     <NumberField

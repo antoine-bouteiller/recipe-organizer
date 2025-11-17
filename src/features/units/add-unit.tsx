@@ -1,103 +1,40 @@
-import { Button } from '@/components/ui/button'
-import {
-  ResponsiveDialog,
-  ResponsiveDialogContent,
-  ResponsiveDialogFooter,
-  ResponsiveDialogHeader,
-  ResponsiveDialogTitle,
-  ResponsiveDialogTrigger,
-} from '@/components/ui/responsive-dialog'
-import { createUnitOptions } from '@/features/units/api/create'
-import {
-  unitDefaultValues,
-  UnitForm,
-  unitFormFields,
-  unitFormSchema,
-} from '@/features/units/unit-form'
+import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { createUnitOptions, unitSchema, type UnitFormInput } from '@/features/units/api/create'
+import { unitDefaultValues, UnitForm, unitFormFields } from '@/features/units/unit-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type JSX } from 'react'
-import { toast } from 'sonner'
+import { type JSX } from 'react'
 
 interface AddUnitProps {
   defaultValue?: string
-  onSuccess?: () => void
   children: JSX.Element
 }
 
-export const AddUnit = ({ defaultValue, onSuccess, children }: AddUnitProps) => {
-  const [isOpen, setIsOpen] = useState(false)
+const FormDialog = getFormDialog(unitDefaultValues)
+
+export const AddUnit = ({ defaultValue, children }: AddUnitProps) => {
   const createMutation = useMutation(createUnitOptions())
 
   const form = useAppForm({
     validators: {
-      onDynamic: unitFormSchema,
+      onDynamic: unitSchema,
     },
     validationLogic: revalidateLogic(),
     defaultValues: {
       ...unitDefaultValues,
       symbol: defaultValue ?? unitDefaultValues.symbol,
-    },
-    onSubmit: async (data) => {
-      try {
-        const parsedData = unitFormSchema.parse(data.value)
-
-        await createMutation.mutateAsync({
-          data: {
-            name: parsedData.name,
-            symbol: parsedData.symbol,
-            parentId:
-              parsedData.parentId && parsedData.parentId !== ''
-                ? Number(parsedData.parentId)
-                : undefined,
-            factor: parsedData.factor ?? undefined,
-          },
-        })
-
-        setIsOpen(false)
-        form.reset()
-        onSuccess?.()
-      } catch (error) {
-        toast.error("Une erreur est survenue lors de la création de l'unité", {
-          description: error instanceof Error ? error.message : JSON.stringify(error),
-        })
-      }
+    } as UnitFormInput,
+    onSubmit: async ({ value }) => {
+      await createMutation.mutateAsync({
+        data: unitSchema.parse(value),
+      })
     },
   })
 
   return (
-    <ResponsiveDialog key={defaultValue} open={isOpen} onOpenChange={setIsOpen}>
-      <ResponsiveDialogTrigger render={children} />
-      <form
-        onSubmit={(event) => {
-          event.preventDefault()
-          form.handleSubmit()
-        }}
-      >
-        <ResponsiveDialogContent>
-          <ResponsiveDialogHeader>
-            <ResponsiveDialogTitle>Ajouter une unité</ResponsiveDialogTitle>
-          </ResponsiveDialogHeader>
-
-          <div className="flex flex-col gap-4 px-4 md:px-0">
-            <UnitForm form={form} fields={unitFormFields} />
-          </div>
-          <ResponsiveDialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              disabled={form.state.isSubmitting}
-            >
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Ajouter" />
-            </form.AppForm>
-          </ResponsiveDialogFooter>
-        </ResponsiveDialogContent>
-      </form>
-    </ResponsiveDialog>
+    <FormDialog form={form} submitLabel="Ajouter" trigger={children} title="Ajouter une unité">
+      <UnitForm form={form} fields={unitFormFields} />
+    </FormDialog>
   )
 }

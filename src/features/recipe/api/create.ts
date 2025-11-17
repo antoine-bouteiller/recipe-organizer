@@ -1,3 +1,4 @@
+import { toastError } from '@/components/ui/sonner'
 import { authGuard } from '@/features/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
@@ -5,6 +6,7 @@ import { parseFormData } from '@/lib/form-data'
 import { uploadFile } from '@/lib/r2'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import { recipesQueryKeys } from './query-keys'
 
@@ -104,8 +106,16 @@ const createRecipe = createServerFn({
 const createRecipeOptions = () =>
   mutationOptions({
     mutationFn: createRecipe,
-    onSuccess: (_data, _variables, _result, context) => {
-      void context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
+    onSuccess: (_data, variables, _result, context) => {
+      void context.client.invalidateQueries({
+        queryKey: recipesQueryKeys.lists(),
+      })
+      const { data: title } = z.string().safeParse(variables.data.get('title'))
+      toast.success(`Recette ${title} créée `)
+    },
+    onError: (error, variables, _context) => {
+      const { data: title } = z.string().safeParse(variables.data.get('title'))
+      toastError(`Erreur lors de la création de la recette ${title}`, error)
     },
   })
 
