@@ -16,9 +16,15 @@ interface DeleteDialogProps {
   title: string
   onDelete: () => Promise<void> | void
   description: string
+  deleteButtonLabel?: string
 }
 
-export const DeleteDialog = ({ title, onDelete, description }: DeleteDialogProps) => {
+export const DeleteDialog = ({
+  title,
+  onDelete,
+  description,
+  deleteButtonLabel,
+}: DeleteDialogProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, startTransition] = useTransition()
 
@@ -31,8 +37,10 @@ export const DeleteDialog = ({ title, onDelete, description }: DeleteDialogProps
 
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      <ResponsiveDialogTrigger render={<Button variant="destructive" size="sm" />}>
-        <TrashSimpleIcon />
+      <ResponsiveDialogTrigger
+        render={<Button variant="destructive" size={deleteButtonLabel ? 'default' : 'icon'} />}
+      >
+        <TrashSimpleIcon /> {deleteButtonLabel}
       </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>

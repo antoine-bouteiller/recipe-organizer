@@ -48,7 +48,7 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
       submitLabel="Mettre à jour"
       form={form}
       trigger={
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="icon">
           <PencilSimpleIcon />
         </Button>
       }

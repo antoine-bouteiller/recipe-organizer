@@ -48,7 +48,7 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   return (
     <FormDialog
       trigger={
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="icon">
           <PencilSimpleIcon />
         </Button>
       }

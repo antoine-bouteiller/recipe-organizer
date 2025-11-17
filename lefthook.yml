@@ -9,7 +9,7 @@ pre-commit:
       run: bun i --frozen-lockfile --silent
     - name: check
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx}"
-      run: bunx oxlint {staged_files} --fix
+      run: bunx oxlint {staged_files} --fix --type-aware
       stage_fixed: true
     - name: format
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}"
