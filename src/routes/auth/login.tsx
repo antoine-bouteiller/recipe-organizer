@@ -8,14 +8,10 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 const getErrorMessage = (error: string) => {
-  switch (error) {
-    case 'signup_disabled': {
-      return "Veuillez contacter l'administrateur pour vous inscrire"
-    }
-    default: {
-      return 'Une erreur est survenue'
-    }
+  if (error === 'signup_disabled') {
+    return "Veuillez contacter l'administrateur pour vous inscrire"
   }
+  return 'Une erreur est survenue'
 }
 
 const LoginPage = () => {
@@ -42,7 +38,7 @@ const LoginPage = () => {
               src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg"
               alt="Google"
               className="h-4"
-            />
+            />{' '}
             Connexion avec Google
           </Button>
         </CardContent>

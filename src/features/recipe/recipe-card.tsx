@@ -6,7 +6,7 @@ import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 
 interface RecipeCardProps {
-  recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
+  readonly recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
 }
 
 const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -15,7 +15,7 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
   callback()
 }
 
-export default function RecipeCard({ recipe }: RecipeCardProps) {
+export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
   const { setRecipesQuantities, recipesQuantities } = useShoppingListStore()
 
   const isInShoppingCart = recipesQuantities[recipe.id]

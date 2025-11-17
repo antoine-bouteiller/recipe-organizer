@@ -17,7 +17,13 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { useIsMobile } from '@/hooks/use-is-mobile'
-import { createContext, useContext, type ReactNode, type ComponentPropsWithoutRef } from 'react'
+import {
+  createContext,
+  useContext,
+  useMemo,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from 'react'
 
 interface ResponsiveDialogContextValue {
   isMobile: boolean
@@ -44,9 +50,16 @@ interface ResponsiveDialogProps {
 const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogProps) => {
   const isMobile = useIsMobile()
 
+  const contextValue = useMemo(
+    () => ({
+      isMobile,
+    }),
+    [isMobile]
+  )
+
   if (isMobile) {
     return (
-      <ResponsiveDialogContext.Provider value={{ isMobile: true }}>
+      <ResponsiveDialogContext.Provider value={contextValue}>
         <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
       </ResponsiveDialogContext.Provider>
     )
@@ -60,7 +73,7 @@ const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogPro
   }
 
   return (
-    <ResponsiveDialogContext.Provider value={{ isMobile: false }}>
+    <ResponsiveDialogContext.Provider value={contextValue}>
       <Dialog
         onOpenChange={
           onOpenChange

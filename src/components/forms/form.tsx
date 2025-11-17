@@ -3,15 +3,16 @@ import { useRender } from '@base-ui-components/react/use-render'
 import { Label } from '@/components/ui/label'
 import { FormItemContext, useFieldContext, useFormContext } from '@/hooks/use-form-context'
 import { cn } from '@/lib/utils'
-import { useId } from 'react'
+import { useId, useMemo } from 'react'
 import { Button } from '../ui/button'
 import { Spinner } from '../ui/spinner'
 
 const FormItem = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const id = useId()
+  const contextValue = useMemo(() => ({ id }), [id])
 
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={contextValue}>
       <div data-slot="form-item" className={cn('grid gap-2', className)} {...props} />
     </FormItemContext.Provider>
   )

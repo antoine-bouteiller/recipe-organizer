@@ -18,20 +18,24 @@ const ToggleGroup = ({
   size,
   children,
   ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive> & VariantProps<typeof toggleVariants>) => (
-  <ToggleGroupPrimitive
-    data-slot="toggle-group"
-    data-variant={variant}
-    data-size={size}
-    className={cn(
-      'group/toggle-group flex w-fit items-center rounded-md data-[variant=outline]:shadow-xs',
-      className
-    )}
-    {...props}
-  >
-    <ToggleGroupContext.Provider value={{ variant, size }}>{children}</ToggleGroupContext.Provider>
-  </ToggleGroupPrimitive>
-)
+}: React.ComponentProps<typeof ToggleGroupPrimitive> & VariantProps<typeof toggleVariants>) => {
+  const contextValue = React.useMemo(() => ({ variant, size }), [variant, size])
+
+  return (
+    <ToggleGroupPrimitive
+      data-slot="toggle-group"
+      data-variant={variant}
+      data-size={size}
+      className={cn(
+        'group/toggle-group flex w-fit items-center rounded-md data-[variant=outline]:shadow-xs',
+        className
+      )}
+      {...props}
+    >
+      <ToggleGroupContext.Provider value={contextValue}>{children}</ToggleGroupContext.Provider>
+    </ToggleGroupPrimitive>
+  )
+}
 
 const ToggleGroupItem = ({
   className,

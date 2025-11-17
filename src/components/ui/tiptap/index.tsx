@@ -7,7 +7,7 @@ import { TextStyleKit } from '@tiptap/extension-text-style'
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -72,13 +72,15 @@ export const Tiptap = ({
     },
   })
 
+  const editorContextValue = useMemo(() => ({ editor }), [editor])
+
   if (!editor) {
     return undefined
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <EditorContext.Provider value={{ editor }}>
+      <EditorContext.Provider value={editorContextValue}>
         <MenuBar />
         <EditorContent
           editor={editor}

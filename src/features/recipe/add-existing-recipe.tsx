@@ -14,11 +14,14 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 
 interface AddExistingRecipeProps {
-  onSelect: (selectedRecipe: { recipeId: number; name: string; ratio: number }) => void
-  disabled?: boolean
+  readonly onSelect: (selectedRecipe: { recipeId: number; name: string; ratio: number }) => void
+  readonly disabled?: boolean
 }
 
-export default function AddExistingRecipe({ onSelect, disabled }: AddExistingRecipeProps) {
+export default function AddExistingRecipe({
+  onSelect,
+  disabled,
+}: Readonly<AddExistingRecipeProps>) {
   const { data: recipes } = useQuery(getRecipeListOptions())
 
   const recipesOptions =
