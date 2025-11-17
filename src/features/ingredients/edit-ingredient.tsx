@@ -16,6 +16,7 @@ import type { Ingredient } from '@/types/ingredient'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
+import { useState } from 'react'
 
 interface EditIngredientProps {
   ingredient: Ingredient
@@ -25,6 +26,7 @@ const FormDialog = getFormDialog(ingredientDefaultValues)
 
 export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const updateMutation = useMutation(updateIngredientOptions())
+  const [open, setOpen] = useState(false)
 
   const initialValues: UpdateIngredientFormInput = {
     id: ingredient.id,
@@ -39,9 +41,17 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
     validationLogic: revalidateLogic(),
     defaultValues: initialValues,
     onSubmit: async (data) => {
-      await updateMutation.mutateAsync({
-        data: updateIngredientSchema.parse(data.value),
-      })
+      await updateMutation.mutateAsync(
+        {
+          data: updateIngredientSchema.parse(data.value),
+        },
+        {
+          onSuccess: () => {
+            form.reset()
+            setOpen(false)
+          },
+        }
+      )
     },
   })
 
@@ -52,6 +62,8 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
           <PencilSimpleIcon />
         </Button>
       }
+      open={open}
+      setOpen={setOpen}
       title="Modifier l'ingrédient"
       submitLabel="Mettre à jour"
       form={form}

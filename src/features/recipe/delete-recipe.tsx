@@ -1,4 +1,5 @@
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
+import { Button } from '@/components/ui/button'
 import { deleteRecipeOptions } from '@/features/recipe/api/delete'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
@@ -30,6 +31,8 @@ export default function DeleteRecipe({ recipeId, recipeName }: Readonly<DeleteRe
       description={`Êtes-vous sûr de vouloir supprimer la recette ${recipeName}?`}
       title="Supprimer la recette"
       onDelete={handleDelete}
+      deleteButtonLabel="Supprimer la recette"
+      trigger={<Button variant="ghost" className="text-destructive hover:text-destructive" />}
     />
   )
 }

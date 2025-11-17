@@ -1,9 +1,10 @@
 import { withForm } from '@/hooks/use-app-form'
-import { useState, type ComponentPropsWithoutRef } from 'react'
+import { type ComponentPropsWithoutRef } from 'react'
 import { Button } from '../ui/button'
 import type { DialogTrigger } from '../ui/dialog'
 import {
   ResponsiveDialog,
+  ResponsiveDialogClose,
   ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
@@ -16,47 +17,44 @@ interface FormModalProps {
   title: string
   submitLabel: string
   trigger: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
+  open: boolean
+  setOpen: (open: boolean) => void
 }
 
 export const getFormDialog = <T,>(defaultValues: T) =>
   withForm({
     defaultValues,
     props: {} as FormModalProps,
-    render: function Render({ form, children, title, submitLabel, trigger }) {
-      const [isOpen, setIsOpen] = useState(false)
+    render: ({ form, children, title, submitLabel, trigger, open, setOpen }) => (
+      <ResponsiveDialog open={open} onOpenChange={setOpen}>
+        <ResponsiveDialogTrigger render={trigger} />
 
-      return (
-        <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-          <ResponsiveDialogTrigger render={trigger} />
+        <ResponsiveDialogContent>
           <form
             onSubmit={async (event) => {
               event.preventDefault()
+              event.stopPropagation()
               await form.handleSubmit()
-              form.reset()
-              setIsOpen(false)
             }}
           >
-            <ResponsiveDialogContent>
+            <div className="flex flex-col gap-2 px-4 md:px-0">
               <ResponsiveDialogHeader>
                 <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
               </ResponsiveDialogHeader>
-              <div className="flex flex-col gap-4 px-4 md:px-0">{children}</div>
+              {children}
               <ResponsiveDialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsOpen(false)}
-                  disabled={form.state.isSubmitting}
+                <ResponsiveDialogClose
+                  render={<Button variant="outline" disabled={form.state.isSubmitting} />}
                 >
                   Annuler
-                </Button>
+                </ResponsiveDialogClose>
                 <form.AppForm>
                   <form.FormSubmit label={submitLabel} />
                 </form.AppForm>
               </ResponsiveDialogFooter>
-            </ResponsiveDialogContent>
+            </div>
           </form>
-        </ResponsiveDialog>
-      )
-    },
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
+    ),
   })

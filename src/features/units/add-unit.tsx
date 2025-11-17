@@ -4,7 +4,7 @@ import { unitDefaultValues, UnitForm, unitFormFields } from '@/features/units/un
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { type JSX } from 'react'
+import { useState, type JSX } from 'react'
 
 interface AddUnitProps {
   defaultValue?: string
@@ -15,6 +15,7 @@ const FormDialog = getFormDialog(unitDefaultValues)
 
 export const AddUnit = ({ defaultValue, children }: AddUnitProps) => {
   const createMutation = useMutation(createUnitOptions())
+  const [open, setOpen] = useState(false)
 
   const form = useAppForm({
     validators: {
@@ -26,14 +27,29 @@ export const AddUnit = ({ defaultValue, children }: AddUnitProps) => {
       symbol: defaultValue ?? unitDefaultValues.symbol,
     } as UnitFormInput,
     onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync({
-        data: unitSchema.parse(value),
-      })
+      await createMutation.mutateAsync(
+        {
+          data: unitSchema.parse(value),
+        },
+        {
+          onSuccess: () => {
+            form.reset()
+            setOpen(false)
+          },
+        }
+      )
     },
   })
 
   return (
-    <FormDialog form={form} submitLabel="Ajouter" trigger={children} title="Ajouter une unité">
+    <FormDialog
+      form={form}
+      submitLabel="Ajouter"
+      trigger={children}
+      title="Ajouter une unité"
+      open={open}
+      setOpen={setOpen}
+    >
       <UnitForm form={form} fields={unitFormFields} />
     </FormDialog>
   )

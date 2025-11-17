@@ -12,7 +12,7 @@ import {
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { type JSX } from 'react'
+import { useState, type JSX } from 'react'
 
 interface AddIngredientProps {
   defaultValue?: string
@@ -23,6 +23,7 @@ const FormDialog = getFormDialog(ingredientDefaultValues)
 
 export const AddIngredient = ({ defaultValue, children }: AddIngredientProps) => {
   const createMutation = useMutation(createIngredientOptions())
+  const [open, setOpen] = useState(false)
 
   const form = useAppForm({
     validators: {
@@ -34,14 +35,29 @@ export const AddIngredient = ({ defaultValue, children }: AddIngredientProps) =>
       name: defaultValue ?? ingredientDefaultValues.name,
     } as IngredientFormInput,
     onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync({
-        data: ingredientSchema.parse(value),
-      })
+      await createMutation.mutateAsync(
+        {
+          data: ingredientSchema.parse(value),
+        },
+        {
+          onSuccess: () => {
+            form.reset()
+            setOpen(false)
+          },
+        }
+      )
     },
   })
 
   return (
-    <FormDialog trigger={children} title="Ajouter un ingrédient" submitLabel="Ajouter" form={form}>
+    <FormDialog
+      trigger={children}
+      title="Ajouter un ingrédient"
+      submitLabel="Ajouter"
+      setOpen={setOpen}
+      open={open}
+      form={form}
+    >
       <IngredientForm form={form} fields={ingredientFormFields} />
     </FormDialog>
   )

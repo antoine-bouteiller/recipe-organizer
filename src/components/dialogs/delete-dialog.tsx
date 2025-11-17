@@ -8,8 +8,9 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { TrashSimpleIcon } from '@phosphor-icons/react'
-import { useState, useTransition } from 'react'
+import { TrashIcon } from '@phosphor-icons/react'
+import { useState, useTransition, type ComponentPropsWithoutRef } from 'react'
+import type { DialogTrigger } from '../ui/dialog'
 import { Spinner } from '../ui/spinner'
 
 interface DeleteDialogProps {
@@ -17,6 +18,7 @@ interface DeleteDialogProps {
   onDelete: () => Promise<void> | void
   description: string
   deleteButtonLabel?: string
+  trigger?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
 export const DeleteDialog = ({
@@ -24,6 +26,7 @@ export const DeleteDialog = ({
   onDelete,
   description,
   deleteButtonLabel,
+  trigger = <Button variant="destructive" />,
 }: DeleteDialogProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, startTransition] = useTransition()
@@ -37,10 +40,8 @@ export const DeleteDialog = ({
 
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={setIsOpen}>
-      <ResponsiveDialogTrigger
-        render={<Button variant="destructive" size={deleteButtonLabel ? 'default' : 'icon'} />}
-      >
-        <TrashSimpleIcon /> {deleteButtonLabel}
+      <ResponsiveDialogTrigger render={trigger}>
+        <TrashIcon /> {deleteButtonLabel}
       </ResponsiveDialogTrigger>
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>

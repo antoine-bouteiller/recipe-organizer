@@ -29,7 +29,9 @@ interface ResponsiveDialogContextValue {
   isMobile: boolean
 }
 
-const ResponsiveDialogContext = createContext<ResponsiveDialogContextValue>({ isMobile: false })
+const ResponsiveDialogContext = createContext<ResponsiveDialogContextValue>({
+  isMobile: false,
+})
 
 const useResponsiveDialogContext = () => {
   const context = useContext(ResponsiveDialogContext)
@@ -171,19 +173,11 @@ interface ResponsiveDialogCloseProps {
   render?: ComponentPropsWithoutRef<typeof DialogClose>['render']
 }
 
-const ResponsiveDialogClose = ({ children, render, ...props }: ResponsiveDialogCloseProps) => {
+const ResponsiveDialogClose = ({ children, ...props }: ResponsiveDialogCloseProps) => {
   const { isMobile } = useResponsiveDialogContext()
 
   if (isMobile) {
     return <DrawerClose {...props}>{children}</DrawerClose>
-  }
-
-  if (render) {
-    return (
-      <DialogClose render={render} {...props}>
-        {children}
-      </DialogClose>
-    )
   }
 
   return <DialogClose {...props}>{children}</DialogClose>
