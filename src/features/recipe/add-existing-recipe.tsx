@@ -57,7 +57,6 @@ export default function AddExistingRecipe({
         </ResponsiveDialogHeader>
         <div className="p-4">
           <Combobox
-            label="Recette"
             placeholder="Rechercher une recette"
             noResultsLabel="Aucune recette trouvée"
             searchPlaceholder="Rechercher une recette"

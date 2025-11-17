@@ -24,7 +24,6 @@ interface Option {
 }
 
 interface ComboboxProps {
-  label?: string
   placeholder?: string
   searchPlaceholder?: string
   disabled?: boolean
@@ -45,6 +44,7 @@ const Combobox = ({
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
   addNew,
+  disabled,
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
@@ -55,6 +55,7 @@ const Combobox = ({
           <Button
             variant="outline"
             role="button"
+            disabled={disabled}
             aria-expanded={open}
             className={cn(
               'w-full justify-between text-ellipsis bg-transparent border-input',
@@ -72,6 +73,7 @@ const Combobox = ({
       <ResponsivePopoverContent className="w-(--anchor-width) p-0">
         <ComboboxContent
           setOpen={setOpen}
+          disabled={disabled}
           options={options}
           value={value}
           onChange={onChange}
@@ -92,6 +94,7 @@ interface ComboboxContentProps {
   setOpen: (open: boolean) => void
   noResultsLabel: string
   addNew?: (inputValue: string) => ReactNode
+  disabled?: boolean
 }
 
 const ComboboxContent = ({
@@ -102,6 +105,7 @@ const ComboboxContent = ({
   setOpen,
   noResultsLabel,
   addNew,
+  disabled,
 }: ComboboxContentProps) => {
   const [inputValue, setInputValue] = useState('')
   return (
@@ -110,6 +114,7 @@ const ComboboxContent = ({
         placeholder={searchPlaceholder}
         value={inputValue}
         onValueChange={setInputValue}
+        disabled={disabled}
       />
       <CommandList>
         <ScrollArea>
