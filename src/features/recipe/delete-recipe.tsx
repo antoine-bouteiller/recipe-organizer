@@ -15,7 +15,7 @@ import { useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { toast } from 'sonner'
 
-export default function DeleteRecipe({ recipeId }: { recipeId: number }) {
+export default function DeleteRecipe({ recipeId }: Readonly<{ recipeId: number }>) {
   const { mutateAsync: deleteRecipe } = useMutation(deleteRecipeOptions())
   const router = useRouter()
 

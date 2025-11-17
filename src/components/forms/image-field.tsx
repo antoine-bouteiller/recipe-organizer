@@ -40,7 +40,7 @@ export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) =
       >
         {previewUrl ? (
           <div className="absolute inset-0">
-            <img src={previewUrl} className="size-full object-cover" />
+            <img src={previewUrl} alt="Image preview" className="size-full object-cover" />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center px-4 py-3 text-center">

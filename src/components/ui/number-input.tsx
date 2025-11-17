@@ -73,7 +73,7 @@ const NumberInput = ({
   }, [controlledValue])
 
   const handleChange = (values: { value: string; floatValue: number | undefined }) => {
-    const newValue = values.floatValue === undefined ? undefined : values.floatValue
+    const newValue = values.floatValue ?? undefined
     setValue(newValue)
     if (onValueChange) {
       onValueChange(newValue)

@@ -34,6 +34,17 @@ export const recipeDefaultValues: RecipeFormInput = {
 const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) =>
   section && 'recipeId' in section && !!section.recipeId
 
+const generateSectionKey = (
+  section: NonNullable<RecipeFormInput['sections']>[number],
+  index: number
+): string => {
+  if (section && 'recipeId' in section) {
+    return `section-recipe-${section.recipeId}`
+  }
+  const firstIngredientId = section.ingredients?.[0]?.id ?? ''
+  return `section-${index}-${firstIngredientId}`
+}
+
 export const recipeFormFields = createFieldMap(recipeDefaultValues)
 
 interface RecipeFormProps extends Record<string, unknown> {
@@ -94,8 +105,11 @@ export const RecipeForm = withFieldGroup({
           <Field name="sections" mode="array">
             {({ state: sectionsState, removeValue: removeSection, pushValue: addSection }) => (
               <>
-                {sectionsState.value?.map((_, sectionIndex) => (
-                  <AppField name={`sections[${sectionIndex}]`} key={`section-${sectionIndex}`}>
+                {sectionsState.value?.map((section, sectionIndex) => (
+                  <AppField
+                    name={`sections[${sectionIndex}]`}
+                    key={generateSectionKey(section, sectionIndex)}
+                  >
                     {({
                       FormItem: SectionFormItem,
                       FormControl: SectionFormControl,
@@ -138,7 +152,7 @@ export const RecipeForm = withFieldGroup({
                                   <div className="flex flex-col gap-2 pt-2">
                                     {ingredientsState.value?.map((ingredient, ingredientIndex) => (
                                       <Fragment
-                                        key={`ingredient-${JSON.stringify(ingredient.id)}-${sectionIndex}`}
+                                        key={`ingredient-s${sectionIndex}-i${ingredientIndex}-${String(ingredient.id) || 'new'}`}
                                       >
                                         <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col">
                                           <AppField
@@ -150,7 +164,7 @@ export const RecipeForm = withFieldGroup({
                                                 disabled={isSubmitting}
                                                 placeholder="Sélectionner un ingrédient"
                                                 searchPlaceholder="Rechercher un ingrédient"
-                                                addNew={(inputValue) => (
+                                                addNew={(inputValue: string) => (
                                                   <AddIngredient
                                                     key={inputValue}
                                                     defaultValue={inputValue}
@@ -160,7 +174,10 @@ export const RecipeForm = withFieldGroup({
                                                       size="sm"
                                                       className="w-full justify-start font-normal px-1.5"
                                                     >
-                                                      <PlusIcon className="size-4" aria-hidden="true" />
+                                                      <PlusIcon
+                                                        className="size-4"
+                                                        aria-hidden="true"
+                                                      />
                                                       Nouvel ingrédient: {inputValue}
                                                     </Button>
                                                   </AddIngredient>
@@ -190,14 +207,20 @@ export const RecipeForm = withFieldGroup({
                                                 placeholder="Sélectionner une unité"
                                                 searchPlaceholder="Rechercher une unité"
                                                 noResultsLabel="Aucune unité trouvée"
-                                                addNew={(inputValue) => (
-                                                  <AddUnit key={inputValue} defaultValue={inputValue}>
+                                                addNew={(inputValue: string) => (
+                                                  <AddUnit
+                                                    key={inputValue}
+                                                    defaultValue={inputValue}
+                                                  >
                                                     <Button
                                                       variant="ghost"
                                                       size="sm"
                                                       className="w-full justify-start font-normal px-1.5"
                                                     >
-                                                      <PlusIcon className="size-4" aria-hidden="true" />
+                                                      <PlusIcon
+                                                        className="size-4"
+                                                        aria-hidden="true"
+                                                      />
                                                       Nouvelle unité: {inputValue}
                                                     </Button>
                                                   </AddUnit>

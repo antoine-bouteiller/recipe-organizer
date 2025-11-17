@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, type ReactNode } from 'react'
 
 import {
   Drawer,
@@ -45,16 +45,19 @@ interface ResponsivePopoverProps {
 const ResponsivePopover = ({ onOpenChange, modal, ...props }: ResponsivePopoverProps) => {
   const isMobile = useIsMobile()
 
+  const mobileContextValue = useMemo(() => ({ isMobile: true }), [])
+  const desktopContextValue = useMemo(() => ({ isMobile: false }), [])
+
   if (isMobile) {
     return (
-      <ResponsivePopoverContext.Provider value={{ isMobile: true }}>
+      <ResponsivePopoverContext.Provider value={mobileContextValue}>
         <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
       </ResponsivePopoverContext.Provider>
     )
   }
 
   return (
-    <ResponsivePopoverContext.Provider value={{ isMobile: false }}>
+    <ResponsivePopoverContext.Provider value={desktopContextValue}>
       <Popover onOpenChange={onOpenChange} {...props} />
     </ResponsivePopoverContext.Provider>
   )

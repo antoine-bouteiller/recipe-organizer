@@ -13,7 +13,7 @@ const listIcons: Record<ListType, Icon> = {
 }
 
 export const canToggleList = (editor: Editor | null, type: ListType): boolean => {
-  if (!editor || !editor.isEditable) {
+  if (!editor?.isEditable) {
     return false
   }
 
@@ -37,7 +37,7 @@ export const canToggleList = (editor: Editor | null, type: ListType): boolean =>
  * Toggles list in the editor
  */
 export const toggleList = (editor: Editor | null, type: ListType) => {
-  if (!editor || !editor.isEditable) {
+  if (!editor?.isEditable) {
     return false
   }
   if (!canToggleList(editor, type)) {
