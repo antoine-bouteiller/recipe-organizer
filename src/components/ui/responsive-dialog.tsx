@@ -21,8 +21,8 @@ import {
   createContext,
   useContext,
   useMemo,
-  type ReactNode,
   type ComponentPropsWithoutRef,
+  type ReactNode,
 } from 'react'
 
 interface ResponsiveDialogContextValue {
@@ -50,12 +50,16 @@ interface ResponsiveDialogProps {
 const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogProps) => {
   const isMobile = useIsMobile()
 
-  const mobileContextValue = useMemo(() => ({ isMobile: true }), [])
-  const desktopContextValue = useMemo(() => ({ isMobile: false }), [])
+  const contextValue = useMemo(
+    () => ({
+      isMobile,
+    }),
+    [isMobile]
+  )
 
   if (isMobile) {
     return (
-      <ResponsiveDialogContext.Provider value={mobileContextValue}>
+      <ResponsiveDialogContext.Provider value={contextValue}>
         <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
       </ResponsiveDialogContext.Provider>
     )
@@ -69,7 +73,7 @@ const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogPro
   }
 
   return (
-    <ResponsiveDialogContext.Provider value={desktopContextValue}>
+    <ResponsiveDialogContext.Provider value={contextValue}>
       <Dialog
         onOpenChange={
           onOpenChange

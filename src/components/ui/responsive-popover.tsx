@@ -45,19 +45,23 @@ interface ResponsivePopoverProps {
 const ResponsivePopover = ({ onOpenChange, modal, ...props }: ResponsivePopoverProps) => {
   const isMobile = useIsMobile()
 
-  const mobileContextValue = useMemo(() => ({ isMobile: true }), [])
-  const desktopContextValue = useMemo(() => ({ isMobile: false }), [])
+  const contextValue = useMemo(
+    () => ({
+      isMobile,
+    }),
+    [isMobile]
+  )
 
   if (isMobile) {
     return (
-      <ResponsivePopoverContext.Provider value={mobileContextValue}>
+      <ResponsivePopoverContext.Provider value={contextValue}>
         <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
       </ResponsivePopoverContext.Provider>
     )
   }
 
   return (
-    <ResponsivePopoverContext.Provider value={desktopContextValue}>
+    <ResponsivePopoverContext.Provider value={contextValue}>
       <Popover onOpenChange={onOpenChange} {...props} />
     </ResponsivePopoverContext.Provider>
   )

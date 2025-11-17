@@ -39,9 +39,9 @@ const generateSectionKey = (
   index: number
 ): string => {
   if (section && 'recipeId' in section) {
-    return `section-recipe-${section.recipeId}`
+    return `section-recipe-${JSON.stringify(section.recipeId)}`
   }
-  const firstIngredientId = section.ingredients?.[0]?.id ?? ''
+  const firstIngredientId = JSON.stringify(section.ingredients?.[0]?.id ?? '')
   return `section-${index}-${firstIngredientId}`
 }
 
