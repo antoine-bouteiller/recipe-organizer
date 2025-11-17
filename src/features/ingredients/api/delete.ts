@@ -23,7 +23,9 @@ const deleteIngredientOptions = () =>
   mutationOptions({
     mutationFn: deleteIngredient,
     onSuccess: async (_data, _variables, _result, context) => {
-      await context.client.invalidateQueries({ queryKey: ingredientsQueryKeys.list() })
+      await context.client.invalidateQueries({
+        queryKey: ingredientsQueryKeys.list(),
+      })
     },
   })
 

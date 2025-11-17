@@ -1,6 +1,6 @@
 import { useRouteContext } from '@tanstack/react-router'
 import type { ToasterProps } from 'sonner'
-import { Toaster as Sonner } from 'sonner'
+import { Toaster as Sonner, toast } from 'sonner'
 
 const style = {
   '--normal-bg': 'var(--popover)',
@@ -14,4 +14,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return <Sonner theme={theme} className="toaster group" richColors style={style} {...props} />
 }
 
-export { Toaster }
+const toastError = (message: string, error: unknown) => {
+  toast.error(message, {
+    description: error instanceof Error ? error.message : String(error),
+  })
+}
+
+export { Toaster, toastError }

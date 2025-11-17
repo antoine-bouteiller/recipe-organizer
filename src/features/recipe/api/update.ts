@@ -1,3 +1,4 @@
+import { toastError } from '@/components/ui/sonner'
 import { authGuard } from '@/features/auth/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
@@ -9,6 +10,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
+import { toast } from 'sonner'
 import { z } from 'zod'
 import { recipesQueryKeys } from './query-keys'
 
@@ -101,9 +103,20 @@ const updateRecipe = createServerFn({
 const updateRecipeOptions = () =>
   mutationOptions({
     mutationFn: updateRecipe,
-    onSuccess: (data, _variables, _result, context) => {
-      void context.client.invalidateQueries({ queryKey: recipesQueryKeys.lists() })
-      void context.client.invalidateQueries({ queryKey: recipesQueryKeys.detail(data) })
+    onSuccess: (data, variables, _result, context) => {
+      void context.client.invalidateQueries({
+        queryKey: recipesQueryKeys.lists(),
+      })
+      void context.client.invalidateQueries({
+        queryKey: recipesQueryKeys.detail(data),
+      })
+      toast.success(`Recette ${variables.data.get('title')} mise à jour`)
+    },
+    onError: (error, variables) => {
+      toastError(
+        `Erreur lors de la mise à jour de la recette ${variables.data.get('title')}`,
+        error
+      )
     },
   })
 
