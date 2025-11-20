@@ -1,6 +1,5 @@
-import { CardLayout } from '@/components/card-layout'
+import { ScreenLayout } from '@/components/screen-layout'
 import { Button } from '@/components/ui/button'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
@@ -90,39 +89,34 @@ const EditRecipePage = () => {
   }
 
   return (
-    <CardLayout>
-      <CardHeader className="text-center pt-6">
-        <CardTitle className="text-3xl font-bold">Modifier la recette</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-          className="space-y-6"
-        >
-          <RecipeForm
-            form={form}
-            fields={recipeFormFields}
-            initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }}
-          />
-          <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.navigate({ to: '/' })}
-              disabled={isLoading}
-            >
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Modifier la recette" />
-            </form.AppForm>
-          </div>
-        </form>
-      </CardContent>
-    </CardLayout>
+    <ScreenLayout title=" Modifier la recette" withGoBack>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          void form.handleSubmit()
+        }}
+        className="space-y-6"
+      >
+        <RecipeForm
+          form={form}
+          fields={recipeFormFields}
+          initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }}
+        />
+        <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.navigate({ to: '/' })}
+            disabled={isLoading}
+          >
+            Annuler
+          </Button>
+          <form.AppForm>
+            <form.FormSubmit label="Modifier la recette" />
+          </form.AppForm>
+        </div>
+      </form>
+    </ScreenLayout>
   )
 }
 

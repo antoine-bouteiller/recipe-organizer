@@ -1,3 +1,4 @@
+import { ScreenLayout } from '@/components/screen-layout'
 import { Card } from '@/components/ui/card'
 import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon } from '@phosphor-icons/react'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -27,9 +28,7 @@ const settingsSections = [
 ]
 
 const RouteComponent = () => (
-  <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto">
-    <h1 className="text-2xl font-bold">Paramètres</h1>
-
+  <ScreenLayout title="Paramètres">
     <div className="grid gap-4 md:grid-cols-2">
       {settingsSections.map((section) => {
         const Icon = section.icon
@@ -53,7 +52,7 @@ const RouteComponent = () => (
         )
       })}
     </div>
-  </div>
+  </ScreenLayout>
 )
 
 export const Route = createFileRoute('/settings/')({

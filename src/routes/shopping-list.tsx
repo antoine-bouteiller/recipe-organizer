@@ -1,6 +1,5 @@
-import { CardLayout } from '@/components/card-layout'
+import { ScreenLayout } from '@/components/screen-layout'
 import { Button } from '@/components/ui/button'
-import { CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
 import { useShoppingListStore, type IngredientWithQuantity } from '@/stores/shopping-list.store'
@@ -37,17 +36,18 @@ const CartPage = () => {
   const { shoppingListIngredients, reset } = useShoppingListStore()
 
   return (
-    <CardLayout className="py-8 gap-4 px-4">
-      <CardHeader className="text-2xl font-bold">Liste de courses</CardHeader>
-      <Button variant="outline" size="icon" onClick={reset} className="absolute top-8 right-4">
-        <ArrowCounterClockwiseIcon className="h-4 w-4" />
-      </Button>
-      <CardContent className="flex flex-col gap-2">
-        {shoppingListIngredients.map((ingredient) => (
-          <CartItem key={ingredient.id} ingredient={ingredient} />
-        ))}
-      </CardContent>
-    </CardLayout>
+    <ScreenLayout
+      title="Liste de courses"
+      headerEndItem={
+        <Button variant="outline" size="icon" onClick={reset}>
+          <ArrowCounterClockwiseIcon className="sier-4 text-primary" />
+        </Button>
+      }
+    >
+      {shoppingListIngredients.map((ingredient) => (
+        <CartItem key={ingredient.id} ingredient={ingredient} />
+      ))}
+    </ScreenLayout>
   )
 }
 

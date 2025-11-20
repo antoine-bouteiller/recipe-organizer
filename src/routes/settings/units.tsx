@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { ScreenLayout } from '@/components/screen-layout'
 import { Input } from '@/components/ui/input'
 import {
   Item,
@@ -9,13 +9,12 @@ import {
   ItemSeparator,
   ItemTitle,
 } from '@/components/ui/item'
-import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { DeleteUnit } from '@/features/units/delete-unit'
 import { EditUnit } from '@/features/units/edit-unit'
-import { ArrowLeftIcon, MagnifyingGlassIcon, PlusIcon } from '@phosphor-icons/react'
+import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
 import { useMemo, useState } from 'react'
 
@@ -41,23 +40,7 @@ const UnitsManagement = () => {
   }, [units, searchQuery])
 
   return (
-    <div className="flex flex-col gap-6 p-4 max-w-4xl mx-auto w-full">
-      <div className="flex items-center gap-2">
-        <Link to="/settings">
-          <Button variant="ghost" size="icon">
-            <ArrowLeftIcon className="h-5 w-5" />
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold">Unités de mesure</h1>
-        </div>
-        <AddUnit>
-          <Button variant="default" size="sm">
-            <PlusIcon />
-          </Button>
-        </AddUnit>
-      </div>
-
+    <ScreenLayout withGoBack title="Unitées">
       <div className="relative">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
@@ -106,7 +89,7 @@ const UnitsManagement = () => {
           ))}
         </ItemGroup>
       )}
-    </div>
+    </ScreenLayout>
   )
 }
 

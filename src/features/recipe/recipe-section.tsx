@@ -1,5 +1,4 @@
 import type { Recipe, RecipeSection } from '@/features/recipe/api/get-one'
-import { Fragment } from 'react/jsx-runtime'
 
 interface RecipeSectionIngredientsProps {
   sectionIngredients: RecipeSection['sectionIngredients']
@@ -40,7 +39,7 @@ export const RecipeIngredientsSections = ({
   baseQuantity,
 }: RecipeIngredientsSectionsProps) =>
   sections.map((section) => (
-    <Fragment key={section.id}>
+    <p key={section.id}>
       {section.name && <h3 className="mb-1 text-md font-semibold">{section.name}</h3>}
 
       <RecipeSectionIngredients
@@ -56,5 +55,5 @@ export const RecipeIngredientsSections = ({
           baseQuantity={baseQuantity}
         />
       )}
-    </Fragment>
+    </p>
   ))

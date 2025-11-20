@@ -18,7 +18,9 @@ const RootComponent = () => {
     if ('serviceWorker' in navigator && import.meta.env.PROD) {
       const swUrl = new URL(`/sw.js`, globalThis.location.href).toString()
 
-      void navigator.serviceWorker.register(swUrl, { scope: import.meta.env.BASE_URL })
+      void navigator.serviceWorker.register(swUrl, {
+        scope: import.meta.env.BASE_URL,
+      })
     }
   }, [])
 
@@ -29,14 +31,14 @@ const RootComponent = () => {
       <head>
         <HeadContent />
       </head>
-      <body className="flex flex-col min-h-dvh">
+      <body className="flex flex-col h-dvh overflow-hidden">
         <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
           <Navbar />
         </header>
-        <div className="flex-1 flex flex-col pb-14 md:pb-0">
+        <div className="flex-1 flex flex-col pb-14 md:pb-0 min-h-0">
           <Outlet />
         </div>
-        <div className="w-full md:hidden fixed bottom-0">
+        <div className="w-full md:hidden fixed bottom-0 z-10">
           <TabBar />
         </div>
         <Toaster />
@@ -74,6 +76,19 @@ export const Route = createRootRouteWithContext<{
       { rel: 'manifest', href: '/manifest.json' },
       { rel: 'icon', href: '/favicon.ico' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap',
+      },
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+      {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossOrigin: 'anonymous',
+      },
     ],
   }),
   beforeLoad: async () => {

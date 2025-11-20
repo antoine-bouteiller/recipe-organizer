@@ -1,6 +1,5 @@
-import { CardLayout } from '@/components/card-layout'
+import { ScreenLayout } from '@/components/screen-layout'
 import { Button } from '@/components/ui/button'
-import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
@@ -31,35 +30,30 @@ const NewRecipePage = () => {
   })
 
   return (
-    <CardLayout>
-      <CardHeader className="text-center pt-6">
-        <CardTitle className="text-3xl font-bold">Nouvelle Recette</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <form
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-          className="space-y-6"
-        >
-          <RecipeForm form={form} fields={recipeFormFields} />
-          <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.navigate({ to: '/' })}
-              disabled={form.state.isSubmitting}
-            >
-              Annuler
-            </Button>
-            <form.AppForm>
-              <form.FormSubmit label="Créer la recette" />
-            </form.AppForm>
-          </div>
-        </form>
-      </CardContent>
-    </CardLayout>
+    <ScreenLayout title="Nouvelle Recette" withGoBack>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault()
+          void form.handleSubmit()
+        }}
+        className="space-y-6"
+      >
+        <RecipeForm form={form} fields={recipeFormFields} />
+        <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.navigate({ to: '/' })}
+            disabled={form.state.isSubmitting}
+          >
+            Annuler
+          </Button>
+          <form.AppForm>
+            <form.FormSubmit label="Créer la recette" />
+          </form.AppForm>
+        </div>
+      </form>
+    </ScreenLayout>
   )
 }
 
