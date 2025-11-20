@@ -13,21 +13,21 @@ const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-2 text-nowrap text-ellipsis',
+        'flex items-center text-nowrap text-ellipsis gap-2',
         isChecked && 'line-through'
       )}
     >
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id={`ingredient-${ingredient.id}`}
-          checked={isChecked}
-          onCheckedChange={(checked) => setIsChecked(checked)}
-        />
-        <label htmlFor={`ingredient-${ingredient.id}`}>{ingredient.name}</label>
-      </div>
-      <div className="font-medium">
-        {ingredient.quantity} {ingredient.unit && ` ${ingredient.unit}`}
-      </div>
+      <Checkbox
+        id={`ingredient-${ingredient.id}`}
+        checked={isChecked}
+        onCheckedChange={(checked) => setIsChecked(checked)}
+      />
+      <label htmlFor={`ingredient-${ingredient.id}`} className="flex-1 flex justify-between">
+        <span>{ingredient.name}</span>
+        <span>
+          {ingredient.quantity} {ingredient.unit && ` ${ingredient.unit}`}
+        </span>
+      </label>
     </div>
   )
 }
@@ -44,9 +44,11 @@ const CartPage = () => {
         </Button>
       }
     >
-      {shoppingListIngredients.map((ingredient) => (
-        <CartItem key={ingredient.id} ingredient={ingredient} />
-      ))}
+      <div className="p-4 space-y-2">
+        {shoppingListIngredients.map((ingredient) => (
+          <CartItem key={ingredient.id} ingredient={ingredient} />
+        ))}
+      </div>
     </ScreenLayout>
   )
 }

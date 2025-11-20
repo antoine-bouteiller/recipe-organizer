@@ -19,12 +19,11 @@ const RecipeList = () => {
       </div>
       <Button
         render={<Link to="/recipe/new" />}
-        className="blurred-box fixed right-4 bottom-16 text-primary size-12 md:hidden rounded-full hover:text-primary"
-        variant="ghost"
+        className="fixed right-2 bottom-16 size-12 md:hidden rounded-full hover:text-primary"
         size="icon"
       >
         <BookIcon className="size-5" />
-        <div className="absolute bottom-2 right-2 p-0.5 border border-primary bg-white rounded-full">
+        <div className="absolute bottom-3 right-3 p-0.5 border rounded-full bg-primary border-primary-foreground">
           <PlusIcon className="size-1.5" />
         </div>
       </Button>

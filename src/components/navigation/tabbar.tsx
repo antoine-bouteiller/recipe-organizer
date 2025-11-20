@@ -40,7 +40,7 @@ export const TabBar = () => {
   }, [location])
 
   return (
-    <div className="relative flex flex-1 blurred-box py-2 rounded-t-3xl">
+    <div className="relative flex flex-1 py-2 border-t border-border">
       <div className="flex justify-around items-center flex-1 mx-4">
         {items.map((item) => (
           <Button

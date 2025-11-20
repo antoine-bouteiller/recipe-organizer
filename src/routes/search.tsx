@@ -1,3 +1,4 @@
+import { ScreenLayout } from '@/components/screen-layout'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator } from '@/components/ui/item'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
@@ -16,8 +17,8 @@ const RouteComponent = () => {
   const { data: recipes } = useQuery(getRecipeListOptions(debouncedSearch))
 
   return (
-    <>
-      <ItemGroup className="flex-1 px-4 justify-end pb-12">
+    <ScreenLayout title="Rechercher">
+      <ItemGroup className="flex-1 px-4 justify-end pb-8">
         {recipes?.map((recipe, index) => (
           <Fragment key={recipe.id}>
             <Item render={<Link to="/recipe/$id" params={{ id: recipe.id.toString() }} />}>
@@ -30,7 +31,7 @@ const RouteComponent = () => {
           </Fragment>
         ))}
       </ItemGroup>
-      <div className="[--radius:9999px] fixed bottom-16 px-4 w-full">
+      <div className="[--radius:9999px] fixed bottom-16 px-4 w-full left-0">
         <InputGroup className="h-10 border-none blurred-box has-[[data-slot=input-group-control]:focus-visible]:border-0 has-[[data-slot=input-group-control]:focus-visible]:ring-0 pl-2">
           <InputGroupInput
             placeholder="Search recipes..."
@@ -44,7 +45,7 @@ const RouteComponent = () => {
           </InputGroupAddon>
         </InputGroup>
       </div>
-    </>
+    </ScreenLayout>
   )
 }
 

@@ -45,8 +45,8 @@ const RecipePage = () => {
   }
 
   return (
-    <div className="flex w-full justify-center">
-      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-md">
+    <div className="flex w-full justify-center overflow-hidden">
+      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-md overflow-y-auto">
         <Button
           variant="outline"
           size="icon"
