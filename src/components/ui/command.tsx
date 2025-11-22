@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 
 const Command = ({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) => (
   <CommandPrimitive
@@ -29,11 +29,12 @@ const CommandDialog = ({
   className,
   showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof Dialog> & {
+}: Omit<React.ComponentProps<typeof Dialog>, 'children'> & {
   title?: string
   description?: string
   className?: string
   showCloseButton?: boolean
+  children?: React.ReactNode
 }) => (
   <Dialog {...props}>
     <DialogHeader className="sr-only">

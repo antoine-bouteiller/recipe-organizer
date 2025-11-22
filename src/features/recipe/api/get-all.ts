@@ -1,7 +1,7 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { getFileUrl } from '@/lib/utils'
+import { getFileUrl } from '@/utils/get-file-url'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { asc, like } from 'drizzle-orm'

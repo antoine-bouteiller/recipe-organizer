@@ -26,7 +26,7 @@ export const DeleteDialog = ({
   onDelete,
   description,
   deleteButtonLabel,
-  trigger = <Button variant="destructive" />,
+  trigger = <Button variant="destructive" size="icon" />,
 }: DeleteDialogProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, startTransition] = useTransition()

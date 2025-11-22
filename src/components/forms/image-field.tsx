@@ -1,9 +1,8 @@
-import { FieldControl, FieldLabel, FieldMessage, FormItem } from '@/components/forms/form'
+import { Field, FieldControl, FieldError, FieldLabel } from '@/components/ui/field'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platfom'
-import { cn } from '@/lib/utils'
 import { ImageIcon, XIcon } from '@phosphor-icons/react'
 
 interface ImageFieldProps {
@@ -14,29 +13,30 @@ interface ImageFieldProps {
 
 export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) => {
   const platform = usePlatform()
-
-  const { setValue } = useFieldContext<File | FileMetadata>()
+  const field = useFieldContext<File | FileMetadata>()
 
   const [{ files, isDragging }, { removeFile, getInputProps }] = useFileUpload({
     maxFiles: 1,
     multiple: false,
     initialFiles: initialImage ? [initialImage] : [],
     onFilesChange: (files) => {
-      setValue(files[0]?.file)
+      field.setValue(files[0]?.file)
     },
   })
 
   const previewUrl = files[0]?.preview
 
   return (
-    <FormItem>
-      <FieldLabel className="text-base font-semibold">{label}</FieldLabel>
+    <Field
+      name={field.name}
+      invalid={!field.state.meta.isValid}
+      dirty={field.state.meta.isDirty}
+      touched={field.state.meta.isTouched}
+    >
+      <FieldLabel>{label}</FieldLabel>
       <FieldLabel
         data-dragging={isDragging || undefined}
-        className={cn(
-          'border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:ring-[3px]',
-          'data-[error=true]:border-destructive data-[error=true]:ring-destructive/20 dark:data-[error=true]:ring-destructive/40 data-[error=true]:text-foreground'
-        )}
+        className="w-full border-input hover:bg-accent/50 data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:ring-[3px] data-invalid:border-destructive"
       >
         {previewUrl ? (
           <div className="absolute inset-0">
@@ -76,10 +76,8 @@ export const ImageField = ({ label, disabled, initialImage }: ImageFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <FieldControl>
-        <input type="file" className="hidden" disabled={disabled} {...getInputProps()} />
-      </FieldControl>
-      <FieldMessage />
-    </FormItem>
+      <FieldControl type="file" className="hidden" disabled={disabled} {...getInputProps()} />
+      <FieldError />
+    </Field>
   )
 }

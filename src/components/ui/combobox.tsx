@@ -14,7 +14,7 @@ import {
   ResponsivePopoverTrigger,
 } from '@/components/ui/responsive-popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 
@@ -30,7 +30,7 @@ interface ComboboxProps {
   onChange?: (option: Option) => void
   value?: string
   options: Option[]
-  error?: string
+  error?: boolean
   noResultsLabel?: string
   addNew?: (inputValue: string) => ReactNode
 }
@@ -58,7 +58,7 @@ const Combobox = ({
             disabled={disabled}
             aria-expanded={open}
             className={cn(
-              'w-full justify-between text-ellipsis bg-transparent border-input',
+              'w-full justify-between text-ellipsis border-input',
               error &&
                 'border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
             )}

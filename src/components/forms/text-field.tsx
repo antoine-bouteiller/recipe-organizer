@@ -1,4 +1,4 @@
-import { FieldControl, FormItem, FieldLabel, FieldMessage } from '@/components/forms/form'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
@@ -9,21 +9,23 @@ interface TextFieldProps {
 }
 
 export const TextField = ({ label, placeholder, disabled }: TextFieldProps) => {
-  const { state, handleChange } = useFieldContext<string>()
+  const field = useFieldContext<string>()
 
   return (
-    <FormItem>
-      {label && <FieldLabel className="text-base font-semibold">{label}</FieldLabel>}
-      <FieldControl>
-        <Input
-          className="text-base"
-          placeholder={placeholder}
-          disabled={disabled}
-          value={state.value}
-          onChange={(e) => handleChange(e.target.value)}
-        />
-      </FieldControl>
-      <FieldMessage />
-    </FormItem>
+    <Field
+      name={field.name}
+      invalid={!field.state.meta.isValid}
+      dirty={field.state.meta.isDirty}
+      touched={field.state.meta.isTouched}
+    >
+      {label && <FieldLabel>{label}</FieldLabel>}
+      <Input
+        placeholder={placeholder}
+        disabled={disabled}
+        value={field.state.value}
+        onChange={(e) => field.handleChange(e.target.value)}
+      />
+      <FieldError />
+    </Field>
   )
 }

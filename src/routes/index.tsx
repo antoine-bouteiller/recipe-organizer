@@ -1,7 +1,7 @@
-import { ScreenLayout } from '@/components/screen-layout'
+import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import RecipeCard from '@/features/recipe/recipe-card'
+import RecipeCard from '@/features/recipe/components/recipe-card'
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
@@ -12,7 +12,7 @@ const RecipeList = () => {
 
   return (
     <ScreenLayout title="Recettes">
-      <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="flex flex-col md:grid gap-8 sm:grid-cols-2 lg:grid-cols-3 p-4">
         {recipes?.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}

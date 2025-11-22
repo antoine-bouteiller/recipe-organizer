@@ -1,11 +1,11 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 import type { ComponentProps } from 'react'
 
 const Card = ({ className, ...props }: ComponentProps<'div'>) => (
   <div
     data-slot="card"
     className={cn(
-      'flex flex-col gap-6 overflow-hidden rounded-md border bg-card py-6 text-card-foreground shadow-sm',
+      'relative flex flex-col gap-6 rounded-2xl border bg-card bg-clip-padding py-6 text-card-foreground shadow-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-clip-border dark:before:shadow-[0_-1px_--theme(--color-white/8%)]',
       className
     )}
     {...props}
@@ -24,7 +24,11 @@ const CardHeader = ({ className, ...props }: ComponentProps<'div'>) => (
 )
 
 const CardTitle = ({ className, ...props }: ComponentProps<'div'>) => (
-  <div data-slot="card-title" className={cn('leading-none font-semibold', className)} {...props} />
+  <div
+    data-slot="card-title"
+    className={cn('font-semibold text-lg leading-none', className)}
+    {...props}
+  />
 )
 
 const CardDescription = ({ className, ...props }: ComponentProps<'div'>) => (

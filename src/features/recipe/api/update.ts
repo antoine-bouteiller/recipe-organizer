@@ -1,16 +1,15 @@
-import { toastError } from '@/components/ui/sonner'
-import { authGuard } from '@/features/auth/auth-guard'
+import { toastError, toastManager } from '@/components/ui/toast'
+import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'
-import { parseFormData } from '@/lib/form-data'
 import { deleteFile, uploadFile } from '@/lib/r2'
+import { parseFormData } from '@/utils/form-data'
 import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { toast } from 'sonner'
 import { z } from 'zod'
 import { recipesQueryKeys } from './query-keys'
 
@@ -111,7 +110,10 @@ const updateRecipeOptions = () =>
         queryKey: recipesQueryKeys.detail(data),
       })
       const { data: title } = z.string().safeParse(variables.data.get('title'))
-      toast.success(`Recette ${title} mise à jour`)
+      toastManager.add({
+        title: `Recette ${title} mise à jour`,
+        type: 'success',
+      })
     },
     onError: (error, variables) => {
       const { data: title } = z.string().safeParse(variables.data.get('title'))

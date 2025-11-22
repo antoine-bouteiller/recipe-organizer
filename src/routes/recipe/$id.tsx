@@ -8,9 +8,9 @@ import {
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
-import DeleteRecipe from '@/features/recipe/delete-recipe'
-import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
-import { getFileUrl } from '@/lib/utils'
+import DeleteRecipe from '@/features/recipe/components/delete-recipe'
+import { RecipeIngredientsSections } from '@/features/recipe/components/recipe-section'
+import { getFileUrl } from '@/utils/get-file-url'
 import {
   ArrowLeftIcon,
   DotsThreeVerticalIcon,
@@ -46,7 +46,7 @@ const RecipePage = () => {
 
   return (
     <div className="flex w-full justify-center overflow-hidden">
-      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-md overflow-y-auto">
+      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-2xl  overflow-y-auto">
         <Button
           variant="outline"
           size="icon"

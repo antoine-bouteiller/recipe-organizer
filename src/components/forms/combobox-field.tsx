@@ -1,6 +1,6 @@
-import { FieldLabel, FieldMessage, FormItem } from '@/components/forms/form'
 import { Combobox, type ComboboxProps } from '@/components/ui/combobox'
 import { useFieldContext } from '@/hooks/use-form-context'
+import { Field, FieldError, FieldLabel } from '../ui/field'
 
 interface ComboboxFieldProps extends ComboboxProps {
   label?: string
@@ -8,10 +8,17 @@ interface ComboboxFieldProps extends ComboboxProps {
 
 const ComboboxField = ({ options, label, ...props }: ComboboxFieldProps) => {
   const field = useFieldContext<string | undefined>()
+  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
   return (
-    <FormItem className="flex-1 w-full">
-      {label && <FieldLabel className="text-base font-semibold">{label}</FieldLabel>}
+    <Field
+      className="flex-1 w-full"
+      name={field.name}
+      invalid={!field.state.meta.isValid}
+      dirty={field.state.meta.isDirty}
+      touched={field.state.meta.isTouched}
+    >
+      {label && <FieldLabel>{label}</FieldLabel>}
       <Combobox
         options={options}
         value={field.store.state.value}
@@ -22,11 +29,11 @@ const ComboboxField = ({ options, label, ...props }: ComboboxFieldProps) => {
             field.handleChange(option.value)
           }
         }}
-        error={field.errors.length > 0 ? field.errors[0].message : undefined}
+        error={isInvalid}
         {...props}
       />
-      <FieldMessage />
-    </FormItem>
+      <FieldError />
+    </Field>
   )
 }
 

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 import { Link, useLocation } from '@tanstack/react-router'
 import { useMemo, useRef } from 'react'
 import { menuItems } from './constants'
@@ -40,7 +40,11 @@ export const TabBar = () => {
   }, [location])
 
   return (
-    <div className="relative flex flex-1 py-2 border-t border-border">
+    <div
+      className={cn('relative flex flex-1 py-2 border-border', {
+        'border-t': location.pathname !== '/search',
+      })}
+    >
       <div className="flex justify-around items-center flex-1 mx-4">
         {items.map((item) => (
           <Button

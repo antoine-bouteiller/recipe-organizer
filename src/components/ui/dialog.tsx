@@ -1,8 +1,8 @@
-import * as React from 'react'
 import { Dialog as DialogPrimitive } from '@base-ui-components/react/dialog'
 import { XIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 
 const Dialog = ({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) => (
   <DialogPrimitive.Root data-slot="dialog" {...props} />

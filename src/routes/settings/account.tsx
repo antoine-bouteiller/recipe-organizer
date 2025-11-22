@@ -1,4 +1,4 @@
-import { ScreenLayout } from '@/components/screen-layout'
+import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { logout } from '@/features/auth/api/logout'

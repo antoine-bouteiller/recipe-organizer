@@ -1,151 +1,139 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { NumericFormatProps } from 'react-number-format'
-import { NumericFormat } from 'react-number-format'
+import { NumberField as NumberFieldPrimitive } from '@base-ui-components/react/number-field'
+import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
+import * as React from 'react'
 
-type NumberInputProps = {
-  stepper?: number
-  thousandSeparator?: string
-  placeholder?: string
-  defaultValue?: number
-  min?: number
-  max?: number
-  value?: number // Controlled value
-  suffix?: string
-  prefix?: string
-  onValueChange?: (value: number | undefined) => void
-  fixedDecimalScale?: boolean
-  decimalScale?: number
-} & Omit<NumericFormatProps, 'value' | 'onValueChange'>
+import { Label } from '@/components/ui/label'
+import { cn } from '@/utils/cn'
+
+const NumberInputContext = React.createContext<
+  | {
+      fieldId: string
+    }
+  | undefined
+>(undefined)
 
 const NumberInput = ({
-  stepper,
-  thousandSeparator,
-  placeholder,
-  defaultValue,
-  min = -Infinity,
-  max = Infinity,
-  onValueChange,
-  fixedDecimalScale = false,
-  decimalScale = 0,
-  suffix,
-  prefix,
-  value: controlledValue,
+  id,
+  className,
+  size = 'default',
   ...props
-}: NumberInputProps) => {
-  const [value, setValue] = useState<number | undefined>(controlledValue ?? defaultValue)
-  const ref = useRef<HTMLInputElement>(null)
-
-  const handleIncrement = useCallback(() => {
-    setValue((prev) => (prev === undefined ? (stepper ?? 1) : Math.min(prev + (stepper ?? 1), max)))
-  }, [stepper, max])
-
-  const handleDecrement = useCallback(() => {
-    setValue((prev) =>
-      prev === undefined ? -(stepper ?? 1) : Math.max(prev - (stepper ?? 1), min)
-    )
-  }, [stepper, min])
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (document.activeElement === (ref as React.RefObject<HTMLInputElement>).current) {
-        if (event.key === 'ArrowUp') {
-          handleIncrement()
-        } else if (event.key === 'ArrowDown') {
-          handleDecrement()
-        }
-      }
-    }
-
-    globalThis.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      globalThis.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [handleIncrement, handleDecrement, ref])
-
-  useEffect(() => {
-    if (controlledValue !== undefined) {
-      setValue(controlledValue)
-    }
-  }, [controlledValue])
-
-  const handleChange = (values: { value: string; floatValue: number | undefined }) => {
-    const newValue = values.floatValue ?? undefined
-    setValue(newValue)
-    if (onValueChange) {
-      onValueChange(newValue)
-    }
-  }
-
-  const handleBlur = () => {
-    if (value !== undefined) {
-      if (value < min) {
-        setValue(min)
-
-        if (ref.current) {
-          ref.current.value = String(min)
-        }
-      } else if (value > max) {
-        setValue(max)
-
-        if (ref.current) {
-          ref.current.value = String(max)
-        }
-      }
-    }
-  }
+}: NumberFieldPrimitive.Root.Props & {
+  size?: 'sm' | 'default' | 'lg'
+}) => {
+  const generatedId = React.useId()
+  const fieldId = id ?? generatedId
 
   return (
-    <div className="relative flex items-center h-8.5">
-      <NumericFormat
-        value={value}
-        onValueChange={handleChange}
-        thousandSeparator={thousandSeparator}
-        decimalScale={decimalScale}
-        fixedDecimalScale={fixedDecimalScale}
-        allowNegative={min < 0}
-        valueIsNumericString
-        onBlur={handleBlur}
-        max={max}
-        min={min}
-        suffix={suffix}
-        prefix={prefix}
-        customInput={Input}
-        placeholder={placeholder}
-        getInputRef={ref}
+    <NumberInputContext.Provider value={{ fieldId }}>
+      <NumberFieldPrimitive.Root
+        className={cn('flex w-full flex-col items-start gap-2', className)}
+        data-size={size}
+        data-slot="number-field"
+        id={fieldId}
         {...props}
       />
-
-      <div className="absolute right-[2px] flex flex-col w-9 border-l border-input">
-        <Button
-          aria-label="Increase value"
-          className="flex-1 h-auto rounded-l-none rounded-br-none border-b-[0.5px] border-l-0 border-input px-2 focus-visible:relative p-0"
-          variant="ghost"
-          type="button"
-          size="icon"
-          onClick={handleIncrement}
-          disabled={value === max}
-        >
-          <CaretUpIcon size={13} />
-        </Button>
-        <Button
-          aria-label="Decrease value"
-          className="flex-1 h-auto rounded-l-none rounded-tr-none border-t-[0.5px] border-l-0 border-input px-2 focus-visible:relative"
-          variant="ghost"
-          size="icon"
-          type="button"
-          onClick={handleDecrement}
-          disabled={value === min}
-        >
-          <CaretDownIcon size={13} />
-        </Button>
-      </div>
-    </div>
+    </NumberInputContext.Provider>
   )
 }
 
-export { NumberInput }
-export type { NumberInputProps }
+const NumberInputGroup = ({ className, ...props }: NumberFieldPrimitive.Group.Props) => (
+  <NumberFieldPrimitive.Group
+    className={cn(
+      "relative flex w-full justify-between rounded-lg border border-input bg-background bg-clip-padding text-sm shadow-xs ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-data-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-within:border-ring focus-within:ring-[3px] has-aria-invalid:border-destructive/36 focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/48 data-disabled:pointer-events-none data-disabled:opacity-64 dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:has-aria-invalid:ring-destructive/24 dark:not-data-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)] [[data-disabled],:focus-within,[aria-invalid]]:shadow-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+      className
+    )}
+    data-slot="number-field-group"
+    {...props}
+  />
+)
+
+const NumberInputDecrement = ({ className, ...props }: NumberFieldPrimitive.Decrement.Props) => (
+  <NumberFieldPrimitive.Decrement
+    className={cn(
+      'relative flex shrink-0 cursor-pointer items-center justify-center rounded-s-[calc(var(--radius-lg)-1px)] in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] px-[calc(--spacing(3)-1px)] transition-colors pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent',
+      className
+    )}
+    data-slot="number-field-decrement"
+    {...props}
+  >
+    <MinusIcon />
+  </NumberFieldPrimitive.Decrement>
+)
+
+const NumberInputIncrement = ({ className, ...props }: NumberFieldPrimitive.Increment.Props) => (
+  <NumberFieldPrimitive.Increment
+    className={cn(
+      'relative flex shrink-0 cursor-pointer items-center justify-center rounded-e-[calc(var(--radius-lg)-1px)] in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] px-[calc(--spacing(3)-1px)] transition-colors pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent',
+      className
+    )}
+    data-slot="number-field-increment"
+    {...props}
+  >
+    <PlusIcon />
+  </NumberFieldPrimitive.Increment>
+)
+
+const NumberInputField = ({ className, ...props }: NumberFieldPrimitive.Input.Props) => (
+  <NumberFieldPrimitive.Input
+    className={cn(
+      'w-full min-w-0 flex-1 bg-transparent in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] px-[calc(--spacing(3)-1px)] in-data-[size=lg]:py-[calc(--spacing(2)-1px)] in-data-[size=sm]:py-[calc(--spacing(1)-1px)] py-[calc(--spacing(1.5)-1px)] text-center tabular-nums outline-none',
+      className
+    )}
+    data-slot="number-field-input"
+    {...props}
+  />
+)
+
+const NumberInputScrubArea = ({
+  className,
+  label,
+  ...props
+}: NumberFieldPrimitive.ScrubArea.Props & {
+  label: string
+}) => {
+  const context = React.useContext(NumberInputContext)
+
+  if (!context) {
+    throw new Error(
+      'NumberInputScrubArea must be used within a NumberInput component for accessibility.'
+    )
+  }
+
+  return (
+    <NumberFieldPrimitive.ScrubArea
+      className={cn('flex cursor-ew-resize', className)}
+      data-slot="number-field-scrub-area"
+      {...props}
+    >
+      <Label className="cursor-ew-resize" htmlFor={context.fieldId}>
+        {label}
+      </Label>
+      <NumberFieldPrimitive.ScrubAreaCursor className="drop-shadow-[0_1px_1px_#0008] filter">
+        <CursorGrowIcon />
+      </NumberFieldPrimitive.ScrubAreaCursor>
+    </NumberFieldPrimitive.ScrubArea>
+  )
+}
+
+const CursorGrowIcon = (props: React.ComponentProps<'svg'>) => (
+  <svg
+    fill="black"
+    height="14"
+    stroke="white"
+    viewBox="0 0 24 14"
+    width="26"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path d="M19.5 5.5L6.49737 5.51844V2L1 6.9999L6.5 12L6.49737 8.5L19.5 8.5V12L25 6.9999L19.5 2V5.5Z" />
+  </svg>
+)
+
+export {
+  NumberInput,
+  NumberInputDecrement,
+  NumberInputField,
+  NumberInputGroup,
+  NumberInputIncrement,
+  NumberInputScrubArea,
+}

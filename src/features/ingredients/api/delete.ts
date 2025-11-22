@@ -1,4 +1,4 @@
-import { authGuard } from '@/features/auth/auth-guard'
+import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { mutationOptions } from '@tanstack/react-query'
