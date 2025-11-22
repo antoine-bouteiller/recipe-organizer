@@ -1,7 +1,7 @@
 import { ToggleGroupItem } from '@/components/ui/toggle-group'
 
+import { ListBulletsIcon, ListChecksIcon, ListNumbersIcon, type Icon } from '@phosphor-icons/react'
 import { EditorContext, useEditorState, type Editor } from '@tiptap/react'
-import { ListBulletsIcon, ListChecksIcon, type Icon, ListNumbersIcon } from '@phosphor-icons/react'
 import { useCallback, useContext } from 'react'
 
 export type ListType = 'bulletList' | 'orderedList' | 'taskList'

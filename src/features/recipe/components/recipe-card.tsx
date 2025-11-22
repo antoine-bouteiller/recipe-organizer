@@ -24,7 +24,7 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
     <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
       <Card key={recipe.id} className="cursor-pointer gap-2 pt-0 pb-2">
         <CardHeader className="relative p-0">
-          <div className="relative h-36 w-full overflow-hidden">
+          <div className="relative h-36 w-full overflow-hidden rounded-t-2xl">
             <img src={recipe.image} alt={recipe.name} className="object-cover w-full h-full" />
           </div>
         </CardHeader>

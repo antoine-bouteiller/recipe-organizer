@@ -5,7 +5,6 @@
     "correctness": "error",
     "suspicious": "error",
     "perf": "error",
-    "pedantic": "error",
     "style": "error"
   },
   "env": {
@@ -51,15 +50,10 @@
     "react-in-jsx-scope": "off",
     "no-unneeded-ternary": "off",
     "style-prop-object": "off",
+    "no-unsafe-type-assertion": "off",
 
     // pedantic
-    "max-lines": "off",
-    "max-lines-per-function": "off",
-    "max-classes-per-file": "off",
-    "radix": "off",
-    "no-useless-undefined": "off",
-    "id-length": "off",
-    "explicit-length-check": "off",
+    "no-deprecated": "error",
 
     // style
     "prefer-template": "error",
@@ -77,22 +71,10 @@
     "no-magic-numbers": "off",
     "sort-imports": "off",
     "sort-keys": "off",
+    "id-length": "off",
     "no-ternary": "off",
     "no-duplicate-imports": "off",
     "jsx-handler-names": "off",
-    "max-params": "off",
-
-    // pedantic
-    "only-throw-error": "off",
-    "no-misused-promises": "off",
-    "no-confusing-void-expression": "off",
-    "unbound-method": "off",
-    "no-unsafe-type-assertion": "off",
-    "no-unsafe-assignment": "off",
-    "no-unsafe-member-access": "off",
-    "no-unsafe-return": "off",
-    "strict-boolean-expressions": "off",
-    "no-floating-promises": "off",
-    "no-deprecated": "off"
+    "max-params": "off"
   }
 }

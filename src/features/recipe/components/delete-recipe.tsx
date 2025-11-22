@@ -1,9 +1,9 @@
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
 import { Button } from '@/components/ui/button'
+import { toastManager } from '@/components/ui/toast'
 import { deleteRecipeOptions } from '@/features/recipe/api/delete'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
-import { toast } from 'sonner'
 
 interface DeleteRecipeProps {
   recipeId: number
@@ -18,10 +18,17 @@ export default function DeleteRecipe({ recipeId, recipeName }: Readonly<DeleteRe
     deleteRecipe(
       { data: recipeId },
       {
-        onError: () => toast.error('Une erreur est survenue lors de la suppression de la recette'),
+        onError: () =>
+          toastManager.add({
+            description: 'Une erreur est survenue lors de la suppression de la recette',
+            type: 'error',
+          }),
         onSuccess: () => {
-          toast.success('Recette supprimée avec succès')
-          router.navigate({ to: '/' })
+          toastManager.add({
+            title: 'Recette supprimée avec succès',
+            type: 'success',
+          })
+          void router.navigate({ to: '/' })
         },
       }
     )

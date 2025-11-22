@@ -1,4 +1,4 @@
-import { ScreenLayout } from '@/components/screen-layout'
+import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { logout } from '@/features/auth/api/logout'
@@ -14,12 +14,12 @@ const RouteComponent = () => {
 
   const handleLogout = async () => {
     await signout()
-    router.invalidate()
+    await router.invalidate()
   }
 
   return (
     <ScreenLayout title="Compte" withGoBack>
-      <Card className="p-6">
+      <Card className="p-6 m-4">
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-semibold mb-4">Informations du compte</h2>

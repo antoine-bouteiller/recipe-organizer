@@ -1,6 +1,6 @@
 // src/router.tsx
-import { DefaultErrorComponent } from '@/components/default-error-component'
-import { NotFound } from '@/components/not-found'
+import { DefaultErrorComponent } from '@/components/error/default-error-component'
+import { NotFound } from '@/components/error/not-found'
 import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'

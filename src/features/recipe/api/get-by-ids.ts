@@ -4,7 +4,7 @@ import { withServerErrorCapture } from '@/lib/error-handler'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { inArray } from 'drizzle-orm'
-import z from 'zod'
+import { z } from 'zod'
 import { recipesQueryKeys } from './query-keys'
 
 const getRecipesByIds = createServerFn({

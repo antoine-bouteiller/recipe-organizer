@@ -1,13 +1,16 @@
-import { ScreenLayout } from '@/components/screen-layout'
+import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { recipeDefaultValues, RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
+import { RecipeForm } from '@/features/recipe/components/recipe-form'
+import { recipeDefaultValues, recipeFormFields } from '@/features/recipe/constants'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
-import { objectToFormData } from '@/lib/form-data'
-import { revalidateLogic } from '@tanstack/react-form'
+import { objectToFormData } from '@/utils/form-data'
+import { formatFormErrors } from '@/utils/format-form-errors'
+import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 
@@ -29,14 +32,18 @@ const NewRecipePage = () => {
     },
   })
 
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+
   return (
     <ScreenLayout title="Nouvelle Recette" withGoBack>
-      <form
+      <Form
         onSubmit={(event) => {
           event.preventDefault()
           void form.handleSubmit()
         }}
-        className="space-y-6"
+        noValidate
+        errors={errors}
+        className="p-4"
       >
         <RecipeForm form={form} fields={recipeFormFields} />
         <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
@@ -52,7 +59,7 @@ const NewRecipePage = () => {
             <form.FormSubmit label="Créer la recette" />
           </form.AppForm>
         </div>
-      </form>
+      </Form>
     </ScreenLayout>
   )
 }

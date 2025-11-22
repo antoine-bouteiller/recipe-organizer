@@ -7,8 +7,7 @@ import {
 import {
   ingredientDefaultValues,
   IngredientForm,
-  ingredientFormFields,
-} from '@/features/ingredients/ingredient-form'
+} from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
@@ -58,7 +57,7 @@ export const AddIngredient = ({ defaultValue, children }: AddIngredientProps) =>
       open={open}
       form={form}
     >
-      <IngredientForm form={form} fields={ingredientFormFields} />
+      <IngredientForm form={form} />
     </FormDialog>
   )
 }

@@ -1,4 +1,4 @@
-import { FieldControl, FieldLabel, FormItem, FieldMessage } from '@/components/forms/form'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Tiptap } from '@/components/ui/tiptap'
 import { useFieldContext } from '@/hooks/use-form-context'
 
@@ -8,16 +8,19 @@ interface TiptapProps {
 }
 
 const TiptapField = ({ label, disabled }: TiptapProps) => {
-  const { state, handleChange } = useFieldContext<string>()
+  const field = useFieldContext<string>()
 
   return (
-    <FormItem>
-      <FieldLabel className="text-base font-semibold">{label}</FieldLabel>
-      <FieldControl>
-        <Tiptap disabled={disabled} onChange={handleChange} content={state.value} />
-      </FieldControl>
-      <FieldMessage />
-    </FormItem>
+    <Field
+      name={field.name}
+      invalid={!field.state.meta.isValid}
+      dirty={field.state.meta.isDirty}
+      touched={field.state.meta.isTouched}
+    >
+      <FieldLabel>{label}</FieldLabel>
+      <Tiptap onChange={field.handleChange} content={field.state.value} disabled={disabled} />
+      <FieldError />
+    </Field>
   )
 }
 

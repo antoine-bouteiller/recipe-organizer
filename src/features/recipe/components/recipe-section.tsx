@@ -39,7 +39,7 @@ export const RecipeIngredientsSections = ({
   baseQuantity,
 }: RecipeIngredientsSectionsProps) =>
   sections.map((section) => (
-    <p key={section.id}>
+    <div key={section.id}>
       {section.name && <h3 className="mb-1 text-md font-semibold">{section.name}</h3>}
 
       <RecipeSectionIngredients
@@ -55,5 +55,5 @@ export const RecipeIngredientsSections = ({
           baseQuantity={baseQuantity}
         />
       )}
-    </p>
+    </div>
   ))

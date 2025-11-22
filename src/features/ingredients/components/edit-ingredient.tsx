@@ -9,8 +9,7 @@ import {
 import {
   IngredientForm,
   ingredientDefaultValues,
-  ingredientFormFields,
-} from '@/features/ingredients/ingredient-form'
+} from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import type { Ingredient } from '@/types/ingredient'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
@@ -68,7 +67,7 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
       submitLabel="Mettre à jour"
       form={form}
     >
-      <IngredientForm form={form} fields={ingredientFormFields} />
+      <IngredientForm form={form} />
     </FormDialog>
   )
 }

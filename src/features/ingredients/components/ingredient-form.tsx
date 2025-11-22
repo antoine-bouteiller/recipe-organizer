@@ -1,22 +1,20 @@
-import { withFieldGroup } from '@/hooks/use-app-form'
-import { createFieldMap, useStore } from '@tanstack/react-form'
-import type { IngredientFormInput } from './api/create'
+import { withForm } from '@/hooks/use-app-form'
+import { useStore } from '@tanstack/react-form'
+import type { IngredientFormInput } from '../api/create'
 
-export { ingredientSchema } from './api/create'
+export { ingredientSchema } from '../api/create'
 
 export const ingredientDefaultValues: IngredientFormInput = {
   name: '',
   category: 'supermarket',
 }
 
-export const ingredientFormFields = createFieldMap(ingredientDefaultValues)
-
-export const IngredientForm = withFieldGroup({
+export const IngredientForm = withForm({
   defaultValues: ingredientDefaultValues,
-  render: function Render({ group }) {
-    const { AppField } = group
+  render: function Render({ form }) {
+    const { AppField } = form
 
-    const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
+    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
     return (
       <>

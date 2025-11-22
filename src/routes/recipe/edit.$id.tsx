@@ -1,5 +1,6 @@
-import { ScreenLayout } from '@/components/screen-layout'
+import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
+import { Form } from '@/components/ui/form'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
@@ -9,15 +10,17 @@ import {
   updateRecipeSchema,
   type UpdateRecipeFormInput,
 } from '@/features/recipe/api/update'
-import { RecipeForm, recipeFormFields } from '@/features/recipe/recipe-form'
+import { RecipeForm } from '@/features/recipe/components/recipe-form'
+import { recipeFormFields } from '@/features/recipe/constants'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
-import { objectToFormData } from '@/lib/form-data'
-import { getFileUrl } from '@/lib/utils'
-import { revalidateLogic } from '@tanstack/react-form'
+import { objectToFormData } from '@/utils/form-data'
+import { formatFormErrors } from '@/utils/format-form-errors'
+import { getFileUrl } from '@/utils/get-file-url'
+import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
-import z from 'zod'
+import { z } from 'zod'
 
 const formatSection = (sections: RecipeSection) => {
   if (sections.subRecipeId) {
@@ -76,6 +79,8 @@ const EditRecipePage = () => {
     },
   })
 
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -90,12 +95,14 @@ const EditRecipePage = () => {
 
   return (
     <ScreenLayout title=" Modifier la recette" withGoBack>
-      <form
+      <Form
         onSubmit={(event) => {
           event.preventDefault()
           void form.handleSubmit()
         }}
-        className="space-y-6"
+        className="p-4"
+        errors={errors}
+        noValidate
       >
         <RecipeForm
           form={form}
@@ -115,7 +122,7 @@ const EditRecipePage = () => {
             <form.FormSubmit label="Modifier la recette" />
           </form.AppForm>
         </div>
-      </form>
+      </Form>
     </ScreenLayout>
   )
 }

@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { Popover as PopoverPrimitive } from '@base-ui-components/react/popover'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 
 const Popover = ({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) => (
   <PopoverPrimitive.Root data-slot="popover" {...props} />
@@ -43,4 +43,4 @@ const PopoverAnchor = ({ ...props }: React.ComponentProps<typeof PopoverPrimitiv
   <PopoverPrimitive.Arrow data-slot="popover-anchor" {...props} />
 )
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor, PopoverPositioner }
+export { Popover, PopoverAnchor, PopoverContent, PopoverPositioner, PopoverTrigger }

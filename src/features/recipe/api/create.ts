@@ -1,12 +1,11 @@
-import { toastError } from '@/components/ui/sonner'
-import { authGuard } from '@/features/auth/auth-guard'
+import { toastError, toastManager } from '@/components/ui/toast'
+import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
-import { parseFormData } from '@/lib/form-data'
 import { uploadFile } from '@/lib/r2'
+import { parseFormData } from '@/utils/form-data'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { toast } from 'sonner'
 import { z } from 'zod'
 import { recipesQueryKeys } from './query-keys'
 
@@ -110,11 +109,14 @@ const createRecipeOptions = () =>
       void context.client.invalidateQueries({
         queryKey: recipesQueryKeys.lists(),
       })
-      const { data: title } = z.string().safeParse(variables.data.get('title'))
-      toast.success(`Recette ${title} créée `)
+      const { data: title } = z.string().safeParse(variables.data.get('name'))
+      toastManager.add({
+        title: `Recette ${title} créée`,
+        type: 'success',
+      })
     },
     onError: (error, variables, _context) => {
-      const { data: title } = z.string().safeParse(variables.data.get('title'))
+      const { data: title } = z.string().safeParse(variables.data.get('name'))
       toastError(`Erreur lors de la création de la recette ${title}`, error)
     },
   })

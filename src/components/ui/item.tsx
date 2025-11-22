@@ -1,10 +1,10 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
-import { useRender } from '@base-ui-components/react/use-render'
+import { cn } from '@/utils/cn'
 import { mergeProps } from '@base-ui-components/react/merge-props'
+import { useRender } from '@base-ui-components/react/use-render'
 
 const ItemGroup = ({ className, ...props }: React.ComponentProps<'div'>) => (
   <div
@@ -146,13 +146,13 @@ const ItemFooter = ({ className, ...props }: React.ComponentProps<'div'>) => (
 
 export {
   Item,
-  ItemMedia,
-  ItemContent,
   ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemFooter,
   ItemGroup,
+  ItemHeader,
+  ItemMedia,
   ItemSeparator,
   ItemTitle,
-  ItemDescription,
-  ItemHeader,
-  ItemFooter,
 }

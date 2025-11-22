@@ -1,8 +1,8 @@
-import { ScreenLayout } from '@/components/screen-layout'
+import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { cn } from '@/lib/utils'
 import { useShoppingListStore, type IngredientWithQuantity } from '@/stores/shopping-list.store'
+import { cn } from '@/utils/cn'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -44,7 +44,7 @@ const CartPage = () => {
         </Button>
       }
     >
-      <div className="p-4 space-y-2">
+      <div className="p-8 space-y-2">
         {shoppingListIngredients.map((ingredient) => (
           <CartItem key={ingredient.id} ingredient={ingredient} />
         ))}

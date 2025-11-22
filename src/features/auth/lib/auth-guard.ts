@@ -1,6 +1,6 @@
 import { redirect } from '@tanstack/react-router'
 import { createMiddleware } from '@tanstack/react-start'
-import { getAuthUser } from './api/get-auth-user'
+import { getAuthUser } from '../api/get-auth-user'
 
 export const authGuard = (role?: string) =>
   createMiddleware({ type: 'function' }).server(async ({ next }) => {

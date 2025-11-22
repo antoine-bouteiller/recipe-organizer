@@ -1,4 +1,4 @@
-import { authGuard } from '@/features/auth/auth-guard'
+import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { withServerErrorCapture } from '@/lib/error-handler'

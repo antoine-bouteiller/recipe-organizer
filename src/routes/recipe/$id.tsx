@@ -6,11 +6,11 @@ import {
   ResponsivePopoverTrigger,
 } from '@/components/ui/responsive-popover'
 import { Spinner } from '@/components/ui/spinner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
-import DeleteRecipe from '@/features/recipe/delete-recipe'
-import { RecipeIngredientsSections } from '@/features/recipe/recipe-section'
-import { getFileUrl } from '@/lib/utils'
+import DeleteRecipe from '@/features/recipe/components/delete-recipe'
+import { RecipeIngredientsSections } from '@/features/recipe/components/recipe-section'
+import { getFileUrl } from '@/utils/get-file-url'
 import {
   ArrowLeftIcon,
   DotsThreeVerticalIcon,
@@ -46,7 +46,7 @@ const RecipePage = () => {
 
   return (
     <div className="flex w-full justify-center overflow-hidden">
-      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-md overflow-y-auto">
+      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-2xl  overflow-y-auto">
         <Button
           variant="outline"
           size="icon"
@@ -105,20 +105,20 @@ const RecipePage = () => {
           <CardContent className="px-8 md:hidden">
             <Tabs defaultValue="ingredients" className="gap-0">
               <TabsList className="w-full">
-                <TabsTrigger value="ingredients">Ingrédients</TabsTrigger>
-                <TabsTrigger value="preparation">Préparation</TabsTrigger>
+                <TabsTab value="ingredients">Ingrédients</TabsTab>
+                <TabsTab value="preparation">Préparation</TabsTab>
               </TabsList>
-              <TabsContent value="ingredients" className="px-2">
+              <TabsPanel value="ingredients" className="px-2">
                 <RecipeIngredientsSections
                   sections={recipe.sections}
                   quantity={quantity}
                   baseQuantity={recipe.quantity}
                 />
-              </TabsContent>
+              </TabsPanel>
 
-              <TabsContent value="preparation" className="px-2">
+              <TabsPanel value="preparation" className="px-2">
                 <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
-              </TabsContent>
+              </TabsPanel>
             </Tabs>
           </CardContent>
 

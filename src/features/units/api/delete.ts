@@ -1,11 +1,10 @@
-import { toastError } from '@/components/ui/sonner'
-import { authGuard } from '@/features/auth/auth-guard'
+import { toastError, toastManager } from '@/components/ui/toast'
+import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { toast } from 'sonner'
 import { z } from 'zod'
 import { unitKeys } from './query-keys'
 
@@ -26,7 +25,10 @@ const deleteUnitOptions = () =>
     mutationFn: deleteUnit,
     onSuccess: async (_data, _variables, _result, context) => {
       await context.client.invalidateQueries({ queryKey: unitKeys.all })
-      toast.success('Unitée supprimée')
+      toastManager.add({
+        title: 'Unitée supprimée',
+        type: 'success',
+      })
     },
     onError: (error, variables) => {
       toastError(

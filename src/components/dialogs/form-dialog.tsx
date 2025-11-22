@@ -37,22 +37,20 @@ export const getFormDialog = <T,>(defaultValues: T) =>
               await form.handleSubmit()
             }}
           >
-            <div className="flex flex-col gap-2 px-4 md:px-0">
-              <ResponsiveDialogHeader>
-                <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
-              </ResponsiveDialogHeader>
-              {children}
-              <ResponsiveDialogFooter>
-                <ResponsiveDialogClose
-                  render={<Button variant="outline" disabled={form.state.isSubmitting} />}
-                >
-                  Annuler
-                </ResponsiveDialogClose>
-                <form.AppForm>
-                  <form.FormSubmit label={submitLabel} />
-                </form.AppForm>
-              </ResponsiveDialogFooter>
-            </div>
+            <ResponsiveDialogHeader>
+              <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
+            </ResponsiveDialogHeader>
+            <div className="flex flex-col gap-2 px-4 md:px-0">{children}</div>
+            <ResponsiveDialogFooter>
+              <ResponsiveDialogClose
+                render={<Button variant="outline" disabled={form.state.isSubmitting} />}
+              >
+                Annuler
+              </ResponsiveDialogClose>
+              <form.AppForm>
+                <form.FormSubmit label={submitLabel} />
+              </form.AppForm>
+            </ResponsiveDialogFooter>
           </form>
         </ResponsiveDialogContent>
       </ResponsiveDialog>

@@ -2,7 +2,7 @@ import { ListButton } from '@/components/ui/tiptap/list-button'
 import { MarkButton } from '@/components/ui/tiptap/mark-button'
 import { UndoRedoButton } from '@/components/ui/tiptap/undo-redo-button'
 import { ToggleGroup } from '@/components/ui/toggle-group'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 import { TextStyleKit } from '@tiptap/extension-text-style'
 import type { EditorContentProps } from '@tiptap/react'
 import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
@@ -79,7 +79,7 @@ export const Tiptap = ({
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full">
       <EditorContext.Provider value={editorContextValue}>
         <MenuBar />
         <EditorContent

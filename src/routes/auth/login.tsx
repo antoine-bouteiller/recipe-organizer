@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
-import z from 'zod'
+import { z } from 'zod'
 
 const getErrorMessage = (error: string) => {
   if (error === 'signup_disabled') {
@@ -19,7 +19,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (error) {
-      toast.error(getErrorMessage(error))
+      toastManager.add({ description: getErrorMessage(error), type: 'error' })
     }
   }, [error])
 

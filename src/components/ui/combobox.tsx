@@ -14,7 +14,7 @@ import {
   ResponsivePopoverTrigger,
 } from '@/components/ui/responsive-popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/cn'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 
@@ -23,14 +23,13 @@ interface Option {
   value: string
 }
 
-interface ComboboxProps {
+interface ComboboxProps extends Omit<React.ComponentProps<'button'>, 'onChange'> {
   placeholder?: string
   searchPlaceholder?: string
   disabled?: boolean
   onChange?: (option: Option) => void
   value?: string
   options: Option[]
-  error?: string
   noResultsLabel?: string
   addNew?: (inputValue: string) => ReactNode
 }
@@ -39,12 +38,11 @@ const Combobox = ({
   options,
   value,
   onChange,
-  error,
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
   addNew,
-  disabled,
+  ...props
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
@@ -55,12 +53,11 @@ const Combobox = ({
           <Button
             variant="outline"
             role="button"
-            disabled={disabled}
             aria-expanded={open}
+            {...props}
             className={cn(
-              'w-full justify-between text-ellipsis bg-transparent border-input',
-              error &&
-                'border-destructive ring-destructive/20 transition-[color,box-shadow] dark:border-destructive dark:ring-destructive/40'
+              'w-full justify-between text-ellipsis border-input',
+              'not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16 aria-invalid:border-destructive/36'
             )}
           />
         }
@@ -73,7 +70,6 @@ const Combobox = ({
       <ResponsivePopoverContent className="w-(--anchor-width) p-0">
         <ComboboxContent
           setOpen={setOpen}
-          disabled={disabled}
           options={options}
           value={value}
           onChange={onChange}
