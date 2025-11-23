@@ -28,7 +28,7 @@ export const getFormDialog = <T,>(defaultValues: T) =>
   withForm({
     defaultValues,
     props: {} as FormModalProps,
-    render: ({ form, children, title, submitLabel, trigger, open, setOpen }) => {
+    render: function Render({ form, children, title, submitLabel, trigger, open, setOpen }) {
       const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
 
       return (

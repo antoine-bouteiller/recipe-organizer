@@ -32,6 +32,7 @@ interface ComboboxProps extends Omit<React.ComponentProps<'button'>, 'onChange'>
   options: Option[]
   noResultsLabel?: string
   addNew?: (inputValue: string) => ReactNode
+  nested?: boolean
 }
 
 const Combobox = ({
@@ -42,13 +43,14 @@ const Combobox = ({
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
   addNew,
+  nested = false,
   className,
   ...props
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
 
   return (
-    <ResponsivePopover open={open} onOpenChange={setOpen}>
+    <ResponsivePopover open={open} onOpenChange={setOpen} nested={nested}>
       <ResponsivePopoverTrigger
         render={
           <Button

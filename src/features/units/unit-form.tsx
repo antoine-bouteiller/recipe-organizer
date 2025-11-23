@@ -54,6 +54,7 @@ export const UnitForm = withFieldGroup({
                 placeholder="Sélectionner une unité parente"
                 searchPlaceholder="Rechercher une unité"
                 noResultsLabel="Aucune unité trouvée"
+                nested
               />
 
               {state.value && (
