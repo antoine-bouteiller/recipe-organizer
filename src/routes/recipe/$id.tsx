@@ -69,7 +69,7 @@ const RecipePage = () => {
               <DotsThreeVerticalIcon className="size-4" weight="bold" />
             </ResponsivePopoverTrigger>
             <ResponsivePopoverContent
-              className="w-auto flex flex-col gap-2 px-4 pb-4 md:px-2 items-start"
+              className="w-auto flex flex-col gap-2 px-4 pb-4 md:pt-4 md:px-2 items-start"
               align="end"
             >
               <Button

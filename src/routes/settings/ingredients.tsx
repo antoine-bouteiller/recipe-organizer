@@ -1,5 +1,6 @@
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
+import { Button } from '@/components/ui/button'
 import {
   Item,
   ItemActions,
@@ -10,8 +11,10 @@ import {
   ItemTitle,
 } from '@/components/ui/item'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
+import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/components/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/components/edit-ingredient'
+import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
@@ -38,8 +41,13 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky top-0 bg-background px-4 pt-4 z-10">
+      <div className="sticky top-0 bg-background px-4 pt-4 z-10 flex items-center gap-4">
         <SearchInput search={search} setSearch={setSearch} />
+        <AddIngredient>
+          <Button size="icon-lg" variant="outline">
+            <PlusIcon />
+          </Button>
+        </AddIngredient>
       </div>
 
       <div className="p-4">

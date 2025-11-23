@@ -1,5 +1,6 @@
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
+import { Button } from '@/components/ui/button'
 import {
   Item,
   ItemActions,
@@ -9,9 +10,11 @@ import {
   ItemSeparator,
   ItemTitle,
 } from '@/components/ui/item'
+import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { DeleteUnit } from '@/features/units/delete-unit'
 import { EditUnit } from '@/features/units/edit-unit'
+import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
@@ -31,17 +34,19 @@ const UnitsManagement = () => {
     const query = search.toLowerCase()
     return units.filter(
       (unit) =>
-        unit.name.toLowerCase().includes(query) ||
-        unit.symbol.toLowerCase().includes(query) ||
-        unit.parent?.name.toLowerCase().includes(query) ||
-        unit.parent?.symbol.toLowerCase().includes(query)
+        unit.name.toLowerCase().includes(query) || unit.parent?.name.toLowerCase().includes(query)
     )
   }, [units, search])
 
   return (
     <ScreenLayout withGoBack title="Unitées">
-      <div className="sticky top-0 bg-background px-4 pt-4 z-10">
+      <div className="sticky top-0 bg-background px-4 pt-4 z-10 flex items-center gap-4">
         <SearchInput search={search} setSearch={setSearch} />
+        <AddUnit>
+          <Button size="icon-lg" variant="outline">
+            <PlusIcon />
+          </Button>
+        </AddUnit>
       </div>
 
       <div className="px-4">
@@ -57,16 +62,12 @@ const UnitsManagement = () => {
               <React.Fragment key={unit.id}>
                 <Item>
                   <ItemContent>
-                    <ItemTitle>
-                      {unit.name} ({unit.symbol})
-                    </ItemTitle>
+                    <ItemTitle>{unit.name}</ItemTitle>
                     <ItemDescription>
-                      {unit.parentId && unit.parent && unit.factor ? (
+                      {unit.parentId && unit.parent && unit.factor && (
                         <>
-                          1 {unit.parent.symbol} = {unit.factor} {unit.symbol}
+                          1 {unit.name} = {unit.factor} {unit.parent.name}
                         </>
-                      ) : (
-                        'Unité de base'
                       )}
                     </ItemDescription>
                   </ItemContent>

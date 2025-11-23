@@ -12,7 +12,6 @@ const ComboboxField = ({ options, label, ...props }: ComboboxFieldProps) => {
 
   return (
     <Field
-      className="flex-1 w-full"
       name={field.name}
       invalid={!field.state.meta.isValid}
       dirty={field.state.meta.isDirty}

@@ -38,7 +38,7 @@ export const IngredientSectionField = withForm({
     const unitsOptions = useMemo(
       () =>
         units?.map((unit) => ({
-          label: unit.symbol,
+          label: unit.name,
           value: unit.id.toString(),
         })) ?? [],
       [units]

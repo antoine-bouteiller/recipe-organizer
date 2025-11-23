@@ -26,7 +26,6 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
   const initialValues: UpdateUnitFormInput = {
     id: unit.id,
     name: unit.name,
-    symbol: unit.symbol,
     parentId: unit.parentId ?? undefined,
     factor: unit.factor ?? undefined,
   }

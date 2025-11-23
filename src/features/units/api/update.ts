@@ -12,8 +12,8 @@ export const updateUnitSchema = z.object({
   id: z.number(),
   name: z.string().min(2),
   symbol: z.string().min(1),
-  parentId: z.number().nullable().optional(),
-  factor: z.number().positive().nullable().optional(),
+  parentId: z.number().optional(),
+  factor: z.number().positive().optional(),
 })
 
 export type UpdateUnitFormValues = z.infer<typeof updateUnitSchema>
@@ -23,16 +23,9 @@ const updateUnit = createServerFn()
   .middleware([authGuard('admin')])
   .inputValidator(updateUnitSchema)
   .handler(async ({ data }) => {
-    const { id, name, symbol, parentId, factor } = data
-    await getDb()
-      .update(unit)
-      .set({
-        name,
-        symbol,
-        parentId: parentId ?? undefined,
-        factor: factor ?? undefined,
-      })
-      .where(eq(unit.id, id))
+    const { id, ...newUnit } = data
+
+    await getDb().update(unit).set(newUnit).where(eq(unit.id, id))
   })
 
 const updateUnitOptions = () =>

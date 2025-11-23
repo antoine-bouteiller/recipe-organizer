@@ -42,6 +42,7 @@ const Combobox = ({
   searchPlaceholder = 'Rechercher une option',
   noResultsLabel = 'Aucun résultat trouvé',
   addNew,
+  className,
   ...props
 }: ComboboxProps) => {
   const [open, setOpen] = useState(false)
@@ -52,13 +53,12 @@ const Combobox = ({
         render={
           <Button
             variant="outline"
-            role="button"
-            aria-expanded={open}
-            {...props}
             className={cn(
               'w-full justify-between text-ellipsis border-input',
-              'not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16 aria-invalid:border-destructive/36'
+              'not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16 aria-invalid:border-destructive/36',
+              className
             )}
+            {...props}
           />
         }
       >

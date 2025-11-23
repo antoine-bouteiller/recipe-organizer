@@ -9,9 +9,8 @@ import { unitKeys } from './query-keys'
 
 const unitSchema = z.object({
   name: z.string().min(2),
-  symbol: z.string().min(1),
-  parentId: z.number().nullable().optional(),
-  factor: z.number().positive().nullable().optional(),
+  parentId: z.number().optional(),
+  factor: z.number().positive().optional(),
 })
 
 export type UnitFormValues = z.infer<typeof unitSchema>
@@ -21,15 +20,7 @@ const createUnit = createServerFn()
   .middleware([authGuard('admin')])
   .inputValidator(unitSchema)
   .handler(async ({ data }) => {
-    const { name, symbol, parentId, factor } = data
-    await getDb()
-      .insert(unit)
-      .values({
-        name,
-        symbol,
-        parentId: parentId ?? undefined,
-        factor: factor ?? undefined,
-      })
+    await getDb().insert(unit).values(data)
   })
 
 const createUnitOptions = () =>

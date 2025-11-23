@@ -24,7 +24,7 @@ export const AddUnit = ({ defaultValue, children }: AddUnitProps) => {
     validationLogic: revalidateLogic(),
     defaultValues: {
       ...unitDefaultValues,
-      symbol: defaultValue ?? unitDefaultValues.symbol,
+      name: defaultValue ?? unitDefaultValues.name,
     } as UnitFormInput,
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(

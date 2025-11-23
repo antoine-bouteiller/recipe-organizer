@@ -19,7 +19,7 @@ const RecipeSectionIngredients = ({
             <div>{sectionIngredient.ingredient.name}</div>
             <div className="font-medium">
               {(sectionIngredient.quantity * quantity) / baseQuantity}
-              {sectionIngredient.unit && ` ${sectionIngredient.unit.symbol}`}
+              {sectionIngredient.unit && ` ${sectionIngredient.unit.name}`}
             </div>
           </div>
         </li>

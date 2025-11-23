@@ -35,11 +35,9 @@ const DrawerOverlay = ({
   />
 )
 
-const DrawerContent = ({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Content>) => (
+export type DrawerOverlayProps = React.ComponentProps<typeof DrawerPrimitive.Overlay>
+
+const DrawerContent = ({ className, children, ...props }: DrawerOverlayProps) => (
   <DrawerPortal data-slot="drawer-portal">
     <DrawerOverlay />
     <DrawerPrimitive.Content

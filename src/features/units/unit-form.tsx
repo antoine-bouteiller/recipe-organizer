@@ -8,7 +8,6 @@ import { getUnitsListOptions } from './api/get-all'
 
 export const unitDefaultValues: UnitFormInput = {
   name: '',
-  symbol: '',
   parentId: undefined,
   factor: undefined,
 }
@@ -32,9 +31,9 @@ export const UnitForm = withFieldGroup({
       const filtered = units?.filter((u) => u.id !== unit?.id) ?? []
       return [
         { label: 'Aucune', value: '' },
-        ...filtered.map((u) => ({
-          label: `${u.name} (${u.symbol})`,
-          value: u.id.toString(),
+        ...filtered.map((unit) => ({
+          label: unit.name,
+          value: unit.id.toString(),
         })),
       ]
     }, [units, unit?.id])
@@ -42,15 +41,7 @@ export const UnitForm = withFieldGroup({
     return (
       <>
         <AppField name="name">
-          {({ TextField }) => (
-            <TextField label="Nom de l'unité" placeholder="Ex: Gramme" disabled={isSubmitting} />
-          )}
-        </AppField>
-
-        <AppField name="symbol">
-          {({ TextField }) => (
-            <TextField label="Symbole" placeholder="Ex: g" disabled={isSubmitting} />
-          )}
+          {({ TextField }) => <TextField label="Nom de l'unité" disabled={isSubmitting} />}
         </AppField>
 
         <AppField name="parentId">
