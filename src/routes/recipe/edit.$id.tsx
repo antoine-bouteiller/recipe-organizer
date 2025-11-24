@@ -11,7 +11,7 @@ import {
   type UpdateRecipeFormInput,
 } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
-import { recipeFormFields } from '@/features/recipe/constants'
+import { recipeFormFields } from '@/features/recipe/utils/constants'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
@@ -20,6 +20,7 @@ import { getFileUrl } from '@/utils/get-file-url'
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
+import { useMemo } from 'react'
 import { z } from 'zod'
 
 const formatSection = (sections: RecipeSection) => {
@@ -27,15 +28,15 @@ const formatSection = (sections: RecipeSection) => {
     return {
       name: sections.name ?? '',
       ratio: sections.ratio ?? 1,
-      recipeId: sections.subRecipeId.toString(),
+      recipeId: sections.subRecipeId,
     }
   }
   return {
     name: sections.name ?? '',
     ingredients: sections.sectionIngredients.map((ingredient) => ({
-      id: ingredient.ingredient.id.toString(),
+      id: ingredient.ingredient.id,
       quantity: ingredient.quantity,
-      unitId: ingredient.unit?.id.toString(),
+      unitId: ingredient.unit?.id,
     })),
   }
 }
@@ -46,19 +47,23 @@ const EditRecipePage = () => {
   const { mutateAsync: updateRecipe } = useMutation(updateRecipeOptions())
   const router = useRouter()
 
-  const initialValues: UpdateRecipeFormInput = recipe
-    ? {
-        id: recipe.id,
-        name: recipe.name,
-        steps: recipe.steps,
-        quantity: recipe.quantity,
-        sections: recipe.sections.map(formatSection),
-        image: {
-          id: recipe.image,
-          url: getFileUrl(recipe.image),
-        },
-      }
-    : {}
+  const initialValues: UpdateRecipeFormInput = useMemo(
+    () =>
+      recipe
+        ? {
+            id: recipe.id,
+            name: recipe.name,
+            steps: recipe.steps,
+            quantity: recipe.quantity,
+            sections: recipe.sections.map(formatSection),
+            image: {
+              id: recipe.image,
+              url: getFileUrl(recipe.image),
+            },
+          }
+        : {},
+    [recipe]
+  )
 
   const form = useAppForm({
     validators: {

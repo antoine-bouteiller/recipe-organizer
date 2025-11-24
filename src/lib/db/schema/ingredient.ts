@@ -1,10 +1,16 @@
 import { relations } from 'drizzle-orm'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
+export const ingredientCategory = ['meat', 'vegetables', 'spices', 'other'] as const
+
 const ingredient = sqliteTable('ingredients', {
   id: integer('id').primaryKey(),
   name: text('name').notNull(),
-  category: text('category').notNull().default('supermarket'),
+  category: text('category', {
+    enum: ingredientCategory,
+  })
+    .notNull()
+    .default('other'),
   parentId: integer('parent_id'),
 })
 

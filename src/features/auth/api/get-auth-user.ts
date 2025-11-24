@@ -1,7 +1,7 @@
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
-import { withServerErrorCapture } from '@/lib/error-handler'
 import { useAppSession } from '@/lib/session'
+import { withServerErrorCapture } from '@/utils/error-handler'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 

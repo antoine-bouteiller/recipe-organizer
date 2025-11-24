@@ -1,15 +1,16 @@
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
-import { ingredient } from '@/lib/db/schema'
+import { ingredient, ingredientCategory } from '@/lib/db/schema'
+import { queryKeys } from '@/lib/query-keys'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { ingredientsQueryKeys } from './query-keys'
 
 const ingredientSchema = z.object({
-  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-  category: z.string().min(1, 'La catégorie est requise'),
+  name: z.string().min(2),
+  category: z.enum(ingredientCategory),
+  parentId: z.number().optional(),
 })
 
 export type IngredientFormValues = z.infer<typeof ingredientSchema>
@@ -19,12 +20,7 @@ const createIngredient = createServerFn()
   .middleware([authGuard()])
   .inputValidator(ingredientSchema)
   .handler(async ({ data }) => {
-    const { name, category } = data
-
-    await getDb().insert(ingredient).values({
-      name,
-      category,
-    })
+    await getDb().insert(ingredient).values(data)
   })
 
 const createIngredientOptions = () =>
@@ -32,7 +28,7 @@ const createIngredientOptions = () =>
     mutationFn: createIngredient,
     onSuccess: async (_data, variables, _result, context) => {
       await context.client.invalidateQueries({
-        queryKey: ingredientsQueryKeys.list(),
+        queryKey: queryKeys.listIngredients(),
       })
       toastManager.add({
         title: `Ingrédient ${variables.data.name} créé`,

@@ -1,14 +1,7 @@
-CREATE TABLE `user` (
-	`id` text PRIMARY KEY NOT NULL,
-	`email` text NOT NULL,
-	`role` text DEFAULT 'user' NOT NULL
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);--> statement-breakpoint
 CREATE TABLE `ingredients` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
-	`category` text DEFAULT 'supermarket' NOT NULL,
+	`category` text DEFAULT 'other' NOT NULL,
 	`parent_id` integer
 );
 --> statement-breakpoint
@@ -45,12 +38,15 @@ CREATE TABLE `section_ingredients` (
 --> statement-breakpoint
 CREATE TABLE `units` (
 	`id` integer PRIMARY KEY NOT NULL,
-	`name` text(100) NOT NULL,
-	`symbol` text(50) NOT NULL,
+	`name` text NOT NULL,
 	`parent_id` integer,
 	`factor` real
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `units_name_unique` ON `units` (`name`);
-
-INSERT INTO "user" VALUES('1','anto.bouteiller@gmail.com', 'admin');
+CREATE TABLE `user` (
+	`id` text PRIMARY KEY NOT NULL,
+	`email` text NOT NULL,
+	`role` text DEFAULT 'user' NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);

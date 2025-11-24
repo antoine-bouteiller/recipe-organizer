@@ -1,12 +1,12 @@
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
-import { withServerErrorCapture } from '@/lib/error-handler'
+import { queryKeys } from '@/lib/query-keys'
+import { withServerErrorCapture } from '@/utils/error-handler'
 import { queryOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { recipesQueryKeys } from './query-keys'
 
 const getRecipe = createServerFn({
   method: 'GET',
@@ -61,7 +61,7 @@ export type RecipeSection = Recipe['sections'][number]
 
 const getRecipeDetailsOptions = (id: number) =>
   queryOptions({
-    queryKey: recipesQueryKeys.detail(id),
+    queryKey: queryKeys.recipeDetail(id),
     queryFn: () => getRecipe({ data: id }),
   })
 

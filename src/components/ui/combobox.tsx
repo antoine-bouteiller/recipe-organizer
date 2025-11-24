@@ -18,24 +18,27 @@ import { cn } from '@/utils/cn'
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 import { type ReactNode, useState } from 'react'
 
-interface Option {
+export type ValueOptions = string | number | undefined
+
+interface Option<T> {
   label: string
-  value: string
+  value: T
 }
 
-interface ComboboxProps extends Omit<React.ComponentProps<'button'>, 'onChange'> {
+interface ComboboxProps<T extends ValueOptions>
+  extends Omit<React.ComponentProps<'button'>, 'onChange'> {
   placeholder?: string
   searchPlaceholder?: string
   disabled?: boolean
-  onChange?: (option: Option) => void
-  value?: string
-  options: Option[]
+  onChange?: (option: Option<T>) => void
+  value?: T
+  options: Option<T>[]
   noResultsLabel?: string
   addNew?: (inputValue: string) => ReactNode
   nested?: boolean
 }
 
-const Combobox = ({
+const Combobox = <T extends ValueOptions>({
   options,
   value,
   onChange,
@@ -46,7 +49,7 @@ const Combobox = ({
   nested = false,
   className,
   ...props
-}: ComboboxProps) => {
+}: ComboboxProps<T>) => {
   const [open, setOpen] = useState(false)
 
   return (
@@ -84,10 +87,10 @@ const Combobox = ({
   )
 }
 
-interface ComboboxContentProps {
-  options: Option[]
-  value?: string
-  onChange?: (option: Option) => void
+interface ComboboxContentProps<T> {
+  options: Option<T>[]
+  value?: T
+  onChange?: (option: Option<T>) => void
   searchPlaceholder: string
   setOpen: (open: boolean) => void
   noResultsLabel: string
@@ -95,7 +98,7 @@ interface ComboboxContentProps {
   disabled?: boolean
 }
 
-const ComboboxContent = ({
+const ComboboxContent = <T extends ValueOptions>({
   options,
   value,
   onChange,
@@ -104,7 +107,7 @@ const ComboboxContent = ({
   noResultsLabel,
   addNew,
   disabled,
-}: ComboboxContentProps) => {
+}: ComboboxContentProps<T>) => {
   const [inputValue, setInputValue] = useState('')
   return (
     <Command>
@@ -120,7 +123,7 @@ const ComboboxContent = ({
           <CommandGroup>
             {options.map((option) => (
               <CommandItem
-                key={option.value}
+                key={String(option.value)}
                 value={option.label}
                 onSelect={() => {
                   onChange?.(option)

@@ -9,8 +9,7 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { useQuery } from '@tanstack/react-query'
+import { useRecipeOptions } from '@/hooks/use-options'
 import { useState } from 'react'
 
 interface AddExistingRecipeProps {
@@ -22,13 +21,7 @@ export default function AddExistingRecipe({
   onSelect,
   disabled,
 }: Readonly<AddExistingRecipeProps>) {
-  const { data: recipes } = useQuery(getRecipeListOptions())
-
-  const recipesOptions =
-    recipes?.map((recipe) => ({
-      label: recipe.name,
-      value: recipe.id.toString(),
-    })) ?? []
+  const recipesOptions = useRecipeOptions()
 
   const [selectedRecipe, setSelectedRecipe] = useState<{
     recipeId: number
@@ -63,7 +56,7 @@ export default function AddExistingRecipe({
             options={recipesOptions}
             onChange={(option) =>
               setSelectedRecipe({
-                recipeId: Number.parseInt(option.value),
+                recipeId: option.value,
                 name: option.label,
                 ratio: 1,
               })

@@ -1,13 +1,13 @@
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
-import { withServerErrorCapture } from '@/lib/error-handler'
+import { queryKeys } from '@/lib/query-keys'
 import { deleteFile } from '@/lib/r2'
+import { withServerErrorCapture } from '@/utils/error-handler'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { recipesQueryKeys } from './query-keys'
 
 const deleteRecipe = createServerFn({
   method: 'POST',
@@ -25,7 +25,7 @@ const deleteRecipeOptions = () =>
   mutationOptions({
     mutationFn: deleteRecipe,
     onSuccess: (_data, _variables, _result, context) => {
-      void context.client.invalidateQueries({ queryKey: recipesQueryKeys.all })
+      void context.client.invalidateQueries({ queryKey: queryKeys.allRecipes })
     },
   })
 

@@ -1,9 +1,9 @@
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
+import { queryKeys } from '@/lib/query-keys'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { asc } from 'drizzle-orm'
-import { ingredientsQueryKeys } from './query-keys'
 
 const getIngredientsList = createServerFn({
   method: 'GET',
@@ -15,7 +15,7 @@ const getIngredientsList = createServerFn({
 
 const getIngredientListOptions = () =>
   queryOptions({
-    queryKey: ingredientsQueryKeys.list(),
+    queryKey: queryKeys.listIngredients(),
     queryFn: getIngredientsList,
   })
 

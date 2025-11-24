@@ -1,13 +1,17 @@
-import { Combobox, type ComboboxProps } from '@/components/ui/combobox'
+import { Combobox, type ComboboxProps, type ValueOptions } from '@/components/ui/combobox'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { Field, FieldError, FieldLabel } from '../ui/field'
 
-interface ComboboxFieldProps extends ComboboxProps {
+interface ComboboxFieldProps<T extends ValueOptions> extends ComboboxProps<T> {
   label?: string
 }
 
-const ComboboxField = ({ options, label, ...props }: ComboboxFieldProps) => {
-  const field = useFieldContext<string | undefined>()
+const ComboboxField = <T extends ValueOptions>({
+  options,
+  label,
+  ...props
+}: ComboboxFieldProps<T>) => {
+  const field = useFieldContext<T | undefined>()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
   return (
@@ -22,10 +26,10 @@ const ComboboxField = ({ options, label, ...props }: ComboboxFieldProps) => {
         options={options}
         value={field.store.state.value}
         onChange={(option) => {
-          if (option.value === field.store.state.value) {
-            field.handleChange(undefined)
+          if (option.value === field.store.state.value || option.value === undefined) {
+            field.setValue(undefined)
           } else {
-            field.handleChange(option.value)
+            field.setValue(option.value)
           }
         }}
         aria-invalid={isInvalid}

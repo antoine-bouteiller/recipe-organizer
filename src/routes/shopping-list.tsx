@@ -1,52 +1,31 @@
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { useShoppingListStore, type IngredientWithQuantity } from '@/stores/shopping-list.store'
-import { cn } from '@/utils/cn'
+import { CartItem } from '@/features/shopping-list/component/cart-item'
+import { useShoppingListStore } from '@/features/shopping-list/hooks/use-shopping-list'
+import { resetShoppingList } from '@/stores/shopping-list.store'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-
-const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
-  const [isChecked, setIsChecked] = useState(false)
-
-  return (
-    <div
-      className={cn(
-        'flex items-center text-nowrap text-ellipsis gap-2',
-        isChecked && 'line-through'
-      )}
-    >
-      <Checkbox
-        id={`ingredient-${ingredient.id}`}
-        checked={isChecked}
-        onCheckedChange={(checked) => setIsChecked(checked)}
-      />
-      <label htmlFor={`ingredient-${ingredient.id}`} className="flex-1 flex justify-between">
-        <span>{ingredient.name}</span>
-        <span>
-          {ingredient.quantity} {ingredient.unit && ` ${ingredient.unit}`}
-        </span>
-      </label>
-    </div>
-  )
-}
 
 const CartPage = () => {
-  const { shoppingListIngredients, reset } = useShoppingListStore()
+  const { shoppingListIngredients } = useShoppingListStore()
 
   return (
     <ScreenLayout
       title="Liste de courses"
       headerEndItem={
-        <Button variant="outline" size="icon" onClick={reset}>
+        <Button variant="outline" size="icon" onClick={resetShoppingList}>
           <ArrowCounterClockwiseIcon className="sier-4 text-primary" />
         </Button>
       }
     >
-      <div className="p-8 space-y-2">
-        {shoppingListIngredients.map((ingredient) => (
-          <CartItem key={ingredient.id} ingredient={ingredient} />
+      <div className="p-8 space-y-4">
+        {Object.entries(shoppingListIngredients).map(([key, ingredients]) => (
+          <div className="space-y-2" key={key}>
+            <div>{key}</div>
+            {ingredients.map((ingredient) => (
+              <CartItem key={ingredient.id} ingredient={ingredient} />
+            ))}
+          </div>
         ))}
       </div>
     </ScreenLayout>

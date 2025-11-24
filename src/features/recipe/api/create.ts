@@ -2,12 +2,12 @@ import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
+import { queryKeys } from '@/lib/query-keys'
 import { uploadFile } from '@/lib/r2'
 import { parseFormData } from '@/utils/form-data'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
-import { recipesQueryKeys } from './query-keys'
 
 const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })], {
   message: "L'image est requise",
@@ -107,7 +107,7 @@ const createRecipeOptions = () =>
     mutationFn: createRecipe,
     onSuccess: (_data, variables, _result, context) => {
       void context.client.invalidateQueries({
-        queryKey: recipesQueryKeys.lists(),
+        queryKey: queryKeys.recipeLists(),
       })
       const { data: title } = z.string().safeParse(variables.data.get('name'))
       toastManager.add({

@@ -2,11 +2,11 @@ import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
+import { queryKeys } from '@/lib/query-keys'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { unitKeys } from './query-keys'
 
 export const updateUnitSchema = z.object({
   id: z.number(),
@@ -32,7 +32,7 @@ const updateUnitOptions = () =>
   mutationOptions({
     mutationFn: updateUnit,
     onSuccess: async (_data, variables, _result, context) => {
-      await context.client.invalidateQueries({ queryKey: unitKeys.all })
+      await context.client.invalidateQueries({ queryKey: queryKeys.allUnits })
       toastManager.add({
         title: `Unité ${variables.data.name} mise à jour`,
         type: 'success',

@@ -6,9 +6,10 @@ interface TextFieldProps {
   label?: string
   placeholder?: string
   disabled?: boolean
+  className?: string
 }
 
-export const TextField = ({ label, placeholder, disabled }: TextFieldProps) => {
+export const TextField = ({ label, placeholder, disabled, className }: TextFieldProps) => {
   const field = useFieldContext<string>()
 
   return (
@@ -17,6 +18,7 @@ export const TextField = ({ label, placeholder, disabled }: TextFieldProps) => {
       invalid={!field.state.meta.isValid}
       dirty={field.state.meta.isDirty}
       touched={field.state.meta.isTouched}
+      className={className}
     >
       {label && <FieldLabel>{label}</FieldLabel>}
       <Input

@@ -10,10 +10,10 @@ import {
   ItemSeparator,
   ItemTitle,
 } from '@/components/ui/item'
-import { AddUnit } from '@/features/units/add-unit'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
-import { DeleteUnit } from '@/features/units/delete-unit'
-import { EditUnit } from '@/features/units/edit-unit'
+import { AddUnit } from '@/features/units/components/add-unit'
+import { DeleteUnit } from '@/features/units/components/delete-unit'
+import { EditUnit } from '@/features/units/components/edit-unit'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'

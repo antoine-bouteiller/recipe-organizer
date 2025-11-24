@@ -1,4 +1,4 @@
-import { getCookie, setCookie } from '@/lib/cookie'
+import { getCookie, setCookie } from '@/utils/cookie'
 
 export type Theme = 'dark' | 'light'
 

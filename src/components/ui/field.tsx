@@ -7,7 +7,7 @@ import { Spinner } from './spinner'
 
 const Field = ({ className, ...props }: FieldPrimitive.Root.Props) => (
   <FieldPrimitive.Root
-    className={cn('flex flex-col items-start gap-2 flex-1', className)}
+    className={cn('flex flex-col items-start gap-2 flex-1 w-full', className)}
     data-slot="field"
     {...props}
   />

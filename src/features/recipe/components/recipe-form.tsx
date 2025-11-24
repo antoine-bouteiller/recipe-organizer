@@ -6,7 +6,7 @@ import { withForm } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useStore } from '@tanstack/react-form'
-import { recipeDefaultValues } from '../constants'
+import { recipeDefaultValues } from '../utils/constants'
 import { IngredientSectionField } from './ingredient-section-field'
 
 const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) =>
@@ -56,7 +56,7 @@ export const RecipeForm = withForm({
         </AppField>
 
         <div className="flex flex-col gap-2 pt-2">
-          <Label>Ingrédients</Label>
+          <Label>Groupes d&apos;ingrédients</Label>
           <Field name="sections" mode="array">
             {(field) => (
               <>
@@ -70,11 +70,13 @@ export const RecipeForm = withForm({
                         {sectionIndex !== 0 && (
                           <>
                             <AppField name={`sections[${sectionIndex}].name`}>
-                              {({ TextField }) => <TextField label="Nom" disabled={isSubmitting} />}
+                              {({ TextField }) => (
+                                <TextField label="Nom" disabled={isSubmitting} className="pt-2" />
+                              )}
                             </AppField>
                             <Button
                               type="button"
-                              variant="outline"
+                              variant="destructive-outline"
                               size="icon"
                               className="absolute top-2 right-2"
                               disabled={isSubmitting}

@@ -31,6 +31,7 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
     id: ingredient.id,
     name: ingredient.name,
     category: ingredient.category,
+    parentId: ingredient.parentId ?? undefined,
   }
 
   const form = useAppForm({

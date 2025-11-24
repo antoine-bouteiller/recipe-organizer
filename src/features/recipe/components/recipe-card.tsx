@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useShoppingListStore } from '@/stores/shopping-list.store'
+import { setRecipesQuantities } from '@/stores/shopping-list.store'
 import type { Recipe } from '@/types/recipe'
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
+import { useShoppingList } from '../hooks/use-shopping-list'
 
 interface RecipeCardProps {
   readonly recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
@@ -16,9 +17,7 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
 }
 
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
-  const { setRecipesQuantities, recipesQuantities } = useShoppingListStore()
-
-  const isInShoppingCart = recipesQuantities[recipe.id]
+  const recipeInCart = useShoppingList(recipe.id)
 
   return (
     <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
@@ -32,22 +31,18 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
           <CardTitle className="mb-2 line-clamp-2 text-xl font-bold text-nowrap text-ellipsis">
             {recipe.name}
           </CardTitle>
-          {isInShoppingCart ? (
+          {recipeInCart ? (
             <div className="flex items-center gap-2">
               <Button
-                onClick={handleClick(() =>
-                  setRecipesQuantities(recipe.id, recipesQuantities[recipe.id] - 1)
-                )}
+                onClick={handleClick(() => setRecipesQuantities(recipe.id, recipeInCart - 1))}
                 variant="outline"
                 size="icon"
               >
                 <MinusIcon />
               </Button>
-              <span>{recipesQuantities[recipe.id]}</span>
+              <span>{recipeInCart}</span>
               <Button
-                onClick={handleClick(() =>
-                  setRecipesQuantities(recipe.id, recipesQuantities[recipe.id] + 1)
-                )}
+                onClick={handleClick(() => setRecipesQuantities(recipe.id, recipeInCart + 1))}
                 variant="outline"
                 size="icon"
               >

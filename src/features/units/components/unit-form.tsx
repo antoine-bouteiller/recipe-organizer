@@ -1,10 +1,8 @@
 import type { Unit } from '@/features/units/api/get-all'
 import { withFieldGroup } from '@/hooks/use-app-form'
+import { useUnitOptions } from '@/hooks/use-options'
 import { createFieldMap, useStore } from '@tanstack/react-form'
-import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-import type { UnitFormInput } from './api/create'
-import { getUnitsListOptions } from './api/get-all'
+import type { UnitFormInput } from '../api/create'
 
 export const unitDefaultValues: UnitFormInput = {
   name: '',
@@ -22,21 +20,14 @@ export const UnitForm = withFieldGroup({
   defaultValues: unitDefaultValues,
   props: {} as UnitFormProps,
   render: function Render({ group, unit }) {
-    const { data: units } = useQuery(getUnitsListOptions())
     const { AppField } = group
 
     const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
 
-    const availableParentUnits = useMemo(() => {
-      const filtered = units?.filter((u) => u.id !== unit?.id) ?? []
-      return [
-        { label: 'Aucune', value: '' },
-        ...filtered.map((unit) => ({
-          label: unit.name,
-          value: unit.id.toString(),
-        })),
-      ]
-    }, [units, unit?.id])
+    const availableParentUnits = useUnitOptions({
+      allowEmpty: true,
+      filter: (u) => u.id !== unit?.id,
+    })
 
     return (
       <>

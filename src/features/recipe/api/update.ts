@@ -3,15 +3,15 @@ import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
 import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
-import { withServerErrorCapture } from '@/lib/error-handler'
+import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
+import { withServerErrorCapture } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { recipesQueryKeys } from './query-keys'
 
 const updateRecipeSchema = z.object({
   ...recipeSchema.shape,
@@ -102,12 +102,9 @@ const updateRecipe = createServerFn({
 const updateRecipeOptions = () =>
   mutationOptions({
     mutationFn: updateRecipe,
-    onSuccess: (data, variables, _result, context) => {
+    onSuccess: (_data, variables, _result, context) => {
       void context.client.invalidateQueries({
-        queryKey: recipesQueryKeys.lists(),
-      })
-      void context.client.invalidateQueries({
-        queryKey: recipesQueryKeys.detail(data),
+        queryKey: queryKeys.allRecipes,
       })
       const { data: title } = z.string().safeParse(variables.data.get('name'))
       toastManager.add({
