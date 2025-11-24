@@ -1,6 +1,7 @@
 import { ComboboxField } from '@/components/forms/combobox-field'
 import { ImageField } from '@/components/forms/image-field'
 import { NumberField } from '@/components/forms/number-field'
+import { SelectField } from '@/components/forms/select-field'
 import { TextField } from '@/components/forms/text-field'
 import TiptapField from '@/components/forms/tiptap-field'
 import {
@@ -26,6 +27,7 @@ const { useAppForm, withForm, withFieldGroup } = createFormHook({
     TextField,
     NumberField,
     ImageField,
+    SelectField,
     TiptapField,
     ComboboxField,
   },

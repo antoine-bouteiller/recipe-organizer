@@ -1,11 +1,11 @@
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
   ItemGroup,
   ItemSeparator,
   ItemTitle,
@@ -14,6 +14,10 @@ import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/components/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/components/edit-ingredient'
+import {
+  ingredientCategoryIcons,
+  ingredientCategoryLabels,
+} from '@/features/ingredients/utils/ingredient-category'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -63,8 +67,13 @@ const IngredientsManagement = () => {
               <React.Fragment key={ingredient.id}>
                 <Item>
                   <ItemContent>
-                    <ItemTitle>{ingredient.name}</ItemTitle>
-                    <ItemDescription>Catégorie: {ingredient.category}</ItemDescription>
+                    <ItemTitle>
+                      {ingredient.name}
+                      <Badge variant={ingredient.category}>
+                        {ingredientCategoryIcons[ingredient.category]}
+                        {ingredientCategoryLabels[ingredient.category]}
+                      </Badge>
+                    </ItemTitle>
                   </ItemContent>
                   {isAdmin && (
                     <ItemActions>

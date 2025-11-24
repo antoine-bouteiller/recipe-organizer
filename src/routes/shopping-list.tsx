@@ -1,8 +1,13 @@
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
+import {
+  ingredientCategoryIcons,
+  ingredientCategoryLabels,
+} from '@/features/ingredients/utils/ingredient-category'
 import { CartItem } from '@/features/shopping-list/component/cart-item'
 import { useShoppingListStore } from '@/features/shopping-list/hooks/use-shopping-list'
 import { resetShoppingList } from '@/stores/shopping-list.store'
+import { typedEntriesOf } from '@/utils/object'
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { createFileRoute } from '@tanstack/react-router'
 
@@ -19,10 +24,13 @@ const CartPage = () => {
       }
     >
       <div className="p-8 space-y-4">
-        {Object.entries(shoppingListIngredients).map(([key, ingredients]) => (
+        {typedEntriesOf(shoppingListIngredients).map(([key, ingredients]) => (
           <div className="space-y-2" key={key}>
-            <div>{key}</div>
-            {ingredients.map((ingredient) => (
+            <h2 className="flex items-center gap-2 font-medium">
+              {ingredientCategoryIcons[key]}
+              {ingredientCategoryLabels[key]}
+            </h2>
+            {ingredients?.map((ingredient) => (
               <CartItem key={ingredient.id} ingredient={ingredient} />
             ))}
           </div>
