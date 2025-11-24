@@ -3,12 +3,11 @@
 // Runtime types generated with workerd@1.20250924.0 2025-07-29 nodejs_compat
 declare namespace Cloudflare {
   interface Env extends Record<string, string> {
-    VITE_PUBLIC_URL: string
     CLOUDFLARE_D1_TOKEN: string
     CLOUDFLARE_ACCOUNT_ID: string
     CLOUDFLARE_DATABASE_ID: string
     R2_BUCKET: string
-    DB: string
+    DB: D1Database
     IMAGES: string
     GOOGLE_CLIENT_ID: string
     GOOGLE_CLIENT_SECRET: string
@@ -25,10 +24,7 @@ declare namespace NodeJS {
     extends StringifyValues<
       Pick<
         Cloudflare.Env,
-        | 'VITE_PUBLIC_URL'
-        | 'CLOUDFLARE_D1_TOKEN'
-        | 'CLOUDFLARE_ACCOUNT_ID'
-        | 'CLOUDFLARE_DATABASE_ID'
+        'CLOUDFLARE_D1_TOKEN' | 'CLOUDFLARE_ACCOUNT_ID' | 'CLOUDFLARE_DATABASE_ID'
       >
     > {}
 }

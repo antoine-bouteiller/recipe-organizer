@@ -18,14 +18,9 @@ export const env = createEnv({
     VITE_PUBLIC_URL: z.url(),
   },
 
-  runtimeEnvStrict: {
+  runtimeEnv: {
     VITE_PUBLIC_URL: import.meta.env.VITE_PUBLIC_URL,
-    R2_BUCKET: cloudflareEnv.R2_BUCKET,
-    DB: cloudflareEnv.DB,
-    IMAGES: cloudflareEnv.IMAGES,
-    GOOGLE_CLIENT_ID: cloudflareEnv.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: cloudflareEnv.GOOGLE_CLIENT_SECRET,
-    SESSION_SECRET: cloudflareEnv.SESSION_SECRET,
+    ...(cloudflareEnv as Record<string, string>),
   },
 
   emptyStringAsUndefined: true,
