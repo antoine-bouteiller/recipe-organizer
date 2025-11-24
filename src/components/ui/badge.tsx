@@ -27,6 +27,12 @@ const badgeVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground [button,a&]:hover:bg-secondary/90',
         success: 'bg-success/8 text-success-foreground dark:bg-success/16',
         warning: 'bg-warning/8 text-warning-foreground dark:bg-warning/16',
+
+        // ingredients categories
+        meat: 'bg-red-200 text-red-600',
+        other: 'bg-zinc-200 text-zinc-700',
+        spices: 'bg-yellow-200 text-yellow-600',
+        vegetables: 'bg-emerald-100 text-emerald-600',
       },
     },
   }

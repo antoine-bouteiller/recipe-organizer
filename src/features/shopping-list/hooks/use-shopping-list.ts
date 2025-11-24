@@ -1,5 +1,5 @@
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
-import type { Ingredient } from '@/types/ingredient'
+import type { Ingredient, IngredientCategory } from '@/types/ingredient'
 import { useQuery } from '@tanstack/react-query'
 import { useStore } from '@tanstack/react-store'
 import { useMemo } from 'react'
@@ -83,14 +83,17 @@ export const useShoppingListStore = () => {
       }
     }
 
-    return result.reduce<Record<string, IngredientWithQuantity[]>>((acc, ingredient) => {
-      const key = ingredient.category.toLowerCase()
-      if (!acc[key]) {
-        acc[key] = []
-      }
-      acc[key].push(ingredient)
-      return acc
-    }, {})
+    return result.reduce<Partial<Record<IngredientCategory, IngredientWithQuantity[]>>>(
+      (acc, ingredient) => {
+        const key = ingredient.category
+        if (!acc[key]) {
+          acc[key] = []
+        }
+        acc[key].push(ingredient)
+        return acc
+      },
+      {}
+    )
   }, [recipesWithQuantities])
 
   return {

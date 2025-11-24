@@ -2,6 +2,7 @@ import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
 import { useStore } from '@tanstack/react-form'
 import type { IngredientFormInput } from '../api/create'
+import { ingredientsCategoryOptions } from '../utils/ingredient-category'
 
 export { ingredientSchema } from '../api/create'
 
@@ -31,8 +32,12 @@ export const IngredientForm = withForm({
         </AppField>
 
         <AppField name="category">
-          {({ TextField }) => (
-            <TextField label="Catégorie" placeholder="Ex: supermarket" disabled={isSubmitting} />
+          {({ SelectField }) => (
+            <SelectField
+              label="Catégorie"
+              items={ingredientsCategoryOptions}
+              disabled={isSubmitting}
+            />
           )}
         </AppField>
         <AppField name="parentId">
