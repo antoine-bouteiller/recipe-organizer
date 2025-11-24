@@ -1,6 +1,6 @@
+import { env } from '@/config/env'
 import { cache } from '@/lib/cache-manager'
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { env } from 'cloudflare:workers'
 import { z } from 'zod'
 
 export const Route = createFileRoute('/api/image/$id')({

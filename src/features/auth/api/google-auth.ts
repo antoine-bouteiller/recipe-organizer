@@ -1,9 +1,9 @@
+import { env } from '@/config/env'
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { useAppSession, useOAuthSession } from '@/lib/session'
 import { redirect } from '@tanstack/react-router'
 import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { env } from 'cloudflare:workers'
 import { eq } from 'drizzle-orm'
 import { type AuthError } from './constants'
 
@@ -27,7 +27,7 @@ export const redirectWithError = (errorMessage: AuthError) => {
 
 export const initiateGoogleAuth = createServerFn({ method: 'POST' }).handler(async () => {
   const state = generateState()
-  const redirectUri = `${import.meta.env.VITE_PUBLIC_URL}/api/auth/google/callback`
+  const redirectUri = `${env.VITE_PUBLIC_URL}/api/auth/google/callback`
 
   const searchParams = new URLSearchParams({
     client_id: env.GOOGLE_CLIENT_ID,
@@ -59,7 +59,7 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
     throw redirectWithError('invalid_state')
   }
 
-  const redirectUri = `${import.meta.env.VITE_PUBLIC_URL}/api/auth/google/callback`
+  const redirectUri = `${env.VITE_PUBLIC_URL}/api/auth/google/callback`
 
   // Exchange code for tokens
   const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
