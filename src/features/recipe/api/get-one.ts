@@ -49,10 +49,7 @@ const getRecipe = createServerFn({
         throw notFound()
       }
 
-      return {
-        ...result,
-        image: result.image,
-      }
+      return result
     })
   )
 

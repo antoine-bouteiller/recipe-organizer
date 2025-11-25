@@ -1,9 +1,9 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/utils/cn'
 import { useState } from 'react'
-import type { IngredientWithQuantity } from '../hooks/use-shopping-list'
+import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
-export const CartItem = ({ ingredient }: { ingredient: IngredientWithQuantity }) => {
+export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => {
   const [isChecked, setIsChecked] = useState(false)
 
   return (

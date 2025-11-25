@@ -1,11 +1,18 @@
 import { getDb } from '@/lib/db'
-import { recipe } from '@/lib/db/schema/recipe'
+import {
+  ingredient,
+  recipe,
+  recipeIngredientsSection,
+  sectionIngredient,
+  unit,
+} from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { inArray } from 'drizzle-orm'
+import { and, eq, inArray, ne } from 'drizzle-orm'
 import { z } from 'zod'
+import type { RecipeById } from '../types/recipe-by-id'
 
 const getRecipesByIds = createServerFn({
   method: 'GET',
@@ -17,26 +24,49 @@ const getRecipesByIds = createServerFn({
   )
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const recipes = await getDb().query.recipe.findMany({
-        where: inArray(recipe.id, data.ids),
-        with: {
-          sections: {
-            with: {
-              sectionIngredients: {
-                with: {
-                  ingredient: true,
-                  unit: true,
-                },
-              },
-            },
+      const rows = await getDb()
+        .select({
+          id: recipe.id,
+          quantity: recipe.quantity,
+          ingredient: {
+            id: ingredient.id,
+            name: ingredient.name,
+            category: ingredient.category,
+            parentId: ingredient.parentId,
           },
-        },
-      })
+          ingredientDetails: {
+            quantity: sectionIngredient.quantity,
+            unit: unit.name,
+          },
+        })
+        .from(recipe)
+        .leftJoin(recipeIngredientsSection, eq(recipe.id, recipeIngredientsSection.recipeId))
+        .leftJoin(sectionIngredient, eq(sectionIngredient.sectionId, recipeIngredientsSection.id))
+        .leftJoin(ingredient, eq(sectionIngredient.ingredientId, ingredient.id))
+        .leftJoin(unit, eq(sectionIngredient.unitId, unit.id))
+        .where(and(ne(ingredient.category, 'spices'), inArray(recipe.id, data.ids)))
 
-      return recipes.map((recipe) => ({
-        ...recipe,
-        image: `/api/image/${recipe.image}`,
-      }))
+      const result = rows.reduce<Record<number, RecipeById>>((acc, row) => {
+        const { ingredient, ingredientDetails } = row
+        if (!acc[row.id]) {
+          acc[row.id] = {
+            id: row.id,
+            quantity: row.quantity,
+            ingredients: [],
+          }
+        }
+        if (ingredient && ingredientDetails.quantity) {
+          acc[row.id].ingredients.push({
+            ...ingredient,
+            quantity: ingredientDetails.quantity,
+            parentId: ingredient.parentId,
+            unit: ingredientDetails.unit ?? undefined,
+          })
+        }
+        return acc
+      }, {})
+
+      return Object.values(result)
     })
   )
 

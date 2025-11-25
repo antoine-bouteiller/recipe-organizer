@@ -1,21 +1,24 @@
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
-import type { Ingredient, IngredientCategory } from '@/types/ingredient'
+import type { IngredientCategory } from '@/types/ingredient'
+import { typedEntriesOf } from '@/utils/object'
 import { useQuery } from '@tanstack/react-query'
 import { useStore } from '@tanstack/react-store'
 import { useMemo } from 'react'
 import { shoppingListStore } from '../../../stores/shopping-list.store'
+import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
-export interface IngredientWithQuantity extends Ingredient {
-  quantity: number
-  unit: string | undefined
-  checked: boolean
-}
 export const useShoppingListStore = () => {
   const { recipesQuantities } = useStore(shoppingListStore)
 
-  const { data: recipes } = useQuery(
-    getRecipeByIdsOptions(Object.keys(recipesQuantities).map(Number))
+  const wantedRecipes = useMemo(
+    () =>
+      typedEntriesOf(recipesQuantities)
+        .filter(([_id, recipe]) => recipe > 0)
+        .map(([id]) => id),
+    [recipesQuantities]
   )
+
+  const { data: recipes } = useQuery(getRecipeByIdsOptions(wantedRecipes))
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,
@@ -28,29 +31,27 @@ export const useShoppingListStore = () => {
     }
 
     // First pass: collect all ingredients with their quantities
-    const ingredientsMap = recipesWithQuantities
-      .filter((recipe) => recipe.wantedQuantity > 0)
-      .reduce<Map<number, IngredientWithQuantity>>((map, recipe) => {
-        for (const section of recipe.sections) {
-          for (const ingredient of section.sectionIngredients) {
-            const existingIngredient = map.get(ingredient.ingredient.id)
-            const calculatedQuantity =
-              (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity
+    const ingredientsMap = recipesWithQuantities.reduce<Map<number, IngredientCartItem>>(
+      (map, recipe) => {
+        for (const ingredient of recipe.ingredients) {
+          const existingIngredient = map.get(ingredient.id)
+          const calculatedQuantity = (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity
 
-            if (existingIngredient) {
-              existingIngredient.quantity += calculatedQuantity
-            } else {
-              map.set(ingredient.ingredient.id, {
-                ...ingredient.ingredient,
-                quantity: calculatedQuantity,
-                unit: ingredient.unit?.name,
-                checked: false,
-              })
-            }
+          if (existingIngredient) {
+            existingIngredient.quantity += calculatedQuantity
+          } else {
+            map.set(ingredient.id, {
+              ...ingredient,
+              quantity: calculatedQuantity,
+              unit: ingredient.unit,
+              checked: false,
+            })
           }
         }
         return map
-      }, new Map())
+      },
+      new Map()
+    )
 
     // Second pass: group by parentId and consolidate
     const parentQuantities = new Map<number, number>()
@@ -66,7 +67,7 @@ export const useShoppingListStore = () => {
     }
 
     // Third pass: build final list
-    const result: IngredientWithQuantity[] = []
+    const result: IngredientCartItem[] = []
 
     for (const ingredient of ingredientsMap
       .values()
@@ -83,7 +84,7 @@ export const useShoppingListStore = () => {
       }
     }
 
-    return result.reduce<Partial<Record<IngredientCategory, IngredientWithQuantity[]>>>(
+    return result.reduce<Partial<Record<IngredientCategory, IngredientCartItem[]>>>(
       (acc, ingredient) => {
         const key = ingredient.category
         if (!acc[key]) {
