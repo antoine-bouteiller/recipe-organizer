@@ -65,13 +65,15 @@ const IngredientsManagement = () => {
           <ItemGroup>
             {filteredIngredients.map((ingredient, index) => (
               <React.Fragment key={ingredient.id}>
-                <Item>
+                <Item className="flex-nowrap">
                   <ItemContent>
                     <ItemTitle>
-                      {ingredient.name}
-                      <Badge variant={ingredient.category}>
+                      <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
+                      <Badge variant={ingredient.category} className="aspect-square md:aspect-auto">
                         {ingredientCategoryIcons[ingredient.category]}
-                        {ingredientCategoryLabels[ingredient.category]}
+                        <span className="hidden md:block">
+                          {ingredientCategoryLabels[ingredient.category]}
+                        </span>
                       </Badge>
                     </ItemTitle>
                   </ItemContent>

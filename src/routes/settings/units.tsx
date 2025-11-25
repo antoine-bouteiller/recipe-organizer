@@ -62,14 +62,15 @@ const UnitsManagement = () => {
               <React.Fragment key={unit.id}>
                 <Item>
                   <ItemContent>
-                    <ItemTitle>{unit.name}</ItemTitle>
-                    <ItemDescription>
-                      {unit.parentId && unit.parent && unit.factor && (
-                        <>
-                          1 {unit.name} = {unit.factor} {unit.parent.name}
-                        </>
+                    <ItemTitle>
+                      {unit.name}
+                      {unit.parent && unit.factor && (
+                        <span className="text-muted-foreground text-sm">
+                          = {unit.factor} {unit.parent.name}
+                        </span>
                       )}
-                    </ItemDescription>
+                    </ItemTitle>
+                    <ItemDescription />
                   </ItemContent>
                   {isAdmin && (
                     <ItemActions>

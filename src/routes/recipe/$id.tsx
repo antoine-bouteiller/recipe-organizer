@@ -10,6 +10,9 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { RecipeIngredientsSections } from '@/features/recipe/components/recipe-section'
+import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
+import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
+import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 import { getFileUrl } from '@/utils/get-file-url'
 import {
   ArrowLeftIcon,
@@ -20,17 +23,20 @@ import {
 } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
 import { z } from 'zod'
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
   const { data: recipe, isLoading } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
+  const isInShoppingList = useIsInShoppingList(id)
 
   const router = useRouter()
 
-  const [quantity, setQuantity] = useState(recipe?.quantity ?? 0)
+  const { quantity, decrementQuantity, incrementQuantity } = useRecipeQuantities(
+    recipe?.id,
+    recipe?.quantity
+  )
 
   if (isLoading) {
     return (
@@ -93,12 +99,23 @@ const RecipePage = () => {
         </CardHeader>
 
         <div className="flex items-center gap-2 justify-center w-full py-2 md:justify-start px-8">
-          <Button variant="outline" size="icon" onClick={() => setQuantity(quantity - 1)}>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={decrementQuantity}
+            disabled={quantity === 1}
+          >
             <MinusIcon />
           </Button>
           {quantity}
-          <Button variant="outline" size="icon" onClick={() => setQuantity(quantity + 1)}>
+          <Button variant="outline" size="icon" onClick={incrementQuantity}>
             <PlusIcon />
+          </Button>
+          <Button
+            onClick={() => (isInShoppingList ? removeFromShoppingList(id) : addToShoppingList(id))}
+            variant="outline"
+          >
+            {isInShoppingList ? 'Supprimer de la liste' : 'Ajouter à la liste'}
           </Button>
         </div>
         <div className="flex-1 prose prose-sm max-w-none text-foreground flex flex-col">

@@ -4,11 +4,11 @@ import { Store } from '@tanstack/react-store'
 const storageKey = 'shopping-list'
 
 interface ShoppingListState {
-  recipesQuantities: Record<number, number>
+  shoppingList: number[]
 }
 
 const defaultState: ShoppingListState = {
-  recipesQuantities: {},
+  shoppingList: [],
 }
 
 export const initShoppingListState = () => {
@@ -25,12 +25,17 @@ export const shoppingListStore = new Store(initShoppingListState(), {
   },
 })
 
-export const setRecipesQuantities = (recipeId: number, quantity: number) => {
-  shoppingListStore.setState(({ recipesQuantities }) => ({
-    recipesQuantities: { ...recipesQuantities, [recipeId]: quantity },
+export const addToShoppingList = (recipeId: number) => {
+  shoppingListStore.setState(({ shoppingList: recipesQuantities }) => ({
+    shoppingList: [...recipesQuantities, recipeId],
   }))
 }
 
+export const removeFromShoppingList = (recipeId: number) => {
+  shoppingListStore.setState(({ shoppingList: recipesQuantities }) => ({
+    shoppingList: recipesQuantities.filter((id) => id !== recipeId),
+  }))
+}
 export const resetShoppingList = () => {
-  shoppingListStore.setState({ recipesQuantities: {} })
+  shoppingListStore.setState({ shoppingList: [] })
 }

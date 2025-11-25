@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { setRecipesQuantities } from '@/stores/shopping-list.store'
+import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 import type { Recipe } from '@/types/recipe'
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
-import { useShoppingList } from '../hooks/use-shopping-list'
+import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
+import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 
 interface RecipeCardProps {
   readonly recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
@@ -17,7 +18,12 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
 }
 
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
-  const recipeInCart = useShoppingList(recipe.id)
+  const isInShoppingList = useIsInShoppingList(recipe.id)
+
+  const { quantity, decrementQuantity, incrementQuantity } = useRecipeQuantities(
+    recipe.id,
+    recipe.quantity
+  )
 
   return (
     <Link to="/recipe/$id" params={{ id: recipe.id.toString() }}>
@@ -31,35 +37,29 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
           <CardTitle className="mb-2 line-clamp-2 text-xl font-bold text-nowrap text-ellipsis">
             {recipe.name}
           </CardTitle>
-          {recipeInCart ? (
+          {isInShoppingList ? (
             <div className="flex items-center gap-2">
               <Button
-                onClick={handleClick(() => setRecipesQuantities(recipe.id, recipeInCart - 1))}
+                onClick={handleClick(decrementQuantity)}
+                disabled={quantity === 1}
                 variant="outline"
                 size="icon"
               >
                 <MinusIcon />
               </Button>
-              <span>{recipeInCart}</span>
-              <Button
-                onClick={handleClick(() => setRecipesQuantities(recipe.id, recipeInCart + 1))}
-                variant="outline"
-                size="icon"
-              >
+              <span>{quantity}</span>
+              <Button onClick={handleClick(incrementQuantity)} variant="outline" size="icon">
                 <PlusIcon />
               </Button>
               <Button
-                onClick={handleClick(() => setRecipesQuantities(recipe.id, 0))}
+                onClick={handleClick(() => removeFromShoppingList(recipe.id))}
                 variant="outline"
               >
                 Supprimer de la liste
               </Button>
             </div>
           ) : (
-            <Button
-              onClick={handleClick(() => setRecipesQuantities(recipe.id, recipe.quantity))}
-              variant="outline"
-            >
+            <Button onClick={handleClick(() => addToShoppingList(recipe.id))} variant="outline">
               Ajouter à la liste de courses
             </Button>
           )}

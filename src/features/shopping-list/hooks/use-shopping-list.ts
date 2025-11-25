@@ -1,6 +1,7 @@
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
+import { recipeQuantitiesStore } from '@/stores/recipe-quantities.store'
 import type { IngredientCategory } from '@/types/ingredient'
-import { typedEntriesOf } from '@/utils/object'
+import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
 import { useQuery } from '@tanstack/react-query'
 import { useStore } from '@tanstack/react-store'
 import { useMemo } from 'react'
@@ -8,21 +9,16 @@ import { shoppingListStore } from '../../../stores/shopping-list.store'
 import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
 export const useShoppingListStore = () => {
-  const { recipesQuantities } = useStore(shoppingListStore)
+  const { shoppingList } = useStore(shoppingListStore)
+  const { recipesQuantities } = useStore(recipeQuantitiesStore)
 
-  const wantedRecipes = useMemo(
-    () =>
-      typedEntriesOf(recipesQuantities)
-        .filter(([_id, recipe]) => recipe > 0)
-        .map(([id]) => id),
-    [recipesQuantities]
-  )
-
-  const { data: recipes } = useQuery(getRecipeByIdsOptions(wantedRecipes))
+  const { data: recipes } = useQuery(getRecipeByIdsOptions(shoppingList))
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,
-    wantedQuantity: recipesQuantities[recipe.id] ?? 0,
+    wantedQuantity: isNullOrUndefined(recipesQuantities[recipe.id])
+      ? recipe.quantity
+      : recipesQuantities[recipe.id],
   }))
 
   const shoppingListIngredients = useMemo(() => {
