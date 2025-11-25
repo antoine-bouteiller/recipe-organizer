@@ -30,6 +30,7 @@ const badgeVariants = cva(
 
         // ingredients categories
         meat: 'bg-red-200 text-red-600',
+        fish: 'bg-blue-200 text-blue-600',
         other: 'bg-zinc-200 text-zinc-700',
         spices: 'bg-yellow-200 text-yellow-600',
         vegetables: 'bg-emerald-100 text-emerald-600',
