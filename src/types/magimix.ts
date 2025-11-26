@@ -1,15 +1,17 @@
-export enum MagimixProgram {
-  COOKING = 'cooking',
-  MIXING = 'mixing',
-  KNEADING = 'kneading',
-  EMULSIFYING = 'emulsifying',
-  CHOPPING = 'chopping',
-  BLENDING = 'blending',
-  STEAMING = 'steaming',
-  SIMMERING = 'simmering',
-  SLOW_COOKING = 'slow_cooking',
-  KEEP_WARM = 'keep_warm',
-}
+export const MagimixProgram = {
+  COOKING: 'cooking',
+  MIXING: 'mixing',
+  KNEADING: 'kneading',
+  EMULSIFYING: 'emulsifying',
+  CHOPPING: 'chopping',
+  BLENDING: 'blending',
+  STEAMING: 'steaming',
+  SIMMERING: 'simmering',
+  SLOW_COOKING: 'slow_cooking',
+  KEEP_WARM: 'keep_warm',
+} as const
+
+export type MagimixProgram = (typeof MagimixProgram)[keyof typeof MagimixProgram]
 
 export interface MagimixProgramData {
   program: MagimixProgram

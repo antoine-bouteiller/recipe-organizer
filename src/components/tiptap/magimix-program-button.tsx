@@ -34,10 +34,11 @@ export const MagimixProgramButton = () => {
   const [temperature, setTemperature] = useState<string>('')
 
   const handleInsert = () => {
-    if (!editor) return
+    if (!editor) {
+      return
+    }
 
-    const time: 'auto' | number =
-      timeType === 'auto' ? 'auto' : timeMinutes * 60 + timeSeconds
+    const time: 'auto' | number = timeType === 'auto' ? 'auto' : timeMinutes * 60 + timeSeconds
 
     const programData: MagimixProgramData = {
       program,
@@ -60,11 +61,19 @@ export const MagimixProgramButton = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <ToggleGroupItem value="magimix" disabled={!canInsert} data-state="off" type="button">
-          <RobotIcon className="size-4" />
-        </ToggleGroupItem>
-      </DialogTrigger>
+      <DialogTrigger
+        render={(props) => (
+          <ToggleGroupItem
+            {...props}
+            value="magimix"
+            disabled={!canInsert}
+            data-state="off"
+            type="button"
+          >
+            <RobotIcon className="size-4" />
+          </ToggleGroupItem>
+        )}
+      />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Ajouter un programme Magimix</DialogTitle>
@@ -78,7 +87,7 @@ export const MagimixProgramButton = () => {
             <Select
               value={program}
               onValueChange={(value) => {
-                setProgram(value as MagimixProgram)
+                setProgram(value)
               }}
             >
               <SelectTrigger id="program">
@@ -99,7 +108,7 @@ export const MagimixProgramButton = () => {
             <Select
               value={timeType}
               onValueChange={(value) => {
-                setTimeType(value as 'auto' | 'manual')
+                setTimeType(value)
               }}
             >
               <SelectTrigger id="time-type">
@@ -158,9 +167,13 @@ export const MagimixProgramButton = () => {
           </div>
         </div>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Annuler</Button>
-          </DialogClose>
+          <DialogClose
+            render={(props) => (
+              <Button {...props} variant="outline">
+                Annuler
+              </Button>
+            )}
+          />
           <Button onClick={handleInsert}>Insérer</Button>
         </DialogFooter>
       </DialogContent>

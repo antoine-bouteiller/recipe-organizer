@@ -1,10 +1,10 @@
-'use client'
-
+import type { Toggle as TogglePrimitive } from '@base-ui-components/react/toggle'
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui-components/react/toggle-group'
 import { type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
 
-import { Toggle, toggleVariants } from '@/components/ui/toggle'
+import { Separator } from '@/components/ui/separator'
+import { Toggle as ToggleComponent, type toggleVariants } from '@/components/ui/toggle'
 import { cn } from '@/utils/cn'
 
 const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants>>({
@@ -12,58 +12,79 @@ const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariant
   variant: 'default',
 })
 
-const ToggleGroup = ({
-  className,
-  variant,
-  size,
-  children,
-  ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive> & VariantProps<typeof toggleVariants>) => {
-  const contextValue = React.useMemo(() => ({ variant, size }), [variant, size])
+const getToggleGroupClassName = (variant: string | null, orientation: string) => {
+  if (variant == 'default') {
+    return 'gap-0.5'
+  }
 
-  return (
-    <ToggleGroupPrimitive
-      data-slot="toggle-group"
-      data-variant={variant}
-      data-size={size}
-      className={cn(
-        'group/toggle-group flex w-fit items-center rounded-md data-[variant=outline]:shadow-xs',
-        className
-      )}
-      {...props}
-    >
-      <ToggleGroupContext.Provider value={contextValue}>{children}</ToggleGroupContext.Provider>
-    </ToggleGroupPrimitive>
-  )
+  if (orientation === 'horizontal') {
+    return '*:not-first:before:-start-[0.5px] *:not-last:before:-end-[0.5px] *:not-first:rounded-s-none *:not-last:rounded-e-none *:not-first:border-s-0 *:not-last:border-e-0 *:not-first:before:rounded-s-none *:not-last:before:rounded-e-none'
+  }
+
+  return '*:not-first:before:-top-[0.5px] *:not-last:before:-bottom-[0.5px] flex-col *:not-first:rounded-t-none *:not-last:rounded-b-none *:not-first:border-t-0 *:not-last:border-b-0 *:not-last:before:hidden *:not-first:before:rounded-t-none *:not-last:before:rounded-b-none dark:*:last:before:hidden dark:*:first:before:block'
 }
 
-const ToggleGroupItem = ({
+const ToggleGroup = ({
+  className,
+  variant = 'default',
+  size = 'default',
+  orientation = 'horizontal',
+  children,
+  ...props
+}: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => (
+  <ToggleGroupPrimitive
+    className={cn(
+      'flex w-fit *:focus-visible:z-10',
+      orientation === 'horizontal'
+        ? '*:pointer-coarse:after:min-w-auto'
+        : '*:pointer-coarse:after:min-h-auto',
+      getToggleGroupClassName(variant, orientation),
+      className
+    )}
+    data-size={size}
+    data-slot="toggle-group"
+    data-variant={variant}
+    orientation={orientation}
+    {...props}
+  >
+    <ToggleGroupContext.Provider value={{ size, variant }}>{children}</ToggleGroupContext.Provider>
+  </ToggleGroupPrimitive>
+)
+
+const Toggle = ({
   className,
   children,
   variant,
   size,
   ...props
-}: React.ComponentProps<typeof Toggle> & VariantProps<typeof toggleVariants>) => {
+}: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) => {
   const context = React.useContext(ToggleGroupContext)
 
+  const resolvedVariant = context.variant || variant
+  const resolvedSize = context.size || size
+
   return (
-    <Toggle
-      data-slot="toggle-group-item"
-      data-variant={context.variant || variant}
-      data-size={context.size || size}
-      className={cn(
-        toggleVariants({
-          variant: context.variant || variant,
-          size: context.size || size,
-        }),
-        'min-w-0 flex-1 shrink-0 rounded-none shadow-none first:rounded-l-md last:rounded-r-md focus:z-10 focus-visible:z-10 data-[variant=outline]:border-l-0 data-[variant=outline]:first:border-l',
-        className
-      )}
+    <ToggleComponent
+      className={className}
+      data-size={resolvedSize}
+      data-variant={resolvedVariant}
+      size={resolvedSize}
+      variant={resolvedVariant}
       {...props}
     >
       {children}
-    </Toggle>
+    </ToggleComponent>
   )
 }
 
-export { ToggleGroup, ToggleGroupItem }
+const ToggleGroupSeparator = ({
+  className,
+  orientation = 'vertical',
+  ...props
+}: {
+  className?: string
+} & React.ComponentProps<typeof Separator>) => (
+  <Separator className={className} orientation={orientation} {...props} />
+)
+
+export { Toggle, ToggleGroup, Toggle as ToggleGroupItem, ToggleGroupSeparator }

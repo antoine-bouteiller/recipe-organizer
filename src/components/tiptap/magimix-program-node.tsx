@@ -1,5 +1,4 @@
-import { mergeAttributes, Node } from '@tiptap/core'
-import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
+import { MagimixProgram, type MagimixProgramData, magimixProgramLabels } from '@/types/magimix'
 import {
   CookingPotIcon,
   ForkKnifeIcon,
@@ -7,7 +6,20 @@ import {
   ThermometerIcon,
   TimerIcon,
 } from '@phosphor-icons/react'
-import { magimixProgramLabels, MagimixProgram, type MagimixProgramData } from '@/types/magimix'
+import { mergeAttributes, Node } from '@tiptap/core'
+import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer } from '@tiptap/react'
+
+// Extend TipTap Commands interface to include our custom command
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    magimixProgram: {
+      /**
+       * Insert a Magimix program node
+       */
+      setMagimixProgram: (attributes: MagimixProgramData) => ReturnType
+    }
+  }
+}
 
 // Icons for each program
 const magimixProgramIcons: Record<MagimixProgram, Icon> = {
@@ -42,8 +54,9 @@ const formatTime = (time: 'auto' | number): string => {
 }
 
 // React component for the Magimix program node view
-const MagimixProgramComponent = ({ node }: { node: { attrs: MagimixProgramData } }) => {
-  const { program, time, temperature } = node.attrs
+const MagimixProgramComponent = ({ node }: ReactNodeViewProps) => {
+  const attrs = node.attrs as MagimixProgramData
+  const { program, time, temperature } = attrs
   const ProgramIcon = magimixProgramIcons[program]
   const label = magimixProgramLabels[program]
 
@@ -71,7 +84,6 @@ const MagimixProgramComponent = ({ node }: { node: { attrs: MagimixProgramData }
           </div>
         </div>
       </div>
-      <NodeViewContent />
     </NodeViewWrapper>
   )
 }
@@ -81,8 +93,6 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
   name: 'magimixProgram',
 
   group: 'block',
-
-  content: 'inline*',
 
   draggable: true,
 
@@ -98,8 +108,10 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
       time: {
         default: 'auto',
         parseHTML: (element) => {
-          const time = element.dataset.time
-          if (time === 'auto') return 'auto'
+          const { time } = element.dataset
+          if (time === 'auto') {
+            return 'auto'
+          }
           const parsed = Number.parseInt(time ?? '0', 10)
           return Number.isNaN(parsed) ? 'auto' : parsed
         },
@@ -111,12 +123,16 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
         default: undefined,
         parseHTML: (element) => {
           const temp = element.dataset.temperature
-          if (!temp) return undefined
+          if (!temp) {
+            return undefined
+          }
           const parsed = Number.parseInt(temp, 10)
           return Number.isNaN(parsed) ? undefined : parsed
         },
         renderHTML: (attributes) => {
-          if (attributes.temperature === undefined) return {}
+          if (attributes.temperature === undefined) {
+            return {}
+          }
           return {
             'data-temperature': String(attributes.temperature),
           }
@@ -138,6 +154,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
   },
 
   addNodeView() {
+    // eslint-disable-next-line new-cap
     return ReactNodeViewRenderer(MagimixProgramComponent)
   },
 
@@ -145,12 +162,11 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
     return {
       setMagimixProgram:
         (attributes: MagimixProgramData) =>
-        ({ commands }) => {
-          return commands.insertContent({
+        ({ commands }) =>
+          commands.insertContent({
             type: this.name,
             attrs: attributes,
-          })
-        },
+          }),
     }
   },
 })
