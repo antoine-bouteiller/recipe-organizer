@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/utils/cn'
+import { formatNumber } from '@/utils/number'
 import { useState } from 'react'
 import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
@@ -21,7 +22,7 @@ export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => 
       <label htmlFor={`ingredient-${ingredient.id}`} className="flex-1 flex justify-between">
         <span>{ingredient.name}</span>
         <span>
-          {ingredient.quantity} {ingredient.unit && ` ${ingredient.unit}`}
+          {formatNumber(ingredient.quantity)} {ingredient.unit && ` ${ingredient.unit}`}
         </span>
       </label>
     </div>

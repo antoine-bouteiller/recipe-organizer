@@ -1,4 +1,5 @@
 import type { Recipe, RecipeSection } from '@/features/recipe/api/get-one'
+import { formatNumber } from '@/utils/number'
 
 interface RecipeSectionIngredientsProps {
   sectionIngredients: RecipeSection['sectionIngredients']
@@ -18,7 +19,7 @@ const RecipeSectionIngredients = ({
           <div className="flex items-center justify-between gap-2 text-nowrap text-ellipsis">
             <div>{sectionIngredient.ingredient.name}</div>
             <div className="font-medium">
-              {(sectionIngredient.quantity * quantity) / baseQuantity}
+              {formatNumber((sectionIngredient.quantity * quantity) / baseQuantity)}
               {sectionIngredient.unit && ` ${sectionIngredient.unit.name}`}
             </div>
           </div>
