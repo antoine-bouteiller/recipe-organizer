@@ -1,5 +1,6 @@
 import { getCookie, setCookie } from '@/utils/cookie'
 import { Store } from '@tanstack/react-store'
+import z from 'zod'
 
 const storageKey = 'recipe-quantities'
 
@@ -11,12 +12,20 @@ const defaultState: RecipeQuantitiesState = {
   recipesQuantities: {},
 }
 
+const storeSchema = z.object({
+  recipesQuantities: z.record(z.string().transform(Number), z.coerce.number()),
+})
+
 export const initRecipeQuantitiesState = () => {
   const state = getCookie(storageKey)
 
-  const parsedState: RecipeQuantitiesState = state ? JSON.parse(state) : defaultState
+  if (!state) {
+    return defaultState
+  }
 
-  return parsedState
+  const parsedState = storeSchema.safeParse(JSON.parse(state))
+
+  return parsedState.success ? parsedState.data : defaultState
 }
 
 export const recipeQuantitiesStore = new Store(initRecipeQuantitiesState(), {
