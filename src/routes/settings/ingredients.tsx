@@ -45,7 +45,7 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky top-0 bg-background px-4 pt-4 z-10 flex items-center gap-4">
+      <div className="sticky top-0 bg-background px-4 pt-4 pb-2 z-10 flex items-center gap-4">
         <SearchInput search={search} setSearch={setSearch} />
         <AddIngredient>
           <Button size="icon-lg" variant="outline">
@@ -54,7 +54,7 @@ const IngredientsManagement = () => {
         </AddIngredient>
       </div>
 
-      <div className="p-4">
+      <div className="px-4">
         {filteredIngredients.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
             {search

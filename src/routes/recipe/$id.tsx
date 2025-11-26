@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import {
   ResponsivePopover,
   ResponsivePopoverContent,
@@ -51,8 +50,8 @@ const RecipePage = () => {
   }
 
   return (
-    <div className="flex w-full justify-center overflow-hidden">
-      <Card className="md:max-w-5xl w-full pt-0 relative bg-background shadow-none md:shadow-sm md:bg-card border-0 md:border rounded-none md:rounded-2xl  overflow-y-auto">
+    <div className="flex w-full justify-center overflow-auto md:pb-4">
+      <div className="md:max-w-5xl w-full relative md:shadow-sm md:bg-card md:border md:rounded-2xl h-fit">
         <Button
           variant="outline"
           size="icon"
@@ -89,37 +88,37 @@ const RecipePage = () => {
             </ResponsivePopoverContent>
           </ResponsivePopover>
         )}
-        <CardHeader className="p-0">
+        <div className="p-0">
           <div className="mb-6 w-full overflow-hidden md:rounded-t-md flex items-center justify-center aspect-16/6">
             <img src={getFileUrl(recipe.image)} alt={recipe.name} className="object-cover w-full" />
           </div>
-          <div className="px-6">
-            <h1 className="text-3xl font-bold md:text-4xl">{recipe.name}</h1>
+          <h1 className="px-6 font-semibold text-xl md:text-2xl">{recipe.name}</h1>
+          <div className="flex items-center gap-2 justify-center w-full py-2 md:justify-start px-8">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={decrementQuantity}
+              disabled={quantity === 1}
+            >
+              <MinusIcon />
+            </Button>
+            {quantity}
+            <Button variant="outline" size="icon" onClick={incrementQuantity}>
+              <PlusIcon />
+            </Button>
+            <Button
+              onClick={() =>
+                isInShoppingList ? removeFromShoppingList(id) : addToShoppingList(id)
+              }
+              variant="outline"
+            >
+              {isInShoppingList ? 'Supprimer de la liste' : 'Ajouter à la liste'}
+            </Button>
           </div>
-        </CardHeader>
-
-        <div className="flex items-center gap-2 justify-center w-full py-2 md:justify-start px-8">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={decrementQuantity}
-            disabled={quantity === 1}
-          >
-            <MinusIcon />
-          </Button>
-          {quantity}
-          <Button variant="outline" size="icon" onClick={incrementQuantity}>
-            <PlusIcon />
-          </Button>
-          <Button
-            onClick={() => (isInShoppingList ? removeFromShoppingList(id) : addToShoppingList(id))}
-            variant="outline"
-          >
-            {isInShoppingList ? 'Supprimer de la liste' : 'Ajouter à la liste'}
-          </Button>
         </div>
+
         <div className="flex-1 prose prose-sm max-w-none text-foreground flex flex-col">
-          <CardContent className="px-8 md:hidden">
+          <div className="px-8 md:hidden">
             <Tabs defaultValue="ingredients" className="gap-0">
               <TabsList className="w-full">
                 <TabsTab value="ingredients">Ingrédients</TabsTab>
@@ -137,11 +136,11 @@ const RecipePage = () => {
                 <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
               </TabsPanel>
             </Tabs>
-          </CardContent>
+          </div>
 
-          <CardContent className="grid-cols-5 gap-8 hidden md:grid flex-1">
-            <div className="col-span-2 border rounded-xl p-8">
-              <div className="text-xl font-semibold">Ingrédients</div>
+          <div className="grid-cols-5 gap-8 hidden md:grid flex-1 p-4">
+            <div className="col-span-2 border rounded-xl px-8">
+              <h2>Ingrédients</h2>
               <RecipeIngredientsSections
                 sections={recipe.sections}
                 quantity={quantity}
@@ -149,13 +148,13 @@ const RecipePage = () => {
               />
             </div>
 
-            <div className="col-span-3 border rounded-xl p-8">
-              <div className="text-xl font-semibold">Préparation</div>
+            <div className="col-span-3 border rounded-xl px-8">
+              <h2>Préparation</h2>
               <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
             </div>
-          </CardContent>
+          </div>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

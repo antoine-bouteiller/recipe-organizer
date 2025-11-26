@@ -18,6 +18,9 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Rechercher">
+      <div className="sticky top-0 bg-background px-4 pt-4 pb-2  z-10 flex items-center gap-4">
+        <SearchInput search={search} setSearch={setSearch} autoFocus />
+      </div>
       <ItemGroup className="flex-1 px-4 justify-end pb-8">
         {recipes?.map((recipe, index) => (
           <Fragment key={recipe.id}>
@@ -31,9 +34,6 @@ const RouteComponent = () => {
           </Fragment>
         ))}
       </ItemGroup>
-      <div className="fixed bottom-16 px-4 w-full left-0 pt-2">
-        <SearchInput search={search} setSearch={setSearch} />
-      </div>
     </ScreenLayout>
   )
 }

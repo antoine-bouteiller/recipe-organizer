@@ -33,7 +33,7 @@ const RootComponent = () => {
         <HeadContent />
       </head>
 
-      <body className="flex flex-col h-dvh overflow-hidden">
+      <body className="flex flex-col h-screen overflow-hidden">
         <ToastProvider>
           <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
             <Navbar />
@@ -63,8 +63,7 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: 'viewport',
-        content:
-          'width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content',
+        content: 'width=device-width, initial-scale=1, user-scalable=no',
       },
       {
         title: 'Recipe Organizer',
