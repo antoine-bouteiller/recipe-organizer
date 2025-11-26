@@ -9,19 +9,14 @@ import {
 import { mergeAttributes, Node } from '@tiptap/core'
 import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer } from '@tiptap/react'
 
-// Extend TipTap Commands interface to include our custom command
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     magimixProgram: {
-      /**
-       * Insert a Magimix program node
-       */
       setMagimixProgram: (attributes: MagimixProgramData) => ReturnType
     }
   }
 }
 
-// Icons for each program
 const magimixProgramIcons: Record<MagimixProgram, Icon> = {
   [MagimixProgram.COOKING]: CookingPotIcon,
   [MagimixProgram.MIXING]: ForkKnifeIcon,
@@ -35,7 +30,6 @@ const magimixProgramIcons: Record<MagimixProgram, Icon> = {
   [MagimixProgram.KEEP_WARM]: ThermometerIcon,
 }
 
-// Format time duration
 const formatTime = (time: 'auto' | number): string => {
   if (time === 'auto') {
     return 'Auto'
@@ -53,7 +47,6 @@ const formatTime = (time: 'auto' | number): string => {
   return `${minutes}min ${seconds}s`
 }
 
-// React component for the Magimix program node view
 const MagimixProgramComponent = ({ node }: ReactNodeViewProps) => {
   const attrs = node.attrs as MagimixProgramData
   const { program, time, temperature } = attrs
@@ -88,7 +81,6 @@ const MagimixProgramComponent = ({ node }: ReactNodeViewProps) => {
   )
 }
 
-// TipTap Node Extension
 export const MagimixProgramNode = Node.create<Record<string, never>>({
   name: 'magimixProgram',
 
@@ -150,7 +142,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'magimix-program' }), 0]
+    return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'magimix-program' })]
   },
 
   addNodeView() {
