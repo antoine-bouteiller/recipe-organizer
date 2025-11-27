@@ -1,6 +1,5 @@
 import { MagimixProgramNode } from '@/components/tiptap/magimix-program-node'
 import { cn } from '@/utils/cn'
-import { Field as FieldPrimitive } from '@base-ui-components/react/field'
 import Bold from '@tiptap/extension-bold'
 import BulletList from '@tiptap/extension-bullet-list'
 import Document from '@tiptap/extension-document'
@@ -149,13 +148,14 @@ const TiptapContent = ({ className, ...props }: Omit<EditorContentProps, 'editor
   const { editor } = useContext(EditorContext)
 
   return (
-    <FieldPrimitive.Control
-      render={<EditorContent editor={editor} {...props} />}
+    <EditorContent
+      editor={editor}
       className={cn(
         editor?.isEditable &&
           'p-4 w-full rounded-lg border border-input bg-background bg-clip-padding shadow-xs ring-ring/24 transition-shadow not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-aria-invalid:border-destructive/36 has-focus-visible:border-ring has-disabled:opacity-64 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none has-focus-visible:ring-[3px] dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)]',
         className
       )}
+      {...props}
     />
   )
 }

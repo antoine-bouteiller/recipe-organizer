@@ -1,13 +1,9 @@
-import { MagimixProgram, type MagimixProgramData, magimixProgramLabels } from '@/types/magimix'
-import {
-  CookingPotIcon,
-  ForkKnifeIcon,
-  type Icon,
-  ThermometerIcon,
-  TimerIcon,
-} from '@phosphor-icons/react'
+import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
+import { ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import { mergeAttributes, Node } from '@tiptap/core'
 import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer } from '@tiptap/react'
+import { useCallback, useMemo } from 'react'
+import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -15,19 +11,6 @@ declare module '@tiptap/core' {
       setMagimixProgram: (attributes: MagimixProgramData) => ReturnType
     }
   }
-}
-
-const magimixProgramIcons: Record<MagimixProgram, Icon> = {
-  [MagimixProgram.COOKING]: CookingPotIcon,
-  [MagimixProgram.MIXING]: ForkKnifeIcon,
-  [MagimixProgram.KNEADING]: ForkKnifeIcon,
-  [MagimixProgram.EMULSIFYING]: ForkKnifeIcon,
-  [MagimixProgram.CHOPPING]: ForkKnifeIcon,
-  [MagimixProgram.BLENDING]: ForkKnifeIcon,
-  [MagimixProgram.STEAMING]: CookingPotIcon,
-  [MagimixProgram.SIMMERING]: CookingPotIcon,
-  [MagimixProgram.SLOW_COOKING]: CookingPotIcon,
-  [MagimixProgram.KEEP_WARM]: ThermometerIcon,
 }
 
 const formatTime = (time: 'auto' | number): string => {
@@ -47,36 +30,63 @@ const formatTime = (time: 'auto' | number): string => {
   return `${minutes}min ${seconds}s`
 }
 
-const MagimixProgramComponent = ({ node }: ReactNodeViewProps) => {
-  const attrs = node.attrs as MagimixProgramData
-  const { program, time, temperature } = attrs
-  const ProgramIcon = magimixProgramIcons[program]
+const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeViewProps) => {
+  const { program, time, temperature } = node.attrs as MagimixProgramData
   const label = magimixProgramLabels[program]
+
+  const formInitialValues: MagimixProgramFormInput = useMemo(
+    () => ({
+      program,
+      timeType: time === 'auto' ? 'auto' : 'manual',
+      timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
+      timeSeconds: typeof time === 'number' ? time % 60 : 0,
+      temperature,
+    }),
+    [program, time, temperature]
+  )
+
+  const Wrapper = useCallback(
+    ({ children }: { children: React.ReactNode }) =>
+      editor.isEditable ? (
+        <MagimixProgramDialog
+          submitLabel="Enregistrer"
+          triggerRender={
+            <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start cursor-pointer" />
+          }
+          title="Modifier le programme Magimix"
+          onSubmit={updateAttributes}
+          initialData={formInitialValues}
+        >
+          {children}
+        </MagimixProgramDialog>
+      ) : (
+        <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start">
+          {children}
+        </div>
+      ),
+    [editor.isEditable, formInitialValues, updateAttributes]
+  )
 
   return (
     <NodeViewWrapper className="magimix-program-node">
-      <div className="my-2 rounded-lg border border-border bg-muted/50 p-4">
+      <Wrapper>
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <ProgramIcon className="size-5" weight="fill" />
-          </div>
-          <div className="flex flex-1 flex-col gap-1">
+          <img src={`/magimix/${program}.png`} className="size-10 not-prose" />
+          <div className="flex flex-1 gap-1">
             <div className="font-semibold text-foreground">{label}</div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <TimerIcon className="size-4" />
-                <span>{formatTime(time)}</span>
-              </div>
-              {temperature !== undefined && (
-                <div className="flex items-center gap-1">
-                  <ThermometerIcon className="size-4" />
-                  <span>{temperature}°C</span>
-                </div>
-              )}
+            <div className="flex items-center gap-1 pl-2">
+              <TimerIcon className="size-4" />
+              <span>{formatTime(time)}</span>
             </div>
+            {temperature !== undefined && (
+              <div className="flex items-center gap-1">
+                <ThermometerIcon className="size-4" />
+                <span>{temperature}°C</span>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </Wrapper>
     </NodeViewWrapper>
   )
 }
@@ -91,7 +101,6 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
   addAttributes() {
     return {
       program: {
-        default: MagimixProgram.COOKING,
         parseHTML: (element) => element.dataset.program,
         renderHTML: (attributes) => ({
           'data-program': attributes.program as string,

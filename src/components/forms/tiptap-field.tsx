@@ -9,6 +9,7 @@ import {
   TextItalicIcon,
   TextUnderlineIcon,
 } from '@phosphor-icons/react'
+import { MagimixProgramButton } from '../tiptap/magimix-program-button'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../ui/toolbar'
 
 interface TiptapProps {
@@ -51,6 +52,10 @@ const TiptapField = ({ label, disabled }: TiptapProps) => {
             <TiptapButton command="bulletList">
               <ListBulletsIcon />
             </TiptapButton>
+          </ToolbarGroup>
+          <ToolbarSeparator />
+          <ToolbarGroup>
+            <MagimixProgramButton />
           </ToolbarGroup>
         </Toolbar>
         <TiptapContent disabled={disabled} />
