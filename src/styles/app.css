@@ -122,6 +122,8 @@
 @layer base {
   html {
     @apply scroll-smooth;
+    height: 100%;
+    overflow: hidden;
   }
 
   * {

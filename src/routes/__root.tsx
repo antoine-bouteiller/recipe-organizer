@@ -33,7 +33,7 @@ const RootComponent = () => {
         <HeadContent />
       </head>
 
-      <body className="flex flex-col h-screen! overflow-hidden">
+      <body className="flex flex-col h-dvh! overflow-hidden fixed top-0 w-screen">
         <ToastProvider>
           <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
             <Navbar />

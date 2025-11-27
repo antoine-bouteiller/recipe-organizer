@@ -76,21 +76,23 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
             src={`/magimix/${program}.png`}
             className="size-10 not-prose"
           />
-          <div className="flex flex-1 gap-1">
+          <div className="flex flex-col md:flex-row flex-1 gap-1">
             <div className="font-semibold text-foreground">{label}</div>
-            <div className="flex items-center gap-1 pl-2">
-              <TimerIcon className="size-4" />
-              <span>{formatTime(time)}</span>
-            </div>
-            /
-            <div className="flex items-center gap-1">
-              <SpinnerGapIcon className="size-4" />
-              <span>{rotationSpeed}</span>
-            </div>
-            /
-            <div className="flex items-center gap-1">
-              <ThermometerIcon className="size-4" />
-              <span>{temperature ?? '__'}°C</span>
+            <div className="flex flex-1 gap-1">
+              <div className="flex items-center gap-1 pl-2">
+                <TimerIcon className="size-4" />
+                <span>{formatTime(time)}</span>
+              </div>
+              /
+              <div className="flex items-center gap-1">
+                <SpinnerGapIcon className="size-4" />
+                <span>{rotationSpeed}</span>
+              </div>
+              /
+              <div className="flex items-center gap-1">
+                <ThermometerIcon className="size-4" />
+                <span>{temperature ?? '__'}°C</span>
+              </div>
             </div>
           </div>
         </div>
