@@ -1,14 +1,15 @@
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
-import type { Recipe } from '@/types/recipe'
-import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
+import { LeafIcon, MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
+import type { ReducedRecipe } from '../api/get-all'
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 
 interface RecipeCardProps {
-  readonly recipe: Pick<Recipe, 'id' | 'name' | 'image' | 'quantity'>
+  readonly recipe: ReducedRecipe
 }
 
 const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -34,8 +35,13 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
           </div>
         </CardHeader>
         <CardContent className="px-6 pb-2">
-          <CardTitle className="mb-2 line-clamp-2 text-xl font-bold text-nowrap text-ellipsis">
-            {recipe.name}
+          <CardTitle className="pb-1 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-nowrap text-ellipsis overflow-hidden">
+              {recipe.name}
+            </h2>
+
+            {recipe.isVegetarian && <LeafIcon className="size-5 text-emerald-700" />}
+            {recipe.isMagimix && <Badge variant="outline">Magimix</Badge>}
           </CardTitle>
           {isInShoppingList ? (
             <div className="flex items-center gap-2">
