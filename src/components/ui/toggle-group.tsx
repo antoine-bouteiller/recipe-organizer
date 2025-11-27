@@ -31,25 +31,28 @@ const ToggleGroup = ({
   orientation = 'horizontal',
   children,
   ...props
-}: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => (
-  <ToggleGroupPrimitive
-    className={cn(
-      'flex w-fit *:focus-visible:z-10',
-      orientation === 'horizontal'
-        ? '*:pointer-coarse:after:min-w-auto'
-        : '*:pointer-coarse:after:min-h-auto',
-      getToggleGroupClassName(variant, orientation),
-      className
-    )}
-    data-size={size}
-    data-slot="toggle-group"
-    data-variant={variant}
-    orientation={orientation}
-    {...props}
-  >
-    <ToggleGroupContext.Provider value={{ size, variant }}>{children}</ToggleGroupContext.Provider>
-  </ToggleGroupPrimitive>
-)
+}: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => {
+  const contextValue = React.useMemo(() => ({ size, variant }), [size, variant])
+  return (
+    <ToggleGroupPrimitive
+      className={cn(
+        'flex w-fit *:focus-visible:z-10',
+        orientation === 'horizontal'
+          ? '*:pointer-coarse:after:min-w-auto'
+          : '*:pointer-coarse:after:min-h-auto',
+        getToggleGroupClassName(variant, orientation),
+        className
+      )}
+      data-size={size}
+      data-slot="toggle-group"
+      data-variant={variant}
+      orientation={orientation}
+      {...props}
+    >
+      <ToggleGroupContext.Provider value={contextValue}>{children}</ToggleGroupContext.Provider>
+    </ToggleGroupPrimitive>
+  )
+}
 
 const Toggle = ({
   className,

@@ -1,7 +1,11 @@
 import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
 import { ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import { mergeAttributes, Node } from '@tiptap/core'
-import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer } from '@tiptap/react'
+import {
+  NodeViewWrapper,
+  type ReactNodeViewProps,
+  ReactNodeViewRenderer as reactNodeViewRenderer,
+} from '@tiptap/react'
 import { useCallback, useMemo } from 'react'
 import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
 
@@ -71,7 +75,11 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
     <NodeViewWrapper className="magimix-program-node">
       <Wrapper>
         <div className="flex items-center gap-3">
-          <img src={`/magimix/${program}.png`} className="size-10 not-prose" />
+          <img
+            alt="Magimix Program Icon"
+            src={`/magimix/${program}.png`}
+            className="size-10 not-prose"
+          />
           <div className="flex flex-1 gap-1">
             <div className="font-semibold text-foreground">{label}</div>
             <div className="flex items-center gap-1 pl-2">
@@ -155,8 +163,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
   },
 
   addNodeView() {
-    // eslint-disable-next-line new-cap
-    return ReactNodeViewRenderer(MagimixProgramComponent)
+    return reactNodeViewRenderer(MagimixProgramComponent)
   },
 
   addCommands() {
