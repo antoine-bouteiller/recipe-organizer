@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/responsive-popover'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
+import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { RecipeIngredientsSections } from '@/features/recipe/components/recipe-section'
@@ -118,8 +119,8 @@ const RecipePage = () => {
         </div>
 
         <div className="flex-1 prose prose-sm max-w-none text-foreground flex flex-col">
-          <div className="px-8 md:hidden">
-            <Tabs defaultValue="ingredients" className="gap-0">
+          <div className="px-4 pb-4 md:hidden">
+            <Tabs defaultValue="ingredients">
               <TabsList className="w-full">
                 <TabsTab value="ingredients">Ingrédients</TabsTab>
                 <TabsTab value="preparation">Préparation</TabsTab>
@@ -132,8 +133,10 @@ const RecipePage = () => {
                 />
               </TabsPanel>
 
-              <TabsPanel value="preparation" className="px-2">
-                <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
+              <TabsPanel value="preparation" className="p-2">
+                <Tiptap content={recipe.steps} readOnly>
+                  <TiptapContent />
+                </Tiptap>
               </TabsPanel>
             </Tabs>
           </div>
@@ -150,7 +153,9 @@ const RecipePage = () => {
 
             <div className="col-span-3 border rounded-xl px-8">
               <h2>Préparation</h2>
-              <div dangerouslySetInnerHTML={{ __html: recipe.steps }} />
+              <Tiptap content={recipe.steps} readOnly>
+                <TiptapContent className="pb-4" />
+              </Tiptap>
             </div>
           </div>
         </div>
