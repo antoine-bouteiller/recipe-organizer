@@ -30,38 +30,28 @@ interface MagimixProgramDialogProps {
   children: ReactNode
 }
 
-export const magimixProgramSchema = z.discriminatedUnion('timeType', [
-  z.object({
-    program: z.enum(magimixProgram),
-    timeType: z.literal('auto'),
-    temperature: z.int().min(0).max(200).optional(),
-  }),
-  z.object({
-    program: z.enum(magimixProgram),
-    timeType: z.literal('manual'),
-    timeMinutes: z.int().min(0),
-    timeSeconds: z.int().min(0).max(59),
-    temperature: z.int().min(0).max(200).optional(),
-  }),
-])
+export const magimixProgramSchema = z.object({
+  program: z.enum(magimixProgram),
+  timeMinutes: z.int().min(0),
+  timeSeconds: z.int().min(0).max(59),
+  temperature: z.int().min(0).max(200).optional(),
+  rotationSpeed: z.int().min(1).max(14),
+})
 
 export type MagimixProgramFormInput = z.input<typeof magimixProgramSchema>
 
 export const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
-  timeType: 'auto',
+  timeMinutes: 0,
+  timeSeconds: 0,
   temperature: undefined,
+  rotationSpeed: 0,
 }
 
 const programItems = Object.entries(magimixProgramLabels).map(([value, label]) => ({
   value,
   label,
 }))
-
-const timeTypeItems = [
-  { value: 'auto', label: 'Automatique' },
-  { value: 'manual', label: 'Manuel' },
-]
 
 export const MagimixProgramDialog = ({
   title,
@@ -82,15 +72,13 @@ export const MagimixProgramDialog = ({
     onSubmit: async ({ value }) => {
       const parsedValue = magimixProgramSchema.parse(value)
 
-      const time: 'auto' | number =
-        parsedValue.timeType === 'auto'
-          ? 'auto'
-          : parsedValue.timeMinutes * 60 + parsedValue.timeSeconds
+      const time = parsedValue.timeMinutes * 60 + parsedValue.timeSeconds
 
       const programData: MagimixProgramData = {
         program: value.program,
         time,
-        temperature: value.temperature ?? undefined,
+        temperature: value.temperature,
+        rotationSpeed: value.rotationSpeed,
       }
       onSubmit(programData)
       form.reset()
@@ -126,37 +114,33 @@ export const MagimixProgramDialog = ({
               )}
             </form.AppField>
 
-            <form.AppField name="timeType">
-              {({ SelectField, state }) => (
-                <>
-                  <SelectField label="Durée" items={timeTypeItems} disabled={isSubmitting} />
+            <form.AppField name="timeMinutes">
+              {({ NumberField }) => (
+                <NumberField label="Minutes*" min={0} disabled={isSubmitting} decimalScale={0} />
+              )}
+            </form.AppField>
+            <form.AppField name="timeSeconds">
+              {({ NumberField }) => (
+                <NumberField
+                  label="Secondes*"
+                  min={0}
+                  max={59}
+                  disabled={isSubmitting}
+                  decimalScale={0}
+                />
+              )}
+            </form.AppField>
 
-                  {state.value === 'manual' && (
-                    <div className="flex gap-2">
-                      <form.AppField name="timeMinutes">
-                        {({ NumberField }) => (
-                          <NumberField
-                            label="Minutes"
-                            min={0}
-                            disabled={isSubmitting}
-                            decimalScale={0}
-                          />
-                        )}
-                      </form.AppField>
-                      <form.AppField name="timeSeconds">
-                        {({ NumberField }) => (
-                          <NumberField
-                            label="Secondes"
-                            min={0}
-                            max={59}
-                            disabled={isSubmitting}
-                            decimalScale={0}
-                          />
-                        )}
-                      </form.AppField>
-                    </div>
-                  )}
-                </>
+            <form.AppField name="rotationSpeed">
+              {({ NumberField }) => (
+                <NumberField
+                  label="Vitesse de rotation*"
+                  placeholder="Ex: 1000"
+                  min={1}
+                  max={14}
+                  disabled={isSubmitting}
+                  decimalScale={0}
+                />
               )}
             </form.AppField>
 

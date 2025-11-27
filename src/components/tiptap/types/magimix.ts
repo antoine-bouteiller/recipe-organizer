@@ -18,8 +18,9 @@ export type MagimixProgram = (typeof magimixProgram)[number]
 
 export interface MagimixProgramData {
   program: MagimixProgram
-  time: 'auto' | number
+  time: number
   temperature?: number
+  rotationSpeed: number
 }
 
 export const magimixProgramLabels: Record<MagimixProgram, string> = {

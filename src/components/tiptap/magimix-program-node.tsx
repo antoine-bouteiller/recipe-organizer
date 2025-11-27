@@ -1,5 +1,5 @@
 import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
-import { ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
+import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import { mergeAttributes, Node } from '@tiptap/core'
 import {
   NodeViewWrapper,
@@ -17,11 +17,7 @@ declare module '@tiptap/core' {
   }
 }
 
-const formatTime = (time: 'auto' | number): string => {
-  if (time === 'auto') {
-    return 'Auto'
-  }
-
+const formatTime = (time: number): string => {
   const minutes = Math.floor(time / 60)
   const seconds = time % 60
 
@@ -35,18 +31,18 @@ const formatTime = (time: 'auto' | number): string => {
 }
 
 const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeViewProps) => {
-  const { program, time, temperature } = node.attrs as MagimixProgramData
+  const { program, time, temperature, rotationSpeed } = node.attrs as MagimixProgramData
   const label = magimixProgramLabels[program]
 
   const formInitialValues: MagimixProgramFormInput = useMemo(
     () => ({
       program,
-      timeType: time === 'auto' ? 'auto' : 'manual',
       timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
       timeSeconds: typeof time === 'number' ? time % 60 : 0,
       temperature,
+      rotationSpeed,
     }),
-    [program, time, temperature]
+    [program, time, temperature, rotationSpeed]
   )
 
   const Wrapper = useCallback(
@@ -86,12 +82,16 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
               <TimerIcon className="size-4" />
               <span>{formatTime(time)}</span>
             </div>
-            {temperature !== undefined && (
-              <div className="flex items-center gap-1">
-                <ThermometerIcon className="size-4" />
-                <span>{temperature}°C</span>
-              </div>
-            )}
+            /
+            <div className="flex items-center gap-1">
+              <SpinnerGapIcon className="size-4" />
+              <span>{rotationSpeed}</span>
+            </div>
+            /
+            <div className="flex items-center gap-1">
+              <ThermometerIcon className="size-4" />
+              <span>{temperature ?? '__'}°C</span>
+            </div>
           </div>
         </div>
       </Wrapper>
@@ -144,6 +144,25 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
           }
           return {
             'data-temperature': String(attributes.temperature),
+          }
+        },
+      },
+      rotationSpeed: {
+        default: undefined,
+        parseHTML: (element) => {
+          const speed = element.dataset.rotationSpeed
+          if (!speed) {
+            return undefined
+          }
+          const parsed = Number.parseInt(speed, 10)
+          return Number.isNaN(parsed) ? undefined : parsed
+        },
+        renderHTML: (attributes) => {
+          if (attributes.rotationSpeed === undefined) {
+            return {}
+          }
+          return {
+            'data-rotation-speed': String(attributes.rotationSpeed),
           }
         },
       },
