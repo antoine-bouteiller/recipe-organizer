@@ -9,6 +9,12 @@ import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { asc, eq, like, sql } from 'drizzle-orm'
 import { z } from 'zod'
+import {
+  subRecipe,
+  subRecipeIngredient,
+  subRecipeIngredientsSection,
+  subRecipeSectionIngredient,
+} from '../utils/drizlle-alias'
 
 const getAllRecipesSchema = z.object({
   search: z.string().optional(),
@@ -27,7 +33,7 @@ const getAllRecipes = createServerFn({
           image: sql`${recipe.image}`.mapWith(getFileUrl),
           quantity: recipe.quantity,
           isVegetarian:
-            sql<boolean>`COUNT(CASE WHEN ${ingredient.category} = 'meat' THEN 1 END) = 0`.mapWith(
+            sql<boolean>`COUNT(CASE WHEN ${ingredient.category} = 'meat' OR ${ingredient.category} = 'fish' OR ${subRecipeIngredient.category} = 'meat' OR ${subRecipeIngredient.category} = 'fish' THEN 1 END) = 0`.mapWith(
               Boolean
             ),
           isMagimix: sql<boolean>`${recipe.steps} LIKE '%data-type="magimix-program"%'`.mapWith(
@@ -38,6 +44,19 @@ const getAllRecipes = createServerFn({
         .leftJoin(recipeIngredientsSection, eq(recipeIngredientsSection.recipeId, recipe.id))
         .leftJoin(sectionIngredient, eq(sectionIngredient.sectionId, recipeIngredientsSection.id))
         .leftJoin(ingredient, eq(ingredient.id, sectionIngredient.ingredientId))
+        .leftJoin(subRecipe, eq(recipeIngredientsSection.subRecipeId, subRecipe.id))
+        .leftJoin(
+          subRecipeIngredientsSection,
+          eq(subRecipeIngredientsSection.recipeId, subRecipe.id)
+        )
+        .leftJoin(
+          subRecipeSectionIngredient,
+          eq(subRecipeSectionIngredient.sectionId, subRecipeIngredientsSection.id)
+        )
+        .leftJoin(
+          subRecipeIngredient,
+          eq(subRecipeIngredient.id, subRecipeSectionIngredient.ingredientId)
+        )
         .where(data.search ? like(recipe.name, `%${data.search}%`) : undefined)
         .groupBy(recipe.id)
         .orderBy(asc(recipe.name))

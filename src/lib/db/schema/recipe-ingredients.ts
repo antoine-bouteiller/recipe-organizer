@@ -26,7 +26,9 @@ const sectionIngredient = sqliteTable('section_ingredients', {
     .references(() => ingredient.id, { onDelete: 'cascade' })
     .notNull(),
   quantity: real('quantity').notNull(),
-  unitId: integer('unit_id').references(() => unit.id, { onDelete: 'set null' }),
+  unitId: integer('unit_id').references(() => unit.id, {
+    onDelete: 'set null',
+  }),
 })
 
 const ingredientsRelation = relations(ingredient, ({ many }) => ({
