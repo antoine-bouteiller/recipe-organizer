@@ -12,6 +12,8 @@ export const magimixProgram = [
   'beaten-egg-white',
   'bread-brioche',
   'robot',
+  'chocolate',
+  'pizza',
 ] as const
 
 export type MagimixProgram = (typeof magimixProgram)[number]
@@ -37,4 +39,6 @@ export const magimixProgramLabels: Record<MagimixProgram, string> = {
   'beaten-egg-white': 'Blanc en neige',
   'bread-brioche': 'Pain/Brioche',
   robot: 'Robot',
+  chocolate: 'Chocolat',
+  pizza: 'Pizza',
 }
