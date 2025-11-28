@@ -3,7 +3,6 @@ import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/react-query'
-import { useMemo } from 'react'
 
 const createOptionsHook = <
   TQueryOptionData,
@@ -33,16 +32,14 @@ const createOptionsHook = <
   } = {}): Option<number | undefined>[] {
     const { data } = useQuery(getQueryOptions())
 
-    return useMemo(() => {
-      const items = data ?? []
-      const options: Option<number | undefined>[] = items.filter(filter).map(mapFn)
+    const items = data ?? []
+    const options: Option<number | undefined>[] = items.filter(filter).map(mapFn)
 
-      if (allowEmpty) {
-        options.unshift({ label: 'Aucune', value: undefined })
-      }
+    if (allowEmpty) {
+      options.unshift({ label: 'Aucune', value: undefined })
+    }
 
-      return options
-    }, [data, filter, allowEmpty])
+    return options
   }
 
   return useOptions

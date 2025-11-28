@@ -6,7 +6,6 @@ import {
   type ReactNodeViewProps,
   ReactNodeViewRenderer as reactNodeViewRenderer,
 } from '@tiptap/react'
-import { useCallback, useMemo } from 'react'
 import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
 
 declare module '@tiptap/core' {
@@ -16,6 +15,32 @@ declare module '@tiptap/core' {
     }
   }
 }
+
+interface WrapperProps {
+  children: React.ReactNode
+  isEditable: boolean
+  updateAttributes: (attributes: MagimixProgramData) => void
+  initialData: MagimixProgramFormInput
+}
+
+const Wrapper = ({ children, isEditable, initialData, updateAttributes }: WrapperProps) =>
+  isEditable ? (
+    <MagimixProgramDialog
+      submitLabel="Enregistrer"
+      triggerRender={
+        <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start cursor-pointer" />
+      }
+      title="Modifier le programme Magimix"
+      onSubmit={updateAttributes}
+      initialData={initialData}
+    >
+      {children}
+    </MagimixProgramDialog>
+  ) : (
+    <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start">
+      {children}
+    </div>
+  )
 
 const formatTime = (time: number): string => {
   const minutes = Math.floor(time / 60)
@@ -34,42 +59,21 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
   const { program, time, temperature, rotationSpeed } = node.attrs as MagimixProgramData
   const label = magimixProgramLabels[program]
 
-  const formInitialValues: MagimixProgramFormInput = useMemo(
-    () => ({
-      program,
-      timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
-      timeSeconds: typeof time === 'number' ? time % 60 : 0,
-      temperature,
-      rotationSpeed,
-    }),
-    [program, time, temperature, rotationSpeed]
-  )
-
-  const Wrapper = useCallback(
-    ({ children }: { children: React.ReactNode }) =>
-      editor.isEditable ? (
-        <MagimixProgramDialog
-          submitLabel="Enregistrer"
-          triggerRender={
-            <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start cursor-pointer" />
-          }
-          title="Modifier le programme Magimix"
-          onSubmit={updateAttributes}
-          initialData={formInitialValues}
-        >
-          {children}
-        </MagimixProgramDialog>
-      ) : (
-        <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start">
-          {children}
-        </div>
-      ),
-    [editor.isEditable, formInitialValues, updateAttributes]
-  )
+  const formInitialValues: MagimixProgramFormInput = {
+    program,
+    timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
+    timeSeconds: typeof time === 'number' ? time % 60 : 0,
+    temperature,
+    rotationSpeed,
+  }
 
   return (
     <NodeViewWrapper className="magimix-program-node">
-      <Wrapper>
+      <Wrapper
+        initialData={formInitialValues}
+        updateAttributes={updateAttributes}
+        isEditable={editor.isEditable}
+      >
         <div className="flex items-center gap-3">
           <img
             alt="Magimix Program Icon"

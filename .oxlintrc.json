@@ -30,6 +30,12 @@
       "rules": {
         "typescript/no-require-imports": "off"
       }
+    },
+    {
+      "files": ["**/use-file-upload.ts"],
+      "rules": {
+        "react-hooks/exhaustive-deps": "off"
+      }
     }
   ],
   "rules": {

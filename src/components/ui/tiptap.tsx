@@ -12,7 +12,7 @@ import Text from '@tiptap/extension-text'
 import Underline from '@tiptap/extension-underline'
 import type { CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
 import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap/react'
-import { useContext, useMemo } from 'react'
+import { useContext } from 'react'
 import { Toggle } from './toggle'
 import { ToolbarButton } from './toolbar'
 
@@ -139,9 +139,7 @@ const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
     },
   })
 
-  const editorContextValue = useMemo(() => ({ editor }), [editor])
-
-  return <EditorContext.Provider value={editorContextValue}>{children}</EditorContext.Provider>
+  return <EditorContext.Provider value={{ editor }}>{children}</EditorContext.Provider>
 }
 
 const TiptapContent = ({ className, ...props }: Omit<EditorContentProps, 'editor'>) => {

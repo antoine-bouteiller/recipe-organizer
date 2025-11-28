@@ -8,7 +8,6 @@ import {
   NumberInputScrubArea,
 } from '@/components/ui/number-input'
 import { useFieldContext } from '@/hooks/use-form-context'
-import { useMemo } from 'react'
 
 interface NumberFieldProps {
   label?: string
@@ -17,6 +16,19 @@ interface NumberFieldProps {
   min?: number
   max?: number
   decimalScale?: number
+  step?: number
+}
+
+const computeStepper = (decimalScale?: number, currentValue?: number) => {
+  if (!currentValue || currentValue < 5) {
+    return decimalScale === 0 ? 1 : 0.5
+  } else if (currentValue < 10) {
+    return 1
+  } else if (currentValue < 50) {
+    return 5
+  }
+
+  return 10
 }
 
 export const NumberField = ({
@@ -26,24 +38,11 @@ export const NumberField = ({
   min,
   max,
   decimalScale,
+  step,
 }: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
 
-  const stepper = useMemo(() => {
-    if (!field.state.value || field.state.value < 5) {
-      return decimalScale === 0 ? 1 : 0.5
-    }
-
-    if (field.state.value < 10) {
-      return 1
-    }
-
-    if (field.state.value < 50) {
-      return 5
-    }
-
-    return 10
-  }, [decimalScale, field.state.value])
+  const stepper = step ?? computeStepper(decimalScale, field.state.value)
 
   return (
     <Field

@@ -1,5 +1,5 @@
 import type { Popover as PopoverPrimitive } from '@base-ui-components/react/popover'
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 
 import {
   Drawer,
@@ -45,23 +45,16 @@ interface ResponsivePopoverProps {
 const ResponsivePopover = ({ nested, ...props }: ResponsivePopoverProps) => {
   const isMobile = useIsMobile()
 
-  const contextValue = useMemo(
-    () => ({
-      isMobile,
-    }),
-    [isMobile]
-  )
-
   if (isMobile) {
     return (
-      <ResponsivePopoverContext.Provider value={contextValue}>
+      <ResponsivePopoverContext.Provider value={{ isMobile }}>
         <Drawer nested={nested} {...props} />
       </ResponsivePopoverContext.Provider>
     )
   }
 
   return (
-    <ResponsivePopoverContext.Provider value={contextValue}>
+    <ResponsivePopoverContext.Provider value={{ isMobile }}>
       <Popover {...props} />
     </ResponsivePopoverContext.Provider>
   )

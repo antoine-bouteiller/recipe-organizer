@@ -20,7 +20,6 @@ import { getFileUrl } from '@/utils/get-file-url'
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
-import { useMemo } from 'react'
 import { z } from 'zod'
 
 const formatSection = (sections: RecipeSection) => {
@@ -47,23 +46,19 @@ const EditRecipePage = () => {
   const { mutateAsync: updateRecipe } = useMutation(updateRecipeOptions())
   const router = useRouter()
 
-  const initialValues: UpdateRecipeFormInput = useMemo(
-    () =>
-      recipe
-        ? {
-            id: recipe.id,
-            name: recipe.name,
-            steps: recipe.steps,
-            quantity: recipe.quantity,
-            sections: recipe.sections.map(formatSection),
-            image: {
-              id: recipe.image,
-              url: getFileUrl(recipe.image),
-            },
-          }
-        : {},
-    [recipe]
-  )
+  const initialValues: UpdateRecipeFormInput = recipe
+    ? {
+        id: recipe.id,
+        name: recipe.name,
+        steps: recipe.steps,
+        quantity: recipe.quantity,
+        sections: recipe.sections.map(formatSection),
+        image: {
+          id: recipe.image,
+          url: getFileUrl(recipe.image),
+        },
+      }
+    : {}
 
   const form = useAppForm({
     validators: {

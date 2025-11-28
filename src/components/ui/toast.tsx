@@ -9,7 +9,6 @@ import {
   WarningCircleIcon,
   WarningIcon,
 } from '@phosphor-icons/react'
-import { useMemo } from 'react'
 
 const toastManager = Toast.createToastManager()
 
@@ -42,19 +41,22 @@ const ToastProvider = ({ children, position = 'bottom-right', ...props }: ToastP
   </Toast.Provider>
 )
 
-const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) => {
-  const { toasts } = Toast.useToastManager()
+const getSwipeDirection = (position: ToastPosition) => {
   const isTop = position.startsWith('top')
 
-  const swipeDirection: SwipeDirection | SwipeDirection[] = useMemo(() => {
-    if (position.includes('center')) {
-      return [isTop ? 'up' : 'down']
-    }
-    if (position.includes('left')) {
-      return ['left', isTop ? 'up' : 'down']
-    }
-    return ['right', isTop ? 'up' : 'down']
-  }, [isTop, position])
+  if (position.includes('center')) {
+    return [isTop ? 'up' : 'down'] as const satisfies SwipeDirection[]
+  } else if (position.includes('left')) {
+    return ['left', isTop ? 'up' : 'down'] as const satisfies SwipeDirection[]
+  }
+
+  return ['right', isTop ? 'up' : 'down'] as const satisfies SwipeDirection[]
+}
+
+const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) => {
+  const { toasts } = Toast.useToastManager()
+
+  let swipeDirection = getSwipeDirection(position)
 
   return (
     <Toast.Portal data-slot="toast-portal">

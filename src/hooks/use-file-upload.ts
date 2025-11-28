@@ -2,7 +2,6 @@
 
 import type React from 'react'
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -74,6 +73,25 @@ const isImageUrl = (url: string): boolean => {
   }
 }
 
+const createPreview = (file: File | FileMetadata): string | undefined => {
+  if (file instanceof File) {
+    return URL.createObjectURL(file)
+  }
+  return file.url
+}
+
+const generateUniqueId = (file: File | FileMetadata): string => {
+  if (file instanceof File) {
+    return `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  }
+  return file.id
+}
+
+const handleDragOver = (e: DragEvent<HTMLElement>) => {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
 export const useFileUpload = (
   options: FileUploadOptions = {}
 ): [FileUploadState, FileUploadActions] => {
@@ -99,51 +117,34 @@ export const useFileUpload = (
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const validateFile = useCallback(
-    (file: File): string | undefined => {
-      if (file.size > maxSize) {
-        return `Le fichier "${file.name}" dépasse la taille maximale de ${formatBytes(maxSize)}.`
-      }
+  const validateFile = (file: File): string | undefined => {
+    if (file.size > maxSize) {
+      return `Le fichier "${file.name}" dépasse la taille maximale de ${formatBytes(maxSize)}.`
+    }
 
-      if (accept !== '*') {
-        const acceptedTypes = accept.split(',').map((type) => type.trim())
-        const fileType = file.type || ''
-        const fileExtension = `.${file.name.split('.').pop()}`
+    if (accept !== '*') {
+      const acceptedTypes = accept.split(',').map((type) => type.trim())
+      const fileType = file.type || ''
+      const fileExtension = `.${file.name.split('.').pop()}`
 
-        const isAccepted = acceptedTypes.some((type) => {
-          if (type.startsWith('.')) {
-            return fileExtension.toLowerCase() === type.toLowerCase()
-          }
-          if (type.endsWith('/*')) {
-            const [baseType] = type.split('/')
-            return fileType.startsWith(`${baseType}/`)
-          }
-          return fileType === type
-        })
-
-        if (!isAccepted) {
-          return `Le fichier "${file.name}" n'est pas un type de fichier accepté.`
+      const isAccepted = acceptedTypes.some((type) => {
+        if (type.startsWith('.')) {
+          return fileExtension.toLowerCase() === type.toLowerCase()
         }
+        if (type.endsWith('/*')) {
+          const [baseType] = type.split('/')
+          return fileType.startsWith(`${baseType}/`)
+        }
+        return fileType === type
+      })
+
+      if (!isAccepted) {
+        return `Le fichier "${file.name}" n'est pas un type de fichier accepté.`
       }
-    },
-    [accept, maxSize]
-  )
-
-  const createPreview = useCallback((file: File | FileMetadata): string | undefined => {
-    if (file instanceof File) {
-      return URL.createObjectURL(file)
     }
-    return file.url
-  }, [])
+  }
 
-  const generateUniqueId = useCallback((file: File | FileMetadata): string => {
-    if (file instanceof File) {
-      return `${file.name}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-    }
-    return file.id
-  }, [])
-
-  const clearFiles = useCallback(() => {
+  const clearFiles = () => {
     const newFiles: FileWithPreview[] = []
     setState((prev) => {
       // Clean up object URLs
@@ -167,189 +168,165 @@ export const useFileUpload = (
     })
 
     onFilesChange?.(newFiles)
-  }, [onFilesChange])
+  }
 
-  const addFiles = useCallback(
-    (newFiles: FileList | File[]) => {
-      if (!newFiles || newFiles.length === 0) {
-        return
-      }
+  const addFiles = (newFiles: FileList | File[]) => {
+    if (!newFiles || newFiles.length === 0) {
+      return
+    }
 
-      const newFilesArray = [...newFiles]
-      const errors: string[] = []
+    const newFilesArray = [...newFiles]
+    const errors: string[] = []
 
-      // Clear existing errors when new files are uploaded
-      setState((prev) => ({ ...prev, errors: [] }))
+    // Clear existing errors when new files are uploaded
+    setState((prev) => ({ ...prev, errors: [] }))
 
-      // In single file mode, clear existing files first
-      if (!multiple) {
-        clearFiles()
-      }
+    // In single file mode, clear existing files first
+    if (!multiple) {
+      clearFiles()
+    }
 
-      // Check if adding these files would exceed maxFiles (only in multiple mode)
-      if (
-        multiple &&
-        maxFiles !== Infinity &&
-        state.files.length + newFilesArray.length > maxFiles
-      ) {
-        errors.push(`Vous ne pouvez uploader qu'un maximum de ${maxFiles} fichiers.`)
-        setState((prev) => ({ ...prev, errors }))
-        return
-      }
+    // Check if adding these files would exceed maxFiles (only in multiple mode)
+    if (multiple && maxFiles !== Infinity && state.files.length + newFilesArray.length > maxFiles) {
+      errors.push(`Vous ne pouvez uploader qu'un maximum de ${maxFiles} fichiers.`)
+      setState((prev) => ({ ...prev, errors }))
+      return
+    }
 
-      const validFiles: FileWithPreview[] = []
+    const validFiles: FileWithPreview[] = []
 
-      for (const file of newFilesArray) {
-        // Only check for duplicates if multiple files are allowed
-        if (multiple) {
-          const isDuplicate = state.files.some(
-            (existingFile) =>
-              existingFile.file.name === file.name && existingFile.file.size === file.size
-          )
+    for (const file of newFilesArray) {
+      // Only check for duplicates if multiple files are allowed
+      if (multiple) {
+        const isDuplicate = state.files.some(
+          (existingFile) =>
+            existingFile.file.name === file.name && existingFile.file.size === file.size
+        )
 
-          // Skip duplicate files silently
-          if (isDuplicate) {
-            return
-          }
-        }
-
-        // Check file size
-        if (file.size > maxSize) {
-          errors.push(
-            multiple
-              ? `Certains fichiers dépassent la taille maximale de ${formatBytes(maxSize)}.`
-              : `Le fichier dépasse la taille maximale de ${formatBytes(maxSize)}.`
-          )
+        // Skip duplicate files silently
+        if (isDuplicate) {
           return
         }
-
-        const error = validateFile(file)
-        if (error) {
-          errors.push(error)
-        } else {
-          validFiles.push({
-            file,
-            id: generateUniqueId(file),
-            preview: createPreview(file),
-          })
-        }
       }
 
-      // Only update state if we have valid files to add
-      if (validFiles.length > 0) {
-        // Call the onFilesAdded callback with the newly added valid files
-        onFilesAdded?.(validFiles)
-
-        const newFiles = multiple ? [...state.files, ...validFiles] : validFiles
-
-        setState((prev) => ({
-          ...prev,
-          files: newFiles,
-          errors,
-        }))
-
-        onFilesChange?.(newFiles)
-      } else if (errors.length > 0) {
-        setState((prev) => ({
-          ...prev,
-          errors,
-        }))
+      // Check file size
+      if (file.size > maxSize) {
+        errors.push(
+          multiple
+            ? `Certains fichiers dépassent la taille maximale de ${formatBytes(maxSize)}.`
+            : `Le fichier dépasse la taille maximale de ${formatBytes(maxSize)}.`
+        )
+        return
       }
 
-      // Reset input value after handling files
-      if (inputRef.current) {
-        inputRef.current.value = ''
+      const error = validateFile(file)
+      if (error) {
+        errors.push(error)
+      } else {
+        validFiles.push({
+          file,
+          id: generateUniqueId(file),
+          preview: createPreview(file),
+        })
       }
-    },
-    [
-      state.files,
-      maxFiles,
-      multiple,
-      maxSize,
-      validateFile,
-      createPreview,
-      generateUniqueId,
-      clearFiles,
-      onFilesChange,
-      onFilesAdded,
-    ]
-  )
+    }
 
-  const removeFile = useCallback(
-    (id: string) => {
-      setState((prev) => {
-        const fileToRemove = prev.files.find((file) => file.id === id)
-        if (
-          fileToRemove?.preview &&
-          fileToRemove.file instanceof File &&
-          fileToRemove.file.type.startsWith('image/')
-        ) {
-          URL.revokeObjectURL(fileToRemove.preview)
-        }
+    // Only update state if we have valid files to add
+    if (validFiles.length > 0) {
+      // Call the onFilesAdded callback with the newly added valid files
+      onFilesAdded?.(validFiles)
 
-        const newFiles = prev.files.filter((file) => file.id !== id)
-        onFilesChange?.(newFiles)
+      const newFiles = multiple ? [...state.files, ...validFiles] : validFiles
 
-        return {
-          ...prev,
-          files: newFiles,
-          errors: [],
-        }
-      })
-    },
-    [onFilesChange]
-  )
+      setState((prev) => ({
+        ...prev,
+        files: newFiles,
+        errors,
+      }))
 
-  const clearErrors = useCallback(() => {
+      onFilesChange?.(newFiles)
+    } else if (errors.length > 0) {
+      setState((prev) => ({
+        ...prev,
+        errors,
+      }))
+    }
+
+    // Reset input value after handling files
+    if (inputRef.current) {
+      inputRef.current.value = ''
+    }
+  }
+
+  const removeFile = (id: string) => {
+    setState((prev) => {
+      const fileToRemove = prev.files.find((file) => file.id === id)
+      if (
+        fileToRemove?.preview &&
+        fileToRemove.file instanceof File &&
+        fileToRemove.file.type.startsWith('image/')
+      ) {
+        URL.revokeObjectURL(fileToRemove.preview)
+      }
+
+      const newFiles = prev.files.filter((file) => file.id !== id)
+      onFilesChange?.(newFiles)
+
+      return {
+        ...prev,
+        files: newFiles,
+        errors: [],
+      }
+    })
+  }
+
+  const clearErrors = () => {
     setState((prev) => ({
       ...prev,
       errors: [],
     }))
-  }, [])
+  }
 
-  const handlePaste = useCallback(
-    async (event: ClipboardEvent) => {
-      const { activeElement } = document
-      const isTextInput =
-        activeElement &&
-        (activeElement.tagName === 'INPUT' ||
-          activeElement.tagName === 'TEXTAREA' ||
-          activeElement.hasAttribute('contenteditable'))
+  const handlePaste = async (event: ClipboardEvent) => {
+    const { activeElement } = document
+    const isTextInput =
+      activeElement &&
+      (activeElement.tagName === 'INPUT' ||
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.hasAttribute('contenteditable'))
 
-      if (isTextInput) {
-        return
-      }
+    if (isTextInput) {
+      return
+    }
 
-      const { clipboardData } = event
-      if (!clipboardData) {
-        return
-      }
+    const { clipboardData } = event
+    if (!clipboardData) {
+      return
+    }
 
-      const files = [...clipboardData.files]
-      const imageFile = files.find((file) => file.type.startsWith('image/'))
+    const files = [...clipboardData.files]
+    const imageFile = files.find((file) => file.type.startsWith('image/'))
 
-      if (imageFile) {
-        addFiles(files)
-        return
-      }
+    if (imageFile) {
+      addFiles(files)
+      return
+    }
 
-      const text = clipboardData.getData('text')
-      if (text && isImageUrl(text)) {
-        try {
-          const response = await fetch(text)
-          if (response.ok && response.headers.get('content-type')?.startsWith('image/')) {
-            const blob = await response.blob()
-            const fileName = text.split('/').pop() || 'image.jpg'
-            const file = new File([blob], fileName, { type: blob.type })
-            addFiles([file])
-          }
-        } catch {
-          // do nothing
+    const text = clipboardData.getData('text')
+    if (text && isImageUrl(text)) {
+      try {
+        const response = await fetch(text)
+        if (response.ok && response.headers.get('content-type')?.startsWith('image/')) {
+          const blob = await response.blob()
+          const fileName = text.split('/').pop() || 'image.jpg'
+          const file = new File([blob], fileName, { type: blob.type })
+          addFiles([file])
         }
+      } catch {
+        // do nothing
       }
-    },
-    [addFiles]
-  )
+    }
+  }
 
   useEffect(() => {
     document.addEventListener('paste', handlePaste)
@@ -358,13 +335,13 @@ export const useFileUpload = (
     }
   }, [handlePaste])
 
-  const handleDragEnter = useCallback((e: DragEvent<HTMLElement>) => {
+  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.stopPropagation()
     setState((prev) => ({ ...prev, isDragging: true }))
-  }, [])
+  }
 
-  const handleDragLeave = useCallback((e: DragEvent<HTMLElement>) => {
+  const handleDragLeave = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -373,63 +350,49 @@ export const useFileUpload = (
     }
 
     setState((prev) => ({ ...prev, isDragging: false }))
-  }, [])
+  }
 
-  const handleDragOver = useCallback((e: DragEvent<HTMLElement>) => {
+  const handleDrop = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.stopPropagation()
-  }, [])
+    setState((prev) => ({ ...prev, isDragging: false }))
 
-  const handleDrop = useCallback(
-    (e: DragEvent<HTMLElement>) => {
-      e.preventDefault()
-      e.stopPropagation()
-      setState((prev) => ({ ...prev, isDragging: false }))
+    // Don't process files if the input is disabled
+    if (inputRef.current?.disabled) {
+      return
+    }
 
-      // Don't process files if the input is disabled
-      if (inputRef.current?.disabled) {
-        return
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      // In single file mode, only use the first file
+      if (multiple) {
+        addFiles(e.dataTransfer.files)
+      } else {
+        const [file] = e.dataTransfer.files
+        addFiles([file])
       }
+    }
+  }
 
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        // In single file mode, only use the first file
-        if (multiple) {
-          addFiles(e.dataTransfer.files)
-        } else {
-          const [file] = e.dataTransfer.files
-          addFiles([file])
-        }
-      }
-    },
-    [addFiles, multiple]
-  )
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      addFiles(e.target.files)
+    }
+  }
 
-  const handleFileChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-        addFiles(e.target.files)
-      }
-    },
-    [addFiles]
-  )
-
-  const openFileDialog = useCallback(() => {
+  const openFileDialog = () => {
     if (inputRef.current) {
       inputRef.current.click()
     }
-  }, [])
+  }
 
-  const getInputProps = useCallback(
-    (props: InputHTMLAttributes<HTMLInputElement> = {}) => ({
-      ...props,
-      type: 'file' as const,
-      onChange: handleFileChange,
-      accept: props.accept || accept,
-      multiple: props.multiple === undefined ? multiple : props.multiple,
-      ref: inputRef,
-    }),
-    [accept, multiple, handleFileChange]
-  )
+  const getInputProps = (props: InputHTMLAttributes<HTMLInputElement> = {}) => ({
+    ...props,
+    type: 'file' as const,
+    onChange: handleFileChange,
+    accept: props.accept || accept,
+    multiple: props.multiple === undefined ? multiple : props.multiple,
+    ref: inputRef,
+  })
 
   return [
     state,
