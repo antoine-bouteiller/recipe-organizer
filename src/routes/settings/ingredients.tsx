@@ -22,7 +22,7 @@ import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
@@ -30,18 +30,14 @@ const IngredientsManagement = () => {
 
   const { isAdmin } = Route.useRouteContext()
 
-  const filteredIngredients = useMemo(() => {
-    if (!search.trim()) {
-      return ingredients
-    }
-
-    const query = search.toLowerCase()
-    return ingredients.filter(
-      (ingredient) =>
-        ingredient.name.toLowerCase().includes(query) ||
-        ingredient.category.toLowerCase().includes(query)
-    )
-  }, [ingredients, search])
+  const query = search.toLowerCase()
+  const filteredIngredients = !search.trim()
+    ? ingredients
+    : ingredients.filter(
+        (ingredient) =>
+          ingredient.name.toLowerCase().includes(query) ||
+          ingredient.category.toLowerCase().includes(query)
+      )
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>

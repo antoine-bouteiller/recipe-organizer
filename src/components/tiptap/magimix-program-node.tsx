@@ -6,7 +6,6 @@ import {
   type ReactNodeViewProps,
   ReactNodeViewRenderer as reactNodeViewRenderer,
 } from '@tiptap/react'
-import { useCallback, useMemo } from 'react'
 import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
 
 declare module '@tiptap/core' {
@@ -34,38 +33,32 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
   const { program, time, temperature, rotationSpeed } = node.attrs as MagimixProgramData
   const label = magimixProgramLabels[program]
 
-  const formInitialValues: MagimixProgramFormInput = useMemo(
-    () => ({
-      program,
-      timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
-      timeSeconds: typeof time === 'number' ? time % 60 : 0,
-      temperature,
-      rotationSpeed,
-    }),
-    [program, time, temperature, rotationSpeed]
-  )
+  const formInitialValues: MagimixProgramFormInput = {
+    program,
+    timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
+    timeSeconds: typeof time === 'number' ? time % 60 : 0,
+    temperature,
+    rotationSpeed,
+  }
 
-  const Wrapper = useCallback(
-    ({ children }: { children: React.ReactNode }) =>
-      editor.isEditable ? (
-        <MagimixProgramDialog
-          submitLabel="Enregistrer"
-          triggerRender={
-            <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start cursor-pointer" />
-          }
-          title="Modifier le programme Magimix"
-          onSubmit={updateAttributes}
-          initialData={formInitialValues}
-        >
-          {children}
-        </MagimixProgramDialog>
-      ) : (
-        <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start">
-          {children}
-        </div>
-      ),
-    [editor.isEditable, formInitialValues, updateAttributes]
-  )
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    editor.isEditable ? (
+      <MagimixProgramDialog
+        submitLabel="Enregistrer"
+        triggerRender={
+          <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start cursor-pointer" />
+        }
+        title="Modifier le programme Magimix"
+        onSubmit={updateAttributes}
+        initialData={formInitialValues}
+      >
+        {children}
+      </MagimixProgramDialog>
+    ) : (
+      <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start">
+        {children}
+      </div>
+    )
 
   return (
     <NodeViewWrapper className="magimix-program-node">

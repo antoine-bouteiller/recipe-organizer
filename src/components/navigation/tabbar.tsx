@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
 import { Link, useLocation } from '@tanstack/react-router'
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import { menuItems } from './constants'
 
 const items = menuItems.filter((item) => item.display !== 'desktop')
@@ -13,31 +13,21 @@ export const TabBar = () => {
   const location = useLocation()
   const previousIsEmptyRef = useRef(true)
 
-  const { clipPath, shouldAnimate } = useMemo(() => {
-    const activeIndex = items.findIndex((item) => location.href === item.linkProps.to)
+  const activeIndex = items.findIndex((item) => location.href === item.linkProps.to)
 
-    const isEmpty = activeIndex === -1
-    const shouldAnimate = !isEmpty && !previousIsEmptyRef.current
+  const isEmpty = activeIndex === -1
+  const shouldAnimate = !isEmpty && !previousIsEmptyRef.current
 
-    previousIsEmptyRef.current = isEmpty
+  previousIsEmptyRef.current = isEmpty
 
-    if (isEmpty) {
-      return {
-        clipPath: 'inset(0px 100% 0px 0% round 9999px)',
-        shouldAnimate: false,
-      }
-    }
-
-    const itemCenterPercent = (activeIndex / itemCount) * 100 + buttonWidthPercent / 2
-
-    const clipLeft = Math.max(0, itemCenterPercent - buttonWidthPercent / 2) + 2
-    const clipRight = Math.max(0, 100 - (itemCenterPercent + buttonWidthPercent / 2)) + 2
-
-    return {
-      clipPath: `inset(0 ${clipRight.toFixed(1)}% 0 ${clipLeft.toFixed(1)}% round var(--radius-3xl))`,
-      shouldAnimate,
-    }
-  }, [location])
+  const clipPath = isEmpty
+    ? 'inset(0px 100% 0px 0% round 9999px)'
+    : (() => {
+        const itemCenterPercent = (activeIndex / itemCount) * 100 + buttonWidthPercent / 2
+        const clipLeft = Math.max(0, itemCenterPercent - buttonWidthPercent / 2) + 2
+        const clipRight = Math.max(0, 100 - (itemCenterPercent + buttonWidthPercent / 2)) + 2
+        return `inset(0 ${clipRight.toFixed(1)}% 0 ${clipLeft.toFixed(1)}% round var(--radius-3xl))`
+      })()
 
   return (
     <div

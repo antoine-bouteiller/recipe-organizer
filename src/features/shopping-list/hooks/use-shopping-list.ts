@@ -4,7 +4,6 @@ import type { IngredientCategory } from '@/types/ingredient'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
 import { useQuery } from '@tanstack/react-query'
 import { useStore } from '@tanstack/react-store'
-import { useMemo } from 'react'
 import { shoppingListStore } from '../../../stores/shopping-list.store'
 import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
@@ -21,11 +20,9 @@ export const useShoppingListStore = () => {
       : recipesQuantities[recipe.id],
   }))
 
-  const shoppingListIngredients = useMemo(() => {
-    if (!recipesWithQuantities) {
-      return {}
-    }
+  let shoppingListIngredients: Partial<Record<IngredientCategory, IngredientCartItem[]>> = {}
 
+  if (recipesWithQuantities) {
     // First pass: collect all ingredients with their quantities
     const ingredientsMap = recipesWithQuantities.reduce<Map<number, IngredientCartItem>>(
       (map, recipe) => {
@@ -80,18 +77,17 @@ export const useShoppingListStore = () => {
       }
     }
 
-    return result.reduce<Partial<Record<IngredientCategory, IngredientCartItem[]>>>(
-      (acc, ingredient) => {
-        const key = ingredient.category
-        if (!acc[key]) {
-          acc[key] = []
-        }
-        acc[key].push(ingredient)
-        return acc
-      },
-      {}
-    )
-  }, [recipesWithQuantities])
+    shoppingListIngredients = result.reduce<
+      Partial<Record<IngredientCategory, IngredientCartItem[]>>
+    >((acc, ingredient) => {
+      const key = ingredient.category
+      if (!acc[key]) {
+        acc[key] = []
+      }
+      acc[key].push(ingredient)
+      return acc
+    }, {})
+  }
 
   return {
     shoppingListIngredients,

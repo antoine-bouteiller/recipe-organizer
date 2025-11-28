@@ -18,7 +18,11 @@ const viteConfig = defineConfig({
       viteEnvironment: { name: 'ssr' },
     }),
     tanstackStart(),
-    react(),
+    react({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
     tailwindcss(),
     workboxGeneratePlugin(),
   ],

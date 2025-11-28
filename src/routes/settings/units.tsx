@@ -18,7 +18,7 @@ import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as React from 'react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 const UnitsManagement = () => {
   const { data: units } = useSuspenseQuery(getUnitsListOptions())
@@ -26,17 +26,13 @@ const UnitsManagement = () => {
 
   const { isAdmin } = Route.useRouteContext()
 
-  const filteredUnits = useMemo(() => {
-    if (!search.trim()) {
-      return units
-    }
-
-    const query = search.toLowerCase()
-    return units.filter(
-      (unit) =>
-        unit.name.toLowerCase().includes(query) || unit.parent?.name.toLowerCase().includes(query)
-    )
-  }, [units, search])
+  const query = search.toLowerCase()
+  const filteredUnits = !search.trim()
+    ? units
+    : units.filter(
+        (unit) =>
+          unit.name.toLowerCase().includes(query) || unit.parent?.name.toLowerCase().includes(query)
+      )
 
   return (
     <ScreenLayout withGoBack title="Unitées">

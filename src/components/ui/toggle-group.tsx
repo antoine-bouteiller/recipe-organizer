@@ -1,13 +1,13 @@
 import type { Toggle as TogglePrimitive } from '@base-ui-components/react/toggle'
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui-components/react/toggle-group'
 import { type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
+import { createContext, useContext } from 'react'
 
 import { Separator } from '@/components/ui/separator'
 import { Toggle as ToggleComponent, type toggleVariants } from '@/components/ui/toggle'
 import { cn } from '@/utils/cn'
 
-const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants>>({
+const ToggleGroupContext = createContext<VariantProps<typeof toggleVariants>>({
   size: 'default',
   variant: 'default',
 })
@@ -31,28 +31,25 @@ const ToggleGroup = ({
   orientation = 'horizontal',
   children,
   ...props
-}: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => {
-  const contextValue = React.useMemo(() => ({ size, variant }), [size, variant])
-  return (
-    <ToggleGroupPrimitive
-      className={cn(
-        'flex w-fit *:focus-visible:z-10',
-        orientation === 'horizontal'
-          ? '*:pointer-coarse:after:min-w-auto'
-          : '*:pointer-coarse:after:min-h-auto',
-        getToggleGroupClassName(variant, orientation),
-        className
-      )}
-      data-size={size}
-      data-slot="toggle-group"
-      data-variant={variant}
-      orientation={orientation}
-      {...props}
-    >
-      <ToggleGroupContext.Provider value={contextValue}>{children}</ToggleGroupContext.Provider>
-    </ToggleGroupPrimitive>
-  )
-}
+}: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => (
+  <ToggleGroupPrimitive
+    className={cn(
+      'flex w-fit *:focus-visible:z-10',
+      orientation === 'horizontal'
+        ? '*:pointer-coarse:after:min-w-auto'
+        : '*:pointer-coarse:after:min-h-auto',
+      getToggleGroupClassName(variant, orientation),
+      className
+    )}
+    data-size={size}
+    data-slot="toggle-group"
+    data-variant={variant}
+    orientation={orientation}
+    {...props}
+  >
+    <ToggleGroupContext.Provider value={{ size, variant }}>{children}</ToggleGroupContext.Provider>
+  </ToggleGroupPrimitive>
+)
 
 const Toggle = ({
   className,
@@ -61,7 +58,7 @@ const Toggle = ({
   size,
   ...props
 }: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) => {
-  const context = React.useContext(ToggleGroupContext)
+  const context = useContext(ToggleGroupContext)
 
   const resolvedVariant = context.variant || variant
   const resolvedSize = context.size || size
