@@ -18,11 +18,29 @@ export const magimixProgram = [
 
 export type MagimixProgram = (typeof magimixProgram)[number]
 
+export const allowedRotationSpeed = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  'auto',
+] as const
+
 export interface MagimixProgramData {
   program: MagimixProgram
   time: number
   temperature?: number
-  rotationSpeed: number
+  rotationSpeed: (typeof allowedRotationSpeed)[number]
 }
 
 export const magimixProgramLabels: Record<MagimixProgram, string> = {

@@ -1,4 +1,5 @@
 import {
+  allowedRotationSpeed,
   magimixProgram,
   magimixProgramLabels,
   type MagimixProgramData,
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/responsive-dialog'
 import { useAppForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
+import { capitalize } from '@/utils/string'
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useState, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 import z from 'zod'
@@ -35,7 +37,7 @@ export const magimixProgramSchema = z.object({
   timeMinutes: z.int().min(0),
   timeSeconds: z.int().min(0).max(59),
   temperature: z.int().min(0).max(200).optional(),
-  rotationSpeed: z.int().min(1).max(14),
+  rotationSpeed: z.enum(allowedRotationSpeed),
 })
 
 export type MagimixProgramFormInput = z.input<typeof magimixProgramSchema>
@@ -45,7 +47,7 @@ export const magimixProgramDefaultValues: MagimixProgramFormInput = {
   timeMinutes: 0,
   timeSeconds: 0,
   temperature: undefined,
-  rotationSpeed: 0,
+  rotationSpeed: 'auto',
 }
 
 const programItems = Object.entries(magimixProgramLabels).map(([value, label]) => ({
@@ -132,14 +134,14 @@ export const MagimixProgramDialog = ({
             </form.AppField>
 
             <form.AppField name="rotationSpeed">
-              {({ NumberField }) => (
-                <NumberField
+              {({ SelectField }) => (
+                <SelectField
                   label="Vitesse de rotation*"
-                  placeholder="Ex: 1000"
-                  min={1}
-                  max={14}
+                  items={allowedRotationSpeed.map((speed) => ({
+                    label: capitalize(speed),
+                    value: speed,
+                  }))}
                   disabled={isSubmitting}
-                  decimalScale={0}
                 />
               )}
             </form.AppField>

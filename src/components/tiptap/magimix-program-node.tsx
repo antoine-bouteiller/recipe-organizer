@@ -1,4 +1,5 @@
 import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
+import { capitalize } from '@/utils/string'
 import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import { mergeAttributes, Node } from '@tiptap/core'
 import {
@@ -90,7 +91,7 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
               /
               <div className="flex items-center gap-1">
                 <SpinnerGapIcon className="size-4" />
-                <span>{rotationSpeed}</span>
+                <span>{capitalize(rotationSpeed)}</span>
               </div>
               /
               <div className="flex items-center gap-1">
@@ -124,11 +125,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
         default: 'auto',
         parseHTML: (element) => {
           const { time } = element.dataset
-          if (time === 'auto') {
-            return 'auto'
-          }
-          const parsed = Number.parseInt(time ?? '0', 10)
-          return Number.isNaN(parsed) ? 'auto' : parsed
+          return Number.parseInt(time ?? '0', 10)
         },
         renderHTML: (attributes) => ({
           'data-time': String(attributes.time),
@@ -155,14 +152,7 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
       },
       rotationSpeed: {
         default: undefined,
-        parseHTML: (element) => {
-          const speed = element.dataset.rotationSpeed
-          if (!speed) {
-            return undefined
-          }
-          const parsed = Number.parseInt(speed, 10)
-          return Number.isNaN(parsed) ? undefined : parsed
-        },
+        parseHTML: (element) => element.dataset.rotationSpeed,
         renderHTML: (attributes) => {
           if (attributes.rotationSpeed === undefined) {
             return {}
