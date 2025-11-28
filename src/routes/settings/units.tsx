@@ -26,13 +26,11 @@ const UnitsManagement = () => {
 
   const { isAdmin } = Route.useRouteContext()
 
-  const query = search.toLowerCase()
-  const filteredUnits = !search.trim()
-    ? units
-    : units.filter(
-        (unit) =>
-          unit.name.toLowerCase().includes(query) || unit.parent?.name.toLowerCase().includes(query)
-      )
+  const query = search.trim().toLowerCase()
+  const filteredUnits = units.filter(
+    (unit) =>
+      unit.name.toLowerCase().includes(query) || unit.parent?.name.toLowerCase().includes(query)
+  )
 
   return (
     <ScreenLayout withGoBack title="Unitées">

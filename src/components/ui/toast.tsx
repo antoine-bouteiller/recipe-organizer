@@ -41,16 +41,22 @@ const ToastProvider = ({ children, position = 'bottom-right', ...props }: ToastP
   </Toast.Provider>
 )
 
-const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) => {
-  const { toasts } = Toast.useToastManager()
+const getSwipeDirection = (position: ToastPosition) => {
   const isTop = position.startsWith('top')
 
-  let swipeDirection: SwipeDirection | SwipeDirection[] = ['right', isTop ? 'up' : 'down']
   if (position.includes('center')) {
-    swipeDirection = [isTop ? 'up' : 'down']
+    return [isTop ? 'up' : 'down'] as const satisfies SwipeDirection[]
   } else if (position.includes('left')) {
-    swipeDirection = ['left', isTop ? 'up' : 'down']
+    return ['left', isTop ? 'up' : 'down'] as const satisfies SwipeDirection[]
   }
+
+  return ['right', isTop ? 'up' : 'down'] as const satisfies SwipeDirection[]
+}
+
+const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) => {
+  const { toasts } = Toast.useToastManager()
+
+  let swipeDirection = getSwipeDirection(position)
 
   return (
     <Toast.Portal data-slot="toast-portal">

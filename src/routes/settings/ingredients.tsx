@@ -30,14 +30,12 @@ const IngredientsManagement = () => {
 
   const { isAdmin } = Route.useRouteContext()
 
-  const query = search.toLowerCase()
-  const filteredIngredients = !search.trim()
-    ? ingredients
-    : ingredients.filter(
-        (ingredient) =>
-          ingredient.name.toLowerCase().includes(query) ||
-          ingredient.category.toLowerCase().includes(query)
-      )
+  const query = search.trim().toLowerCase()
+  const filteredIngredients = ingredients.filter(
+    (ingredient) =>
+      ingredient.name.toLowerCase().includes(query) ||
+      ingredient.category.toLowerCase().includes(query)
+  )
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
