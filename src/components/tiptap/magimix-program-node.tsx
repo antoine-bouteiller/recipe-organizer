@@ -7,6 +7,7 @@ import {
   type ReactNodeViewProps,
   ReactNodeViewRenderer as reactNodeViewRenderer,
 } from '@tiptap/react'
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '../ui/item'
 import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
 
 declare module '@tiptap/core' {
@@ -28,9 +29,7 @@ const Wrapper = ({ children, isEditable, initialData, updateAttributes }: Wrappe
   isEditable ? (
     <MagimixProgramDialog
       submitLabel="Enregistrer"
-      triggerRender={
-        <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start cursor-pointer" />
-      }
+      triggerRender={<Item variant="outline" />}
       title="Modifier le programme Magimix"
       onSubmit={updateAttributes}
       initialData={initialData}
@@ -38,9 +37,7 @@ const Wrapper = ({ children, isEditable, initialData, updateAttributes }: Wrappe
       {children}
     </MagimixProgramDialog>
   ) : (
-    <div className="my-2 rounded-lg border border-border bg-muted/50 p-4 w-full text-start">
-      {children}
-    </div>
+    <Item variant="outline">{children}</Item>
   )
 
 const formatTime = (time: number): string => {
@@ -69,38 +66,31 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
   }
 
   return (
-    <NodeViewWrapper className="magimix-program-node">
+    <NodeViewWrapper className="not-prose">
       <Wrapper
         initialData={formInitialValues}
         updateAttributes={updateAttributes}
         isEditable={editor.isEditable}
       >
-        <div className="flex items-center gap-3">
+        <ItemMedia>
           <img
             alt="Magimix Program Icon"
             src={`/magimix/${program}.png`}
             className="size-10 not-prose"
           />
-          <div className="flex flex-col md:flex-row flex-1 gap-1">
-            <div className="font-semibold text-foreground">{label}</div>
-            <div className="flex flex-1 gap-1">
-              <div className="flex items-center gap-1 pl-2">
-                <TimerIcon className="size-4" />
-                <span>{formatTime(time)}</span>
-              </div>
-              /
-              <div className="flex items-center gap-1">
-                <SpinnerGapIcon className="size-4" />
-                <span>{capitalize(rotationSpeed)}</span>
-              </div>
-              /
-              <div className="flex items-center gap-1">
-                <ThermometerIcon className="size-4" />
-                <span>{temperature ?? '__'}°C</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>{label}</ItemTitle>
+          <ItemDescription className="flex items-center gap-1 my-0">
+            <TimerIcon className="size-4" />
+            <span>{formatTime(time)}</span>/
+            <SpinnerGapIcon className="size-4" />
+            <span>{capitalize(rotationSpeed)}</span>
+            /
+            <ThermometerIcon className="size-4" />
+            <span>{temperature ?? '__'}°C</span>
+          </ItemDescription>
+        </ItemContent>
       </Wrapper>
     </NodeViewWrapper>
   )

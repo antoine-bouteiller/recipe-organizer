@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Cal+Sans&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap',
       },
       {
         rel: 'preconnect',
