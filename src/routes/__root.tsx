@@ -87,7 +87,7 @@ export const Route = createRootRouteWithContext<{
     return { authUser, isAdmin: authUser?.role === 'admin', theme }
   },
   component: RootComponent,
-  head: ({ loaderData }) => ({
+  head: () => ({
     links: [
       { href: appCss, rel: 'stylesheet' },
       { href: '/manifest.json', rel: 'manifest' },
@@ -119,7 +119,7 @@ export const Route = createRootRouteWithContext<{
         title: 'Recipe Organizer',
       },
       {
-        content: loaderData === 'dark' ? '#0d0a0e' : '#fdf6fb',
+        content: '#2f0d68',
         name: 'theme-color',
       },
     ],
