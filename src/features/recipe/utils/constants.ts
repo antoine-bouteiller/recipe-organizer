@@ -1,10 +1,10 @@
 import { createFieldMap } from '@tanstack/react-form'
+
 import type { RecipeFormInput } from '../api/create'
 
 export const recipeDefaultValues: RecipeFormInput = {
-  name: '',
-  steps: '',
   image: undefined,
+  name: '',
   quantity: 4,
   sections: [
     {
@@ -16,6 +16,7 @@ export const recipeDefaultValues: RecipeFormInput = {
       ],
     },
   ],
+  steps: '',
 }
 
 export const recipeFormFields = createFieldMap(recipeDefaultValues)

@@ -2,46 +2,31 @@ import { Field as FieldPrimitive } from '@base-ui-components/react/field'
 
 import { useFormContext } from '@/hooks/use-form-context'
 import { cn } from '@/utils/cn'
+
 import { Button } from './button'
 import { Spinner } from './spinner'
 
 const Field = ({ className, ...props }: FieldPrimitive.Root.Props) => (
-  <FieldPrimitive.Root
-    className={cn('flex flex-col items-start gap-2 flex-1 w-full', className)}
-    data-slot="field"
-    {...props}
-  />
+  <FieldPrimitive.Root className={cn('flex w-full flex-1 flex-col items-start gap-2', className)} data-slot="field" {...props} />
 )
 
 const FieldLabel = ({ className, ...props }: FieldPrimitive.Label.Props) => (
-  <FieldPrimitive.Label
-    className={cn('inline-flex items-center gap-2 text-sm/4', className)}
-    data-slot="field-label"
-    {...props}
-  />
+  <FieldPrimitive.Label className={cn('inline-flex items-center gap-2 text-sm/4', className)} data-slot="field-label" {...props} />
 )
 
 const FieldDescription = ({ className, ...props }: FieldPrimitive.Description.Props) => (
-  <FieldPrimitive.Description
-    className={cn('text-muted-foreground text-xs', className)}
-    data-slot="field-description"
-    {...props}
-  />
+  <FieldPrimitive.Description className={cn('text-xs text-muted-foreground', className)} data-slot="field-description" {...props} />
 )
 
 const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props) => (
-  <FieldPrimitive.Error
-    className={cn('text-destructive-foreground text-xs', className)}
-    data-slot="field-error"
-    {...props}
-  />
+  <FieldPrimitive.Error className={cn('text-xs text-destructive-foreground', className)} data-slot="field-error" {...props} />
 )
 const FormSubmit = ({ label }: { label: string }) => {
   const form = useFormContext()
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button type="submit" disabled={isSubmitting}>
+        <Button disabled={isSubmitting} type="submit">
           {isSubmitting && <Spinner />}
           {label}
         </Button>

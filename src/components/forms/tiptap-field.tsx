@@ -1,34 +1,24 @@
+import { ArrowUUpLeftIcon, ArrowUUpRightIcon, ListBulletsIcon, TextBolderIcon, TextItalicIcon, TextUnderlineIcon } from '@phosphor-icons/react'
+
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Tiptap, TiptapButton, TiptapContent } from '@/components/ui/tiptap'
 import { useFieldContext } from '@/hooks/use-form-context'
-import {
-  ArrowUUpLeftIcon,
-  ArrowUUpRightIcon,
-  ListBulletsIcon,
-  TextBolderIcon,
-  TextItalicIcon,
-  TextUnderlineIcon,
-} from '@phosphor-icons/react'
+
 import { MagimixProgramButton } from '../tiptap/magimix-program-button'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../ui/toolbar'
 
 interface TiptapProps {
-  label?: string
   disabled?: boolean
+  label?: string
 }
 
-const TiptapField = ({ label, disabled }: TiptapProps) => {
+const TiptapField = ({ disabled, label }: TiptapProps) => {
   const field = useFieldContext<string>()
 
   return (
-    <Field
-      name={field.name}
-      invalid={!field.state.meta.isValid}
-      dirty={field.state.meta.isDirty}
-      touched={field.state.meta.isTouched}
-    >
+    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
-      <Tiptap onChange={field.handleChange} content={field.state.value}>
+      <Tiptap content={field.state.value} onChange={field.handleChange}>
         <Toolbar>
           <ToolbarGroup>
             <TiptapButton command="undo">

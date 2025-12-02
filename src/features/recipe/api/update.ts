@@ -1,3 +1,9 @@
+import { mutationOptions } from '@tanstack/react-query'
+import { notFound } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
+import { z } from 'zod'
+
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
@@ -7,11 +13,6 @@ import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
-import { mutationOptions } from '@tanstack/react-query'
-import { notFound } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 
 const updateRecipeSchema = z.object({
   ...recipeSchema.shape,
@@ -28,7 +29,7 @@ const updateRecipe = createServerFn({
   .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const { image, sections, name, steps, id, quantity } = data
+      const { id, image, name, quantity, sections, steps } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, id),
@@ -49,10 +50,10 @@ const updateRecipe = createServerFn({
         getDb()
           .update(recipe)
           .set({
-            name,
             image: imageKey,
-            steps,
+            name,
             quantity,
+            steps,
           })
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),
@@ -64,18 +65,18 @@ const updateRecipe = createServerFn({
         sections.map(async (section, index) => {
           if ('recipeId' in section) {
             await getDb().insert(recipeIngredientsSection).values({
-              recipeId: currentRecipe.id,
-              subRecipeId: section.recipeId,
               name: section.name,
               ratio: section.ratio,
+              recipeId: currentRecipe.id,
+              subRecipeId: section.recipeId,
             })
           } else if ('ingredients' in section) {
             const [updatedSection] = await getDb()
               .insert(recipeIngredientsSection)
               .values({
-                recipeId: currentRecipe.id,
-                name: section.name,
                 isDefault: index === 0,
+                name: section.name,
+                recipeId: currentRecipe.id,
               })
               .returning()
 
@@ -84,9 +85,9 @@ const updateRecipe = createServerFn({
                 .insert(sectionIngredient)
                 .values(
                   section.ingredients.map((ingredient) => ({
-                    sectionId: updatedSection.id,
                     ingredientId: ingredient.id,
                     quantity: ingredient.quantity,
+                    sectionId: updatedSection.id,
                     unitId: ingredient.unitId ?? undefined,
                   }))
                 )
@@ -102,6 +103,10 @@ const updateRecipe = createServerFn({
 const updateRecipeOptions = () =>
   mutationOptions({
     mutationFn: updateRecipe,
+    onError: (error, variables) => {
+      const { data: title } = z.string().safeParse(variables.data.get('name'))
+      toastError(`Erreur lors de la mise à jour de la recette ${title}`, error)
+    },
     onSuccess: (_data, variables, _result, context) => {
       void context.client.invalidateQueries({
         queryKey: queryKeys.allRecipes,
@@ -112,15 +117,6 @@ const updateRecipeOptions = () =>
         type: 'success',
       })
     },
-    onError: (error, variables) => {
-      const { data: title } = z.string().safeParse(variables.data.get('name'))
-      toastError(`Erreur lors de la mise à jour de la recette ${title}`, error)
-    },
   })
 
-export {
-  updateRecipeOptions,
-  updateRecipeSchema,
-  type UpdateRecipeFormInput,
-  type UpdateRecipeFormValues,
-}
+export { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput, type UpdateRecipeFormValues }

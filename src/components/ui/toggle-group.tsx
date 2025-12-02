@@ -1,4 +1,5 @@
 import type { Toggle as TogglePrimitive } from '@base-ui-components/react/toggle'
+
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui-components/react/toggle-group'
 import { type VariantProps } from 'class-variance-authority'
 import { createContext, useContext } from 'react'
@@ -12,7 +13,7 @@ const ToggleGroupContext = createContext<VariantProps<typeof toggleVariants>>({
   variant: 'default',
 })
 
-const getToggleGroupClassName = (variant: string | null, orientation: string) => {
+const getToggleGroupClassName = (variant: null | string, orientation: string) => {
   if (variant == 'default') {
     return 'gap-0.5'
   }
@@ -25,19 +26,20 @@ const getToggleGroupClassName = (variant: string | null, orientation: string) =>
 }
 
 const ToggleGroup = ({
-  className,
-  variant = 'default',
-  size = 'default',
-  orientation = 'horizontal',
   children,
+  className,
+  orientation = 'horizontal',
+  size = 'default',
+  variant = 'default',
   ...props
 }: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => (
   <ToggleGroupPrimitive
     className={cn(
-      'flex w-fit *:focus-visible:z-10',
-      orientation === 'horizontal'
-        ? '*:pointer-coarse:after:min-w-auto'
-        : '*:pointer-coarse:after:min-h-auto',
+      `
+        flex w-fit
+        *:focus-visible:z-10
+      `,
+      orientation === 'horizontal' ? '*:pointer-coarse:after:min-w-auto' : '*:pointer-coarse:after:min-h-auto',
       getToggleGroupClassName(variant, orientation),
       className
     )}
@@ -51,13 +53,7 @@ const ToggleGroup = ({
   </ToggleGroupPrimitive>
 )
 
-const Toggle = ({
-  className,
-  children,
-  variant,
-  size,
-  ...props
-}: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) => {
+const Toggle = ({ children, className, size, variant, ...props }: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) => {
   const context = useContext(ToggleGroupContext)
 
   const resolvedVariant = context.variant || variant
@@ -81,10 +77,8 @@ const ToggleGroupSeparator = ({
   className,
   orientation = 'vertical',
   ...props
-}: {
+}: React.ComponentProps<typeof Separator> & {
   className?: string
-} & React.ComponentProps<typeof Separator>) => (
-  <Separator className={className} orientation={orientation} {...props} />
-)
+}) => <Separator className={className} orientation={orientation} {...props} />
 
 export { Toggle, ToggleGroup, Toggle as ToggleGroupItem, ToggleGroupSeparator }

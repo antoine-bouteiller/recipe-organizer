@@ -1,9 +1,10 @@
+import { createServerFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
+
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { useAppSession } from '@/lib/session'
 import { withServerErrorCapture } from '@/utils/error-handler'
-import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
 
 export const getAuthUser = createServerFn({ method: 'GET' }).handler(
   withServerErrorCapture(async () => {

@@ -1,11 +1,12 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { toastManager } from '@/components/ui/toast'
-import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
 import { z } from 'zod'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { toastManager } from '@/components/ui/toast'
+import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
 const getErrorMessage = (error: string) => {
   if (error === 'signup_disabled') {
@@ -26,20 +27,16 @@ const LoginPage = () => {
   const login = useServerFn(initiateGoogleAuth)
 
   return (
-    <div className="flex-1 grid place-items-center p-4">
+    <div className="grid flex-1 place-items-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Connexion</CardTitle>
           <CardDescription>Connectez-vous pour accéder au portail administrateur</CardDescription>
         </CardHeader>
         <CardContent className="flex-1">
-          <Button variant="outline" className="w-full" onClick={() => login()}>
-            <img
-              src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg"
-              alt="Google"
-              className="h-4"
-            />{' '}
-            Connexion avec Google
+          <Button className="w-full" onClick={() => login()} variant="outline">
+            <img alt="Google" className="h-4" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg" /> Connexion avec
+            Google
           </Button>
         </CardContent>
       </Card>
@@ -53,6 +50,6 @@ export const Route = createFileRoute('/auth/login')({
       throw redirect({ to: '/' })
     }
   },
-  validateSearch: z.object({ error: z.string().optional() }),
   component: LoginPage,
+  validateSearch: z.object({ error: z.string().optional() }),
 })

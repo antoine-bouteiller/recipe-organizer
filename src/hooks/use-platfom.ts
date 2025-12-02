@@ -1,8 +1,8 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { getRequestHeader } from '@tanstack/react-start/server'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-type Platform = 'macOS' | 'Windows' | 'Android' | 'iOS' | 'Unknown'
+type Platform = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Windows'
 
 const getPlatform = createIsomorphicFn()
   .server(() => getPlatformFromUserAgent(getRequestHeader('user-agent')))

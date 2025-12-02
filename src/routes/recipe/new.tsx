@@ -1,3 +1,7 @@
+import { revalidateLogic, useStore } from '@tanstack/react-form'
+import { useMutation } from '@tanstack/react-query'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
@@ -10,25 +14,22 @@ import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
-import { revalidateLogic, useStore } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 
 const NewRecipePage = () => {
   const router = useRouter()
   const { mutateAsync: createRecipe } = useMutation(createRecipeOptions())
 
   const form = useAppForm({
-    validators: {
-      onDynamic: recipeSchema,
-    },
-    validationLogic: revalidateLogic(),
     defaultValues: recipeDefaultValues,
     onSubmit: async ({ value }) => {
       const formData = objectToFormData(value)
       await createRecipe({ data: formData })
 
       await router.navigate({ to: '/' })
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: recipeSchema,
     },
   })
 
@@ -37,22 +38,22 @@ const NewRecipePage = () => {
   return (
     <ScreenLayout title="Nouvelle Recette" withGoBack>
       <Form
+        className="p-4"
+        errors={errors}
+        noValidate
         onSubmit={(event) => {
           event.preventDefault()
           void form.handleSubmit()
         }}
-        noValidate
-        errors={errors}
-        className="p-4"
       >
-        <RecipeForm form={form} fields={recipeFormFields} />
-        <div className="flex gap-4 pt-6 md:flex-row flex-col justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.navigate({ to: '/' })}
-            disabled={form.state.isSubmitting}
-          >
+        <RecipeForm fields={recipeFormFields} form={form} />
+        <div
+          className={`
+            flex flex-col justify-end gap-4 pt-6
+            md:flex-row
+          `}
+        >
+          <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>
           <form.AppForm>
@@ -65,12 +66,12 @@ const NewRecipePage = () => {
 }
 
 export const Route = createFileRoute('/recipe/new')({
-  component: NewRecipePage,
   beforeLoad: ({ context }) => {
     if (!context.authUser) {
-      throw redirect({ to: '/auth/login', from: '/recipe/new' })
+      throw redirect({ from: '/recipe/new', to: '/auth/login' })
     }
   },
+  component: NewRecipePage,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())

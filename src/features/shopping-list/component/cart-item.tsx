@@ -1,25 +1,18 @@
+import { useState } from 'react'
+
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
-import { useState } from 'react'
+
 import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
 export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => {
   const [isChecked, setIsChecked] = useState(false)
 
   return (
-    <div
-      className={cn(
-        'flex items-center text-nowrap text-ellipsis gap-2',
-        isChecked && 'line-through'
-      )}
-    >
-      <Checkbox
-        id={`ingredient-${ingredient.id}`}
-        checked={isChecked}
-        onCheckedChange={(checked) => setIsChecked(checked)}
-      />
-      <label htmlFor={`ingredient-${ingredient.id}`} className="flex-1 flex justify-between">
+    <div className={cn('flex items-center gap-2 text-nowrap text-ellipsis', isChecked && 'line-through')}>
+      <Checkbox checked={isChecked} id={`ingredient-${ingredient.id}`} onCheckedChange={(checked) => setIsChecked(checked)} />
+      <label className="flex flex-1 justify-between" htmlFor={`ingredient-${ingredient.id}`}>
         <span>{ingredient.name}</span>
         <span>
           {formatNumber(ingredient.quantity)} {ingredient.unit && ` ${ingredient.unit}`}

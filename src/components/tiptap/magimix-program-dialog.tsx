@@ -1,9 +1,8 @@
-import {
-  allowedRotationSpeed,
-  magimixProgram,
-  magimixProgramLabels,
-  type MagimixProgramData,
-} from '@/components/tiptap/types/magimix'
+import { revalidateLogic, useStore } from '@tanstack/react-form'
+import { type ComponentPropsWithoutRef, type ReactNode, useState } from 'react'
+import z from 'zod'
+
+import { allowedRotationSpeed, magimixProgram, type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import {
@@ -18,58 +17,45 @@ import {
 import { useAppForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
 import { capitalize } from '@/utils/string'
-import { revalidateLogic, useStore } from '@tanstack/react-form'
-import { useState, type ComponentPropsWithoutRef, type ReactNode } from 'react'
-import z from 'zod'
+
 import type { DialogTrigger } from '../ui/dialog'
 
 interface MagimixProgramDialogProps {
-  title: string
-  submitLabel: string
-  triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
-  onSubmit: (data: MagimixProgramData) => void
-  initialData?: MagimixProgramFormInput
   children: ReactNode
+  initialData?: MagimixProgramFormInput
+  onSubmit: (data: MagimixProgramData) => void
+  submitLabel: string
+  title: string
+  triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
 export const magimixProgramSchema = z.object({
   program: z.enum(magimixProgram),
+  rotationSpeed: z.enum(allowedRotationSpeed),
+  temperature: z.int().min(0).max(200).optional(),
   timeMinutes: z.int().min(0),
   timeSeconds: z.int().min(0).max(59),
-  temperature: z.int().min(0).max(200).optional(),
-  rotationSpeed: z.enum(allowedRotationSpeed),
 })
 
 export type MagimixProgramFormInput = z.input<typeof magimixProgramSchema>
 
 export const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
+  rotationSpeed: 'auto',
+  temperature: undefined,
   timeMinutes: 0,
   timeSeconds: 0,
-  temperature: undefined,
-  rotationSpeed: 'auto',
 }
 
 const programItems = Object.entries(magimixProgramLabels).map(([value, label]) => ({
-  value,
   label,
+  value,
 }))
 
-export const MagimixProgramDialog = ({
-  title,
-  submitLabel,
-  initialData,
-  children,
-  onSubmit,
-  triggerRender,
-}: MagimixProgramDialogProps) => {
+export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLabel, title, triggerRender }: MagimixProgramDialogProps) => {
   const [open, setOpen] = useState(false)
 
   const form = useAppForm({
-    validators: {
-      onDynamic: magimixProgramSchema,
-    },
-    validationLogic: revalidateLogic(),
     defaultValues: initialData ?? magimixProgramDefaultValues,
     onSubmit: async ({ value }) => {
       const parsedValue = magimixProgramSchema.parse(value)
@@ -78,13 +64,17 @@ export const MagimixProgramDialog = ({
 
       const programData: MagimixProgramData = {
         program: value.program,
-        time,
-        temperature: value.temperature,
         rotationSpeed: value.rotationSpeed,
+        temperature: value.temperature,
+        time,
       }
       onSubmit(programData)
       form.reset()
       setOpen(false)
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: magimixProgramSchema,
     },
   })
 
@@ -94,75 +84,59 @@ export const MagimixProgramDialog = ({
   }))
 
   return (
-    <ResponsiveDialog open={open} onOpenChange={setOpen}>
+    <ResponsiveDialog onOpenChange={setOpen} open={open}>
       <ResponsiveDialogTrigger render={triggerRender}>{children}</ResponsiveDialogTrigger>
 
       <ResponsiveDialogContent>
         <Form
+          errors={errors}
           onSubmit={async (event) => {
             event.preventDefault()
             event.stopPropagation()
             await form.handleSubmit()
           }}
-          errors={errors}
         >
           <ResponsiveDialogHeader>
             <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
           </ResponsiveDialogHeader>
-          <div className="flex flex-col gap-2 px-4 md:px-0 md:py-4">
+          <div
+            className={`
+              flex flex-col gap-2 px-4
+              md:px-0 md:py-4
+            `}
+          >
             <form.AppField name="program">
-              {({ SelectField }) => (
-                <SelectField label="Programme" items={programItems} disabled={isSubmitting} />
-              )}
+              {({ SelectField }) => <SelectField disabled={isSubmitting} items={programItems} label="Programme" />}
             </form.AppField>
 
             <form.AppField name="timeMinutes">
-              {({ NumberField }) => (
-                <NumberField label="Minutes*" min={0} disabled={isSubmitting} decimalScale={0} />
-              )}
+              {({ NumberField }) => <NumberField decimalScale={0} disabled={isSubmitting} label="Minutes*" min={0} />}
             </form.AppField>
             <form.AppField name="timeSeconds">
-              {({ NumberField }) => (
-                <NumberField
-                  label="Secondes*"
-                  min={0}
-                  max={59}
-                  disabled={isSubmitting}
-                  decimalScale={0}
-                />
-              )}
+              {({ NumberField }) => <NumberField decimalScale={0} disabled={isSubmitting} label="Secondes*" max={59} min={0} />}
             </form.AppField>
 
             <form.AppField name="rotationSpeed">
               {({ SelectField }) => (
                 <SelectField
-                  label="Vitesse de rotation*"
+                  disabled={isSubmitting}
                   items={allowedRotationSpeed.map((speed) => ({
                     label: capitalize(speed),
                     value: speed,
                   }))}
-                  disabled={isSubmitting}
+                  label="Vitesse de rotation*"
                 />
               )}
             </form.AppField>
 
             <form.AppField name="temperature">
               {({ NumberField }) => (
-                <NumberField
-                  label="Température (°C) - Optionnel"
-                  placeholder="Ex: 100"
-                  min={0}
-                  max={200}
-                  disabled={isSubmitting}
-                  decimalScale={0}
-                />
+                <NumberField decimalScale={0} disabled={isSubmitting} label="Température (°C) - Optionnel" max={200} min={0} placeholder="Ex: 100" />
               )}
             </form.AppField>
           </div>
           <ResponsiveDialogFooter>
-            <ResponsiveDialogClose render={<Button variant="outline" disabled={isSubmitting} />}>
-              Annuler
-            </ResponsiveDialogClose>
+            <ResponsiveDialogClose render={<Button disabled={isSubmitting} variant="outline" />}>Annuler</ResponsiveDialogClose>
             <form.AppForm>
               <form.FormSubmit label={submitLabel} />
             </form.AppForm>

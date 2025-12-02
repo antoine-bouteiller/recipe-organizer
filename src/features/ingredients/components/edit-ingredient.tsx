@@ -1,21 +1,16 @@
-import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { Button } from '@/components/ui/button'
-import { ingredientSchema } from '@/features/ingredients/api/create'
-import {
-  updateIngredientOptions,
-  updateIngredientSchema,
-  type UpdateIngredientFormInput,
-} from '@/features/ingredients/api/update'
-import {
-  IngredientForm,
-  ingredientDefaultValues,
-} from '@/features/ingredients/components/ingredient-form'
-import { useAppForm } from '@/hooks/use-app-form'
-import type { Ingredient } from '@/types/ingredient'
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+
+import type { Ingredient } from '@/types/ingredient'
+
+import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { Button } from '@/components/ui/button'
+import { ingredientSchema } from '@/features/ingredients/api/create'
+import { type UpdateIngredientFormInput, updateIngredientOptions, updateIngredientSchema } from '@/features/ingredients/api/update'
+import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
+import { useAppForm } from '@/hooks/use-app-form'
 
 interface EditIngredientProps {
   ingredient: Ingredient
@@ -28,17 +23,13 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const [open, setOpen] = useState(false)
 
   const initialValues: UpdateIngredientFormInput = {
+    category: ingredient.category,
     id: ingredient.id,
     name: ingredient.name,
-    category: ingredient.category,
     parentId: ingredient.parentId ?? undefined,
   }
 
   const form = useAppForm({
-    validators: {
-      onDynamic: ingredientSchema,
-    },
-    validationLogic: revalidateLogic(),
     defaultValues: initialValues,
     onSubmit: async (data) => {
       await updateMutation.mutateAsync(
@@ -53,20 +44,24 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
         }
       )
     },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: ingredientSchema,
+    },
   })
 
   return (
     <FormDialog
+      form={form}
+      open={open}
+      setOpen={setOpen}
+      submitLabel="Mettre à jour"
+      title="Modifier l'ingrédient"
       trigger={
-        <Button variant="outline" size="icon">
+        <Button size="icon" variant="outline">
           <PencilSimpleIcon />
         </Button>
       }
-      open={open}
-      setOpen={setOpen}
-      title="Modifier l'ingrédient"
-      submitLabel="Mettre à jour"
-      form={form}
     >
       <IngredientForm form={form} />
     </FormDialog>

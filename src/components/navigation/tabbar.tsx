@@ -1,7 +1,9 @@
+import { Link, useLocation } from '@tanstack/react-router'
+
 import { Button } from '@/components/ui/button'
 import { usePrevious } from '@/hooks/use-previous-value'
 import { cn } from '@/utils/cn'
-import { Link, useLocation } from '@tanstack/react-router'
+
 import { menuItems } from './constants'
 
 const items = menuItems.filter((item) => item.display !== 'desktop')
@@ -30,37 +32,39 @@ export const TabBar = () => {
 
   return (
     <div
-      className={cn('relative flex flex-1 py-2 border-border', {
+      className={cn('relative flex flex-1 border-border py-2', {
         'border-t': location.pathname !== '/search',
       })}
     >
-      <div className="flex justify-around items-center flex-1 mx-4">
+      <div className="mx-4 flex flex-1 items-center justify-around">
         {items.map((item) => (
           <Button
-            variant="ghost"
-            size="lg"
-            className="text-primary hover:text-primary hover:bg-transparent"
-            render={<Link to={item.linkProps.to} />}
+            className={`
+              text-primary
+              hover:bg-transparent hover:text-primary
+            `}
             key={item.label}
+            render={<Link to={item.linkProps.to} />}
+            size="lg"
+            variant="ghost"
           >
             <item.icon className="size-6" />
           </Button>
         ))}
       </div>
       <div
+        aria-hidden
         className={cn(
-          'absolute flex justify-around items-center bg-accent h-10 text-primary inset-x-4',
+          `
+            absolute inset-x-4 flex h-10 items-center justify-around bg-accent
+            text-primary
+          `,
           shouldAnimate && 'transition-[clip-path] duration-250 ease-[ease]'
         )}
         style={{ clipPath }}
-        aria-hidden
       >
         {items.map((item) => (
-          <item.icon
-            className="size-6"
-            key={item.label}
-            {...(item.linkProps.to === location.href ? item.iconFilledProps : {})}
-          />
+          <item.icon className="size-6" key={item.label} {...(item.linkProps.to === location.href ? item.iconFilledProps : {})} />
         ))}
       </div>
     </div>

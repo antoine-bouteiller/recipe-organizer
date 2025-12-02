@@ -1,16 +1,17 @@
+import { mutationOptions } from '@tanstack/react-query'
+import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
+
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
 
 const unitSchema = z.object({
+  factor: z.number().positive().optional(),
   name: z.string().min(2),
   parentId: z.number().optional(),
-  factor: z.number().positive().optional(),
 })
 
 export type UnitFormValues = z.infer<typeof unitSchema>
@@ -26,18 +27,15 @@ const createUnit = createServerFn()
 const createUnitOptions = () =>
   mutationOptions({
     mutationFn: createUnit,
+    onError: (error, variables) => {
+      toastError(`Une erreur est survenue lors de la création de l'unité ${variables.data.name}`, error)
+    },
     onSuccess: async (_data, variables, _result, context) => {
       await context.client.invalidateQueries({ queryKey: queryKeys.allUnits })
       toastManager.add({
         title: `Unité ${variables.data.name} créée`,
         type: 'success',
       })
-    },
-    onError: (error, variables) => {
-      toastError(
-        `Une erreur est survenue lors de la création de l'unité ${variables.data.name}`,
-        error
-      )
     },
   })
 

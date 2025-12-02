@@ -1,5 +1,6 @@
-import { shoppingListStore } from '@/stores/shopping-list.store'
 import { useStore } from '@tanstack/react-store'
+
+import { shoppingListStore } from '@/stores/shopping-list.store'
 
 export const useIsInShoppingList = (recipeId: number) => {
   const { shoppingList } = useStore(shoppingListStore)

@@ -1,7 +1,7 @@
-import { useState } from 'react'
-
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
+import { useState } from 'react'
+
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 const MOBILE_QUERY = '(max-width: 768px)'

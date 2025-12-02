@@ -1,34 +1,24 @@
-import { getFormDialog } from '@/components/dialogs/form-dialog'
-import {
-  createIngredientOptions,
-  ingredientSchema,
-  type IngredientFormInput,
-} from '@/features/ingredients/api/create'
-import {
-  ingredientDefaultValues,
-  IngredientForm,
-} from '@/features/ingredients/components/ingredient-form'
-import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type JSX } from 'react'
+import { type JSX, useState } from 'react'
+
+import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { createIngredientOptions, type IngredientFormInput, ingredientSchema } from '@/features/ingredients/api/create'
+import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
+import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddIngredientProps {
-  defaultValue?: string
   children: JSX.Element
+  defaultValue?: string
 }
 
 const FormDialog = getFormDialog(ingredientDefaultValues)
 
-export const AddIngredient = ({ defaultValue, children }: AddIngredientProps) => {
+export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) => {
   const createMutation = useMutation(createIngredientOptions())
   const [open, setOpen] = useState(false)
 
   const form = useAppForm({
-    validators: {
-      onDynamic: ingredientSchema,
-    },
-    validationLogic: revalidateLogic(),
     defaultValues: {
       ...ingredientDefaultValues,
       name: defaultValue ?? ingredientDefaultValues.name,
@@ -46,17 +36,14 @@ export const AddIngredient = ({ defaultValue, children }: AddIngredientProps) =>
         }
       )
     },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: ingredientSchema,
+    },
   })
 
   return (
-    <FormDialog
-      trigger={children}
-      title="Ajouter un ingrédient"
-      submitLabel="Ajouter"
-      setOpen={setOpen}
-      open={open}
-      form={form}
-    >
+    <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un ingrédient" trigger={children}>
       <IngredientForm form={form} />
     </FormDialog>
   )

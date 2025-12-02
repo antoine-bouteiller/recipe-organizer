@@ -1,21 +1,15 @@
 'use client'
 
 import type React from 'react'
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type DragEvent,
-  type InputHTMLAttributes,
-} from 'react'
+
+import { type ChangeEvent, type DragEvent, type InputHTMLAttributes, useEffect, useRef, useState } from 'react'
 
 export interface FileMetadata {
+  id: string
   name?: string
   size?: number
   type?: string
   url: string
-  id: string
 }
 
 export interface FileWithPreview {
@@ -25,37 +19,35 @@ export interface FileWithPreview {
 }
 
 export interface FileUploadOptions {
+  accept?: string
+  initialFiles?: FileMetadata[]
   maxFiles?: number // Only used when multiple is true, defaults to Infinity
   maxSize?: number // in bytes
-  accept?: string
   multiple?: boolean // Defaults to false
-  initialFiles?: FileMetadata[]
-  onFilesChange?: (files: FileWithPreview[]) => void // Callback when files change
   onFilesAdded?: (addedFiles: FileWithPreview[]) => void // Callback when new files are added
+  onFilesChange?: (files: FileWithPreview[]) => void // Callback when files change
 }
 
 export interface FileUploadState {
+  errors: string[]
   files: FileWithPreview[]
   isDragging: boolean
-  errors: string[]
 }
 
 export interface FileUploadActions {
-  addFiles: (files: FileList | File[]) => void
-  removeFile: (id: string) => void
-  clearFiles: () => void
+  addFiles: (files: File[] | FileList) => void
   clearErrors: () => void
+  clearFiles: () => void
+  getInputProps: (props?: InputHTMLAttributes<HTMLInputElement>) => InputHTMLAttributes<HTMLInputElement> & {
+    ref: React.Ref<HTMLInputElement>
+  }
   handleDragEnter: (e: DragEvent<HTMLElement>) => void
   handleDragLeave: (e: DragEvent<HTMLElement>) => void
   handleDragOver: (e: DragEvent<HTMLElement>) => void
   handleDrop: (e: DragEvent<HTMLElement>) => void
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void
   openFileDialog: () => void
-  getInputProps: (
-    props?: InputHTMLAttributes<HTMLInputElement>
-  ) => InputHTMLAttributes<HTMLInputElement> & {
-    ref: React.Ref<HTMLInputElement>
-  }
+  removeFile: (id: string) => void
 }
 
 const isImageUrl = (url: string): boolean => {
@@ -92,27 +84,17 @@ const handleDragOver = (e: DragEvent<HTMLElement>) => {
   e.stopPropagation()
 }
 
-export const useFileUpload = (
-  options: FileUploadOptions = {}
-): [FileUploadState, FileUploadActions] => {
-  const {
-    maxFiles = Infinity,
-    maxSize = Infinity,
-    accept = '*',
-    multiple = false,
-    initialFiles = [],
-    onFilesChange,
-    onFilesAdded,
-  } = options
+export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState, FileUploadActions] => {
+  const { accept = '*', initialFiles = [], maxFiles = Infinity, maxSize = Infinity, multiple = false, onFilesAdded, onFilesChange } = options
 
   const [state, setState] = useState<FileUploadState>({
+    errors: [],
     files: initialFiles.map((file) => ({
       file,
       id: file.id,
       preview: file.url,
     })),
     isDragging: false,
-    errors: [],
   })
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -160,8 +142,8 @@ export const useFileUpload = (
 
       const newState = {
         ...prev,
-        files: newFiles,
         errors: [],
+        files: newFiles,
       }
 
       return newState
@@ -170,7 +152,7 @@ export const useFileUpload = (
     onFilesChange?.(newFiles)
   }
 
-  const addFiles = (newFiles: FileList | File[]) => {
+  const addFiles = (newFiles: File[] | FileList) => {
     if (!newFiles || newFiles.length === 0) {
       return
     }
@@ -198,10 +180,7 @@ export const useFileUpload = (
     for (const file of newFilesArray) {
       // Only check for duplicates if multiple files are allowed
       if (multiple) {
-        const isDuplicate = state.files.some(
-          (existingFile) =>
-            existingFile.file.name === file.name && existingFile.file.size === file.size
-        )
+        const isDuplicate = state.files.some((existingFile) => existingFile.file.name === file.name && existingFile.file.size === file.size)
 
         // Skip duplicate files silently
         if (isDuplicate) {
@@ -240,8 +219,8 @@ export const useFileUpload = (
 
       setState((prev) => ({
         ...prev,
-        files: newFiles,
         errors,
+        files: newFiles,
       }))
 
       onFilesChange?.(newFiles)
@@ -261,11 +240,7 @@ export const useFileUpload = (
   const removeFile = (id: string) => {
     setState((prev) => {
       const fileToRemove = prev.files.find((file) => file.id === id)
-      if (
-        fileToRemove?.preview &&
-        fileToRemove.file instanceof File &&
-        fileToRemove.file.type.startsWith('image/')
-      ) {
+      if (fileToRemove?.preview && fileToRemove.file instanceof File && fileToRemove.file.type.startsWith('image/')) {
         URL.revokeObjectURL(fileToRemove.preview)
       }
 
@@ -274,8 +249,8 @@ export const useFileUpload = (
 
       return {
         ...prev,
-        files: newFiles,
         errors: [],
+        files: newFiles,
       }
     })
   }
@@ -290,10 +265,7 @@ export const useFileUpload = (
   const handlePaste = async (event: ClipboardEvent) => {
     const { activeElement } = document
     const isTextInput =
-      activeElement &&
-      (activeElement.tagName === 'INPUT' ||
-        activeElement.tagName === 'TEXTAREA' ||
-        activeElement.hasAttribute('contenteditable'))
+      activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.hasAttribute('contenteditable'))
 
     if (isTextInput) {
       return
@@ -387,27 +359,27 @@ export const useFileUpload = (
 
   const getInputProps = (props: InputHTMLAttributes<HTMLInputElement> = {}) => ({
     ...props,
-    type: 'file' as const,
-    onChange: handleFileChange,
     accept: props.accept || accept,
     multiple: props.multiple === undefined ? multiple : props.multiple,
+    onChange: handleFileChange,
     ref: inputRef,
+    type: 'file' as const,
   })
 
   return [
     state,
     {
       addFiles,
-      removeFile,
-      clearFiles,
       clearErrors,
+      clearFiles,
+      getInputProps,
       handleDragEnter,
       handleDragLeave,
       handleDragOver,
       handleDrop,
       handleFileChange,
       openFileDialog,
-      getInputProps,
+      removeFile,
     },
   ]
 }

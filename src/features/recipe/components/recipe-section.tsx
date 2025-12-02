@@ -1,22 +1,28 @@
 import type { Recipe, RecipeSection } from '@/features/recipe/api/get-one'
+
 import { formatNumber } from '@/utils/number'
 
 interface RecipeSectionIngredientsProps {
-  sectionIngredients: RecipeSection['sectionIngredients']
-  quantity: number
   baseQuantity: number
+  quantity: number
+  sectionIngredients: RecipeSection['sectionIngredients']
 }
 
-const RecipeSectionIngredients = ({
-  sectionIngredients,
-  quantity,
-  baseQuantity,
-}: RecipeSectionIngredientsProps) =>
+const RecipeSectionIngredients = ({ baseQuantity, quantity, sectionIngredients }: RecipeSectionIngredientsProps) =>
   sectionIngredients.length > 0 && (
-    <ul className="space-y-2 pr-4 md:pr-2 mt-0 mb-0">
+    <ul
+      className={`
+        mt-0 mb-0 space-y-2 pr-4
+        md:pr-2
+      `}
+    >
       {sectionIngredients.map((sectionIngredient) => (
         <li key={sectionIngredient.id}>
-          <div className="flex items-center justify-between gap-2 text-nowrap text-ellipsis">
+          <div
+            className={`
+              flex items-center justify-between gap-2 text-nowrap text-ellipsis
+            `}
+          >
             <div>{sectionIngredient.ingredient.name}</div>
             <div className="font-medium">
               {formatNumber((sectionIngredient.quantity * quantity) / baseQuantity)}
@@ -29,31 +35,23 @@ const RecipeSectionIngredients = ({
   )
 
 interface RecipeIngredientsSectionsProps {
-  sections: Recipe['sections']
-  quantity: number
   baseQuantity: number
+  quantity: number
+  sections: Recipe['sections']
 }
 
-export const RecipeIngredientsSections = ({
-  sections,
-  quantity,
-  baseQuantity,
-}: RecipeIngredientsSectionsProps) =>
+export const RecipeIngredientsSections = ({ baseQuantity, quantity, sections }: RecipeIngredientsSectionsProps) =>
   sections.map((section) => (
     <div key={section.id}>
-      {section.name && <h3 className="mb-1 text-md font-semibold">{section.name}</h3>}
+      {section.name && <h3 className="mb-1 font-semibold">{section.name}</h3>}
 
-      <RecipeSectionIngredients
-        sectionIngredients={section.sectionIngredients}
-        quantity={quantity}
-        baseQuantity={baseQuantity}
-      />
+      <RecipeSectionIngredients baseQuantity={baseQuantity} quantity={quantity} sectionIngredients={section.sectionIngredients} />
 
       {section.subRecipe && (
         <RecipeSectionIngredients
-          sectionIngredients={section.subRecipe.sections[0].sectionIngredients}
-          quantity={quantity}
           baseQuantity={baseQuantity}
+          quantity={quantity}
+          sectionIngredients={section.subRecipe.sections[0].sectionIngredients}
         />
       )}
     </div>

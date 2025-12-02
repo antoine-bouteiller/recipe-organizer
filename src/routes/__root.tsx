@@ -1,5 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
+
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 import { Navbar } from '@/components/navigation/navbar'
 import { TabBar } from '@/components/navigation/tabbar'
@@ -8,7 +10,7 @@ import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
 import { initRecipeQuantitiesState, recipeQuantitiesStore } from '@/stores/recipe-quantities.store'
 import { initShoppingListState, shoppingListStore } from '@/stores/shopping-list.store'
-import { useEffect } from 'react'
+
 import appCss from '../styles/app.css?url'
 
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
@@ -28,20 +30,39 @@ const RootComponent = () => {
   const { theme } = Route.useRouteContext()
 
   return (
-    <html lang="fr" className={theme}>
+    <html className={theme} lang="fr">
       <head>
         <HeadContent />
       </head>
 
-      <body className="flex flex-col h-dvh! overflow-hidden fixed top-0 w-screen">
+      <body
+        className={`
+        fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden
+      `}
+      >
         <ToastProvider>
-          <header className="bg-background sticky top-0 z-50 w-full hidden md:block">
+          <header
+            className={`
+              sticky top-0 z-50 hidden w-full bg-background
+              md:block
+            `}
+          >
             <Navbar />
           </header>
-          <main className="flex-1 flex flex-col pb-14 md:pb-0 min-h-0">
+          <main
+            className={`
+              flex min-h-0 flex-1 flex-col pb-14
+              md:pb-0
+            `}
+          >
             <Outlet />
           </main>
-          <div className="w-full md:hidden fixed bottom-0 z-10">
+          <div
+            className={`
+              fixed bottom-0 z-10 w-full
+              md:hidden
+            `}
+          >
             <TabBar />
           </div>
         </ToastProvider>
@@ -52,47 +73,10 @@ const RootComponent = () => {
 }
 
 export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
   authUser: AuthUser
+  queryClient: QueryClient
   theme: Theme
 }>()({
-  head: ({ loaderData }) => ({
-    meta: [
-      {
-        charSet: 'utf8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1, user-scalable=no',
-      },
-      {
-        title: 'Recipe Organizer',
-      },
-      {
-        name: 'theme-color',
-        content: loaderData === 'dark' ? '#0d0a0e' : '#fdf6fb',
-      },
-    ],
-    links: [
-      { rel: 'stylesheet', href: appCss },
-      { rel: 'manifest', href: '/manifest.json' },
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Cal+Sans&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap',
-      },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.googleapis.com',
-      },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
-      },
-    ],
-  }),
   beforeLoad: async () => {
     const authUser = await getAuthUser()
     const theme = getTheme()
@@ -100,8 +84,45 @@ export const Route = createRootRouteWithContext<{
     shoppingListStore.setState(initShoppingListState())
     recipeQuantitiesStore.setState(initRecipeQuantitiesState())
 
-    return { authUser, theme, isAdmin: authUser?.role === 'admin' }
+    return { authUser, isAdmin: authUser?.role === 'admin', theme }
   },
   component: RootComponent,
+  head: ({ loaderData }) => ({
+    links: [
+      { href: appCss, rel: 'stylesheet' },
+      { href: '/manifest.json', rel: 'manifest' },
+      { href: '/favicon.ico', rel: 'icon' },
+      { href: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
+      {
+        href: 'https://fonts.googleapis.com/css2?family=Cal+Sans&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap',
+        rel: 'stylesheet',
+      },
+      {
+        href: 'https://fonts.googleapis.com',
+        rel: 'preconnect',
+      },
+      {
+        crossOrigin: 'anonymous',
+        href: 'https://fonts.gstatic.com',
+        rel: 'preconnect',
+      },
+    ],
+    meta: [
+      {
+        charSet: 'utf8',
+      },
+      {
+        content: 'width=device-width, initial-scale=1, user-scalable=no',
+        name: 'viewport',
+      },
+      {
+        title: 'Recipe Organizer',
+      },
+      {
+        content: loaderData === 'dark' ? '#0d0a0e' : '#fdf6fb',
+        name: 'theme-color',
+      },
+    ],
+  }),
   notFoundComponent: () => <div>Not found</div>,
 })

@@ -1,10 +1,11 @@
-import { Input as InputPrimitive } from '@base-ui-components/react/input'
 import type * as React from 'react'
+
+import { Input as InputPrimitive } from '@base-ui-components/react/input'
 
 import { cn } from '@/utils/cn'
 
 type InputProps = Omit<InputPrimitive.Props & React.RefAttributes<HTMLInputElement>, 'size'> & {
-  size?: 'sm' | 'default' | 'lg' | number
+  size?: 'default' | 'lg' | 'sm' | number
   unstyled?: boolean
 }
 
@@ -22,13 +23,29 @@ const Input = ({ className, size = 'default', unstyled = false, ...props }: Inpu
   >
     <InputPrimitive
       className={cn(
-        'w-full min-w-0 rounded-[inherit] px-[calc(--spacing(3)-1px)] py-[calc(--spacing(1.5)-1px)] outline-none placeholder:text-muted-foreground/64',
-        size === 'sm' && 'px-[calc(--spacing(2.5)-1px)] py-[calc(--spacing(1)-1px)]',
+        `
+          w-full min-w-0 rounded-[inherit] px-[calc(--spacing(3)-1px)]
+          py-[calc(--spacing(1.5)-1px)] outline-none
+          placeholder:text-muted-foreground/64
+        `,
+        size === 'sm' &&
+          `
+          px-[calc(--spacing(2.5)-1px)] py-[calc(--spacing(1)-1px)]
+        `,
         size === 'lg' && 'py-[calc(--spacing(2)-1px)]',
         props.type === 'search' &&
-          '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none',
+          `
+            [&::-webkit-search-cancel-button]:appearance-none
+            [&::-webkit-search-decoration]:appearance-none
+            [&::-webkit-search-results-button]:appearance-none
+            [&::-webkit-search-results-decoration]:appearance-none
+          `,
         props.type === 'file' &&
-          'text-muted-foreground file:me-3 file:bg-transparent file:font-medium file:text-foreground file:text-sm'
+          `
+            text-muted-foreground
+            file:me-3 file:bg-transparent file:text-sm file:font-medium
+            file:text-foreground
+          `
       )}
       data-slot="input"
       size={typeof size === 'number' ? size : undefined}

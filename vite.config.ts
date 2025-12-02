@@ -4,12 +4,10 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
+
 import { workboxGeneratePlugin } from './service-worker-generate'
 
 const viteConfig = defineConfig({
-  server: {
-    port: 3000,
-  },
   plugins: [
     tsConfigPaths({
       projects: ['./tsconfig.json'],
@@ -26,6 +24,9 @@ const viteConfig = defineConfig({
     tailwindcss(),
     workboxGeneratePlugin(),
   ],
+  server: {
+    port: 3000,
+  },
 })
 
 export default viteConfig

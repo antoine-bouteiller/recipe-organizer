@@ -1,5 +1,5 @@
-import { MagimixProgramNode } from '@/components/tiptap/magimix-program-node'
-import { cn } from '@/utils/cn'
+import type { CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
+
 import Bold from '@tiptap/extension-bold'
 import BulletList from '@tiptap/extension-bullet-list'
 import Document from '@tiptap/extension-document'
@@ -10,65 +10,48 @@ import ListItem from '@tiptap/extension-list-item'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import Underline from '@tiptap/extension-underline'
-import type { CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
 import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap/react'
 import { useContext } from 'react'
+
+import { MagimixProgramNode } from '@/components/tiptap/magimix-program-node'
+import { cn } from '@/utils/cn'
+
 import { Toggle } from './toggle'
 import { ToolbarButton } from './toolbar'
 
 // Import only the extensions we actually use (instead of StarterKit)
-const extensions = [
-  Document,
-  Text,
-  Paragraph,
-  HardBreak,
-  Bold,
-  Italic,
-  Underline,
-  BulletList,
-  ListItem,
-  History,
-  MagimixProgramNode,
-]
+const extensions = [Document, Text, Paragraph, HardBreak, Bold, Italic, Underline, BulletList, ListItem, History, MagimixProgramNode]
 
-type Command =
-  | 'bold'
-  | 'italic'
-  | 'underline'
-  | 'bulletList'
-  | 'orderedList'
-  | 'taskList'
-  | 'undo'
-  | 'redo'
+type Command = 'bold' | 'bulletList' | 'italic' | 'orderedList' | 'redo' | 'taskList' | 'underline' | 'undo'
 
 const canCommand = {
   bold: 'toggleBold',
-  italic: 'toggleItalic',
-  underline: 'toggleUnderline',
   bulletList: 'toggleBulletList',
+  italic: 'toggleItalic',
   orderedList: 'toggleOrderedList',
-  taskList: 'toggleTaskList',
-  undo: 'undo',
   redo: 'redo',
+  taskList: 'toggleTaskList',
+  underline: 'toggleUnderline',
+  undo: 'undo',
 } as const satisfies Record<Command, keyof CanCommands>
 
 const runCommand = {
   bold: 'toggleBold',
-  italic: 'toggleItalic',
-  underline: 'toggleUnderline',
   bulletList: 'toggleBulletList',
+  italic: 'toggleItalic',
   orderedList: 'toggleOrderedList',
-  taskList: 'toggleTaskList',
-  undo: 'undo',
   redo: 'redo',
+  taskList: 'toggleTaskList',
+  underline: 'toggleUnderline',
+  undo: 'undo',
 } as const satisfies Record<Command, keyof ChainedCommands>
 
 interface TiptapButtonProps {
-  command: Command
   children: React.ReactNode
+  command: Command
 }
 
-const TiptapButton = ({ command, children }: TiptapButtonProps) => {
+const TiptapButton = ({ children, command }: TiptapButtonProps) => {
   const { editor } = useContext(EditorContext)
 
   const editorState = useEditorState({
@@ -95,11 +78,11 @@ const TiptapButton = ({ command, children }: TiptapButtonProps) => {
       aria-label={command}
       render={
         <Toggle
-          value={command}
-          onClick={toggle}
-          disabled={!editorState?.canToggle}
           aria-pressed={editorState?.isActive}
           data-pressed={editorState?.isActive === true ? true : undefined}
+          disabled={!editorState?.canToggle}
+          onClick={toggle}
+          value={command}
         />
       }
     >
@@ -109,20 +92,21 @@ const TiptapButton = ({ command, children }: TiptapButtonProps) => {
 }
 
 interface TiptapProps {
+  children?: React.ReactNode
   content?: string
   onChange?: (content: string) => void
-  children?: React.ReactNode
   readOnly?: boolean
 }
 
 const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
   const editor = useEditor({
-    extensions: extensions,
-    immediatelyRender: false,
-    content,
     autofocus: false,
+    content,
     editable: !readOnly,
     editorProps: {
+      attributes: {
+        class: 'focus:outline-none prose prose-sm max-w-none',
+      },
       handleScrollToSelection(this, view) {
         if ('focused' in view && !view.focused) {
           return true
@@ -130,10 +114,9 @@ const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
 
         return false
       },
-      attributes: {
-        class: 'focus:outline-none prose prose-sm max-w-none',
-      },
     },
+    extensions: extensions,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML())
     },
@@ -147,12 +130,25 @@ const TiptapContent = ({ className, ...props }: Omit<EditorContentProps, 'editor
 
   return (
     <EditorContent
-      editor={editor}
       className={cn(
         editor?.isEditable &&
-          'p-4 w-full rounded-lg border border-input bg-background bg-clip-padding shadow-xs ring-ring/24 transition-shadow not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-aria-invalid:border-destructive/36 has-focus-visible:border-ring has-disabled:opacity-64 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none has-focus-visible:ring-[3px] dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)]',
+          `
+            w-full rounded-lg border border-input bg-background bg-clip-padding
+            p-4 shadow-xs ring-ring/24 transition-shadow
+            not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)]
+            has-focus-visible:border-ring has-focus-visible:ring-[3px]
+            has-disabled:opacity-64
+            has-aria-invalid:border-destructive/36
+            has-focus-visible:has-aria-invalid:border-destructive/64
+            has-focus-visible:has-aria-invalid:ring-destructive/16
+            has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none
+            dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border
+            dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)]
+            dark:has-aria-invalid:ring-destructive/24
+          `,
         className
       )}
+      editor={editor}
       {...props}
     />
   )

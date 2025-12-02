@@ -1,5 +1,6 @@
-import { env } from '@/config/env'
 import { useSession } from '@tanstack/react-start/server'
+
+import { env } from '@/config/env'
 
 interface AppSessionData {
   userId?: string
@@ -11,23 +12,23 @@ interface OAuthSessionData {
 
 export const useAppSession = () =>
   useSession<AppSessionData>({
-    name: 'app-session',
-    password: env.SESSION_SECRET,
     cookie: {
-      secure: import.meta.env.PROD,
-      sameSite: 'lax',
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 30, // 7 days
+      sameSite: 'lax',
+      secure: import.meta.env.PROD,
     },
+    name: 'app-session',
+    password: env.SESSION_SECRET,
   })
 
 export const useOAuthSession = () =>
   useSession<OAuthSessionData>({
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: import.meta.env.PROD,
+    },
     name: 'oauth-session',
     password: env.SESSION_SECRET,
-    cookie: {
-      secure: import.meta.env.PROD,
-      sameSite: 'lax',
-      httpOnly: true,
-    },
   })

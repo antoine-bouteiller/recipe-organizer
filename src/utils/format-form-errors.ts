@@ -1,8 +1,6 @@
 import type { StandardSchemaV1Issue } from '@tanstack/react-form'
 
-export const formatFormErrors = (
-  errors: (Record<string, StandardSchemaV1Issue[]> | undefined)[] | undefined
-) => {
+export const formatFormErrors = (errors: (Record<string, StandardSchemaV1Issue[]> | undefined)[] | undefined) => {
   if (!errors?.length) {
     return {}
   }

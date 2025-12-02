@@ -1,10 +1,12 @@
+import { redirect } from '@tanstack/react-router'
+import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
+
 import { env } from '@/config/env'
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { useAppSession, useOAuthSession } from '@/lib/session'
-import { redirect } from '@tanstack/react-router'
-import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+
 import { type AuthError } from './constants'
 
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
@@ -18,10 +20,10 @@ const generateState = (): string => {
 
 export const redirectWithError = (errorMessage: AuthError) => {
   throw redirect({
-    to: '/auth/login',
     search: {
       error: errorMessage,
     },
+    to: '/auth/login',
   })
 }
 
@@ -30,13 +32,13 @@ export const initiateGoogleAuth = createServerFn({ method: 'POST' }).handler(asy
   const redirectUri = `${env.VITE_PUBLIC_URL}/api/auth/google/callback`
 
   const searchParams = new URLSearchParams({
+    access_type: 'online',
     client_id: env.GOOGLE_CLIENT_ID,
+    prompt: 'select_account',
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'openid email profile',
     state,
-    access_type: 'online',
-    prompt: 'select_account',
   })
 
   const session = await useOAuthSession()
@@ -63,17 +65,17 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
 
   // Exchange code for tokens
   const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
-    method: 'POST',
+    body: new URLSearchParams({
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      code,
+      grant_type: 'authorization_code',
+      redirect_uri: redirectUri,
+    }),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: new URLSearchParams({
-      code,
-      client_id: env.GOOGLE_CLIENT_ID,
-      client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: redirectUri,
-      grant_type: 'authorization_code',
-    }),
+    method: 'POST',
   })
 
   if (!tokenResponse.ok) {
@@ -100,8 +102,8 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
 
   const userInfoData = await userInfoResponse.json()
   const userInfo = userInfoData as {
-    id?: string
     email?: string
+    id?: string
     name?: string
     picture?: string
   }

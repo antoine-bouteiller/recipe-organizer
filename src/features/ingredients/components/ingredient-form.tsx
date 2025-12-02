@@ -1,14 +1,17 @@
+import { useStore } from '@tanstack/react-form'
+
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
-import { useStore } from '@tanstack/react-form'
+
 import type { IngredientFormInput } from '../api/create'
+
 import { ingredientsCategoryOptions } from '../utils/ingredient-category'
 
 export { ingredientSchema } from '../api/create'
 
 export const ingredientDefaultValues: IngredientFormInput = {
-  name: '',
   category: undefined,
+  name: '',
 }
 
 export const IngredientForm = withForm({
@@ -22,32 +25,14 @@ export const IngredientForm = withForm({
     return (
       <>
         <AppField name="name">
-          {({ TextField }) => (
-            <TextField
-              label="Nom de l'ingrédient"
-              placeholder="Ex: Tomate"
-              disabled={isSubmitting}
-            />
-          )}
+          {({ TextField }) => <TextField disabled={isSubmitting} label="Nom de l'ingrédient" placeholder="Ex: Tomate" />}
         </AppField>
 
         <AppField name="category">
-          {({ SelectField }) => (
-            <SelectField
-              label="Catégorie"
-              items={ingredientsCategoryOptions}
-              disabled={isSubmitting}
-            />
-          )}
+          {({ SelectField }) => <SelectField disabled={isSubmitting} items={ingredientsCategoryOptions} label="Catégorie" />}
         </AppField>
         <AppField name="parentId">
-          {({ ComboboxField }) => (
-            <ComboboxField
-              label="Ingrédient parent"
-              disabled={isSubmitting}
-              options={ingredientOptions}
-            />
-          )}
+          {({ ComboboxField }) => <ComboboxField disabled={isSubmitting} label="Ingrédient parent" options={ingredientOptions} />}
         </AppField>
       </>
     )

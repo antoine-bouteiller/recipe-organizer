@@ -1,21 +1,16 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
+
 import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group'
 
 interface InputProps {
+  autoFocus?: boolean
   search: string
   setSearch: (value: string) => void
-  autoFocus?: boolean
 }
 
-export const SearchInput = ({ search, setSearch, autoFocus }: InputProps) => (
+export const SearchInput = ({ autoFocus, search, setSearch }: InputProps) => (
   <InputGroup>
-    <InputGroupInput
-      placeholder="Search recipes..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      size="lg"
-      autoFocus={autoFocus}
-    />
+    <InputGroupInput autoFocus={autoFocus} onChange={(e) => setSearch(e.target.value)} placeholder="Search recipes..." size="lg" value={search} />
     <InputGroupAddon>
       <MagnifyingGlassIcon />
     </InputGroupAddon>

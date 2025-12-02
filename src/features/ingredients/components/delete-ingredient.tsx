@@ -1,6 +1,7 @@
+import { useMutation } from '@tanstack/react-query'
+
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
 import { deleteIngredientOptions } from '@/features/ingredients/api/delete'
-import { useMutation } from '@tanstack/react-query'
 
 interface DeleteIngredientProps {
   ingredientId: number
@@ -13,10 +14,6 @@ export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredi
   const handleDelete = () => deleteMutation.mutate({ data: { id: ingredientId } })
 
   return (
-    <DeleteDialog
-      onDelete={handleDelete}
-      title="Supprimer l'ingrédient"
-      description={`Êtes-vous sûr de vouloir supprimer l'${ingredientName} ?`}
-    />
+    <DeleteDialog description={`Êtes-vous sûr de vouloir supprimer l'${ingredientName} ?`} onDelete={handleDelete} title="Supprimer l'ingrédient" />
   )
 }

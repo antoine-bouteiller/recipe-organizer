@@ -1,8 +1,5 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
-import {
-  getCookie as getCookieServer,
-  setCookie as setCookieServer,
-} from '@tanstack/react-start/server'
+import { getCookie as getCookieServer, setCookie as setCookieServer } from '@tanstack/react-start/server'
 
 export const getCookie = createIsomorphicFn()
   .server(getCookieServer)
@@ -27,14 +24,9 @@ export const setCookie = createIsomorphicFn()
       return
     }
 
-    const { maxAge = 31_536_000, path = '/', domain, secure = false, sameSite = 'lax' } = options
+    const { domain, maxAge = 31_536_000, path = '/', sameSite = 'lax', secure = false } = options
 
-    const cookieParts = [
-      `${key}=${encodeURIComponent(value)}`,
-      `path=${path}`,
-      `max-age=${maxAge}`,
-      `samesite=${sameSite}`,
-    ]
+    const cookieParts = [`${key}=${encodeURIComponent(value)}`, `path=${path}`, `max-age=${maxAge}`, `samesite=${sameSite}`]
 
     if (domain) {
       cookieParts.push(`domain=${domain}`)

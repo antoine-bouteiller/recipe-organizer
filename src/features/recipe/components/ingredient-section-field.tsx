@@ -1,3 +1,7 @@
+import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { useStore } from '@tanstack/react-form'
+import { Fragment } from 'react/jsx-runtime'
+
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
@@ -5,9 +9,7 @@ import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { AddUnit } from '@/features/units/components/add-unit'
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions, useUnitOptions } from '@/hooks/use-options'
-import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
-import { useStore } from '@tanstack/react-form'
-import { Fragment } from 'react/jsx-runtime'
+
 import { recipeDefaultValues } from '../utils/constants'
 
 interface IngredientFormProps {
@@ -25,82 +27,79 @@ export const IngredientSectionField = withForm({
     const unitsOptions = useUnitOptions({ allowEmpty: true })
 
     return (
-      <AppField name={`sections[${sectionIndex}].ingredients`} mode="array">
+      <AppField mode="array" name={`sections[${sectionIndex}].ingredients`}>
         {(field) => (
-          <div className="flex flex-col gap-2 pt-2 w-full">
+          <div className="flex w-full flex-col gap-2 pt-2">
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
-              <Fragment
-                key={`ingredient-s${sectionIndex}-i${ingredientIndex}-${String(ingredient.id) || 'new'}`}
-              >
+              <Fragment key={`ingredient-s${sectionIndex}-i${ingredientIndex}-${String(ingredient.id) || 'new'}`}>
                 <div className="flex gap-2">
-                  <div className="flex w-full items-start justify-between gap-2 md:flex-row flex-col flex-1">
+                  <div
+                    className={`
+                      flex w-full flex-1 flex-col items-start justify-between
+                      gap-2
+                      md:flex-row
+                    `}
+                  >
                     <AppField name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
-                          options={ingredientsOptions}
-                          disabled={isSubmitting}
-                          placeholder="Sélectionner un ingrédient"
-                          searchPlaceholder="Rechercher un ingrédient"
                           addNew={(inputValue) => (
-                            <AddIngredient key={inputValue} defaultValue={inputValue}>
+                            <AddIngredient defaultValue={inputValue} key={inputValue}>
                               <Button
-                                variant="ghost"
+                                className={`
+                                  w-full justify-start px-1.5 font-normal
+                                `}
                                 size="sm"
-                                className="w-full justify-start font-normal px-1.5"
+                                variant="ghost"
                               >
-                                <PlusIcon className="size-4" aria-hidden="true" />
+                                <PlusIcon aria-hidden="true" className="size-4" />
                                 Nouvel ingrédient: {inputValue}
                               </Button>
                             </AddIngredient>
                           )}
-                        />
-                      )}
-                    </AppField>
-                    <AppField
-                      name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].quantity`}
-                    >
-                      {({ NumberField }) => (
-                        <NumberField
-                          min={0}
                           disabled={isSubmitting}
-                          placeholder="Quantité"
-                          decimalScale={3}
+                          options={ingredientsOptions}
+                          placeholder="Sélectionner un ingrédient"
+                          searchPlaceholder="Rechercher un ingrédient"
                         />
                       )}
                     </AppField>
-                    <AppField
-                      name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unitId`}
-                    >
+                    <AppField name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].quantity`}>
+                      {({ NumberField }) => <NumberField decimalScale={3} disabled={isSubmitting} min={0} placeholder="Quantité" />}
+                    </AppField>
+                    <AppField name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unitId`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
-                          options={unitsOptions}
-                          disabled={isSubmitting}
-                          placeholder="Sélectionner une unité"
-                          searchPlaceholder="Rechercher une unité"
-                          noResultsLabel="Aucune unité trouvée"
                           addNew={(inputValue: string) => (
-                            <AddUnit key={inputValue} defaultValue={inputValue}>
+                            <AddUnit defaultValue={inputValue} key={inputValue}>
                               <Button
-                                variant="ghost"
+                                className={`
+                                  w-full justify-start px-1.5 font-normal
+                                `}
                                 size="sm"
-                                className="w-full justify-start font-normal px-1.5"
+                                variant="ghost"
                               >
-                                <PlusIcon className="size-4" aria-hidden="true" />
+                                <PlusIcon aria-hidden="true" className="size-4" />
                                 Nouvelle unité: {inputValue}
                               </Button>
                             </AddUnit>
                           )}
+                          disabled={isSubmitting}
+                          noResultsLabel="Aucune unité trouvée"
+                          options={unitsOptions}
+                          placeholder="Sélectionner une unité"
+                          searchPlaceholder="Rechercher une unité"
                         />
                       )}
                     </AppField>
                   </div>
                   <Button
-                    type="button"
-                    variant="destructive-outline"
-                    size="icon"
                     disabled={isSubmitting}
                     onClick={() => field.removeValue(ingredientIndex)}
+                    size="icon"
+                    type="button"
+                    variant="destructive-outline"
                   >
                     <TrashIcon className="h-4 w-4" />
                   </Button>
@@ -110,8 +109,7 @@ export const IngredientSectionField = withForm({
             ))}
             <field.FieldError />
             <Button
-              type="button"
-              variant="outline"
+              disabled={isSubmitting}
               onClick={() => {
                 field.pushValue({
                   id: undefined,
@@ -119,7 +117,8 @@ export const IngredientSectionField = withForm({
                 })
               }}
               size="sm"
-              disabled={isSubmitting}
+              type="button"
+              variant="outline"
             >
               <PlusIcon className="h-4 w-4" />
             </Button>

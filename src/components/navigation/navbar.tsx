@@ -1,8 +1,10 @@
+import { Link, useLocation, useRouter } from '@tanstack/react-router'
+
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
 import { SearchBar } from '@/features/recipe/components/search-bar'
 import { toggleTheme } from '@/lib/theme'
-import { Link, useLocation, useRouter } from '@tanstack/react-router'
+
 import { Tabs, TabsList, TabsTab } from '../ui/tabs'
 import { menuItems } from './constants'
 
@@ -12,32 +14,27 @@ export const Navbar = () => {
   const location = useLocation()
 
   return (
-    <div className="3xl:fixed:container flex h-14 items-center gap-2 **:data-[slot=separator]:h-4! px-6">
+    <div className="flex h-14 items-center gap-2 px-6">
       <Tabs value={location.href}>
         <TabsList variant="underline">
           {menuItems
             .filter((item) => item.display !== 'mobile')
             .map((item) => (
-              <TabsTab
-                key={item.label}
-                value={item.linkProps.to}
-                render={<Link {...item.linkProps} />}
-                nativeButton={false}
-              >
+              <TabsTab key={item.label} nativeButton={false} render={<Link {...item.linkProps} />} value={item.linkProps.to}>
                 {item.label}
               </TabsTab>
             ))}
         </TabsList>
       </Tabs>
-      <div className="flex items-center gap-2 flex-1 justify-end">
+      <div className="flex flex-1 items-center justify-end gap-2">
         <SearchBar />
         <Button
-          variant="ghost"
-          size="icon"
           onClick={async () => {
             toggleTheme()
             await router.invalidate()
           }}
+          size="icon"
+          variant="ghost"
         >
           <ThemeIcon className="size-6" />
         </Button>

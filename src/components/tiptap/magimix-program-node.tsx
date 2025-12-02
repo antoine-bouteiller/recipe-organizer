@@ -1,12 +1,10 @@
-import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
-import { capitalize } from '@/utils/string'
 import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import { mergeAttributes, Node } from '@tiptap/core'
-import {
-  NodeViewWrapper,
-  type ReactNodeViewProps,
-  ReactNodeViewRenderer as reactNodeViewRenderer,
-} from '@tiptap/react'
+import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer as reactNodeViewRenderer } from '@tiptap/react'
+
+import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
+import { capitalize } from '@/utils/string'
+
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '../ui/item'
 import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
 
@@ -20,19 +18,19 @@ declare module '@tiptap/core' {
 
 interface WrapperProps {
   children: React.ReactNode
+  initialData: MagimixProgramFormInput
   isEditable: boolean
   updateAttributes: (attributes: MagimixProgramData) => void
-  initialData: MagimixProgramFormInput
 }
 
-const Wrapper = ({ children, isEditable, initialData, updateAttributes }: WrapperProps) =>
+const Wrapper = ({ children, initialData, isEditable, updateAttributes }: WrapperProps) =>
   isEditable ? (
     <MagimixProgramDialog
-      submitLabel="Enregistrer"
-      triggerRender={<Item variant="outline" />}
-      title="Modifier le programme Magimix"
-      onSubmit={updateAttributes}
       initialData={initialData}
+      onSubmit={updateAttributes}
+      submitLabel="Enregistrer"
+      title="Modifier le programme Magimix"
+      triggerRender={<Item variant="outline" />}
     >
       {children}
     </MagimixProgramDialog>
@@ -53,35 +51,27 @@ const formatTime = (time: number): string => {
   return `${minutes}min ${seconds}s`
 }
 
-const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeViewProps) => {
-  const { program, time, temperature, rotationSpeed } = node.attrs as MagimixProgramData
+const MagimixProgramComponent = ({ editor, node, updateAttributes }: ReactNodeViewProps) => {
+  const { program, rotationSpeed, temperature, time } = node.attrs as MagimixProgramData
   const label = magimixProgramLabels[program]
 
   const formInitialValues: MagimixProgramFormInput = {
     program,
+    rotationSpeed,
+    temperature,
     timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
     timeSeconds: typeof time === 'number' ? time % 60 : 0,
-    temperature,
-    rotationSpeed,
   }
 
   return (
     <NodeViewWrapper className="not-prose">
-      <Wrapper
-        initialData={formInitialValues}
-        updateAttributes={updateAttributes}
-        isEditable={editor.isEditable}
-      >
+      <Wrapper initialData={formInitialValues} isEditable={editor.isEditable} updateAttributes={updateAttributes}>
         <ItemMedia>
-          <img
-            alt="Magimix Program Icon"
-            src={`/magimix/${program}.png`}
-            className="size-10 not-prose"
-          />
+          <img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />
         </ItemMedia>
         <ItemContent>
           <ItemTitle>{label}</ItemTitle>
-          <ItemDescription className="flex items-center gap-1 my-0">
+          <ItemDescription className="my-0 flex items-center gap-1">
             <TimerIcon className="size-4" />
             <span>{formatTime(time)}</span>/
             <SpinnerGapIcon className="size-4" />
@@ -97,12 +87,6 @@ const MagimixProgramComponent = ({ node, editor, updateAttributes }: ReactNodeVi
 }
 
 export const MagimixProgramNode = Node.create<Record<string, never>>({
-  name: 'magimixProgram',
-
-  group: 'block',
-
-  draggable: true,
-
   addAttributes() {
     return {
       program: {
@@ -111,15 +95,17 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
           'data-program': attributes.program as string,
         }),
       },
-      time: {
-        default: 'auto',
-        parseHTML: (element) => {
-          const { time } = element.dataset
-          return Number.parseInt(time ?? '0', 10)
+      rotationSpeed: {
+        default: undefined,
+        parseHTML: (element) => element.dataset.rotationSpeed,
+        renderHTML: (attributes) => {
+          if (attributes.rotationSpeed === undefined) {
+            return {}
+          }
+          return {
+            'data-rotation-speed': String(attributes.rotationSpeed),
+          }
         },
-        renderHTML: (attributes) => ({
-          'data-time': String(attributes.time),
-        }),
       },
       temperature: {
         default: undefined,
@@ -140,20 +126,40 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
           }
         },
       },
-      rotationSpeed: {
-        default: undefined,
-        parseHTML: (element) => element.dataset.rotationSpeed,
-        renderHTML: (attributes) => {
-          if (attributes.rotationSpeed === undefined) {
-            return {}
-          }
-          return {
-            'data-rotation-speed': String(attributes.rotationSpeed),
-          }
+      time: {
+        default: 'auto',
+        parseHTML: (element) => {
+          const { time } = element.dataset
+          return Number.parseInt(time ?? '0', 10)
         },
+        renderHTML: (attributes) => ({
+          'data-time': String(attributes.time),
+        }),
       },
     }
   },
+
+  addCommands() {
+    return {
+      setMagimixProgram:
+        (attributes: MagimixProgramData) =>
+        ({ commands }) =>
+          commands.insertContent({
+            attrs: attributes,
+            type: this.name,
+          }),
+    }
+  },
+
+  addNodeView() {
+    return reactNodeViewRenderer(MagimixProgramComponent)
+  },
+
+  draggable: true,
+
+  group: 'block',
+
+  name: 'magimixProgram',
 
   parseHTML() {
     return [
@@ -165,21 +171,5 @@ export const MagimixProgramNode = Node.create<Record<string, never>>({
 
   renderHTML({ HTMLAttributes }) {
     return ['div', mergeAttributes(HTMLAttributes, { 'data-type': 'magimix-program' })]
-  },
-
-  addNodeView() {
-    return reactNodeViewRenderer(MagimixProgramComponent)
-  },
-
-  addCommands() {
-    return {
-      setMagimixProgram:
-        (attributes: MagimixProgramData) =>
-        ({ commands }) =>
-          commands.insertContent({
-            type: this.name,
-            attrs: attributes,
-          }),
-    }
   },
 })

@@ -1,36 +1,27 @@
 import { useFieldContext } from '@/hooks/use-form-context'
+
 import { Field, FieldError, FieldLabel } from '../ui/field'
 import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '../ui/select'
 
 interface SelectFieldProps {
-  label?: string
-  items: { label: string; value: string }[]
   disabled?: boolean
+  items: { label: string; value: string }[]
+  label?: string
 }
 
-const SelectField = ({ items, label, disabled }: SelectFieldProps) => {
+const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
   const field = useFieldContext<string | undefined>()
 
   return (
-    <Field
-      name={field.name}
-      invalid={!field.state.meta.isValid}
-      dirty={field.state.meta.isDirty}
-      touched={field.state.meta.isTouched}
-    >
+    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       {label && <FieldLabel>{label}</FieldLabel>}
-      <Select
-        items={items}
-        disabled={disabled}
-        onValueChange={(value) => field.setValue(value ?? undefined)}
-        value={field.store.state.value}
-      >
+      <Select disabled={disabled} items={items} onValueChange={(value) => field.setValue(value ?? undefined)} value={field.store.state.value}>
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
           {items.map(({ label, value }) => (
-            <SelectItem key={value} value={value} className="justify-start">
+            <SelectItem className="justify-start" key={value} value={value}>
               {label}
             </SelectItem>
           ))}

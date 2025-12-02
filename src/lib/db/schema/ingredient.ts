@@ -4,13 +4,13 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 export const ingredientCategory = ['meat', 'fish', 'vegetables', 'spices', 'other'] as const
 
 const ingredient = sqliteTable('ingredients', {
-  id: integer('id').primaryKey(),
-  name: text('name').notNull(),
   category: text('category', {
     enum: ingredientCategory,
   })
     .notNull()
     .default('other'),
+  id: integer('id').primaryKey(),
+  name: text('name').notNull(),
   parentId: integer('parent_id'),
 })
 

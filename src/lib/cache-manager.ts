@@ -13,12 +13,6 @@ class CacheManager {
     }
   }
 
-  private get(key: string) {
-    if (this.cache) {
-      return this.cache.match(key)
-    }
-  }
-
   getWithCache(key: string, cacheControl = 'public, max-age=31536000, immutable') {
     return async (getItem: () => Promise<Response>) => {
       const cachedResponse = await this.get(key)
@@ -26,9 +20,9 @@ class CacheManager {
       if (cachedResponse) {
         return new Response(cachedResponse?.body, {
           headers: {
-            'Content-Type': cachedResponse?.headers.get('Content-Type') ?? 'image/webp',
             'Cache-Control': cacheControl,
             'CF-Cache-Status': 'HIT',
+            'Content-Type': cachedResponse?.headers.get('Content-Type') ?? 'image/webp',
           },
         })
       }
@@ -38,11 +32,17 @@ class CacheManager {
 
       return new Response(response.body, {
         headers: {
-          'Content-Type': response.headers.get('Content-Type') ?? 'image/webp',
           'Cache-Control': cacheControl,
           'CF-Cache-Status': 'MISS',
+          'Content-Type': response.headers.get('Content-Type') ?? 'image/webp',
         },
       })
+    }
+  }
+
+  private get(key: string) {
+    if (this.cache) {
+      return this.cache.match(key)
     }
   }
 

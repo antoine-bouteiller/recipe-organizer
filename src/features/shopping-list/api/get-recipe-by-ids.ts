@@ -1,17 +1,13 @@
-import { getDb } from '@/lib/db'
-import {
-  ingredient,
-  recipe,
-  recipeIngredientsSection,
-  sectionIngredient,
-  unit,
-} from '@/lib/db/schema'
-import { queryKeys } from '@/lib/query-keys'
-import { withServerErrorCapture } from '@/utils/error-handler'
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { and, eq, inArray, ne } from 'drizzle-orm'
 import { z } from 'zod'
+
+import { getDb } from '@/lib/db'
+import { ingredient, recipe, recipeIngredientsSection, sectionIngredient, unit } from '@/lib/db/schema'
+import { queryKeys } from '@/lib/query-keys'
+import { withServerErrorCapture } from '@/utils/error-handler'
+
 import type { RecipeById } from '../types/recipe-by-id'
 
 const getRecipesByIds = createServerFn({
@@ -27,17 +23,17 @@ const getRecipesByIds = createServerFn({
       const rows = await getDb()
         .select({
           id: recipe.id,
-          quantity: recipe.quantity,
           ingredient: {
+            category: ingredient.category,
             id: ingredient.id,
             name: ingredient.name,
-            category: ingredient.category,
             parentId: ingredient.parentId,
           },
           ingredientDetails: {
             quantity: sectionIngredient.quantity,
             unit: unit.name,
           },
+          quantity: recipe.quantity,
         })
         .from(recipe)
         .leftJoin(recipeIngredientsSection, eq(recipe.id, recipeIngredientsSection.recipeId))
@@ -51,15 +47,15 @@ const getRecipesByIds = createServerFn({
         if (!acc[row.id]) {
           acc[row.id] = {
             id: row.id,
-            quantity: row.quantity,
             ingredients: [],
+            quantity: row.quantity,
           }
         }
         if (ingredient && ingredientDetails.quantity) {
           acc[row.id].ingredients.push({
             ...ingredient,
-            quantity: ingredientDetails.quantity,
             parentId: ingredient.parentId,
+            quantity: ingredientDetails.quantity,
             unit: ingredientDetails.unit ?? undefined,
           })
         }
@@ -72,8 +68,8 @@ const getRecipesByIds = createServerFn({
 
 const getRecipeByIdsOptions = (ids: number[]) =>
   queryOptions({
-    queryKey: queryKeys.recipeListByIds(ids),
     queryFn: () => getRecipesByIds({ data: { ids } }),
+    queryKey: queryKeys.recipeListByIds(ids),
   })
 
 export { getRecipeByIdsOptions }

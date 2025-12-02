@@ -1,23 +1,8 @@
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
+import { type ComponentPropsWithoutRef, createContext, type ReactNode, useContext } from 'react'
+
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { useIsMobile } from '@/hooks/use-is-mobile'
-import { createContext, useContext, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 
 interface ResponsiveDialogContextValue {
   isMobile: boolean
@@ -37,24 +22,24 @@ const useResponsiveDialogContext = () => {
 
 interface ResponsiveDialogProps {
   children?: ReactNode
-  open?: boolean
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean) => void
   modal?: boolean
+  onOpenChange?: (open: boolean) => void
+  open?: boolean
 }
 
-const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogProps) => {
+const ResponsiveDialog = ({ modal, onOpenChange, ...props }: ResponsiveDialogProps) => {
   const isMobile = useIsMobile()
 
   if (isMobile) {
     return (
       <ResponsiveDialogContext.Provider value={{ isMobile }}>
-        <Drawer onOpenChange={onOpenChange} modal={modal} {...props} />
+        <Drawer modal={modal} onOpenChange={onOpenChange} {...props} />
       </ResponsiveDialogContext.Provider>
     )
   }
 
-  let dialogModal: boolean | 'trap-focus' = 'trap-focus'
+  let dialogModal: 'trap-focus' | boolean = 'trap-focus'
   if (modal === true) {
     dialogModal = true
   } else if (modal === false) {
@@ -64,6 +49,7 @@ const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogPro
   return (
     <ResponsiveDialogContext.Provider value={{ isMobile }}>
       <Dialog
+        modal={dialogModal}
         onOpenChange={
           onOpenChange
             ? (open, _eventDetails) => {
@@ -71,7 +57,6 @@ const ResponsiveDialog = ({ onOpenChange, modal, ...props }: ResponsiveDialogPro
               }
             : undefined
         }
-        modal={dialogModal}
         {...props}
       />
     </ResponsiveDialogContext.Provider>

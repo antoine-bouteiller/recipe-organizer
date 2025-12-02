@@ -1,5 +1,6 @@
-import { handleGoogleCallback } from '@/features/auth/api/google-auth'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+
+import { handleGoogleCallback } from '@/features/auth/api/google-auth'
 
 export const Route = createFileRoute('/api/auth/google/callback')({
   server: {

@@ -1,6 +1,10 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "react", "unicorn"],
+  "jsPlugins": [
+    "eslint-plugin-better-tailwindcss",
+    "eslint-plugin-perfectionist"
+  ],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
@@ -81,6 +85,48 @@
     "no-ternary": "off",
     "no-duplicate-imports": "off",
     "jsx-handler-names": "off",
-    "max-params": "off"
+    "max-params": "off",
+
+    // tailwindcss
+    "better-tailwindcss/enforce-consistent-class-order": [
+      "error",
+      { "entryPoint": "src/styles/app.css" }
+    ],
+    "better-tailwindcss/enforce-consistent-line-wrapping": ["off"],
+    "better-tailwindcss/no-conflicting-classes": [
+      "error",
+      { "entryPoint": "src/styles/app.css" }
+    ],
+    "better-tailwindcss/no-duplicate-classes": [
+      "error",
+      { "entryPoint": "src/styles/app.css" }
+    ],
+    "better-tailwindcss/no-unnecessary-whitespace": [
+      "error",
+      { "entryPoint": "src/styles/app.css" }
+    ],
+    "better-tailwindcss/no-unregistered-classes": [
+      "error",
+      { "entryPoint": "src/styles/app.css", "ignore": ["not-prose"] }
+    ],
+
+    // perfectionist
+    "perfectionist/sort-array-includes": ["error", { "type": "natural" }],
+    "perfectionist/sort-classes": ["error", { "type": "natural" }],
+    "perfectionist/sort-decorators": ["error", { "type": "natural" }],
+    "perfectionist/sort-enums": ["error", { "type": "natural" }],
+    "perfectionist/sort-exports": ["error", { "type": "natural" }],
+    "perfectionist/sort-imports": ["error", { "type": "natural" }],
+    "perfectionist/sort-interfaces": ["error", { "type": "natural" }],
+    "perfectionist/sort-intersection-types": ["error", { "type": "natural" }],
+    "perfectionist/sort-jsx-props": ["error", { "type": "natural" }],
+    "perfectionist/sort-maps": ["error", { "type": "natural" }],
+    "perfectionist/sort-named-imports": ["error", { "type": "natural" }],
+    "perfectionist/sort-object-types": ["error", { "type": "natural" }],
+    "perfectionist/sort-objects": ["error", { "type": "natural" }],
+    "perfectionist/sort-sets": ["error", { "type": "natural" }],
+    "perfectionist/sort-switch-case": ["error", { "type": "natural" }],
+    "perfectionist/sort-union-types": ["error", { "type": "natural" }],
+    "perfectionist/sort-variable-declarations": ["error", { "type": "natural" }]
   }
 }

@@ -1,27 +1,24 @@
-import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { createUnitOptions, unitSchema, type UnitFormInput } from '@/features/units/api/create'
-import { unitDefaultValues, UnitForm, unitFormFields } from '@/features/units/components/unit-form'
-import { useAppForm } from '@/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type JSX } from 'react'
+import { type JSX, useState } from 'react'
+
+import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { createUnitOptions, type UnitFormInput, unitSchema } from '@/features/units/api/create'
+import { unitDefaultValues, UnitForm, unitFormFields } from '@/features/units/components/unit-form'
+import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddUnitProps {
-  defaultValue?: string
   children: JSX.Element
+  defaultValue?: string
 }
 
 const FormDialog = getFormDialog(unitDefaultValues)
 
-export const AddUnit = ({ defaultValue, children }: AddUnitProps) => {
+export const AddUnit = ({ children, defaultValue }: AddUnitProps) => {
   const createMutation = useMutation(createUnitOptions())
   const [open, setOpen] = useState(false)
 
   const form = useAppForm({
-    validators: {
-      onDynamic: unitSchema,
-    },
-    validationLogic: revalidateLogic(),
     defaultValues: {
       ...unitDefaultValues,
       name: defaultValue ?? unitDefaultValues.name,
@@ -39,18 +36,15 @@ export const AddUnit = ({ defaultValue, children }: AddUnitProps) => {
         }
       )
     },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: unitSchema,
+    },
   })
 
   return (
-    <FormDialog
-      form={form}
-      submitLabel="Ajouter"
-      trigger={children}
-      title="Ajouter une unité"
-      open={open}
-      setOpen={setOpen}
-    >
-      <UnitForm form={form} fields={unitFormFields} />
+    <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter une unité" trigger={children}>
+      <UnitForm fields={unitFormFields} form={form} />
     </FormDialog>
   )
 }

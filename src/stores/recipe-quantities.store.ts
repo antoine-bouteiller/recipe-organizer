@@ -1,6 +1,7 @@
-import { getCookie, setCookie } from '@/utils/cookie'
 import { Store } from '@tanstack/react-store'
 import z from 'zod'
+
+import { getCookie, setCookie } from '@/utils/cookie'
 
 const storageKey = 'recipe-quantities'
 

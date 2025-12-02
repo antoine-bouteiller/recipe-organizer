@@ -18,45 +18,29 @@ export const magimixProgram = [
 
 export type MagimixProgram = (typeof magimixProgram)[number]
 
-export const allowedRotationSpeed = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12',
-  '13',
-  '14',
-  'auto',
-] as const
+export const allowedRotationSpeed = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', 'auto'] as const
 
 export interface MagimixProgramData {
   program: MagimixProgram
-  time: number
-  temperature?: number
   rotationSpeed: (typeof allowedRotationSpeed)[number]
+  temperature?: number
+  time: number
 }
 
 export const magimixProgramLabels: Record<MagimixProgram, string> = {
-  expert: 'Expert',
-  'pureed-soup': 'Soupe moulinée',
-  'cream-soup': 'Soupe veloutée',
-  simmer: 'Mijotage',
-  'stir-fry': 'Rissolage',
-  steam: 'Vapeur',
-  'frozen-dessert': 'Dessert glacé',
-  'crushed-ice': 'Glace pilée',
-  smoothie: 'Smoothie',
-  'pastry-cake': 'Pâte/Gateau',
   'beaten-egg-white': 'Blanc en neige',
   'bread-brioche': 'Pain/Brioche',
-  robot: 'Robot',
   chocolate: 'Chocolat',
+  'cream-soup': 'Soupe veloutée',
+  'crushed-ice': 'Glace pilée',
+  expert: 'Expert',
+  'frozen-dessert': 'Dessert glacé',
+  'pastry-cake': 'Pâte/Gateau',
   pizza: 'Pizza',
+  'pureed-soup': 'Soupe moulinée',
+  robot: 'Robot',
+  simmer: 'Mijotage',
+  smoothie: 'Smoothie',
+  steam: 'Vapeur',
+  'stir-fry': 'Rissolage',
 }

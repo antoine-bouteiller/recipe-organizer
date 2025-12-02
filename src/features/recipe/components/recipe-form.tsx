@@ -1,21 +1,20 @@
+import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { useStore } from '@tanstack/react-form'
+
+import type { FileMetadata } from '@/hooks/use-file-upload'
+
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
 import AddExistingRecipe from '@/features/recipe/components/add-existing-recipe'
 import { withForm } from '@/hooks/use-app-form'
-import type { FileMetadata } from '@/hooks/use-file-upload'
-import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
-import { useStore } from '@tanstack/react-form'
+
 import { recipeDefaultValues } from '../utils/constants'
 import { IngredientSectionField } from './ingredient-section-field'
 
-const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) =>
-  section && 'recipeId' in section && !!section.recipeId
+const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) => section && 'recipeId' in section && !!section.recipeId
 
-const generateSectionKey = (
-  section: NonNullable<RecipeFormInput['sections']>[number],
-  index: number
-): string => {
+const generateSectionKey = (section: NonNullable<RecipeFormInput['sections']>[number], index: number): string => {
   if (section && 'recipeId' in section) {
     return `section-recipe-${JSON.stringify(section.recipeId)}`
   }
@@ -37,93 +36,79 @@ export const RecipeForm = withForm({
 
     return (
       <>
-        <AppField name="name">
-          {({ TextField }) => <TextField label="Nom de la recette" disabled={isSubmitting} />}
-        </AppField>
+        <AppField name="name">{({ TextField }) => <TextField disabled={isSubmitting} label="Nom de la recette" />}</AppField>
 
-        <AppField name="quantity">
-          {({ NumberField }) => <NumberField min={0} disabled={isSubmitting} label="Quantité" />}
-        </AppField>
+        <AppField name="quantity">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Quantité" min={0} />}</AppField>
 
         <AppField name="image">
-          {({ ImageField }) => (
-            <ImageField
-              label="Photo de la recette"
-              disabled={isSubmitting}
-              initialImage={initialImage}
-            />
-          )}
+          {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
         </AppField>
 
         <div className="flex flex-col gap-2 pt-2">
           <Label>Groupes d&apos;ingrédients</Label>
-          <Field name="sections" mode="array">
+          <Field mode="array" name="sections">
             {(field) => (
               <>
                 {field.state.value?.map((section, sectionIndex) => (
-                  <AppField
-                    name={`sections[${sectionIndex}]`}
-                    key={generateSectionKey(section, sectionIndex)}
-                  >
+                  <AppField key={generateSectionKey(section, sectionIndex)} name={`sections[${sectionIndex}]`}>
                     {({ Field, FieldError }) => (
-                      <Field className="p-4 border rounded-xl relative">
+                      <Field className="relative rounded-xl border p-4">
                         {sectionIndex !== 0 && (
                           <>
                             <AppField name={`sections[${sectionIndex}].name`}>
-                              {({ TextField }) => (
-                                <TextField label="Nom" disabled={isSubmitting} className="pt-2" />
-                              )}
+                              {({ TextField }) => <TextField className="pt-2" disabled={isSubmitting} label="Nom" />}
                             </AppField>
                             <Button
-                              type="button"
-                              variant="destructive-outline"
-                              size="icon"
                               className="absolute top-2 right-2"
                               disabled={isSubmitting}
                               onClick={() => field.removeValue(sectionIndex)}
+                              size="icon"
+                              type="button"
+                              variant="destructive-outline"
                             >
                               <TrashIcon className="h-4 w-4" />
                             </Button>
                           </>
                         )}
 
-                        {hasSubRecipe(section) ? (
-                          <div />
-                        ) : (
-                          <IngredientSectionField form={form} sectionIndex={sectionIndex} />
-                        )}
+                        {hasSubRecipe(section) ? <div /> : <IngredientSectionField form={form} sectionIndex={sectionIndex} />}
                         <FieldError />
                       </Field>
                     )}
                   </AppField>
                 ))}
-                <div className="flex w-full gap-2 md:flex-row flex-col">
+                <div
+                  className={`
+                    flex w-full flex-col gap-2
+                    md:flex-row
+                  `}
+                >
                   <Button
-                    type="button"
-                    variant="outline"
+                    className="md:flex-1"
+                    disabled={isSubmitting}
                     onClick={() => {
                       field.pushValue({
+                        ingredients: [],
                         name: undefined,
                         ratio: 1,
-                        ingredients: [],
                       })
                     }}
                     size="sm"
-                    className="md:flex-1"
-                    disabled={isSubmitting}
+                    type="button"
+                    variant="outline"
                   >
                     Ajouter une section <PlusIcon className="h-4 w-4" />
                   </Button>
                   <AddExistingRecipe
+                    disabled={isSubmitting}
                     onSelect={(selectedRecipe) => {
                       field.pushValue({
-                        recipeId: selectedRecipe.recipeId.toString(),
+                        ingredients: [],
                         name: selectedRecipe.name,
                         ratio: 1,
-                        ingredients: [],
+                        recipeId: selectedRecipe.recipeId.toString(),
                       })
                     }}
-                    disabled={isSubmitting}
                   />
                 </div>
               </>
@@ -131,9 +116,7 @@ export const RecipeForm = withForm({
           </Field>
         </div>
 
-        <AppField name="steps">
-          {({ TiptapField }) => <TiptapField label="Étapes" disabled={isSubmitting} />}
-        </AppField>
+        <AppField name="steps">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Étapes" />}</AppField>
       </>
     )
   },
