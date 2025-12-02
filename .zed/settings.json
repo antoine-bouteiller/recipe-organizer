@@ -3,6 +3,9 @@
     "oxc": {
       "initialization_options": {
         "options": {
+          "fmt": {
+            "experimental": true
+          },
           "configPath": null,
           "tsConfigPath": null,
           "unusedDisableDirectives": "allow",

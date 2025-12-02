@@ -32,7 +32,7 @@ export const TabBar = () => {
 
   return (
     <div
-      className={cn('relative flex flex-1 border-border py-2', {
+      className={cn('relative flex flex-1 border-border pt-2 pb-safe-2', {
         'border-t': location.pathname !== '/search',
       })}
     >

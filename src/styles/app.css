@@ -78,6 +78,9 @@
   --border: --alpha(var(--color-black) / 12%);
   --input: --alpha(var(--color-black) / 12%);
   --ring: var(--color-zinc-400);
+
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
@@ -117,6 +120,18 @@
   --border: --alpha(var(--color-white) / 12%);
   --input: --alpha(var(--color-white) / 12%);
   --ring: var(--color-zinc-500);
+}
+
+@utility pt-safe-* {
+  padding-top: calc(
+    var(--safe-area-inset-top) + --value(integer) * var(--spacing)
+  );
+}
+
+@utility pb-safe-* {
+  padding-bottom: calc(
+    var(--safe-area-inset-bottom) + --value(integer) * var(--spacing)
+  );
 }
 
 @layer base {

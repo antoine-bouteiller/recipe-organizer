@@ -24,7 +24,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack }: Scr
       <div
         className={`
           flex w-full shrink-0 items-center gap-2 bg-linear-to-b from-violet-950
-          to-primary px-6 pt-4 pb-12 font-heading text-2xl
+          to-primary px-6 pt-safe-4 pb-12 font-heading text-2xl
           text-primary-foreground
           md:hidden
         `}
