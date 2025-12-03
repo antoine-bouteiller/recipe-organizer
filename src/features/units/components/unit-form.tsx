@@ -2,7 +2,7 @@ import { createFieldMap, useStore } from '@tanstack/react-form'
 
 import type { Unit } from '@/features/units/api/get-all'
 
-import { withFieldGroup } from '@/hooks/use-app-form'
+import { withForm } from '@/hooks/use-app-form'
 import { useUnitOptions } from '@/hooks/use-options'
 
 import type { UnitFormInput } from '../api/create'
@@ -19,13 +19,13 @@ export interface UnitFormProps extends Record<string, unknown> {
   unit?: Unit
 }
 
-export const UnitForm = withFieldGroup({
+export const UnitForm = withForm({
   defaultValues: unitDefaultValues,
   props: {} as UnitFormProps,
-  render: function Render({ group, unit }) {
-    const { AppField } = group
+  render: function Render({ form, unit }) {
+    const { AppField } = form
 
-    const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
+    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
     const availableParentUnits = useUnitOptions({
       allowEmpty: true,

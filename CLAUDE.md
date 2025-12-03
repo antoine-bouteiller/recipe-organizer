@@ -11,11 +11,9 @@ Recipe Organizer is a full-stack recipe management application built with TanSta
 - **Frontend**: React 19, TanStack Router (file-based routing), TanStack Query, TanStack Form, TanStack Store
 - **Backend**: TanStack Start (SSR), Cloudflare Workers, Cloudflare D1 (SQLite), Cloudflare R2 (object storage)
 - **Database**: Drizzle ORM with D1 SQLite
-- **Auth**: Better Auth with Google OAuth
+- **Auth**: Google OAuth
 - **Styling**: Tailwind CSS v4, Shadcn UI components (Base UI)
-- **Rich Text**: TipTap editor
-- **Linting/Formatting**: oxlint, Prettier
-- **Testing**: Vitest
+- **Linting/Formatting**: oxlint, oxfmt
 - **Git Hooks**: Lefthook with commitlint (conventional commits)
 
 ## Package Manager
@@ -35,7 +33,7 @@ Recipe Organizer is a full-stack recipe management application built with TanSta
 bun dev
 
 # Build for production
-bun build
+bun run build
 
 # Type checking
 bun typecheck
@@ -48,16 +46,6 @@ bun format
 
 # Run tests
 bun test
-
-# Preview production build
-bun serve
-
-# Database operations
-bun database:dump    # Export D1 data to database.sql
-bun database:import  # Import database.sql to D1
-
-# Generate Cloudflare types
-bun cf-typegen
 ```
 
 ## Project Structure
@@ -90,24 +78,11 @@ src/
 
 ### Feature-Based Organization
 
-Features are organized in `src/features/` with the following structure:
-- `api/` - React Query hooks and API functions (create, edit, delete, get-all, get-one, get-by-ids)
-  - Each API file exports query/mutation options for use with TanStack Query
-  - `query-keys.ts` - Centralized query key factory
-- **Feature components** - All components related to a feature live directly in the feature folder
-  - Forms for creating/editing (e.g., `recipe-form.tsx`)
-  - Display components (e.g., `recipe-card.tsx`, `recipe-section.tsx`)
-  - Feature-specific UI (e.g., `search-bar.tsx`, `delete-recipe.tsx`)
+For more details about the file structure, look at the `agent_doc/file_structure.md`
 
-**Important**: When creating new components for a feature (forms, cards, modals, etc.), place them in the corresponding feature folder, not in `src/components/`. The `src/components/` directory is reserved for generic, reusable UI components.
+### Database
 
-### Database Schema
-
-Core entities:
-- **recipes**: id, name, image, steps, quantity, tags (JSON array)
-- **ingredients**: id, name, allowedUnits (JSON array), category, parentId (for sub-ingredients)
-- **recipe_ingredients**: Joins recipes with ingredients, includes sections
-- **auth tables**: Managed by Better Auth (user, session, account, verification)
+You can find more information about the database in the `agent_doc/database.md` file.
 
 ### API Routes
 
@@ -123,108 +98,7 @@ Core entities:
 
 ### Form Management
 
-**CRITICAL: All forms in this project MUST use TanStack Form. Never use manual state management (useState) for forms.**
-
-This project uses TanStack Form (`@tanstack/react-form`) for all form handling. The form architecture is built around the `use-app-form.ts` hook.
-
-#### Form Pattern (REQUIRED)
-
-**For feature forms** (creating/editing entities like recipes, units, ingredients):
-
-1. **Define form input types, default values, and create field map:**
-```typescript
-import { createFieldMap } from '@tanstack/react-form'
-
-export interface UnitFormInput {
-  name: string
-  symbol: string
-  parentId: string | undefined
-  factor: number | undefined
-}
-
-export const unitDefaultValues: UnitFormInput = {
-  name: '',
-  symbol: '',
-  parentId: undefined,
-  factor: undefined,
-}
-
-// REQUIRED: Create field map for TanStack Form
-export const unitFormFields = createFieldMap(unitDefaultValues)
-```
-
-2. **Create form component using `withFieldGroup`:**
-```typescript
-import { withFieldGroup } from '@/hooks/use-app-form'
-
-export const UnitForm = withFieldGroup({
-  defaultValues: unitDefaultValues,
-  props: {} as UnitFormProps,
-  render: function Render({ group, ...props }) {
-    const { AppField } = group
-    const isSubmitting = useStore(group.form.store, (state) => state.isSubmitting)
-
-    return (
-      <>
-        <AppField name="name">
-          {({ TextField }) => (
-            <TextField label="Nom" placeholder="..." disabled={isSubmitting} />
-          )}
-        </AppField>
-        {/* More fields... */}
-        <group.form.AppForm>
-          <group.form.FormSubmit label="Submit" />
-        </group.form.AppForm>
-      </>
-    )
-  },
-})
-```
-
-3. **Use the form in route/dialog components with `useAppForm`:**
-```typescript
-import { useAppForm } from '@/hooks/use-app-form'
-import { revalidateLogic } from '@tanstack/react-form'
-import { unitDefaultValues, unitFormFields, UnitForm } from './unit-form'
-
-const form = useAppForm({
-  validators: { onDynamic: myZodSchema },
-  validationLogic: revalidateLogic(),
-  defaultValues: unitDefaultValues,
-  onSubmit: async (data) => {
-    const parsedData = myZodSchema.parse(data.value)
-    await mutation.mutateAsync({ data: parsedData })
-  },
-})
-
-// In JSX: IMPORTANT - must pass both form AND fields props
-<form onSubmit={(e) => { e.preventDefault(); void form.handleSubmit() }}>
-  <UnitForm form={form} fields={unitFormFields} {...props} />
-</form>
-```
-
-#### Available Field Components
-
-The `AppField` component provides these field types:
-- `TextField` - Text inputs
-- `NumberField` - Numeric inputs with decimal support
-- `ComboboxField` - Searchable select with custom options
-- `ImageField` - Image upload with preview
-- `TiptapField` - Rich text editor
-
-**NEVER use Base UI Select components directly in forms** - always use `ComboboxField` through `AppField`.
-
-#### Examples
-
-- **Recipe forms**: `src/features/recipe/recipe-form.tsx`, `src/routes/recipe/new.tsx`
-- **Unit forms**: `src/features/units/unit-form.tsx`, `src/features/units/add-unit.tsx`
-
-### Authentication
-
-- Better Auth with Drizzle adapter
-- Google OAuth (requires `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in env)
-- Sign-up disabled (`disableSignUp: true`)
-- Auth guard: `src/features/auth/auth-guard.ts`
+This project uses Tanstack form for form management. You can find more information about the implementation by looking at `file_structure/forms.md`
 
 ## Code Quality Standards
 
@@ -264,12 +138,12 @@ This project enforces strict code quality via oxlint configured in `.oxlintrc.js
 
 ### Shadcn Components
 
+This project uses Coss UI for UI components. You can find the documentation [here](https://coss.com/ui/llms.txt).
+
 Add new Shadcn components using:
 ```bash
-bunx shadcn@latest add <component-name>
+bunx shadcn@latest add @coss/<component-name>
 ```
-
-Components use Base UI (@base-ui-components/react) instead of Radix UI.
 
 ## Type Safety
 
@@ -295,11 +169,6 @@ Configuration in `wrangler.jsonc`:
   - oxlint auto-fix on staged files
   - Prettier format on staged files
   - Type checking
-
-## Testing
-
-- Vitest configured
-- Run with `bun test`
 
 ## Important Notes
 
