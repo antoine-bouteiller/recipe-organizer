@@ -26,7 +26,7 @@ const RouteComponent = () => {
       >
         <SearchInput autoFocus search={search} setSearch={setSearch} />
       </div>
-      <ItemGroup className="flex-1 justify-end px-4 pb-8">
+      <ItemGroup className="flex-1 justify-end px-4">
         {recipes?.map((recipe, index) => (
           <Fragment key={recipe.id}>
             <Item render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" />}>

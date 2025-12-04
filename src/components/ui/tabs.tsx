@@ -1,8 +1,7 @@
 import { Tabs as TabsPrimitive } from '@base-ui-components/react/tabs'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/utils/cn'
-
-type TabsVariant = 'default' | 'underline'
 
 const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props) => (
   <TabsPrimitive.Root
@@ -18,57 +17,65 @@ const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props) => (
   />
 )
 
-const TabsList = ({
-  children,
-  className,
-  variant = 'default',
-  ...props
-}: TabsPrimitive.List.Props & {
-  variant?: TabsVariant
-}) => (
-  <TabsPrimitive.List
-    className={cn(
-      `
-        relative z-0 flex w-fit items-center justify-center gap-x-0.5
-        text-muted-foreground
-      `,
-      'data-[orientation=vertical]:flex-col',
-      variant === 'default'
-        ? 'rounded-lg bg-muted p-0.5 text-muted-foreground/64'
-        : `
+const tabListVariants = cva(
+  `
+    relative z-0 flex w-fit items-center justify-center gap-x-0.5
+    text-muted-foreground data-[orientation=vertical]:flex-col
+  `,
+  {
+    defaultVariants: {
+      variant: 'default',
+    },
+    variants: {
+      variant: {
+        default: 'rounded-lg bg-muted p-0.5 text-muted-foreground/64',
+        tabbar: 'flex w-full flex-1 items-center justify-around',
+        underline: `
           data-[orientation=horizontal]:py-1
           data-[orientation=vertical]:px-1
           *:data-[slot=tabs-trigger]:hover:bg-accent
         `,
-      className
-    )}
-    data-slot="tabs-list"
-    {...props}
-  >
-    {children}
-    <TabsPrimitive.Indicator
-      className={cn(
-        `
-          absolute bottom-0 left-0 h-(--active-tab-height)
-          w-(--active-tab-width) translate-x-(--active-tab-left)
-          -translate-y-(--active-tab-bottom) transition-[width,translate]
-          duration-200 ease-in-out
+      },
+    },
+  }
+)
+
+const tabIndicatorVariants = cva(
+  `
+  absolute bottom-0 left-0 h-(--active-tab-height)
+  w-(--active-tab-width) translate-x-(--active-tab-left)
+  -translate-y-(--active-tab-bottom) transition-[width,translate]
+  duration-200 ease-in-out
+`,
+  {
+    defaultVariants: {
+      variant: 'default',
+    },
+    variants: {
+      variant: {
+        default: `
+          -z-1 rounded-md bg-background shadow-sm
+          dark:bg-accent
         `,
-        variant === 'underline'
-          ? `
-            z-10 bg-primary
-            data-[orientation=horizontal]:h-0.5
-            data-[orientation=horizontal]:translate-y-px
-            data-[orientation=vertical]:w-0.5
-            data-[orientation=vertical]:-translate-x-px
-          `
-          : `
-            -z-1 rounded-md bg-background shadow-sm
-            dark:bg-accent
-          `
-      )}
-      data-slot="tab-indicator"
-    />
+        tabbar: `
+          -z-1 rounded-full bg-accent
+        `,
+        underline: `
+          z-10 bg-primary
+          data-[orientation=horizontal]:h-0.5
+          data-[orientation=horizontal]:translate-y-px
+          data-[orientation=vertical]:w-0.5
+          data-[orientation=vertical]:-translate-x-px
+        `,
+      },
+    },
+  }
+)
+
+const TabsList = ({ children, className, variant = 'default', ...props }: TabsPrimitive.List.Props & VariantProps<typeof tabListVariants>) => (
+  <TabsPrimitive.List className={cn(tabListVariants({ variant }), className)} data-slot="tabs-list" {...props}>
+    {children}
+    <TabsPrimitive.Indicator className={cn(tabIndicatorVariants({ variant }))} data-slot="tab-indicator" />
   </TabsPrimitive.List>
 )
 
