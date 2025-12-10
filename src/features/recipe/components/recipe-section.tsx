@@ -43,7 +43,7 @@ interface RecipeIngredientsSectionsProps {
 export const RecipeIngredientsSections = ({ baseQuantity, quantity, sections }: RecipeIngredientsSectionsProps) =>
   sections.map((section) => (
     <div key={section.id}>
-      {section.name && <h3 className="mb-1 font-semibold">{section.name}</h3>}
+      {section.name && <div className="font-semibold">{section.name}</div>}
 
       <RecipeSectionIngredients baseQuantity={baseQuantity} quantity={quantity} sectionIngredients={section.sectionIngredients} />
 
