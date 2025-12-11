@@ -9,7 +9,7 @@ import { Form } from '@/components/ui/form'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { getRecipeDetailsOptions, type RecipeSection } from '@/features/recipe/api/get-one'
+import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { type UpdateRecipeFormInput, updateRecipeOptions, updateRecipeSchema } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
 import { recipeFormFields } from '@/features/recipe/utils/constants'
@@ -19,21 +19,21 @@ import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
 import { getFileUrl } from '@/utils/get-file-url'
 
-const formatSection = (sections: RecipeSection) => {
-  if (sections.subRecipeId) {
+const formatIngredientGroup = (group: RecipeIngredientGroup) => {
+  if (group.embeddedRecipeId) {
     return {
-      name: sections.name ?? '',
-      ratio: sections.ratio ?? 1,
-      recipeId: sections.subRecipeId,
+      embeddedRecipeId: group.embeddedRecipeId,
+      groupName: group.groupName ?? '',
+      scaleFactor: group.scaleFactor ?? 1,
     }
   }
   return {
-    ingredients: sections.sectionIngredients.map((ingredient) => ({
+    groupName: group.groupName ?? '',
+    ingredients: group.groupIngredients.map((ingredient) => ({
       id: ingredient.ingredient.id,
       quantity: ingredient.quantity,
       unitId: ingredient.unit?.id,
     })),
-    name: sections.name ?? '',
   }
 }
 
@@ -50,10 +50,10 @@ const EditRecipePage = () => {
           id: recipe.image,
           url: getFileUrl(recipe.image),
         },
+        ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
+        instructions: recipe.instructions,
         name: recipe.name,
-        quantity: recipe.quantity,
-        sections: recipe.sections.map(formatSection),
-        steps: recipe.steps,
+        servings: recipe.servings,
       }
     : {}
 

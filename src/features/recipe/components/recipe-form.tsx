@@ -10,16 +10,17 @@ import AddExistingRecipe from '@/features/recipe/components/add-existing-recipe'
 import { withForm } from '@/hooks/use-app-form'
 
 import { recipeDefaultValues } from '../utils/constants'
-import { IngredientSectionField } from './ingredient-section-field'
+import { IngredientGroupField } from './ingredient-group-field'
 
-const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) => section && 'recipeId' in section && !!section.recipeId
+const hasEmbeddedRecipe = (group: NonNullable<RecipeFormInput['ingredientGroups']>[number] | undefined) =>
+  group && 'embeddedRecipeId' in group && !!group.embeddedRecipeId
 
-const generateSectionKey = (section: NonNullable<RecipeFormInput['sections']>[number], index: number): string => {
-  if (section && 'recipeId' in section) {
-    return `section-recipe-${JSON.stringify(section.recipeId)}`
+const generateGroupKey = (group: NonNullable<RecipeFormInput['ingredientGroups']>[number], index: number): string => {
+  if (group && 'embeddedRecipeId' in group) {
+    return `group-recipe-${JSON.stringify(group.embeddedRecipeId)}`
   }
-  const firstIngredientId = JSON.stringify(section.ingredients?.[0]?.id ?? '')
-  return `section-${index}-${firstIngredientId}`
+  const firstIngredientId = JSON.stringify(group.ingredients?.[0]?.id ?? '')
+  return `group-${index}-${firstIngredientId}`
 }
 
 interface RecipeFormProps extends Record<string, unknown> {
@@ -38,7 +39,7 @@ export const RecipeForm = withForm({
       <>
         <AppField name="name">{({ TextField }) => <TextField disabled={isSubmitting} label="Nom de la recette" />}</AppField>
 
-        <AppField name="quantity">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Quantité" min={0} />}</AppField>
+        <AppField name="servings">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Portions" min={0} />}</AppField>
 
         <AppField name="image">
           {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
@@ -46,22 +47,22 @@ export const RecipeForm = withForm({
 
         <div className="flex flex-col gap-2 pt-2">
           <Label>Groupes d&apos;ingrédients</Label>
-          <Field mode="array" name="sections">
+          <Field mode="array" name="ingredientGroups">
             {(field) => (
               <>
-                {field.state.value?.map((section, sectionIndex) => (
-                  <AppField key={generateSectionKey(section, sectionIndex)} name={`sections[${sectionIndex}]`}>
+                {field.state.value?.map((group, groupIndex) => (
+                  <AppField key={generateGroupKey(group, groupIndex)} name={`ingredientGroups[${groupIndex}]`}>
                     {({ Field, FieldError }) => (
                       <Field className="relative rounded-xl border p-4">
-                        {sectionIndex !== 0 && (
+                        {groupIndex !== 0 && (
                           <>
-                            <AppField name={`sections[${sectionIndex}].name`}>
-                              {({ TextField }) => <TextField className="pt-2" disabled={isSubmitting} label="Nom" />}
+                            <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
+                              {({ TextField }) => <TextField className="pt-2" disabled={isSubmitting} label="Nom du groupe" />}
                             </AppField>
                             <Button
                               className="absolute top-2 right-2"
                               disabled={isSubmitting}
-                              onClick={() => field.removeValue(sectionIndex)}
+                              onClick={() => field.removeValue(groupIndex)}
                               size="icon"
                               type="button"
                               variant="destructive-outline"
@@ -71,7 +72,7 @@ export const RecipeForm = withForm({
                           </>
                         )}
 
-                        {hasSubRecipe(section) ? <div /> : <IngredientSectionField form={form} sectionIndex={sectionIndex} />}
+                        {hasEmbeddedRecipe(group) ? <div /> : <IngredientGroupField form={form} groupIndex={groupIndex} />}
                         <FieldError />
                       </Field>
                     )}
@@ -88,25 +89,25 @@ export const RecipeForm = withForm({
                     disabled={isSubmitting}
                     onClick={() => {
                       field.pushValue({
+                        groupName: undefined,
                         ingredients: [],
-                        name: undefined,
-                        ratio: 1,
+                        scaleFactor: 1,
                       })
                     }}
                     size="sm"
                     type="button"
                     variant="outline"
                   >
-                    Ajouter une section <PlusIcon className="h-4 w-4" />
+                    Ajouter un groupe <PlusIcon className="h-4 w-4" />
                   </Button>
                   <AddExistingRecipe
                     disabled={isSubmitting}
                     onSelect={(selectedRecipe) => {
                       field.pushValue({
+                        embeddedRecipeId: selectedRecipe.embeddedRecipeId.toString(),
+                        groupName: selectedRecipe.name,
                         ingredients: [],
-                        name: selectedRecipe.name,
-                        ratio: 1,
-                        recipeId: selectedRecipe.recipeId.toString(),
+                        scaleFactor: 1,
                       })
                     }}
                   />
@@ -116,7 +117,7 @@ export const RecipeForm = withForm({
           </Field>
         </div>
 
-        <AppField name="steps">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Étapes" />}</AppField>
+        <AppField name="instructions">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Instructions" />}</AppField>
       </>
     )
   },

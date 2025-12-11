@@ -10,7 +10,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
-import { RecipeIngredientsSections } from '@/features/recipe/components/recipe-section'
+import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
@@ -24,7 +24,7 @@ const RecipePage = () => {
 
   const router = useRouter()
 
-  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe?.id, recipe?.quantity)
+  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe?.id, recipe?.servings)
 
   if (isLoading) {
     return (
@@ -128,11 +128,11 @@ const RecipePage = () => {
                 <TabsTab value="preparation">Préparation</TabsTab>
               </TabsList>
               <TabsPanel className="px-2" value="ingredients">
-                <RecipeIngredientsSections baseQuantity={recipe.quantity} quantity={quantity} sections={recipe.sections} />
+                <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={recipe.ingredientGroups} servings={quantity} />
               </TabsPanel>
 
               <TabsPanel className="p-2" value="preparation">
-                <Tiptap content={recipe.steps} readOnly>
+                <Tiptap content={recipe.instructions} readOnly>
                   <TiptapContent />
                 </Tiptap>
               </TabsPanel>
@@ -147,12 +147,12 @@ const RecipePage = () => {
           >
             <div className="col-span-2 rounded-xl border px-8">
               <h2>Ingrédients</h2>
-              <RecipeIngredientsSections baseQuantity={recipe.quantity} quantity={quantity} sections={recipe.sections} />
+              <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={recipe.ingredientGroups} servings={quantity} />
             </div>
 
             <div className="col-span-3 rounded-xl border px-8">
               <h2>Préparation</h2>
-              <Tiptap content={recipe.steps} readOnly>
+              <Tiptap content={recipe.instructions} readOnly>
                 <TiptapContent className="pb-4" />
               </Tiptap>
             </div>

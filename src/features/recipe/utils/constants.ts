@@ -4,9 +4,7 @@ import type { RecipeFormInput } from '../api/create'
 
 export const recipeDefaultValues: RecipeFormInput = {
   image: undefined,
-  name: '',
-  quantity: 4,
-  sections: [
+  ingredientGroups: [
     {
       ingredients: [
         {
@@ -16,7 +14,9 @@ export const recipeDefaultValues: RecipeFormInput = {
       ],
     },
   ],
-  steps: '',
+  instructions: '',
+  name: '',
+  servings: 4,
 }
 
 export const recipeFormFields = createFieldMap(recipeDefaultValues)

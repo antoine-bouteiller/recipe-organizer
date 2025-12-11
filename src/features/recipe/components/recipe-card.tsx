@@ -24,7 +24,7 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
   const isInShoppingList = useIsInShoppingList(recipe.id)
 
-  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.quantity)
+  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.servings)
 
   return (
     <Link params={{ id: recipe.id.toString() }} to="/recipe/$id">

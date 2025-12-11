@@ -8,9 +8,10 @@ import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
-import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
+import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
+import { extractLinkedRecipeIds } from '@/lib/utils/circular-reference'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
@@ -29,7 +30,7 @@ const updateRecipe = createServerFn({
   .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const { id, image, name, quantity, sections, steps } = data
+      const { id, image, ingredientGroups, instructions, name, servings } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, id),
@@ -51,43 +52,44 @@ const updateRecipe = createServerFn({
           .update(recipe)
           .set({
             image: imageKey,
+            instructions,
             name,
-            quantity,
-            steps,
+            servings,
           })
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),
 
-        getDb().delete(recipeIngredientsSection).where(eq(recipeIngredientsSection.recipeId, id)),
+        getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
+        getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
       ])
 
       await Promise.all(
-        sections.map(async (section, index) => {
-          if ('recipeId' in section) {
-            await getDb().insert(recipeIngredientsSection).values({
-              name: section.name,
-              ratio: section.ratio,
+        ingredientGroups.map(async (group, index) => {
+          if ('embeddedRecipeId' in group) {
+            await getDb().insert(recipeIngredientGroup).values({
+              embeddedRecipeId: group.embeddedRecipeId,
+              groupName: group.groupName,
               recipeId: currentRecipe.id,
-              subRecipeId: section.recipeId,
+              scaleFactor: group.scaleFactor,
             })
-          } else if ('ingredients' in section) {
-            const [updatedSection] = await getDb()
-              .insert(recipeIngredientsSection)
+          } else if ('ingredients' in group) {
+            const [updatedGroup] = await getDb()
+              .insert(recipeIngredientGroup)
               .values({
+                groupName: group.groupName,
                 isDefault: index === 0,
-                name: section.name,
                 recipeId: currentRecipe.id,
               })
               .returning()
 
-            if (section.ingredients.length > 0) {
+            if (group.ingredients.length > 0) {
               await getDb()
-                .insert(sectionIngredient)
+                .insert(groupIngredient)
                 .values(
-                  section.ingredients.map((ingredient) => ({
+                  group.ingredients.map((ingredient) => ({
+                    groupId: updatedGroup.id,
                     ingredientId: ingredient.id,
                     quantity: ingredient.quantity,
-                    sectionId: updatedSection.id,
                     unitId: ingredient.unitId ?? undefined,
                   }))
                 )
@@ -95,6 +97,19 @@ const updateRecipe = createServerFn({
           }
         })
       )
+
+      const linkedRecipes = extractLinkedRecipeIds(instructions)
+      if (linkedRecipes.length > 0) {
+        await getDb()
+          .insert(recipeLinkedRecipes)
+          .values(
+            linkedRecipes.map(({ position, recipeId: linkedRecipeId }) => ({
+              linkedRecipeId,
+              position,
+              recipeId: id,
+            }))
+          )
+      }
 
       return id
     })

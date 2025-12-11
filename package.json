@@ -12,8 +12,9 @@
     "test": "vitest run",
     "cf-typegen": "wrangler types",
     "migration:apply": "wrangler d1 migrations apply recipe-organizer",
-    "database:dump": "rm -f database.sql && wrangler d1 export recipe-organizer --output=./database.sql --no-schema",
-    "database:import": "wrangler d1 execute recipe-organizer --file ./database.sql",
+    "db:dump": "rm -f database.sql && wrangler d1 export recipe-organizer --output=./database.sql --no-schema",
+    "db:dump:remote": "bun scripts/dump-remote-db.ts",
+    "db:import": "wrangler d1 execute recipe-organizer --file ./database.sql",
     "prepare": "lefthook install"
   },
   "dependencies": {

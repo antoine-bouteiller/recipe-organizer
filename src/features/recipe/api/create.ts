@@ -5,9 +5,10 @@ import { z } from 'zod'
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
-import { recipe, recipeIngredientsSection, sectionIngredient } from '@/lib/db/schema'
+import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { uploadFile } from '@/lib/r2'
+import { extractLinkedRecipeIds } from '@/lib/utils/circular-reference'
 import { parseFormData } from '@/utils/form-data'
 
 const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })], {
@@ -16,13 +17,10 @@ const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: 
 
 const recipeSchema = z.object({
   image: fileSchema,
-  name: z.string().min(2, {
-    message: 'Le nom de la recette doit contenir au moins 2 caractères.',
-  }),
-  quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
-  sections: z.array(
+  ingredientGroups: z.array(
     z.union([
       z.object({
+        groupName: z.string().optional(),
         ingredients: z
           .array(
             z.object({
@@ -32,21 +30,24 @@ const recipeSchema = z.object({
             })
           )
           .min(1, { message: 'Au moins un ingrédient est requis' }),
-        name: z.string().optional(),
       }),
       z.object({
-        name: z.string().optional(),
-        ratio: z.number().positive({ message: 'Le ratio est requis' }),
-        recipeId: z.coerce.number().positive({ message: 'La recette est requise' }),
+        embeddedRecipeId: z.coerce.number().positive({ message: 'La recette est requise' }),
+        groupName: z.string().optional(),
+        scaleFactor: z.number().positive({ message: 'Le facteur est requis' }),
       }),
     ])
   ),
-  steps: z.string(),
+  instructions: z.string(),
+  name: z.string().min(2, {
+    message: 'Le nom de la recette doit contenir au moins 2 caractères.',
+  }),
+  servings: z.coerce.number().positive({ message: 'Le nombre de portions est requis' }),
 })
 
 type RecipeFormValues = z.infer<typeof recipeSchema>
 type RecipeFormInput = Partial<z.input<typeof recipeSchema>>
-export type RecipeSectionFormInput = NonNullable<RecipeFormInput['sections']>[number]
+export type RecipeIngredientGroupFormInput = NonNullable<RecipeFormInput['ingredientGroups']>[number]
 
 const createRecipe = createServerFn({
   method: 'POST',
@@ -54,46 +55,46 @@ const createRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data }) => {
-    const { image, name, quantity, sections, steps } = data
+    const { image, ingredientGroups, instructions, name, servings } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
 
     const [createdRecipe] = await getDb()
       .insert(recipe)
       .values({
         image: imageKey,
+        instructions,
         name,
-        quantity,
-        steps,
+        servings,
       })
       .returning({ id: recipe.id })
 
     await Promise.all(
-      sections.map(async (section, index) => {
-        if ('recipeId' in section) {
-          await getDb().insert(recipeIngredientsSection).values({
-            name: section.name,
-            ratio: section.ratio,
+      ingredientGroups.map(async (group, index) => {
+        if ('embeddedRecipeId' in group) {
+          await getDb().insert(recipeIngredientGroup).values({
+            embeddedRecipeId: group.embeddedRecipeId,
+            groupName: group.groupName,
             recipeId: createdRecipe.id,
-            subRecipeId: section.recipeId,
+            scaleFactor: group.scaleFactor,
           })
-        } else if ('ingredients' in section) {
-          const [createdSection] = await getDb()
-            .insert(recipeIngredientsSection)
+        } else if ('ingredients' in group) {
+          const [createdGroup] = await getDb()
+            .insert(recipeIngredientGroup)
             .values({
+              groupName: group.groupName,
               isDefault: index === 0,
-              name: section.name,
               recipeId: createdRecipe.id,
             })
             .returning()
 
-          if (section.ingredients.length > 0) {
+          if (group.ingredients.length > 0) {
             await getDb()
-              .insert(sectionIngredient)
+              .insert(groupIngredient)
               .values(
-                section.ingredients.map((ingredient) => ({
+                group.ingredients.map((ingredient) => ({
+                  groupId: createdGroup.id,
                   ingredientId: ingredient.id,
                   quantity: ingredient.quantity,
-                  sectionId: createdSection.id,
                   unitId: ingredient.unitId ?? undefined,
                 }))
               )
@@ -101,6 +102,19 @@ const createRecipe = createServerFn({
         }
       })
     )
+
+    const linkedRecipes = extractLinkedRecipeIds(instructions)
+    if (linkedRecipes.length > 0) {
+      await getDb()
+        .insert(recipeLinkedRecipes)
+        .values(
+          linkedRecipes.map(({ position, recipeId: linkedRecipeId }) => ({
+            linkedRecipeId,
+            position,
+            recipeId: createdRecipe.id,
+          }))
+        )
+    }
   })
 
 const createRecipeOptions = () =>

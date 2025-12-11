@@ -18,20 +18,14 @@ const getRecipe = createServerFn({
       const result = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, data),
         with: {
-          sections: {
+          ingredientGroups: {
             orderBy: (table) => [desc(table.isDefault)],
             with: {
-              sectionIngredients: {
+              embeddedRecipe: {
                 with: {
-                  ingredient: true,
-                  unit: true,
-                },
-              },
-              subRecipe: {
-                with: {
-                  sections: {
+                  ingredientGroups: {
                     with: {
-                      sectionIngredients: {
+                      groupIngredients: {
                         with: {
                           ingredient: true,
                           unit: true,
@@ -39,6 +33,12 @@ const getRecipe = createServerFn({
                       },
                     },
                   },
+                },
+              },
+              groupIngredients: {
+                with: {
+                  ingredient: true,
+                  unit: true,
                 },
               },
             },
@@ -55,7 +55,7 @@ const getRecipe = createServerFn({
   )
 
 export type Recipe = Awaited<ReturnType<typeof getRecipe>>
-export type RecipeSection = Recipe['sections'][number]
+export type RecipeIngredientGroup = Recipe['ingredientGroups'][number]
 
 const getRecipeDetailsOptions = (id: number) =>
   queryOptions({

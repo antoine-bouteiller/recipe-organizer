@@ -14,13 +14,14 @@ import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap
 import { useContext } from 'react'
 
 import { MagimixProgramNode } from '@/components/tiptap/magimix-program-node'
+import { SubrecipeNode } from '@/components/tiptap/subrecipe-node'
 import { cn } from '@/utils/cn'
 
 import { Toggle } from './toggle'
 import { ToolbarButton } from './toolbar'
 
 // Import only the extensions we actually use (instead of StarterKit)
-const extensions = [Document, Text, Paragraph, HardBreak, Bold, Italic, Underline, BulletList, ListItem, History, MagimixProgramNode]
+const extensions = [Document, Text, Paragraph, HardBreak, Bold, Italic, Underline, BulletList, ListItem, History, MagimixProgramNode, SubrecipeNode]
 
 type Command = 'bold' | 'bulletList' | 'italic' | 'orderedList' | 'redo' | 'taskList' | 'underline' | 'undo'
 

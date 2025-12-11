@@ -5,6 +5,7 @@ import { Tiptap, TiptapButton, TiptapContent } from '@/components/ui/tiptap'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 import { MagimixProgramButton } from '../tiptap/magimix-program-button'
+import { SubrecipeButton } from '../tiptap/subrecipe-button'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../ui/toolbar'
 
 interface TiptapProps {
@@ -46,6 +47,7 @@ const TiptapField = ({ disabled, label }: TiptapProps) => {
           <ToolbarSeparator />
           <ToolbarGroup>
             <MagimixProgramButton />
+            <SubrecipeButton />
           </ToolbarGroup>
         </Toolbar>
         <TiptapContent disabled={disabled} />

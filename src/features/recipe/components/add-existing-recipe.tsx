@@ -15,16 +15,16 @@ import { useRecipeOptions } from '@/hooks/use-options'
 
 interface AddExistingRecipeProps {
   readonly disabled?: boolean
-  readonly onSelect: (selectedRecipe: { name: string; ratio: number; recipeId: number }) => void
+  readonly onSelect: (selectedRecipe: { embeddedRecipeId: number; name: string; scaleFactor: number }) => void
 }
 
 export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddExistingRecipeProps>) {
   const recipesOptions = useRecipeOptions()
 
   const [selectedRecipe, setSelectedRecipe] = useState<{
+    embeddedRecipeId: number
     name: string
-    ratio: number
-    recipeId: number
+    scaleFactor: number
   }>()
 
   return (
@@ -41,9 +41,9 @@ export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddEx
             noResultsLabel="Aucune recette trouvée"
             onChange={(option) =>
               setSelectedRecipe({
+                embeddedRecipeId: option.value,
                 name: option.label,
-                ratio: 1,
-                recipeId: option.value,
+                scaleFactor: 1,
               })
             }
             options={recipesOptions}
