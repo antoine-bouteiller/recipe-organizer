@@ -19,22 +19,8 @@ interface NumberFieldProps {
   step?: number
 }
 
-const computeStepper = (decimalScale?: number, currentValue?: number) => {
-  if (!currentValue || currentValue < 5) {
-    return decimalScale === 0 ? 1 : 0.5
-  } else if (currentValue < 10) {
-    return 1
-  } else if (currentValue < 50) {
-    return 5
-  }
-
-  return 10
-}
-
-export const NumberField = ({ decimalScale, disabled, label, max, min, placeholder, step }: NumberFieldProps) => {
+export const NumberField = ({ decimalScale, disabled, label, max, min, placeholder }: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
-
-  const stepper = step ?? computeStepper(decimalScale, field.state.value)
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
@@ -44,7 +30,8 @@ export const NumberField = ({ decimalScale, disabled, label, max, min, placehold
         max={max}
         min={min}
         onValueChange={(value) => field.handleChange(value ?? undefined)}
-        step={stepper}
+        step={decimalScale ? 0.25 : 1}
+        value={field.state.value}
       >
         {label && <NumberInputScrubArea label={label} />}
         <NumberInputGroup>

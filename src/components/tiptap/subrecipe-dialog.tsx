@@ -19,6 +19,7 @@ import type { DialogTrigger } from '../ui/dialog'
 
 interface SubrecipeDialogProps {
   children: ReactNode
+  className?: string
   initialData?: SubrecipeNodeData
   onSubmit: (data: SubrecipeNodeData) => void
   submitLabel: string
@@ -26,7 +27,7 @@ interface SubrecipeDialogProps {
   triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-export const SubrecipeDialog = ({ children, initialData, onSubmit, submitLabel, title, triggerRender }: SubrecipeDialogProps) => {
+export const SubrecipeDialog = ({ children, className, initialData, onSubmit, submitLabel, title, triggerRender }: SubrecipeDialogProps) => {
   const [open, setOpen] = useState(false)
   const recipesOptions = useRecipeOptions()
 
@@ -41,7 +42,9 @@ export const SubrecipeDialog = ({ children, initialData, onSubmit, submitLabel, 
 
   return (
     <ResponsiveDialog onOpenChange={setOpen} open={open}>
-      <ResponsiveDialogTrigger render={triggerRender}>{children}</ResponsiveDialogTrigger>
+      <ResponsiveDialogTrigger className={className} render={triggerRender}>
+        {children}
+      </ResponsiveDialogTrigger>
 
       <ResponsiveDialogContent>
         <ResponsiveDialogHeader>

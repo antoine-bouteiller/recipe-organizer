@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { mergeAttributes, Node } from '@tiptap/core'
 import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer as reactNodeViewRenderer } from '@tiptap/react'
 
@@ -28,21 +27,24 @@ interface WrapperProps {
 
 const Wrapper = ({ children, initialData, isEditable, updateAttributes }: WrapperProps) =>
   isEditable ? (
-    <SubrecipeDialog initialData={initialData} onSubmit={updateAttributes} submitLabel="Enregistrer" title="Modifier la sous-recette">
-      <div className="cursor-pointer">{children}</div>
+    <SubrecipeDialog
+      className="w-full"
+      initialData={initialData}
+      onSubmit={updateAttributes}
+      submitLabel="Enregistrer"
+      title="Modifier la sous-recette"
+    >
+      <div className="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start">{children}</div>
     </SubrecipeDialog>
   ) : (
-    <div>{children}</div>
+    children
   )
-
-const SubrecipeInstructionsContent = ({ instructions }: { instructions: string | undefined }) => {
+const SubrecipeInstructionsContent = ({ instructions }: { instructions?: string }) => {
   if (instructions) {
     return (
-      <div className="pointer-events-none border-t border-muted-foreground/20 pt-2">
-        <Tiptap content={instructions} readOnly>
-          <TiptapContent className="text-sm opacity-80" />
-        </Tiptap>
-      </div>
+      <Tiptap content={instructions} readOnly>
+        <TiptapContent className="pl-4" />
+      </Tiptap>
     )
   }
   return <div className="py-2 text-sm text-muted-foreground">Aucune instruction disponible</div>
@@ -59,29 +61,18 @@ const SubrecipeComponent = ({ editor, node, updateAttributes }: ReactNodeViewPro
   }
 
   return (
-    <NodeViewWrapper className="not-prose my-4">
+    <NodeViewWrapper>
       <Wrapper initialData={formInitialValues} isEditable={editor.isEditable} updateAttributes={updateAttributes}>
-        <div className="rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <Link
-              className="text-lg font-semibold text-primary hover:underline"
-              onClick={(e) => e.stopPropagation()}
-              params={{ id: recipeId.toString() }}
-              target="_blank"
-              to="/recipe/$id"
-            >
-              {recipeName}
-            </Link>
-            <span className="text-xs text-muted-foreground">Sous-recette</span>
+        <p>
+          <strong>{recipe?.name}</strong>
+        </p>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-4">
+            <Spinner />
           </div>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-4">
-              <Spinner />
-            </div>
-          ) : (
-            <SubrecipeInstructionsContent instructions={recipe?.instructions} />
-          )}
-        </div>
+        ) : (
+          <SubrecipeInstructionsContent instructions={recipe?.instructions} />
+        )}
       </Wrapper>
     </NodeViewWrapper>
   )

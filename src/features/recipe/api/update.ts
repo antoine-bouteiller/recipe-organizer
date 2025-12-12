@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { toastError, toastManager } from '@/components/ui/toast'
@@ -34,6 +34,13 @@ const updateRecipe = createServerFn({
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, id),
+        with: {
+          ingredientGroups: {
+            columns: {
+              id: true,
+            },
+          },
+        },
       })
 
       if (!currentRecipe) {
@@ -59,6 +66,14 @@ const updateRecipe = createServerFn({
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),
 
+        getDb()
+          .delete(groupIngredient)
+          .where(
+            inArray(
+              groupIngredient.groupId,
+              currentRecipe.ingredientGroups.map(({ id }) => id)
+            )
+          ),
         getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
         getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
       ])
