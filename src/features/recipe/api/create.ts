@@ -18,27 +18,21 @@ const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: 
 const recipeSchema = z.object({
   image: fileSchema,
   ingredientGroups: z.array(
-    z.union([
-      z.object({
-        groupName: z.string().optional(),
-        ingredients: z
-          .array(
-            z.object({
-              id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
-              quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
-              unitId: z.coerce.number().positive().optional(),
-            })
-          )
-          .min(1, { message: 'Au moins un ingrédient est requis' }),
-      }),
-      z.object({
-        embeddedRecipeId: z.coerce.number().positive({ message: 'La recette est requise' }),
-        groupName: z.string().optional(),
-        scaleFactor: z.number().positive({ message: 'Le facteur est requis' }),
-      }),
-    ])
+    z.object({
+      groupName: z.string().optional(),
+      ingredients: z
+        .array(
+          z.object({
+            id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
+            quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
+            unitId: z.coerce.number().positive().optional(),
+          })
+        )
+        .min(1, { message: 'Au moins un ingrédient est requis' }),
+    })
   ),
   instructions: z.string(),
+  isSubrecipe: z.boolean().default(false),
   name: z.string().min(2, {
     message: 'Le nom de la recette doit contenir au moins 2 caractères.',
   }),
@@ -55,7 +49,7 @@ const createRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data }) => {
-    const { image, ingredientGroups, instructions, name, servings } = data
+    const { image, ingredientGroups, instructions, isSubrecipe, name, servings } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
 
     const [createdRecipe] = await getDb()
@@ -63,6 +57,7 @@ const createRecipe = createServerFn({
       .values({
         image: imageKey,
         instructions,
+        isSubrecipe,
         name,
         servings,
       })
@@ -70,35 +65,26 @@ const createRecipe = createServerFn({
 
     await Promise.all(
       ingredientGroups.map(async (group, index) => {
-        if ('embeddedRecipeId' in group) {
-          await getDb().insert(recipeIngredientGroup).values({
-            embeddedRecipeId: group.embeddedRecipeId,
+        const [createdGroup] = await getDb()
+          .insert(recipeIngredientGroup)
+          .values({
             groupName: group.groupName,
+            isDefault: index === 0,
             recipeId: createdRecipe.id,
-            scaleFactor: group.scaleFactor,
           })
-        } else if ('ingredients' in group) {
-          const [createdGroup] = await getDb()
-            .insert(recipeIngredientGroup)
-            .values({
-              groupName: group.groupName,
-              isDefault: index === 0,
-              recipeId: createdRecipe.id,
-            })
-            .returning()
+          .returning()
 
-          if (group.ingredients.length > 0) {
-            await getDb()
-              .insert(groupIngredient)
-              .values(
-                group.ingredients.map((ingredient) => ({
-                  groupId: createdGroup.id,
-                  ingredientId: ingredient.id,
-                  quantity: ingredient.quantity,
-                  unitId: ingredient.unitId ?? undefined,
-                }))
-              )
-          }
+        if (group.ingredients.length > 0) {
+          await getDb()
+            .insert(groupIngredient)
+            .values(
+              group.ingredients.map((ingredient) => ({
+                groupId: createdGroup.id,
+                ingredientId: ingredient.id,
+                quantity: ingredient.quantity,
+                unitId: ingredient.unitId ?? undefined,
+              }))
+            )
         }
       })
     )

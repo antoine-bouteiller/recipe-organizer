@@ -30,7 +30,7 @@ const updateRecipe = createServerFn({
   .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerErrorCapture(async ({ data }) => {
-      const { id, image, ingredientGroups, instructions, name, servings } = data
+      const { id, image, ingredientGroups, instructions, isSubrecipe, name, servings } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, id),
@@ -60,6 +60,7 @@ const updateRecipe = createServerFn({
           .set({
             image: imageKey,
             instructions,
+            isSubrecipe,
             name,
             servings,
           })
@@ -80,35 +81,26 @@ const updateRecipe = createServerFn({
 
       await Promise.all(
         ingredientGroups.map(async (group, index) => {
-          if ('embeddedRecipeId' in group) {
-            await getDb().insert(recipeIngredientGroup).values({
-              embeddedRecipeId: group.embeddedRecipeId,
+          const [updatedGroup] = await getDb()
+            .insert(recipeIngredientGroup)
+            .values({
               groupName: group.groupName,
+              isDefault: index === 0,
               recipeId: currentRecipe.id,
-              scaleFactor: group.scaleFactor,
             })
-          } else if ('ingredients' in group) {
-            const [updatedGroup] = await getDb()
-              .insert(recipeIngredientGroup)
-              .values({
-                groupName: group.groupName,
-                isDefault: index === 0,
-                recipeId: currentRecipe.id,
-              })
-              .returning()
+            .returning()
 
-            if (group.ingredients.length > 0) {
-              await getDb()
-                .insert(groupIngredient)
-                .values(
-                  group.ingredients.map((ingredient) => ({
-                    groupId: updatedGroup.id,
-                    ingredientId: ingredient.id,
-                    quantity: ingredient.quantity,
-                    unitId: ingredient.unitId ?? undefined,
-                  }))
-                )
-            }
+          if (group.ingredients.length > 0) {
+            await getDb()
+              .insert(groupIngredient)
+              .values(
+                group.ingredients.map((ingredient) => ({
+                  groupId: updatedGroup.id,
+                  ingredientId: ingredient.id,
+                  quantity: ingredient.quantity,
+                  unitId: ingredient.unitId ?? undefined,
+                }))
+              )
           }
         })
       )

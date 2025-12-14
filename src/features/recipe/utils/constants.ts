@@ -15,6 +15,7 @@ export const recipeDefaultValues: RecipeFormInput = {
     },
   ],
   instructions: '',
+  isSubrecipe: false,
   name: '',
   servings: 4,
 }

@@ -46,13 +46,5 @@ export const RecipeIngredientGroups = ({ baseServings, ingredientGroups, serving
       {group.groupName && <div className="font-semibold">{group.groupName}</div>}
 
       <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} servings={servings} />
-
-      {group.embeddedRecipe && (
-        <RecipeGroupIngredients
-          baseServings={baseServings}
-          groupIngredients={group.embeddedRecipe.ingredientGroups[0].groupIngredients}
-          servings={servings}
-        />
-      )}
     </div>
   ))

@@ -10,8 +10,6 @@ import { queryKeys } from '@/lib/query-keys'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { getFileUrl } from '@/utils/get-file-url'
 
-import { embeddedRecipe, embeddedRecipeGroupIngredient, embeddedRecipeIngredient, embeddedRecipeIngredientGroup } from '../utils/drizzle-alias'
-
 const getAllRecipesSchema = z.object({
   search: z.string().optional(),
 })
@@ -27,10 +25,10 @@ const getAllRecipes = createServerFn({
           id: recipe.id,
           image: sql`${recipe.image}`.mapWith(getFileUrl),
           isMagimix: sql<boolean>`${recipe.instructions} LIKE '%data-type="magimix-program"%'`.mapWith(Boolean),
-          isVegetarian:
-            sql<boolean>`COUNT(CASE WHEN ${ingredient.category} = 'meat' OR ${ingredient.category} = 'fish' OR ${embeddedRecipeIngredient.category} = 'meat' OR ${embeddedRecipeIngredient.category} = 'fish' THEN 1 END) = 0`.mapWith(
-              Boolean
-            ),
+          isSubrecipe: recipe.isSubrecipe,
+          isVegetarian: sql<boolean>`COUNT(CASE WHEN ${ingredient.category} = 'meat' OR ${ingredient.category} = 'fish' THEN 1 END) = 0`.mapWith(
+            Boolean
+          ),
           name: recipe.name,
           servings: recipe.servings,
         })
@@ -38,10 +36,6 @@ const getAllRecipes = createServerFn({
         .leftJoin(recipeIngredientGroup, eq(recipeIngredientGroup.recipeId, recipe.id))
         .leftJoin(groupIngredient, eq(groupIngredient.groupId, recipeIngredientGroup.id))
         .leftJoin(ingredient, eq(ingredient.id, groupIngredient.ingredientId))
-        .leftJoin(embeddedRecipe, eq(recipeIngredientGroup.embeddedRecipeId, embeddedRecipe.id))
-        .leftJoin(embeddedRecipeIngredientGroup, eq(embeddedRecipeIngredientGroup.recipeId, embeddedRecipe.id))
-        .leftJoin(embeddedRecipeGroupIngredient, eq(embeddedRecipeGroupIngredient.groupId, embeddedRecipeIngredientGroup.id))
-        .leftJoin(embeddedRecipeIngredient, eq(embeddedRecipeIngredient.id, embeddedRecipeGroupIngredient.ingredientId))
         .where(data.search ? like(recipe.name, `%${data.search}%`) : undefined)
         .groupBy(recipe.id)
         .orderBy(asc(recipe.name))

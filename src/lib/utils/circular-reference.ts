@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 
 import { getDb } from '@/lib/db'
-import { recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
+import { recipeLinkedRecipes } from '@/lib/db/schema'
 
 export const detectCircularReference = async (
   recipeId: number,
@@ -23,15 +23,7 @@ export const detectCircularReference = async (
     .from(recipeLinkedRecipes)
     .where(eq(recipeLinkedRecipes.recipeId, linkedRecipeId))
 
-  const embeddedRecipesFromGroups = await getDb()
-    .select({ embeddedRecipeId: recipeIngredientGroup.embeddedRecipeId })
-    .from(recipeIngredientGroup)
-    .where(eq(recipeIngredientGroup.recipeId, linkedRecipeId))
-
-  const allLinked = [
-    ...linkedRecipesFromTable.map((r) => r.linkedRecipeId),
-    ...embeddedRecipesFromGroups.map((r) => r.embeddedRecipeId).filter((id): id is number => id !== null),
-  ]
+  const allLinked = linkedRecipesFromTable.map((r) => r.linkedRecipeId)
 
   const checkResults = await Promise.all(allLinked.map(async (id) => (id === recipeId ? true : detectCircularReference(recipeId, id, visited))))
 

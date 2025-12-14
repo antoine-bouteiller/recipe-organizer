@@ -19,23 +19,14 @@ import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
 import { getFileUrl } from '@/utils/get-file-url'
 
-const formatIngredientGroup = (group: RecipeIngredientGroup) => {
-  if (group.embeddedRecipeId) {
-    return {
-      embeddedRecipeId: group.embeddedRecipeId,
-      groupName: group.groupName ?? '',
-      scaleFactor: group.scaleFactor ?? 1,
-    }
-  }
-  return {
-    groupName: group.groupName ?? '',
-    ingredients: group.groupIngredients.map((ingredient) => ({
-      id: ingredient.ingredient.id,
-      quantity: ingredient.quantity,
-      unitId: ingredient.unit?.id,
-    })),
-  }
-}
+const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
+  groupName: group.groupName ?? '',
+  ingredients: group.groupIngredients.map((ingredient) => ({
+    id: ingredient.ingredient.id,
+    quantity: ingredient.quantity,
+    unitId: ingredient.unit?.id,
+  })),
+})
 
 const EditRecipePage = () => {
   const { id } = Route.useLoaderData()
@@ -52,6 +43,7 @@ const EditRecipePage = () => {
         },
         ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
         instructions: recipe.instructions,
+        isSubrecipe: recipe.isSubrecipe,
         name: recipe.name,
         servings: recipe.servings,
       }

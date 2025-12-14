@@ -39,10 +39,45 @@ const Wrapper = ({ children, initialData, isEditable, updateAttributes }: Wrappe
   ) : (
     children
   )
-const SubrecipeInstructionsContent = ({ instructions }: { instructions?: string }) => {
+const filterNodes = (instructions: string, hideFirstNodes?: number, hideLastNodes?: number): string => {
+  if (hideFirstNodes === undefined && hideLastNodes === undefined) {
+    return instructions
+  }
+
+  try {
+    const parsed = JSON.parse(instructions)
+    if (!parsed?.content || !Array.isArray(parsed.content)) {
+      return instructions
+    }
+
+    const totalNodes = parsed.content.length
+    const startIndex = hideFirstNodes ?? 0
+    const endIndex = hideLastNodes !== undefined ? totalNodes - hideLastNodes : totalNodes
+
+    if (startIndex >= endIndex || startIndex >= totalNodes) {
+      return JSON.stringify({ ...parsed, content: [] })
+    }
+
+    const filteredContent = parsed.content.slice(startIndex, endIndex)
+    return JSON.stringify({ ...parsed, content: filteredContent })
+  } catch {
+    return instructions
+  }
+}
+
+const SubrecipeInstructionsContent = ({
+  hideFirstNodes,
+  hideLastNodes,
+  instructions,
+}: {
+  hideFirstNodes?: number
+  hideLastNodes?: number
+  instructions?: string
+}) => {
   if (instructions) {
+    const filteredInstructions = filterNodes(instructions, hideFirstNodes, hideLastNodes)
     return (
-      <Tiptap content={instructions} readOnly>
+      <Tiptap content={filteredInstructions} readOnly>
         <TiptapContent className="pl-4" />
       </Tiptap>
     )
@@ -51,11 +86,13 @@ const SubrecipeInstructionsContent = ({ instructions }: { instructions?: string 
 }
 
 const SubrecipeComponent = ({ editor, node, updateAttributes }: ReactNodeViewProps) => {
-  const { recipeId, recipeName } = node.attrs as SubrecipeNodeData
+  const { hideFirstNodes, hideLastNodes, recipeId, recipeName } = node.attrs as SubrecipeNodeData
 
   const { data: recipe, isLoading } = useQuery(getRecipeInstructionsOptions(recipeId))
 
   const formInitialValues: SubrecipeNodeData = {
+    hideFirstNodes,
+    hideLastNodes,
     recipeId,
     recipeName,
   }
@@ -71,7 +108,7 @@ const SubrecipeComponent = ({ editor, node, updateAttributes }: ReactNodeViewPro
             <Spinner />
           </div>
         ) : (
-          <SubrecipeInstructionsContent instructions={recipe?.instructions} />
+          <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe?.instructions} />
         )}
       </Wrapper>
     </NodeViewWrapper>
@@ -81,6 +118,28 @@ const SubrecipeComponent = ({ editor, node, updateAttributes }: ReactNodeViewPro
 export const SubrecipeNode = Node.create<Record<string, never>>({
   addAttributes() {
     return {
+      hideFirstNodes: {
+        default: undefined,
+        parseHTML: (element) => {
+          const value = element.dataset.hideFirstNodes
+          return value ? Number.parseInt(value, 10) : undefined
+        },
+        renderHTML: (attributes) => {
+          const value = attributes.hideFirstNodes as number | undefined
+          return value ? { 'data-hide-first-nodes': String(value) } : {}
+        },
+      },
+      hideLastNodes: {
+        default: undefined,
+        parseHTML: (element) => {
+          const value = element.dataset.hideLastNodes
+          return value ? Number.parseInt(value, 10) : undefined
+        },
+        renderHTML: (attributes) => {
+          const value = attributes.hideLastNodes as number | undefined
+          return value ? { 'data-hide-last-nodes': String(value) } : {}
+        },
+      },
       recipeId: {
         parseHTML: (element) => {
           const id = element.dataset.recipeId

@@ -6,16 +6,12 @@ import { recipe } from '@/lib/db/schema/recipe'
 import { unit } from '@/lib/db/schema/unit'
 
 const recipeIngredientGroup = sqliteTable('recipe_ingredient_groups', {
-  embeddedRecipeId: integer('embedded_recipe_id').references(() => recipe.id, {
-    onDelete: 'restrict',
-  }),
   groupName: text('group_name', { length: 255 }),
   id: integer('id').primaryKey(),
   isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
   recipeId: integer('recipe_id')
     .references(() => recipe.id, { onDelete: 'restrict' })
     .notNull(),
-  scaleFactor: real('scale_factor'),
 })
 
 const groupIngredient = sqliteTable('group_ingredients', {
@@ -37,25 +33,14 @@ const ingredientsRelation = relations(ingredient, ({ many }) => ({
 }))
 
 const recipesRelation = relations(recipe, ({ many }) => ({
-  embeddedInRecipes: many(recipeIngredientGroup, {
-    relationName: 'embeddedRecipe',
-  }),
-  ingredientGroups: many(recipeIngredientGroup, {
-    relationName: 'ingredientGroup',
-  }),
+  ingredientGroups: many(recipeIngredientGroup),
 }))
 
 const recipeIngredientGroupRelation = relations(recipeIngredientGroup, ({ many, one }) => ({
-  embeddedRecipe: one(recipe, {
-    fields: [recipeIngredientGroup.embeddedRecipeId],
-    references: [recipe.id],
-    relationName: 'embeddedRecipe',
-  }),
   groupIngredients: many(groupIngredient),
   recipe: one(recipe, {
     fields: [recipeIngredientGroup.recipeId],
     references: [recipe.id],
-    relationName: 'ingredientGroup',
   }),
 }))
 

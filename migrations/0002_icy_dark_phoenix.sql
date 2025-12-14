@@ -1,0 +1,1 @@
+ALTER TABLE `recipes` ADD `is_subrecipe` integer DEFAULT false NOT NULL;

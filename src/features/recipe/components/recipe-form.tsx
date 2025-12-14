@@ -6,19 +6,12 @@ import type { FileMetadata } from '@/hooks/use-file-upload'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { type RecipeFormInput } from '@/features/recipe/api/create'
-import AddExistingRecipe from '@/features/recipe/components/add-existing-recipe'
 import { withForm } from '@/hooks/use-app-form'
 
 import { recipeDefaultValues } from '../utils/constants'
 import { IngredientGroupField } from './ingredient-group-field'
 
-const hasEmbeddedRecipe = (group: NonNullable<RecipeFormInput['ingredientGroups']>[number] | undefined) =>
-  group && 'embeddedRecipeId' in group && !!group.embeddedRecipeId
-
 const generateGroupKey = (group: NonNullable<RecipeFormInput['ingredientGroups']>[number], index: number): string => {
-  if (group && 'embeddedRecipeId' in group) {
-    return `group-recipe-${JSON.stringify(group.embeddedRecipeId)}`
-  }
   const firstIngredientId = JSON.stringify(group.ingredients?.[0]?.id ?? '')
   return `group-${index}-${firstIngredientId}`
 }
@@ -40,6 +33,8 @@ export const RecipeForm = withForm({
         <AppField name="name">{({ TextField }) => <TextField disabled={isSubmitting} label="Nom de la recette" />}</AppField>
 
         <AppField name="servings">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Portions" min={0} />}</AppField>
+
+        <AppField name="isSubrecipe">{({ CheckboxField }) => <CheckboxField disabled={isSubmitting} label="Sous-recette" />}</AppField>
 
         <AppField name="image">
           {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
@@ -72,46 +67,26 @@ export const RecipeForm = withForm({
                           </>
                         )}
 
-                        {hasEmbeddedRecipe(group) ? <div /> : <IngredientGroupField form={form} groupIndex={groupIndex} />}
+                        <IngredientGroupField form={form} groupIndex={groupIndex} />
                         <FieldError />
                       </Field>
                     )}
                   </AppField>
                 ))}
-                <div
-                  className={`
-                    flex w-full flex-col gap-2
-                    md:flex-row
-                  `}
+                <Button
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    field.pushValue({
+                      groupName: undefined,
+                      ingredients: [],
+                    })
+                  }}
+                  size="sm"
+                  type="button"
+                  variant="outline"
                 >
-                  <Button
-                    className="md:flex-1"
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      field.pushValue({
-                        groupName: undefined,
-                        ingredients: [],
-                        scaleFactor: 1,
-                      })
-                    }}
-                    size="sm"
-                    type="button"
-                    variant="outline"
-                  >
-                    Ajouter un groupe <PlusIcon className="h-4 w-4" />
-                  </Button>
-                  <AddExistingRecipe
-                    disabled={isSubmitting}
-                    onSelect={(selectedRecipe) => {
-                      field.pushValue({
-                        embeddedRecipeId: selectedRecipe.embeddedRecipeId.toString(),
-                        groupName: selectedRecipe.name,
-                        ingredients: [],
-                        scaleFactor: 1,
-                      })
-                    }}
-                  />
-                </div>
+                  Ajouter un groupe <PlusIcon className="h-4 w-4" />
+                </Button>
               </>
             )}
           </Field>

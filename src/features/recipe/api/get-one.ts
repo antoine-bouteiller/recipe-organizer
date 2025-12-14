@@ -21,20 +21,6 @@ const getRecipe = createServerFn({
           ingredientGroups: {
             orderBy: (table) => [desc(table.isDefault)],
             with: {
-              embeddedRecipe: {
-                with: {
-                  ingredientGroups: {
-                    with: {
-                      groupIngredients: {
-                        with: {
-                          ingredient: true,
-                          unit: true,
-                        },
-                      },
-                    },
-                  },
-                },
-              },
               groupIngredients: {
                 with: {
                   ingredient: true,
