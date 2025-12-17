@@ -60,7 +60,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.17",
     "@tsconfig/vite-react": "^7.0.2",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@typescript/native-preview": "7.0.0-dev.20251124.1",
