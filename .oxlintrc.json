@@ -1,10 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "react", "unicorn"],
-  "jsPlugins": [
-    "eslint-plugin-better-tailwindcss",
-    "eslint-plugin-perfectionist"
-  ],
+  "jsPlugins": ["eslint-plugin-better-tailwindcss", "eslint-plugin-perfectionist"],
   "categories": {
     "correctness": "error",
     "suspicious": "error",
@@ -88,27 +85,12 @@
     "max-params": "off",
 
     // tailwindcss
-    "better-tailwindcss/enforce-consistent-class-order": [
-      "error",
-      { "entryPoint": "src/styles/app.css" }
-    ],
+    "better-tailwindcss/enforce-consistent-class-order": ["error", { "entryPoint": "src/styles/app.css" }],
     "better-tailwindcss/enforce-consistent-line-wrapping": ["off"],
-    "better-tailwindcss/no-conflicting-classes": [
-      "error",
-      { "entryPoint": "src/styles/app.css" }
-    ],
-    "better-tailwindcss/no-duplicate-classes": [
-      "error",
-      { "entryPoint": "src/styles/app.css" }
-    ],
-    "better-tailwindcss/no-unnecessary-whitespace": [
-      "error",
-      { "entryPoint": "src/styles/app.css" }
-    ],
-    "better-tailwindcss/no-unregistered-classes": [
-      "error",
-      { "entryPoint": "src/styles/app.css", "ignore": ["not-prose"] }
-    ],
+    "better-tailwindcss/no-conflicting-classes": ["error", { "entryPoint": "src/styles/app.css" }],
+    "better-tailwindcss/no-duplicate-classes": ["error", { "entryPoint": "src/styles/app.css" }],
+    "better-tailwindcss/no-unnecessary-whitespace": ["error", { "entryPoint": "src/styles/app.css" }],
+    "better-tailwindcss/no-unregistered-classes": ["error", { "entryPoint": "src/styles/app.css", "ignore": ["not-prose"] }],
 
     // perfectionist
     "perfectionist/sort-array-includes": ["error", { "type": "natural" }],

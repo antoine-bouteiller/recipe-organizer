@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
@@ -10,11 +10,13 @@ import { queryKeys } from '@/lib/query-keys'
 import { deleteFile } from '@/lib/r2'
 import { withServerErrorCapture } from '@/utils/error-handler'
 
+const deleteRecipeSchema = type('number')
+
 const deleteRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard('admin')])
-  .inputValidator(z.number())
+  .inputValidator(deleteRecipeSchema)
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const deletedRecipe = await getDb().delete(recipe).where(eq(recipe.id, data)).returning()

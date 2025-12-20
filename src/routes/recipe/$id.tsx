@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
-import { z } from 'zod'
+import { type } from 'arktype'
 
 import { Button } from '@/components/ui/button'
 import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger } from '@/components/ui/responsive-popover'
@@ -163,10 +163,16 @@ const RecipePage = () => {
   )
 }
 
+const paramsSchema = type({ id: 'string.integer.parse' })
+
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
   loader: async ({ context, params }) => {
-    const { id } = z.object({ id: z.coerce.number() }).parse(params)
+    const validated = paramsSchema(params)
+    if (validated instanceof type.errors) {
+      throw new Error(validated.summary)
+    }
+    const { id } = validated
 
     await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
 

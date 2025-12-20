@@ -3,11 +3,11 @@
   "extends": "@tsconfig/vite-react/tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable", "webworker"],
-    "types": ["vite/client"]
+    "types": ["vite/client"],
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-  "files": ["worker-configuration.d.ts"]
+  "files": ["worker-configuration.d.ts"],
 }

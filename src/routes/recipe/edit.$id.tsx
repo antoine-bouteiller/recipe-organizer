@@ -1,7 +1,7 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
-import { z } from 'zod'
+import { type } from 'arktype'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -43,7 +43,10 @@ const EditRecipePage = () => {
         },
         ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
         instructions: recipe.instructions,
-        isSubrecipe: recipe.isSubrecipe,
+        linkedRecipes: recipe.linkedRecipes.map((lr) => ({
+          id: lr.linkedRecipe.id,
+          ratio: lr.ratio,
+        })),
         name: recipe.name,
         servings: recipe.servings,
       }
@@ -68,7 +71,7 @@ const EditRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors as unknown as Record<string, type.errors>[]))
 
   if (isLoading) {
     return (
@@ -112,6 +115,8 @@ const EditRecipePage = () => {
   )
 }
 
+const paramsSchema = type({ id: 'string.integer.parse' })
+
 export const Route = createFileRoute('/recipe/edit/$id')({
   beforeLoad: ({ context }) => {
     if (!context.authUser) {
@@ -120,7 +125,11 @@ export const Route = createFileRoute('/recipe/edit/$id')({
   },
   component: EditRecipePage,
   loader: async ({ context, params }) => {
-    const { id } = z.object({ id: z.coerce.number() }).parse(params)
+    const validated = paramsSchema(params)
+    if (validated instanceof type.errors) {
+      throw new Error(validated.summary)
+    }
+    const { id } = validated
     await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())

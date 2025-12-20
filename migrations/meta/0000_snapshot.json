@@ -1,12 +1,20 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "14f5a0fa-24ab-4c90-a57b-d7bf690326dd",
+  "id": "5c6f062e-721d-4fd3-a830-ff94b1cdc7e7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "ingredients": {
       "name": "ingredients",
       "columns": {
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'other'"
+        },
         "id": {
           "name": "id",
           "type": "integer",
@@ -20,14 +28,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "category": {
-          "name": "category",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'other'"
         },
         "parent_id": {
           "name": "parent_id",
@@ -53,13 +53,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
-          "type": "text(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "image": {
           "name": "image",
           "type": "text(255)",
@@ -70,6 +63,21 @@
         "instructions": {
           "name": "instructions",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_subrecipe": {
+          "name": "is_subrecipe",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -99,17 +107,17 @@
     "group_ingredients": {
       "name": "group_ingredients",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "group_id": {
           "name": "group_id",
           "type": "integer",
           "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
@@ -141,12 +149,8 @@
           "name": "group_ingredients_group_id_recipe_ingredient_groups_id_fk",
           "tableFrom": "group_ingredients",
           "tableTo": "recipe_ingredient_groups",
-          "columnsFrom": [
-            "group_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["group_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -154,12 +158,8 @@
           "name": "group_ingredients_ingredient_id_ingredients_id_fk",
           "tableFrom": "group_ingredients",
           "tableTo": "ingredients",
-          "columnsFrom": [
-            "ingredient_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["ingredient_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -167,12 +167,8 @@
           "name": "group_ingredients_unit_id_units_id_fk",
           "tableFrom": "group_ingredients",
           "tableTo": "units",
-          "columnsFrom": [
-            "unit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["unit_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -184,13 +180,6 @@
     "recipe_ingredient_groups": {
       "name": "recipe_ingredient_groups",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "group_name": {
           "name": "group_name",
           "type": "text(255)",
@@ -198,11 +187,11 @@
           "notNull": false,
           "autoincrement": false
         },
-        "embedded_recipe_id": {
-          "name": "embedded_recipe_id",
+        "id": {
+          "name": "id",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
+          "primaryKey": true,
+          "notNull": true,
           "autoincrement": false
         },
         "is_default": {
@@ -219,40 +208,16 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "scale_factor": {
-          "name": "scale_factor",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "recipe_ingredient_groups_embedded_recipe_id_recipes_id_fk": {
-          "name": "recipe_ingredient_groups_embedded_recipe_id_recipes_id_fk",
-          "tableFrom": "recipe_ingredient_groups",
-          "tableTo": "recipes",
-          "columnsFrom": [
-            "embedded_recipe_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "restrict",
-          "onUpdate": "no action"
-        },
         "recipe_ingredient_groups_recipe_id_recipes_id_fk": {
           "name": "recipe_ingredient_groups_recipe_id_recipes_id_fk",
           "tableFrom": "recipe_ingredient_groups",
           "tableTo": "recipes",
-          "columnsFrom": [
-            "recipe_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["recipe_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -299,12 +264,8 @@
           "name": "recipe_linked_recipes_linked_recipe_id_recipes_id_fk",
           "tableFrom": "recipe_linked_recipes",
           "tableTo": "recipes",
-          "columnsFrom": [
-            "linked_recipe_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["linked_recipe_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -312,12 +273,8 @@
           "name": "recipe_linked_recipes_recipe_id_recipes_id_fk",
           "tableFrom": "recipe_linked_recipes",
           "tableTo": "recipes",
-          "columnsFrom": [
-            "recipe_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["recipe_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -329,6 +286,13 @@
     "units": {
       "name": "units",
       "columns": {
+        "factor": {
+          "name": "factor",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "id": {
           "name": "id",
           "type": "integer",
@@ -341,13 +305,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "factor": {
-          "name": "factor",
-          "type": "real",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "parent_id": {
@@ -367,17 +324,17 @@
     "user": {
       "name": "user",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "email": {
           "name": "email",
           "type": "text",
           "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
           "notNull": true,
           "autoincrement": false
         },
@@ -393,9 +350,7 @@
       "indexes": {
         "user_email_unique": {
           "name": "user_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { integer, sqliteTable } from 'drizzle-orm/sqlite-core'
+import { integer, real, sqliteTable } from 'drizzle-orm/sqlite-core'
 
 import { recipe } from '@/lib/db/schema/recipe'
 
@@ -9,6 +9,7 @@ const recipeLinkedRecipes = sqliteTable('recipe_linked_recipes', {
     .references(() => recipe.id, { onDelete: 'restrict' })
     .notNull(),
   position: integer('position').notNull(),
+  ratio: real('ratio').notNull().default(1),
   recipeId: integer('recipe_id')
     .references(() => recipe.id, { onDelete: 'restrict' })
     .notNull(),

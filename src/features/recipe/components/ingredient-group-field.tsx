@@ -112,7 +112,7 @@ export const IngredientGroupField = withForm({
               disabled={isSubmitting}
               onClick={() => {
                 field.pushValue({
-                  id: undefined,
+                  id: -1,
                   quantity: 0,
                 })
               }}

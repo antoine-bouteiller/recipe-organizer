@@ -5,14 +5,17 @@ import type { FileMetadata } from '@/hooks/use-file-upload'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { type RecipeFormInput } from '@/features/recipe/api/create'
+import { LinkedRecipesProvider } from '@/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
+import { useRecipeOptions } from '@/hooks/use-options'
+
+import type { RecipeIngredientGroupFormInput } from '../api/create'
 
 import { recipeDefaultValues } from '../utils/constants'
 import { IngredientGroupField } from './ingredient-group-field'
 
-const generateGroupKey = (group: NonNullable<RecipeFormInput['ingredientGroups']>[number], index: number): string => {
-  const firstIngredientId = JSON.stringify(group.ingredients?.[0]?.id ?? '')
+const generateGroupKey = (group: RecipeIngredientGroupFormInput, index: number): string => {
+  const firstIngredientId = group.ingredients?.[0]?.id ?? ''
   return `group-${index}-${firstIngredientId}`
 }
 
@@ -27,6 +30,8 @@ export const RecipeForm = withForm({
     const { AppField, Field } = form
 
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
+    const linkedRecipeIds = useStore(form.store, (state) => (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((id) => id > 0))
+    const recipeOptions = useRecipeOptions()
 
     return (
       <>
@@ -34,7 +39,45 @@ export const RecipeForm = withForm({
 
         <AppField name="servings">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Portions" min={0} />}</AppField>
 
-        <AppField name="isSubrecipe">{({ CheckboxField }) => <CheckboxField disabled={isSubmitting} label="Sous-recette" />}</AppField>
+        <div className="flex flex-col gap-2">
+          <Label>Sous-recettes liées</Label>
+          <AppField mode="array" name="linkedRecipes">
+            {(field) => (
+              <>
+                {field.state.value?.map((_linkedRecipe, index) => (
+                  <div className="flex gap-2" key={`linked-recipe-${index}`}>
+                    <div className="flex flex-1 gap-2">
+                      <div className="flex-1">
+                        <AppField name={`linkedRecipes[${index}].id`}>
+                          {({ ComboboxField }) => (
+                            <ComboboxField
+                              disabled={isSubmitting}
+                              noResultsLabel="Aucune sous-recette trouvée"
+                              options={recipeOptions}
+                              placeholder="Sélectionner une sous-recette"
+                              searchPlaceholder="Rechercher une sous-recette"
+                            />
+                          )}
+                        </AppField>
+                      </div>
+                      <div className="w-24">
+                        <AppField name={`linkedRecipes[${index}].ratio`}>
+                          {({ NumberField }) => <NumberField decimalScale={2} disabled={isSubmitting} min={0} placeholder="Ratio" step={0.1} />}
+                        </AppField>
+                      </div>
+                    </div>
+                    <Button disabled={isSubmitting} onClick={() => field.removeValue(index)} size="icon" type="button" variant="destructive-outline">
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button disabled={isSubmitting} onClick={() => field.pushValue({ id: -1, ratio: 1 })} size="sm" type="button" variant="outline">
+                  Ajouter une sous-recette <PlusIcon className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </AppField>
+        </div>
 
         <AppField name="image">
           {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
@@ -92,7 +135,9 @@ export const RecipeForm = withForm({
           </Field>
         </div>
 
-        <AppField name="instructions">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Instructions" />}</AppField>
+        <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
+          <AppField name="instructions">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Instructions" />}</AppField>
+        </LinkedRecipesProvider>
       </>
     )
   },

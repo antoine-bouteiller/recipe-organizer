@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { asc, eq, like, sql } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup } from '@/lib/db/schema'
@@ -10,8 +10,8 @@ import { queryKeys } from '@/lib/query-keys'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { getFileUrl } from '@/utils/get-file-url'
 
-const getAllRecipesSchema = z.object({
-  search: z.string().optional(),
+const getAllRecipesSchema = type({
+  'search?': 'string | undefined',
 })
 
 const getAllRecipes = createServerFn({
@@ -25,7 +25,6 @@ const getAllRecipes = createServerFn({
           id: recipe.id,
           image: sql`${recipe.image}`.mapWith(getFileUrl),
           isMagimix: sql<boolean>`${recipe.instructions} LIKE '%data-type="magimix-program"%'`.mapWith(Boolean),
-          isSubrecipe: recipe.isSubrecipe,
           isVegetarian: sql<boolean>`COUNT(CASE WHEN ${ingredient.category} = 'meat' OR ${ingredient.category} = 'fish' THEN 1 END) = 0`.mapWith(
             Boolean
           ),

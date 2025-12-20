@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -9,16 +9,16 @@ import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-export const updateUnitSchema = z.object({
-  factor: z.number().positive().optional(),
-  id: z.number(),
-  name: z.string().min(2),
-  parentId: z.number().optional(),
-  symbol: z.string().min(1),
+export const updateUnitSchema = type({
+  'factor?': 'number>0',
+  id: 'number',
+  name: 'string>=2',
+  'parentId?': 'number',
+  symbol: 'string>=1',
 })
 
-export type UpdateUnitFormValues = z.infer<typeof updateUnitSchema>
-export type UpdateUnitFormInput = Partial<z.input<typeof updateUnitSchema>>
+export type UpdateUnitFormValues = typeof updateUnitSchema.infer
+export type UpdateUnitFormInput = Partial<UpdateUnitFormValues>
 
 const updateUnit = createServerFn()
   .middleware([authGuard('admin')])

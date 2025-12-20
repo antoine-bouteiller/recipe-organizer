@@ -1,5 +1,5 @@
 import { Store } from '@tanstack/react-store'
-import z from 'zod'
+import { type } from 'arktype'
 
 import { getCookie, setCookie } from '@/utils/cookie'
 
@@ -13,9 +13,11 @@ const defaultState: ShoppingListState = {
   shoppingList: [],
 }
 
-const storeSchema = z.object({
-  shoppingList: z.array(z.number()),
-})
+const storeSchema = type('string')
+  .pipe.try((s): object => JSON.parse(s))
+  .to({
+    shoppingList: 'number[]',
+  })
 
 export const initShoppingListState = () => {
   const state = getCookie(storageKey)
@@ -24,9 +26,9 @@ export const initShoppingListState = () => {
     return defaultState
   }
 
-  const parsedState = storeSchema.safeParse(JSON.parse(state))
+  const parsedState = storeSchema(state)
 
-  return parsedState.success ? parsedState.data : defaultState
+  return parsedState instanceof type.errors ? defaultState : parsedState
 }
 
 export const shoppingListStore = new Store(initShoppingListState(), {

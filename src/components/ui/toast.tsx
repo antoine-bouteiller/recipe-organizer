@@ -1,5 +1,6 @@
 import { Toast } from '@base-ui-components/react/toast'
 import { CheckCircleIcon, CircleNotchIcon, InfoIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
+import { ArkErrors } from 'arktype'
 
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
@@ -232,11 +233,19 @@ const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) =
 }
 
 export const toastError = (message: string, error?: unknown) => {
-  toastManager.add({
-    description: error instanceof Error ? error.message : undefined,
-    title: message,
-    type: 'error',
-  })
+  if (error instanceof ArkErrors) {
+    toastManager.add({
+      description: error.summary,
+      title: message,
+      type: 'error',
+    })
+  } else {
+    toastManager.add({
+      description: error instanceof Error ? error.message : undefined,
+      title: message,
+      type: 'error',
+    })
+  }
 }
 
 export { toastManager, ToastProvider, type ToastPosition }

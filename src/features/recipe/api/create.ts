@@ -1,6 +1,6 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
+import { type } from 'arktype'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -11,45 +11,41 @@ import { uploadFile } from '@/lib/r2'
 import { extractLinkedRecipeIds } from '@/lib/utils/circular-reference'
 import { parseFormData } from '@/utils/form-data'
 
-const fileSchema = z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })], {
-  message: "L'image est requise",
-})
+import { getTitle } from '../utils/get-recipe-title'
 
-const recipeSchema = z.object({
-  image: fileSchema,
-  ingredientGroups: z.array(
-    z.object({
-      groupName: z.string().optional(),
-      ingredients: z
-        .array(
-          z.object({
-            id: z.coerce.number().positive({ message: "L'ingrédient est requis" }),
-            quantity: z.coerce.number().positive({ message: 'La quantité est requise' }),
-            unitId: z.coerce.number().positive().optional(),
-          })
-        )
-        .min(1, { message: 'Au moins un ingrédient est requis' }),
-    })
-  ),
-  instructions: z.string(),
-  isSubrecipe: z.boolean().default(false),
-  name: z.string().min(2, {
-    message: 'Le nom de la recette doit contenir au moins 2 caractères.',
+const recipeSchema = type({
+  image: type('File').or({
+    id: 'string',
+    url: 'string',
   }),
-  servings: z.coerce.number().positive({ message: 'Le nombre de portions est requis' }),
+  ingredientGroups: type({
+    'groupName?': 'string',
+    ingredients: type({
+      id: 'number>0',
+      quantity: 'number>0',
+      'unitId?': 'number>0 | undefined',
+    }).array(),
+  }).array(),
+  instructions: 'string',
+  'linkedRecipes?': type({
+    id: 'number>0',
+    ratio: 'number>0',
+  }).array(),
+  name: 'string>=2',
+  servings: 'number>0',
 })
 
-type RecipeFormValues = z.infer<typeof recipeSchema>
-type RecipeFormInput = Partial<z.input<typeof recipeSchema>>
+type RecipeFormValues = typeof recipeSchema.infer
+type RecipeFormInput = Partial<RecipeFormValues>
 export type RecipeIngredientGroupFormInput = NonNullable<RecipeFormInput['ingredientGroups']>[number]
 
 const createRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
+  .inputValidator((formData: FormData) => recipeSchema.assert(parseFormData(formData)))
   .handler(async ({ data }) => {
-    const { image, ingredientGroups, instructions, isSubrecipe, name, servings } = data
+    const { image, ingredientGroups, instructions, linkedRecipes, name, servings } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
 
     const [createdRecipe] = await getDb()
@@ -57,7 +53,6 @@ const createRecipe = createServerFn({
       .values({
         image: imageKey,
         instructions,
-        isSubrecipe,
         name,
         servings,
       })
@@ -89,17 +84,29 @@ const createRecipe = createServerFn({
       })
     )
 
-    const linkedRecipes = extractLinkedRecipeIds(instructions)
-    if (linkedRecipes.length > 0) {
-      await getDb()
-        .insert(recipeLinkedRecipes)
-        .values(
-          linkedRecipes.map(({ position, recipeId: linkedRecipeId }) => ({
-            linkedRecipeId,
-            position,
-            recipeId: createdRecipe.id,
-          }))
-        )
+    // Combine linked recipes from instructions and explicit form selections
+    const linkedRecipesFromInstructions = extractLinkedRecipeIds(instructions)
+    const linkedRecipesFromForm = (linkedRecipes ?? [])
+      .filter((lr) => lr.id > 0)
+      .map((lr, index) => ({
+        linkedRecipeId: lr.id,
+        position: linkedRecipesFromInstructions.length + index,
+        ratio: lr.ratio,
+        recipeId: createdRecipe.id,
+      }))
+
+    const allLinkedRecipes = [
+      ...linkedRecipesFromInstructions.map(({ position, recipeId: linkedRecipeId }) => ({
+        linkedRecipeId,
+        position,
+        ratio: 1,
+        recipeId: createdRecipe.id,
+      })),
+      ...linkedRecipesFromForm,
+    ]
+
+    if (allLinkedRecipes.length > 0) {
+      await getDb().insert(recipeLinkedRecipes).values(allLinkedRecipes)
     }
   })
 
@@ -107,16 +114,14 @@ const createRecipeOptions = () =>
   mutationOptions({
     mutationFn: createRecipe,
     onError: (error, variables, _context) => {
-      const { data: title } = z.string().safeParse(variables.data.get('name'))
-      toastError(`Erreur lors de la création de la recette ${title}`, error)
+      toastError(`Erreur lors de la création de la recette ${getTitle(variables.data)}`, error)
     },
     onSuccess: (_data, variables, _result, context) => {
       void context.client.invalidateQueries({
         queryKey: queryKeys.recipeLists(),
       })
-      const { data: title } = z.string().safeParse(variables.data.get('name'))
       toastManager.add({
-        title: `Recette ${title} créée`,
+        title: `Recette ${getTitle(variables.data)} créée`,
         type: 'success',
       })
     },

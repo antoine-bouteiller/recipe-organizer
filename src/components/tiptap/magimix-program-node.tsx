@@ -58,9 +58,9 @@ const MagimixProgramComponent = ({ editor, node, updateAttributes }: ReactNodeVi
   const formInitialValues: MagimixProgramFormInput = {
     program,
     rotationSpeed,
-    temperature,
-    timeMinutes: typeof time === 'number' ? Math.floor(time / 60) : 0,
-    timeSeconds: typeof time === 'number' ? time % 60 : 0,
+    temperature: temperature ?? undefined,
+    timeMinutes: Math.floor(time / 60),
+    timeSeconds: time % 60,
   }
 
   return (

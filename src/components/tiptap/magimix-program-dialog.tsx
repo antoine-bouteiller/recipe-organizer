@@ -1,6 +1,6 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
+import { type } from 'arktype'
 import { type ComponentPropsWithoutRef, type ReactNode, useState } from 'react'
-import z from 'zod'
 
 import { allowedRotationSpeed, magimixProgram, type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
 import { Button } from '@/components/ui/button'
@@ -29,15 +29,15 @@ interface MagimixProgramDialogProps {
   triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-export const magimixProgramSchema = z.object({
-  program: z.enum(magimixProgram),
-  rotationSpeed: z.enum(allowedRotationSpeed),
-  temperature: z.int().min(0).max(200).optional(),
-  timeMinutes: z.int().min(0),
-  timeSeconds: z.int().min(0).max(59),
+export const magimixProgramSchema = type({
+  program: type.enumerated(...magimixProgram),
+  rotationSpeed: type.enumerated(...allowedRotationSpeed),
+  'temperature?': '0 < number < 200',
+  timeMinutes: '0 <= number < 60',
+  timeSeconds: '0 <= number < 60',
 })
 
-export type MagimixProgramFormInput = z.input<typeof magimixProgramSchema>
+export type MagimixProgramFormInput = typeof magimixProgramSchema.infer
 
 export const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
@@ -58,23 +58,28 @@ export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLa
   const form = useAppForm({
     defaultValues: initialData ?? magimixProgramDefaultValues,
     onSubmit: async ({ value }) => {
-      const parsedValue = magimixProgramSchema.parse(value)
+      const validated = magimixProgramSchema.assert(value)
 
-      const time = parsedValue.timeMinutes * 60 + parsedValue.timeSeconds
+      const time = validated.timeMinutes * 60 + validated.timeSeconds
 
-      const programData: MagimixProgramData = {
-        program: value.program,
-        rotationSpeed: value.rotationSpeed,
-        temperature: value.temperature,
+      onSubmit({
+        program: validated.program,
+        rotationSpeed: validated.rotationSpeed,
+        temperature: validated.temperature,
         time,
-      }
-      onSubmit(programData)
+      })
       form.reset()
       setOpen(false)
     },
     validationLogic: revalidateLogic(),
     validators: {
-      onDynamic: magimixProgramSchema,
+      onDynamic: (value) => {
+        const validated = magimixProgramSchema(value)
+        if (validated instanceof type.errors) {
+          return validated.summary
+        }
+        return undefined
+      },
     },
   })
 

@@ -32,7 +32,7 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
     onSubmit: async ({ value }) => {
       await updateMutation.mutateAsync(
         {
-          data: updateUnitSchema.parse(value),
+          data: updateUnitSchema.assert(value),
         },
         {
           onSuccess: () => {

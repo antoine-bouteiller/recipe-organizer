@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { and, eq, inArray, ne } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { getDb } from '@/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, unit } from '@/lib/db/schema'
@@ -10,14 +10,14 @@ import { withServerErrorCapture } from '@/utils/error-handler'
 
 import type { RecipeById } from '../types/recipe-by-id'
 
+const getRecipesByIdsSchema = type({
+  ids: 'number[]',
+})
+
 const getRecipesByIds = createServerFn({
   method: 'GET',
 })
-  .inputValidator(
-    z.object({
-      ids: z.array(z.number()),
-    })
-  )
+  .inputValidator(getRecipesByIdsSchema)
   .handler(
     withServerErrorCapture(async ({ data }) => {
       const rows = await getDb()
