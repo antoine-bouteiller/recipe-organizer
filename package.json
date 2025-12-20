@@ -71,7 +71,7 @@
     "lefthook": "^2.0.7",
     "oxfmt": "^0.16.0",
     "oxlint": "^1.31.0",
-    "oxlint-tsgolint": "^0.8.3",
+    "oxlint-tsgolint": "^0.10.0",
     "tailwindcss": "^4.1.17",
     "vite": "^8.0.0-beta.0",
     "vite-tsconfig-paths": "^5.1.4",
