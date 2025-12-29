@@ -63,7 +63,7 @@
     "@types/node": "^25.0.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native-preview": "7.0.0-dev.20251124.1",
+    "@typescript/native-preview": "7.0.0-dev.20251229.1",
     "@vitejs/plugin-react": "^5.1.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint-plugin-better-tailwindcss": "^3.7.11",
