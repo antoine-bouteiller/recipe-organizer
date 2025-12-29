@@ -74,7 +74,7 @@
     "oxlint-tsgolint": "^0.8.3",
     "tailwindcss": "^4.1.17",
     "vite": "^8.0.0-beta.0",
-    "vite-tsconfig-paths": "^5.1.4",
+    "vite-tsconfig-paths": "^6.0.0",
     "workbox-build": "^7.4.0",
     "wrangler": "^4.52.1"
   },
