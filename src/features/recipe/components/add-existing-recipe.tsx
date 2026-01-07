@@ -5,9 +5,9 @@ import { Combobox } from '@/components/ui/combobox'
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
@@ -32,13 +32,12 @@ export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddEx
       <ResponsiveDialogTrigger render={<Button className="md:flex-1" disabled={disabled} size="sm" type="button" variant="outline" />}>
         Ajouter une recette existante
       </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent>
+      <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter une recette existante</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
         <div className="p-4">
           <Combobox
-            noResultsLabel="Aucune recette trouvée"
             onChange={(option) =>
               setSelectedRecipe({
                 embeddedRecipeId: option.value,
@@ -67,7 +66,7 @@ export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddEx
             Ajouter
           </Button>
         </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
+      </ResponsiveDialogPopup>
     </ResponsiveDialog>
   )
 }

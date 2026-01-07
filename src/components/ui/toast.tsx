@@ -1,4 +1,4 @@
-import { Toast } from '@base-ui-components/react/toast'
+import { Toast } from '@base-ui/react/toast'
 import { CheckCircleIcon, CircleNotchIcon, InfoIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
 import { ArkErrors } from 'arktype'
 

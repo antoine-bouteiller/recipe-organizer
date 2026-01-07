@@ -10,7 +10,6 @@ import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
-import { extractLinkedRecipeIds } from '@/lib/utils/circular-reference'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
@@ -65,7 +64,6 @@ const updateRecipe = createServerFn({
           })
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),
-
         getDb()
           .delete(groupIngredient)
           .where(
@@ -104,29 +102,16 @@ const updateRecipe = createServerFn({
         })
       )
 
-      // Combine linked recipes from instructions and explicit form selections
-      const linkedRecipesFromInstructions = extractLinkedRecipeIds(instructions)
-      const linkedRecipesFromForm = (linkedRecipes ?? [])
-        .filter((lr) => lr.id > 0)
-        .map((lr, index) => ({
-          linkedRecipeId: lr.id,
-          position: linkedRecipesFromInstructions.length + index,
-          ratio: lr.ratio,
-          recipeId: id,
-        }))
-
-      const allLinkedRecipes = [
-        ...linkedRecipesFromInstructions.map(({ position, recipeId: linkedRecipeId }) => ({
-          linkedRecipeId,
-          position,
-          ratio: 1,
-          recipeId: id,
-        })),
-        ...linkedRecipesFromForm,
-      ]
-
-      if (allLinkedRecipes.length > 0) {
-        await getDb().insert(recipeLinkedRecipes).values(allLinkedRecipes)
+      if (linkedRecipes && linkedRecipes.length > 0) {
+        await getDb()
+          .insert(recipeLinkedRecipes)
+          .values(
+            linkedRecipes.map((lr) => ({
+              linkedRecipeId: lr.id,
+              ratio: lr.ratio,
+              recipeId: currentRecipe.id,
+            }))
+          )
       }
 
       return id

@@ -1,8 +1,8 @@
-import type { Popover as PopoverPrimitive } from '@base-ui-components/react/popover'
+import type { Popover as PopoverPrimitive } from '@base-ui/react/popover'
 
 import { createContext, type ReactNode, useContext } from 'react'
 
-import { Drawer, DrawerContent, type DrawerOverlayProps, DrawerTrigger, type DrawerTriggerProps } from '@/components/ui/drawer'
+import { Drawer, type DrawerOverlayProps, DrawerPopup, DrawerTrigger, type DrawerTriggerProps } from '@/components/ui/drawer'
 import { Popover, PopoverContent, type PopoverContentProps, PopoverTrigger } from '@/components/ui/popover'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
@@ -58,11 +58,11 @@ const ResponsivePopoverTrigger = ({ ...props }: DrawerTriggerProps & PopoverPrim
   return <PopoverTrigger {...props} />
 }
 
-const ResponsivePopoverContent = ({ ...props }: DrawerOverlayProps & PopoverContentProps) => {
+const ResponsivePopoverContent = ({ ...props }: DrawerOverlayProps & PopoverContentProps & { noPadding?: boolean }) => {
   const { isMobile } = useResponsivePopoverContext()
 
   if (isMobile) {
-    return <DrawerContent {...props} />
+    return <DrawerPopup {...props} />
   }
 
   return <PopoverContent {...props} />

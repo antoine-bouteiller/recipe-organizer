@@ -1,7 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { type } from 'arktype'
+import { env as cloudflareEnv } from 'cloudflare:workers'
 
-import { env } from '@/config/env'
 import { cache } from '@/lib/cache-manager'
 
 const paramsSchema = type({ id: 'string' })
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/api/image/$id')({
         const { id } = validated
 
         return cache.getWithCache(request.url)(async () => {
-          const file = await env.R2_BUCKET.get(id)
+          const file = await cloudflareEnv.R2_BUCKET.get(id)
 
           if (!file) {
             throw notFound()

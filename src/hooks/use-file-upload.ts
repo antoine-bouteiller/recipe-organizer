@@ -22,7 +22,7 @@ export interface FileUploadOptions {
   accept?: string
   initialFiles?: FileMetadata[]
   maxFiles?: number // Only used when multiple is true, defaults to Infinity
-  maxSize?: number // in bytes
+  maxSize?: number // In bytes
   multiple?: boolean // Defaults to false
   onFilesAdded?: (addedFiles: FileWithPreview[]) => void // Callback when new files are added
   onFilesChange?: (files: FileWithPreview[]) => void // Callback when files change
@@ -295,7 +295,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
           addFiles([file])
         }
       } catch {
-        // do nothing
+        // Do nothing
       }
     }
   }

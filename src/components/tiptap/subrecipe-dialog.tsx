@@ -9,9 +9,9 @@ import { Label } from '@/components/ui/label'
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
@@ -56,7 +56,7 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
         {children}
       </ResponsiveDialogTrigger>
 
-      <ResponsiveDialogContent>
+      <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
@@ -69,7 +69,6 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
           <div className="flex flex-col gap-2">
             <Label>Recette</Label>
             <Combobox
-              noResultsLabel="Aucune recette trouvée"
               onChange={(option) =>
                 setSelectedRecipe((prev) => ({
                   hideFirstNodes: prev?.hideFirstNodes,
@@ -137,7 +136,7 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
             {submitLabel}
           </Button>
         </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
+      </ResponsiveDialogPopup>
     </ResponsiveDialog>
   )
 }

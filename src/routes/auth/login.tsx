@@ -19,7 +19,7 @@ const getErrorMessage = (error: string) => {
 
 const LoginPage = () => {
   const searchParams = Route.useSearch()
-  const error = (searchParams as { error?: string }).error
+  const { error } = searchParams as { error?: string }
 
   useEffect(() => {
     if (error) {

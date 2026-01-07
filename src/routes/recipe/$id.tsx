@@ -59,18 +59,18 @@ const RecipePage = () => {
             <ResponsivePopoverTrigger render={<Button className="absolute top-4 right-4 rounded-full" size="icon" variant="outline" />}>
               <DotsThreeVerticalIcon className="size-4" weight="bold" />
             </ResponsivePopoverTrigger>
-            <ResponsivePopoverContent
-              align="end"
-              className={`
-                flex w-auto flex-col items-start gap-2 px-4 pb-4
-                md:px-2 md:pt-4
-              `}
-            >
-              <Button render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" />} variant="ghost">
-                <PencilSimpleIcon className="size-4" />
-                Modifier la recette
-              </Button>
-              <DeleteRecipe recipeId={recipe.id} recipeName={recipe.name} />
+            <ResponsivePopoverContent align="end">
+              <div className="flex flex-col items-start gap-2 p-4 md:p-0">
+                <Button
+                  className="w-full justify-start"
+                  render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" />}
+                  variant="ghost"
+                >
+                  <PencilSimpleIcon className="size-4" />
+                  Modifier la recette
+                </Button>
+                <DeleteRecipe recipeId={recipe.id} recipeName={recipe.name} />
+              </div>
             </ResponsivePopoverContent>
           </ResponsivePopover>
         )}

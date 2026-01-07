@@ -4,16 +4,16 @@ import { type ComponentPropsWithoutRef } from 'react'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
 
-import type { DialogTrigger } from '../ui/dialog'
-
 import { Button } from '../ui/button'
+import { type DialogTrigger } from '../ui/dialog'
 import { Form } from '../ui/form'
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '../ui/responsive-dialog'
@@ -38,8 +38,9 @@ export const getFormDialog = <T,>(defaultValues: T) =>
         <ResponsiveDialog onOpenChange={setOpen} open={open}>
           <ResponsiveDialogTrigger render={trigger} />
 
-          <ResponsiveDialogContent>
+          <ResponsiveDialogPopup>
             <Form
+              className="contents"
               errors={errors}
               onSubmit={async (event) => {
                 event.preventDefault()
@@ -50,14 +51,7 @@ export const getFormDialog = <T,>(defaultValues: T) =>
               <ResponsiveDialogHeader>
                 <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
               </ResponsiveDialogHeader>
-              <div
-                className={`
-                  flex flex-col gap-2 px-4
-                  md:px-0 md:py-4
-                `}
-              >
-                {children}
-              </div>
+              <ResponsiveDialogPanel className="flex flex-col gap-4">{children}</ResponsiveDialogPanel>
               <ResponsiveDialogFooter>
                 <ResponsiveDialogClose render={<Button disabled={form.state.isSubmitting} variant="outline" />}>Annuler</ResponsiveDialogClose>
                 <form.AppForm>
@@ -65,7 +59,7 @@ export const getFormDialog = <T,>(defaultValues: T) =>
                 </form.AppForm>
               </ResponsiveDialogFooter>
             </Form>
-          </ResponsiveDialogContent>
+          </ResponsiveDialogPopup>
         </ResponsiveDialog>
       )
     },

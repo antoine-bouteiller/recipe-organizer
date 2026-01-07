@@ -86,7 +86,6 @@ export const IngredientGroupField = withForm({
                             </AddUnit>
                           )}
                           disabled={isSubmitting}
-                          noResultsLabel="Aucune unité trouvée"
                           options={unitsOptions}
                           placeholder="Sélectionner une unité"
                           searchPlaceholder="Rechercher une unité"

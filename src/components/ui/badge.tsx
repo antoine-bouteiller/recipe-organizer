@@ -1,5 +1,5 @@
-import { mergeProps } from '@base-ui-components/react/merge-props'
-import { useRender } from '@base-ui-components/react/use-render'
+import { mergeProps } from '@base-ui/react/merge-props'
+import { useRender } from '@base-ui/react/use-render'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/utils/cn'
@@ -51,7 +51,7 @@ const badgeVariants = cva(
           bg-info/8 text-info-foreground
           dark:bg-info/16
         `,
-        // ingredients categories
+        // Ingredients categories
         meat: 'bg-red-200 text-red-600',
         other: 'bg-zinc-200 text-zinc-700',
         outline: `

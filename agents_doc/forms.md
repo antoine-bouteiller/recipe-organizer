@@ -129,10 +129,9 @@ All accessed via `<AppField name="...">` with render props:
   {({ ComboboxField }) => (
     <ComboboxField
       label="Parent"
-      options={options}  // { label: string, value: T }[]
+      options={options}  
       placeholder="Select..."
       searchPlaceholder="Search..."
-      noResultsLabel="No results"
       disabled={isSubmitting}
       nested  // Optional: for grouped options
     />

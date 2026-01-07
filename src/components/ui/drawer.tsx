@@ -3,6 +3,8 @@ import { Drawer as DrawerPrimitive } from 'vaul-base'
 
 import { cn } from '@/utils/cn'
 
+import { ScrollArea } from './scroll-area'
+
 const Drawer = ({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Root>) => <DrawerPrimitive.Root data-slot="drawer" {...props} />
 
 export type DrawerTriggerProps = React.ComponentProps<typeof DrawerPrimitive.Trigger>
@@ -20,21 +22,17 @@ const DrawerClose = ({ ...props }: React.ComponentProps<typeof DrawerPrimitive.C
 const DrawerOverlay = ({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Overlay>) => (
   <DrawerPrimitive.Overlay
     className={cn(
-      `
-        fixed inset-0 z-50 bg-black/50
-        data-[state=closed]:animate-out data-[state=closed]:fade-out-0
-        data-[state=open]:animate-in data-[state=open]:fade-in-0
-      `,
+      'fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
       className
     )}
-    data-slot="drawer-overlay"
+    data-slot="drawer-backdrop"
     {...props}
   />
 )
 
 export type DrawerOverlayProps = React.ComponentProps<typeof DrawerPrimitive.Overlay>
 
-const DrawerContent = ({ children, className, ...props }: DrawerOverlayProps) => (
+const DrawerPopup = ({ children, className, ...props }: DrawerOverlayProps) => (
   <DrawerPortal data-slot="drawer-portal">
     <DrawerOverlay />
     <DrawerPrimitive.Content
@@ -80,7 +78,7 @@ const DrawerContent = ({ children, className, ...props }: DrawerOverlayProps) =>
     >
       <div
         className={`
-          mx-auto mt-4 hidden h-1 w-[100px] shrink-0 rounded-full
+          mx-auto mt-4 hidden h-1 w-25 shrink-0 rounded-full
           bg-popover-foreground/50
           group-data-[vaul-drawer-direction=bottom]/drawer-content:block
         `}
@@ -106,6 +104,19 @@ const DrawerHeader = ({ className, ...props }: React.ComponentProps<'div'>) => (
   />
 )
 
+const DrawerPanel = ({ className, ...props }: React.ComponentProps<'div'>) => (
+  <ScrollArea>
+    <div
+      className={cn(
+        'px-4 pb-4 in-[[data-slot=drawer-popup]:has([data-slot=drawer-header])]:pt-1 in-[[data-slot=drawer-popup]:not(:has([data-slot=drawer-footer]))]:pb-4! in-[[data-slot=drawer-popup]:not(:has([data-slot=drawer-footer].border-t))]:pb-1 in-[[data-slot=drawer-popup]:not(:has([data-slot=drawer-header]))]:pt-4',
+        className
+      )}
+      data-slot="drawer-panel"
+      {...props}
+    />
+  </ScrollArea>
+)
+
 const DrawerFooter = ({ className, ...props }: React.ComponentProps<'div'>) => (
   <div className={cn('mt-auto flex flex-col gap-2 p-4', className)} data-slot="drawer-footer" {...props} />
 )
@@ -118,4 +129,16 @@ const DrawerDescription = ({ className, ...props }: React.ComponentProps<typeof 
   <DrawerPrimitive.Description className={cn('text-sm text-muted-foreground', className)} data-slot="drawer-description" {...props} />
 )
 
-export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger }
+export {
+  Drawer,
+  DrawerClose,
+  DrawerPopup,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerPanel,
+}

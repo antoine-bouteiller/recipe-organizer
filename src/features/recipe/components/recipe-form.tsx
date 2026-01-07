@@ -52,7 +52,6 @@ export const RecipeForm = withForm({
                           {({ ComboboxField }) => (
                             <ComboboxField
                               disabled={isSubmitting}
-                              noResultsLabel="Aucune sous-recette trouvée"
                               options={recipeOptions}
                               placeholder="Sélectionner une sous-recette"
                               searchPlaceholder="Rechercher une sous-recette"

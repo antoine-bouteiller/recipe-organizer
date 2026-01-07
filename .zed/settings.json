@@ -1,18 +1,5 @@
 {
   "lsp": {
-    "oxc": {
-      "initialization_options": {
-        "options": {
-          "fmt": {
-            "experimental": true
-          },
-          "configPath": null,
-          "tsConfigPath": null,
-          "unusedDisableDirectives": "allow",
-          "typeAware": true
-        }
-      }
-    },
     "vscode-css-language-server": {
       "settings": {
         "css": {
@@ -21,6 +8,26 @@
           }
         }
       }
+    }
+  },
+  "languages": {
+    "TSX": {
+      "formatter": [
+        {
+          "language_server": {
+            "name": "oxfmt"
+          }
+        }
+      ]
+    },
+    "TypeScript": {
+      "formatter": [
+        {
+          "language_server": {
+            "name": "oxfmt"
+          }
+        }
+      ]
     }
   }
 }

@@ -43,7 +43,6 @@ export const UnitForm = withForm({
                 disabled={isSubmitting}
                 label="Unité parente (optionnel)"
                 nested
-                noResultsLabel="Aucune unité trouvée"
                 options={availableParentUnits}
                 placeholder="Sélectionner une unité parente"
                 searchPlaceholder="Rechercher une unité"

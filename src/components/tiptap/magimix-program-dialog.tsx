@@ -8,9 +8,9 @@ import { Form } from '@/components/ui/form'
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
@@ -92,7 +92,7 @@ export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLa
     <ResponsiveDialog onOpenChange={setOpen} open={open}>
       <ResponsiveDialogTrigger render={triggerRender}>{children}</ResponsiveDialogTrigger>
 
-      <ResponsiveDialogContent>
+      <ResponsiveDialogPopup>
         <Form
           errors={errors}
           onSubmit={async (event) => {
@@ -147,7 +147,7 @@ export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLa
             </form.AppForm>
           </ResponsiveDialogFooter>
         </Form>
-      </ResponsiveDialogContent>
+      </ResponsiveDialogPopup>
     </ResponsiveDialog>
   )
 }
