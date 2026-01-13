@@ -10,6 +10,7 @@ import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
+import { isNotEmpty } from '@/utils/array'
 import { withServerErrorCapture } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
@@ -102,7 +103,7 @@ const updateRecipe = createServerFn({
         })
       )
 
-      if (linkedRecipes && linkedRecipes.length > 0) {
+      if (isNotEmpty(linkedRecipes)) {
         await getDb()
           .insert(recipeLinkedRecipes)
           .values(

@@ -60,12 +60,7 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-        <div
-          className={`
-            flex flex-col gap-4 px-4 py-4
-            md:px-0
-          `}
-        >
+        <div className="flex flex-col gap-4 px-4 py-4 md:px-0">
           <div className="flex flex-col gap-2">
             <Label>Recette</Label>
             <Combobox

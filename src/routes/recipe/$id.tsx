@@ -39,18 +39,8 @@ const RecipePage = () => {
   }
 
   return (
-    <div
-      className={`
-        flex w-full justify-center overflow-auto
-        md:pb-4
-      `}
-    >
-      <div
-        className={`
-          relative h-fit w-full
-          md:max-w-5xl md:rounded-2xl md:border md:bg-card md:shadow-sm
-        `}
-      >
+    <div className="flex w-full justify-center overflow-auto md:pb-4">
+      <div className="relative h-fit w-full md:max-w-5xl md:rounded-2xl md:border md:bg-card md:shadow-sm">
         <Button className="absolute top-4 left-4 rounded-full" onClick={() => router.history.back()} size="icon" variant="outline">
           <ArrowLeftIcon className="size-4" />
         </Button>
@@ -75,29 +65,11 @@ const RecipePage = () => {
           </ResponsivePopover>
         )}
         <div className="p-0">
-          <div
-            className={`
-              mb-6 flex aspect-16/6 w-full items-center justify-center
-              overflow-hidden
-              md:rounded-t-md
-            `}
-          >
+          <div className="mb-6 flex aspect-16/6 w-full items-center justify-center overflow-hidden md:rounded-t-md">
             <img alt={recipe.name} className="w-full object-cover" src={getFileUrl(recipe.image)} />
           </div>
-          <h1
-            className={`
-              px-6 text-xl font-semibold
-              md:text-2xl
-            `}
-          >
-            {recipe.name}
-          </h1>
-          <div
-            className={`
-              flex w-full items-center justify-center gap-2 px-8 py-2
-              md:justify-start
-            `}
-          >
+          <h1 className="px-6 text-xl font-semibold md:text-2xl">{recipe.name}</h1>
+          <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">
             <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon" variant="outline">
               <MinusIcon />
             </Button>
@@ -111,17 +83,8 @@ const RecipePage = () => {
           </div>
         </div>
 
-        <div
-          className={`
-            prose prose-sm flex max-w-none flex-1 flex-col text-foreground
-          `}
-        >
-          <div
-            className={`
-              px-4 pb-4
-              md:hidden
-            `}
-          >
+        <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
+          <div className="px-4 pb-4 md:hidden">
             <Tabs defaultValue="ingredients">
               <TabsList className="w-full">
                 <TabsTab value="ingredients">Ingrédients</TabsTab>
@@ -139,12 +102,7 @@ const RecipePage = () => {
             </Tabs>
           </div>
 
-          <div
-            className={`
-              hidden flex-1 grid-cols-5 gap-8 p-4
-              md:grid
-            `}
-          >
+          <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
             <div className="col-span-2 rounded-xl border px-8">
               <h2>Ingrédients</h2>
               <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={recipe.ingredientGroups} servings={quantity} />

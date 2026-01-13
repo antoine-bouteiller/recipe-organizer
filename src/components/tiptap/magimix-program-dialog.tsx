@@ -104,12 +104,7 @@ export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLa
           <ResponsiveDialogHeader>
             <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
           </ResponsiveDialogHeader>
-          <div
-            className={`
-              flex flex-col gap-2 px-4
-              md:px-0 md:py-4
-            `}
-          >
+          <div className="flex flex-col gap-2 px-4 md:px-0 md:py-4">
             <form.AppField name="program">
               {({ SelectField }) => <SelectField disabled={isSubmitting} items={programItems} label="Programme" />}
             </form.AppField>

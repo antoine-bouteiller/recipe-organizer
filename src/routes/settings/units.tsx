@@ -24,11 +24,7 @@ const UnitsManagement = () => {
 
   return (
     <ScreenLayout title="Unitées" withGoBack>
-      <div
-        className={`
-          sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2
-        `}
-      >
+      <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
         <SearchInput search={search} setSearch={setSearch} />
         <AddUnit>
           <Button size="icon-lg" variant="outline">

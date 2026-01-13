@@ -35,10 +35,7 @@ const ToggleGroup = ({
 }: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => (
   <ToggleGroupPrimitive
     className={cn(
-      `
-        flex w-fit
-        *:focus-visible:z-10
-      `,
+      `flex w-fit *:focus-visible:z-10`,
       orientation === 'horizontal' ? '*:pointer-coarse:after:min-w-auto' : '*:pointer-coarse:after:min-h-auto',
       getToggleGroupClassName(variant, orientation),
       className

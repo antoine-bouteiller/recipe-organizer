@@ -10,19 +10,10 @@ interface RecipeGroupIngredientsProps {
 
 const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: RecipeGroupIngredientsProps) =>
   groupIngredients.length > 0 && (
-    <ul
-      className={`
-        mt-0 mb-0 space-y-2 pr-4
-        md:pr-2
-      `}
-    >
+    <ul className="mt-0 mb-0 space-y-2 pr-4 md:pr-2">
       {groupIngredients.map((groupIngredient) => (
         <li key={groupIngredient.id}>
-          <div
-            className={`
-              flex items-center justify-between gap-2 text-nowrap text-ellipsis
-            `}
-          >
+          <div className="flex items-center justify-between gap-2 text-nowrap text-ellipsis">
             <div>{groupIngredient.ingredient.name}</div>
             <div className="font-medium">
               {formatNumber((groupIngredient.quantity * servings) / baseServings)}

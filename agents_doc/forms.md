@@ -86,15 +86,15 @@ const unitSchema = z.object({
   parentId: z.number().optional(),
 })
 
-export type UnitFormValues = z.infer<typeof unitSchema>  // After validation
-export type UnitFormInput = Partial<z.input<typeof unitSchema>>  // Before validation (partial)
+export type UnitFormValues = z.infer<typeof unitSchema> // After validation
+export type UnitFormInput = Partial<z.input<typeof unitSchema>> // Before validation (partial)
 ```
 
 ## Default Values & Field Maps
 
 ```typescript
 export const unitDefaultValues: UnitFormInput = { name: '', factor: undefined, parentId: undefined }
-export const unitFormFields = createFieldMap(unitDefaultValues)  // Type-safe field names
+export const unitFormFields = createFieldMap(unitDefaultValues) // Type-safe field names
 ```
 
 ## Field Components
@@ -129,7 +129,7 @@ All accessed via `<AppField name="...">` with render props:
   {({ ComboboxField }) => (
     <ComboboxField
       label="Parent"
-      options={options}  
+      options={options}
       placeholder="Select..."
       searchPlaceholder="Search..."
       disabled={isSubmitting}

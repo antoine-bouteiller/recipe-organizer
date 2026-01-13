@@ -94,43 +94,18 @@ const ItemMedia = ({ className, variant = 'default', ...props }: React.Component
 )
 
 const ItemContent = ({ className, ...props }: React.ComponentProps<'div'>) => (
-  <div
-    className={cn(
-      `
-        flex flex-1 flex-col gap-1
-        [&+[data-slot=item-content]]:flex-none
-      `,
-      className
-    )}
-    data-slot="item-content"
-    {...props}
-  />
+  <div className={cn(`flex flex-1 flex-col gap-1 [&+[data-slot=item-content]]:flex-none`, className)} data-slot="item-content" {...props} />
 )
 
 const ItemTitle = ({ className, ...props }: React.ComponentProps<'div'>) => (
-  <div
-    className={cn(
-      `
-      flex w-fit items-center gap-2 text-sm leading-snug font-medium
-    `,
-      className
-    )}
-    data-slot="item-title"
-    {...props}
-  />
+  <div className={cn(`flex w-fit items-center gap-2 text-sm leading-snug font-medium`, className)} data-slot="item-title" {...props} />
 )
 
 const ItemDescription = ({ className, ...props }: React.ComponentProps<'p'>) => (
   <p
     className={cn(
-      `
-        line-clamp-2 text-sm leading-normal font-normal text-balance
-        text-muted-foreground
-      `,
-      `
-        [&>a]:underline [&>a]:underline-offset-4
-        [&>a:hover]:text-primary
-      `,
+      `line-clamp-2 text-sm leading-normal font-normal text-balance text-muted-foreground`,
+      `[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary`,
       className
     )}
     data-slot="item-description"

@@ -3,5 +3,9 @@
   "trailingComma": "es5",
   "semi": false,
   "singleQuote": true,
-  "printWidth": 150
+  "printWidth": 150,
+  "experimentalSortImports": {},
+  "experimentalTailwindcss": {
+    "stylesheet": "src/styles/app.css"
+  }
 }

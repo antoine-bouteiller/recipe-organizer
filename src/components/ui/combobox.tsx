@@ -44,12 +44,7 @@ const Combobox = <T extends ValueOptions>({
           <Button
             className={cn(
               'w-full justify-between border-input font-normal text-ellipsis',
-              `
-                not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)]
-                aria-invalid:border-destructive/36
-                focus-visible:aria-invalid:border-destructive/64
-                focus-visible:aria-invalid:ring-destructive/16
-              `,
+              `not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] aria-invalid:border-destructive/36 focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16`,
               className
             )}
             variant="outline"

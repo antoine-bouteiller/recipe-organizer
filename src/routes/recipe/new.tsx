@@ -49,12 +49,7 @@ const NewRecipePage = () => {
         }}
       >
         <RecipeForm fields={recipeFormFields} form={form} />
-        <div
-          className={`
-            flex flex-col justify-end gap-4 pt-6
-            md:flex-row
-          `}
-        >
+        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>

@@ -28,11 +28,7 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div
-        className={`
-          sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2
-        `}
-      >
+      <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
         <SearchInput search={search} setSearch={setSearch} />
         <AddIngredient>
           <Button size="icon-lg" variant="outline">
@@ -54,22 +50,9 @@ const IngredientsManagement = () => {
                   <ItemContent>
                     <ItemTitle>
                       <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
-                      <Badge
-                        className={`
-                          aspect-square
-                          md:aspect-auto
-                        `}
-                        variant={ingredient.category}
-                      >
+                      <Badge className="aspect-square md:aspect-auto" variant={ingredient.category}>
                         {ingredientCategoryIcons[ingredient.category]}
-                        <span
-                          className={`
-                            hidden
-                            md:block
-                          `}
-                        >
-                          {ingredientCategoryLabels[ingredient.category]}
-                        </span>
+                        <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
                       </Badge>
                     </ItemTitle>
                   </ItemContent>

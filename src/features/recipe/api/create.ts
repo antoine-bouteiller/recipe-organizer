@@ -8,6 +8,7 @@ import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { uploadFile } from '@/lib/r2'
+import { isNotEmpty } from '@/utils/array'
 import { parseFormData } from '@/utils/form-data'
 
 import { getTitle } from '../utils/get-recipe-title'
@@ -83,7 +84,7 @@ const createRecipe = createServerFn({
       })
     )
 
-    if (linkedRecipes && linkedRecipes.length > 0) {
+    if (isNotEmpty(linkedRecipes)) {
       await getDb()
         .insert(recipeLinkedRecipes)
         .values(

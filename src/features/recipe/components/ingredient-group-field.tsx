@@ -34,25 +34,13 @@ export const IngredientGroupField = withForm({
             {field.state.value?.map((ingredient, ingredientIndex) => (
               <Fragment key={`ingredient-g${groupIndex}-i${ingredientIndex}-${String(ingredient.id) || 'new'}`}>
                 <div className="flex gap-2">
-                  <div
-                    className={`
-                      flex w-full flex-1 flex-col items-start justify-between
-                      gap-2
-                      md:flex-row
-                    `}
-                  >
+                  <div className="flex w-full flex-1 flex-col items-start justify-between gap-2 md:flex-row">
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
                           addNew={(inputValue) => (
                             <AddIngredient defaultValue={inputValue} key={inputValue}>
-                              <Button
-                                className={`
-                                  w-full justify-start px-1.5 font-normal
-                                `}
-                                size="sm"
-                                variant="ghost"
-                              >
+                              <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
                                 <PlusIcon aria-hidden="true" className="size-4" />
                                 Nouvel ingrédient: {inputValue}
                               </Button>
@@ -73,13 +61,7 @@ export const IngredientGroupField = withForm({
                         <ComboboxField
                           addNew={(inputValue: string) => (
                             <AddUnit defaultValue={inputValue} key={inputValue}>
-                              <Button
-                                className={`
-                                  w-full justify-start px-1.5 font-normal
-                                `}
-                                size="sm"
-                                variant="ghost"
-                              >
+                              <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
                                 <PlusIcon aria-hidden="true" className="size-4" />
                                 Nouvelle unité: {inputValue}
                               </Button>
