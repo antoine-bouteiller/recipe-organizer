@@ -1,7 +1,7 @@
 import { type ComponentPropsWithoutRef, createContext, type ReactNode, useContext } from 'react'
 
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
+import { Dialog, DialogClose, DialogFooter, DialogHeader, DialogPanel, DialogPopup, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Drawer, DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 interface ResponsiveDialogContextValue {
@@ -79,19 +79,19 @@ const ResponsiveDialogTrigger = ({ children, ...props }: ResponsiveDialogTrigger
   return <DialogTrigger {...props}>{children}</DialogTrigger>
 }
 
-interface ResponsiveDialogContentProps {
+interface ResponsiveDialogPopupProps {
   children?: ReactNode
   className?: string
 }
 
-const ResponsiveDialogContent = ({ ...props }: ResponsiveDialogContentProps) => {
+const ResponsiveDialogPopup = ({ ...props }: ResponsiveDialogPopupProps) => {
   const { isMobile } = useResponsiveDialogContext()
 
   if (isMobile) {
-    return <DrawerContent {...props} />
+    return <DrawerPopup {...props} />
   }
 
-  return <DialogContent {...props} />
+  return <DialogPopup {...props} />
 }
 
 interface ResponsiveDialogHeaderProps {
@@ -109,12 +109,12 @@ const ResponsiveDialogHeader = ({ ...props }: ResponsiveDialogHeaderProps) => {
   return <DialogHeader {...props} />
 }
 
-interface ResponsiveDialogTitleProps {
+interface ResponsiveDialogContentProps {
   children?: ReactNode
   className?: string
 }
 
-const ResponsiveDialogTitle = ({ ...props }: ResponsiveDialogTitleProps) => {
+const ResponsiveDialogTitle = ({ ...props }: ResponsiveDialogContentProps) => {
   const { isMobile } = useResponsiveDialogContext()
 
   if (isMobile) {
@@ -124,12 +124,17 @@ const ResponsiveDialogTitle = ({ ...props }: ResponsiveDialogTitleProps) => {
   return <DialogTitle {...props} />
 }
 
-interface ResponsiveDialogFooterProps {
-  children?: ReactNode
-  className?: string
+const ResponsiveDialogPanel = ({ ...props }: ResponsiveDialogContentProps) => {
+  const { isMobile } = useResponsiveDialogContext()
+
+  if (isMobile) {
+    return <DrawerPanel {...props} />
+  }
+
+  return <DialogPanel {...props} />
 }
 
-const ResponsiveDialogFooter = ({ ...props }: ResponsiveDialogFooterProps) => {
+const ResponsiveDialogFooter = ({ ...props }: ResponsiveDialogContentProps) => {
   const { isMobile } = useResponsiveDialogContext()
 
   if (isMobile) {
@@ -158,7 +163,8 @@ const ResponsiveDialogClose = ({ children, ...props }: ResponsiveDialogCloseProp
 export {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,

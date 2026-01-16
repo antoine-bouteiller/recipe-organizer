@@ -6,6 +6,7 @@ export const queryKeys = {
   listIngredients: () => [...queryKeys.allIngredients, 'list'] as const,
 
   recipeDetail: (id: number) => [...queryKeys.allRecipes, 'detail', id] as const,
+  recipeInstructions: (id: number) => [...queryKeys.allRecipes, 'instructions', id] as const,
   recipeList: (search?: string) => [...queryKeys.recipeLists(), 'all', search] as const,
   recipeListByIds: (ids: number[]) => [...queryKeys.recipeLists(), ids] as const,
 

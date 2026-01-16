@@ -1,44 +1,42 @@
 import { queryOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { desc, eq } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
+
+const getRecipeSchema = type('number')
 
 const getRecipe = createServerFn({
   method: 'GET',
 })
-  .inputValidator(z.number())
+  .inputValidator(getRecipeSchema)
   .handler(
-    withServerErrorCapture(async ({ data }) => {
+    withServerError(async ({ data }) => {
       const result = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, data),
         with: {
-          sections: {
+          ingredientGroups: {
             orderBy: (table) => [desc(table.isDefault)],
             with: {
-              sectionIngredients: {
+              groupIngredients: {
                 with: {
                   ingredient: true,
                   unit: true,
                 },
               },
-              subRecipe: {
-                with: {
-                  sections: {
-                    with: {
-                      sectionIngredients: {
-                        with: {
-                          ingredient: true,
-                          unit: true,
-                        },
-                      },
-                    },
-                  },
+            },
+          },
+          linkedRecipes: {
+            with: {
+              linkedRecipe: {
+                columns: {
+                  id: true,
+                  name: true,
                 },
               },
             },
@@ -55,7 +53,7 @@ const getRecipe = createServerFn({
   )
 
 export type Recipe = Awaited<ReturnType<typeof getRecipe>>
-export type RecipeSection = Recipe['sections'][number]
+export type RecipeIngredientGroup = Recipe['ingredientGroups'][number]
 
 const getRecipeDetailsOptions = (id: number) =>
   queryOptions({

@@ -1,25 +1,25 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { and, eq, inArray, ne } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { getDb } from '@/lib/db'
-import { ingredient, recipe, recipeIngredientsSection, sectionIngredient, unit } from '@/lib/db/schema'
+import { groupIngredient, ingredient, recipe, recipeIngredientGroup, unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
 
 import type { RecipeById } from '../types/recipe-by-id'
+
+const getRecipesByIdsSchema = type({
+  ids: 'number[]',
+})
 
 const getRecipesByIds = createServerFn({
   method: 'GET',
 })
-  .inputValidator(
-    z.object({
-      ids: z.array(z.number()),
-    })
-  )
+  .inputValidator(getRecipesByIdsSchema)
   .handler(
-    withServerErrorCapture(async ({ data }) => {
+    withServerError(async ({ data }) => {
       const rows = await getDb()
         .select({
           id: recipe.id,
@@ -30,16 +30,16 @@ const getRecipesByIds = createServerFn({
             parentId: ingredient.parentId,
           },
           ingredientDetails: {
-            quantity: sectionIngredient.quantity,
+            quantity: groupIngredient.quantity,
             unit: unit.name,
           },
-          quantity: recipe.quantity,
+          servings: recipe.servings,
         })
         .from(recipe)
-        .leftJoin(recipeIngredientsSection, eq(recipe.id, recipeIngredientsSection.recipeId))
-        .leftJoin(sectionIngredient, eq(sectionIngredient.sectionId, recipeIngredientsSection.id))
-        .leftJoin(ingredient, eq(sectionIngredient.ingredientId, ingredient.id))
-        .leftJoin(unit, eq(sectionIngredient.unitId, unit.id))
+        .leftJoin(recipeIngredientGroup, eq(recipe.id, recipeIngredientGroup.recipeId))
+        .leftJoin(groupIngredient, eq(groupIngredient.groupId, recipeIngredientGroup.id))
+        .leftJoin(ingredient, eq(groupIngredient.ingredientId, ingredient.id))
+        .leftJoin(unit, eq(groupIngredient.unitId, unit.id))
         .where(and(ne(ingredient.category, 'spices'), inArray(recipe.id, data.ids)))
 
       const result = rows.reduce<Record<number, RecipeById>>((acc, row) => {
@@ -48,7 +48,7 @@ const getRecipesByIds = createServerFn({
           acc[row.id] = {
             id: row.id,
             ingredients: [],
-            quantity: row.quantity,
+            servings: row.servings,
           }
         }
         if (ingredient && ingredientDetails.quantity) {

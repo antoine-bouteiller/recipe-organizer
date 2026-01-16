@@ -5,40 +5,79 @@ import type { FileMetadata } from '@/hooks/use-file-upload'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { type RecipeFormInput } from '@/features/recipe/api/create'
-import AddExistingRecipe from '@/features/recipe/components/add-existing-recipe'
+import { LinkedRecipesProvider } from '@/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
+import { useRecipeOptions } from '@/hooks/use-options'
+
+import type { RecipeIngredientGroupFormInput } from '../api/create'
 
 import { recipeDefaultValues } from '../utils/constants'
-import { IngredientSectionField } from './ingredient-section-field'
+import { IngredientGroupField } from './ingredient-group-field'
 
-const hasSubRecipe = (section: NonNullable<RecipeFormInput['sections']>[number] | undefined) => section && 'recipeId' in section && !!section.recipeId
-
-const generateSectionKey = (section: NonNullable<RecipeFormInput['sections']>[number], index: number): string => {
-  if (section && 'recipeId' in section) {
-    return `section-recipe-${JSON.stringify(section.recipeId)}`
-  }
-  const firstIngredientId = JSON.stringify(section.ingredients?.[0]?.id ?? '')
-  return `section-${index}-${firstIngredientId}`
+const generateGroupKey = (group: RecipeIngredientGroupFormInput, index: number): string => {
+  const firstIngredientId = group.ingredients?.[0]?.id ?? ''
+  return `group-${index}-${firstIngredientId}`
 }
 
 interface RecipeFormProps extends Record<string, unknown> {
   initialImage?: FileMetadata
+  id?: number
 }
 
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
-  render: function Render({ form, initialImage }) {
+  render: function Render({ form, initialImage, id }) {
     const { AppField, Field } = form
 
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
+    const linkedRecipeIds = useStore(form.store, (state) => (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((id) => id > 0))
+    const recipeOptions = useRecipeOptions({ filter: (recipe) => recipe.id !== id })
 
     return (
       <>
         <AppField name="name">{({ TextField }) => <TextField disabled={isSubmitting} label="Nom de la recette" />}</AppField>
 
-        <AppField name="quantity">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Quantité" min={0} />}</AppField>
+        <AppField name="servings">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Portions" min={0} />}</AppField>
+
+        <div className="flex flex-col gap-2">
+          <Label>Sous-recettes liées</Label>
+          <AppField mode="array" name="linkedRecipes">
+            {(field) => (
+              <>
+                {field.state.value?.map((linkedRecipe, index) => (
+                  <div className="flex gap-2" key={`linked-recipe-${linkedRecipe.id}`}>
+                    <div className="flex flex-1 gap-2">
+                      <div className="flex-1">
+                        <AppField name={`linkedRecipes[${index}].id`}>
+                          {({ ComboboxField }) => (
+                            <ComboboxField
+                              disabled={isSubmitting}
+                              options={recipeOptions}
+                              placeholder="Sélectionner une sous-recette"
+                              searchPlaceholder="Rechercher une sous-recette"
+                            />
+                          )}
+                        </AppField>
+                      </div>
+                      <div className="w-24">
+                        <AppField name={`linkedRecipes[${index}].ratio`}>
+                          {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />}
+                        </AppField>
+                      </div>
+                    </div>
+                    <Button disabled={isSubmitting} onClick={() => field.removeValue(index)} size="icon" type="button" variant="destructive-outline">
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button disabled={isSubmitting} onClick={() => field.pushValue({ id: -1, ratio: 1 })} size="sm" type="button" variant="outline">
+                  Ajouter une sous-recette <PlusIcon className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </AppField>
+        </div>
 
         <AppField name="image">
           {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
@@ -46,22 +85,22 @@ export const RecipeForm = withForm({
 
         <div className="flex flex-col gap-2 pt-2">
           <Label>Groupes d&apos;ingrédients</Label>
-          <Field mode="array" name="sections">
+          <Field mode="array" name="ingredientGroups">
             {(field) => (
               <>
-                {field.state.value?.map((section, sectionIndex) => (
-                  <AppField key={generateSectionKey(section, sectionIndex)} name={`sections[${sectionIndex}]`}>
+                {field.state.value?.map((group, groupIndex) => (
+                  <AppField key={generateGroupKey(group, groupIndex)} name={`ingredientGroups[${groupIndex}]`}>
                     {({ Field, FieldError }) => (
                       <Field className="relative rounded-xl border p-4">
-                        {sectionIndex !== 0 && (
+                        {groupIndex !== 0 && (
                           <>
-                            <AppField name={`sections[${sectionIndex}].name`}>
-                              {({ TextField }) => <TextField className="pt-2" disabled={isSubmitting} label="Nom" />}
+                            <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
+                              {({ TextField }) => <TextField className="pt-2" disabled={isSubmitting} label="Nom du groupe" />}
                             </AppField>
                             <Button
                               className="absolute top-2 right-2"
                               disabled={isSubmitting}
-                              onClick={() => field.removeValue(sectionIndex)}
+                              onClick={() => field.removeValue(groupIndex)}
                               size="icon"
                               type="button"
                               variant="destructive-outline"
@@ -71,52 +110,34 @@ export const RecipeForm = withForm({
                           </>
                         )}
 
-                        {hasSubRecipe(section) ? <div /> : <IngredientSectionField form={form} sectionIndex={sectionIndex} />}
+                        <IngredientGroupField form={form} groupIndex={groupIndex} />
                         <FieldError />
                       </Field>
                     )}
                   </AppField>
                 ))}
-                <div
-                  className={`
-                    flex w-full flex-col gap-2
-                    md:flex-row
-                  `}
+                <Button
+                  disabled={isSubmitting}
+                  onClick={() => {
+                    field.pushValue({
+                      groupName: undefined,
+                      ingredients: [],
+                    })
+                  }}
+                  size="sm"
+                  type="button"
+                  variant="outline"
                 >
-                  <Button
-                    className="md:flex-1"
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      field.pushValue({
-                        ingredients: [],
-                        name: undefined,
-                        ratio: 1,
-                      })
-                    }}
-                    size="sm"
-                    type="button"
-                    variant="outline"
-                  >
-                    Ajouter une section <PlusIcon className="h-4 w-4" />
-                  </Button>
-                  <AddExistingRecipe
-                    disabled={isSubmitting}
-                    onSelect={(selectedRecipe) => {
-                      field.pushValue({
-                        ingredients: [],
-                        name: selectedRecipe.name,
-                        ratio: 1,
-                        recipeId: selectedRecipe.recipeId.toString(),
-                      })
-                    }}
-                  />
-                </div>
+                  Ajouter un groupe <PlusIcon className="h-4 w-4" />
+                </Button>
               </>
             )}
           </Field>
         </div>
 
-        <AppField name="steps">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Étapes" />}</AppField>
+        <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
+          <AppField name="instructions">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Instructions" />}</AppField>
+        </LinkedRecipesProvider>
       </>
     )
   },

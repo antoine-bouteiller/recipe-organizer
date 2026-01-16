@@ -1,5 +1,5 @@
 import { Store } from '@tanstack/react-store'
-import z from 'zod'
+import { type } from 'arktype'
 
 import { getCookie, setCookie } from '@/utils/cookie'
 
@@ -13,9 +13,11 @@ const defaultState: RecipeQuantitiesState = {
   recipesQuantities: {},
 }
 
-const storeSchema = z.object({
-  recipesQuantities: z.record(z.string().transform(Number), z.coerce.number()),
-})
+const storeSchema = type('string')
+  .pipe.try((s): object => JSON.parse(s))
+  .to({
+    recipesQuantities: 'Record<string, number>',
+  })
 
 export const initRecipeQuantitiesState = () => {
   const state = getCookie(storageKey)
@@ -24,9 +26,19 @@ export const initRecipeQuantitiesState = () => {
     return defaultState
   }
 
-  const parsedState = storeSchema.safeParse(JSON.parse(state))
+  const validated = storeSchema(state)
 
-  return parsedState.success ? parsedState.data : defaultState
+  if (validated instanceof type.errors) {
+    return defaultState
+  }
+
+  // Convert string keys back to numbers
+  const recipesQuantities: Record<number, number> = {}
+  for (const [key, value] of Object.entries(validated.recipesQuantities)) {
+    recipesQuantities[Number(key)] = value
+  }
+
+  return { recipesQuantities }
 }
 
 export const recipeQuantitiesStore = new Store(initRecipeQuantitiesState(), {

@@ -6,7 +6,7 @@
       "@/*": ["./src/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable", "webworker"],
-    "types": ["vite/client"]
+    "types": ["vite/client", "bun", "vite-plugin-pwa/client"]
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
   "files": ["worker-configuration.d.ts"]

@@ -1,24 +1,57 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import { z } from 'zod'
+import { type } from 'arktype'
+import { eq, inArray } from 'drizzle-orm'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
-import { recipe } from '@/lib/db/schema'
+import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile } from '@/lib/r2'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
+
+const deleteRecipeSchema = type('number')
 
 const deleteRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard('admin')])
-  .inputValidator(z.number())
+  .inputValidator(deleteRecipeSchema)
   .handler(
-    withServerErrorCapture(async ({ data }) => {
-      const deletedRecipe = await getDb().delete(recipe).where(eq(recipe.id, data)).returning()
-      await deleteFile(deletedRecipe[0].image)
+    withServerError(async ({ data: id }) => {
+      const currentRecipe = await getDb().query.recipe.findFirst({
+        where: eq(recipe.id, id),
+        columns: {
+          id: true,
+          image: true,
+        },
+        with: {
+          ingredientGroups: {
+            columns: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!currentRecipe) {
+        throw new Error('Recipe not found')
+      }
+
+      await getDb().batch([
+        getDb()
+          .delete(groupIngredient)
+          .where(
+            inArray(
+              groupIngredient.groupId,
+              currentRecipe.ingredientGroups.map(({ id }) => id)
+            )
+          ),
+        getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
+        getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
+        getDb().delete(recipe).where(eq(recipe.id, id)),
+      ])
+      await deleteFile(currentRecipe.image)
     })
   )
 

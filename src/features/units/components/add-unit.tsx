@@ -26,7 +26,7 @@ export const AddUnit = ({ children, defaultValue }: AddUnitProps) => {
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
-          data: unitSchema.parse(value),
+          data: unitSchema.assert(value),
         },
         {
           onSuccess: () => {

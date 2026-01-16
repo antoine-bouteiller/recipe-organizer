@@ -1,12 +1,14 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
+import { type } from 'arktype'
 import { useEffect } from 'react'
-import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
+
+const searchSchema = type({ 'error?': 'string' })
 
 const getErrorMessage = (error: string) => {
   if (error === 'signup_disabled') {
@@ -16,7 +18,8 @@ const getErrorMessage = (error: string) => {
 }
 
 const LoginPage = () => {
-  const { error } = Route.useSearch()
+  const searchParams = Route.useSearch()
+  const { error } = searchParams as { error?: string }
 
   useEffect(() => {
     if (error) {
@@ -51,5 +54,5 @@ export const Route = createFileRoute('/auth/login')({
     }
   },
   component: LoginPage,
-  validateSearch: z.object({ error: z.string().optional() }),
+  validateSearch: (search) => searchSchema.assert(search),
 })

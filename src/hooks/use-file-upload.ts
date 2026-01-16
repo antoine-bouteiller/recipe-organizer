@@ -4,6 +4,8 @@ import type React from 'react'
 
 import { type ChangeEvent, type DragEvent, type InputHTMLAttributes, useEffect, useRef, useState } from 'react'
 
+import { isNotEmpty } from '@/utils/array'
+
 export interface FileMetadata {
   id: string
   name?: string
@@ -22,7 +24,7 @@ export interface FileUploadOptions {
   accept?: string
   initialFiles?: FileMetadata[]
   maxFiles?: number // Only used when multiple is true, defaults to Infinity
-  maxSize?: number // in bytes
+  maxSize?: number // In bytes
   multiple?: boolean // Defaults to false
   onFilesAdded?: (addedFiles: FileWithPreview[]) => void // Callback when new files are added
   onFilesChange?: (files: FileWithPreview[]) => void // Callback when files change
@@ -131,7 +133,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     setState((prev) => {
       // Clean up object URLs
       for (const file of prev.files) {
-        if (file.preview && file.file instanceof File && file.file.type.startsWith('image/')) {
+        if (file.file.type?.startsWith('image/') && file.preview) {
           URL.revokeObjectURL(file.preview)
         }
       }
@@ -240,7 +242,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
   const removeFile = (id: string) => {
     setState((prev) => {
       const fileToRemove = prev.files.find((file) => file.id === id)
-      if (fileToRemove?.preview && fileToRemove.file instanceof File && fileToRemove.file.type.startsWith('image/')) {
+      if (fileToRemove?.file?.type?.startsWith('image/') && fileToRemove?.preview) {
         URL.revokeObjectURL(fileToRemove.preview)
       }
 
@@ -264,8 +266,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
 
   const handlePaste = async (event: ClipboardEvent) => {
     const { activeElement } = document
-    const isTextInput =
-      activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.hasAttribute('contenteditable'))
+    const isTextInput = activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.hasAttribute('contenteditable'))
 
     if (isTextInput) {
       return
@@ -295,7 +296,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
           addFiles([file])
         }
       } catch {
-        // do nothing
+        // Do nothing
       }
     }
   }
@@ -334,7 +335,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
       return
     }
 
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    if (isNotEmpty(e.dataTransfer.files)) {
       // In single file mode, only use the first file
       if (multiple) {
         addFiles(e.dataTransfer.files)
@@ -346,7 +347,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
   }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
+    if (isNotEmpty(e.target?.files)) {
       addFiles(e.target.files)
     }
   }

@@ -3,9 +3,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA as vitePwa } from 'vite-plugin-pwa'
 import tsConfigPaths from 'vite-tsconfig-paths'
-
-import { workboxGeneratePlugin } from './service-worker-generate'
 
 const viteConfig = defineConfig({
   plugins: [
@@ -22,7 +21,15 @@ const viteConfig = defineConfig({
       },
     }),
     tailwindcss(),
-    workboxGeneratePlugin(),
+    vitePwa({
+      registerType: 'prompt',
+      injectRegister: false,
+      devOptions: {
+        enabled: false,
+        type: 'module',
+        suppressWarnings: true,
+      },
+    }),
   ],
   server: {
     port: 3000,

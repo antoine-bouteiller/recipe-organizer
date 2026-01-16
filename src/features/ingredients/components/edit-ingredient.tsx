@@ -34,7 +34,7 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
     onSubmit: async (data) => {
       await updateMutation.mutateAsync(
         {
-          data: updateIngredientSchema.parse(data.value),
+          data: updateIngredientSchema.assert(data.value),
         },
         {
           onSuccess: () => {

@@ -107,6 +107,7 @@ This project uses Tanstack form for form management. You can find more informati
 **CRITICAL: Always prefer code factorization over duplication.**
 
 When writing code, follow these principles:
+
 - **No code duplication**: If you find yourself writing the same code twice, extract it into a shared utility, hook, or component
 - **Centralize utilities**: Common helper functions should be placed in `src/lib/utils.ts` or appropriate feature-specific utility files
 - **Reuse components**: Extract common UI patterns into reusable components in `src/components/`
@@ -114,6 +115,7 @@ When writing code, follow these principles:
 - **Extract hooks**: Shared logic should be extracted into custom hooks in `src/hooks/`
 
 **Before adding new code, always check if:**
+
 1. A similar function/component already exists that you can reuse or extend
 2. The code you're writing appears elsewhere and should be extracted
 3. A utility function would make the code more maintainable
@@ -125,6 +127,7 @@ When writing code, follow these principles:
 **IMPORTANT** Always lint your code before committing using `bun lint`.
 
 This project enforces strict code quality via oxlint configured in `.oxlintrc.json`:
+
 - No `console` statements allowed (use proper logging)
 - No `any` types or non-null assertions
 - No unused variables, imports, or function parameters
@@ -141,6 +144,7 @@ This project enforces strict code quality via oxlint configured in `.oxlintrc.js
 This project uses Coss UI for UI components. You can find the documentation [here](https://coss.com/ui/llms.txt).
 
 Add new Shadcn components using:
+
 ```bash
 bunx shadcn@latest add @coss/<component-name>
 ```
@@ -155,6 +159,7 @@ bunx shadcn@latest add @coss/<component-name>
 ## Deployment (Cloudflare)
 
 Configuration in `wrangler.jsonc`:
+
 - D1 database binding: `DB`
 - R2 bucket binding: `R2_BUCKET`
 - Cloudflare Images binding: `IMAGES`

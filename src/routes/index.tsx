@@ -1,45 +1,30 @@
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { z } from 'zod'
+import { type } from 'arktype'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/components/recipe-card'
 
+const searchSchema = type({
+  'search?': 'boolean',
+})
+
 const RecipeList = () => {
   const { data: recipes } = useQuery(getRecipeListOptions())
 
   return (
     <ScreenLayout title="Recettes">
-      <div
-        className={`
-          flex flex-col gap-8 p-4
-          sm:grid-cols-2
-          md:grid
-          lg:grid-cols-3
-        `}
-      >
+      <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
         {recipes?.map((recipe) => (
           <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
       </div>
-      <Button
-        className={`
-          fixed right-2 bottom-16
-          md:hidden
-        `}
-        render={<Link to="/recipe/new" />}
-        size="icon-xl"
-      >
+      <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" />} size="icon-xl">
         <BookIcon className="size-5" />
-        <div
-          className={`
-            absolute right-1.75 bottom-1.75 rounded-full border
-            border-primary-foreground bg-primary p-0.5
-          `}
-        >
+        <div className="absolute right-1.75 bottom-1.75 rounded-full border border-primary-foreground bg-primary p-0.5">
           <PlusIcon className="size-1.5" />
         </div>
       </Button>
@@ -52,7 +37,11 @@ export const Route = createFileRoute('/')({
   loader: async ({ context }) => {
     await context.queryClient.prefetchQuery(getRecipeListOptions())
   },
-  validateSearch: z.object({
-    search: z.boolean().optional(),
-  }),
+  validateSearch: (search) => {
+    const validated = searchSchema(search)
+    if (validated instanceof type.errors) {
+      throw new Error(validated.summary)
+    }
+    return validated
+  },
 })

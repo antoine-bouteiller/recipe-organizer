@@ -1,23 +1,19 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
-import { ingredient, ingredientCategory } from '@/lib/db/schema'
+import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-const updateIngredientSchema = z.object({
-  category: z.enum(ingredientCategory).optional(),
-  id: z.number(),
-  name: z.string().min(2),
-  parentId: z.number().optional(),
-})
+import { ingredientSchema } from './create'
 
-export type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
-export type UpdateIngredientFormInput = Partial<z.input<typeof updateIngredientSchema>>
+const updateIngredientSchema = ingredientSchema.merge({ id: 'number' })
+
+export type UpdateIngredientFormValues = typeof updateIngredientSchema.infer
+export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 
 const updateIngredient = createServerFn()
   .middleware([authGuard()])

@@ -1,5 +1,6 @@
 import { createFormHook } from '@tanstack/react-form'
 
+import { CheckboxField } from '@/components/forms/checkbox-field'
 import { ComboboxField } from '@/components/forms/combobox-field'
 import { ImageField } from '@/components/forms/image-field'
 import { NumberField } from '@/components/forms/number-field'
@@ -11,6 +12,7 @@ import { fieldContext, formContext } from '@/hooks/use-form-context'
 
 const { useAppForm, withFieldGroup, withForm } = createFormHook({
   fieldComponents: {
+    CheckboxField,
     ComboboxField,
     Field,
     FieldControl,

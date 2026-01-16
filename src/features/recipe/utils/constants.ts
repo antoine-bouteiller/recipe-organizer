@@ -2,21 +2,22 @@ import { createFieldMap } from '@tanstack/react-form'
 
 import type { RecipeFormInput } from '../api/create'
 
-export const recipeDefaultValues: RecipeFormInput = {
+export const recipeDefaultValues: Partial<RecipeFormInput> = {
   image: undefined,
-  name: '',
-  quantity: 4,
-  sections: [
+  ingredientGroups: [
     {
       ingredients: [
         {
-          id: '',
+          id: -1,
           quantity: 0,
         },
       ],
     },
   ],
-  steps: '',
+  instructions: '',
+  linkedRecipes: [],
+  name: '',
+  servings: 4,
 }
 
 export const recipeFormFields = createFieldMap(recipeDefaultValues)

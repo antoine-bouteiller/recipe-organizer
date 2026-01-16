@@ -1,7 +1,7 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
-import { z } from 'zod'
+import { type } from 'arktype'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,7 @@ import { Form } from '@/components/ui/form'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { getRecipeDetailsOptions, type RecipeSection } from '@/features/recipe/api/get-one'
+import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { type UpdateRecipeFormInput, updateRecipeOptions, updateRecipeSchema } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
 import { recipeFormFields } from '@/features/recipe/utils/constants'
@@ -19,23 +19,14 @@ import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
 import { getFileUrl } from '@/utils/get-file-url'
 
-const formatSection = (sections: RecipeSection) => {
-  if (sections.subRecipeId) {
-    return {
-      name: sections.name ?? '',
-      ratio: sections.ratio ?? 1,
-      recipeId: sections.subRecipeId,
-    }
-  }
-  return {
-    ingredients: sections.sectionIngredients.map((ingredient) => ({
-      id: ingredient.ingredient.id,
-      quantity: ingredient.quantity,
-      unitId: ingredient.unit?.id,
-    })),
-    name: sections.name ?? '',
-  }
-}
+const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
+  groupName: group.groupName ?? '',
+  ingredients: group.groupIngredients.map((ingredient) => ({
+    id: ingredient.ingredient.id,
+    quantity: ingredient.quantity,
+    unitId: ingredient.unit?.id,
+  })),
+})
 
 const EditRecipePage = () => {
   const { id } = Route.useLoaderData()
@@ -50,10 +41,14 @@ const EditRecipePage = () => {
           id: recipe.image,
           url: getFileUrl(recipe.image),
         },
+        ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
+        instructions: recipe.instructions,
+        linkedRecipes: recipe.linkedRecipes.map((lr) => ({
+          id: lr.linkedRecipe.id,
+          ratio: lr.ratio,
+        })),
         name: recipe.name,
-        quantity: recipe.quantity,
-        sections: recipe.sections.map(formatSection),
-        steps: recipe.steps,
+        servings: recipe.servings,
       }
     : {}
 
@@ -76,7 +71,7 @@ const EditRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors as unknown as Record<string, type.errors>[]))
 
   if (isLoading) {
     return (
@@ -101,13 +96,8 @@ const EditRecipePage = () => {
           void form.handleSubmit()
         }}
       >
-        <RecipeForm fields={recipeFormFields} form={form} initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }} />
-        <div
-          className={`
-            flex flex-col justify-end gap-4 pt-6
-            md:flex-row
-          `}
-        >
+        <RecipeForm fields={recipeFormFields} form={form} initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }} id={recipe.id} />
+        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={isLoading} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>
@@ -120,6 +110,8 @@ const EditRecipePage = () => {
   )
 }
 
+const paramsSchema = type({ id: 'string.integer.parse' })
+
 export const Route = createFileRoute('/recipe/edit/$id')({
   beforeLoad: ({ context }) => {
     if (!context.authUser) {
@@ -128,7 +120,11 @@ export const Route = createFileRoute('/recipe/edit/$id')({
   },
   component: EditRecipePage,
   loader: async ({ context, params }) => {
-    const { id } = z.object({ id: z.coerce.number() }).parse(params)
+    const validated = paramsSchema(params)
+    if (validated instanceof type.errors) {
+      throw new Error(validated.summary)
+    }
+    const { id } = validated
     await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())

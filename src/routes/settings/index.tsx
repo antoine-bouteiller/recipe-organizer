@@ -30,22 +30,12 @@ const settingsSections = [
 
 const RouteComponent = () => (
   <ScreenLayout title="Paramètres">
-    <div
-      className={`
-        grid gap-4 p-4
-        md:grid-cols-2
-      `}
-    >
+    <div className="grid gap-4 p-4 md:grid-cols-2">
       {settingsSections.map((section) => {
         const Icon = section.icon
         return (
           <Link key={section.id} to={section.path}>
-            <Card
-              className={`
-                h-full cursor-pointer p-4 transition-colors
-                hover:bg-accent
-              `}
-            >
+            <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
               <div className="flex items-start justify-between">
                 <div className="flex flex-1 items-start gap-3">
                   <div className="rounded-lg bg-primary/10 p-2">

@@ -105,6 +105,7 @@ src/
 ## Contributing
 
 This project uses:
+
 - **Conventional Commits** for commit messages
 - **Lefthook** for pre-commit hooks (linting, formatting, type checking)
 - **oxlint** for fast, strict linting
@@ -113,6 +114,7 @@ This project uses:
 ## Deployment
 
 Configured for Cloudflare Workers with:
+
 - D1 database binding
 - R2 bucket for images
 - Cloudflare Images integration

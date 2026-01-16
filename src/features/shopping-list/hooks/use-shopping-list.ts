@@ -19,7 +19,7 @@ export const useShoppingListStore = () => {
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,
-    wantedQuantity: isNullOrUndefined(recipesQuantities[recipe.id]) ? recipe.quantity : recipesQuantities[recipe.id],
+    wantedQuantity: isNullOrUndefined(recipesQuantities[recipe.id]) ? recipe.servings : recipesQuantities[recipe.id],
   }))
 
   let shoppingListIngredients: Partial<Record<IngredientCategory, IngredientCartItem[]>> = {}
@@ -29,7 +29,7 @@ export const useShoppingListStore = () => {
     const ingredientsMap = recipesWithQuantities.reduce<Map<number, IngredientCartItem>>((map, recipe) => {
       for (const ingredient of recipe.ingredients) {
         const existingIngredient = map.get(ingredient.id)
-        const calculatedQuantity = (ingredient.quantity * recipe.wantedQuantity) / recipe.quantity
+        const calculatedQuantity = (ingredient.quantity * recipe.wantedQuantity) / recipe.servings
 
         if (existingIngredient) {
           existingIngredient.quantity += calculatedQuantity

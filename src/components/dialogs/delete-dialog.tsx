@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button'
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
@@ -46,25 +47,18 @@ export const DeleteDialog = ({
       <ResponsiveDialogTrigger render={trigger}>
         <TrashIcon /> {deleteButtonLabel}
       </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent>
+      <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-        <div
-          className={`
-            px-4 text-sm text-muted-foreground
-            md:px-0
-          `}
-        >
-          {description}
-        </div>
+        <ResponsiveDialogPanel>{description}</ResponsiveDialogPanel>
         <ResponsiveDialogFooter>
           <ResponsiveDialogClose render={<Button variant="outline" />}>Annuler</ResponsiveDialogClose>
           <Button disabled={isLoading} onClick={handleDelete} variant="destructive">
             {isLoading && <Spinner />} Supprimer
           </Button>
         </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
+      </ResponsiveDialogPopup>
     </ResponsiveDialog>
   )
 }

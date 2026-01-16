@@ -40,15 +40,7 @@ export default function DeleteRecipe({ recipeId, recipeName }: Readonly<DeleteRe
       description={`Êtes-vous sûr de vouloir supprimer la recette ${recipeName}?`}
       onDelete={handleDelete}
       title="Supprimer la recette"
-      trigger={
-        <Button
-          className={`
-            text-destructive
-            hover:text-destructive
-          `}
-          variant="ghost"
-        />
-      }
+      trigger={<Button className="text-destructive hover:text-destructive" variant="ghost" />}
     />
   )
 }

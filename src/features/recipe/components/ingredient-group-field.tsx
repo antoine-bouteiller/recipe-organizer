@@ -13,13 +13,13 @@ import { useIngredientOptions, useUnitOptions } from '@/hooks/use-options'
 import { recipeDefaultValues } from '../utils/constants'
 
 interface IngredientFormProps {
-  sectionIndex: number
+  groupIndex: number
 }
 
-export const IngredientSectionField = withForm({
+export const IngredientGroupField = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as IngredientFormProps,
-  render: function Render({ form, sectionIndex }) {
+  render: function Render({ form, groupIndex }) {
     const { AppField } = form
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
@@ -27,32 +27,20 @@ export const IngredientSectionField = withForm({
     const unitsOptions = useUnitOptions({ allowEmpty: true })
 
     return (
-      <AppField mode="array" name={`sections[${sectionIndex}].ingredients`}>
+      <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
         {(field) => (
           <div className="flex w-full flex-col gap-2 pt-2">
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
-              <Fragment key={`ingredient-s${sectionIndex}-i${ingredientIndex}-${String(ingredient.id) || 'new'}`}>
+              <Fragment key={`ingredient-g${groupIndex}-i${ingredientIndex}-${String(ingredient.id) || 'new'}`}>
                 <div className="flex gap-2">
-                  <div
-                    className={`
-                      flex w-full flex-1 flex-col items-start justify-between
-                      gap-2
-                      md:flex-row
-                    `}
-                  >
-                    <AppField name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].id`}>
+                  <div className="flex w-full flex-1 flex-col items-start justify-between gap-2 md:flex-row">
+                    <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
                           addNew={(inputValue) => (
                             <AddIngredient defaultValue={inputValue} key={inputValue}>
-                              <Button
-                                className={`
-                                  w-full justify-start px-1.5 font-normal
-                                `}
-                                size="sm"
-                                variant="ghost"
-                              >
+                              <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
                                 <PlusIcon aria-hidden="true" className="size-4" />
                                 Nouvel ingrédient: {inputValue}
                               </Button>
@@ -65,28 +53,21 @@ export const IngredientSectionField = withForm({
                         />
                       )}
                     </AppField>
-                    <AppField name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].quantity`}>
-                      {({ NumberField }) => <NumberField decimalScale={3} disabled={isSubmitting} min={0} placeholder="Quantité" />}
+                    <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].quantity`}>
+                      {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Quantité" />}
                     </AppField>
-                    <AppField name={`sections[${sectionIndex}].ingredients[${ingredientIndex}].unitId`}>
+                    <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].unitId`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
                           addNew={(inputValue: string) => (
                             <AddUnit defaultValue={inputValue} key={inputValue}>
-                              <Button
-                                className={`
-                                  w-full justify-start px-1.5 font-normal
-                                `}
-                                size="sm"
-                                variant="ghost"
-                              >
+                              <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
                                 <PlusIcon aria-hidden="true" className="size-4" />
                                 Nouvelle unité: {inputValue}
                               </Button>
                             </AddUnit>
                           )}
                           disabled={isSubmitting}
-                          noResultsLabel="Aucune unité trouvée"
                           options={unitsOptions}
                           placeholder="Sélectionner une unité"
                           searchPlaceholder="Rechercher une unité"
@@ -112,7 +93,7 @@ export const IngredientSectionField = withForm({
               disabled={isSubmitting}
               onClick={() => {
                 field.pushValue({
-                  id: undefined,
+                  id: -1,
                   quantity: 0,
                 })
               }}

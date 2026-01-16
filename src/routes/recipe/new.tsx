@@ -1,3 +1,5 @@
+import type { type } from 'arktype'
+
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
@@ -33,7 +35,7 @@ const NewRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors as unknown as Record<string, type.errors>[]))
 
   return (
     <ScreenLayout title="Nouvelle Recette" withGoBack>
@@ -47,12 +49,7 @@ const NewRecipePage = () => {
         }}
       >
         <RecipeForm fields={recipeFormFields} form={form} />
-        <div
-          className={`
-            flex flex-col justify-end gap-4 pt-6
-            md:flex-row
-          `}
-        >
+        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>

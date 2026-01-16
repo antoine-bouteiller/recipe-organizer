@@ -10,5 +10,5 @@ export interface RecipeById {
     quantity: number
     unit?: string
   }[]
-  quantity: number
+  servings: number
 }

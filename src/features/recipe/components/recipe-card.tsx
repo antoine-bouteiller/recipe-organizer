@@ -24,7 +24,7 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
   const isInShoppingList = useIsInShoppingList(recipe.id)
 
-  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.quantity)
+  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.servings)
 
   return (
     <Link params={{ id: recipe.id.toString() }} to="/recipe/$id">
@@ -36,21 +36,9 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
         </CardHeader>
         <CardContent className="px-6 pb-2">
           <CardTitle className="flex items-center gap-2 pb-1">
-            <h2
-              className={`
-                overflow-hidden text-lg font-semibold text-nowrap text-ellipsis
-              `}
-            >
-              {recipe.name}
-            </h2>
+            <h2 className="overflow-hidden text-lg font-semibold text-nowrap text-ellipsis">{recipe.name}</h2>
 
-            {recipe.isVegetarian && (
-              <LeafIcon
-                className={`
-              size-5 text-emerald-700
-            `}
-              />
-            )}
+            {recipe.isVegetarian && <LeafIcon className="size-5 text-emerald-700" />}
             {recipe.isMagimix && <Badge variant="outline">Magimix</Badge>}
           </CardTitle>
           {isInShoppingList ? (

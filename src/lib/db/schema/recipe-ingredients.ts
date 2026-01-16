@@ -3,78 +3,62 @@ import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 import { ingredient } from '@/lib/db/schema/ingredient'
 import { recipe } from '@/lib/db/schema/recipe'
+import { recipeLinkedRecipes } from '@/lib/db/schema/recipe-linked-recipes'
 import { unit } from '@/lib/db/schema/unit'
 
-const recipeIngredientsSection = sqliteTable('recipe_ingredients_sections', {
+const recipeIngredientGroup = sqliteTable('recipe_ingredient_groups', {
+  groupName: text('group_name', { length: 255 }),
   id: integer('id').primaryKey(),
   isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
-  name: text('name', { length: 255 }),
-  ratio: real('ratio'),
   recipeId: integer('recipe_id')
-    .references(() => recipe.id, { onDelete: 'cascade' })
+    .references(() => recipe.id, { onDelete: 'restrict' })
     .notNull(),
-  subRecipeId: integer('sub_recipe_id').references(() => recipe.id, {
-    onDelete: 'cascade',
-  }),
 })
 
-const sectionIngredient = sqliteTable('section_ingredients', {
+const groupIngredient = sqliteTable('group_ingredients', {
+  groupId: integer('group_id')
+    .references(() => recipeIngredientGroup.id, { onDelete: 'restrict' })
+    .notNull(),
   id: integer('id').primaryKey(),
   ingredientId: integer('ingredient_id')
-    .references(() => ingredient.id, { onDelete: 'cascade' })
+    .references(() => ingredient.id, { onDelete: 'restrict' })
     .notNull(),
   quantity: real('quantity').notNull(),
-  sectionId: integer('section_id')
-    .references(() => recipeIngredientsSection.id, { onDelete: 'cascade' })
-    .notNull(),
   unitId: integer('unit_id').references(() => unit.id, {
     onDelete: 'set null',
   }),
 })
 
 const ingredientsRelation = relations(ingredient, ({ many }) => ({
-  sectionIngredients: many(sectionIngredient),
+  groupIngredients: many(groupIngredient),
 }))
 
 const recipesRelation = relations(recipe, ({ many }) => ({
-  sections: many(recipeIngredientsSection, { relationName: 'section' }),
-  subRecipes: many(recipeIngredientsSection, { relationName: 'subRecipe' }),
+  ingredientGroups: many(recipeIngredientGroup),
+  linkedRecipes: many(recipeLinkedRecipes, { relationName: 'linkedRecipes' }),
 }))
 
-const recipeIngredientSectionRelation = relations(recipeIngredientsSection, ({ many, one }) => ({
+const recipeIngredientGroupRelation = relations(recipeIngredientGroup, ({ many, one }) => ({
+  groupIngredients: many(groupIngredient),
   recipe: one(recipe, {
-    fields: [recipeIngredientsSection.recipeId],
+    fields: [recipeIngredientGroup.recipeId],
     references: [recipe.id],
-    relationName: 'section',
-  }),
-  sectionIngredients: many(sectionIngredient),
-  subRecipe: one(recipe, {
-    fields: [recipeIngredientsSection.subRecipeId],
-    references: [recipe.id],
-    relationName: 'subRecipe',
   }),
 }))
 
-const sectionIngredientsRelation = relations(sectionIngredient, ({ one }) => ({
+const groupIngredientsRelation = relations(groupIngredient, ({ one }) => ({
+  group: one(recipeIngredientGroup, {
+    fields: [groupIngredient.groupId],
+    references: [recipeIngredientGroup.id],
+  }),
   ingredient: one(ingredient, {
-    fields: [sectionIngredient.ingredientId],
+    fields: [groupIngredient.ingredientId],
     references: [ingredient.id],
   }),
-  section: one(recipeIngredientsSection, {
-    fields: [sectionIngredient.sectionId],
-    references: [recipeIngredientsSection.id],
-  }),
   unit: one(unit, {
-    fields: [sectionIngredient.unitId],
+    fields: [groupIngredient.unitId],
     references: [unit.id],
   }),
 }))
 
-export {
-  ingredientsRelation,
-  recipeIngredientSectionRelation,
-  recipeIngredientsSection,
-  recipesRelation,
-  sectionIngredient,
-  sectionIngredientsRelation,
-}
+export { groupIngredient, groupIngredientsRelation, ingredientsRelation, recipeIngredientGroup, recipeIngredientGroupRelation, recipesRelation }

@@ -5,9 +5,9 @@ import { Combobox } from '@/components/ui/combobox'
 import {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogContent,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
@@ -15,16 +15,16 @@ import { useRecipeOptions } from '@/hooks/use-options'
 
 interface AddExistingRecipeProps {
   readonly disabled?: boolean
-  readonly onSelect: (selectedRecipe: { name: string; ratio: number; recipeId: number }) => void
+  readonly onSelect: (selectedRecipe: { embeddedRecipeId: number; name: string; scaleFactor: number }) => void
 }
 
 export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddExistingRecipeProps>) {
   const recipesOptions = useRecipeOptions()
 
   const [selectedRecipe, setSelectedRecipe] = useState<{
+    embeddedRecipeId: number
     name: string
-    ratio: number
-    recipeId: number
+    scaleFactor: number
   }>()
 
   return (
@@ -32,18 +32,17 @@ export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddEx
       <ResponsiveDialogTrigger render={<Button className="md:flex-1" disabled={disabled} size="sm" type="button" variant="outline" />}>
         Ajouter une recette existante
       </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent>
+      <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Ajouter une recette existante</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
         <div className="p-4">
           <Combobox
-            noResultsLabel="Aucune recette trouvée"
             onChange={(option) =>
               setSelectedRecipe({
+                embeddedRecipeId: option.value,
                 name: option.label,
-                ratio: 1,
-                recipeId: option.value,
+                scaleFactor: 1,
               })
             }
             options={recipesOptions}
@@ -67,7 +66,7 @@ export default function AddExistingRecipe({ disabled, onSelect }: Readonly<AddEx
             Ajouter
           </Button>
         </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
+      </ResponsiveDialogPopup>
     </ResponsiveDialog>
   )
 }

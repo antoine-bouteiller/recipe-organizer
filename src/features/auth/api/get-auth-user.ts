@@ -4,10 +4,10 @@ import { eq } from 'drizzle-orm'
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { useAppSession } from '@/lib/session'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
 
 export const getAuthUser = createServerFn({ method: 'GET' }).handler(
-  withServerErrorCapture(async () => {
+  withServerError(async () => {
     const session = await useAppSession()
 
     if (!session?.data?.userId) {

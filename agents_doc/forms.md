@@ -1,6 +1,7 @@
 # Form Management
 
 **CRITICAL RULES:**
+
 - ALWAYS use TanStack Form (`@tanstack/react-form`) - NEVER use `useState` for form state
 - NEVER use Base UI Select components in forms - use `ComboboxField` instead
 - Import from `@/hooks/use-app-form` for all form functionality
@@ -10,12 +11,14 @@
 Located: `src/hooks/use-app-form.ts`
 
 Provides:
+
 - Field components: `TextField`, `NumberField`, `ComboboxField`, `SelectField`, `ImageField`, `TiptapField`
 - Helpers: `useAppForm`, `withForm`, `withFieldGroup`
 
 ## Form Patterns
 
 ### 1. Single-Use Forms (Direct `useAppForm`)
+
 **Use for**: Forms used in only ONE place (e.g., unique create/edit pages)
 **Pattern**: Create form directly in component, render fields inline
 
@@ -48,6 +51,7 @@ const ProfilePage = () => {
 ```
 
 ### 2. `withForm` - Reusable Form Components
+
 **Use for**: Forms shared between create AND edit (or multiple contexts)
 **Example**: Recipe form used in both create and edit routes
 
@@ -82,15 +86,15 @@ const unitSchema = z.object({
   parentId: z.number().optional(),
 })
 
-export type UnitFormValues = z.infer<typeof unitSchema>  // After validation
-export type UnitFormInput = Partial<z.input<typeof unitSchema>>  // Before validation (partial)
+export type UnitFormValues = z.infer<typeof unitSchema> // After validation
+export type UnitFormInput = Partial<z.input<typeof unitSchema>> // Before validation (partial)
 ```
 
 ## Default Values & Field Maps
 
 ```typescript
 export const unitDefaultValues: UnitFormInput = { name: '', factor: undefined, parentId: undefined }
-export const unitFormFields = createFieldMap(unitDefaultValues)  // Type-safe field names
+export const unitFormFields = createFieldMap(unitDefaultValues) // Type-safe field names
 ```
 
 ## Field Components
@@ -98,63 +102,74 @@ export const unitFormFields = createFieldMap(unitDefaultValues)  // Type-safe fi
 All accessed via `<AppField name="...">` with render props:
 
 ### TextField
+
 ```typescript
 <AppField name="name">
   {({ TextField }) => <TextField label="Name" placeholder="..." disabled={isSubmitting} />}
 </AppField>
 ```
+
 **Props**: `label`, `placeholder`, `disabled`, `className`
 
 ### NumberField
+
 ```typescript
 <AppField name="quantity">
   {({ NumberField }) => <NumberField label="Quantity" min={0} max={100} decimalScale={2} disabled={isSubmitting} />}
 </AppField>
 ```
+
 **Props**: `label`, `min`, `max`, `step`, `decimalScale`, `placeholder`, `disabled`
 **Features**: Auto-adjusting step, drag-to-scrub on label
 
 ### ComboboxField (Use for searchable selects)
+
 ```typescript
 <AppField name="parentId">
   {({ ComboboxField }) => (
     <ComboboxField
       label="Parent"
-      options={options}  // { label: string, value: T }[]
+      options={options}
       placeholder="Select..."
       searchPlaceholder="Search..."
-      noResultsLabel="No results"
       disabled={isSubmitting}
       nested  // Optional: for grouped options
     />
   )}
 </AppField>
 ```
+
 **Props**: `label`, `options`, `placeholder`, `searchPlaceholder`, `noResultsLabel`, `disabled`, `nested`
 
 ### SelectField (Simple dropdown)
+
 ```typescript
 <AppField name="category">
   {({ SelectField }) => <SelectField label="Category" items={[{ label: 'Meat', value: 'meat' }]} disabled={isSubmitting} />}
 </AppField>
 ```
+
 **Props**: `label`, `items: { label, value }[]`, `disabled`
 
 ### ImageField
+
 ```typescript
 <AppField name="image">
   {({ ImageField }) => <ImageField label="Photo" initialImage={initialImage} disabled={isSubmitting} />}
 </AppField>
 ```
+
 **Props**: `label`, `initialImage: { id, url }`, `disabled`
 **Returns**: `File` or `FileMetadata` - Use `objectToFormData()` for submission
 
 ### TiptapField (Rich text)
+
 ```typescript
 <AppField name="steps">
   {({ TiptapField }) => <TiptapField label="Steps" disabled={isSubmitting} />}
 </AppField>
 ```
+
 **Props**: `label`, `disabled`
 **Returns**: HTML string
 
@@ -187,6 +202,7 @@ return (
 ## Advanced Patterns
 
 ### Array Fields
+
 ```typescript
 <Field mode="array" name="sections">
   {(field) => (
@@ -210,6 +226,7 @@ return (
 ```
 
 ### Conditional Fields
+
 ```typescript
 <AppField name="parentId">
   {({ ComboboxField, state }) => (
@@ -226,6 +243,7 @@ return (
 ```
 
 ### Accessing Form State
+
 ```typescript
 const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
@@ -245,19 +263,23 @@ Is the form used in multiple places? (e.g., create AND edit)
 ## Reference Implementation Files
 
 **Single-use form** (direct useAppForm):
+
 - Look for examples in route files where forms are defined inline
 
 **Reusable form** (withForm - used in create + edit):
+
 - Schema: `src/features/recipe/api/create.ts`
 - Default values: `src/features/recipe/utils/constants.ts`
 - Form component: `src/features/recipe/components/recipe-form.tsx`
 - Usage: `src/routes/recipe/new.tsx`
 
 **Reusable field group** (withFieldGroup - dialog):
+
 - Schema: `src/features/units/api/create.ts`
 - Form component: `src/features/units/components/unit-form.tsx`
 - Usage: `src/features/units/components/edit-unit.tsx`
 
 **Core files**:
+
 - Hook: `src/hooks/use-app-form.ts`
 - Field components: `src/components/forms/*.tsx`

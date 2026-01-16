@@ -6,6 +6,7 @@
 ## Tables
 
 ### `user`
+
 ```typescript
 // src/lib/db/schema/user.ts
 id: text (PK)
@@ -14,6 +15,7 @@ role: text (NOT NULL, DEFAULT 'user') // 'user' | 'admin'
 ```
 
 ### `recipes`
+
 ```typescript
 // src/lib/db/schema/recipe.ts
 id: integer (PK)
@@ -29,6 +31,7 @@ Relations:
 ```
 
 ### `ingredients`
+
 ```typescript
 // src/lib/db/schema/ingredient.ts
 id: integer (PK)
@@ -42,6 +45,7 @@ Relations:
 ```
 
 ### `units`
+
 ```typescript
 // src/lib/db/schema/unit.ts
 id: integer (PK)
@@ -55,6 +59,7 @@ Relations:
 ```
 
 ### `recipe_ingredients_sections`
+
 ```typescript
 // src/lib/db/schema/recipe-ingredients.ts
 id: integer (PK)
@@ -74,6 +79,7 @@ Notes:
 ```
 
 ### `section_ingredients`
+
 ```typescript
 // src/lib/db/schema/recipe-ingredients.ts
 id: integer (PK)

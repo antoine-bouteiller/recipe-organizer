@@ -1,6 +1,6 @@
-import type { Toggle as TogglePrimitive } from '@base-ui-components/react/toggle'
+import type { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 
-import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui-components/react/toggle-group'
+import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui/react/toggle-group'
 import { type VariantProps } from 'class-variance-authority'
 import { createContext, useContext } from 'react'
 
@@ -35,10 +35,7 @@ const ToggleGroup = ({
 }: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) => (
   <ToggleGroupPrimitive
     className={cn(
-      `
-        flex w-fit
-        *:focus-visible:z-10
-      `,
+      `flex w-fit *:focus-visible:z-10`,
       orientation === 'horizontal' ? '*:pointer-coarse:after:min-w-auto' : '*:pointer-coarse:after:min-h-auto',
       getToggleGroupClassName(variant, orientation),
       className

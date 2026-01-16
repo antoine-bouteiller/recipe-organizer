@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 @plugin '@tailwindcss/typography';
 
 @custom-variant dark (&:is(.dark *));
@@ -32,7 +32,7 @@
   --color-ring: var(--ring);
 
   --font-sans: Roboto, sans-serif;
-  --font-heading: "Cal Sans", sans-serif;
+  --font-heading: 'Cal Sans', sans-serif;
 }
 
 :root {
@@ -47,11 +47,7 @@
   --popover: var(--color-white);
   --popover-foreground: var(--color-zinc-900);
 
-  --primary: color-mix(
-    in oklch,
-    var(--color-violet-700) 90%,
-    var(--color-zinc-700)
-  );
+  --primary: color-mix(in oklch, var(--color-violet-700) 90%, var(--color-zinc-700));
   --primary-foreground: var(--color-zinc-50);
 
   --secondary: var(--color-gray-600);
@@ -123,15 +119,11 @@
 }
 
 @utility pt-safe-* {
-  padding-top: calc(
-    var(--safe-area-inset-top) + --value(integer) * var(--spacing)
-  );
+  padding-top: calc(var(--safe-area-inset-top) + --value(integer) * var(--spacing));
 }
 
 @utility pb-safe-* {
-  padding-bottom: calc(
-    var(--safe-area-inset-bottom) + --value(integer) * var(--spacing)
-  );
+  padding-bottom: calc(var(--safe-area-inset-bottom) + --value(integer) * var(--spacing));
 }
 
 @layer base {

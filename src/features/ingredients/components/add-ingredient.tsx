@@ -26,7 +26,7 @@ export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) =>
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
-          data: ingredientSchema.parse(value),
+          data: ingredientSchema.assert(value),
         },
         {
           onSuccess: () => {
