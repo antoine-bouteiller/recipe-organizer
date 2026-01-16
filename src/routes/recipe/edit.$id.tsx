@@ -96,7 +96,7 @@ const EditRecipePage = () => {
           void form.handleSubmit()
         }}
       >
-        <RecipeForm fields={recipeFormFields} form={form} initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }} />
+        <RecipeForm fields={recipeFormFields} form={form} initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }} id={recipe.id} />
         <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={isLoading} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler

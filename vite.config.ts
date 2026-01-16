@@ -24,28 +24,6 @@ const viteConfig = defineConfig({
     vitePwa({
       registerType: 'prompt',
       injectRegister: false,
-      includeAssets: ['favicon.ico', 'favicon.svg', 'robots.txt'],
-      manifest: {
-        name: 'Your App Name',
-        short_name: 'App',
-        description: 'Your app description',
-        theme_color: '#000000',
-        background_color: '#ffffff',
-        display: 'standalone',
-        icons: [
-          {
-            src: 'logo192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: 'logo512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable',
-          },
-        ],
-      },
       devOptions: {
         enabled: false,
         type: 'module',

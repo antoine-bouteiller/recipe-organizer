@@ -21,17 +21,18 @@ const generateGroupKey = (group: RecipeIngredientGroupFormInput, index: number):
 
 interface RecipeFormProps extends Record<string, unknown> {
   initialImage?: FileMetadata
+  id?: number
 }
 
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
-  render: function Render({ form, initialImage }) {
+  render: function Render({ form, initialImage, id }) {
     const { AppField, Field } = form
 
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
     const linkedRecipeIds = useStore(form.store, (state) => (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((id) => id > 0))
-    const recipeOptions = useRecipeOptions()
+    const recipeOptions = useRecipeOptions({ filter: (recipe) => recipe.id !== id })
 
     return (
       <>
