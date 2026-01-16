@@ -109,11 +109,9 @@ export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLa
               {({ SelectField }) => <SelectField disabled={isSubmitting} items={programItems} label="Programme" />}
             </form.AppField>
 
-            <form.AppField name="timeMinutes">
-              {({ NumberField }) => <NumberField decimalScale={0} disabled={isSubmitting} label="Minutes*" min={0} />}
-            </form.AppField>
+            <form.AppField name="timeMinutes">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Minutes*" min={0} />}</form.AppField>
             <form.AppField name="timeSeconds">
-              {({ NumberField }) => <NumberField decimalScale={0} disabled={isSubmitting} label="Secondes*" max={59} min={0} />}
+              {({ NumberField }) => <NumberField disabled={isSubmitting} label="Secondes*" max={59} min={0} />}
             </form.AppField>
 
             <form.AppField name="rotationSpeed">
@@ -131,7 +129,7 @@ export const MagimixProgramDialog = ({ children, initialData, onSubmit, submitLa
 
             <form.AppField name="temperature">
               {({ NumberField }) => (
-                <NumberField decimalScale={0} disabled={isSubmitting} label="Température (°C) - Optionnel" max={200} min={0} placeholder="Ex: 100" />
+                <NumberField disabled={isSubmitting} label="Température (°C) - Optionnel" max={200} min={0} placeholder="Ex: 100" />
               )}
             </form.AppField>
           </div>

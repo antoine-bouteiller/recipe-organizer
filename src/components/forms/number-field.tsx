@@ -10,16 +10,15 @@ import {
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface NumberFieldProps {
-  decimalScale?: number
+  allowDecimals?: number
   disabled?: boolean
   label?: string
   max?: number
   min?: number
   placeholder?: string
-  step?: number
 }
 
-export const NumberField = ({ decimalScale, disabled, label, max, min, placeholder }: NumberFieldProps) => {
+export const NumberField = ({ allowDecimals, disabled, label, max, min, placeholder }: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
 
   return (
@@ -30,7 +29,7 @@ export const NumberField = ({ decimalScale, disabled, label, max, min, placehold
         max={max}
         min={min}
         onValueChange={(value) => field.handleChange(value ?? undefined)}
-        step={decimalScale ? 0.25 : 1}
+        step={allowDecimals ? 0.25 : 1}
         value={field.state.value}
       >
         {label && <NumberInputScrubArea label={label} />}

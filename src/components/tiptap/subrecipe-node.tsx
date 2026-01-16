@@ -52,7 +52,7 @@ const filterNodes = (instructions: string, hideFirstNodes?: number, hideLastNode
 
     const totalNodes = parsed.content.length
     const startIndex = hideFirstNodes ?? 0
-    const endIndex = hideLastNodes !== undefined ? totalNodes - hideLastNodes : totalNodes
+    const endIndex = hideLastNodes === undefined ? totalNodes : totalNodes - hideLastNodes
 
     if (startIndex >= endIndex || startIndex >= totalNodes) {
       return JSON.stringify({ ...parsed, content: [] })

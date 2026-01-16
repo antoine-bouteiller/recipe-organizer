@@ -52,7 +52,6 @@ export const UnitForm = withForm({
                 <AppField name="factor">
                   {({ NumberField }) => (
                     <NumberField
-                      decimalScale={2}
                       disabled={isSubmitting}
                       label="Facteur de conversion (combien de cette unité dans l'unité parente)"
                       min={0.01}

@@ -45,8 +45,8 @@ export const RecipeForm = withForm({
           <AppField mode="array" name="linkedRecipes">
             {(field) => (
               <>
-                {field.state.value?.map((_linkedRecipe, index) => (
-                  <div className="flex gap-2" key={`linked-recipe-${index}`}>
+                {field.state.value?.map((linkedRecipe, index) => (
+                  <div className="flex gap-2" key={`linked-recipe-${linkedRecipe.id}`}>
                     <div className="flex flex-1 gap-2">
                       <div className="flex-1">
                         <AppField name={`linkedRecipes[${index}].id`}>
@@ -62,7 +62,7 @@ export const RecipeForm = withForm({
                       </div>
                       <div className="w-24">
                         <AppField name={`linkedRecipes[${index}].ratio`}>
-                          {({ NumberField }) => <NumberField decimalScale={2} disabled={isSubmitting} min={0} placeholder="Ratio" step={0.1} />}
+                          {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />}
                         </AppField>
                       </div>
                     </div>
