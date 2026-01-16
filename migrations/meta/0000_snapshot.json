@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5c6f062e-721d-4fd3-a830-ff94b1cdc7e7",
+  "id": "29af3a79-af51-4af0-a6dc-8fef54ca6b9d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "ingredients": {
@@ -66,14 +66,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "is_subrecipe": {
-          "name": "is_subrecipe",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
         },
         "name": {
           "name": "name",
@@ -229,13 +221,6 @@
     "recipe_linked_recipes": {
       "name": "recipe_linked_recipes",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
         "linked_recipe_id": {
           "name": "linked_recipe_id",
           "type": "integer",
@@ -243,12 +228,13 @@
           "notNull": true,
           "autoincrement": false
         },
-        "position": {
-          "name": "position",
-          "type": "integer",
+        "ratio": {
+          "name": "ratio",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": 1
         },
         "recipe_id": {
           "name": "recipe_id",

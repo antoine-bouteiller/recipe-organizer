@@ -7,7 +7,7 @@ import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup } from '@/lib/db/schema'
 import { ingredient } from '@/lib/db/schema/ingredient'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
 import { getFileUrl } from '@/utils/get-file-url'
 
 const getAllRecipesSchema = type({
@@ -19,7 +19,7 @@ const getAllRecipes = createServerFn({
 })
   .inputValidator(getAllRecipesSchema)
   .handler(
-    withServerErrorCapture(async ({ data }) =>
+    withServerError(async ({ data }) =>
       getDb()
         .select({
           id: recipe.id,

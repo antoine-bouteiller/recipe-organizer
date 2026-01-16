@@ -7,7 +7,7 @@ import { desc, eq } from 'drizzle-orm'
 import { getDb } from '@/lib/db'
 import { recipe } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
 
 const getRecipeSchema = type('number')
 
@@ -16,7 +16,7 @@ const getRecipe = createServerFn({
 })
   .inputValidator(getRecipeSchema)
   .handler(
-    withServerErrorCapture(async ({ data }) => {
+    withServerError(async ({ data }) => {
       const result = await getDb().query.recipe.findFirst({
         where: eq(recipe.id, data),
         with: {

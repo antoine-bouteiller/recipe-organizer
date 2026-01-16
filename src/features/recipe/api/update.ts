@@ -11,7 +11,7 @@ import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } f
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
 import { getTitle } from '../utils/get-recipe-title'
@@ -29,7 +29,7 @@ const updateRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => updateRecipeSchema.assert(parseFormData(formData)))
   .handler(
-    withServerErrorCapture(async ({ data }) => {
+    withServerError(async ({ data }) => {
       const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({

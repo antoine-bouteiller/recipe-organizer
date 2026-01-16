@@ -9,7 +9,6 @@ CREATE TABLE `recipes` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`image` text(255) NOT NULL,
 	`instructions` text NOT NULL,
-	`is_subrecipe` integer DEFAULT false NOT NULL,
 	`name` text(255) NOT NULL,
 	`servings` integer NOT NULL,
 	`tags` text DEFAULT '[]'
@@ -35,9 +34,8 @@ CREATE TABLE `recipe_ingredient_groups` (
 );
 --> statement-breakpoint
 CREATE TABLE `recipe_linked_recipes` (
-	`id` integer PRIMARY KEY NOT NULL,
 	`linked_recipe_id` integer NOT NULL,
-	`position` integer NOT NULL,
+	`ratio` real DEFAULT 1 NOT NULL,
 	`recipe_id` integer NOT NULL,
 	FOREIGN KEY (`linked_recipe_id`) REFERENCES `recipes`(`id`) ON UPDATE no action ON DELETE restrict,
 	FOREIGN KEY (`recipe_id`) REFERENCES `recipes`(`id`) ON UPDATE no action ON DELETE restrict

@@ -1,6 +1,6 @@
 import { ArkErrors } from 'arktype'
 
-export const withServerErrorCapture =
+export const withServerError =
   <TContext, TResult>(handler: (ctx: TContext) => Promise<TResult> | TResult) =>
   async (ctx: TContext): Promise<TResult> => {
     try {

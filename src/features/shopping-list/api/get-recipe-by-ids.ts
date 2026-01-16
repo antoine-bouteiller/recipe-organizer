@@ -6,7 +6,7 @@ import { and, eq, inArray, ne } from 'drizzle-orm'
 import { getDb } from '@/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerErrorCapture } from '@/utils/error-handler'
+import { withServerError } from '@/utils/error-handler'
 
 import type { RecipeById } from '../types/recipe-by-id'
 
@@ -19,7 +19,7 @@ const getRecipesByIds = createServerFn({
 })
   .inputValidator(getRecipesByIdsSchema)
   .handler(
-    withServerErrorCapture(async ({ data }) => {
+    withServerError(async ({ data }) => {
       const rows = await getDb()
         .select({
           id: recipe.id,
