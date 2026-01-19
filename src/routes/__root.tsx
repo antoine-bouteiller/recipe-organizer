@@ -1,10 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query'
 
+import { Serwist } from '@serwist/window'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 import { Navbar } from '@/components/navigation/navbar'
 import { TabBar } from '@/components/navigation/tabbar'
-import { ReloadPrompt } from '@/components/register-sw'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
@@ -19,6 +20,17 @@ type Theme = ReturnType<typeof getTheme>
 const RootComponent = () => {
   const { theme } = Route.useRouteContext()
 
+  useEffect(() => {
+    const registerServiceWorker = async () => {
+      if ('serviceWorker' in navigator) {
+        const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
+        await serwist.register()
+      }
+    }
+
+    void registerServiceWorker()
+  }, [])
+
   return (
     <html className={theme} lang="fr">
       <head>
@@ -26,7 +38,6 @@ const RootComponent = () => {
       </head>
 
       <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
-        <ReloadPrompt />
         <ToastProvider>
           <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
             <Navbar />

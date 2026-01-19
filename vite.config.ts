@@ -3,8 +3,9 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import { VitePWA as vitePwa } from 'vite-plugin-pwa'
 import tsConfigPaths from 'vite-tsconfig-paths'
+
+import { tanstackSerwistPlugin } from './scripts/generate-sw'
 
 const viteConfig = defineConfig({
   plugins: [
@@ -21,15 +22,7 @@ const viteConfig = defineConfig({
       },
     }),
     tailwindcss(),
-    vitePwa({
-      registerType: 'prompt',
-      injectRegister: false,
-      devOptions: {
-        enabled: false,
-        type: 'module',
-        suppressWarnings: true,
-      },
-    }),
+    tanstackSerwistPlugin(),
   ],
   server: {
     port: 3000,

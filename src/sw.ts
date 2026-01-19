@@ -1,71 +1,20 @@
-import { ExpirationPlugin } from 'workbox-expiration'
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
-import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { CacheFirst, NetworkFirst } from 'workbox-strategies'
+import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
 
-declare let self: ServiceWorkerGlobalScope
+import { Serwist } from 'serwist'
 
-// Precache static assets (injected by workbox-build)
-precacheAndRoute(self.__WB_MANIFEST)
-cleanupOutdatedCaches()
+declare global {
+  interface WorkerGlobalScope extends SerwistGlobalConfig {
+    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined
+  }
+}
 
-// Navigation requests: NetworkFirst with offline fallback
-// Caches SSR-rendered HTML pages for offline access
-registerRoute(
-  new NavigationRoute(
-    new NetworkFirst({
-      cacheName: 'pages-cache',
-      networkTimeoutSeconds: 3,
-      plugins: [
-        new ExpirationPlugin({
-          maxEntries: 50,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        }),
-      ],
-    })
-  )
-)
+declare const self: ServiceWorkerGlobalScope
 
-// API requests: NetworkFirst with timeout
-// Replace with your API pattern (e.g., Convex)
-registerRoute(
-  ({ url }) => url.hostname.includes('.convex.cloud'),
-  new NetworkFirst({
-    cacheName: 'api-cache',
-    networkTimeoutSeconds: 3,
-    plugins: [
-      new ExpirationPlugin({
-        maxEntries: 100,
-        maxAgeSeconds: 24 * 60 * 60,
-      }),
-    ],
-  })
-)
+const serwist = new Serwist({
+  precacheEntries: self.__SW_MANIFEST,
+  skipWaiting: true,
+  clientsClaim: true,
+  navigationPreload: true,
+})
 
-// Static assets: CacheFirst for performance
-registerRoute(
-  ({ request }) => request.destination === 'font',
-  new CacheFirst({
-    cacheName: 'static-assets',
-    plugins: [
-      new ExpirationPlugin({
-        maxEntries: 100,
-        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
-      }),
-    ],
-  })
-)
-
-// Images: CacheFirst
-registerRoute(
-  ({ request }) => request.destination === 'image',
-  new CacheFirst({
-    cacheName: 'images-cache',
-    plugins: [
-      new ExpirationPlugin({
-        maxEntries: 50,
-        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-      }),
-    ],
-  })
-)
+serwist.addEventListeners()

@@ -1,58 +1,91 @@
-/* oxlint-disable no-console */
-import { existsSync, unlinkSync, writeFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { injectManifest } from 'workbox-build'
+/* oxlint-disable no-console, init-declarations, prefer-destructuring */
+import type { Plugin } from 'vite'
 
-const distClient = resolve(import.meta.dirname, '../dist/client')
-const srcSw = resolve(import.meta.dirname, '../src/sw.ts')
+import { injectManifest } from '@serwist/build'
+import path from 'node:path'
+import { build } from 'vite'
 
-const generateServiceWorker = async () => {
-  if (!existsSync(distClient)) {
-    console.error('Error: dist/client does not exist. Run build first.')
-    process.exit(1)
-  }
+/**
+ * Custom Serwist plugin for TanStack Start
+ * Builds service worker in both dev and production modes
+ */
+export const tanstackSerwistPlugin = (): Plugin => {
+  let rootDir: string
+  let isProduction: boolean
 
-  // Use Bun to transpile TypeScript to JavaScript
-  console.log('Transpiling service worker...')
-  const transpiled = await Bun.build({
-    entrypoints: [srcSw],
-    format: 'esm',
-    target: 'browser',
-    minify: false,
-  })
-
-  if (!transpiled.success) {
-    console.error('Failed to transpile service worker:', transpiled.logs)
-    process.exit(1)
-  }
-
-  const swJsContent = await transpiled.outputs[0].text()
-  const tempSwPath = resolve(distClient, 'sw-src.js')
-  writeFileSync(tempSwPath, swJsContent)
-
-  console.log('Generating service worker with workbox...')
-
-  try {
-    const { count, size, warnings } = await injectManifest({
-      swSrc: tempSwPath,
-      swDest: resolve(distClient, 'sw.js'),
-      globDirectory: distClient,
-      globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
-      globIgnores: ['sw-src.js', 'sw.js'],
-      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
-    })
-
-    unlinkSync(tempSwPath)
-
-    if (warnings.length > 0) {
-      console.warn('Warnings:', warnings.join('\n'))
-    }
-
-    console.log(`✓ Service worker generated with ${count} files, totaling ${(size / 1024).toFixed(1)} KB`)
-  } catch (error) {
-    console.error('Error generating service worker:', error)
-    process.exit(1)
+  return {
+    name: 'tanstack-serwist',
+    configResolved(config) {
+      rootDir = config.root
+      isProduction = config.isProduction
+    },
+    async buildStart() {
+      // Build service worker in dev mode
+      if (!isProduction) {
+        await buildServiceWorker(rootDir, false)
+      }
+    },
+    async closeBundle() {
+      // Build service worker in production mode
+      if (isProduction) {
+        await buildServiceWorker(rootDir, true)
+      }
+    },
   }
 }
 
-await generateServiceWorker()
+const buildServiceWorker = async (rootDir: string, production: boolean) => {
+  const outName = 'sw.js'
+  const outDir = production ? path.resolve(rootDir, 'dist', 'client') : path.resolve(rootDir, 'public')
+  const swSrc = path.resolve(rootDir, 'src', 'sw.ts')
+  const swDest = path.resolve(outDir, outName)
+  const env = production ? 'production' : 'dev'
+
+  console.log(`\n🔧 [SERWIST] Building service worker (${env})...`)
+
+  try {
+    await build({
+      root: rootDir,
+      configFile: false,
+      define: {
+        'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
+      },
+      build: {
+        lib: {
+          entry: swSrc,
+          formats: ['es'],
+          fileName: () => outName,
+        },
+        outDir,
+        emptyOutDir: false,
+        minify: production,
+        rollupOptions: {
+          output: {
+            entryFileNames: outName,
+          },
+        },
+      },
+      logLevel: 'error',
+    })
+
+    // Step 2: Inject the precache manifest (only in production)
+    if (production) {
+      const result = await injectManifest({
+        swSrc: swDest,
+        swDest,
+        globDirectory: outDir,
+        globPatterns: ['**/*.{js,css,html,png,svg,ico,webmanifest,woff,woff2}'],
+        injectionPoint: 'self.__SW_MANIFEST',
+      })
+
+      const cacheSize = (result.size / 1024 / 1024).toFixed(2)
+
+      console.log(`✅ [SERWIST] Precached ${result.count} files (${cacheSize} MB)`)
+    } else {
+      console.log('✅ [SERWIST] Dev service worker built')
+    }
+  } catch (error) {
+    console.error('❌ [SERWIST] Failed to build service worker:', error)
+    throw error
+  }
+}
