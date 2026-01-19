@@ -14,7 +14,13 @@ declare module '@tanstack/react-router' {
 }
 
 export const getRouter = () => {
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        gcTime: 1000 * 60 * 60 * 24, // 24 hours
+      },
+    },
+  })
 
   const router = createRouter({
     context: {
