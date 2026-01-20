@@ -5,7 +5,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "lib": ["ES2022", "DOM", "DOM.Iterable", "webworker"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "webworker"],
     "types": ["vite/client", "bun", "@serwist/vite/typings"]
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
