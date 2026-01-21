@@ -28,11 +28,12 @@ const RecipePage = () => {
 
   const ingredientGroups = recipe
     ? [
+        ...recipe.ingredientGroups,
         ...(recipe.linkedRecipes ?? []).map(({ linkedRecipe }) => ({
           ...linkedRecipe.ingredientGroups[0],
           groupName: linkedRecipe.name,
+          isDefault: false,
         })),
-        ...recipe.ingredientGroups,
       ]
     : []
 
@@ -115,7 +116,7 @@ const RecipePage = () => {
           <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
             <div className="col-span-2 rounded-xl border px-8">
               <h2>Ingrédients</h2>
-              <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={recipe.ingredientGroups} servings={quantity} />
+              <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
             </div>
 
             <div className="col-span-3 rounded-xl border px-8">

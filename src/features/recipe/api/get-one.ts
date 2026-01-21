@@ -7,6 +7,8 @@ import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
+import { ingredientGroupSelect } from '../utils/constants'
+
 const getRecipeSchema = type('number')
 
 const getRecipe = createServerFn({
@@ -19,17 +21,7 @@ const getRecipe = createServerFn({
         where: { id: data },
         with: {
           ingredientGroups: {
-            orderBy: {
-              isDefault: 'desc',
-            },
-            with: {
-              groupIngredients: {
-                with: {
-                  ingredient: true,
-                  unit: true,
-                },
-              },
-            },
+            ...ingredientGroupSelect,
           },
           linkedRecipes: {
             with: {
@@ -38,20 +30,9 @@ const getRecipe = createServerFn({
                   id: true,
                   name: true,
                 },
-
                 with: {
                   ingredientGroups: {
-                    orderBy: {
-                      isDefault: 'desc',
-                    },
-                    with: {
-                      groupIngredients: {
-                        with: {
-                          ingredient: true,
-                          unit: true,
-                        },
-                      },
-                    },
+                    ...ingredientGroupSelect,
                     where: {
                       isDefault: true,
                     },
