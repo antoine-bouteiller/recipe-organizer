@@ -38,6 +38,25 @@ const getRecipe = createServerFn({
                   id: true,
                   name: true,
                 },
+
+                with: {
+                  ingredientGroups: {
+                    orderBy: {
+                      isDefault: 'desc',
+                    },
+                    with: {
+                      groupIngredients: {
+                        with: {
+                          ingredient: true,
+                          unit: true,
+                        },
+                      },
+                    },
+                    where: {
+                      isDefault: true,
+                    },
+                  },
+                },
               },
             },
           },

@@ -26,6 +26,16 @@ const RecipePage = () => {
 
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe?.id, recipe?.servings)
 
+  const ingredientGroups = recipe
+    ? [
+        ...(recipe.linkedRecipes ?? []).map(({ linkedRecipe }) => ({
+          ...linkedRecipe.ingredientGroups[0],
+          groupName: linkedRecipe.name,
+        })),
+        ...recipe.ingredientGroups,
+      ]
+    : []
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -91,7 +101,7 @@ const RecipePage = () => {
                 <TabsTab value="preparation">Préparation</TabsTab>
               </TabsList>
               <TabsPanel className="px-2" value="ingredients">
-                <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={recipe.ingredientGroups} servings={quantity} />
+                <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
               </TabsPanel>
 
               <TabsPanel className="p-2" value="preparation">
