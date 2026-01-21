@@ -1,9 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { Serwist } from '@serwist/window'
-import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
@@ -21,7 +19,7 @@ type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
 
 const RootComponent = () => {
-  const { theme, queryClient } = Route.useRouteContext()
+  const { theme } = Route.useRouteContext()
 
   useEffect(() => {
     const registerServiceWorker = async () => {
@@ -34,10 +32,6 @@ const RootComponent = () => {
     void registerServiceWorker()
   }, [])
 
-  const asyncStoragePersister = createAsyncStoragePersister({
-    storage: import.meta.env.SSR ? undefined : globalThis.localStorage,
-  })
-
   return (
     <html className={theme} lang="fr">
       <head>
@@ -45,19 +39,17 @@ const RootComponent = () => {
       </head>
 
       <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
-        <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: asyncStoragePersister }}>
-          <ToastProvider>
-            <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
-              <Navbar />
-            </header>
-            <main className="flex min-h-0 flex-1 flex-col pb-14 md:pb-0">
-              <Outlet />
-            </main>
-            <div className="fixed bottom-0 z-10 w-full md:hidden">
-              <TabBar />
-            </div>
-          </ToastProvider>
-        </PersistQueryClientProvider>
+        <ToastProvider>
+          <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
+            <Navbar />
+          </header>
+          <main className="flex min-h-0 flex-1 flex-col pb-14 md:pb-0">
+            <Outlet />
+          </main>
+          <div className="fixed bottom-0 z-10 w-full md:hidden">
+            <TabBar />
+          </div>
+        </ToastProvider>
         <Scripts />
         {import.meta.env.DEV && <ReactQueryDevtools />}
       </body>
