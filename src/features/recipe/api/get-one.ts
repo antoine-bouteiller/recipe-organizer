@@ -2,10 +2,8 @@ import { queryOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { desc, eq } from 'drizzle-orm'
 
 import { getDb } from '@/lib/db'
-import { recipe } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
@@ -18,10 +16,12 @@ const getRecipe = createServerFn({
   .handler(
     withServerError(async ({ data }) => {
       const result = await getDb().query.recipe.findFirst({
-        where: eq(recipe.id, data),
+        where: { id: data },
         with: {
           ingredientGroups: {
-            orderBy: (table) => [desc(table.isDefault)],
+            orderBy: {
+              isDefault: 'desc',
+            },
             with: {
               groupIngredients: {
                 with: {

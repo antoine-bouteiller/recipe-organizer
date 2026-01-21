@@ -33,7 +33,7 @@ const updateRecipe = createServerFn({
       const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
-        where: eq(recipe.id, id),
+        where: { id },
         with: {
           ingredientGroups: {
             columns: {

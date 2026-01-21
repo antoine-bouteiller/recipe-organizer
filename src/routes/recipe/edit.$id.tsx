@@ -43,9 +43,9 @@ const EditRecipePage = () => {
         },
         ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
         instructions: recipe.instructions,
-        linkedRecipes: recipe.linkedRecipes.map((lr) => ({
-          id: lr.linkedRecipe.id,
-          ratio: lr.ratio,
+        linkedRecipes: recipe.linkedRecipes.map((linkedRecipe) => ({
+          id: linkedRecipe.linkedRecipe.id,
+          ratio: linkedRecipe.ratio,
         })),
         name: recipe.name,
         servings: recipe.servings,

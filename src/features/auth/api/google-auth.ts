@@ -1,10 +1,8 @@
 import { redirect } from '@tanstack/react-router'
 import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
 
 import { env } from '@/config/env'
 import { getDb } from '@/lib/db'
-import { user } from '@/lib/db/schema'
 import { useAppSession, useOAuthSession } from '@/lib/session'
 
 import { type AuthError } from './constants'
@@ -114,7 +112,9 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
 
   // Find or create user
   const existingUser = await getDb().query.user.findFirst({
-    where: eq(user.email, userInfo.email),
+    where: {
+      email: userInfo.email,
+    },
   })
 
   if (!existingUser) {

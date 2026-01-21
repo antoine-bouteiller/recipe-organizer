@@ -1,10 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { eq } from 'drizzle-orm'
 
 import { getDb } from '@/lib/db'
-import { recipe } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
@@ -18,7 +16,7 @@ const getRecipeInstructions = createServerFn({
     withServerError(async ({ data }) => {
       const result = await getDb().query.recipe.findFirst({
         columns: { id: true, instructions: true, name: true },
-        where: eq(recipe.id, data),
+        where: { id: data },
       })
 
       return result ?? undefined

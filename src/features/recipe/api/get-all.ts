@@ -1,11 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
-import { asc, eq, like, sql } from 'drizzle-orm'
 
 import { getDb } from '@/lib/db'
-import { groupIngredient, recipe, recipeIngredientGroup } from '@/lib/db/schema'
-import { ingredient } from '@/lib/db/schema/ingredient'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 import { getFileUrl } from '@/utils/get-file-url'
@@ -19,26 +16,51 @@ const getAllRecipes = createServerFn({
 })
   .inputValidator(getAllRecipesSchema)
   .handler(
-    withServerError(async ({ data }) =>
-      getDb()
-        .select({
-          id: recipe.id,
-          image: sql`${recipe.image}`.mapWith(getFileUrl),
-          isMagimix: sql<boolean>`${recipe.instructions} LIKE '%data-type="magimix-program"%'`.mapWith(Boolean),
-          isVegetarian: sql<boolean>`COUNT(CASE WHEN ${ingredient.category} = 'meat' OR ${ingredient.category} = 'fish' THEN 1 END) = 0`.mapWith(
-            Boolean
-          ),
-          name: recipe.name,
-          servings: recipe.servings,
-        })
-        .from(recipe)
-        .leftJoin(recipeIngredientGroup, eq(recipeIngredientGroup.recipeId, recipe.id))
-        .leftJoin(groupIngredient, eq(groupIngredient.groupId, recipeIngredientGroup.id))
-        .leftJoin(ingredient, eq(ingredient.id, groupIngredient.ingredientId))
-        .where(data.search ? like(recipe.name, `%${data.search}%`) : undefined)
-        .groupBy(recipe.id)
-        .orderBy(asc(recipe.name))
-    )
+    withServerError(async ({ data }) => {
+      const rows = await getDb().query.recipe.findMany({
+        orderBy: {
+          name: 'asc',
+        },
+        columns: {
+          id: true,
+          name: true,
+          image: true,
+          servings: true,
+        },
+        extras: {
+          isMagimix: (recipe, { sql }) => sql<boolean>`${recipe.instructions} LIKE '%data-type="magimix-program"%'`.mapWith(Boolean),
+        },
+        where: {
+          name: {
+            like: data.search ? `%${data.search}%` : undefined,
+          },
+        },
+        with: {
+          ingredientGroups: {
+            with: {
+              groupIngredients: {
+                with: {
+                  ingredient: true,
+                },
+              },
+            },
+          },
+        },
+      })
+
+      return rows.map((row) => {
+        const ingredients = row.ingredientGroups.flatMap((group) => group.groupIngredients.map((gi) => gi.ingredient))
+
+        return {
+          id: row.id,
+          image: getFileUrl(row.image),
+          isMagimix: row.isMagimix,
+          isVegetarian: ingredients.every((ingredient) => ingredient.category !== 'meat' && ingredient.category !== 'fish'),
+          name: row.name,
+          servings: row.servings,
+        }
+      })
+    })
   )
 
 const getRecipeListOptions = (search?: string) =>
