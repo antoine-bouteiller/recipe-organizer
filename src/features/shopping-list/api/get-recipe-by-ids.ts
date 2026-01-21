@@ -6,6 +6,8 @@ import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
+import { ingredientGroupSelect } from '../utils/constants'
+
 const getRecipesByIdsSchema = type({
   ids: 'number[]',
 })
@@ -19,22 +21,19 @@ const getRecipesByIds = createServerFn({
       const rows = await getDb().query.recipe.findMany({
         where: {
           id: {
-            arrayContains: data.ids,
+            in: data.ids,
           },
         },
         with: {
           ingredientGroups: {
+            ...ingredientGroupSelect,
+          },
+          linkedRecipes: {
             with: {
-              groupIngredients: {
+              linkedRecipe: {
                 with: {
-                  ingredient: true,
-                  unit: true,
-                },
-                where: {
-                  ingredient: {
-                    category: {
-                      NOT: 'spices',
-                    },
+                  ingredientGroups: {
+                    ...ingredientGroupSelect,
                   },
                 },
               },
@@ -45,16 +44,30 @@ const getRecipesByIds = createServerFn({
 
       return rows.map((row) => ({
         id: row.id,
-        ingredients: row.ingredientGroups
-          .flatMap((group) => group.groupIngredients)
-          .map((gi) => ({
-            category: gi.ingredient.category,
-            id: gi.ingredient.id,
-            name: gi.ingredient.name,
-            parentId: gi.ingredient.parentId,
-            quantity: gi.quantity,
-            unit: gi.unit?.name,
-          })),
+        ingredients: [
+          ...row.ingredientGroups
+            .flatMap((group) => group.groupIngredients)
+            .map((groupIngredient) => ({
+              category: groupIngredient.ingredient.category,
+              id: groupIngredient.ingredient.id,
+              name: groupIngredient.ingredient.name,
+              parentId: groupIngredient.ingredient.parentId,
+              quantity: groupIngredient.quantity,
+              unit: groupIngredient.unit?.name,
+            })),
+          ...row.linkedRecipes.flatMap(({ linkedRecipe, ratio }) =>
+            linkedRecipe.ingredientGroups
+              .flatMap((group) => group.groupIngredients)
+              .map((groupIngredient) => ({
+                category: groupIngredient.ingredient.category,
+                id: groupIngredient.ingredient.id,
+                name: groupIngredient.ingredient.name,
+                parentId: groupIngredient.ingredient.parentId,
+                quantity: (groupIngredient.quantity * ratio) / linkedRecipe.servings,
+                unit: groupIngredient.unit?.name,
+              }))
+          ),
+        ],
         servings: row.servings,
       }))
     })
