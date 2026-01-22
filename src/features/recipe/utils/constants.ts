@@ -25,9 +25,6 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
 export const recipeFormFields = createFieldMap(recipeDefaultValues)
 
 export const ingredientGroupSelect = {
-  orderBy: {
-    isDefault: 'desc',
-  },
   columns: {
     id: true,
     groupName: true,

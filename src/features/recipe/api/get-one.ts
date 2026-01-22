@@ -21,6 +21,9 @@ const getRecipe = createServerFn({
         where: { id: data },
         with: {
           ingredientGroups: {
+            orderBy: {
+              isDefault: 'desc',
+            },
             ...ingredientGroupSelect,
           },
           linkedRecipes: {

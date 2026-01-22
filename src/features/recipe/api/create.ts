@@ -1,11 +1,12 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { type } from 'arktype'
+import { inArray } from 'drizzle-orm'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
-import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
+import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { uploadFile } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
@@ -48,11 +49,41 @@ const createRecipe = createServerFn({
     const { image, ingredientGroups, instructions, linkedRecipes, name, servings } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
 
+    const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
+    const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
+
+    const hasIngredients = allIngredientIds.length > 0
+    const hasLinkedRecipes = linkedRecipeIds.length > 0
+
+    let ownIngredientsVegetarian = true
+    let linkedRecipesVegetarian = true
+
+    if (hasIngredients && hasLinkedRecipes) {
+      const [ingredientCategories, linkedRecipesData] = await getDb().batch([
+        getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
+        getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+      ])
+      ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
+      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.isVegetarian)
+    } else if (hasIngredients) {
+      const ingredientCategories = await getDb()
+        .select({ category: ingredient.category })
+        .from(ingredient)
+        .where(inArray(ingredient.id, allIngredientIds))
+      ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
+    } else if (hasLinkedRecipes) {
+      const linkedRecipesData = await getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds))
+      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.isVegetarian)
+    }
+
+    const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
+
     const [createdRecipe] = await getDb()
       .insert(recipe)
       .values({
         image: imageKey,
         instructions,
+        isVegetarian,
         name,
         servings,
       })

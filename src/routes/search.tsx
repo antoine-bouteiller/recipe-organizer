@@ -8,14 +8,13 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator } from '@/components/ui/item'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { useDebounce } from '@/hooks/use-debounce'
 
 const RouteComponent = () => {
   const [search, setSearch] = useState('')
 
-  const debouncedSearch = useDebounce(search, 200)
+  const { data: recipes } = useQuery(getRecipeListOptions())
 
-  const { data: recipes } = useQuery(getRecipeListOptions(debouncedSearch))
+  const filteredRecipes = recipes?.filter((recipe) => recipe.name.toLowerCase().includes(search.toLowerCase())) ?? []
 
   return (
     <ScreenLayout title="Rechercher">
@@ -23,7 +22,7 @@ const RouteComponent = () => {
         <SearchInput autoFocus search={search} setSearch={setSearch} />
       </div>
       <ItemGroup className="flex-1 justify-end px-4">
-        {recipes?.map((recipe, index) => (
+        {filteredRecipes.map((recipe, index) => (
           <Fragment key={recipe.id}>
             <Item render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" />}>
               <ItemContent>{recipe.name}</ItemContent>
@@ -31,7 +30,7 @@ const RouteComponent = () => {
                 <ArrowRightIcon />
               </ItemMedia>
             </Item>
-            {index !== recipes.length - 1 && <ItemSeparator />}
+            {index !== filteredRecipes.length - 1 && <ItemSeparator />}
           </Fragment>
         ))}
       </ItemGroup>

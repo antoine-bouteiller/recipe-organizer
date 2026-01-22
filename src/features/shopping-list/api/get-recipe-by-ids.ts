@@ -24,13 +24,23 @@ const getRecipesByIds = createServerFn({
             in: data.ids,
           },
         },
+        columns: {
+          id: true,
+          servings: true,
+        },
         with: {
           ingredientGroups: {
             ...ingredientGroupSelect,
           },
           linkedRecipes: {
+            columns: {
+              ratio: true,
+            },
             with: {
               linkedRecipe: {
+                columns: {
+                  servings: true,
+                },
                 with: {
                   ingredientGroups: {
                     ...ingredientGroupSelect,

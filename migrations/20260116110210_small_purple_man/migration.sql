@@ -42,8 +42,8 @@ CREATE TABLE `recipe_linked_recipes` (
 );
 --> statement-breakpoint
 CREATE TABLE `units` (
-	`factor` real,
 	`id` integer PRIMARY KEY NOT NULL,
+	`factor` real,
 	`name` text NOT NULL,
 	`parent_id` integer
 );

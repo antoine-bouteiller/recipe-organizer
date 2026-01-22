@@ -7,7 +7,7 @@ import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
-import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
+import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
@@ -54,12 +54,24 @@ const updateRecipe = createServerFn({
         imageKey = await uploadFile(image)
       }
 
+      const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
+      const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
+
+      const [ingredientCategories, linkedRecipesData] = await getDb().batch([
+        getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
+        getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+      ])
+
       await getDb().batch([
         getDb()
           .update(recipe)
           .set({
             image: imageKey,
             instructions,
+            isVegetarian:
+              ingredientCategories.every((ingredient) => ingredient.category !== 'meat' && ingredient.category !== 'fish') &&
+              linkedRecipesData.every((linkedRecipe) => linkedRecipe.isVegetarian),
+            isMagimix: instructions.includes('data-type="magimix-program"'),
             name,
             servings,
           })

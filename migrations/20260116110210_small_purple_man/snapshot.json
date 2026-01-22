@@ -343,22 +343,22 @@
       "entityType": "tables"
     },
     {
-      "type": "real",
-      "notNull": false,
-      "autoincrement": false,
-      "default": null,
-      "generated": null,
-      "name": "factor",
-      "table": "units",
-      "entityType": "columns"
-    },
-    {
       "type": "integer",
       "notNull": false,
       "autoincrement": false,
       "default": null,
       "generated": null,
       "name": "id",
+      "table": "units",
+      "entityType": "columns"
+    },
+    {
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "factor",
       "table": "units",
       "entityType": "columns"
     },
