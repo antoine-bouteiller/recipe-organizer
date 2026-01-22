@@ -54,7 +54,7 @@ export const IngredientGroupField = withForm({
                       )}
                     </AppField>
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].quantity`}>
-                      {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Quantité" />}
+                      {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Quantité" allowDecimals />}
                     </AppField>
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].unitId`}>
                       {({ ComboboxField }) => (

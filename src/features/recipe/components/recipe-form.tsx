@@ -48,23 +48,20 @@ export const RecipeForm = withForm({
                 {field.state.value?.map((linkedRecipe, index) => (
                   <div className="flex gap-2" key={`linked-recipe-${linkedRecipe.id}`}>
                     <div className="flex flex-1 gap-2">
-                      <div className="flex-1">
-                        <AppField name={`linkedRecipes[${index}].id`}>
-                          {({ ComboboxField }) => (
-                            <ComboboxField
-                              disabled={isSubmitting}
-                              options={recipeOptions}
-                              placeholder="Sélectionner une sous-recette"
-                              searchPlaceholder="Rechercher une sous-recette"
-                            />
-                          )}
-                        </AppField>
-                      </div>
-                      <div className="w-24">
-                        <AppField name={`linkedRecipes[${index}].ratio`}>
-                          {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />}
-                        </AppField>
-                      </div>
+                      <AppField name={`linkedRecipes[${index}].id`}>
+                        {({ ComboboxField }) => (
+                          <ComboboxField
+                            disabled={isSubmitting}
+                            options={recipeOptions}
+                            placeholder="Sélectionner une sous-recette"
+                            searchPlaceholder="Rechercher une sous-recette"
+                            fieldClassName="flex-2"
+                          />
+                        )}
+                      </AppField>
+                      <AppField name={`linkedRecipes[${index}].ratio`}>
+                        {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />}
+                      </AppField>
                     </div>
                     <Button disabled={isSubmitting} onClick={() => field.removeValue(index)} size="icon" type="button" variant="destructive-outline">
                       <TrashIcon className="h-4 w-4" />

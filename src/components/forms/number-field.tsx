@@ -10,7 +10,7 @@ import {
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface NumberFieldProps {
-  allowDecimals?: number
+  allowDecimals?: boolean
   disabled?: boolean
   label?: string
   max?: number
@@ -18,7 +18,7 @@ interface NumberFieldProps {
   placeholder?: string
 }
 
-export const NumberField = ({ allowDecimals, disabled, label, max, min, placeholder }: NumberFieldProps) => {
+export const NumberField = ({ allowDecimals = false, disabled, label, max, min, placeholder }: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
 
   return (
