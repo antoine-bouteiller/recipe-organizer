@@ -7,6 +7,7 @@ import { NumberField } from '@/components/forms/number-field'
 import { SelectField } from '@/components/forms/select-field'
 import { TextField } from '@/components/forms/text-field'
 import TiptapField from '@/components/forms/tiptap-field'
+import { VideoField } from '@/components/forms/video-field'
 import { Field, FieldControl, FieldDescription, FieldError, FieldLabel, FormSubmit } from '@/components/ui/field'
 import { fieldContext, formContext } from '@/hooks/use-form-context'
 
@@ -24,6 +25,7 @@ const { useAppForm, withFieldGroup, withForm } = createFormHook({
     SelectField,
     TextField,
     TiptapField,
+    VideoField,
   },
   fieldContext: fieldContext,
   formComponents: {

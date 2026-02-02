@@ -8,7 +8,7 @@ import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { uploadFile } from '@/lib/r2'
+import { uploadFile, uploadVideo } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
 import { parseFormData } from '@/utils/form-data'
 
@@ -34,7 +34,12 @@ const recipeSchema = type({
   }).array(),
   name: 'string>=2',
   servings: 'number>0',
-  'videoLink?': 'string',
+  'video?': type('File')
+    .or({
+      id: 'string',
+      url: 'string',
+    })
+    .or('undefined'),
 })
 
 type RecipeFormValues = typeof recipeSchema.infer
@@ -47,8 +52,9 @@ const createRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.assert(parseFormData(formData)))
   .handler(async ({ data }) => {
-    const { image, ingredientGroups, instructions, linkedRecipes, name, servings, videoLink } = data
+    const { image, ingredientGroups, instructions, linkedRecipes, name, servings, video } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
+    const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
 
     const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
     const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
@@ -87,7 +93,7 @@ const createRecipe = createServerFn({
         isVegetarian,
         name,
         servings,
-        videoLink,
+        video: videoKey,
       })
       .returning({ id: recipe.id })
 

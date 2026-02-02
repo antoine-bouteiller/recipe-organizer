@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
 import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
+import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
@@ -84,6 +85,11 @@ const RecipeEditIdRoute = RecipeEditIdRouteImport.update({
   path: '/recipe/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVideoIdRoute = ApiVideoIdRouteImport.update({
+  id: '/api/video/$id',
+  path: '/api/video/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiImageIdRoute = ApiImageIdRouteImport.update({
   id: '/api/image/$id',
   path: '/api/image/$id',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/settings/units': typeof SettingsUnitsRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/image/$id': typeof ApiImageIdRoute
+  '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
 }
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/settings/units': typeof SettingsUnitsRoute
   '/settings': typeof SettingsIndexRoute
   '/api/image/$id': typeof ApiImageIdRoute
+  '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
 }
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/settings/units': typeof SettingsUnitsRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/image/$id': typeof ApiImageIdRoute
+  '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
 }
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/settings/units'
     | '/settings/'
     | '/api/image/$id'
+    | '/api/video/$id'
     | '/recipe/edit/$id'
     | '/api/auth/google/callback'
   fileRoutesByTo: FileRoutesByTo
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/settings/units'
     | '/settings'
     | '/api/image/$id'
+    | '/api/video/$id'
     | '/recipe/edit/$id'
     | '/api/auth/google/callback'
   id:
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/settings/units'
     | '/settings/'
     | '/api/image/$id'
+    | '/api/video/$id'
     | '/recipe/edit/$id'
     | '/api/auth/google/callback'
   fileRoutesById: FileRoutesById
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   RecipeIdRoute: typeof RecipeIdRoute
   RecipeNewRoute: typeof RecipeNewRoute
   ApiImageIdRoute: typeof ApiImageIdRoute
+  ApiVideoIdRoute: typeof ApiVideoIdRoute
   RecipeEditIdRoute: typeof RecipeEditIdRoute
   ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
 }
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipeEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/video/$id': {
+      id: '/api/video/$id'
+      path: '/api/video/$id'
+      fullPath: '/api/video/$id'
+      preLoaderRoute: typeof ApiVideoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/image/$id': {
       id: '/api/image/$id'
       path: '/api/image/$id'
@@ -334,6 +354,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipeIdRoute: RecipeIdRoute,
   RecipeNewRoute: RecipeNewRoute,
   ApiImageIdRoute: ApiImageIdRoute,
+  ApiVideoIdRoute: ApiVideoIdRoute,
   RecipeEditIdRoute: RecipeEditIdRoute,
   ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
 }

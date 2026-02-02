@@ -21,13 +21,14 @@ const generateGroupKey = (group: RecipeIngredientGroupFormInput, index: number):
 
 interface RecipeFormProps extends Record<string, unknown> {
   initialImage?: FileMetadata
+  initialVideo?: FileMetadata
   id?: number
 }
 
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
-  render: function Render({ form, initialImage, id }) {
+  render: function Render({ form, initialImage, initialVideo, id }) {
     const { AppField, Field } = form
 
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
@@ -80,8 +81,8 @@ export const RecipeForm = withForm({
           {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
         </AppField>
 
-        <AppField name="videoLink">
-          {({ TextField }) => <TextField disabled={isSubmitting} label="Lien vidéo (optionnel)" placeholder="YouTube, Instagram ou TikTok" />}
+        <AppField name="video">
+          {({ VideoField }) => <VideoField disabled={isSubmitting} initialVideo={initialVideo} label="Vidéo (optionnel)" />}
         </AppField>
 
         <div className="flex flex-col gap-2 pt-2">

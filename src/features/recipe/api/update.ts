@@ -9,7 +9,7 @@ import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { deleteFile, uploadFile } from '@/lib/r2'
+import { deleteFile, uploadFile, uploadVideo } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
 import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
@@ -30,7 +30,7 @@ const updateRecipe = createServerFn({
   .inputValidator((formData: FormData) => updateRecipeSchema.assert(parseFormData(formData)))
   .handler(
     withServerError(async ({ data }) => {
-      const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, videoLink } = data
+      const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, video } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: { id },
@@ -54,6 +54,17 @@ const updateRecipe = createServerFn({
         imageKey = await uploadFile(image)
       }
 
+      let videoKey = currentRecipe.video
+
+      if (video instanceof File) {
+        if (videoKey) {
+          await deleteFile(videoKey)
+        }
+        videoKey = await uploadVideo(video)
+      } else if (video !== undefined) {
+        videoKey = video?.id
+      }
+
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
@@ -74,7 +85,7 @@ const updateRecipe = createServerFn({
             isMagimix: instructions.includes('data-type="magimix-program"'),
             name,
             servings,
-            videoLink,
+            video: videoKey,
           })
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),

@@ -22,8 +22,19 @@ const uploadFile = async (file: File) => {
   return key
 }
 
+const uploadVideo = async (file: File) => {
+  const key = randomUUID()
+
+  const videoBuffer = await file.arrayBuffer()
+  await env.R2_BUCKET.put(key, videoBuffer, {
+    httpMetadata: { contentType: file.type },
+  })
+
+  return key
+}
+
 const deleteFile = async (key: string) => {
   await env.R2_BUCKET.delete(key)
 }
 
-export { deleteFile, uploadFile }
+export { deleteFile, uploadFile, uploadVideo }

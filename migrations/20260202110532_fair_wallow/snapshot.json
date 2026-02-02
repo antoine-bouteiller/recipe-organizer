@@ -1,0 +1,570 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "id": "a4e13bad-274e-4685-bb52-62976dfae5ec",
+  "prevIds": ["1e4076c4-6400-48eb-8b36-278a3f44aa96"],
+  "ddl": [
+    {
+      "name": "ingredients",
+      "entityType": "tables"
+    },
+    {
+      "name": "recipes",
+      "entityType": "tables"
+    },
+    {
+      "name": "group_ingredients",
+      "entityType": "tables"
+    },
+    {
+      "name": "recipe_ingredient_groups",
+      "entityType": "tables"
+    },
+    {
+      "name": "recipe_linked_recipes",
+      "entityType": "tables"
+    },
+    {
+      "name": "units",
+      "entityType": "tables"
+    },
+    {
+      "name": "user",
+      "entityType": "tables"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'other'",
+      "generated": null,
+      "name": "category",
+      "entityType": "columns",
+      "table": "ingredients"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "ingredients"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "name",
+      "entityType": "columns",
+      "table": "ingredients"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "parent_id",
+      "entityType": "columns",
+      "table": "ingredients"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "text(255)",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "image",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "instructions",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "true",
+      "generated": null,
+      "name": "is_vegetarian",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "name": "is_magimix",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "text(255)",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "name",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "servings",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": "'[]'",
+      "generated": null,
+      "name": "tags",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "text(255)",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "video",
+      "entityType": "columns",
+      "table": "recipes"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "group_id",
+      "entityType": "columns",
+      "table": "group_ingredients"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "group_ingredients"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "ingredient_id",
+      "entityType": "columns",
+      "table": "group_ingredients"
+    },
+    {
+      "type": "real",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "quantity",
+      "entityType": "columns",
+      "table": "group_ingredients"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "unit_id",
+      "entityType": "columns",
+      "table": "group_ingredients"
+    },
+    {
+      "type": "text(255)",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "group_name",
+      "entityType": "columns",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "name": "is_default",
+      "entityType": "columns",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "recipe_id",
+      "entityType": "columns",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "linked_recipe_id",
+      "entityType": "columns",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "type": "real",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "1",
+      "generated": null,
+      "name": "ratio",
+      "entityType": "columns",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "recipe_id",
+      "entityType": "columns",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "factor",
+      "entityType": "columns",
+      "table": "units"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "units"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "name",
+      "entityType": "columns",
+      "table": "units"
+    },
+    {
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "parent_id",
+      "entityType": "columns",
+      "table": "units"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "email",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "name": "id",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'user'",
+      "generated": null,
+      "name": "role",
+      "entityType": "columns",
+      "table": "user"
+    },
+    {
+      "columns": ["group_id"],
+      "tableTo": "recipe_ingredient_groups",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "name": "group_ingredients_group_id_recipe_ingredient_groups_id_fk",
+      "entityType": "fks",
+      "table": "group_ingredients"
+    },
+    {
+      "columns": ["ingredient_id"],
+      "tableTo": "ingredients",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "name": "group_ingredients_ingredient_id_ingredients_id_fk",
+      "entityType": "fks",
+      "table": "group_ingredients"
+    },
+    {
+      "columns": ["unit_id"],
+      "tableTo": "units",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "nameExplicit": false,
+      "name": "group_ingredients_unit_id_units_id_fk",
+      "entityType": "fks",
+      "table": "group_ingredients"
+    },
+    {
+      "columns": ["recipe_id"],
+      "tableTo": "recipes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "name": "recipe_ingredient_groups_recipe_id_recipes_id_fk",
+      "entityType": "fks",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "columns": ["linked_recipe_id"],
+      "tableTo": "recipes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "name": "recipe_linked_recipes_linked_recipe_id_recipes_id_fk",
+      "entityType": "fks",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "columns": ["recipe_id"],
+      "tableTo": "recipes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "name": "recipe_linked_recipes_recipe_id_recipes_id_fk",
+      "entityType": "fks",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "ingredients_pk",
+      "table": "ingredients",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "recipes_pk",
+      "table": "recipes",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "group_ingredients_pk",
+      "table": "group_ingredients",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "recipe_ingredient_groups_pk",
+      "table": "recipe_ingredient_groups",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "units_pk",
+      "table": "units",
+      "entityType": "pks"
+    },
+    {
+      "columns": ["id"],
+      "nameExplicit": false,
+      "name": "user_pk",
+      "table": "user",
+      "entityType": "pks"
+    },
+    {
+      "columns": [
+        {
+          "value": "category",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_ingredients_category",
+      "entityType": "indexes",
+      "table": "ingredients"
+    },
+    {
+      "columns": [
+        {
+          "value": "group_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_group_ingredients_group_id",
+      "entityType": "indexes",
+      "table": "group_ingredients"
+    },
+    {
+      "columns": [
+        {
+          "value": "ingredient_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_group_ingredients_ingredient_id",
+      "entityType": "indexes",
+      "table": "group_ingredients"
+    },
+    {
+      "columns": [
+        {
+          "value": "recipe_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_recipe_ingredient_groups_recipe_id",
+      "entityType": "indexes",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "columns": [
+        {
+          "value": "is_default",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_recipe_ingredient_groups_is_default",
+      "entityType": "indexes",
+      "table": "recipe_ingredient_groups"
+    },
+    {
+      "columns": [
+        {
+          "value": "recipe_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_recipe_linked_recipes_recipe_id",
+      "entityType": "indexes",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "columns": [
+        {
+          "value": "linked_recipe_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "name": "idx_recipe_linked_recipes_linked_recipe_id",
+      "entityType": "indexes",
+      "table": "recipe_linked_recipes"
+    },
+    {
+      "columns": ["email"],
+      "nameExplicit": false,
+      "name": "user_email_unique",
+      "entityType": "uniques",
+      "table": "user"
+    }
+  ],
+  "renames": []
+}

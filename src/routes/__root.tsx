@@ -1,8 +1,10 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { Serwist } from '@serwist/window'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
@@ -58,7 +60,22 @@ const RootComponent = () => {
           </div>
         </ToastProvider>
         <Scripts />
-        {import.meta.env.DEV && <ReactQueryDevtools />}
+        {import.meta.env.DEV && (
+          <TanStackDevtools
+            plugins={[
+              {
+                name: 'TanStack Query',
+                render: <ReactQueryDevtoolsPanel />,
+                defaultOpen: true,
+              },
+              {
+                name: 'TanStack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+                defaultOpen: false,
+              },
+            ]}
+          />
+        )}
       </body>
     </html>
   )

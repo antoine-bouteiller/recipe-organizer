@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import '@vidstack/react/player/styles/base.css';
+
 @plugin '@tailwindcss/typography';
+@plugin '@vidstack/react/tailwind.cjs';
 
 @custom-variant dark (&:is(.dark *));
 

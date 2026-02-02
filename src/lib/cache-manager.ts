@@ -22,7 +22,8 @@ class CacheManager {
           headers: {
             'Cache-Control': cacheControl,
             'CF-Cache-Status': 'HIT',
-            'Content-Type': cachedResponse?.headers.get('Content-Type') ?? 'image/webp',
+            'Content-Type': 'image/webp',
+            ...Object.fromEntries(cachedResponse.headers.entries()),
           },
         })
       }
@@ -34,7 +35,8 @@ class CacheManager {
         headers: {
           'Cache-Control': cacheControl,
           'CF-Cache-Status': 'MISS',
-          'Content-Type': response.headers.get('Content-Type') ?? 'image/webp',
+          'Content-Type': 'image/webp',
+          ...Object.fromEntries(response.headers.entries()),
         },
       })
     }

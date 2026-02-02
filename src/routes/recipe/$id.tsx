@@ -1,14 +1,15 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
-import { MediaOutlet, MediaPlayer } from '@vidstack/react'
+import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { type } from 'arktype'
 
+import { NotFound } from '@/components/error/not-found'
 import { Button } from '@/components/ui/button'
 import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger } from '@/components/ui/responsive-popover'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
+import { Video } from '@/components/ui/video'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
@@ -47,7 +48,7 @@ const RecipePage = () => {
   }
 
   if (!recipe) {
-    return notFound()
+    return <NotFound />
   }
 
   return (
@@ -95,13 +96,7 @@ const RecipePage = () => {
           </div>
         </div>
 
-        {recipe.videoLink && (
-          <div className="aspect-video w-full max-w-3xl px-4 py-4 md:px-8">
-            <MediaPlayer src={recipe.videoLink} className="aspect-video w-full overflow-hidden rounded-lg">
-              <MediaOutlet />
-            </MediaPlayer>
-          </div>
-        )}
+        {recipe.video && <Video className="mx-6 mb-6" src={recipe.video} />}
 
         <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
           <div className="px-4 pb-4 md:hidden">

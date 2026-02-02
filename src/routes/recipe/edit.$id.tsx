@@ -1,8 +1,9 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, notFound, redirect, useRouter } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { type } from 'arktype'
 
+import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
@@ -17,7 +18,7 @@ import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
-import { getFileUrl } from '@/utils/get-file-url'
+import { getFileUrl, getVideoUrl } from '@/utils/get-file-url'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   groupName: group.groupName ?? '',
@@ -49,6 +50,12 @@ const EditRecipePage = () => {
         })),
         name: recipe.name,
         servings: recipe.servings,
+        video: recipe.video
+          ? {
+              id: recipe.video,
+              url: getVideoUrl(recipe.video),
+            }
+          : undefined,
       }
     : {}
 
@@ -82,7 +89,7 @@ const EditRecipePage = () => {
   }
 
   if (!recipe) {
-    return notFound()
+    return <NotFound />
   }
 
   return (
@@ -96,7 +103,13 @@ const EditRecipePage = () => {
           void form.handleSubmit()
         }}
       >
-        <RecipeForm fields={recipeFormFields} form={form} initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }} id={recipe.id} />
+        <RecipeForm
+          fields={recipeFormFields}
+          form={form}
+          id={recipe.id}
+          initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }}
+          initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
+        />
         <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={isLoading} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
