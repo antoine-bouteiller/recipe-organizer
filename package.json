@@ -59,7 +59,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "lefthook": "^2.0.15",
-    "oxfmt": "^0.26.0",
+    "oxfmt": "^0.28.0",
     "oxlint": "^1.41.0",
     "oxlint-tsgolint": "^0.11.1",
     "serwist": "^9.5.0",
