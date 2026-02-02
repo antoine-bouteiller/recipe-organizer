@@ -1,6 +1,7 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
+import { MediaOutlet, MediaPlayer } from '@vidstack/react'
 import { type } from 'arktype'
 
 import { Button } from '@/components/ui/button'
@@ -93,6 +94,14 @@ const RecipePage = () => {
             </Button>
           </div>
         </div>
+
+        {recipe.videoLink && (
+          <div className="aspect-video w-full max-w-3xl px-4 py-4 md:px-8">
+            <MediaPlayer src={recipe.videoLink} className="aspect-video w-full overflow-hidden rounded-lg">
+              <MediaOutlet />
+            </MediaPlayer>
+          </div>
+        )}
 
         <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
           <div className="px-4 pb-4 md:hidden">

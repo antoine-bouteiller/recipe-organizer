@@ -1,0 +1,1 @@
+ALTER TABLE `recipes` ADD `video_link` text(500);

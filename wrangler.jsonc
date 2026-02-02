@@ -13,7 +13,7 @@
       "binding": "DB",
       "database_name": "recipe-organizer",
       "database_id": "542863e2-5f6d-4ef7-9fd0-84b673f76f43",
-      "migrations_dir": "migrations",
+      "migrations_dir": "migrations_tmp",
     },
   ],
   "r2_buckets": [

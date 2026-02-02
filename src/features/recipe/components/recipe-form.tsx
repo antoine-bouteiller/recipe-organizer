@@ -80,6 +80,10 @@ export const RecipeForm = withForm({
           {({ ImageField }) => <ImageField disabled={isSubmitting} initialImage={initialImage} label="Photo de la recette" />}
         </AppField>
 
+        <AppField name="videoLink">
+          {({ TextField }) => <TextField disabled={isSubmitting} label="Lien vidéo (optionnel)" placeholder="YouTube, Instagram ou TikTok" />}
+        </AppField>
+
         <div className="flex flex-col gap-2 pt-2">
           <Label>Groupes d&apos;ingrédients</Label>
           <Field mode="array" name="ingredientGroups">

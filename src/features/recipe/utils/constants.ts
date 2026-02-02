@@ -20,6 +20,7 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
   linkedRecipes: [],
   name: '',
   servings: 4,
+  videoLink: undefined,
 }
 
 export const recipeFormFields = createFieldMap(recipeDefaultValues)

@@ -34,6 +34,7 @@ const recipeSchema = type({
   }).array(),
   name: 'string>=2',
   servings: 'number>0',
+  'videoLink?': 'string',
 })
 
 type RecipeFormValues = typeof recipeSchema.infer
@@ -46,7 +47,7 @@ const createRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.assert(parseFormData(formData)))
   .handler(async ({ data }) => {
-    const { image, ingredientGroups, instructions, linkedRecipes, name, servings } = data
+    const { image, ingredientGroups, instructions, linkedRecipes, name, servings, videoLink } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
 
     const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
@@ -86,6 +87,7 @@ const createRecipe = createServerFn({
         isVegetarian,
         name,
         servings,
+        videoLink,
       })
       .returning({ id: recipe.id })
 

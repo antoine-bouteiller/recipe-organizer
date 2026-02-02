@@ -86,7 +86,7 @@ const EditRecipePage = () => {
   }
 
   return (
-    <ScreenLayout title=" Modifier la recette" withGoBack>
+    <ScreenLayout title="Modifier la recette" withGoBack>
       <Form
         className="p-4"
         errors={errors}

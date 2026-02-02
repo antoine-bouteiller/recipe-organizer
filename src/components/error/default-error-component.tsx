@@ -10,7 +10,7 @@ export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
   })
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-6 p-4">
+    <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-6 p-4" role="alert">
       <ErrorComponent error={error} />
       <div className="flex flex-wrap items-center gap-2">
         <button
@@ -19,11 +19,11 @@ export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
             void router.invalidate()
           }}
         >
-          Try Again
+          Réessayer
         </button>
         {isRoot ? (
           <Link className="rounded bg-gray-600 px-2 py-1 font-extrabold text-white uppercase dark:bg-gray-700" to="/">
-            Home
+            Accueil
           </Link>
         ) : (
           <Link
@@ -34,7 +34,7 @@ export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => {
             }}
             to="/"
           >
-            Go Back
+            Retour
           </Link>
         )}
       </div>

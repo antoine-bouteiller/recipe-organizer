@@ -83,7 +83,7 @@
       "prettier": {
         "allowed": false
       },
-      "language_servers": ["!eslint", "!typescript-language-server", "vtsls", "..."],
+      "language_servers": ["vtsls", "oxlint", "oxfmt"],
       "code_actions_on_format": {
         "source.fixAll.oxc": true
       },
@@ -99,7 +99,7 @@
       "prettier": {
         "allowed": false
       },
-      "language_servers": ["!eslint", "!typescript-language-server", "vtsls", "..."],
+      "language_servers": ["vtsls", "oxlint", "oxfmt", "tailwind-language-server"],
       "code_actions_on_format": {
         "source.fixAll.oxc": true
       },

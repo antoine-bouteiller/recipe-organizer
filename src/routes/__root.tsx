@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
+import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { TabBar } from '@/components/navigation/tabbar'
 import { ToastProvider } from '@/components/ui/toast'
@@ -24,8 +25,13 @@ const RootComponent = () => {
   useEffect(() => {
     const registerServiceWorker = async () => {
       if ('serviceWorker' in navigator) {
-        const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
-        await serwist.register()
+        try {
+          const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
+          await serwist.register()
+        } catch {
+          // App still works without SW - silent failure is OK
+          // Service worker provides offline support, not critical functionality
+        }
       }
     }
 
@@ -40,6 +46,7 @@ const RootComponent = () => {
 
       <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
         <ToastProvider>
+          <OfflineBanner />
           <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
             <Navbar />
           </header>
