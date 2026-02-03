@@ -1,17 +1,14 @@
-import { FrameCornersIcon, PauseIcon, PictureInPictureIcon, PlayIcon } from '@phosphor-icons/react'
+import { FrameCornersIcon, PauseIcon, PlayIcon } from '@phosphor-icons/react'
 import { ClientOnly } from '@tanstack/react-router'
-import { Controls, FullscreenButton, MediaPlayer, MediaProvider, PIPButton, PlayButton, Time, useMediaRemote, useMediaState } from '@vidstack/react'
+import { Controls, FullscreenButton, MediaPlayer, MediaProvider, PlayButton, Time, useMediaRemote, useMediaState } from '@vidstack/react'
 import { useEffect, useState, type ComponentPropsWithoutRef } from 'react'
 
 import { cn } from '@/utils/cn'
-import { getVideoUrl } from '@/utils/get-file-url'
 
 import { Button } from './button'
 import { Slider } from './slider'
 
-interface VideoProps extends ComponentPropsWithoutRef<'div'> {
-  src: string
-}
+type VideoProps = Omit<ComponentPropsWithoutRef<typeof MediaPlayer>, 'children'>
 
 const VideoControls = () => {
   const time = useMediaState('currentTime')
@@ -29,7 +26,7 @@ const VideoControls = () => {
   }, [time, duration, seeking])
 
   return (
-    <Controls.Root className="absolute inset-0 z-10 flex h-full w-full flex-col bg-gradient-to-t from-black/10 to-transparent opacity-0 transition-opacity media-controls:opacity-100">
+    <Controls.Root className="absolute inset-0 z-10 flex size-full flex-col bg-linear-to-t from-black/10 to-transparent opacity-0 transition-opacity media-controls:opacity-100">
       <div className="flex-1" />
       <Controls.Group className="flex w-full items-center px-2">
         <Slider
@@ -46,8 +43,8 @@ const VideoControls = () => {
       </Controls.Group>
       <Controls.Group className="flex w-full items-center py-0.5 text-white">
         <Button render={<PlayButton />} variant="ghost" size="icon" className="group">
-          <PlayIcon className="hidden group-data-[paused]:block" />
-          <PauseIcon className="group-data-[paused]:hidden" />
+          <PlayIcon className="hidden group-data-paused:block" />
+          <PauseIcon className="group-data-paused:hidden" />
         </Button>
         <div className="ml-2.5 flex items-center text-sm font-medium">
           <Time className="time" type="current" />
@@ -55,9 +52,6 @@ const VideoControls = () => {
           <Time className="time" type="duration" />
         </div>
         <div className="flex-1" />
-        <Button render={<PIPButton />} variant="ghost" size="icon">
-          <PictureInPictureIcon />
-        </Button>
         <Button render={<FullscreenButton />} variant="ghost" size="icon">
           <FrameCornersIcon />
         </Button>
@@ -66,17 +60,18 @@ const VideoControls = () => {
   )
 }
 
-export const Video = ({ className, src, ...props }: VideoProps) => {
-  const videoUrl = getVideoUrl(src)
-
-  return (
-    <ClientOnly>
-      <div className={cn('overflow-hidden rounded-lg flex justify-center items-center', className)} {...props}>
-        <MediaPlayer src={{ src: videoUrl, type: 'video/mp4' }} aspectRatio="9/16" crossOrigin className="flex max-w-sm flex-col">
-          <MediaProvider />
-          <VideoControls />
-        </MediaPlayer>
-      </div>
-    </ClientOnly>
-  )
-}
+export const Video = ({ className, ...props }: VideoProps) => (
+  <ClientOnly>
+    <MediaPlayer
+      aspectRatio="9/16"
+      crossOrigin
+      className={cn('flex max-w-sm flex-col rounded-lg relative', className)}
+      fullscreenOrientation="portrait"
+      playsInline
+      {...props}
+    >
+      <MediaProvider />
+      <VideoControls />
+    </MediaPlayer>
+  </ClientOnly>
+)

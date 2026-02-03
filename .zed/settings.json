@@ -1,11 +1,10 @@
 {
   "lsp": {
-    "vscode-css-language-server": {
+    "tailwindcss-language-server": {
       "settings": {
-        "css": {
-          "lint": {
-            "unknownAtRules": "ignore"
-          }
+        "classFunctions": ["cva", "cn"],
+        "experimental": {
+          "classRegex": ["[cls|className]\\s\\:\\=\\s\"([^\"]*)"]
         }
       }
     },
@@ -35,6 +34,7 @@
       "prettier": {
         "allowed": false
       },
+      "language_servers": ["tailwindcss-intellisense-css", "!vscode-css-language-server", "..."],
       "formatter": [
         {
           "language_server": {
@@ -83,7 +83,7 @@
       "prettier": {
         "allowed": false
       },
-      "language_servers": ["vtsls", "oxlint", "oxfmt"],
+      "language_servers": ["oxlint", "oxfmt", "..."],
       "code_actions_on_format": {
         "source.fixAll.oxc": true
       },
@@ -99,7 +99,7 @@
       "prettier": {
         "allowed": false
       },
-      "language_servers": ["vtsls", "oxlint", "oxfmt", "tailwind-language-server"],
+      "language_servers": ["oxlint", "oxfmt", "..."],
       "code_actions_on_format": {
         "source.fixAll.oxc": true
       },

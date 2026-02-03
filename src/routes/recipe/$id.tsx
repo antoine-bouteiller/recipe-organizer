@@ -16,7 +16,7 @@ import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-sect
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
-import { getFileUrl } from '@/utils/get-file-url'
+import { getFileUrl, getVideoUrl } from '@/utils/get-file-url'
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
@@ -96,7 +96,11 @@ const RecipePage = () => {
           </div>
         </div>
 
-        {recipe.video && <Video className="mx-6 mb-6" src={recipe.video} />}
+        {recipe.video && (
+          <div className="flex w-full justify-center">
+            <Video src={{ src: getVideoUrl(recipe.video), type: 'video/mp4' }} />
+          </div>
+        )}
 
         <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
           <div className="px-4 pb-4 md:hidden">
