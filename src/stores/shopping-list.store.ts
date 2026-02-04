@@ -1,8 +1,6 @@
 import { Store } from '@tanstack/react-store'
 import { type } from 'arktype'
 
-import { getCookie, setCookie } from '@/utils/cookie'
-
 const storageKey = 'shopping-list'
 
 interface ShoppingListState {
@@ -20,7 +18,7 @@ const storeSchema = type('string')
   })
 
 export const initShoppingListState = () => {
-  const state = getCookie(storageKey)
+  const state = localStorage.getItem(storageKey)
 
   if (!state) {
     return defaultState
@@ -33,7 +31,7 @@ export const initShoppingListState = () => {
 
 export const shoppingListStore = new Store(initShoppingListState(), {
   onUpdate: () => {
-    setCookie(storageKey, JSON.stringify(shoppingListStore.state))
+    localStorage.setItem(storageKey, JSON.stringify(shoppingListStore.state))
   },
 })
 

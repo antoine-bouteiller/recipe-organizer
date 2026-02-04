@@ -1,12 +1,11 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import { type } from 'arktype'
 
-import { NotFound } from '@/components/error/not-found'
 import { Button } from '@/components/ui/button'
 import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger } from '@/components/ui/responsive-popover'
-import { Spinner } from '@/components/ui/spinner'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { Video } from '@/components/ui/video'
@@ -18,9 +17,73 @@ import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantiti
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 import { getFileUrl, getVideoUrl } from '@/utils/get-file-url'
 
+const RecipeDetailPending = () => {
+  const router = useRouter()
+
+  return (
+    <div className="flex w-full justify-center overflow-auto md:pb-4">
+      <div className="relative h-fit w-full md:max-w-5xl md:rounded-2xl md:border md:bg-card md:shadow-sm">
+        <Button className="absolute top-4 left-4 rounded-full" onClick={() => router.history.back()} size="icon" variant="outline">
+          <ArrowLeftIcon className="size-4" />
+        </Button>
+
+        <div className="p-0">
+          <div className="mb-6 flex aspect-16/6 w-full items-center justify-center overflow-hidden md:rounded-t-md">
+            <Skeleton className="h-full w-full" />
+          </div>
+          <div className="px-6">
+            <Skeleton className="h-8 w-3/4" />
+          </div>
+          <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">
+            <Skeleton className="size-10" />
+            <Skeleton className="h-6 w-8" />
+            <Skeleton className="size-10" />
+            <Skeleton className="h-10 w-48" />
+          </div>
+        </div>
+
+        <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
+          <div className="px-4 pb-4 md:hidden">
+            <Skeleton className="mb-4 h-10 w-full" />
+            <div className="flex flex-col gap-3 px-2">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-5/6" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-4/5" />
+            </div>
+          </div>
+
+          <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
+            <div className="col-span-2 flex flex-col gap-4 rounded-xl border px-8 py-4">
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-5/6" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-4/5" />
+            </div>
+
+            <div className="col-span-3 flex flex-col gap-4 rounded-xl border px-8 py-4">
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-11/12" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-5/6" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-10/12" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
-  const { data: recipe, isLoading } = useQuery(getRecipeDetailsOptions(id))
+  const { data: recipe } = useSuspenseQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
   const isInShoppingList = useIsInShoppingList(id)
 
@@ -38,18 +101,6 @@ const RecipePage = () => {
         })),
       ]
     : []
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Spinner />
-      </div>
-    )
-  }
-
-  if (!recipe) {
-    return <NotFound />
-  }
 
   return (
     <div className="flex w-full justify-center overflow-auto md:pb-4">
@@ -144,6 +195,7 @@ const paramsSchema = type({ id: 'string.integer.parse' })
 
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
+  pendingComponent: RecipeDetailPending,
   loader: async ({ context, params }) => {
     const validated = paramsSchema(params)
     if (validated instanceof type.errors) {
@@ -151,7 +203,7 @@ export const Route = createFileRoute('/recipe/$id')({
     }
     const { id } = validated
 
-    await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
+    await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
 
     return { id }
   },

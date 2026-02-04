@@ -45,7 +45,7 @@ const getSwipeDirection = (position: ToastPosition) => {
 const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) => {
   const { toasts } = Toast.useToastManager()
 
-  let swipeDirection = getSwipeDirection(position)
+  const swipeDirection = getSwipeDirection(position)
 
   return (
     <Toast.Portal data-slot="toast-portal">

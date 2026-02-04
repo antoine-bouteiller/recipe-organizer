@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useStore } from '@tanstack/react-store'
 
 import type { IngredientCategory } from '@/types/ingredient'
@@ -15,7 +15,7 @@ export const useShoppingListStore = () => {
   const { shoppingList } = useStore(shoppingListStore)
   const { recipesQuantities } = useStore(recipeQuantitiesStore)
 
-  const { data: recipes } = useQuery(getRecipeByIdsOptions(shoppingList))
+  const { data: recipes } = useSuspenseQuery(getRecipeByIdsOptions(shoppingList))
 
   const recipesWithQuantities = recipes?.map((recipe) => ({
     ...recipe,
@@ -25,7 +25,6 @@ export const useShoppingListStore = () => {
   let shoppingListIngredients: Partial<Record<IngredientCategory, IngredientCartItem[]>> = {}
 
   if (recipesWithQuantities) {
-    // First pass: collect all ingredients with their quantities
     const ingredientsMap = recipesWithQuantities.reduce<Map<number, IngredientCartItem>>((map, recipe) => {
       for (const ingredient of recipe.ingredients) {
         const existingIngredient = map.get(ingredient.id)
@@ -45,7 +44,6 @@ export const useShoppingListStore = () => {
       return map
     }, new Map())
 
-    // Second pass: group by parentId and consolidate
     const parentQuantities = new Map<number, number>()
     const childrenIds = new Set<number>()
 
@@ -58,7 +56,6 @@ export const useShoppingListStore = () => {
       }
     }
 
-    // Third pass: build final list
     const result: IngredientCartItem[] = []
 
     for (const ingredient of ingredientsMap.values().filter((ingredient) => !childrenIds.has(ingredient.id))) {

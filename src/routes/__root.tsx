@@ -13,8 +13,6 @@ import { TabBar } from '@/components/navigation/tabbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
-import { initRecipeQuantitiesState, recipeQuantitiesStore } from '@/stores/recipe-quantities.store'
-import { initShoppingListState, shoppingListStore } from '@/stores/shopping-list.store'
 
 import appCss from '../styles/app.css?url'
 
@@ -90,12 +88,10 @@ export const Route = createRootRouteWithContext<{
     const authUser = await getAuthUser()
     const theme = getTheme()
 
-    shoppingListStore.setState(initShoppingListState())
-    recipeQuantitiesStore.setState(initRecipeQuantitiesState())
-
     return { authUser, isAdmin: authUser?.role === 'admin', theme }
   },
-  component: RootComponent,
+  shellComponent: RootComponent,
+  ssr: false,
   head: () => ({
     links: [
       { href: appCss, rel: 'stylesheet' },

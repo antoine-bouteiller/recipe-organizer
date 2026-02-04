@@ -1,8 +1,6 @@
 import { Store } from '@tanstack/react-store'
 import { type } from 'arktype'
 
-import { getCookie, setCookie } from '@/utils/cookie'
-
 const storageKey = 'recipe-quantities'
 
 interface RecipeQuantitiesState {
@@ -20,7 +18,7 @@ const storeSchema = type('string')
   })
 
 export const initRecipeQuantitiesState = () => {
-  const state = getCookie(storageKey)
+  const state = localStorage.getItem(storageKey)
 
   if (!state) {
     return defaultState
@@ -43,7 +41,7 @@ export const initRecipeQuantitiesState = () => {
 
 export const recipeQuantitiesStore = new Store(initRecipeQuantitiesState(), {
   onUpdate: () => {
-    setCookie(storageKey, JSON.stringify(recipeQuantitiesStore.state))
+    localStorage.setItem(storageKey, JSON.stringify(recipeQuantitiesStore.state))
   },
 })
 

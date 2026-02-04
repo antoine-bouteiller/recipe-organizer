@@ -1,5 +1,5 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { type } from 'arktype'
 
@@ -7,11 +7,12 @@ import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
-import { type UpdateRecipeFormInput, updateRecipeOptions, updateRecipeSchema } from '@/features/recipe/api/update'
+import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
 import { recipeFormFields } from '@/features/recipe/utils/constants'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
@@ -29,9 +30,61 @@ const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   })),
 })
 
+const EditRecipePending = () => (
+  <ScreenLayout title="Modifier la recette" withGoBack>
+    <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-9 w-48" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-36" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-36" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2 pt-2">
+        <Skeleton className="h-4 w-44" />
+        <div className="flex flex-col gap-4 rounded-xl border p-4">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <Skeleton className="h-9 w-44" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+
+      <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+        <Skeleton className="h-10 w-full md:w-32" />
+        <Skeleton className="h-10 w-full md:w-40" />
+      </div>
+    </div>
+  </ScreenLayout>
+)
+
 const EditRecipePage = () => {
   const { id } = Route.useLoaderData()
-  const { data: recipe, isLoading } = useQuery(getRecipeDetailsOptions(id))
+  const { data: recipe, isLoading } = useSuspenseQuery(getRecipeDetailsOptions(id))
   const { mutateAsync: updateRecipe } = useMutation(updateRecipeOptions())
   const router = useRouter()
 
@@ -138,11 +191,12 @@ export const Route = createFileRoute('/recipe/edit/$id')({
       throw new Error(validated.summary)
     }
     const { id } = validated
-    await context.queryClient.prefetchQuery(getRecipeDetailsOptions(id))
+    await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())
     await context.queryClient.ensureQueryData(getUnitsListOptions())
 
     return { id }
   },
+  pendingComponent: EditRecipePending,
 })

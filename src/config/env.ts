@@ -7,9 +7,9 @@ const validatedEnv = type({
   SESSION_SECRET: 'string>=32',
   VITE_PUBLIC_URL: 'string',
 }).assert({
-  GOOGLE_CLIENT_ID: cloudflareEnv.GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET: cloudflareEnv.GOOGLE_CLIENT_SECRET,
-  SESSION_SECRET: cloudflareEnv.SESSION_SECRET,
+  GOOGLE_CLIENT_ID: cloudflareEnv.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: cloudflareEnv.GOOGLE_CLIENT_SECRET ?? process.env.GOOGLE_CLIENT_SECRET,
+  SESSION_SECRET: cloudflareEnv.SESSION_SECRET ?? process.env.SESSION_SECRET,
   VITE_PUBLIC_URL: import.meta.env.VITE_PUBLIC_URL,
 })
 

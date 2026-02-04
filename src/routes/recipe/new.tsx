@@ -7,6 +7,7 @@ import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
+import { Skeleton } from '@/components/ui/skeleton'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
@@ -16,6 +17,58 @@ import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
+
+const NewRecipePending = () => (
+  <ScreenLayout title="Nouvelle Recette" withGoBack>
+    <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-9 w-48" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-36" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-36" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+
+      <div className="flex flex-col gap-2 pt-2">
+        <Skeleton className="h-4 w-44" />
+        <div className="flex flex-col gap-4 rounded-xl border p-4">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+        <Skeleton className="h-9 w-44" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+
+      <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+        <Skeleton className="h-10 w-full md:w-32" />
+        <Skeleton className="h-10 w-full md:w-40" />
+      </div>
+    </div>
+  </ScreenLayout>
+)
 
 const NewRecipePage = () => {
   const router = useRouter()
@@ -74,4 +127,5 @@ export const Route = createFileRoute('/recipe/new')({
     await context.queryClient.ensureQueryData(getRecipeListOptions())
     await context.queryClient.ensureQueryData(getUnitsListOptions())
   },
+  pendingComponent: NewRecipePending,
 })
