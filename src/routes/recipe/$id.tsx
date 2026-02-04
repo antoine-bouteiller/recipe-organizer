@@ -148,7 +148,7 @@ const RecipePage = () => {
         </div>
 
         {recipe.video && (
-          <div className="flex w-full justify-center">
+          <div className="flex w-full justify-center p-6">
             <Video src={{ src: getVideoUrl(recipe.video), type: 'video/mp4' }} />
           </div>
         )}
