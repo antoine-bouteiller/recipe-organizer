@@ -21,7 +21,7 @@ import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
-import { getImageUrl, getVideoUrl } from '@/utils/get-file-url'
+import { getVideoUrl } from '@/utils/get-file-url'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   groupName: group.groupName ?? '',
@@ -95,7 +95,7 @@ const EditRecipePage = () => {
         id: recipe.id,
         image: {
           id: recipe.image,
-          url: getImageUrl(recipe.image),
+          url: recipe.image,
         },
         ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
         instructions: recipe.instructions,
@@ -163,7 +163,7 @@ const EditRecipePage = () => {
           fields={recipeFormFields}
           form={form}
           id={recipe.id}
-          initialImage={{ id: recipe.image, url: getImageUrl(recipe.image) }}
+          initialImage={{ id: recipe.image, url: recipe.image }}
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
         <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
