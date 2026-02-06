@@ -106,7 +106,6 @@ const RecipePage = () => {
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto bg-background md:pb-4">
       <div className="w-full md:max-w-5xl md:rounded-2xl md:border md:bg-card md:shadow-sm">
-        {/* Hero image */}
         <div
           className={cn(
             'relative flex aspect-[16/9] w-full flex-col bg-linear-to-b from-violet-950 to-primary md:aspect-[16/6] md:rounded-t-2xl',
@@ -114,10 +113,8 @@ const RecipePage = () => {
           )}
           style={{ '--background-image': `url(${recipe.image})` } as CSSProperties}
         >
-          {/* Gradient overlay for text contrast */}
           <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-black/10 md:rounded-t-2xl" />
 
-          {/* Top bar */}
           <div className="relative z-10 flex items-center px-4 pt-safe-4 pb-2">
             <Button className="rounded-full" onClick={() => router.history.back()} size="icon" variant="outline">
               <ArrowLeftIcon className="size-4" />
@@ -146,11 +143,9 @@ const RecipePage = () => {
             </div>
           </div>
 
-          {/* Title at bottom of hero */}
           <h1 className="relative z-10 mt-auto px-6 pb-8 font-heading text-2xl text-white drop-shadow-lg md:text-3xl">{recipe.name}</h1>
         </div>
 
-        {/* Content area */}
         <div className="relative z-10 -mt-4 rounded-t-3xl bg-background md:mt-0 md:rounded-t-none">
           <div className="flex w-full items-center justify-center gap-2 px-8 py-4 md:justify-start">
             <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon" variant="outline">
