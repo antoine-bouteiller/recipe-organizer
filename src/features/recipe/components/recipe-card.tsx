@@ -1,15 +1,16 @@
-import { LeafIcon, MinusIcon, PlusIcon } from '@phosphor-icons/react'
+import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 
 import type { ReducedRecipe } from '../api/get-all'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
+import { RECIPE_TAG_LABELS, type RecipeTag } from '../utils/constants'
 
 interface RecipeCardProps {
   readonly recipe: ReducedRecipe
@@ -28,25 +29,28 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
 
   return (
     <Link params={{ id: recipe.id.toString() }} to="/recipe/$id">
-      <Card className="cursor-pointer gap-2 pt-0 pb-2" key={recipe.id}>
-        <CardHeader className="relative p-0">
-          <div className="relative h-36 w-full overflow-hidden rounded-t-2xl">
-            <img alt={recipe.name} className="h-full w-full object-cover" src={recipe.image} />
-          </div>
-        </CardHeader>
-        <CardContent className="px-6 pb-2">
-          <CardTitle className="flex items-center gap-2 pb-1">
-            <h2 className="overflow-hidden text-lg font-semibold text-nowrap text-ellipsis">{recipe.name}</h2>
-
-            {recipe.isVegetarian && <LeafIcon className="size-5 text-emerald-700" />}
-            {recipe.isMagimix && <Badge variant="outline">Magimix</Badge>}
+      <Card className="relative min-h-60 cursor-pointer justify-end gap-2 overflow-hidden bg-center py-4" key={recipe.id}>
+        <img src={recipe.image} alt={recipe.name} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-4/5 rounded-b-2xl bg-white/30 mask-[linear-gradient(to_bottom,transparent,black_40%)] backdrop-blur-sm" />
+        <CardHeader className="relative px-4">
+          <CardTitle className="flex items-center gap-2 overflow-hidden font-heading">
+            <h2 className="overflow-hidden text-2xl font-semibold text-nowrap text-ellipsis text-white">{recipe.name}</h2>
           </CardTitle>
+          <CardDescription className="flex flex-wrap gap-2">
+            {recipe.tags.map((tag) => (
+              <Badge key={tag} variant={tag === 'vegetarian' ? 'success' : 'outline'}>
+                {RECIPE_TAG_LABELS[tag as RecipeTag]}
+              </Badge>
+            ))}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="relative px-4">
           {isInShoppingList ? (
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-between gap-2">
               <Button disabled={quantity === 1} onClick={handleClick(decrementQuantity)} size="icon" variant="outline">
                 <MinusIcon />
               </Button>
-              <span>{quantity}</span>
+              <span className="text-white">{quantity}</span>
               <Button onClick={handleClick(incrementQuantity)} size="icon" variant="outline">
                 <PlusIcon />
               </Button>
@@ -55,7 +59,7 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
               </Button>
             </div>
           ) : (
-            <Button onClick={handleClick(() => addToShoppingList(recipe.id))} variant="outline">
+            <Button onClick={handleClick(() => addToShoppingList(recipe.id))} variant="outline" className="w-full">
               Ajouter à la liste de courses
             </Button>
           )}

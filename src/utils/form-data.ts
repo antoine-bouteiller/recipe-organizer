@@ -3,7 +3,7 @@ export const objectToFormData = (object: Record<string, unknown>) => {
   for (const [key, value] of Object.entries(object)) {
     if (value instanceof File) {
       formData.append(key, value)
-    } else {
+    } else if (value !== undefined && value !== null) {
       formData.append(key, JSON.stringify(value))
     }
   }

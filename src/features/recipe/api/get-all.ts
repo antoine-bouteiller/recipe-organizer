@@ -4,7 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
-import { getFileUrl } from '@/utils/get-file-url'
+import { getImageUrl } from '@/utils/get-file-url'
 
 const getAllRecipes = createServerFn({
   method: 'GET',
@@ -19,18 +19,16 @@ const getAllRecipes = createServerFn({
         name: true,
         image: true,
         servings: true,
-        isVegetarian: true,
-        isMagimix: true,
+        tags: true,
       },
     })
 
     return rows.map((row) => ({
       id: row.id,
-      image: getFileUrl(row.image),
-      isMagimix: row.isMagimix,
-      isVegetarian: row.isVegetarian,
+      image: getImageUrl(row.image),
       name: row.name,
       servings: row.servings,
+      tags: row.tags ?? [],
     }))
   })
 )

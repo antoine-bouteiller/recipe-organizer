@@ -11,8 +11,13 @@ import { useRecipeOptions } from '@/hooks/use-options'
 
 import type { RecipeIngredientGroupFormInput } from '../api/create'
 
-import { recipeDefaultValues } from '../utils/constants'
+import { RECIPE_TAG_LABELS, RECIPE_TAGS, recipeDefaultValues } from '../utils/constants'
 import { IngredientGroupField } from './ingredient-group-field'
+
+const tagItems = RECIPE_TAGS.map((tag) => ({
+  label: RECIPE_TAG_LABELS[tag],
+  value: tag,
+}))
 
 const generateGroupKey = (group: RecipeIngredientGroupFormInput, index: number): string => {
   const firstIngredientId = group.ingredients?.[0]?.id ?? ''
@@ -40,6 +45,8 @@ export const RecipeForm = withForm({
         <AppField name="name">{({ TextField }) => <TextField disabled={isSubmitting} label="Nom de la recette" />}</AppField>
 
         <AppField name="servings">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Portions" min={0} />}</AppField>
+
+        <AppField name="tags">{({ ToggleGroupField }) => <ToggleGroupField disabled={isSubmitting} items={tagItems} label="Tags" />}</AppField>
 
         <div className="flex flex-col gap-2">
           <Label>Sous-recettes liées</Label>

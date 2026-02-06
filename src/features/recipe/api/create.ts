@@ -12,7 +12,10 @@ import { uploadFile, uploadVideo } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
 import { parseFormData } from '@/utils/form-data'
 
+import { AUTO_TAGS, RECIPE_TAGS } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
+
+const MANUAL_TAGS = RECIPE_TAGS.filter((tag) => !AUTO_TAGS.includes(tag as (typeof AUTO_TAGS)[number]))
 
 const recipeSchema = type({
   image: type('File').or({
@@ -34,6 +37,7 @@ const recipeSchema = type({
   }).array(),
   name: 'string>=2',
   servings: 'number>0',
+  tags: type.enumerated(...MANUAL_TAGS).array(),
   'video?': type('File')
     .or({
       id: 'string',
@@ -52,7 +56,7 @@ const createRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.assert(parseFormData(formData)))
   .handler(async ({ data }) => {
-    const { image, ingredientGroups, instructions, linkedRecipes, name, servings, video } = data
+    const { image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
     const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
 
@@ -68,10 +72,10 @@ const createRecipe = createServerFn({
     if (hasIngredients && hasLinkedRecipes) {
       const [ingredientCategories, linkedRecipesData] = await getDb().batch([
         getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-        getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+        getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
       ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
-      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.isVegetarian)
+      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
     } else if (hasIngredients) {
       const ingredientCategories = await getDb()
         .select({ category: ingredient.category })
@@ -79,20 +83,29 @@ const createRecipe = createServerFn({
         .where(inArray(ingredient.id, allIngredientIds))
       ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
     } else if (hasLinkedRecipes) {
-      const linkedRecipesData = await getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds))
-      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.isVegetarian)
+      const linkedRecipesData = await getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds))
+      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
     }
 
     const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
+    const isMagimix = instructions.includes('data-type="magimix-program"')
+
+    const autoTags: string[] = []
+    if (isVegetarian && !tags.includes('dessert')) {
+      autoTags.push('vegetarian')
+    }
+    if (isMagimix) {
+      autoTags.push('magimix')
+    }
 
     const [createdRecipe] = await getDb()
       .insert(recipe)
       .values({
         image: imageKey,
         instructions,
-        isVegetarian,
         name,
         servings,
+        tags: [...tags, ...autoTags],
         video: videoKey,
       })
       .returning({ id: recipe.id })

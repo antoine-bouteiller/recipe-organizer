@@ -129,5 +129,4 @@ export const Route = createRootRouteWithContext<{
       },
     ],
   }),
-  notFoundComponent: () => <div>Not found</div>,
 })

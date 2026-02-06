@@ -15,7 +15,7 @@ import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-sect
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
-import { getFileUrl, getVideoUrl } from '@/utils/get-file-url'
+import { getImageUrl, getVideoUrl } from '@/utils/get-file-url'
 
 const RecipeDetailPending = () => {
   const router = useRouter()
@@ -130,7 +130,7 @@ const RecipePage = () => {
         )}
         <div className="p-0">
           <div className="mb-6 flex aspect-16/6 w-full items-center justify-center overflow-hidden md:rounded-t-md">
-            <img alt={recipe.name} className="w-full object-cover" src={getFileUrl(recipe.image)} />
+            <img alt={recipe.name} className="w-full object-cover" src={getImageUrl(recipe.image)} />
           </div>
           <h1 className="px-6 text-xl font-semibold md:text-2xl">{recipe.name}</h1>
           <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">

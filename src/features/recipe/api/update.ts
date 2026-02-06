@@ -30,7 +30,7 @@ const updateRecipe = createServerFn({
   .inputValidator((formData: FormData) => updateRecipeSchema.assert(parseFormData(formData)))
   .handler(
     withServerError(async ({ data }) => {
-      const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, video } = data
+      const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: { id },
@@ -70,8 +70,21 @@ const updateRecipe = createServerFn({
 
       const [ingredientCategories, linkedRecipesData] = await getDb().batch([
         getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-        getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+        getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
+
+      const ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
+      const linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
+      const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
+      const isMagimix = instructions.includes('data-type="magimix-program"')
+
+      const autoTags: string[] = []
+      if (isVegetarian && !tags.includes('dessert')) {
+        autoTags.push('vegetarian')
+      }
+      if (isMagimix) {
+        autoTags.push('magimix')
+      }
 
       await getDb().batch([
         getDb()
@@ -79,12 +92,9 @@ const updateRecipe = createServerFn({
           .set({
             image: imageKey,
             instructions,
-            isVegetarian:
-              ingredientCategories.every((ingredient) => ingredient.category !== 'meat' && ingredient.category !== 'fish') &&
-              linkedRecipesData.every((linkedRecipe) => linkedRecipe.isVegetarian),
-            isMagimix: instructions.includes('data-type="magimix-program"'),
             name,
             servings,
+            tags: [...tags, ...autoTags],
             video: videoKey,
           })
           .where(eq(recipe.id, id))

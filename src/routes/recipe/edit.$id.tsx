@@ -3,6 +3,8 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { type } from 'arktype'
 
+import type { RECIPE_TAGS } from '@/features/recipe/utils/constants'
+
 import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -14,12 +16,12 @@ import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
-import { recipeFormFields } from '@/features/recipe/utils/constants'
+import { AUTO_TAGS, recipeFormFields } from '@/features/recipe/utils/constants'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
-import { getFileUrl, getVideoUrl } from '@/utils/get-file-url'
+import { getImageUrl, getVideoUrl } from '@/utils/get-file-url'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   groupName: group.groupName ?? '',
@@ -93,7 +95,7 @@ const EditRecipePage = () => {
         id: recipe.id,
         image: {
           id: recipe.image,
-          url: getFileUrl(recipe.image),
+          url: getImageUrl(recipe.image),
         },
         ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
         instructions: recipe.instructions,
@@ -103,6 +105,7 @@ const EditRecipePage = () => {
         })),
         name: recipe.name,
         servings: recipe.servings,
+        tags: recipe.tags.filter((tag) => !AUTO_TAGS.includes(tag as (typeof AUTO_TAGS)[number])) as (typeof RECIPE_TAGS)[number][],
         video: recipe.video
           ? {
               id: recipe.video,
@@ -160,7 +163,7 @@ const EditRecipePage = () => {
           fields={recipeFormFields}
           form={form}
           id={recipe.id}
-          initialImage={{ id: recipe.image, url: getFileUrl(recipe.image) }}
+          initialImage={{ id: recipe.image, url: getImageUrl(recipe.image) }}
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
         <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">

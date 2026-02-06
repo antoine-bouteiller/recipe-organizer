@@ -38,43 +38,43 @@ const badgeVariants = cva(
           bg-primary text-primary-foreground
           [button,a&]:hover:bg-primary/90
         `,
+        secondary: `
+          bg-secondary text-secondary-foreground
+          [button,a&]:hover:bg-secondary/90
+        `,
         destructive: `
           bg-destructive text-white
           [button,a&]:hover:bg-destructive/90
+        `,
+        outline: `
+          border-border bg-background/80 backdrop-blur-sm
+          dark:bg-input/80
+          [button,a&]:hover:bg-accent/80
+          dark:[button,a&]:hover:bg-input/90
+        `,
+        success: `
+          bg-success/90 text-success-foreground
+          dark:bg-success/80
         `,
         error: `
           bg-destructive/8 text-destructive-foreground
           dark:bg-destructive/16
         `,
-        fish: 'bg-blue-200 text-blue-600',
         info: `
           bg-info/8 text-info-foreground
           dark:bg-info/16
         `,
+
         // Ingredients categories
         meat: 'bg-red-200 text-red-600',
-        other: 'bg-zinc-200 text-zinc-700',
-        outline: `
-          border-border bg-transparent
-          dark:bg-input/32
-          [button,a&]:hover:bg-accent/50
-          dark:[button,a&]:hover:bg-input/48
-        `,
-
-        secondary: `
-          bg-secondary text-secondary-foreground
-          [button,a&]:hover:bg-secondary/90
-        `,
+        fish: 'bg-blue-200 text-blue-600',
         spices: 'bg-yellow-200 text-yellow-600',
-        success: `
-          bg-success/8 text-success-foreground
-          dark:bg-success/16
-        `,
         vegetables: 'bg-emerald-100 text-emerald-600',
         warning: `
           bg-warning/8 text-warning-foreground
           dark:bg-warning/16
         `,
+        other: 'bg-zinc-200 text-zinc-700',
       },
     },
   }

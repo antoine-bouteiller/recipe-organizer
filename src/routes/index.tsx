@@ -5,9 +5,9 @@ import { type } from 'arktype'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/components/recipe-card'
+import { RecipeCardSkeleton } from '@/features/recipe/components/recipe-card-skeleton'
 import { incrementalArray } from '@/utils/array'
 
 const searchSchema = type({
@@ -18,13 +18,7 @@ const RecipeListPending = () => (
   <ScreenLayout title="Recettes">
     <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
       {incrementalArray({ length: 6 }).map((i) => (
-        <div className="gap-2 rounded-2xl border pt-0 pb-2" key={i}>
-          <Skeleton className="h-36 w-full rounded-t-2xl" />
-          <div className="px-6 pt-4 pb-2">
-            <Skeleton className="mb-2 h-6 w-3/4" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        </div>
+        <RecipeCardSkeleton key={i} />
       ))}
     </div>
   </ScreenLayout>
