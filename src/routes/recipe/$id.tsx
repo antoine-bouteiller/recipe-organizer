@@ -10,6 +10,7 @@ import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger }
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
+import { Video } from '@/components/ui/video'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
@@ -17,6 +18,7 @@ import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 import { cn } from '@/utils/cn'
+import { getVideoUrl } from '@/utils/get-file-url'
 
 const RecipeDetailPending = () => {
   const router = useRouter()
@@ -143,7 +145,14 @@ const RecipePage = () => {
             </div>
           </div>
 
-          <h1 className="relative z-10 mt-auto px-6 pb-8 font-heading text-2xl text-white drop-shadow-lg md:text-3xl">{recipe.name}</h1>
+          <div className="relative z-10 mt-auto flex items-end gap-4 px-6 pb-8">
+            <h1 className="min-w-0 flex-1 font-heading text-2xl text-white drop-shadow-lg md:text-3xl">{recipe.name}</h1>
+            {recipe.video && (
+              <div className="w-28 shrink-0 md:w-36">
+                <Video src={{ src: getVideoUrl(recipe.video), type: 'video/mp4' }} />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="relative z-10 -mt-4 rounded-t-3xl bg-background md:mt-0 md:rounded-t-none">
