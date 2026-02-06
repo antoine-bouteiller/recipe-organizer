@@ -4,11 +4,11 @@
 
 Config file: `wrangler.jsonc`
 
-| Binding | Name |
-|---------|------|
-| D1 Database | `DB` |
-| R2 Bucket | `R2_BUCKET` |
-| Cloudflare Images | `IMAGES` |
+| Binding           | Name        |
+| ----------------- | ----------- |
+| D1 Database       | `DB`        |
+| R2 Bucket         | `R2_BUCKET` |
+| Cloudflare Images | `IMAGES`    |
 
 Node.js compatibility enabled.
 

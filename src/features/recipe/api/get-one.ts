@@ -6,6 +6,7 @@ import { type } from 'arktype'
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
+import { getImageUrl } from '@/utils/get-file-url'
 
 import { ingredientGroupSelect } from '../utils/constants'
 
@@ -51,7 +52,7 @@ const getRecipe = createServerFn({
         throw notFound()
       }
 
-      return result
+      return { ...result, image: getImageUrl(result.image) }
     })
   )
 
