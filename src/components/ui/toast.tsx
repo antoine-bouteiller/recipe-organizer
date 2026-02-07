@@ -157,4 +157,4 @@ export const toastError = (message: string, error?: unknown) => {
   }
 }
 
-export { toastManager, ToastProvider, type ToastPosition }
+export { toastManager, ToastProvider }
