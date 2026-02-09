@@ -19,7 +19,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backg
       <div className="relative flex w-full shrink-0 items-center gap-2 overflow-hidden bg-linear-to-b from-violet-950 to-primary px-6 pt-safe-4 pb-12 text-primary-foreground md:hidden">
         {backgroundImage && (
           <>
-            <img src={backgroundImage} alt="Background Image" className="absolute inset-0 w-full object-cover" />
+            <img src={backgroundImage} alt="Background Image" className="absolute inset-0 size-full object-cover object-center" />
             <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-black/10 md:rounded-t-2xl" />
           </>
         )}
