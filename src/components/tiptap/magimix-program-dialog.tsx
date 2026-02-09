@@ -1,8 +1,8 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { type } from 'arktype'
-import { type ComponentPropsWithoutRef, type ReactNode, useState } from 'react'
+import { useState, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 
-import { allowedRotationSpeed, magimixProgram, type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
+import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/components/tiptap/types/magimix'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import {
@@ -29,7 +29,7 @@ interface MagimixProgramDialogProps {
   triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-export const magimixProgramSchema = type({
+const magimixProgramSchema = type({
   program: type.enumerated(...magimixProgram),
   rotationSpeed: type.enumerated(...allowedRotationSpeed),
   'temperature?': '0 < number < 200',
@@ -39,7 +39,7 @@ export const magimixProgramSchema = type({
 
 export type MagimixProgramFormInput = typeof magimixProgramSchema.infer
 
-export const magimixProgramDefaultValues: MagimixProgramFormInput = {
+const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
   rotationSpeed: 'auto',
   temperature: undefined,

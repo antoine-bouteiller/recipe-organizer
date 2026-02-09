@@ -1,8 +1,7 @@
 import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
-import { mergeAttributes, Node } from '@tiptap/core'
-import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer as reactNodeViewRenderer } from '@tiptap/react'
+import { mergeAttributes, Node, NodeViewWrapper, ReactNodeViewRenderer as reactNodeViewRenderer, type ReactNodeViewProps } from '@tiptap/react'
 
-import { type MagimixProgramData, magimixProgramLabels } from '@/components/tiptap/types/magimix'
+import { magimixProgramLabels, type MagimixProgramData } from '@/components/tiptap/types/magimix'
 import { capitalize } from '@/utils/string'
 
 import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '../ui/item'

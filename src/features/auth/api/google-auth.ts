@@ -16,7 +16,7 @@ const generateState = (): string => {
   return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export const redirectWithError = (errorMessage: AuthError) => {
+const redirectWithError = (errorMessage: AuthError) => {
   throw redirect({
     search: {
       error: errorMessage,

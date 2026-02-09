@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/d1'
 
 import * as schema from './schema'
 
-export const relations = defineRelations(schema, (relation) => ({
+const relations = defineRelations(schema, (relation) => ({
   ingredient: {
     parent: relation.one.ingredient({
       from: relation.ingredient.parentId,

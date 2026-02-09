@@ -20,4 +20,4 @@ const getIngredientListOptions = () =>
     queryKey: queryKeys.listIngredients(),
   })
 
-export { getIngredientListOptions, getIngredientsList }
+export { getIngredientListOptions }

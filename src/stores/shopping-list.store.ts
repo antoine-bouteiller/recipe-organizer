@@ -17,7 +17,7 @@ const storeSchema = type('string')
     shoppingList: 'number[]',
   })
 
-export const initShoppingListState = () => {
+const initShoppingListState = () => {
   const state = localStorage.getItem(storageKey)
 
   if (!state) {

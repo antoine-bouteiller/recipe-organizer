@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { mergeAttributes, Node } from '@tiptap/core'
-import { NodeViewWrapper, type ReactNodeViewProps, ReactNodeViewRenderer as reactNodeViewRenderer } from '@tiptap/react'
+import { mergeAttributes, Node, NodeViewWrapper, ReactNodeViewRenderer as reactNodeViewRenderer, type ReactNodeViewProps } from '@tiptap/react'
 
 import type { SubrecipeNodeData } from '@/components/tiptap/types/subrecipe'
 

@@ -30,4 +30,4 @@ const getRecipeInstructionsOptions = (id: number) =>
     staleTime: 5 * 60 * 1000,
   })
 
-export { getRecipeInstructions, getRecipeInstructionsOptions }
+export { getRecipeInstructionsOptions }

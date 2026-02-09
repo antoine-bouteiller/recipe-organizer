@@ -5,15 +5,17 @@ commit-msg:
 pre-commit:
   parallel: true
   jobs:
-    - name: check-lockfile
+    - name: Check Lockfile
       run: bun i --frozen-lockfile --silent
-    - name: check
+    - name: Lint
       glob: '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx}'
       run: bunx oxlint {staged_files} --fix --type-aware
       stage_fixed: true
-    - name: format
+    - name: Format
       glob: '*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}'
       run: bunx oxfmt {staged_files}
       stage_fixed: true
-    - name: type-check
+    - name: Type Check
       run: bun typecheck
+    - name: Knip
+      run: bun knip

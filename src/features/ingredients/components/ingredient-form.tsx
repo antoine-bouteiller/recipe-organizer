@@ -7,8 +7,6 @@ import type { IngredientFormInput } from '../api/create'
 
 import { ingredientsCategoryOptions } from '../utils/ingredient-category'
 
-export { ingredientSchema } from '../api/create'
-
 export const ingredientDefaultValues: IngredientFormInput = {
   category: undefined,
   name: '',

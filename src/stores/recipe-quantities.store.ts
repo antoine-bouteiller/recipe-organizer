@@ -17,7 +17,7 @@ const storeSchema = type('string')
     recipesQuantities: 'Record<string, number>',
   })
 
-export const initRecipeQuantitiesState = () => {
+const initRecipeQuantitiesState = () => {
   const state = localStorage.getItem(storageKey)
 
   if (!state) {

@@ -12,7 +12,7 @@ import { VideoField } from '@/components/forms/video-field'
 import { Field, FieldControl, FieldDescription, FieldError, FieldLabel, FormSubmit } from '@/components/ui/field'
 import { fieldContext, formContext } from '@/hooks/use-form-context'
 
-const { useAppForm, withFieldGroup, withForm } = createFormHook({
+const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     CheckboxField,
     ComboboxField,
@@ -36,4 +36,4 @@ const { useAppForm, withFieldGroup, withForm } = createFormHook({
   formContext: formContext,
 })
 
-export { useAppForm, withFieldGroup, withForm }
+export { useAppForm, withForm }
