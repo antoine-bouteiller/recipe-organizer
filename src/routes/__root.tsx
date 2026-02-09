@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
+import { NavigationProgressBar } from '@/components/navigation/navigation-progress-bar'
 import { TabBar } from '@/components/navigation/tabbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
@@ -46,6 +47,7 @@ const RootComponent = () => {
 
       <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
         <ToastProvider>
+          <NavigationProgressBar />
           <OfflineBanner />
           <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
             <Navbar />

@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { type ChangeEvent, type DragEvent, type InputHTMLAttributes, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type InputHTMLAttributes } from 'react'
 
 import { isNotEmpty } from '@/utils/array'
 
@@ -14,13 +14,13 @@ export interface FileMetadata {
   url: string
 }
 
-export interface FileWithPreview {
+interface FileWithPreview {
   file: File | FileMetadata
   id: string
   preview?: string
 }
 
-export interface FileUploadOptions {
+interface FileUploadOptions {
   accept?: string
   initialFiles?: FileMetadata[]
   maxFiles?: number // Only used when multiple is true, defaults to Infinity
@@ -30,13 +30,13 @@ export interface FileUploadOptions {
   onFilesChange?: (files: FileWithPreview[]) => void // Callback when files change
 }
 
-export interface FileUploadState {
+interface FileUploadState {
   errors: string[]
   files: FileWithPreview[]
   isDragging: boolean
 }
 
-export interface FileUploadActions {
+interface FileUploadActions {
   addFiles: (files: File[] | FileList) => void
   clearErrors: () => void
   clearFiles: () => void

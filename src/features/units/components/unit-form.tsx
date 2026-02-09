@@ -15,7 +15,7 @@ export const unitDefaultValues: UnitFormInput = {
 
 export const unitFormFields = createFieldMap(unitDefaultValues)
 
-export interface UnitFormProps extends Record<string, unknown> {
+interface UnitFormProps extends Record<string, unknown> {
   unit?: Unit
 }
 

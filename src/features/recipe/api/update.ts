@@ -170,4 +170,4 @@ const updateRecipeOptions = () =>
     },
   })
 
-export { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput, type UpdateRecipeFormValues }
+export { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput }

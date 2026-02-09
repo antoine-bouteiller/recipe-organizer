@@ -1,6 +1,6 @@
 import { getCookie, setCookie } from '@/utils/cookie'
 
-export type Theme = 'dark' | 'light'
+type Theme = 'dark' | 'light'
 
 const storageKey = 'ui-theme'
 
