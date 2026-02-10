@@ -14,30 +14,46 @@ export const NavigationProgressBar = () => {
 
   const [progress, setProgress] = useState(0)
   const [visible, setVisible] = useState(false)
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const showTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const initialCountsRef = useRef({ matches: 0, queries: 0 })
 
   useEffect(() => {
     if (isLoading) {
       setProgress(0)
-      setVisible(true)
       initialCountsRef.current = {
         matches: pendingMatches + resolvedMatches,
         queries: Math.max(fetchingCount, 1),
       }
+
+      showTimeoutRef.current = setTimeout(() => {
+        setVisible(true)
+      }, 1000)
+
+      return () => {
+        if (showTimeoutRef.current) {
+          clearTimeout(showTimeoutRef.current)
+          showTimeoutRef.current = null
+        }
+      }
     } else if (visible) {
       setProgress(100)
 
-      timeoutRef.current = setTimeout(() => {
+      hideTimeoutRef.current = setTimeout(() => {
         setVisible(false)
         setProgress(0)
       }, 300)
 
       return () => {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = null
+        if (hideTimeoutRef.current) {
+          clearTimeout(hideTimeoutRef.current)
+          hideTimeoutRef.current = null
         }
+      }
+    } else {
+      if (showTimeoutRef.current) {
+        clearTimeout(showTimeoutRef.current)
+        showTimeoutRef.current = null
       }
     }
   }, [isLoading, visible, pendingMatches, resolvedMatches, fetchingCount])
@@ -63,9 +79,5 @@ export const NavigationProgressBar = () => {
     return null
   }
 
-  return (
-    <div className="fixed inset-x-0 top-0 z-60 h-0.5">
-      <div className="h-full bg-primary transition-all duration-200 ease-out" style={{ width: `${progress}%` }} />
-    </div>
-  )
+  return <div className="h-0.5 bg-primary transition-all duration-200 ease-out" style={{ width: `${progress}%` }} />
 }

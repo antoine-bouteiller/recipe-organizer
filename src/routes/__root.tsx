@@ -47,7 +47,6 @@ const RootComponent = () => {
 
       <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
         <ToastProvider>
-          <NavigationProgressBar />
           <OfflineBanner />
           <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
             <Navbar />
@@ -56,6 +55,7 @@ const RootComponent = () => {
             <Outlet />
           </main>
           <div className="fixed bottom-0 z-10 w-full md:hidden">
+            <NavigationProgressBar />
             <TabBar />
           </div>
         </ToastProvider>
