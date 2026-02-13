@@ -1,7 +1,8 @@
 import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
+import { useHotkey } from '@tanstack/react-hotkeys'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import type { Recipe } from '@/types/recipe'
 
@@ -30,16 +31,10 @@ export const SearchBar = () => {
 
   const { data: recipes } = useQuery(getRecipeListOptions())
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
-        setOpen((open) => !open)
-      }
-    }
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [])
+  useHotkey('Mod+K', (e) => {
+    e.preventDefault()
+    setOpen((open) => !open)
+  })
 
   return (
     <CommandDialog onOpenChange={setOpen} open={open}>
