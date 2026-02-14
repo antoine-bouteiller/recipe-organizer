@@ -27,7 +27,7 @@ export const getRouter = () => {
     },
   })
 
-  if (typeof globalThis.localStorage !== 'undefined') {
+  if (globalThis.localStorage !== undefined) {
     const persister = createAsyncStoragePersister({
       storage: globalThis.localStorage,
     })
