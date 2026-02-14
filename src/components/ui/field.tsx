@@ -24,8 +24,8 @@ const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props) => (
 const FormSubmit = ({ label }: { label: string }) => {
   const form = useFormContext()
   return (
-    <form.Subscribe selector={(state) => state.isSubmitting}>
-      {(isSubmitting) => (
+    <form.Subscribe>
+      {({ isSubmitting }) => (
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting && <Spinner />}
           {label}
