@@ -57,7 +57,7 @@
     "@types/bun": "^1.3.9",
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native-preview": "7.0.0-dev.20260213.1",
+    "@typescript/native-preview": "7.0.0-dev.20260214.1",
     "@vitejs/plugin-react": "^5.1.4",
     "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "^1.0.0-beta.9-e89174b",
