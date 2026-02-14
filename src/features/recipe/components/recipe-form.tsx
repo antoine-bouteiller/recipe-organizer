@@ -9,8 +9,6 @@ import { LinkedRecipesProvider } from '@/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
 import { useRecipeOptions } from '@/hooks/use-options'
 
-import type { RecipeIngredientGroupFormInput } from '../api/create'
-
 import { RECIPE_TAG_LABELS, RECIPE_TAGS, recipeDefaultValues } from '../utils/constants'
 import { IngredientGroupField } from './ingredient-group-field'
 
@@ -18,11 +16,6 @@ const tagItems = RECIPE_TAGS.map((tag) => ({
   label: RECIPE_TAG_LABELS[tag],
   value: tag,
 }))
-
-const generateGroupKey = (group: RecipeIngredientGroupFormInput, index: number): string => {
-  const firstIngredientId = group.ingredients?.[0]?.id ?? ''
-  return `group-${index}-${firstIngredientId}`
-}
 
 interface RecipeFormProps extends Record<string, unknown> {
   initialImage?: FileMetadata
@@ -98,7 +91,7 @@ export const RecipeForm = withForm({
             {(field) => (
               <>
                 {field.state.value?.map((group, groupIndex) => (
-                  <AppField key={generateGroupKey(group, groupIndex)} name={`ingredientGroups[${groupIndex}]`}>
+                  <AppField key={group.groupName} name={`ingredientGroups[${groupIndex}]`}>
                     {({ Field, FieldError }) => (
                       <Field className="relative rounded-xl border p-4">
                         {groupIndex !== 0 && (
