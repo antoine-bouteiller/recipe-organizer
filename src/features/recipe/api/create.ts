@@ -48,7 +48,6 @@ const recipeSchema = type({
 
 type RecipeFormValues = typeof recipeSchema.infer
 type RecipeFormInput = Partial<RecipeFormValues>
-export type RecipeIngredientGroupFormInput = NonNullable<RecipeFormInput['ingredientGroups']>[number]
 
 const createRecipe = createServerFn({
   method: 'POST',
