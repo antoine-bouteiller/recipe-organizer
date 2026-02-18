@@ -2,7 +2,7 @@ import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const ingredientCategory = ['meat', 'fish', 'vegetables', 'spices', 'other'] as const
 
-const ingredient = sqliteTable(
+export const ingredient = sqliteTable(
   'ingredients',
   {
     category: text('category', {
@@ -16,5 +16,3 @@ const ingredient = sqliteTable(
   },
   (table) => [index('idx_ingredients_category').on(table.category)]
 )
-
-export { ingredient }

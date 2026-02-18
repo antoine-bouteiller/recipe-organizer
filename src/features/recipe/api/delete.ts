@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
 import { eq, inArray } from 'drizzle-orm'
+import * as v from 'valibot'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
@@ -10,7 +10,7 @@ import { queryKeys } from '@/lib/query-keys'
 import { deleteFile } from '@/lib/r2'
 import { withServerError } from '@/utils/error-handler'
 
-const deleteRecipeSchema = type('number')
+const deleteRecipeSchema = v.number()
 
 const deleteRecipe = createServerFn({
   method: 'POST',
@@ -46,7 +46,7 @@ const deleteRecipe = createServerFn({
           .where(
             inArray(
               groupIngredient.groupId,
-              currentRecipe.ingredientGroups.map(({ id }) => id)
+              currentRecipe.ingredientGroups.map(({ id: groupId }) => groupId)
             )
           ),
         getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),

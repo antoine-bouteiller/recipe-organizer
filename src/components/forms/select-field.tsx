@@ -20,9 +20,9 @@ const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
-          {items.map(({ label, value }) => (
+          {items.map(({ label: itemLabel, value }) => (
             <SelectItem className="justify-start" key={value} value={value}>
-              {label}
+              {itemLabel}
             </SelectItem>
           ))}
         </SelectPopup>

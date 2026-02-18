@@ -30,7 +30,7 @@ export const RecipeForm = withForm({
     const { AppField, Field } = form
 
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
-    const linkedRecipeIds = useStore(form.store, (state) => (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((id) => id > 0))
+    const linkedRecipeIds = useStore(form.store, (state) => (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((recipeId) => recipeId > 0))
     const recipeOptions = useRecipeOptions({ filter: (recipe) => recipe.id !== id })
 
     return (
@@ -47,7 +47,7 @@ export const RecipeForm = withForm({
             {(field) => (
               <>
                 {field.state.value?.map((linkedRecipe, index) => (
-                  <div className="flex gap-2" key={`linked-recipe-${linkedRecipe.id}`}>
+                  <div className="flex gap-2" key={linkedRecipe.id}>
                     <div className="flex flex-1 gap-2">
                       <AppField name={`linkedRecipes[${index}].id`}>
                         {({ ComboboxField }) => (
@@ -91,9 +91,9 @@ export const RecipeForm = withForm({
             {(field) => (
               <>
                 {field.state.value?.map((group, groupIndex) => (
-                  <AppField key={group.groupName} name={`ingredientGroups[${groupIndex}]`}>
-                    {({ Field, FieldError }) => (
-                      <Field className="relative rounded-xl border p-4">
+                  <AppField key={group._key} name={`ingredientGroups[${groupIndex}]`}>
+                    {({ Field: GroupField, FieldError }) => (
+                      <GroupField className="relative rounded-xl border p-4">
                         {groupIndex !== 0 && (
                           <>
                             <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
@@ -114,7 +114,7 @@ export const RecipeForm = withForm({
 
                         <IngredientGroupField form={form} groupIndex={groupIndex} />
                         <FieldError />
-                      </Field>
+                      </GroupField>
                     )}
                   </AppField>
                 ))}
@@ -122,6 +122,7 @@ export const RecipeForm = withForm({
                   disabled={isSubmitting}
                   onClick={() => {
                     field.pushValue({
+                      _key: crypto.randomUUID(),
                       groupName: undefined,
                       ingredients: [],
                     })

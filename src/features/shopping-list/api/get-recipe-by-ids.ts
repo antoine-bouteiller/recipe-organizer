@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
@@ -8,8 +8,8 @@ import { withServerError } from '@/utils/error-handler'
 
 import { ingredientGroupSelect } from '../utils/constants'
 
-const getRecipesByIdsSchema = type({
-  ids: 'number[]',
+const getRecipesByIdsSchema = v.object({
+  ids: v.array(v.number()),
 })
 
 const getRecipesByIds = createServerFn({

@@ -2,12 +2,13 @@ import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
+import * as v from 'valibot'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
-import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
+import { groupIngredient, ingredient, recipeIngredientGroup, recipeLinkedRecipes, recipe } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile, uploadVideo } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
@@ -16,18 +17,16 @@ import { parseFormData } from '@/utils/form-data'
 
 import { getTitle } from '../utils/get-recipe-title'
 
-const updateRecipeSchema = recipeSchema.merge({
-  id: 'number',
-})
+const updateRecipeSchema = v.object({ ...recipeSchema.entries, id: v.number() })
 
-type UpdateRecipeFormValues = typeof updateRecipeSchema.infer
+type UpdateRecipeFormValues = v.InferOutput<typeof updateRecipeSchema>
 type UpdateRecipeFormInput = Partial<UpdateRecipeFormValues>
 
 const updateRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => updateRecipeSchema.assert(parseFormData(formData)))
+  .inputValidator((formData: FormData) => v.parse(updateRecipeSchema, parseFormData(formData)))
   .handler(
     withServerError(async ({ data }) => {
       const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
@@ -104,7 +103,7 @@ const updateRecipe = createServerFn({
           .where(
             inArray(
               groupIngredient.groupId,
-              currentRecipe.ingredientGroups.map(({ id }) => id)
+              currentRecipe.ingredientGroups.map(({ id: ingredientGroupId }) => ingredientGroupId)
             )
           ),
         getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
@@ -126,11 +125,11 @@ const updateRecipe = createServerFn({
             await getDb()
               .insert(groupIngredient)
               .values(
-                group.ingredients.map((ingredient) => ({
+                group.ingredients.map((ingredientEntry) => ({
                   groupId: updatedGroup.id,
-                  ingredientId: ingredient.id,
-                  quantity: ingredient.quantity,
-                  unitId: ingredient.unitId ?? undefined,
+                  ingredientId: ingredientEntry.id,
+                  quantity: ingredientEntry.quantity,
+                  unitId: ingredientEntry.unitId ?? undefined,
                 }))
               )
           }

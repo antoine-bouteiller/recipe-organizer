@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@vidstack/react/player/styles/base.css';
+@import 'tailwindcss/preflight.css' layer(base);
 
 @plugin '@tailwindcss/typography';
 @plugin '@vidstack/react/tailwind.cjs';

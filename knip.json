@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
-  "entry": ["src/sw.ts"],
+  "entry": ["src/sw.ts", "oxlint.config.ts"],
   "ignore": ["src/components/ui/**"],
   "ignoreDependencies": ["cloudflare"]
 }

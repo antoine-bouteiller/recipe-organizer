@@ -2,6 +2,7 @@ import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
@@ -32,7 +33,7 @@ export const EditUnit = ({ unit }: EditUnitProps) => {
     onSubmit: async ({ value }) => {
       await updateMutation.mutateAsync(
         {
-          data: updateUnitSchema.assert(value),
+          data: v.parse(updateUnitSchema, value),
         },
         {
           onSuccess: () => {

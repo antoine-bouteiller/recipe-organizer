@@ -1,6 +1,6 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -8,13 +8,18 @@ import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-const unitSchema = type({
-  'factor?': 'number>0',
-  name: 'string>=2',
-  'parentId?': 'number',
+const unitSchema = v.object({
+  factor: v.optional(
+    v.pipe(
+      v.number(),
+      v.check((n) => n > 0)
+    )
+  ),
+  name: v.pipe(v.string(), v.minLength(2)),
+  parentId: v.optional(v.number()),
 })
 
-export type UnitFormValues = typeof unitSchema.infer
+export type UnitFormValues = v.InferOutput<typeof unitSchema>
 export type UnitFormInput = Partial<UnitFormValues>
 
 const createUnit = createServerFn()

@@ -1,6 +1,6 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -8,13 +8,13 @@ import { getDb } from '@/lib/db'
 import { ingredient, ingredientCategory } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-const ingredientSchema = type({
-  category: type.enumerated(...ingredientCategory),
-  name: 'string>=2',
-  'parentId?': 'number',
+const ingredientSchema = v.object({
+  category: v.picklist([...ingredientCategory]),
+  name: v.pipe(v.string(), v.minLength(2)),
+  parentId: v.optional(v.number()),
 })
 
-export type IngredientFormValues = typeof ingredientSchema.infer
+export type IngredientFormValues = v.InferOutput<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>
 
 const createIngredient = createServerFn()

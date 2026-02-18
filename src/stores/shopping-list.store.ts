@@ -1,5 +1,5 @@
 import { Store } from '@tanstack/react-store'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 const storageKey = 'shopping-list'
 
@@ -11,11 +11,17 @@ const defaultState: ShoppingListState = {
   shoppingList: [],
 }
 
-const storeSchema = type('string')
-  .pipe.try((s): object => JSON.parse(s))
-  .to({
-    shoppingList: 'number[]',
-  })
+const storeSchema = v.pipe(
+  v.string(),
+  v.transform((s) => {
+    try {
+      return JSON.parse(s) as unknown
+    } catch {
+      return null
+    }
+  }),
+  v.object({ shoppingList: v.array(v.number()) })
+)
 
 const initShoppingListState = () => {
   const state = localStorage.getItem(storageKey)
@@ -24,9 +30,9 @@ const initShoppingListState = () => {
     return defaultState
   }
 
-  const parsedState = storeSchema(state)
+  const result = v.safeParse(storeSchema, state)
 
-  return parsedState instanceof type.errors ? defaultState : parsedState
+  return result.success ? result.output : defaultState
 }
 
 export const shoppingListStore = new Store(initShoppingListState(), {

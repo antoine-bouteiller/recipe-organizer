@@ -91,7 +91,7 @@ interface TiptapProps {
 }
 
 const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
-  const editor = useEditor({
+  const contextEditor = useEditor({
     autofocus: false,
     content,
     editable: !readOnly,
@@ -114,7 +114,7 @@ const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
     },
   })
 
-  return <EditorContext.Provider value={{ editor }}>{children}</EditorContext.Provider>
+  return <EditorContext.Provider value={{ editor: contextEditor }}>{children}</EditorContext.Provider>
 }
 
 const TiptapContent = ({ className, ...props }: Omit<EditorContentProps, 'editor'>) => {

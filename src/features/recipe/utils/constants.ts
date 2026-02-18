@@ -27,6 +27,7 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
   image: undefined,
   ingredientGroups: [
     {
+      _key: crypto.randomUUID(),
       ingredients: [
         {
           id: -1,

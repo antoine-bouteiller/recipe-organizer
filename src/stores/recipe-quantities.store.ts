@@ -1,5 +1,5 @@
 import { Store } from '@tanstack/react-store'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 const storageKey = 'recipe-quantities'
 
@@ -11,11 +11,17 @@ const defaultState: RecipeQuantitiesState = {
   recipesQuantities: {},
 }
 
-const storeSchema = type('string')
-  .pipe.try((s): object => JSON.parse(s))
-  .to({
-    recipesQuantities: 'Record<string, number>',
-  })
+const storeSchema = v.pipe(
+  v.string(),
+  v.transform((s) => {
+    try {
+      return JSON.parse(s) as unknown
+    } catch {
+      return null
+    }
+  }),
+  v.object({ recipesQuantities: v.record(v.string(), v.number()) })
+)
 
 const initRecipeQuantitiesState = () => {
   const state = localStorage.getItem(storageKey)
@@ -24,15 +30,15 @@ const initRecipeQuantitiesState = () => {
     return defaultState
   }
 
-  const validated = storeSchema(state)
+  const result = v.safeParse(storeSchema, state)
 
-  if (validated instanceof type.errors) {
+  if (!result.success) {
     return defaultState
   }
 
   // Convert string keys back to numbers
   const recipesQuantities: Record<number, number> = {}
-  for (const [key, value] of Object.entries(validated.recipesQuantities)) {
+  for (const [key, value] of Object.entries(result.output.recipesQuantities)) {
     recipesQuantities[Number(key)] = value
   }
 

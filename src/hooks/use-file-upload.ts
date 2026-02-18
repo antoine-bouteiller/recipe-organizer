@@ -217,15 +217,15 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
       // Call the onFilesAdded callback with the newly added valid files
       onFilesAdded?.(validFiles)
 
-      const newFiles = multiple ? [...state.files, ...validFiles] : validFiles
+      const updatedFiles = multiple ? [...state.files, ...validFiles] : validFiles
 
       setState((prev) => ({
         ...prev,
         errors,
-        files: newFiles,
+        files: updatedFiles,
       }))
 
-      onFilesChange?.(newFiles)
+      onFilesChange?.(updatedFiles)
     } else if (errors.length > 0) {
       setState((prev) => ({
         ...prev,

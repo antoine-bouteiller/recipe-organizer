@@ -1,7 +1,7 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 import type { RECIPE_TAGS } from '@/features/recipe/utils/constants'
 
@@ -24,6 +24,7 @@ import { formatFormErrors } from '@/utils/format-form-errors'
 import { getVideoUrl } from '@/utils/get-file-url'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
+  _key: crypto.randomUUID(),
   groupName: group.groupName ?? '',
   ingredients: group.groupIngredients.map((ingredient) => ({
     id: ingredient.ingredient.id,
@@ -134,7 +135,7 @@ const EditRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors as unknown as Record<string, type.errors>[]))
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
 
   if (isLoading) {
     return (
@@ -179,7 +180,12 @@ const EditRecipePage = () => {
   )
 }
 
-const paramsSchema = type({ id: 'string.integer.parse' })
+const paramsSchema = v.object({
+  id: v.pipe(
+    v.string(),
+    v.transform((s) => Number.parseInt(s, 10))
+  ),
+})
 
 export const Route = createFileRoute('/recipe/edit/$id')({
   beforeLoad: ({ context }) => {
@@ -189,11 +195,11 @@ export const Route = createFileRoute('/recipe/edit/$id')({
   },
   component: EditRecipePage,
   loader: async ({ context, params }) => {
-    const validated = paramsSchema(params)
-    if (validated instanceof type.errors) {
-      throw new Error(validated.summary)
+    const result = v.safeParse(paramsSchema, params)
+    if (!result.success) {
+      throw new Error(result.issues[0]?.message ?? 'Invalid id')
     }
-    const { id } = validated
+    const { id } = result.output
     await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())

@@ -58,7 +58,7 @@ export const useShoppingListStore = () => {
 
     const result: IngredientCartItem[] = []
 
-    for (const ingredient of ingredientsMap.values().filter((ingredient) => !childrenIds.has(ingredient.id))) {
+    for (const ingredient of ingredientsMap.values().filter((item) => !childrenIds.has(item.id))) {
       const parentQuantity = parentQuantities.get(ingredient.id)
 
       if (parentQuantity) {

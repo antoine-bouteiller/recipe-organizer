@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
 import { inArray } from 'drizzle-orm'
+import * as v from 'valibot'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -17,43 +17,65 @@ import { getTitle } from '../utils/get-recipe-title'
 
 const MANUAL_TAGS = RECIPE_TAGS.filter((tag) => !AUTO_TAGS.includes(tag as (typeof AUTO_TAGS)[number]))
 
-const recipeSchema = type({
-  image: type('File').or({
-    id: 'string',
-    url: 'string',
-  }),
-  ingredientGroups: type({
-    'groupName?': 'string',
-    ingredients: type({
-      id: 'number>0',
-      quantity: 'number>0',
-      'unitId?': 'number>0 | undefined',
-    }).array(),
-  }).array(),
-  instructions: 'string',
-  'linkedRecipes?': type({
-    id: 'number>0',
-    ratio: 'number>0',
-  }).array(),
-  name: 'string>=2',
-  servings: 'number>0',
-  tags: type.enumerated(...MANUAL_TAGS).array(),
-  'video?': type('File')
-    .or({
-      id: 'string',
-      url: 'string',
+const recipeSchema = v.object({
+  image: v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })]),
+  ingredientGroups: v.array(
+    v.object({
+      _key: v.string(),
+      groupName: v.optional(v.string()),
+      ingredients: v.array(
+        v.object({
+          id: v.pipe(
+            v.number(),
+            v.check((n) => n > 0)
+          ),
+          quantity: v.pipe(
+            v.number(),
+            v.check((n) => n > 0)
+          ),
+          unitId: v.optional(
+            v.pipe(
+              v.number(),
+              v.check((n) => n > 0)
+            )
+          ),
+        })
+      ),
     })
-    .or('undefined'),
+  ),
+  instructions: v.string(),
+  linkedRecipes: v.optional(
+    v.array(
+      v.object({
+        _key: v.optional(v.string()),
+        id: v.pipe(
+          v.number(),
+          v.check((n) => n > 0)
+        ),
+        ratio: v.pipe(
+          v.number(),
+          v.check((n) => n > 0)
+        ),
+      })
+    )
+  ),
+  name: v.pipe(v.string(), v.minLength(2)),
+  servings: v.pipe(
+    v.number(),
+    v.check((n) => n > 0)
+  ),
+  tags: v.array(v.picklist(MANUAL_TAGS)),
+  video: v.optional(v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })])),
 })
 
-type RecipeFormValues = typeof recipeSchema.infer
+type RecipeFormValues = v.InferOutput<typeof recipeSchema>
 type RecipeFormInput = Partial<RecipeFormValues>
 
 const createRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => recipeSchema.assert(parseFormData(formData)))
+  .inputValidator((formData: FormData) => v.parse(recipeSchema, parseFormData(formData)))
   .handler(async ({ data }) => {
     const { image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
@@ -124,11 +146,11 @@ const createRecipe = createServerFn({
           await getDb()
             .insert(groupIngredient)
             .values(
-              group.ingredients.map((ingredient) => ({
+              group.ingredients.map((ingredientEntry) => ({
                 groupId: createdGroup.id,
-                ingredientId: ingredient.id,
-                quantity: ingredient.quantity,
-                unitId: ingredient.unitId ?? undefined,
+                ingredientId: ingredientEntry.id,
+                quantity: ingredientEntry.quantity,
+                unitId: ingredientEntry.unitId ?? undefined,
               }))
             )
         }

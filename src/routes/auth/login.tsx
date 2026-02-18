@@ -1,14 +1,14 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
 import { useEffect } from 'react'
+import * as v from 'valibot'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
-const searchSchema = type({ 'error?': 'string' })
+const searchSchema = v.object({ error: v.optional(v.string()) })
 
 const getErrorMessage = (error: string) => {
   if (error === 'signup_disabled') {
@@ -54,5 +54,5 @@ export const Route = createFileRoute('/auth/login')({
     }
   },
   component: LoginPage,
-  validateSearch: (search) => searchSchema.assert(search),
+  validateSearch: (search) => v.parse(searchSchema, search),
 })

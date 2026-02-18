@@ -1,7 +1,7 @@
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -10,8 +10,8 @@ import RecipeCard from '@/features/recipe/components/recipe-card'
 import { RecipeCardSkeleton } from '@/features/recipe/components/recipe-card-skeleton'
 import { incrementalArray } from '@/utils/array'
 
-const searchSchema = type({
-  'search?': 'boolean',
+const searchSchema = v.object({
+  search: v.optional(v.boolean()),
 })
 
 const RecipeListPending = () => (
@@ -51,10 +51,10 @@ export const Route = createFileRoute('/')({
   },
   pendingComponent: RecipeListPending,
   validateSearch: (search) => {
-    const validated = searchSchema(search)
-    if (validated instanceof type.errors) {
-      throw new Error(validated.summary)
+    const result = v.safeParse(searchSchema, search)
+    if (!result.success) {
+      throw new Error(result.issues[0]?.message ?? 'Invalid search params')
     }
-    return validated
+    return result.output
   },
 })

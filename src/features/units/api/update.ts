@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { type } from 'arktype'
 import { eq } from 'drizzle-orm'
+import * as v from 'valibot'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -9,15 +9,20 @@ import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-export const updateUnitSchema = type({
-  'factor?': 'number>0',
-  id: 'number',
-  name: 'string>=2',
-  'parentId?': 'number',
-  symbol: 'string>=1',
+export const updateUnitSchema = v.object({
+  factor: v.optional(
+    v.pipe(
+      v.number(),
+      v.check((n) => n > 0)
+    )
+  ),
+  id: v.number(),
+  name: v.pipe(v.string(), v.minLength(2)),
+  parentId: v.optional(v.number()),
+  symbol: v.pipe(v.string(), v.minLength(1)),
 })
 
-export type UpdateUnitFormValues = typeof updateUnitSchema.infer
+export type UpdateUnitFormValues = v.InferOutput<typeof updateUnitSchema>
 export type UpdateUnitFormInput = Partial<UpdateUnitFormValues>
 
 const updateUnit = createServerFn()

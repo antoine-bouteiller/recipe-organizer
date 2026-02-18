@@ -60,22 +60,20 @@ const RootComponent = () => {
           </div>
         </ToastProvider>
         <Scripts />
-        {import.meta.env.DEV && (
-          <TanStackDevtools
-            plugins={[
-              {
-                name: 'TanStack Query',
-                render: <ReactQueryDevtoolsPanel />,
-                defaultOpen: true,
-              },
-              {
-                name: 'TanStack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-                defaultOpen: false,
-              },
-            ]}
-          />
-        )}
+        <TanStackDevtools
+          plugins={[
+            {
+              name: 'TanStack Query',
+              render: <ReactQueryDevtoolsPanel />,
+              defaultOpen: true,
+            },
+            {
+              name: 'TanStack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+              defaultOpen: false,
+            },
+          ]}
+        />
       </body>
     </html>
   )

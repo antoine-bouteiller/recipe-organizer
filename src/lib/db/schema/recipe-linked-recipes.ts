@@ -2,7 +2,7 @@ import { index, integer, real, sqliteTable } from 'drizzle-orm/sqlite-core'
 
 import { recipe } from '@/lib/db/schema/recipe'
 
-const recipeLinkedRecipes = sqliteTable(
+export const recipeLinkedRecipes = sqliteTable(
   'recipe_linked_recipes',
   {
     linkedRecipeId: integer('linked_recipe_id')
@@ -18,5 +18,3 @@ const recipeLinkedRecipes = sqliteTable(
     index('idx_recipe_linked_recipes_linked_recipe_id').on(table.linkedRecipeId),
   ]
 )
-
-export { recipeLinkedRecipes }

@@ -1,12 +1,14 @@
-import { type } from 'arktype'
 import { env as cloudflareEnv } from 'cloudflare:workers'
+import * as v from 'valibot'
 
-const validatedEnv = type({
-  GOOGLE_CLIENT_ID: /^\d+-[a-zA-Z0-9]+.apps.googleusercontent.com$/,
-  GOOGLE_CLIENT_SECRET: /^GOCSPX-[a-zA-Z0-9_-]+$/,
-  SESSION_SECRET: 'string>=32',
-  VITE_PUBLIC_URL: 'string',
-}).assert({
+const envSchema = v.object({
+  GOOGLE_CLIENT_ID: v.pipe(v.string(), v.regex(/^\d+-[a-zA-Z0-9]+.apps.googleusercontent.com$/)),
+  GOOGLE_CLIENT_SECRET: v.pipe(v.string(), v.regex(/^GOCSPX-[a-zA-Z0-9_-]+$/)),
+  SESSION_SECRET: v.pipe(v.string(), v.minLength(32)),
+  VITE_PUBLIC_URL: v.string(),
+})
+
+const validatedEnv = v.parse(envSchema, {
   GOOGLE_CLIENT_ID: cloudflareEnv.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: cloudflareEnv.GOOGLE_CLIENT_SECRET ?? process.env.GOOGLE_CLIENT_SECRET,
   SESSION_SECRET: cloudflareEnv.SESSION_SECRET ?? process.env.SESSION_SECRET,

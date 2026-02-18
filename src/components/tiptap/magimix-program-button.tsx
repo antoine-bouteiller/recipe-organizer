@@ -23,9 +23,11 @@ export const MagimixProgramButton = () => {
       onSubmit={handleInsert}
       submitLabel="Insérer"
       title="Ajouter un programme Magimix"
-      triggerRender={<Toggle data-pressed={undefined} />}
-    >
-      <CookingPotIcon className="size-4" />
-    </MagimixProgramDialog>
+      triggerRender={
+        <Toggle data-pressed={undefined}>
+          <CookingPotIcon className="size-4" />
+        </Toggle>
+      }
+    />
   )
 }

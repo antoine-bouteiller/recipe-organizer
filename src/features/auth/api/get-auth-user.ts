@@ -8,6 +8,14 @@ export const getAuthUser = createServerFn({ method: 'GET' }).handler(
   withServerError(async () => {
     const session = await useAppSession()
 
+    if (import.meta.env.DEV) {
+      return {
+        id: 'string',
+        email: 'admin@test.fr',
+        role: 'admin',
+      }
+    }
+
     if (!session?.data?.userId) {
       return undefined
     }

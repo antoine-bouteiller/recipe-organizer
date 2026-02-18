@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
-import { type } from 'arktype'
+import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -178,17 +178,22 @@ const RecipePage = () => {
   )
 }
 
-const paramsSchema = type({ id: 'string.integer.parse' })
+const paramsSchema = v.object({
+  id: v.pipe(
+    v.string(),
+    v.transform((s) => Number.parseInt(s, 10))
+  ),
+})
 
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
   pendingComponent: RecipeDetailPending,
   loader: async ({ context, params }) => {
-    const validated = paramsSchema(params)
-    if (validated instanceof type.errors) {
-      throw new Error(validated.summary)
+    const result = v.safeParse(paramsSchema, params)
+    if (!result.success) {
+      throw new Error(result.issues[0]?.message ?? 'Invalid id')
     }
-    const { id } = validated
+    const { id } = result.output
 
     await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
 

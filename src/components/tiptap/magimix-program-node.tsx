@@ -29,10 +29,12 @@ const Wrapper = ({ children, initialData, isEditable, updateAttributes }: Wrappe
       onSubmit={updateAttributes}
       submitLabel="Enregistrer"
       title="Modifier le programme Magimix"
-      triggerRender={<Item variant="outline" />}
-    >
-      {children}
-    </MagimixProgramDialog>
+      triggerRender={
+        <Item variant="outline" render={<button />} className="w-full">
+          {children}
+        </Item>
+      }
+    />
   ) : (
     <Item variant="outline">{children}</Item>
   )
@@ -85,7 +87,7 @@ const MagimixProgramComponent = ({ editor, node, updateAttributes }: ReactNodeVi
   )
 }
 
-export const MagimixProgramNode = Node.create<Record<string, never>>({
+export const MagimixProgramNode = Node.create({
   addAttributes() {
     return {
       program: {

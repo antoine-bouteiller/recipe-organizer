@@ -1,5 +1,3 @@
-import type { type } from 'arktype'
-
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
@@ -88,7 +86,7 @@ const NewRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors as unknown as Record<string, type.errors>[]))
+  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
 
   return (
     <ScreenLayout title="Nouvelle Recette" withGoBack>

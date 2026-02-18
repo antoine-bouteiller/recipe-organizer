@@ -20,8 +20,8 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
     initialFiles: initialImage ? [initialImage] : [],
     maxFiles: 1,
     multiple: false,
-    onFilesChange: (files) => {
-      field.setValue(files[0]?.file)
+    onFilesChange: (newFiles) => {
+      field.setValue(newFiles[0]?.file)
     },
   })
 

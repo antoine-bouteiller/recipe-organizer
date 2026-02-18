@@ -28,9 +28,9 @@ export const ToggleGroupField = ({ className, disabled, items, label }: ToggleGr
         onValueChange={(value) => field.handleChange(value)}
         value={field.state.value ?? []}
       >
-        {items.map(({ label, value }) => (
+        {items.map(({ label: itemLabel, value }) => (
           <Toggle key={value} value={value}>
-            {label}
+            {itemLabel}
           </Toggle>
         ))}
       </ToggleGroup>

@@ -25,8 +25,8 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
     maxFiles: 1,
     maxSize: maxVideoSizeBytes,
     multiple: false,
-    onFilesChange: (files) => {
-      field.setValue(files[0]?.file)
+    onFilesChange: (newFiles) => {
+      field.setValue(newFiles[0]?.file)
     },
   })
 

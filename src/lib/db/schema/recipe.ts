@@ -1,6 +1,6 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-const recipe = sqliteTable('recipes', {
+export const recipe = sqliteTable('recipes', {
   id: integer('id').primaryKey(),
   image: text('image', { length: 255 }).notNull(),
   instructions: text('instructions').notNull(),
@@ -9,5 +9,3 @@ const recipe = sqliteTable('recipes', {
   tags: text('tags', { mode: 'json' }).$type<string[]>().notNull().default([]),
   video: text('video', { length: 255 }),
 })
-
-export { recipe }

@@ -1,6 +1,6 @@
 import { Toast } from '@base-ui/react/toast'
 import { CheckCircleIcon, CircleNotchIcon, InfoIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
-import { ArkErrors } from 'arktype'
+import { ValiError } from 'valibot'
 
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
@@ -142,9 +142,9 @@ const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) =
 }
 
 export const toastError = (message: string, error?: unknown) => {
-  if (error instanceof ArkErrors) {
+  if (error instanceof ValiError) {
     toastManager.add({
-      description: error.summary,
+      description: error.message,
       title: message,
       type: 'error',
     })

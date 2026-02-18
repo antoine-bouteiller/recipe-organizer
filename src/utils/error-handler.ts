@@ -1,4 +1,4 @@
-import { ArkErrors } from 'arktype'
+import { ValiError } from 'valibot'
 
 export const withServerError =
   <TContext, TResult>(handler: (ctx: TContext) => Promise<TResult> | TResult) =>
@@ -6,8 +6,8 @@ export const withServerError =
     try {
       return await handler(ctx)
     } catch (error) {
-      if (error instanceof ArkErrors) {
-        throw new Error(`Invalid Schema; ${error.summary}`, { cause: error })
+      if (error instanceof ValiError) {
+        throw new Error(`Invalid Schema; ${error.message}`, { cause: error })
       }
       throw new Error('Une erreur est survenue', { cause: error })
     }

@@ -1,20 +1,20 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import { type } from 'arktype'
 import { env as cloudflareEnv } from 'cloudflare:workers'
+import * as v from 'valibot'
 
 import { cache } from '@/lib/cache-manager'
 
-const paramsSchema = type({ id: 'string' })
+const paramsSchema = v.object({ id: v.string() })
 
 export const Route = createFileRoute('/api/image/$id')({
   server: {
     handlers: {
       GET: ({ params, request }) => {
-        const validated = paramsSchema(params)
-        if (validated instanceof type.errors) {
-          throw new Error(validated.summary)
+        const result = v.safeParse(paramsSchema, params)
+        if (!result.success) {
+          throw new Error(result.issues[0]?.message ?? 'Invalid params')
         }
-        const { id } = validated
+        const { id } = result.output
 
         return cache.getWithCache(request.url)(async () => {
           const file = await cloudflareEnv.R2_BUCKET.get(id)

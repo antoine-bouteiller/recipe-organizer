@@ -4,7 +4,7 @@ import { ingredient } from '@/lib/db/schema/ingredient'
 import { recipe } from '@/lib/db/schema/recipe'
 import { unit } from '@/lib/db/schema/unit'
 
-const recipeIngredientGroup = sqliteTable(
+export const recipeIngredientGroup = sqliteTable(
   'recipe_ingredient_groups',
   {
     groupName: text('group_name', { length: 255 }),
@@ -20,7 +20,7 @@ const recipeIngredientGroup = sqliteTable(
   ]
 )
 
-const groupIngredient = sqliteTable(
+export const groupIngredient = sqliteTable(
   'group_ingredients',
   {
     groupId: integer('group_id')
@@ -37,5 +37,3 @@ const groupIngredient = sqliteTable(
   },
   (table) => [index('idx_group_ingredients_group_id').on(table.groupId), index('idx_group_ingredients_ingredient_id').on(table.ingredientId)]
 )
-
-export { groupIngredient, recipeIngredientGroup }

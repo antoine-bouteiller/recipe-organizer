@@ -32,12 +32,12 @@ const VideoControls = () => {
         <Slider
           value={value}
           disabled={!canSeek}
-          onValueChange={(value) => {
-            setValue(value)
-            remote.seeking((value / 100) * duration)
+          onValueChange={(sliderValue) => {
+            setValue(sliderValue)
+            remote.seeking((sliderValue / 100) * duration)
           }}
-          onValueCommitted={(value) => {
-            remote.seek((value / 100) * duration)
+          onValueCommitted={(sliderValue) => {
+            remote.seek((sliderValue / 100) * duration)
           }}
         />
       </Controls.Group>
