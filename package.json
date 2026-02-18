@@ -5,7 +5,7 @@
   "scripts": {
     "build": "vite build && bun run typecheck",
     "dev": "vite",
-    "lint": "oxlint --fix --type-aware",
+    "lint": "bun oxlint --fix --type-aware",
     "typecheck": "tsgo --noEmit",
     "format": "oxfmt .",
     "serve": "vite preview",
