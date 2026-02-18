@@ -12,7 +12,6 @@ import { groupIngredient, ingredient, recipeIngredientGroup, recipeLinkedRecipes
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile, uploadVideo } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
-import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
 import { getTitle } from '../utils/get-recipe-title'
@@ -27,130 +26,128 @@ const updateRecipe = createServerFn({
 })
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => v.parse(updateRecipeSchema, parseFormData(formData)))
-  .handler(
-    withServerError(async ({ data }) => {
-      const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
+  .handler(async ({ data }) => {
+    const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
 
-      const currentRecipe = await getDb().query.recipe.findFirst({
-        where: { id },
-        with: {
-          ingredientGroups: {
-            columns: {
-              id: true,
-            },
+    const currentRecipe = await getDb().query.recipe.findFirst({
+      where: { id },
+      with: {
+        ingredientGroups: {
+          columns: {
+            id: true,
           },
         },
-      })
-
-      if (!currentRecipe) {
-        throw notFound()
-      }
-
-      let imageKey = currentRecipe.image
-
-      if (image instanceof File) {
-        await deleteFile(imageKey)
-        imageKey = await uploadFile(image)
-      }
-
-      let videoKey = currentRecipe.video
-
-      if (video instanceof File) {
-        if (videoKey) {
-          await deleteFile(videoKey)
-        }
-        videoKey = await uploadVideo(video)
-      } else if (video !== undefined) {
-        videoKey = video?.id
-      }
-
-      const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
-      const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
-
-      const [ingredientCategories, linkedRecipesData] = await getDb().batch([
-        getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-        getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
-      ])
-
-      const ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
-      const linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
-      const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
-      const isMagimix = instructions.includes('data-type="magimix-program"')
-
-      const autoTags: string[] = []
-      if (isVegetarian && !tags.includes('dessert')) {
-        autoTags.push('vegetarian')
-      }
-      if (isMagimix) {
-        autoTags.push('magimix')
-      }
-
-      await getDb().batch([
-        getDb()
-          .update(recipe)
-          .set({
-            image: imageKey,
-            instructions,
-            name,
-            servings,
-            tags: [...tags, ...autoTags],
-            video: videoKey,
-          })
-          .where(eq(recipe.id, id))
-          .returning({ id: recipe.id }),
-        getDb()
-          .delete(groupIngredient)
-          .where(
-            inArray(
-              groupIngredient.groupId,
-              currentRecipe.ingredientGroups.map(({ id: ingredientGroupId }) => ingredientGroupId)
-            )
-          ),
-        getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
-        getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
-      ])
-
-      await Promise.all(
-        ingredientGroups.map(async (group, index) => {
-          const [updatedGroup] = await getDb()
-            .insert(recipeIngredientGroup)
-            .values({
-              groupName: group.groupName,
-              isDefault: index === 0,
-              recipeId: currentRecipe.id,
-            })
-            .returning()
-
-          if (group.ingredients.length > 0) {
-            await getDb()
-              .insert(groupIngredient)
-              .values(
-                group.ingredients.map((ingredientEntry) => ({
-                  groupId: updatedGroup.id,
-                  ingredientId: ingredientEntry.id,
-                  quantity: ingredientEntry.quantity,
-                  unitId: ingredientEntry.unitId ?? undefined,
-                }))
-              )
-          }
-        })
-      )
-
-      if (isNotEmpty(linkedRecipes)) {
-        await getDb()
-          .insert(recipeLinkedRecipes)
-          .values(
-            linkedRecipes.map((lr) => ({
-              linkedRecipeId: lr.id,
-              ratio: lr.ratio,
-              recipeId: currentRecipe.id,
-            }))
-          )
-      }
-
-      return id
+      },
     })
-  )
+
+    if (!currentRecipe) {
+      throw notFound()
+    }
+
+    let imageKey = currentRecipe.image
+
+    if (image instanceof File) {
+      await deleteFile(imageKey)
+      imageKey = await uploadFile(image)
+    }
+
+    let videoKey = currentRecipe.video
+
+    if (video instanceof File) {
+      if (videoKey) {
+        await deleteFile(videoKey)
+      }
+      videoKey = await uploadVideo(video)
+    } else if (video !== undefined) {
+      videoKey = video?.id
+    }
+
+    const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
+    const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
+
+    const [ingredientCategories, linkedRecipesData] = await getDb().batch([
+      getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
+      getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+    ])
+
+    const ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
+    const linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
+    const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
+    const isMagimix = instructions.includes('data-type="magimix-program"')
+
+    const autoTags: string[] = []
+    if (isVegetarian && !tags.includes('dessert')) {
+      autoTags.push('vegetarian')
+    }
+    if (isMagimix) {
+      autoTags.push('magimix')
+    }
+
+    await getDb().batch([
+      getDb()
+        .update(recipe)
+        .set({
+          image: imageKey,
+          instructions,
+          name,
+          servings,
+          tags: [...tags, ...autoTags],
+          video: videoKey,
+        })
+        .where(eq(recipe.id, id))
+        .returning({ id: recipe.id }),
+      getDb()
+        .delete(groupIngredient)
+        .where(
+          inArray(
+            groupIngredient.groupId,
+            currentRecipe.ingredientGroups.map(({ id: ingredientGroupId }) => ingredientGroupId)
+          )
+        ),
+      getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
+      getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
+    ])
+
+    await Promise.all(
+      ingredientGroups.map(async (group, index) => {
+        const [updatedGroup] = await getDb()
+          .insert(recipeIngredientGroup)
+          .values({
+            groupName: group.groupName,
+            isDefault: index === 0,
+            recipeId: currentRecipe.id,
+          })
+          .returning()
+
+        if (group.ingredients.length > 0) {
+          await getDb()
+            .insert(groupIngredient)
+            .values(
+              group.ingredients.map((ingredientEntry) => ({
+                groupId: updatedGroup.id,
+                ingredientId: ingredientEntry.id,
+                quantity: ingredientEntry.quantity,
+                unitId: ingredientEntry.unitId ?? undefined,
+              }))
+            )
+        }
+      })
+    )
+
+    if (isNotEmpty(linkedRecipes)) {
+      await getDb()
+        .insert(recipeLinkedRecipes)
+        .values(
+          linkedRecipes.map((lr) => ({
+            linkedRecipeId: lr.id,
+            ratio: lr.ratio,
+            recipeId: currentRecipe.id,
+          }))
+        )
+    }
+
+    return id
+  })
 
 const updateRecipeOptions = () =>
   mutationOptions({

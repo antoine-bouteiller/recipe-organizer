@@ -4,7 +4,6 @@ import * as v from 'valibot'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerError } from '@/utils/error-handler'
 
 const getRecipeInstructionsSchema = v.number()
 
@@ -12,16 +11,14 @@ const getRecipeInstructions = createServerFn({
   method: 'GET',
 })
   .inputValidator(getRecipeInstructionsSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      const result = await getDb().query.recipe.findFirst({
-        columns: { id: true, instructions: true, name: true },
-        where: { id: data },
-      })
-
-      return result ?? undefined
+  .handler(async ({ data }) => {
+    const result = await getDb().query.recipe.findFirst({
+      columns: { id: true, instructions: true, name: true },
+      where: { id: data },
     })
-  )
+
+    return result ?? undefined
+  })
 
 const getRecipeInstructionsOptions = (id: number) =>
   queryOptions({

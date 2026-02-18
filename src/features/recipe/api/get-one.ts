@@ -5,7 +5,6 @@ import * as v from 'valibot'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerError } from '@/utils/error-handler'
 import { getImageUrl } from '@/utils/get-file-url'
 
 import { ingredientGroupSelect } from '../utils/constants'
@@ -16,45 +15,43 @@ const getRecipe = createServerFn({
   method: 'GET',
 })
   .inputValidator(getRecipeSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      const result = await getDb().query.recipe.findFirst({
-        where: { id: data },
-        with: {
-          ingredientGroups: {
-            orderBy: {
-              isDefault: 'desc',
-            },
-            ...ingredientGroupSelect,
+  .handler(async ({ data }) => {
+    const result = await getDb().query.recipe.findFirst({
+      where: { id: data },
+      with: {
+        ingredientGroups: {
+          orderBy: {
+            isDefault: 'desc',
           },
-          linkedRecipes: {
-            with: {
-              linkedRecipe: {
-                columns: {
-                  id: true,
-                  name: true,
-                },
-                with: {
-                  ingredientGroups: {
-                    ...ingredientGroupSelect,
-                    where: {
-                      isDefault: true,
-                    },
+          ...ingredientGroupSelect,
+        },
+        linkedRecipes: {
+          with: {
+            linkedRecipe: {
+              columns: {
+                id: true,
+                name: true,
+              },
+              with: {
+                ingredientGroups: {
+                  ...ingredientGroupSelect,
+                  where: {
+                    isDefault: true,
                   },
                 },
               },
             },
           },
         },
-      })
-
-      if (!result) {
-        throw notFound()
-      }
-
-      return { ...result, image: getImageUrl(result.image) }
+      },
     })
-  )
+
+    if (!result) {
+      throw notFound()
+    }
+
+    return { ...result, image: getImageUrl(result.image) }
+  })
 
 export type Recipe = Awaited<ReturnType<typeof getRecipe>>
 export type RecipeIngredientGroup = Recipe['ingredientGroups'][number]
