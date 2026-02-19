@@ -23,8 +23,8 @@ const UnitsPending = () => (
     </div>
 
     <div className="flex flex-col gap-2 px-4 pt-2">
-      {incrementalArray({ length: 10 }).map((i) => (
-        <Skeleton className="h-14 w-full" key={i} />
+      {incrementalArray({ length: 10 }).map((index) => (
+        <Skeleton className="h-14 w-full" key={index} />
       ))}
     </div>
   </ScreenLayout>

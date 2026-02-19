@@ -6,9 +6,8 @@ import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type Magimi
 import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
 
-import type { DialogTrigger } from '../ui/dialog'
-
 import { getFormDialog } from '../dialogs/form-dialog'
+import type { DialogTrigger } from '../ui/dialog'
 
 interface MagimixProgramDialogProps {
   initialData?: MagimixProgramFormInput
@@ -24,18 +23,18 @@ const magimixProgramSchema = v.object({
   temperature: v.optional(
     v.pipe(
       v.number(),
-      v.check((n) => n > 0 && n < 200)
+      v.check((num) => num > 0 && num < 200)
     )
   ),
   timeMinutes: v.pipe(
     v.number(),
     v.minValue(0),
-    v.check((n) => n < 60)
+    v.check((num) => num < 60)
   ),
   timeSeconds: v.pipe(
     v.number(),
     v.minValue(0),
-    v.check((n) => n < 60)
+    v.check((num) => num < 60)
   ),
 })
 

@@ -1,10 +1,9 @@
-import { useStore } from '@tanstack/react-store'
-
-import { recipeQuantitiesStore, setRecipesQuantities } from '@/stores/recipe-quantities.store'
+import { useRecipeQuantitiesStore } from '@/stores/recipe-quantities.store'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
 
 export const useRecipeQuantities = (recipeId?: number, defaultValue?: number) => {
-  const { recipesQuantities } = useStore(recipeQuantitiesStore)
+  const recipesQuantities = useRecipeQuantitiesStore((state) => state.recipesQuantities)
+  const setRecipesQuantities = useRecipeQuantitiesStore((state) => state.setRecipesQuantities)
 
   const quantity = isNullOrUndefined(recipeId) || isNullOrUndefined(recipesQuantities[recipeId]) ? (defaultValue ?? 0) : recipesQuantities[recipeId]
 

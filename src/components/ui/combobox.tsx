@@ -91,7 +91,7 @@ const ComboboxContent = <T extends ValueOptions>({
   const [inputValue, setInputValue] = useState('')
   return (
     <Command items={options} open>
-      <CommandInput disabled={disabled} onChange={(e) => setInputValue(e.target.value)} placeholder={searchPlaceholder} value={inputValue} />
+      <CommandInput disabled={disabled} onChange={(event) => setInputValue(event.target.value)} placeholder={searchPlaceholder} value={inputValue} />
       <CommandList className="max-h-52">
         {(option: Option<T>) => (
           <CommandItem

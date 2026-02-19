@@ -64,7 +64,7 @@ const updateRecipe = createServerFn({
         videoKey = video?.id
       }
 
-      const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
+      const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
       const [ingredientCategories, linkedRecipesData] = await getDb().batch([
@@ -72,8 +72,10 @@ const updateRecipe = createServerFn({
         getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
 
-      const ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
-      const linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
+      const ownIngredientsVegetarian = ingredientCategories.every(
+        (ingredientItem) => ingredientItem.category !== 'meat' && ingredientItem.category !== 'fish'
+      )
+      const linkedRecipesVegetarian = linkedRecipesData.every((recipeItem) => recipeItem.tags?.includes('vegetarian'))
       const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
       const isMagimix = instructions.includes('data-type="magimix-program"')
 

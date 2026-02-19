@@ -88,11 +88,11 @@ const formatBytes = (bytes: number, decimals = 1): string => {
     return '0 Bytes'
   }
 
-  const k = 1024
+  const base = 1024
   const dm = Math.max(0, decimals)
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const index = Math.floor(Math.log(bytes) / Math.log(base))
 
-  return `${Number.parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
+  return `${Number.parseFloat((bytes / base ** index).toFixed(dm))} ${sizes[index]}`
 }

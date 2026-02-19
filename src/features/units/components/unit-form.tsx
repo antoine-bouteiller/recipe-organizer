@@ -1,7 +1,6 @@
 import { createFieldMap, useStore } from '@tanstack/react-form'
 
 import type { Unit } from '@/features/units/api/get-all'
-
 import { withForm } from '@/hooks/use-app-form'
 import { useUnitOptions } from '@/hooks/use-options'
 
@@ -29,7 +28,7 @@ export const UnitForm = withForm({
 
     const availableParentUnits = useUnitOptions({
       allowEmpty: true,
-      filter: (u) => u.id !== unit?.id,
+      filter: (unitItem) => unitItem.id !== unit?.id,
     })
 
     return (

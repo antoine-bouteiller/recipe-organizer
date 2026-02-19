@@ -1,19 +1,16 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { useStore } from '@tanstack/react-store'
-
-import type { IngredientCategory } from '@/types/ingredient'
 
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
-import { recipeQuantitiesStore } from '@/stores/recipe-quantities.store'
+import { useRecipeQuantitiesStore } from '@/stores/recipe-quantities.store'
+import type { IngredientCategory } from '@/types/ingredient'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
 
+import { useShoppingListStore } from '../../../stores/shopping-list.store'
 import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
-import { shoppingListStore } from '../../../stores/shopping-list.store'
-
-export const useShoppingListStore = () => {
-  const { shoppingList } = useStore(shoppingListStore)
-  const { recipesQuantities } = useStore(recipeQuantitiesStore)
+export const useShoppingList = () => {
+  const shoppingList = useShoppingListStore((state) => state.shoppingList)
+  const recipesQuantities = useRecipeQuantitiesStore((state) => state.recipesQuantities)
 
   const { data: recipes } = useSuspenseQuery(getRecipeByIdsOptions(shoppingList))
 

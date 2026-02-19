@@ -10,7 +10,13 @@ interface InputProps {
 
 export const SearchInput = ({ autoFocus, search, setSearch }: InputProps) => (
   <InputGroup>
-    <InputGroupInput autoFocus={autoFocus} onChange={(e) => setSearch(e.target.value)} placeholder="Search recipes..." size="lg" value={search} />
+    <InputGroupInput
+      autoFocus={autoFocus}
+      onChange={(event) => setSearch(event.target.value)}
+      placeholder="Search recipes..."
+      size="lg"
+      value={search}
+    />
     <InputGroupAddon>
       <MagnifyingGlassIcon />
     </InputGroupAddon>

@@ -4,10 +4,9 @@ import { Link } from '@tanstack/react-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
+import { useShoppingListStore } from '@/stores/shopping-list.store'
 
 import type { ReducedRecipe } from '../api/get-all'
-
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 import { RECIPE_TAG_LABELS, type RecipeTag } from '../utils/constants'
@@ -24,6 +23,8 @@ const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButto
 
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
   const isInShoppingList = useIsInShoppingList(recipe.id)
+  const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
+  const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
 
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.servings)
 

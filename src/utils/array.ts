@@ -5,4 +5,4 @@ export const isNotEmpty = <T extends unknown[] | FileList>(array: T | null | und
   return array.length > 0
 }
 
-export const incrementalArray = ({ length }: { length: number }): number[] => Array.from({ length }, (_, i) => i + 1)
+export const incrementalArray = ({ length }: { length: number }): number[] => Array.from({ length }, (_val, index) => index + 1)

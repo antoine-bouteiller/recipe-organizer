@@ -1,7 +1,6 @@
 'use client'
 
 import type React from 'react'
-
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type InputHTMLAttributes } from 'react'
 
 import { isNotEmpty } from '@/utils/array'
@@ -43,11 +42,11 @@ interface FileUploadActions {
   getInputProps: (props?: InputHTMLAttributes<HTMLInputElement>) => InputHTMLAttributes<HTMLInputElement> & {
     ref: React.Ref<HTMLInputElement>
   }
-  handleDragEnter: (e: DragEvent<HTMLElement>) => void
-  handleDragLeave: (e: DragEvent<HTMLElement>) => void
-  handleDragOver: (e: DragEvent<HTMLElement>) => void
-  handleDrop: (e: DragEvent<HTMLElement>) => void
-  handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void
+  handleDragEnter: (event: DragEvent<HTMLElement>) => void
+  handleDragLeave: (event: DragEvent<HTMLElement>) => void
+  handleDragOver: (event: DragEvent<HTMLElement>) => void
+  handleDrop: (event: DragEvent<HTMLElement>) => void
+  handleFileChange: (event: ChangeEvent<HTMLInputElement>) => void
   openFileDialog: () => void
   removeFile: (id: string) => void
 }
@@ -81,9 +80,9 @@ const generateUniqueId = (file: File | FileMetadata): string => {
   return file.id
 }
 
-const handleDragOver = (e: DragEvent<HTMLElement>) => {
-  e.preventDefault()
-  e.stopPropagation()
+const handleDragOver = (event: DragEvent<HTMLElement>) => {
+  event.preventDefault()
+  event.stopPropagation()
 }
 
 export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState, FileUploadActions] => {
@@ -308,26 +307,26 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     }
   }, [handlePaste])
 
-  const handleDragEnter = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleDragEnter = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
     setState((prev) => ({ ...prev, isDragging: true }))
   }
 
-  const handleDragLeave = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleDragLeave = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
 
-    if (e.currentTarget.contains(e.relatedTarget as Node)) {
+    if (event.currentTarget.contains(event.relatedTarget as Node)) {
       return
     }
 
     setState((prev) => ({ ...prev, isDragging: false }))
   }
 
-  const handleDrop = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleDrop = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
     setState((prev) => ({ ...prev, isDragging: false }))
 
     // Don't process files if the input is disabled
@@ -335,20 +334,20 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
       return
     }
 
-    if (isNotEmpty(e.dataTransfer.files)) {
+    if (isNotEmpty(event.dataTransfer.files)) {
       // In single file mode, only use the first file
       if (multiple) {
-        addFiles(e.dataTransfer.files)
+        addFiles(event.dataTransfer.files)
       } else {
-        const [file] = e.dataTransfer.files
+        const [file] = event.dataTransfer.files
         addFiles([file])
       }
     }
   }
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isNotEmpty(e.target?.files)) {
-      addFiles(e.target.files)
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (isNotEmpty(event.target?.files)) {
+      addFiles(event.target.files)
     }
   }
 
@@ -391,11 +390,11 @@ const formatBytes = (bytes: number, decimals = 2): string => {
     return '0 Bytes'
   }
 
-  const k = 1024
+  const base = 1024
   const dm = Math.max(0, decimals)
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  const index = Math.floor(Math.log(bytes) / Math.log(base))
 
-  return Number.parseFloat((bytes / k ** i).toFixed(dm)) + sizes[i]
+  return Number.parseFloat((bytes / base ** index).toFixed(dm)) + sizes[index]
 }

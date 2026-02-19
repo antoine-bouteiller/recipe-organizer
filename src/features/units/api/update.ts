@@ -13,7 +13,7 @@ export const updateUnitSchema = v.object({
   factor: v.optional(
     v.pipe(
       v.number(),
-      v.check((n) => n > 0)
+      v.check((num) => num > 0)
     )
   ),
   id: v.number(),

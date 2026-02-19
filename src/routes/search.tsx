@@ -17,8 +17,8 @@ const SearchPending = () => (
       <Skeleton className="h-10 w-full" />
     </div>
     <div className="flex flex-col gap-2 px-4 pt-2">
-      {incrementalArray({ length: 8 }).map((i) => (
-        <Skeleton className="h-12 w-full" key={i} />
+      {incrementalArray({ length: 8 }).map((index) => (
+        <Skeleton className="h-12 w-full" key={index} />
       ))}
     </div>
   </ScreenLayout>

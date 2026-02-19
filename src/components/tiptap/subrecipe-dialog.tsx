@@ -1,7 +1,6 @@
 import { type ComponentPropsWithoutRef, type ReactNode, useMemo, useState } from 'react'
 
 import type { SubrecipeNodeData } from '@/components/tiptap/types/subrecipe'
-
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
@@ -85,8 +84,8 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
               <Input
                 id="hideFirstNodes"
                 min={0}
-                onChange={(e) => {
-                  const value = e.target.value ? Number.parseInt(e.target.value, 10) : undefined
+                onChange={(event) => {
+                  const value = event.target.value ? Number.parseInt(event.target.value, 10) : undefined
                   setSelectedRecipe((prev) =>
                     prev
                       ? {
@@ -107,8 +106,8 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
               <Input
                 id="hideLastNodes"
                 min={0}
-                onChange={(e) => {
-                  const value = e.target.value ? Number.parseInt(e.target.value, 10) : undefined
+                onChange={(event) => {
+                  const value = event.target.value ? Number.parseInt(event.target.value, 10) : undefined
                   setSelectedRecipe((prev) =>
                     prev
                       ? {

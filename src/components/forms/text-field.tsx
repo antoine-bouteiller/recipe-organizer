@@ -21,7 +21,7 @@ export const TextField = ({ className, disabled, label, placeholder }: TextField
       touched={field.state.meta.isTouched}
     >
       {label && <FieldLabel>{label}</FieldLabel>}
-      <Input disabled={disabled} onChange={(e) => field.handleChange(e.target.value)} placeholder={placeholder} value={field.state.value} />
+      <Input disabled={disabled} onChange={(event) => field.handleChange(event.target.value)} placeholder={placeholder} value={field.state.value} />
       <FieldError />
     </Field>
   )

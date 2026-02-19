@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/features/ingredients/utils/ingredient-category'
 import { CartItem } from '@/features/shopping-list/component/cart-item'
-import { useShoppingListStore } from '@/features/shopping-list/hooks/use-shopping-list'
-import { resetShoppingList } from '@/stores/shopping-list.store'
+import { useShoppingList } from '@/features/shopping-list/hooks/use-shopping-list'
+import { useShoppingListStore } from '@/stores/shopping-list.store'
 import { incrementalArray } from '@/utils/array'
 import { typedEntriesOf } from '@/utils/object'
 
@@ -21,12 +21,12 @@ const ShoppingListPending = () => (
     title="Liste de courses"
   >
     <div className="space-y-4 p-8">
-      {incrementalArray({ length: 4 }).map((i) => (
-        <div className="space-y-2" key={i}>
+      {incrementalArray({ length: 4 }).map((index) => (
+        <div className="space-y-2" key={index}>
           <Skeleton className="h-6 w-32" />
           <div className="space-y-2">
-            {incrementalArray({ length: 3 }).map((j) => (
-              <Skeleton className="h-8 w-full" key={j} />
+            {incrementalArray({ length: 3 }).map((innerIndex) => (
+              <Skeleton className="h-8 w-full" key={innerIndex} />
             ))}
           </div>
         </div>
@@ -36,7 +36,8 @@ const ShoppingListPending = () => (
 )
 
 const CartPage = () => {
-  const { shoppingListIngredients } = useShoppingListStore()
+  const { shoppingListIngredients } = useShoppingList()
+  const resetShoppingList = useShoppingListStore((state) => state.resetShoppingList)
 
   return (
     <ScreenLayout

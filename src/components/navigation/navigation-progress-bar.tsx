@@ -3,12 +3,12 @@ import { useRouterState } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 
 export const NavigationProgressBar = () => {
-  const isLoading = useRouterState({ select: (s) => s.isLoading })
+  const isLoading = useRouterState({ select: (state) => state.isLoading })
   const pendingMatches = useRouterState({
-    select: (s) => s.pendingMatches?.length ?? 0,
+    select: (state) => state.pendingMatches?.length ?? 0,
   })
   const resolvedMatches = useRouterState({
-    select: (s) => s.matches.length,
+    select: (state) => state.matches.length,
   })
   const fetchingCount = useIsFetching()
 

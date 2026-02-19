@@ -3,8 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
-import type { Recipe } from '@/types/recipe'
-
 import { Button } from '@/components/ui/button'
 import {
   Command,
@@ -21,6 +19,7 @@ import {
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
+import type { Recipe } from '@/types/recipe'
 
 export const SearchBar = () => {
   const [open, setOpen] = useState(false)
@@ -31,9 +30,9 @@ export const SearchBar = () => {
   const { data: recipes } = useQuery(getRecipeListOptions())
 
   useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault()
+    const down = (event: KeyboardEvent) => {
+      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault()
         setOpen((prev) => !prev)
       }
     }

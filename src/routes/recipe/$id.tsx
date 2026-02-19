@@ -14,7 +14,7 @@ import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
-import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
+import { useShoppingListStore } from '@/stores/shopping-list.store'
 
 const RecipeDetailPending = () => {
   const router = useRouter()
@@ -87,6 +87,8 @@ const RecipePage = () => {
   const isInShoppingList = useIsInShoppingList(id)
 
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe?.id, recipe?.servings)
+  const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
+  const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
 
   const ingredientGroups = recipe
     ? [
@@ -181,7 +183,7 @@ const RecipePage = () => {
 const paramsSchema = v.object({
   id: v.pipe(
     v.string(),
-    v.transform((s) => Number.parseInt(s, 10))
+    v.transform((str) => Number.parseInt(str, 10))
   ),
 })
 

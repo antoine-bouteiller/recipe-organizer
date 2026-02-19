@@ -17,8 +17,8 @@ const searchSchema = v.object({
 const RecipeListPending = () => (
   <ScreenLayout title="Recettes">
     <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
-      {incrementalArray({ length: 6 }).map((i) => (
-        <RecipeCardSkeleton key={i} />
+      {incrementalArray({ length: 6 }).map((index) => (
+        <RecipeCardSkeleton key={index} />
       ))}
     </div>
   </ScreenLayout>

@@ -3,8 +3,6 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import * as v from 'valibot'
 
-import type { RECIPE_TAGS } from '@/features/recipe/utils/constants'
-
 import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -16,6 +14,7 @@ import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
+import type { RECIPE_TAGS } from '@/features/recipe/utils/constants'
 import { AUTO_TAGS, recipeFormFields } from '@/features/recipe/utils/constants'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -183,7 +182,7 @@ const EditRecipePage = () => {
 const paramsSchema = v.object({
   id: v.pipe(
     v.string(),
-    v.transform((s) => Number.parseInt(s, 10))
+    v.transform((str) => Number.parseInt(str, 10))
   ),
 })
 

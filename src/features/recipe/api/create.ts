@@ -27,16 +27,16 @@ const recipeSchema = v.object({
         v.object({
           id: v.pipe(
             v.number(),
-            v.check((n) => n > 0)
+            v.check((num) => num > 0)
           ),
           quantity: v.pipe(
             v.number(),
-            v.check((n) => n > 0)
+            v.check((num) => num > 0)
           ),
           unitId: v.optional(
             v.pipe(
               v.number(),
-              v.check((n) => n > 0)
+              v.check((num) => num > 0)
             )
           ),
         })
@@ -50,11 +50,11 @@ const recipeSchema = v.object({
         _key: v.optional(v.string()),
         id: v.pipe(
           v.number(),
-          v.check((n) => n > 0)
+          v.check((num) => num > 0)
         ),
         ratio: v.pipe(
           v.number(),
-          v.check((n) => n > 0)
+          v.check((num) => num > 0)
         ),
       })
     )
@@ -62,7 +62,7 @@ const recipeSchema = v.object({
   name: v.pipe(v.string(), v.minLength(2)),
   servings: v.pipe(
     v.number(),
-    v.check((n) => n > 0)
+    v.check((num) => num > 0)
   ),
   tags: v.array(v.picklist(MANUAL_TAGS)),
   video: v.optional(v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })])),
@@ -81,7 +81,7 @@ const createRecipe = createServerFn({
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
     const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
 
-    const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((i) => i.id))
+    const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
     const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
     const hasIngredients = allIngredientIds.length > 0
@@ -95,17 +95,21 @@ const createRecipe = createServerFn({
         getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
         getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
-      ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
-      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
+      ownIngredientsVegetarian = ingredientCategories.every(
+        (ingredientItem) => ingredientItem.category !== 'meat' && ingredientItem.category !== 'fish'
+      )
+      linkedRecipesVegetarian = linkedRecipesData.every((recipeItem) => recipeItem.tags?.includes('vegetarian'))
     } else if (hasIngredients) {
       const ingredientCategories = await getDb()
         .select({ category: ingredient.category })
         .from(ingredient)
         .where(inArray(ingredient.id, allIngredientIds))
-      ownIngredientsVegetarian = ingredientCategories.every((i) => i.category !== 'meat' && i.category !== 'fish')
+      ownIngredientsVegetarian = ingredientCategories.every(
+        (ingredientItem) => ingredientItem.category !== 'meat' && ingredientItem.category !== 'fish'
+      )
     } else if (hasLinkedRecipes) {
       const linkedRecipesData = await getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds))
-      linkedRecipesVegetarian = linkedRecipesData.every((r) => r.tags?.includes('vegetarian'))
+      linkedRecipesVegetarian = linkedRecipesData.every((recipeItem) => recipeItem.tags?.includes('vegetarian'))
     }
 
     const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
