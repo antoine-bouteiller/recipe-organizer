@@ -9,6 +9,10 @@ export const withServerError =
       if (error instanceof ValiError) {
         throw new Error(`Invalid Schema; ${error.message}`, { cause: error })
       }
+
+      // oxlint-disable-next-line no-console
+      console.error(error)
+
       throw new Error('Une erreur est survenue', { cause: error })
     }
   }
