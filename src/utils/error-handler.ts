@@ -1,3 +1,4 @@
+import { isNotFound, isRedirect } from '@tanstack/react-router'
 import { ValiError } from 'valibot'
 
 export const withServerError =
@@ -6,6 +7,10 @@ export const withServerError =
     try {
       return await handler(ctx)
     } catch (error) {
+      if (isNotFound(error) || isRedirect(error)) {
+        throw error
+      }
+
       if (error instanceof ValiError) {
         throw new Error(`Invalid Schema; ${error.message}`, { cause: error })
       }
