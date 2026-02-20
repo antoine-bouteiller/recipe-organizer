@@ -90,7 +90,9 @@ const RecipePage = () => {
   const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
   const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
 
-  if (!recipe) return null
+  if (!recipe) {
+    return null
+  }
 
   const ingredientGroups = [
     ...recipe.ingredientGroups,
@@ -190,14 +192,14 @@ const paramsSchema = v.object({
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
   pendingComponent: RecipeDetailPending,
-  loader: async ({ context, params }) => {
+  loader: async ({ params }) => {
     const result = v.safeParse(paramsSchema, params)
     if (!result.success) {
       throw new Error(result.issues[0]?.message ?? 'Invalid id')
     }
     const { id } = result.output
 
-    await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
+    // Await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
 
     return { id }
   },
