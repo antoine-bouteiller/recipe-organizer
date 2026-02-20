@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import * as v from 'valibot'
 
@@ -82,7 +82,7 @@ const RecipeDetailPending = () => {
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
-  const { data: recipe } = useSuspenseQuery(getRecipeDetailsOptions(id))
+  const { data: recipe } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
   const isInShoppingList = useIsInShoppingList(id)
 
@@ -90,16 +90,16 @@ const RecipePage = () => {
   const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
   const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
 
-  const ingredientGroups = recipe
-    ? [
-        ...recipe.ingredientGroups,
-        ...(recipe.linkedRecipes ?? []).map(({ linkedRecipe }) => ({
-          ...linkedRecipe.ingredientGroups[0],
-          groupName: linkedRecipe.name,
-          isDefault: false,
-        })),
-      ]
-    : []
+  if (!recipe) return null
+
+  const ingredientGroups = [
+    ...recipe.ingredientGroups,
+    ...recipe.linkedRecipes.map(({ linkedRecipe }) => ({
+      ...linkedRecipe.ingredientGroups[0],
+      groupName: linkedRecipe.name,
+      isDefault: false,
+    })),
+  ]
 
   return (
     <ScreenLayout
