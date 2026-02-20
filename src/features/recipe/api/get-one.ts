@@ -18,9 +18,6 @@ const getRecipe = createServerFn({
   .inputValidator(getRecipeSchema)
   .handler(
     withServerError(async ({ data }) => {
-      // oxlint-disable-next-line no-console
-      console.log(data)
-
       const result = await getDb().query.recipe.findFirst({
         where: { id: data },
         with: {
@@ -50,9 +47,6 @@ const getRecipe = createServerFn({
           },
         },
       })
-
-      // oxlint-disable-next-line no-console
-      console.log(result)
 
       if (!result) {
         throw notFound()

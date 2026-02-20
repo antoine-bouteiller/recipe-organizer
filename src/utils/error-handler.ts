@@ -5,6 +5,8 @@ export const withServerError =
   <TContext, TResult>(handler: (ctx: TContext) => Promise<TResult> | TResult) =>
   async (ctx: TContext): Promise<TResult> => {
     try {
+      // oxlint-disable-next-line no-console
+      console.info('request received')
       return await handler(ctx)
     } catch (error) {
       if (isNotFound(error) || isRedirect(error)) {
