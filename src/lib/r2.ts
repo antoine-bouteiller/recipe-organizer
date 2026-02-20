@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import { env } from '@/config/env'
+import { env } from 'cloudflare:workers'
 
 const uploadFile = async (file: File) => {
   const key = randomUUID()

@@ -1,6 +1,5 @@
 import { useSession } from '@tanstack/react-start/server'
-
-import { env } from '@/config/env'
+import { env } from 'cloudflare:workers'
 
 interface AppSessionData {
   userId?: string
