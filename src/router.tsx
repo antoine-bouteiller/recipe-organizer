@@ -1,6 +1,4 @@
-import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
 import { QueryClient } from '@tanstack/react-query'
-import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 import * as v from 'valibot'
@@ -30,18 +28,6 @@ export const getRouter = () => {
       },
     },
   })
-
-  if (globalThis.localStorage !== undefined) {
-    const persister = createAsyncStoragePersister({
-      storage: globalThis.localStorage,
-    })
-
-    void persistQueryClient({
-      queryClient,
-      persister,
-      maxAge: MAX_AGE,
-    })
-  }
 
   const router = createRouter({
     context: {
