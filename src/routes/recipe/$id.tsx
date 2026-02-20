@@ -192,14 +192,14 @@ const paramsSchema = v.object({
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
   pendingComponent: RecipeDetailPending,
-  loader: async ({ params }) => {
+  loader: async ({ context, params }) => {
     const result = v.safeParse(paramsSchema, params)
     if (!result.success) {
       throw new Error(result.issues[0]?.message ?? 'Invalid id')
     }
     const { id } = result.output
 
-    // Await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
+    await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
 
     return { id }
   },

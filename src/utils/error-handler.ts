@@ -5,8 +5,6 @@ export const withServerError =
   <TContext, TResult>(handler: (ctx: TContext) => Promise<TResult> | TResult) =>
   async (ctx: TContext): Promise<TResult> => {
     try {
-      // oxlint-disable-next-line no-console
-      console.info('request received')
       return await handler(ctx)
     } catch (error) {
       if (isNotFound(error) || isRedirect(error)) {
@@ -17,8 +15,16 @@ export const withServerError =
         throw new Error(`Invalid Schema; ${error.message}`, { cause: error })
       }
 
+      let errorMessage = ''
+
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else {
+        errorMessage = JSON.stringify(error)
+      }
+
       // oxlint-disable-next-line no-console
-      console.error(error)
+      console.error('Internal Server Error :', errorMessage)
 
       throw new Error('Une erreur est survenue', { cause: error })
     }

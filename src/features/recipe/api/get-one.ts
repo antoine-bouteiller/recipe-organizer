@@ -17,9 +17,9 @@ const getRecipe = createServerFn({
 })
   .inputValidator(getRecipeSchema)
   .handler(
-    withServerError(async ({ data }) => {
+    withServerError(async ({ data: id }) => {
       const result = await getDb().query.recipe.findFirst({
-        where: { id: data },
+        where: { id },
         with: {
           ingredientGroups: {
             orderBy: {
@@ -52,7 +52,17 @@ const getRecipe = createServerFn({
         throw notFound()
       }
 
-      return { ...result, image: getImageUrl(result.image) }
+      return {
+        id: result.id,
+        image: getImageUrl(result.image),
+        instructions: result.instructions,
+        name: result.name,
+        servings: result.servings,
+        tags: result.tags,
+        video: result.video,
+        ingredientGroups: result.ingredientGroups,
+        linkedRecipes: result.linkedRecipes,
+      }
     })
   )
 
