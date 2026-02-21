@@ -4,14 +4,13 @@ import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import * as v from 'valibot'
 
-import type { Ingredient } from '@/types/ingredient'
-
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
 import { ingredientSchema } from '@/features/ingredients/api/create'
 import { type UpdateIngredientFormInput, updateIngredientOptions, updateIngredientSchema } from '@/features/ingredients/api/update'
 import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
+import type { Ingredient } from '@/types/ingredient'
 
 interface EditIngredientProps {
   ingredient: Ingredient

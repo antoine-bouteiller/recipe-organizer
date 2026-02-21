@@ -5,6 +5,7 @@ import { useRecipeQuantitiesStore } from '@/stores/recipe-quantities.store'
 import type { IngredientCategory } from '@/types/ingredient'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
 
+import '@tanstack/react-start/client-only'
 import { useShoppingListStore } from '../../../stores/shopping-list.store'
 import type { IngredientCartItem } from '../types/ingredient-cart-item'
 

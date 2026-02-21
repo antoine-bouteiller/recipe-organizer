@@ -8,27 +8,10 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { Item, ItemActions, ItemContent, ItemDescription, ItemGroup, ItemSeparator, ItemTitle } from '@/components/ui/item'
-import { Skeleton } from '@/components/ui/skeleton'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { AddUnit } from '@/features/units/components/add-unit'
 import { DeleteUnit } from '@/features/units/components/delete-unit'
 import { EditUnit } from '@/features/units/components/edit-unit'
-import { incrementalArray } from '@/utils/array'
-
-const UnitsPending = () => (
-  <ScreenLayout title="Unitées" withGoBack>
-    <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
-      <Skeleton className="h-10 flex-1" />
-      <Skeleton className="h-10 w-10" />
-    </div>
-
-    <div className="flex flex-col gap-2 px-4 pt-2">
-      {incrementalArray({ length: 10 }).map((index) => (
-        <Skeleton className="h-14 w-full" key={index} />
-      ))}
-    </div>
-  </ScreenLayout>
-)
 
 const UnitsManagement = () => {
   const { data: units } = useSuspenseQuery(getUnitsListOptions())
@@ -93,5 +76,4 @@ const RouteComponent = () => <UnitsManagement />
 export const Route = createFileRoute('/settings/units')({
   component: RouteComponent,
   loader: ({ context }) => context.queryClient.ensureQueryData(getUnitsListOptions()),
-  pendingComponent: UnitsPending,
 })

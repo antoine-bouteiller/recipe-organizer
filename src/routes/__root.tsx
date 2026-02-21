@@ -1,7 +1,6 @@
-import type { QueryClient } from '@tanstack/react-query'
-
 import { Serwist } from '@serwist/window'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
@@ -91,7 +90,6 @@ export const Route = createRootRouteWithContext<{
     return { authUser, isAdmin: authUser?.role === 'admin', theme }
   },
   shellComponent: RootComponent,
-  ssr: false,
   head: () => ({
     links: [
       { href: appCss, rel: 'stylesheet' },

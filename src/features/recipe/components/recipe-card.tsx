@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
 
+import '@tanstack/react-start/client-only'
 import type { ReducedRecipe } from '../api/get-all'
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'

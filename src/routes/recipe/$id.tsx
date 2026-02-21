@@ -1,6 +1,6 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { ClientOnly, createFileRoute, Link, useRouter } from '@tanstack/react-router'
 import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -190,8 +190,11 @@ const paramsSchema = v.object({
 })
 
 export const Route = createFileRoute('/recipe/$id')({
-  component: RecipePage,
-  pendingComponent: RecipeDetailPending,
+  component: () => (
+    <ClientOnly fallback={<RecipeDetailPending />}>
+      <RecipePage />
+    </ClientOnly>
+  ),
   loader: async ({ context, params }) => {
     const result = v.safeParse(paramsSchema, params)
     if (!result.success) {

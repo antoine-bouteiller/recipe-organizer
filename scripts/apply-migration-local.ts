@@ -1,6 +1,7 @@
-import { $ } from 'bun'
 import { copyFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { $ } from 'bun'
 
 const SOURCE_DIR = 'migrations'
 const TMP_DIR = 'migrations_tmp'

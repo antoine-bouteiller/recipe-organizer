@@ -7,22 +7,7 @@ import { Fragment } from 'react/jsx-runtime'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Item, ItemContent, ItemGroup, ItemMedia, ItemSeparator } from '@/components/ui/item'
-import { Skeleton } from '@/components/ui/skeleton'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { incrementalArray } from '@/utils/array'
-
-const SearchPending = () => (
-  <ScreenLayout title="Rechercher">
-    <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
-      <Skeleton className="h-10 w-full" />
-    </div>
-    <div className="flex flex-col gap-2 px-4 pt-2">
-      {incrementalArray({ length: 8 }).map((index) => (
-        <Skeleton className="h-12 w-full" key={index} />
-      ))}
-    </div>
-  </ScreenLayout>
-)
 
 const RouteComponent = () => {
   const [search, setSearch] = useState('')
@@ -58,5 +43,4 @@ export const Route = createFileRoute('/search')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getRecipeListOptions())
   },
-  pendingComponent: SearchPending,
 })

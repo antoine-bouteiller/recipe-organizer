@@ -1,6 +1,6 @@
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { ClientOnly, createFileRoute, Link } from '@tanstack/react-router'
 import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -8,21 +8,10 @@ import { Button } from '@/components/ui/button'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/components/recipe-card'
 import { RecipeCardSkeleton } from '@/features/recipe/components/recipe-card-skeleton'
-import { incrementalArray } from '@/utils/array'
 
 const searchSchema = v.object({
   search: v.optional(v.boolean()),
 })
-
-const RecipeListPending = () => (
-  <ScreenLayout title="Recettes">
-    <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
-      {incrementalArray({ length: 6 }).map((index) => (
-        <RecipeCardSkeleton key={index} />
-      ))}
-    </div>
-  </ScreenLayout>
-)
 
 const RecipeList = () => {
   const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
@@ -31,7 +20,9 @@ const RecipeList = () => {
     <ScreenLayout title="Recettes">
       <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
         {recipes.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
+          <ClientOnly fallback={<RecipeCardSkeleton />} key={recipe.id}>
+            <RecipeCard recipe={recipe} />
+          </ClientOnly>
         ))}
       </div>
       <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" />} size="icon-xl">
@@ -49,7 +40,6 @@ export const Route = createFileRoute('/')({
   loader: async ({ context }) => {
     await context.queryClient.prefetchQuery(getRecipeListOptions())
   },
-  pendingComponent: RecipeListPending,
   validateSearch: (search) => {
     const result = v.safeParse(searchSchema, search)
     if (!result.success) {

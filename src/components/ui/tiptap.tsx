@@ -1,5 +1,4 @@
 import type { CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
-
 import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { useContext } from 'react'

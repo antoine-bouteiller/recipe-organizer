@@ -1,5 +1,4 @@
 import type { Recipe, RecipeIngredientGroup } from '@/features/recipe/api/get-one'
-
 import { formatNumber } from '@/utils/number'
 
 interface RecipeGroupIngredientsProps {

@@ -1,5 +1,5 @@
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { ClientOnly, createFileRoute } from '@tanstack/react-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -66,6 +66,9 @@ const CartPage = () => {
 }
 
 export const Route = createFileRoute('/shopping-list')({
-  component: CartPage,
-  pendingComponent: ShoppingListPending,
+  component: () => (
+    <ClientOnly fallback={<ShoppingListPending />}>
+      <CartPage />
+    </ClientOnly>
+  ),
 })

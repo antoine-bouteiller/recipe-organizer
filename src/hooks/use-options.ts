@@ -1,7 +1,6 @@
 import { type QueryKey, useQuery, type UseQueryOptions } from '@tanstack/react-query'
 
 import type { Option } from '@/components/ui/combobox'
-
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
