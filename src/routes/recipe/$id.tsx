@@ -165,12 +165,12 @@ const RecipePage = () => {
         </div>
 
         <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
-          <div className="col-span-2 rounded-xl border px-8">
+          <div className="col-span-2 rounded-xl border px-8 pb-8">
             <h2>Ingrédients</h2>
             <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
           </div>
 
-          <div className="col-span-3 rounded-xl border px-8">
+          <div className="col-span-3 rounded-xl border px-8 pb-8">
             <h2>Préparation</h2>
             <Tiptap content={recipe.instructions} readOnly>
               <TiptapContent className="pb-4" />
