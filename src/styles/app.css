@@ -126,6 +126,9 @@
   --border: --alpha(var(--color-white) / 12%);
   --input: --alpha(var(--color-white) / 12%);
   --ring: var(--color-zinc-500);
+
+  --ease-out-snappy: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-bounce: cubic-bezier(0.45, 1.005, 0, 1.005);
 }
 
 @utility pt-safe-* {

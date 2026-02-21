@@ -1,5 +1,5 @@
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
-import { type ReactNode, useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Command, CommandFooter, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command'
@@ -55,7 +55,7 @@ const Combobox = <T extends ValueOptions>({
         <span className={cn('truncate')}>{value ? options.find((option) => option.value === value)?.label : placeholder}</span>
         <CaretDownIcon />
       </ResponsivePopoverTrigger>
-      <ResponsivePopoverContent className="w-(--anchor-width)" noPadding>
+      <ResponsivePopoverContent className="md:w-(--anchor-width)" noPadding>
         <ComboboxContent
           addNew={addNew}
           onChange={onChange}
