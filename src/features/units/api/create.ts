@@ -9,12 +9,7 @@ import { unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
 const unitSchema = v.object({
-  factor: v.optional(
-    v.pipe(
-      v.number(),
-      v.check((num) => num > 0)
-    )
-  ),
+  factor: v.optional(v.pipe(v.number(), v.minValue(0))),
   name: v.pipe(v.string(), v.minLength(2)),
   parentId: v.optional(v.number()),
 })

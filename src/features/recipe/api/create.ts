@@ -25,20 +25,9 @@ const recipeSchema = v.object({
       groupName: v.optional(v.string()),
       ingredients: v.array(
         v.object({
-          id: v.pipe(
-            v.number(),
-            v.check((num) => num > 0)
-          ),
-          quantity: v.pipe(
-            v.number(),
-            v.check((num) => num > 0)
-          ),
-          unitId: v.optional(
-            v.pipe(
-              v.number(),
-              v.check((num) => num > 0)
-            )
-          ),
+          id: v.pipe(v.number(), v.minValue(0)),
+          quantity: v.pipe(v.number(), v.minValue(0)),
+          unitId: v.optional(v.pipe(v.number(), v.minValue(0))),
         })
       ),
     })
@@ -48,22 +37,13 @@ const recipeSchema = v.object({
     v.array(
       v.object({
         _key: v.optional(v.string()),
-        id: v.pipe(
-          v.number(),
-          v.check((num) => num > 0)
-        ),
-        ratio: v.pipe(
-          v.number(),
-          v.check((num) => num > 0)
-        ),
+        id: v.pipe(v.number(), v.minValue(0)),
+        ratio: v.pipe(v.number(), v.minValue(0)),
       })
     )
   ),
   name: v.pipe(v.string(), v.minLength(2)),
-  servings: v.pipe(
-    v.number(),
-    v.check((num) => num > 0)
-  ),
+  servings: v.pipe(v.number(), v.minValue(0)),
   tags: v.array(v.picklist(MANUAL_TAGS)),
   video: v.optional(v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })])),
 })

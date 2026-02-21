@@ -20,22 +20,9 @@ interface MagimixProgramDialogProps {
 const magimixProgramSchema = v.object({
   program: v.picklist([...magimixProgram]),
   rotationSpeed: v.picklist([...allowedRotationSpeed]),
-  temperature: v.optional(
-    v.pipe(
-      v.number(),
-      v.check((num) => num > 0 && num < 200)
-    )
-  ),
-  timeMinutes: v.pipe(
-    v.number(),
-    v.minValue(0),
-    v.check((num) => num < 60)
-  ),
-  timeSeconds: v.pipe(
-    v.number(),
-    v.minValue(0),
-    v.check((num) => num < 60)
-  ),
+  temperature: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(200))),
+  timeMinutes: v.pipe(v.number(), v.minValue(0), v.maxValue(60)),
+  timeSeconds: v.pipe(v.number(), v.minValue(0), v.maxValue(60)),
 })
 
 export type MagimixProgramFormInput = v.InferOutput<typeof magimixProgramSchema>
