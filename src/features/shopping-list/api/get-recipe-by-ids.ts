@@ -6,7 +6,7 @@ import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
-import { ingredientGroupSelect } from '../utils/constants'
+import { ingredientGroupSelect } from '../utils/ingredient-group-select'
 
 const getRecipesByIdsSchema = v.object({
   ids: v.array(v.number()),

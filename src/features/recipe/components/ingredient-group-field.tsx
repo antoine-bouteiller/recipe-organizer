@@ -10,7 +10,7 @@ import { AddUnit } from '@/features/units/components/add-unit'
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions, useUnitOptions } from '@/hooks/use-options'
 
-import { recipeDefaultValues } from '../utils/constants'
+import { recipeDefaultValues } from '../utils/form'
 
 interface IngredientFormProps {
   groupIndex: number

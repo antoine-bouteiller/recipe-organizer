@@ -1,15 +1,15 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useStore } from '@tanstack/react-form'
 
-import type { FileMetadata } from '@/hooks/use-file-upload'
-
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { LinkedRecipesProvider } from '@/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
+import type { FileMetadata } from '@/hooks/use-file-upload'
 import { useRecipeOptions } from '@/hooks/use-options'
 
-import { RECIPE_TAG_LABELS, RECIPE_TAGS, recipeDefaultValues } from '../utils/constants'
+import { RECIPE_TAG_LABELS, RECIPE_TAGS } from '../utils/constants'
+import { recipeDefaultValues } from '../utils/form'
 import { IngredientGroupField } from './ingredient-group-field'
 
 const tagItems = RECIPE_TAGS.map((tag) => ({

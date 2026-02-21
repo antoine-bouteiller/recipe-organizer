@@ -4,8 +4,7 @@ import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
 
 import type { IngredientFormInput } from '../api/create'
-
-import { ingredientsCategoryOptions } from '../utils/ingredient-category'
+import { ingredientsCategoryOptions } from '../utils/constants'
 
 export const ingredientDefaultValues: IngredientFormInput = {
   category: undefined,

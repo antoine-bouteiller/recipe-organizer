@@ -8,7 +8,7 @@ import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 import { getImageUrl } from '@/utils/get-file-url'
 
-import { ingredientGroupSelect } from '../utils/constants'
+import { ingredientGroupSelect } from '../utils/ingredient-group-select'
 
 const getRecipeSchema = v.number()
 
@@ -37,9 +37,7 @@ const getRecipe = createServerFn({
                 with: {
                   ingredientGroups: {
                     ...ingredientGroupSelect,
-                    where: {
-                      isDefault: true,
-                    },
+                    where: { isDefault: true },
                   },
                 },
               },

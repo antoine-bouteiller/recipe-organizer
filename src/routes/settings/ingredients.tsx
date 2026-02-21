@@ -14,7 +14,7 @@ import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/components/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/components/edit-ingredient'
-import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/features/ingredients/utils/ingredient-category'
+import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/features/ingredients/utils/constants'
 import { incrementalArray } from '@/utils/array'
 
 const IngredientsPending = () => (
