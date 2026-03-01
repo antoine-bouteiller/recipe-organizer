@@ -111,7 +111,12 @@ const UsersManagement = () => {
 
           <TabsPanel value="blocked">
             <React.Suspense fallback={null}>
-              <UserList actions={() => null} emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+              <UserList
+                actions={(userItem) => <ApproveUser userId={userItem.id} />}
+                emptyLabel="Aucun utilisateur bloqué."
+                search={search}
+                status="blocked"
+              />
             </React.Suspense>
           </TabsPanel>
         </Tabs>

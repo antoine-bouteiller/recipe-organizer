@@ -1,3 +1,4 @@
+import { ProhibitIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
@@ -16,8 +17,9 @@ export const BlockUser = ({ userEmail, userId }: BlockUserProps) => {
 
   return (
     <DeleteDialog
-      deleteButtonLabel="Bloquer"
+      actionLabel="Bloquer"
       description={`Êtes-vous sûr de vouloir bloquer l'utilisateur ${userEmail} ?`}
+      icon={ProhibitIcon}
       onDelete={handleBlock}
       title="Bloquer l'utilisateur"
       trigger={<Button size="icon" variant="destructive-outline" />}
