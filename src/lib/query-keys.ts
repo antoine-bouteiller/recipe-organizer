@@ -2,6 +2,7 @@ export const queryKeys = {
   allIngredients: ['ingredients'] as const,
   allRecipes: ['recipes'] as const,
   allUnits: ['units'] as const,
+  allUsers: ['users'] as const,
   detailIngredient: (id: string) => [...queryKeys.allIngredients, id] as const,
   listIngredients: () => [...queryKeys.allIngredients, 'list'] as const,
 
@@ -14,4 +15,6 @@ export const queryKeys = {
   unitDetail: (id: number) => [...queryKeys.unitDetails(), id] as const,
   unitDetails: () => [...queryKeys.allUnits, 'detail'] as const,
   unitList: () => [...queryKeys.allUnits, 'list'] as const,
+
+  listUsers: () => [...queryKeys.allUsers, 'list'] as const,
 }

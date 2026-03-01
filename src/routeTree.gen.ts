@@ -9,21 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ShoppingListRouteImport } from './routes/shopping-list'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as SettingsUnitsRouteImport } from './routes/settings/units'
-import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
-import { Route as SettingsAccountRouteImport } from './routes/settings/account'
-import { Route as RecipeNewRouteImport } from './routes/recipe/new'
-import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
-import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as RecipeEditIdRouteImport } from './routes/recipe/edit.$id'
-import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
-import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
 import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
+import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
+import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
+import { Route as RecipeEditIdRouteImport } from './routes/recipe/edit.$id'
+import { Route as RecipeNewRouteImport } from './routes/recipe/new'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SettingsAccountRouteImport } from './routes/settings/account'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
+import { Route as SettingsUnitsRouteImport } from './routes/settings/units'
+import { Route as SettingsUsersRouteImport } from './routes/settings/users'
+import { Route as ShoppingListRouteImport } from './routes/shopping-list'
 
 const ShoppingListRoute = ShoppingListRouteImport.update({
   id: '/shopping-list',
@@ -48,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsUsersRoute = SettingsUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsUnitsRoute = SettingsUnitsRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/settings/account': typeof SettingsAccountRoute
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/units': typeof SettingsUnitsRoute
+  '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/api/video/$id': typeof ApiVideoIdRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/settings/account': typeof SettingsAccountRoute
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/units': typeof SettingsUnitsRoute
+  '/settings/users': typeof SettingsUsersRoute
   '/settings': typeof SettingsIndexRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/api/video/$id': typeof ApiVideoIdRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/settings/account': typeof SettingsAccountRoute
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/units': typeof SettingsUnitsRoute
+  '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/api/video/$id': typeof ApiVideoIdRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/settings/account'
     | '/settings/ingredients'
     | '/settings/units'
+    | '/settings/users'
     | '/settings/'
     | '/api/image/$id'
     | '/api/video/$id'
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/settings/account'
     | '/settings/ingredients'
     | '/settings/units'
+    | '/settings/users'
     | '/settings'
     | '/api/image/$id'
     | '/api/video/$id'
@@ -198,6 +209,7 @@ export interface FileRouteTypes {
     | '/settings/account'
     | '/settings/ingredients'
     | '/settings/units'
+    | '/settings/users'
     | '/settings/'
     | '/api/image/$id'
     | '/api/video/$id'
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/settings/'
       preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/users': {
+      id: '/settings/users'
+      path: '/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof SettingsUsersRouteImport
       parentRoute: typeof SettingsRoute
     }
     '/settings/units': {
@@ -333,6 +352,7 @@ interface SettingsRouteChildren {
   SettingsAccountRoute: typeof SettingsAccountRoute
   SettingsIngredientsRoute: typeof SettingsIngredientsRoute
   SettingsUnitsRoute: typeof SettingsUnitsRoute
+  SettingsUsersRoute: typeof SettingsUsersRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
@@ -340,12 +360,11 @@ const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsAccountRoute: SettingsAccountRoute,
   SettingsIngredientsRoute: SettingsIngredientsRoute,
   SettingsUnitsRoute: SettingsUnitsRoute,
+  SettingsUsersRoute: SettingsUsersRoute,
   SettingsIndexRoute: SettingsIndexRoute,
 }
 
-const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
-  SettingsRouteChildren,
-)
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(SettingsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -360,12 +379,11 @@ const rootRouteChildren: RootRouteChildren = {
   RecipeEditIdRoute: RecipeEditIdRoute,
   ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
 }
-export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
+
+import type { createStart } from '@tanstack/react-start'
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true

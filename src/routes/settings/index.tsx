@@ -1,10 +1,20 @@
-import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon } from '@phosphor-icons/react'
+import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon, UsersIcon } from '@phosphor-icons/react'
+import type { IconProps } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Card } from '@/components/ui/card'
 
-const settingsSections = [
+interface SettingsSection {
+  adminOnly?: boolean
+  description: string
+  icon: React.ComponentType<IconProps>
+  id: string
+  path: string
+  title: string
+}
+
+const settingsSections: SettingsSection[] = [
   {
     description: 'Gérer vos informations de compte et vous déconnecter',
     icon: UserIcon,
@@ -26,35 +36,49 @@ const settingsSections = [
     path: '/settings/units',
     title: 'Unités de mesure',
   },
+  {
+    adminOnly: true,
+    description: 'Gérer les utilisateurs et leurs rôles',
+    icon: UsersIcon,
+    id: 'users',
+    path: '/settings/users',
+    title: 'Utilisateurs',
+  },
 ]
 
-const RouteComponent = () => (
-  <ScreenLayout title="Paramètres">
-    <div className="grid gap-4 p-4 md:grid-cols-2">
-      {settingsSections.map((section) => {
-        const Icon = section.icon
-        return (
-          <Link key={section.id} to={section.path}>
-            <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
-              <div className="flex items-start justify-between">
-                <div className="flex flex-1 items-start gap-3">
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <Icon className="h-5 w-5 text-primary" />
+const RouteComponent = () => {
+  const { isAdmin } = Route.useRouteContext()
+
+  const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
+
+  return (
+    <ScreenLayout title="Paramètres">
+      <div className="grid gap-4 p-4 md:grid-cols-2">
+        {visibleSections.map((section) => {
+          const Icon = section.icon
+          return (
+            <Link key={section.id} to={section.path}>
+              <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-1 items-start gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold">{section.title}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{section.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
-                  </div>
+                  <CaretRightIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
                 </div>
-                <CaretRightIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
-              </div>
-            </Card>
-          </Link>
-        )
-      })}
-    </div>
-  </ScreenLayout>
-)
+              </Card>
+            </Link>
+          )
+        })}
+      </div>
+    </ScreenLayout>
+  )
+}
 
 export const Route = createFileRoute('/settings/')({
   component: RouteComponent,
