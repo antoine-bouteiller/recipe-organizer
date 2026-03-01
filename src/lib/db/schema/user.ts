@@ -6,4 +6,7 @@ export const user = sqliteTable('user', {
   role: text('role', { enum: ['user', 'admin'] })
     .notNull()
     .default('user'),
+  status: text('status', { enum: ['pending', 'active', 'blocked'] })
+    .notNull()
+    .default('active'),
 })

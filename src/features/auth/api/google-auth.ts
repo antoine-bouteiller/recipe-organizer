@@ -3,6 +3,7 @@ import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
 import { env } from 'cloudflare:workers'
 
 import { getDb } from '@/lib/db'
+import { user } from '@/lib/db/schema'
 import { useAppSession, useOAuthSession } from '@/lib/session'
 
 import { type AuthError } from './constants'
@@ -118,7 +119,23 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
   })
 
   if (!existingUser) {
-    throw redirectWithError('signup_disabled')
+    // Create user in pending state for admin approval
+    const newUser = {
+      email: userInfo.email,
+      id: userInfo.id,
+      role: 'user' as const,
+      status: 'pending' as const,
+    }
+    await getDb().insert(user).values(newUser)
+    throw redirectWithError('account_pending')
+  }
+
+  if (existingUser.status === 'pending') {
+    throw redirectWithError('account_pending')
+  }
+
+  if (existingUser.status === 'blocked') {
+    throw redirectWithError('account_blocked')
   }
 
   // Create session

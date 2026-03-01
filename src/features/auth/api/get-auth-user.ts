@@ -13,6 +13,7 @@ export const getAuthUser = createServerFn({ method: 'GET' }).handler(
         id: 'string',
         email: 'admin@test.fr',
         role: 'admin',
+        status: 'active' as const,
       }
     }
 

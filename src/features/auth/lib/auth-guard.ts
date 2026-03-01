@@ -11,6 +11,14 @@ export const authGuard = (role?: string) =>
       throw redirect({ to: '/auth/login' })
     }
 
+    if (user.status === 'blocked') {
+      throw redirect({ to: '/auth/login', search: { error: 'account_blocked' } })
+    }
+
+    if (user.status === 'pending') {
+      throw redirect({ to: '/auth/login', search: { error: 'account_pending' } })
+    }
+
     if (role === 'admin' && user?.role !== 'admin') {
       throw new Error('Permission denied')
     }
