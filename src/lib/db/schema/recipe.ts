@@ -7,5 +7,6 @@ export const recipe = sqliteTable('recipes', {
   name: text('name', { length: 255 }).notNull(),
   servings: integer('servings').notNull(),
   tags: text('tags', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  createdBy: text('created_by').notNull().default('1'),
   video: text('video', { length: 255 }),
 })

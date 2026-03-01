@@ -13,6 +13,10 @@ const relations = defineRelations(schema, (relation) => ({
     groupIngredients: relation.many.groupIngredient(),
   },
   recipe: {
+    creator: relation.one.user({
+      from: relation.recipe.createdBy,
+      to: relation.user.id,
+    }),
     ingredientGroups: relation.many.recipeIngredientGroup(),
     linkedRecipes: relation.many.recipeLinkedRecipes({
       from: relation.recipe.id,
@@ -62,6 +66,9 @@ const relations = defineRelations(schema, (relation) => ({
       from: relation.unit.parentId,
       to: relation.unit.id,
     }),
+  },
+  user: {
+    recipes: relation.many.recipe(),
   },
 }))
 

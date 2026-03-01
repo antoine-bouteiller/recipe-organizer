@@ -28,7 +28,7 @@ const updateRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => v.parse(updateRecipeSchema, parseFormData(formData)))
   .handler(
-    withServerError(async ({ data }) => {
+    withServerError(async ({ data, context }) => {
       const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
@@ -44,6 +44,10 @@ const updateRecipe = createServerFn({
 
       if (!currentRecipe) {
         throw notFound()
+      }
+
+      if (context.user.role !== 'admin' && currentRecipe.createdBy !== context.user.id) {
+        throw new Error('Permission denied')
       }
 
       let imageKey = currentRecipe.image

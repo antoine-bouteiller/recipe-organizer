@@ -56,7 +56,7 @@ const createRecipe = createServerFn({
 })
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => v.parse(recipeSchema, parseFormData(formData)))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
     const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
@@ -106,6 +106,7 @@ const createRecipe = createServerFn({
     const [createdRecipe] = await getDb()
       .insert(recipe)
       .values({
+        createdBy: context.user.id,
         image: imageKey,
         instructions,
         name,

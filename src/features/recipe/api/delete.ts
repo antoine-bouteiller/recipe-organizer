@@ -15,15 +15,16 @@ const deleteRecipeSchema = v.number()
 const deleteRecipe = createServerFn({
   method: 'POST',
 })
-  .middleware([authGuard('admin')])
+  .middleware([authGuard()])
   .inputValidator(deleteRecipeSchema)
   .handler(
-    withServerError(async ({ data: id }) => {
+    withServerError(async ({ data: id, context }) => {
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: {
           id,
         },
         columns: {
+          createdBy: true,
           id: true,
           image: true,
         },
@@ -38,6 +39,10 @@ const deleteRecipe = createServerFn({
 
       if (!currentRecipe) {
         throw new Error('Recipe not found')
+      }
+
+      if (context.user.role !== 'admin' && currentRecipe.createdBy !== context.user.id) {
+        throw new Error('Permission denied')
       }
 
       await getDb().batch([

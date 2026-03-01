@@ -15,5 +15,5 @@ export const authGuard = (role?: string) =>
       throw new Error('Permission denied')
     }
 
-    return next()
+    return next({ context: { user } })
   })

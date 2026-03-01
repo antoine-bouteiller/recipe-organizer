@@ -14,6 +14,7 @@ const searchSchema = v.object({
 })
 
 const RecipeList = () => {
+  const { authUser } = Route.useRouteContext()
   const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
 
   return (
@@ -25,12 +26,14 @@ const RecipeList = () => {
           </ClientOnly>
         ))}
       </div>
-      <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" />} size="icon-xl">
-        <BookIcon className="size-5" />
-        <div className="absolute right-1.75 bottom-1.75 rounded-full border border-primary-foreground bg-primary p-0.5">
-          <PlusIcon className="size-1.5" />
-        </div>
-      </Button>
+      {authUser && (
+        <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" />} size="icon-xl">
+          <BookIcon className="size-5" />
+          <div className="absolute right-1.75 bottom-1.75 rounded-full border border-primary-foreground bg-primary p-0.5">
+            <PlusIcon className="size-1.5" />
+          </div>
+        </Button>
+      )}
     </ScreenLayout>
   )
 }
