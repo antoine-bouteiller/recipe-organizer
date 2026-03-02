@@ -9,21 +9,51 @@ import { SearchInput } from '@/components/search-input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Item, ItemActions, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from '@/components/ui/item'
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { getUserListOptions } from '@/features/users/api/get-all'
 import { AddUser } from '@/features/users/components/add-user'
-import { DeleteUser } from '@/features/users/components/delete-user'
+import { ApproveUser } from '@/features/users/components/approve-user'
+import { BlockUser } from '@/features/users/components/block-user'
 
 const roleLabels: Record<string, string> = {
   admin: 'Admin',
   user: 'Utilisateur',
 }
 
-const UsersManagement = () => {
-  const { data: users } = useSuspenseQuery(getUserListOptions())
-  const [search, setSearch] = useState('')
-
+const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: string; status: 'active' | 'pending' | 'blocked' }) => {
+  const { data: users } = useSuspenseQuery(getUserListOptions(status))
   const query = search.trim().toLowerCase()
-  const filteredUsers = users.filter((user) => user.email.toLowerCase().includes(query) || user.role.toLowerCase().includes(query))
+  const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
+
+  if (filteredUsers.length === 0) {
+    return <p className="py-8 text-center text-muted-foreground">{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
+  }
+
+  return (
+    <ItemGroup>
+      {filteredUsers.map((userItem, index) => (
+        <React.Fragment key={userItem.id}>
+          <Item className="flex-nowrap">
+            <ItemContent>
+              <ItemTitle>
+                <span className="text-nowrap text-ellipsis">{userItem.email}</span>
+                <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[userItem.role]}</Badge>
+              </ItemTitle>
+            </ItemContent>
+            <ItemActions>
+              {(status === 'blocked' || status === 'pending') && <ApproveUser userId={userItem.id} />}
+              {(status === 'active' || status === 'pending') && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
+            </ItemActions>
+          </Item>
+          {index !== filteredUsers.length - 1 && <ItemSeparator />}
+        </React.Fragment>
+      ))}
+    </ItemGroup>
+  )
+}
+
+const UsersManagement = () => {
+  const [search, setSearch] = useState('')
 
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
@@ -37,30 +67,31 @@ const UsersManagement = () => {
       </div>
 
       <div className="px-4">
-        {filteredUsers.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">
-            {search ? 'Aucun utilisateur trouvé pour cette recherche.' : 'Aucun utilisateur trouvé.'}
-          </p>
-        ) : (
-          <ItemGroup>
-            {filteredUsers.map((user, index) => (
-              <React.Fragment key={user.id}>
-                <Item className="flex-nowrap">
-                  <ItemContent>
-                    <ItemTitle>
-                      <span className="text-nowrap text-ellipsis">{user.email}</span>
-                      <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[user.role]}</Badge>
-                    </ItemTitle>
-                  </ItemContent>
-                  <ItemActions>
-                    <DeleteUser userEmail={user.email} userId={user.id} />
-                  </ItemActions>
-                </Item>
-                {index !== filteredUsers.length - 1 && <ItemSeparator />}
-              </React.Fragment>
-            ))}
-          </ItemGroup>
-        )}
+        <Tabs defaultValue="active">
+          <TabsList className="mb-4 w-full">
+            <TabsTab value="active">Actifs</TabsTab>
+            <TabsTab value="pending">En attente</TabsTab>
+            <TabsTab value="blocked">Bloqués</TabsTab>
+          </TabsList>
+
+          <TabsPanel value="active">
+            <React.Suspense fallback={null}>
+              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+            </React.Suspense>
+          </TabsPanel>
+
+          <TabsPanel value="pending">
+            <React.Suspense fallback={null}>
+              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
+            </React.Suspense>
+          </TabsPanel>
+
+          <TabsPanel value="blocked">
+            <React.Suspense fallback={null}>
+              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+            </React.Suspense>
+          </TabsPanel>
+        </Tabs>
       </div>
     </ScreenLayout>
   )
@@ -70,5 +101,5 @@ const RouteComponent = () => <UsersManagement />
 
 export const Route = createFileRoute('/settings/users')({
   component: RouteComponent,
-  loader: ({ context }) => context.queryClient.ensureQueryData(getUserListOptions()),
+  loader: ({ context }) => context.queryClient.ensureQueryData(getUserListOptions('active')),
 })

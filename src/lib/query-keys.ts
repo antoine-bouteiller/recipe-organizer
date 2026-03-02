@@ -16,5 +16,5 @@ export const queryKeys = {
   unitDetails: () => [...queryKeys.allUnits, 'detail'] as const,
   unitList: () => [...queryKeys.allUnits, 'list'] as const,
 
-  listUsers: () => [...queryKeys.allUsers, 'list'] as const,
+  listUsers: (status?: string) => [...queryKeys.allUsers, 'list', status ?? 'active'] as const,
 }

@@ -14,6 +14,12 @@ const getErrorMessage = (error: string) => {
   if (error === 'signup_disabled') {
     return "Veuillez contacter l'administrateur pour vous inscrire"
   }
+  if (error === 'account_pending') {
+    return "Votre compte est en attente d'approbation par un administrateur"
+  }
+  if (error === 'account_blocked') {
+    return 'Votre compte a été bloqué. Veuillez contacter un administrateur'
+  }
   return 'Une erreur est survenue'
 }
 
