@@ -14,24 +14,13 @@ import { getUserListOptions } from '@/features/users/api/get-all'
 import { AddUser } from '@/features/users/components/add-user'
 import { ApproveUser } from '@/features/users/components/approve-user'
 import { BlockUser } from '@/features/users/components/block-user'
-import { DeleteUser } from '@/features/users/components/delete-user'
 
 const roleLabels: Record<string, string> = {
   admin: 'Admin',
   user: 'Utilisateur',
 }
 
-const UserList = ({
-  actions,
-  emptyLabel,
-  search,
-  status,
-}: {
-  actions: (userItem: { email: string; id: string }) => React.ReactNode
-  emptyLabel: string
-  search: string
-  status: 'active' | 'pending' | 'blocked'
-}) => {
+const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: string; status: 'active' | 'pending' | 'blocked' }) => {
   const { data: users } = useSuspenseQuery(getUserListOptions(status))
   const query = search.trim().toLowerCase()
   const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
@@ -51,7 +40,10 @@ const UserList = ({
                 <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[userItem.role]}</Badge>
               </ItemTitle>
             </ItemContent>
-            <ItemActions>{actions(userItem)}</ItemActions>
+            <ItemActions>
+              {(status === 'blocked' || status === 'pending') && <ApproveUser userId={userItem.id} />}
+              {(status === 'active' || status === 'pending') && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
+            </ItemActions>
           </Item>
           {index !== filteredUsers.length - 1 && <ItemSeparator />}
         </React.Fragment>
@@ -84,39 +76,19 @@ const UsersManagement = () => {
 
           <TabsPanel value="active">
             <React.Suspense fallback={null}>
-              <UserList
-                actions={(userItem) => <DeleteUser userEmail={userItem.email} userId={userItem.id} />}
-                emptyLabel="Aucun utilisateur actif."
-                search={search}
-                status="active"
-              />
+              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
             </React.Suspense>
           </TabsPanel>
 
           <TabsPanel value="pending">
             <React.Suspense fallback={null}>
-              <UserList
-                actions={(userItem) => (
-                  <>
-                    <ApproveUser userId={userItem.id} />
-                    <BlockUser userEmail={userItem.email} userId={userItem.id} />
-                  </>
-                )}
-                emptyLabel="Aucun utilisateur en attente."
-                search={search}
-                status="pending"
-              />
+              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
             </React.Suspense>
           </TabsPanel>
 
           <TabsPanel value="blocked">
             <React.Suspense fallback={null}>
-              <UserList
-                actions={(userItem) => <ApproveUser userId={userItem.id} />}
-                emptyLabel="Aucun utilisateur bloqué."
-                search={search}
-                status="blocked"
-              />
+              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
             </React.Suspense>
           </TabsPanel>
         </Tabs>
