@@ -1,4 +1,5 @@
 import { ClientOnly, createFileRoute } from '@tanstack/react-router'
+import { Suspense } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -29,7 +30,9 @@ const ShoppingListPage = () => (
   >
     <div className="space-y-4 p-8">
       <ClientOnly fallback={<ShoppingListPending />}>
-        <ShoppingList />
+        <Suspense fallback={<ShoppingListPending />}>
+          <ShoppingList />
+        </Suspense>
       </ClientOnly>
     </div>
   </ScreenLayout>
