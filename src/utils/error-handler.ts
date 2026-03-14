@@ -15,13 +15,7 @@ export const withServerError =
         throw new Error(`Invalid Schema; ${error.message}`, { cause: error })
       }
 
-      let errorMessage = ''
-
-      if (error instanceof Error) {
-        errorMessage = error.message
-      } else {
-        errorMessage = JSON.stringify(error)
-      }
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
 
       // oxlint-disable-next-line no-console
       console.error('Internal Server Error :', errorMessage)

@@ -22,11 +22,7 @@ const isJsonString = (str: string): boolean => {
 export const parseFormData = (formData: FormData) => {
   const data: Record<string, unknown> = {}
   for (const [key, value] of formData.entries()) {
-    if (typeof value === 'string' && isJsonString(value)) {
-      data[key] = JSON.parse(value)
-    } else {
-      data[key] = value
-    }
+    data[key] = typeof value === 'string' && isJsonString(value) ? JSON.parse(value) : value
   }
   return data
 }

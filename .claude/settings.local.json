@@ -13,5 +13,11 @@
       "Bash(wc:*)",
       "Bash(bunx drizzle-kit:*)"
     ]
+  },
+  "mcpServers": {
+    "vite-plus": {
+      "command": "npx",
+      "args": ["vp", "mcp"]
+    }
   }
 }
