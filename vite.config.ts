@@ -1,25 +1,21 @@
 import { cloudflare } from '@cloudflare/vite-plugin'
+import babel from '@rolldown/plugin-babel'
 import { serwist } from '@serwist/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import react from '@vitejs/plugin-react'
+import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
-import tsConfigPaths from 'vite-tsconfig-paths'
 
 const viteConfig = defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
-    tsConfigPaths({
-      projects: ['./tsconfig.json'],
-    }),
+    tanstackStart(),
+    react(),
     cloudflare({
       viteEnvironment: { name: 'ssr' },
-    }),
-    tanstackStart(),
-    react({
-      babel: {
-        plugins: ['babel-plugin-react-compiler'],
-      },
     }),
     tailwindcss(),
     serwist({
@@ -30,6 +26,7 @@ const viteConfig = defineConfig({
       rollupFormat: 'iife',
     }),
     devtools(),
+    babel({ presets: [reactCompilerPreset()] }),
   ],
   server: {
     port: 3000,

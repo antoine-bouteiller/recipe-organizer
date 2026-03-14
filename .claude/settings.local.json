@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun remove:*)",
+      "Bash(bun add:*)",
+      "Bash(bun typecheck:*)",
+      "Bash(bun lint:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:base-ui.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__github__search_code",
+      "mcp__github__get_file_contents",
+      "Bash(wc:*)",
+      "Bash(bunx drizzle-kit:*)"
+    ]
+  }
+}
