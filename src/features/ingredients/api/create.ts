@@ -14,32 +14,28 @@ const ingredientSchema = z.object({
   parentId: z.number().optional(),
 })
 
-export interface IngredientFormValues {
-  category: (typeof ingredientCategory)[number]
-  name: string
-  parentId?: number
-}
+export type IngredientFormValues = z.infer<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>
 
 const createIngredient = createServerFn()
   .middleware([authGuard()])
   .inputValidator(ingredientSchema)
   .handler(async ({ data }) => {
-    await getDb().insert(ingredient).values(data as IngredientFormValues)
+    await getDb().insert(ingredient).values(data)
   })
 
 const createIngredientOptions = () =>
   mutationOptions({
     mutationFn: createIngredient,
-    onError: (error, variables) => {
-      toastError(`Erreur lors de la création de l'ingrédient ${(variables as { data: IngredientFormValues }).data.name}`, error)
+    onError: (error) => {
+      toastError(`Erreur lors de la création de l'ingrédient`, error)
     },
     onSuccess: async (_data, variables, _result, context) => {
       await context.client.invalidateQueries({
         queryKey: queryKeys.listIngredients(),
       })
       toastManager.add({
-        title: `Ingrédient ${(variables as { data: IngredientFormValues }).data.name} créé`,
+        title: `Ingrédient ${variables.data.name} créé`,
         type: 'success',
       })
     },

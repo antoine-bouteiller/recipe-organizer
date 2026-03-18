@@ -9,18 +9,18 @@ import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-import { type IngredientFormValues, ingredientSchema } from './create'
+import { ingredientSchema } from './create'
 
 const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
 
-export type UpdateIngredientFormValues = IngredientFormValues & { id: number }
+export type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
 export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 
 const updateIngredient = createServerFn()
   .middleware([authGuard()])
   .inputValidator(updateIngredientSchema)
   .handler(async ({ data }) => {
-    const { id, ...newIngredient } = data as UpdateIngredientFormValues
+    const { id, ...newIngredient } = data
 
     await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
   })

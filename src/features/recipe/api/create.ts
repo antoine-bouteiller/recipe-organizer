@@ -12,10 +12,8 @@ import { uploadFile, uploadVideo } from '@/lib/r2'
 import { isNotEmpty } from '@/utils/array'
 import { parseFormData } from '@/utils/form-data'
 
-import { AUTO_TAGS, RECIPE_TAGS } from '../utils/constants'
+import { RECIPE_TAGS } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
-
-const MANUAL_TAGS = RECIPE_TAGS.filter((tag) => !AUTO_TAGS.includes(tag as (typeof AUTO_TAGS)[number]))
 
 const recipeSchema = z.object({
   image: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]),
@@ -44,7 +42,7 @@ const recipeSchema = z.object({
     .optional(),
   name: z.string().min(2),
   servings: z.number().min(0),
-  tags: z.array(z.enum(MANUAL_TAGS as unknown as readonly [string, ...string[]])),
+  tags: z.array(z.enum(RECIPE_TAGS)),
   video: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]).optional(),
 })
 
