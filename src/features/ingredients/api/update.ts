@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -9,18 +9,18 @@ import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-import { ingredientSchema } from './create'
+import { type IngredientFormValues, ingredientSchema } from './create'
 
-const updateIngredientSchema = v.object({ ...ingredientSchema.entries, id: v.number() })
+const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
 
-export type UpdateIngredientFormValues = v.InferOutput<typeof updateIngredientSchema>
+export type UpdateIngredientFormValues = IngredientFormValues & { id: number }
 export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 
 const updateIngredient = createServerFn()
   .middleware([authGuard()])
   .inputValidator(updateIngredientSchema)
   .handler(async ({ data }) => {
-    const { id, ...newIngredient } = data
+    const { id, ...newIngredient } = data as UpdateIngredientFormValues
 
     await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
   })

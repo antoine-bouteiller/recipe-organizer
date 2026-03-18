@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
@@ -10,7 +10,7 @@ import { queryKeys } from '@/lib/query-keys'
 import { deleteFile } from '@/lib/r2'
 import { withServerError } from '@/utils/error-handler'
 
-const deleteRecipeSchema = v.number()
+const deleteRecipeSchema = z.number()
 
 const deleteRecipe = createServerFn({
   method: 'POST',

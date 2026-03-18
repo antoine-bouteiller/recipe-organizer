@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { inArray } from 'drizzle-orm'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -17,45 +17,45 @@ import { getTitle } from '../utils/get-recipe-title'
 
 const MANUAL_TAGS = RECIPE_TAGS.filter((tag) => !AUTO_TAGS.includes(tag as (typeof AUTO_TAGS)[number]))
 
-const recipeSchema = v.object({
-  image: v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })]),
-  ingredientGroups: v.array(
-    v.object({
-      _key: v.string(),
-      groupName: v.optional(v.string()),
-      ingredients: v.array(
-        v.object({
-          id: v.pipe(v.number(), v.minValue(0)),
-          quantity: v.pipe(v.number(), v.minValue(0)),
-          unitId: v.optional(v.pipe(v.number(), v.minValue(0))),
+const recipeSchema = z.object({
+  image: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]),
+  ingredientGroups: z.array(
+    z.object({
+      _key: z.string(),
+      groupName: z.string().optional(),
+      ingredients: z.array(
+        z.object({
+          id: z.number().min(0),
+          quantity: z.number().min(0),
+          unitId: z.number().min(0).optional(),
         })
       ),
     })
   ),
-  instructions: v.string(),
-  linkedRecipes: v.optional(
-    v.array(
-      v.object({
-        _key: v.optional(v.string()),
-        id: v.pipe(v.number(), v.minValue(0)),
-        ratio: v.pipe(v.number(), v.minValue(0)),
+  instructions: z.string(),
+  linkedRecipes: z
+    .array(
+      z.object({
+        _key: z.string().optional(),
+        id: z.number().min(0),
+        ratio: z.number().min(0),
       })
     )
-  ),
-  name: v.pipe(v.string(), v.minLength(2)),
-  servings: v.pipe(v.number(), v.minValue(0)),
-  tags: v.array(v.picklist(MANUAL_TAGS)),
-  video: v.optional(v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })])),
+    .optional(),
+  name: z.string().min(2),
+  servings: z.number().min(0),
+  tags: z.array(z.enum(MANUAL_TAGS as unknown as readonly [string, ...string[]])),
+  video: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]).optional(),
 })
 
-type RecipeFormValues = v.InferOutput<typeof recipeSchema>
+type RecipeFormValues = z.infer<typeof recipeSchema>
 type RecipeFormInput = Partial<RecipeFormValues>
 
 const createRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => v.parse(recipeSchema, parseFormData(formData)))
+  .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data, context }) => {
     const { image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id

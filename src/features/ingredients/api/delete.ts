@@ -1,15 +1,15 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-const deleteIngredientSchema = v.object({
-  id: v.number(),
+const deleteIngredientSchema = z.object({
+  id: z.number(),
 })
 
 const deleteIngredient = createServerFn()

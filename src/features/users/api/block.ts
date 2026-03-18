@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { toastError, toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -9,8 +9,8 @@ import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 
-const blockUserSchema = v.object({
-  id: v.string(),
+const blockUserSchema = z.object({
+  id: z.string(),
 })
 
 const blockUser = createServerFn()

@@ -1,20 +1,20 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { env as cloudflareEnv } from 'cloudflare:workers'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { cache } from '@/lib/cache-manager'
 
-const paramsSchema = v.object({ id: v.string() })
+const paramsSchema = z.object({ id: z.string() })
 
 export const Route = createFileRoute('/api/video/$id')({
   server: {
     handlers: {
       GET: ({ params, request }) => {
-        const result = v.safeParse(paramsSchema, params)
+        const result = paramsSchema.safeParse(params)
         if (!result.success) {
-          throw new Error(result.issues[0]?.message ?? 'Invalid params')
+          throw new Error(result.error?.issues[0]?.message ?? 'Invalid params')
         }
-        const { id } = result.output
+        const { id } = result.data
 
         return cache.getWithCache(request.url)(async () => {
           const file = await cloudflareEnv.R2_BUCKET.get(id)
@@ -31,11 +31,11 @@ export const Route = createFileRoute('/api/video/$id')({
         })
       },
       HEAD: ({ params, request }) => {
-        const result = v.safeParse(paramsSchema, params)
+        const result = paramsSchema.safeParse(params)
         if (!result.success) {
-          throw new Error(result.issues[0]?.message ?? 'Invalid params')
+          throw new Error(result.error?.issues[0]?.message ?? 'Invalid params')
         }
-        const { id } = result.output
+        const { id } = result.data
 
         return cache.getWithCache(request.url)(async () => {
           const file = await cloudflareEnv.R2_BUCKET.head(id)

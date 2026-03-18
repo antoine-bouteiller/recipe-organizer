@@ -1,6 +1,6 @@
 import { Toast } from '@base-ui/react/toast'
 import { CheckCircleIcon, CircleNotchIcon, InfoIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
-import { ValiError } from 'valibot'
+import { ZodError } from 'zod'
 
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
@@ -142,7 +142,7 @@ const ToastList = ({ position = 'bottom-right' }: { position: ToastPosition }) =
 }
 
 export const toastError = (message: string, error?: unknown) => {
-  if (error instanceof ValiError) {
+  if (error instanceof ZodError) {
     toastManager.add({
       description: error.message,
       title: message,

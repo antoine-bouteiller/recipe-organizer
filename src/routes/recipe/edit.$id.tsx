@@ -1,7 +1,7 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -180,11 +180,8 @@ const EditRecipePage = () => {
   )
 }
 
-const paramsSchema = v.object({
-  id: v.pipe(
-    v.string(),
-    v.transform((str) => Number.parseInt(str, 10))
-  ),
+const paramsSchema = z.object({
+  id: z.string().transform((str) => Number.parseInt(str, 10)),
 })
 
 export const Route = createFileRoute('/recipe/edit/$id')({
@@ -195,11 +192,11 @@ export const Route = createFileRoute('/recipe/edit/$id')({
   },
   component: EditRecipePage,
   loader: async ({ context, params }) => {
-    const result = v.safeParse(paramsSchema, params)
+    const result = paramsSchema.safeParse(params)
     if (!result.success) {
-      throw new Error(result.issues[0]?.message ?? 'Invalid id')
+      throw new Error(result.error?.issues[0]?.message ?? 'Invalid id')
     }
-    const { id } = result.output
+    const { id } = result.data
     await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())
