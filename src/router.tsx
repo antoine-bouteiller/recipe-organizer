@@ -1,12 +1,14 @@
 import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { z } from 'zod'
 
 import { DefaultErrorComponent } from '@/components/error/default-error-component'
 import { NotFound } from '@/components/error/not-found'
 
-import '@/utils/zod-fr'
 import { routeTree } from './routeTree.gen'
+
+z.config(z.locales.fr())
 
 declare module '@tanstack/react-router' {
   interface Register {
