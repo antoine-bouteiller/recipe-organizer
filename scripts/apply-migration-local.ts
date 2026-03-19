@@ -1,7 +1,6 @@
+import { execSync } from 'node:child_process'
 import { copyFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
-
-import { $ } from 'bun'
 
 const SOURCE_DIR = 'migrations'
 const TMP_DIR = 'migrations_tmp'
@@ -28,5 +27,5 @@ for (const folder of folders) {
   }
 }
 
-await $`wrangler d1 migrations apply recipe-organizer`
+execSync('wrangler d1 migrations apply recipe-organizer')
 rmSync(TMP_DIR, { recursive: true, force: true })

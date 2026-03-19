@@ -8,6 +8,7 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
 
 const viteConfig = defineConfig({
+  staged: { '*': 'vp check --fix' },
   lint: {
     options: { typeAware: true, typeCheck: true },
     plugins: ['typescript', 'react', 'unicorn'],

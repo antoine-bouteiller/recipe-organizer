@@ -6,7 +6,7 @@
       "@/*": ["./src/*"]
     },
     "lib": ["ESNext", "DOM", "DOM.Iterable", "webworker"],
-    "types": ["vite/client", "bun", "@serwist/vite/typings"]
+    "types": ["vite-plus/client", "@serwist/vite/typings"]
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
   "files": ["worker-configuration.d.ts"]
