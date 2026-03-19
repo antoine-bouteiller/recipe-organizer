@@ -45,9 +45,6 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^3.20.1
         version: 3.20.1
-      '@valibot/i18n':
-        specifier: ^1.0.0
-        version: 1.0.0(valibot@1.2.0(typescript@6.0.0-dev.20260314))
       '@vidstack/react':
         specifier: ^1.12.13
         version: 1.12.13(@types/react@19.2.14)(react@19.2.4)
@@ -72,9 +69,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
-      valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@6.0.0-dev.20260314)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
       zustand:
         specifier: ^5.0.11
         version: 5.0.11(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
@@ -2358,11 +2355,6 @@ packages:
     resolution: {integrity: sha512-CI0NhTrz4EBaa0U+HaaUZrJhPoso8sG7ZFya8uQoBA57fjzrjRSv87ekCjLZOFExN+gXE/z0xuN2QfH4H2HrLQ==}
     engines: {node: '>=20.0.0'}
 
-  '@valibot/i18n@1.0.0':
-    resolution: {integrity: sha512-daCwLqQOHAbUAWtWm1zE2JV6Gn3lqS3Qw/Rm4s+FGbwyfrk3ljee2eiZBVACFet3oanB2TZpZeLssppH3YxfiQ==}
-    peerDependencies:
-      valibot: ^1.0.0
-
   '@vidstack/react@1.12.13':
     resolution: {integrity: sha512-zyNydy1+HtoK6cJ8EmqFNkPPGHIFMrr2KH+ef3654EqXx4IcJ8A5LCNMXBuALQE8IMxtk040JMoR9OKyeXjBOQ==}
     engines: {node: '>=18'}
@@ -4046,14 +4038,6 @@ packages:
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
-
-  valibot@1.2.0:
-    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
-    peerDependencies:
-      typescript: '>=5'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   vite-plus@0.1.11:
     resolution: {integrity: sha512-mDUbWirSUWtS/diQiq1QkHGsMNQWu90kSH5s7RWqVnV9s1PRxQ1IcH6mIeOG7YzPJlfO1vQbONZRsOfdyj9IKw==}
@@ -6129,10 +6113,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@valibot/i18n@1.0.0(valibot@1.2.0(typescript@6.0.0-dev.20260314))':
-    dependencies:
-      valibot: 1.2.0(typescript@6.0.0-dev.20260314)
-
   '@vidstack/react@1.12.13(@types/react@19.2.14)(react@19.2.4)':
     dependencies:
       '@floating-ui/dom': 1.7.6
@@ -7694,10 +7674,6 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   uuid@8.3.2: {}
-
-  valibot@1.2.0(typescript@6.0.0-dev.20260314):
-    optionalDependencies:
-      typescript: 6.0.0-dev.20260314
 
   vite-plus@0.1.11(@types/node@25.5.0)(@voidzero-dev/vite-plus-core@0.1.12(@types/node@25.5.0)(esbuild@0.27.4)(jiti@2.6.1)(tsx@4.21.0)(typescript@6.0.0-dev.20260314)(yaml@2.8.2))(esbuild@0.27.4)(jiti@2.6.1)(tsx@4.21.0)(typescript@6.0.0-dev.20260314)(yaml@2.8.2):
     dependencies:

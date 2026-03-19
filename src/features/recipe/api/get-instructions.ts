@@ -1,12 +1,12 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
-const getRecipeInstructionsSchema = v.number()
+const getRecipeInstructionsSchema = z.number()
 
 const getRecipeInstructions = createServerFn({
   method: 'GET',

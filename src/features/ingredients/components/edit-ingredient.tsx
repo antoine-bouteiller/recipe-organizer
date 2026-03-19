@@ -2,7 +2,6 @@ import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
@@ -34,7 +33,7 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
     onSubmit: async (data) => {
       await updateMutation.mutateAsync(
         {
-          data: v.parse(updateIngredientSchema, data.value),
+          data: updateIngredientSchema.parse(data.value),
         },
         {
           onSuccess: () => {

@@ -1,13 +1,13 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 
-const getUsersListSchema = v.object({
-  status: v.optional(v.picklist(['pending', 'active', 'blocked']), 'active'),
+const getUsersListSchema = z.object({
+  status: z.enum(['pending', 'active', 'blocked']).default('active'),
 })
 
 const getUsersList = createServerFn({

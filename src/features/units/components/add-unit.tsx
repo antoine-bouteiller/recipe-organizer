@@ -1,7 +1,6 @@
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { type JSX, useState } from 'react'
-import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { createUnitOptions, type UnitFormInput, unitSchema } from '@/features/units/api/create'
@@ -27,7 +26,7 @@ export const AddUnit = ({ children, defaultValue }: AddUnitProps) => {
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
-          data: v.parse(unitSchema, value),
+          data: unitSchema.parse(value),
         },
         {
           onSuccess: () => {

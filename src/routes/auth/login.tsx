@@ -1,14 +1,14 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
-import * as v from 'valibot'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
-const searchSchema = v.object({ error: v.optional(v.string()) })
+const searchSchema = z.object({ error: z.string().optional() })
 
 const getErrorMessage = (error: string) => {
   if (error === 'signup_disabled') {
@@ -60,5 +60,5 @@ export const Route = createFileRoute('/auth/login')({
     }
   },
   component: LoginPage,
-  validateSearch: (search) => v.parse(searchSchema, search),
+  validateSearch: (search) => searchSchema.parse(search),
 })

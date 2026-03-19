@@ -1,7 +1,6 @@
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { type JSX, useState } from 'react'
-import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { createIngredientOptions, type IngredientFormInput, ingredientSchema } from '@/features/ingredients/api/create'
@@ -27,7 +26,7 @@ export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) =>
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
-          data: v.parse(ingredientSchema, value),
+          data: ingredientSchema.parse(value),
         },
         {
           onSuccess: () => {
