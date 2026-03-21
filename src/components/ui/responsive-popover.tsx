@@ -1,8 +1,9 @@
 import type { Popover as PopoverPrimitive } from '@base-ui/react/popover'
 import { createContext, useContext, type ReactNode } from 'react'
 
-import { Drawer, DrawerPopup, DrawerTrigger, type DrawerContentProps, type DrawerTriggerProps } from '@/components/ui/drawer'
-import { Popover, PopoverContent, PopoverTrigger, type PopoverContentProps } from '@/components/ui/popover'
+import type { DrawerPrimitive } from '@/components/ui/drawer'
+import { Drawer, DrawerPopup, DrawerTrigger } from '@/components/ui/drawer'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 interface ResponsivePopoverContextValue {
@@ -24,18 +25,17 @@ const useResponsivePopoverContext = () => {
 interface ResponsivePopoverProps {
   children?: ReactNode
   defaultOpen?: boolean
-  nested?: boolean
   onOpenChange?: (open: boolean) => void
   open?: boolean
 }
 
-const ResponsivePopover = ({ nested, ...props }: ResponsivePopoverProps) => {
+const ResponsivePopover = ({ ...props }: ResponsivePopoverProps) => {
   const isMobile = useIsMobile()
 
   if (isMobile) {
     return (
       <ResponsivePopoverContext.Provider value={{ isMobile }}>
-        <Drawer nested={nested} {...props} />
+        <Drawer {...props} />
       </ResponsivePopoverContext.Provider>
     )
   }
@@ -47,7 +47,7 @@ const ResponsivePopover = ({ nested, ...props }: ResponsivePopoverProps) => {
   )
 }
 
-const ResponsivePopoverTrigger = ({ ...props }: DrawerTriggerProps & PopoverPrimitive.Trigger.Props) => {
+const ResponsivePopoverTrigger = ({ ...props }: DrawerPrimitive.Trigger.Props & PopoverPrimitive.Trigger.Props) => {
   const { isMobile } = useResponsivePopoverContext()
 
   if (isMobile) {
@@ -57,7 +57,7 @@ const ResponsivePopoverTrigger = ({ ...props }: DrawerTriggerProps & PopoverPrim
   return <PopoverTrigger {...props} />
 }
 
-const ResponsivePopoverContent = ({ ...props }: DrawerContentProps & PopoverContentProps & { noPadding?: boolean }) => {
+const ResponsivePopoverContent = (props: PopoverPrimitive.Popup.Props & DrawerPrimitive.Content.Props) => {
   const { isMobile } = useResponsivePopoverContext()
 
   if (isMobile) {

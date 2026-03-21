@@ -1,6 +1,5 @@
-import { type ComponentPropsWithoutRef, type ReactNode, useMemo, useState } from 'react'
+import { useMemo, useState, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 
-import type { SubrecipeNodeData } from '@/components/tiptap/types/subrecipe'
 import { Button } from '@/components/ui/button'
 import { Combobox } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
@@ -14,10 +13,11 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
+import type { SubrecipeNodeData } from '@/components/ui/tiptap/types/subrecipe'
 import { useLinkedRecipes } from '@/contexts/linked-recipes-context'
 import { useRecipeOptions } from '@/hooks/use-options'
 
-import type { DialogTrigger } from '../ui/dialog'
+import type { DialogTrigger } from '../../dialog'
 
 interface SubrecipeDialogProps {
   children: ReactNode
@@ -34,7 +34,6 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
   const linkedRecipeIds = useLinkedRecipes()
   const allRecipesOptions = useRecipeOptions()
 
-  // Filter recipes to only show linked recipes
   const recipesOptions = useMemo(
     () => allRecipesOptions.filter((option) => linkedRecipeIds.includes(option.value)),
     [allRecipesOptions, linkedRecipeIds]

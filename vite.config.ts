@@ -121,7 +121,6 @@ const viteConfig = defineConfig({
       rollupFormat: 'iife',
     }),
     devtools(),
-    // @ts-expect-error
     babel({ presets: [reactCompilerPreset()] }),
   ],
   server: {

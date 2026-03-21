@@ -3,12 +3,12 @@ import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap
 import StarterKit from '@tiptap/starter-kit'
 import { useContext } from 'react'
 
-import { MagimixProgramNode } from '@/components/tiptap/magimix-program-node'
-import { SubrecipeNode } from '@/components/tiptap/subrecipe-node'
+import { Toggle } from '@/components/ui/toggle'
+import { ToolbarButton } from '@/components/ui/toolbar'
 import { cn } from '@/utils/cn'
 
-import { Toggle } from './toggle'
-import { ToolbarButton } from './toolbar'
+import { MagimixProgramNode } from './components/magimix-program-node'
+import { SubrecipeNode } from './components/subrecipe-node'
 
 // Import only the extensions we actually use (instead of StarterKit)
 const extensions = [StarterKit, MagimixProgramNode, SubrecipeNode]

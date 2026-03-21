@@ -2,9 +2,9 @@ import { CookingPotIcon } from '@phosphor-icons/react'
 import { EditorContext } from '@tiptap/react'
 import { useContext } from 'react'
 
-import type { MagimixProgramData } from '@/components/tiptap/types/magimix'
+import type { MagimixProgramData } from '@/components/ui/tiptap/types/magimix'
 
-import { Toggle } from '../ui/toggle'
+import { Toggle } from '../../toggle'
 import { MagimixProgramDialog } from './magimix-program-dialog'
 
 export const MagimixProgramButton = () => {

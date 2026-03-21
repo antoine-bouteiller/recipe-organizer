@@ -16,7 +16,6 @@ interface Option<T> {
 interface ComboboxProps<T extends ValueOptions> extends Omit<React.ComponentProps<'button'>, 'onChange'> {
   addNew?: (inputValue: string) => ReactNode
   disabled?: boolean
-  nested?: boolean
   onChange?: (option: Option<T>) => void
   options: Option<T>[]
   placeholder?: string
@@ -27,7 +26,6 @@ interface ComboboxProps<T extends ValueOptions> extends Omit<React.ComponentProp
 const Combobox = <T extends ValueOptions>({
   addNew,
   className,
-  nested = false,
   onChange,
   options,
   placeholder = 'Sélectionner une option',
@@ -38,7 +36,7 @@ const Combobox = <T extends ValueOptions>({
   const [open, setOpen] = useState(false)
 
   return (
-    <ResponsivePopover nested={nested} onOpenChange={setOpen} open={open}>
+    <ResponsivePopover onOpenChange={setOpen} open={open}>
       <ResponsivePopoverTrigger
         render={
           <Button
@@ -55,7 +53,7 @@ const Combobox = <T extends ValueOptions>({
         <span className={cn('truncate')}>{value ? options.find((option) => option.value === value)?.label : placeholder}</span>
         <CaretDownIcon />
       </ResponsivePopoverTrigger>
-      <ResponsivePopoverContent className="md:w-(--anchor-width)" noPadding>
+      <ResponsivePopoverContent className="md:w-(--anchor-width)">
         <ComboboxContent
           addNew={addNew}
           onChange={onChange}

@@ -11,7 +11,8 @@
       "mcp__github__search_code",
       "mcp__github__get_file_contents",
       "Bash(wc:*)",
-      "Bash(bunx drizzle-kit:*)"
+      "Bash(bunx drizzle-kit:*)",
+      "Bash(vp lint:*)"
     ]
   },
   "mcpServers": {

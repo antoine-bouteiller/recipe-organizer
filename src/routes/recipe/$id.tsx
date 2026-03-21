@@ -114,7 +114,7 @@ const RecipePage = () => {
             <ResponsivePopoverTrigger render={<Button size="icon" variant="outline" />}>
               <DotsThreeVerticalIcon className="text-primary" weight="bold" />
             </ResponsivePopoverTrigger>
-            <ResponsivePopoverContent align="end">
+            <ResponsivePopoverContent>
               <div className="flex flex-col items-start gap-2 p-4 md:p-0">
                 <Button
                   className="w-full justify-start"

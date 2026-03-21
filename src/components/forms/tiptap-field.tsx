@@ -4,8 +4,8 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Tiptap, TiptapButton, TiptapContent } from '@/components/ui/tiptap'
 import { useFieldContext } from '@/hooks/use-form-context'
 
-import { MagimixProgramButton } from '../tiptap/magimix-program-button'
-import { SubrecipeButton } from '../tiptap/subrecipe-button'
+import { MagimixProgramButton } from '../ui/tiptap/components/magimix-program-button'
+import { SubrecipeButton } from '../ui/tiptap/components/subrecipe-button'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../ui/toolbar'
 
 interface TiptapProps {

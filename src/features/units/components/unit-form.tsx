@@ -41,7 +41,6 @@ export const UnitForm = withForm({
               <ComboboxField
                 disabled={isSubmitting}
                 label="Unité parente (optionnel)"
-                nested
                 options={availableParentUnits}
                 placeholder="Sélectionner une unité parente"
                 searchPlaceholder="Rechercher une unité"

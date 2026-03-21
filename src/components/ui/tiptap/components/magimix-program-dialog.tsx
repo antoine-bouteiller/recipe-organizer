@@ -2,12 +2,12 @@ import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useState, type ComponentPropsWithoutRef } from 'react'
 import { z } from 'zod'
 
-import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/components/tiptap/types/magimix'
+import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/components/ui/tiptap/types/magimix'
 import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
 
-import { getFormDialog } from '../dialogs/form-dialog'
-import type { DialogTrigger } from '../ui/dialog'
+import type { DialogTrigger } from '../../dialog'
 
 interface MagimixProgramDialogProps {
   initialData?: MagimixProgramFormInput

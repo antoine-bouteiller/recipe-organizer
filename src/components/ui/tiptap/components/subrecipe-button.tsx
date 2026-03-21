@@ -2,9 +2,9 @@ import { BookOpenIcon } from '@phosphor-icons/react'
 import { EditorContext } from '@tiptap/react'
 import { useContext } from 'react'
 
-import type { SubrecipeNodeData } from '@/components/tiptap/types/subrecipe'
+import type { SubrecipeNodeData } from '@/components/ui/tiptap/types/subrecipe'
 
-import { Toggle } from '../ui/toggle'
+import { Toggle } from '../../toggle'
 import { SubrecipeDialog } from './subrecipe-dialog'
 
 export const SubrecipeButton = () => {
