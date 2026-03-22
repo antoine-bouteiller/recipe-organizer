@@ -1,19 +1,18 @@
 import { Separator as SeparatorPrimitive } from '@base-ui/react/separator'
-import * as React from 'react'
+import type React from 'react'
 
 import { cn } from '@/utils/cn'
 
-const Separator = ({ className, ...props }: React.ComponentProps<typeof SeparatorPrimitive>) => (
+export const Separator = ({ className, orientation = 'horizontal', ...props }: SeparatorPrimitive.Props): React.ReactElement => (
   <SeparatorPrimitive
     className={cn(
-      `shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px`,
+      "shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:not-[[class^='h-']]:not-[[class*='_h-']]:self-stretch",
       className
     )}
     data-slot="separator"
+    orientation={orientation}
     {...props}
   />
 )
 
-Separator.displayName = SeparatorPrimitive.displayName
-
-export { Separator }
+export { SeparatorPrimitive }

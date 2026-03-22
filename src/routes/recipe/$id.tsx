@@ -12,6 +12,7 @@ import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
+import { recipeExtensions } from '@/features/recipe/components/tiptap/extensions'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
@@ -157,7 +158,7 @@ const RecipePage = () => {
             </TabsPanel>
 
             <TabsPanel className="p-2" value="preparation">
-              <Tiptap content={recipe.instructions} readOnly>
+              <Tiptap content={recipe.instructions} extensions={recipeExtensions} readOnly>
                 <TiptapContent />
               </Tiptap>
             </TabsPanel>
@@ -172,7 +173,7 @@ const RecipePage = () => {
 
           <div className="col-span-3 rounded-xl border px-8 pb-8">
             <h2>Préparation</h2>
-            <Tiptap content={recipe.instructions} readOnly>
+            <Tiptap content={recipe.instructions} extensions={recipeExtensions} readOnly>
               <TiptapContent className="pb-4" />
             </Tiptap>
           </div>

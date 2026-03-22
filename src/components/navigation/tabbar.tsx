@@ -14,7 +14,7 @@ export const TabBar = () => {
       <TabsList variant="tabbar">
         {items.map((item) => (
           <TabsTab
-            className="h-11 text-primary aria-selected:text-primary"
+            className="h-11 text-primary data-active:text-primary"
             key={item.label}
             nativeButton={false}
             render={<Link {...item.linkProps} />}

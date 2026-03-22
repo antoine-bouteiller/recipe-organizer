@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardHeader, CardPanel, CardTitle } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
@@ -42,12 +42,12 @@ const LoginPage = () => {
           <CardTitle>Connexion</CardTitle>
           <CardDescription>Connectez-vous pour accéder au portail administrateur</CardDescription>
         </CardHeader>
-        <CardContent className="flex-1">
+        <CardPanel className="flex-1">
           <Button className="w-full" onClick={() => login()} variant="outline">
             <img alt="Google" className="h-4" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg" /> Connexion avec
             Google
           </Button>
-        </CardContent>
+        </CardPanel>
       </Card>
     </div>
   )

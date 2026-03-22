@@ -1,10 +1,11 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
 import { cva, type VariantProps } from 'class-variance-authority'
+import type React from 'react'
 
 import { cn } from '@/utils/cn'
 
-const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props) => (
-  <TabsPrimitive.Root className={cn(`flex flex-col gap-2 data-[orientation=vertical]:flex-row`, className)} data-slot="tabs" {...props} />
+export const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props): React.ReactElement => (
+  <TabsPrimitive.Root className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)} data-slot="tabs" {...props} />
 )
 
 const tabListVariants = cva(
@@ -62,29 +63,31 @@ const tabIndicatorVariants = cva(
   }
 )
 
-const TabsList = ({ children, className, variant = 'default', ...props }: TabsPrimitive.List.Props & VariantProps<typeof tabListVariants>) => (
+export const TabsList = ({
+  variant = 'default',
+  className,
+  children,
+  ...props
+}: TabsPrimitive.List.Props & VariantProps<typeof tabListVariants>): React.ReactElement => (
   <TabsPrimitive.List className={cn(tabListVariants({ variant }), className)} data-slot="tabs-list" {...props}>
     {children}
     <TabsPrimitive.Indicator className={cn(tabIndicatorVariants({ variant }))} data-slot="tab-indicator" />
   </TabsPrimitive.List>
 )
 
-const TabsTab = ({ className, ...props }: TabsPrimitive.Tab.Props) => (
+export const TabsTab = ({ className, ...props }: TabsPrimitive.Tab.Props): React.ReactElement => (
   <TabsPrimitive.Tab
     className={cn(
-      `flex flex-1 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent text-sm font-medium whitespace-nowrap transition-[color,background-color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-ring data-disabled:pointer-events-none data-disabled:opacity-64 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4`,
-      `hover:text-muted-foreground aria-selected:text-foreground`,
-      'gap-1.5 px-[calc(--spacing(2.5)-1px)] py-[calc(--spacing(1.5)-1px)]',
-      `data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start`,
+      "relative flex h-9 shrink-0 grow cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-[calc(--spacing(2.5)-1px)] font-medium text-base outline-none transition-[color,background-color,box-shadow] hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring data-disabled:pointer-events-none data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start data-active:text-foreground data-disabled:opacity-64 sm:h-8 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0",
       className
     )}
-    data-slot="tabs-trigger"
+    data-slot="tabs-tab"
     {...props}
   />
 )
 
-const TabsPanel = ({ className, ...props }: TabsPrimitive.Panel.Props) => (
+export const TabsPanel = ({ className, ...props }: TabsPrimitive.Panel.Props): React.ReactElement => (
   <TabsPrimitive.Panel className={cn('flex-1 outline-none', className)} data-slot="tabs-content" {...props} />
 )
 
-export { Tabs, TabsList, TabsPanel, TabsTab }
+export { TabsPrimitive }

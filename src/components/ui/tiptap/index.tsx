@@ -1,17 +1,11 @@
-import type { CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
+import type { AnyExtension, CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
 import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 
 import { Toggle } from '@/components/ui/toggle'
 import { ToolbarButton } from '@/components/ui/toolbar'
 import { cn } from '@/utils/cn'
-
-import { MagimixProgramNode } from './components/magimix-program-node'
-import { SubrecipeNode } from './components/subrecipe-node'
-
-// Import only the extensions we actually use (instead of StarterKit)
-const extensions = [StarterKit, MagimixProgramNode, SubrecipeNode]
 
 type Command = 'bold' | 'bulletList' | 'italic' | 'orderedList' | 'redo' | 'taskList' | 'underline' | 'undo'
 
@@ -85,11 +79,14 @@ const TiptapButton = ({ children, command }: TiptapButtonProps) => {
 interface TiptapProps {
   children?: React.ReactNode
   content?: string
+  extensions?: AnyExtension[]
   onChange?: (content: string) => void
   readOnly?: boolean
 }
 
-const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
+const Tiptap = ({ children, content, extensions: extraExtensions, onChange, readOnly }: TiptapProps) => {
+  const allExtensions = useMemo(() => (extraExtensions ? [StarterKit, ...extraExtensions] : [StarterKit]), [extraExtensions])
+
   const contextEditor = useEditor({
     autofocus: false,
     content,
@@ -106,7 +103,7 @@ const Tiptap = ({ children, content, onChange, readOnly }: TiptapProps) => {
         return false
       },
     },
-    extensions: extensions,
+    extensions: allExtensions,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML())

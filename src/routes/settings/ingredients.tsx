@@ -6,13 +6,13 @@ import { useState } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Item, ItemActions, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from '@/components/ui/item'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/components/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/components/edit-ingredient'
+import { IngredientBadge } from '@/features/ingredients/components/ingredient-badge'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/features/ingredients/utils/constants'
 
 const IngredientsManagement = () => {
@@ -50,10 +50,10 @@ const IngredientsManagement = () => {
                   <ItemContent>
                     <ItemTitle>
                       <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
-                      <Badge className="aspect-square md:aspect-auto" variant={ingredient.category}>
+                      <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
                         {ingredientCategoryIcons[ingredient.category]}
                         <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
-                      </Badge>
+                      </IngredientBadge>
                     </ItemTitle>
                   </ItemContent>
                   {isAdmin && (

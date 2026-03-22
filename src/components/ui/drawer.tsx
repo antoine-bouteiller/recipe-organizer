@@ -1,5 +1,3 @@
-'use client'
-
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox'
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
 import { mergeProps } from '@base-ui/react/merge-props'
@@ -87,6 +85,7 @@ export const DrawerBackdrop = ({ className, ...props }: DrawerPrimitive.Backdrop
 )
 
 export const DrawerViewport = ({
+  className: _className,
   position,
   variant = 'default',
   ...props

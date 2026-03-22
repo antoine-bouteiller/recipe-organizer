@@ -24,7 +24,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backg
           </>
         )}
         {withGoBack && (
-          <Button onClick={() => router.history.back()} variant="ghost" size="icon" className="-ml-4">
+          <Button onClick={() => router.history.back()} variant="ghost" size="icon" className="-ml-4 text-white">
             <ArrowLeftIcon />
           </Button>
         )}

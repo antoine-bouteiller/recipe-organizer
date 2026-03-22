@@ -14,6 +14,10 @@ export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredi
   const handleDelete = () => deleteMutation.mutate({ data: { id: ingredientId } })
 
   return (
-    <DeleteDialog description={`Êtes-vous sûr de vouloir supprimer l'${ingredientName} ?`} onDelete={handleDelete} title="Supprimer l'ingrédient" />
+    <DeleteDialog
+      description={`Êtes-vous sûr de vouloir supprimer l'ingrédient ${ingredientName} ?`}
+      onDelete={handleDelete}
+      title="Supprimer l'ingrédient"
+    />
   )
 }

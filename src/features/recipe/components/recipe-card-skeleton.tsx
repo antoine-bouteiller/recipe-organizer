@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardHeader, CardPanel, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export const RecipeCardSkeleton = () => (
@@ -13,8 +13,8 @@ export const RecipeCardSkeleton = () => (
         <Skeleton className="h-5 w-16 rounded-full" />
       </CardDescription>
     </CardHeader>
-    <CardContent className="relative z-10 px-4">
+    <CardPanel className="relative z-10 px-4">
       <Skeleton className="h-9 w-full rounded-md" />
-    </CardContent>
+    </CardPanel>
   </Card>
 )

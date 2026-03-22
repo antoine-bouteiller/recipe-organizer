@@ -1,5 +1,3 @@
-'use client'
-
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { useEffect, useLayoutEffect } from 'react'
 

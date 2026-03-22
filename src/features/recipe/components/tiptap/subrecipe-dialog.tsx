@@ -1,7 +1,8 @@
 import { useMemo, useState, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Combobox } from '@/components/ui/combobox'
+import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/components/ui/combobox'
+import type { DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -13,11 +14,10 @@ import {
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
-import type { SubrecipeNodeData } from '@/components/ui/tiptap/types/subrecipe'
 import { useLinkedRecipes } from '@/contexts/linked-recipes-context'
+import type { SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
+import type { Option } from '@/hooks/use-options'
 import { useRecipeOptions } from '@/hooks/use-options'
-
-import type { DialogTrigger } from '../../dialog'
 
 interface SubrecipeDialogProps {
   children: ReactNode
@@ -41,6 +41,11 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
 
   const [selectedRecipe, setSelectedRecipe] = useState<SubrecipeNodeData | undefined>(initialData)
 
+  const selectedOption = useMemo(
+    () => recipesOptions.find((opt) => opt.value === selectedRecipe?.recipeId) ?? null,
+    [recipesOptions, selectedRecipe?.recipeId]
+  )
+
   const handleSubmit = () => {
     if (selectedRecipe) {
       onSubmit(selectedRecipe)
@@ -61,20 +66,34 @@ export const SubrecipeDialog = ({ children, className, initialData, onSubmit, su
         <div className="flex flex-col gap-4 px-4 py-4 md:px-0">
           <div className="flex flex-col gap-2">
             <Label>Recette</Label>
-            <Combobox
-              onChange={(option) =>
-                setSelectedRecipe((prev) => ({
-                  hideFirstNodes: prev?.hideFirstNodes,
-                  hideLastNodes: prev?.hideLastNodes,
-                  recipeId: option.value,
-                  recipeName: option.label,
-                }))
+            <Combobox<Option<number>>
+              items={recipesOptions}
+              onValueChange={(option) =>
+                setSelectedRecipe((prev) =>
+                  option
+                    ? {
+                        hideFirstNodes: prev?.hideFirstNodes,
+                        hideLastNodes: prev?.hideLastNodes,
+                        recipeId: option.value,
+                        recipeName: option.label,
+                      }
+                    : undefined
+                )
               }
-              options={recipesOptions}
-              placeholder="Sélectionner une recette"
-              searchPlaceholder="Rechercher une recette"
-              value={selectedRecipe?.recipeId}
-            />
+              value={selectedOption}
+            >
+              <ComboboxInput placeholder="Sélectionner une recette" showClear={Boolean(selectedOption)} />
+              <ComboboxPopup>
+                <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
+                <ComboboxList>
+                  {(item) => (
+                    <ComboboxItem key={item.value} value={item}>
+                      {item.label}
+                    </ComboboxItem>
+                  )}
+                </ComboboxList>
+              </ComboboxPopup>
+            </Combobox>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

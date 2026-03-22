@@ -3,11 +3,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { toastError, toastManager } from '@/components/ui/toast'
+import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
+import { toastError } from '@/lib/toast-helpers'
 
 const approveUserSchema = z.object({
   id: z.string(),

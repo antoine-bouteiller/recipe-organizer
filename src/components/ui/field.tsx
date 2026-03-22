@@ -1,41 +1,33 @@
 import { Field as FieldPrimitive } from '@base-ui/react/field'
+import type React from 'react'
 
-import { useFormContext } from '@/hooks/use-form-context'
 import { cn } from '@/utils/cn'
 
-import { Button } from './button'
-import { Spinner } from './spinner'
-
-const Field = ({ className, ...props }: FieldPrimitive.Root.Props) => (
-  <FieldPrimitive.Root className={cn('flex w-full flex-1 flex-col items-start gap-2', className)} data-slot="field" {...props} />
+export const Field = ({ className, ...props }: FieldPrimitive.Root.Props): React.ReactElement => (
+  <FieldPrimitive.Root className={cn('flex flex-col items-start gap-2 w-full', className)} data-slot="field" {...props} />
 )
 
-const FieldLabel = ({ className, ...props }: FieldPrimitive.Label.Props) => (
-  <FieldPrimitive.Label className={cn('inline-flex items-center gap-2 text-sm/4', className)} data-slot="field-label" {...props} />
+export const FieldLabel = ({ className, ...props }: FieldPrimitive.Label.Props): React.ReactElement => (
+  <FieldPrimitive.Label
+    className={cn('inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4', className)}
+    data-slot="field-label"
+    {...props}
+  />
 )
 
-const FieldDescription = ({ className, ...props }: FieldPrimitive.Description.Props) => (
-  <FieldPrimitive.Description className={cn('text-xs text-muted-foreground', className)} data-slot="field-description" {...props} />
+export const FieldItem = ({ className, ...props }: FieldPrimitive.Item.Props): React.ReactElement => (
+  <FieldPrimitive.Item className={cn('flex', className)} data-slot="field-item" {...props} />
 )
 
-const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props) => (
-  <FieldPrimitive.Error className={cn('text-xs text-destructive-foreground', className)} data-slot="field-error" {...props} />
+export const FieldDescription = ({ className, ...props }: FieldPrimitive.Description.Props): React.ReactElement => (
+  <FieldPrimitive.Description className={cn('text-muted-foreground text-xs', className)} data-slot="field-description" {...props} />
 )
-const FormSubmit = ({ label }: { label: string }) => {
-  const form = useFormContext()
-  return (
-    <form.Subscribe>
-      {({ isSubmitting }) => (
-        <Button disabled={isSubmitting} type="submit">
-          {isSubmitting && <Spinner />}
-          {label}
-        </Button>
-      )}
-    </form.Subscribe>
-  )
-}
 
-const FieldControl = FieldPrimitive.Control
-const FieldValidity = FieldPrimitive.Validity
+export const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props): React.ReactElement => (
+  <FieldPrimitive.Error className={cn('text-destructive-foreground text-xs', className)} data-slot="field-error" {...props} />
+)
 
-export { Field, FieldControl, FieldDescription, FieldError, FieldLabel, FieldValidity, FormSubmit }
+export const FieldControl: typeof FieldPrimitive.Control = FieldPrimitive.Control
+export const FieldValidity: typeof FieldPrimitive.Validity = FieldPrimitive.Validity
+
+export { FieldPrimitive }

@@ -1,17 +1,21 @@
 import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/react-query'
 
-import type { Option } from '@/components/ui/combobox'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 
+export interface Option<T = number | undefined> {
+  label: string
+  value: T
+}
+
 const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(
   getQueryOptions: () => UseQueryOptions<TQueryOptionData, TError, TData, TQueryKey>,
-  mapFn: (item: TData[number]) => Option<number | undefined>
+  mapFn: (item: TData[number]) => Option
 ) => {
   function useOptions(props?: { allowEmpty?: false; filter?: (item: TData[number]) => boolean }): Option<number>[]
 
-  function useOptions(props: { allowEmpty: true; filter?: (item: TData[number]) => boolean }): Option<number | undefined>[]
+  function useOptions(props: { allowEmpty: true; filter?: (item: TData[number]) => boolean }): Option[]
 
   function useOptions({
     allowEmpty,
@@ -19,11 +23,11 @@ const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQu
   }: {
     allowEmpty?: boolean
     filter?: (item: TData[number]) => boolean
-  } = {}): Option<number | undefined>[] {
+  } = {}): Option[] {
     const { data } = useQuery(getQueryOptions())
 
     const items = data ?? []
-    const options: Option<number | undefined>[] = items.filter(filter).map(mapFn)
+    const options: Option[] = items.filter(filter).map(mapFn)
 
     if (allowEmpty) {
       options.unshift({ label: 'Aucune', value: undefined })

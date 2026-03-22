@@ -16,13 +16,20 @@ interface NumberFieldProps {
   max?: number
   min?: number
   placeholder?: string
+  className?: string
 }
 
-export const NumberField = ({ allowDecimals = false, disabled, label, max, min, placeholder }: NumberFieldProps) => {
+export const NumberField = ({ allowDecimals = false, disabled, label, max, min, placeholder, className }: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
+    <Field
+      dirty={field.state.meta.isDirty}
+      invalid={!field.state.meta.isValid}
+      name={field.name}
+      touched={field.state.meta.isTouched}
+      className={className}
+    >
       <NumberInput
         defaultValue={field.state.value}
         disabled={disabled}

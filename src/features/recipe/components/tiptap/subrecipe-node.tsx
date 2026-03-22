@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { mergeAttributes, Node, NodeViewWrapper, ReactNodeViewRenderer as reactNodeViewRenderer, type ReactNodeViewProps } from '@tiptap/react'
 
 import { Spinner } from '@/components/ui/spinner'
-import type { SubrecipeNodeData } from '@/components/ui/tiptap/types/subrecipe'
+import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeInstructionsOptions } from '@/features/recipe/api/get-instructions'
+import type { SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 
-import { Tiptap, TiptapContent } from '../index'
 import { SubrecipeDialog } from './subrecipe-dialog'
 
 declare module '@tiptap/core' {

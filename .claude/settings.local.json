@@ -12,7 +12,16 @@
       "mcp__github__get_file_contents",
       "Bash(wc:*)",
       "Bash(bunx drizzle-kit:*)",
-      "Bash(vp lint:*)"
+      "Bash(vp lint:*)",
+      "WebFetch(domain:coss.com)",
+      "Bash(bunx:*)",
+      "Bash(git checkout:*)",
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i '' \"s|import { toastError, toastManager } from ''@/components/ui/toast''|import { toastManager } from ''@/components/ui/toast''\\\\nimport { toastError } from ''@/lib/toast-helpers''|\" \"$f\")",
+      "Bash(echo \"Fixed: $f\")",
+      "Bash(done)",
+      "Bash(vp check:*)"
     ]
   },
   "mcpServers": {

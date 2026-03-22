@@ -3,6 +3,7 @@ import { useStore } from '@tanstack/react-form'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
@@ -11,6 +12,9 @@ import { useRecipeOptions } from '@/hooks/use-options'
 import { RECIPE_TAG_LABELS, RECIPE_TAGS } from '../utils/constants'
 import { recipeDefaultValues } from '../utils/form'
 import { IngredientGroupField } from './ingredient-group-field'
+import { recipeExtensions } from './tiptap/extensions'
+import { MagimixProgramButton } from './tiptap/magimix-program-button'
+import { SubrecipeButton } from './tiptap/subrecipe-button'
 
 const tagItems = RECIPE_TAGS.map((tag) => ({
   label: RECIPE_TAG_LABELS[tag],
@@ -48,7 +52,7 @@ export const RecipeForm = withForm({
               <>
                 {field.state.value?.map((linkedRecipe, index) => (
                   <div className="flex gap-2" key={linkedRecipe.id}>
-                    <div className="flex flex-1 gap-2">
+                    <div className="flex flex-1 gap-2 overflow-hidden">
                       <AppField name={`linkedRecipes[${index}].id`}>
                         {({ ComboboxField }) => (
                           <ComboboxField
@@ -56,12 +60,12 @@ export const RecipeForm = withForm({
                             options={recipeOptions}
                             placeholder="Sélectionner une sous-recette"
                             searchPlaceholder="Rechercher une sous-recette"
-                            fieldClassName="flex-2"
+                            className="flex-1 overflow-hidden"
                           />
                         )}
                       </AppField>
                       <AppField name={`linkedRecipes[${index}].ratio`}>
-                        {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />}
+                        {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" className="w-28 shrink-0" />}
                       </AppField>
                     </div>
                     <Button disabled={isSubmitting} onClick={() => field.removeValue(index)} size="icon" type="button" variant="destructive-outline">
@@ -139,7 +143,24 @@ export const RecipeForm = withForm({
         </div>
 
         <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
-          <AppField name="instructions">{({ TiptapField }) => <TiptapField disabled={isSubmitting} label="Instructions" />}</AppField>
+          <AppField name="instructions">
+            {({ TiptapField }) => (
+              <TiptapField
+                disabled={isSubmitting}
+                extensions={recipeExtensions}
+                extraToolbar={
+                  <>
+                    <ToolbarSeparator />
+                    <ToolbarGroup>
+                      <MagimixProgramButton />
+                      <SubrecipeButton />
+                    </ToolbarGroup>
+                  </>
+                }
+                label="Instructions"
+              />
+            )}
+          </AppField>
         </LinkedRecipesProvider>
       </>
     )

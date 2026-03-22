@@ -3,11 +3,10 @@ import { useState, type ComponentPropsWithoutRef } from 'react'
 import { z } from 'zod'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/components/ui/tiptap/types/magimix'
+import type { DialogTrigger } from '@/components/ui/dialog'
+import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
-
-import type { DialogTrigger } from '../../dialog'
 
 interface MagimixProgramDialogProps {
   initialData?: MagimixProgramFormInput

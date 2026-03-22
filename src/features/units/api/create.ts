@@ -2,11 +2,12 @@ import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { toastError, toastManager } from '@/components/ui/toast'
+import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { unit } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
+import { toastError } from '@/lib/toast-helpers'
 
 const unitSchema = z.object({
   factor: z.number().min(0).optional(),

@@ -3,16 +3,17 @@ import { createServerFn } from '@tanstack/react-start'
 import { inArray } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { toastError, toastManager } from '@/components/ui/toast'
+import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { uploadFile, uploadVideo } from '@/lib/r2'
+import { toastError } from '@/lib/toast-helpers'
 import { isNotEmpty } from '@/utils/array'
 import { parseFormData } from '@/utils/form-data'
 
-import { RECIPE_TAGS } from '../utils/constants'
+import { RECIPE_TAGS, type RecipeTag } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
 
 const recipeSchema = z.object({
@@ -93,7 +94,7 @@ const createRecipe = createServerFn({
     const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
     const isMagimix = instructions.includes('data-type="magimix-program"')
 
-    const autoTags: string[] = []
+    const autoTags: RecipeTag[] = []
     if (isVegetarian && !tags.includes('dessert')) {
       autoTags.push('vegetarian')
     }
