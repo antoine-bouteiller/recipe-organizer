@@ -1,5 +1,18 @@
+import type { AnyRouter } from '@tanstack/react-router'
 import { useRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
+
+const waitForRouterResolved = (router: AnyRouter) =>
+  new Promise<void>((resolve) => {
+    const unsub = router.subscribe('onResolved', () => {
+      unsub()
+      resolve()
+    })
+  })
+
+const redispatchPopstate = (state: PopStateEvent['state']) => {
+  globalThis.dispatchEvent(new PopStateEvent('popstate', { state }))
+}
 
 /**
  * When enabled, intercepts popstate events (Android back button/gesture)
@@ -9,10 +22,7 @@ export const useBackViewTransition = (isEnabled: boolean) => {
   const router = useRouter()
 
   useEffect(() => {
-    if (!isEnabled) {
-      return
-    }
-    if (!document.startViewTransition) {
+    if (!isEnabled || !document.startViewTransition) {
       return
     }
 
@@ -28,18 +38,13 @@ export const useBackViewTransition = (isEnabled: boolean) => {
 
       document.documentElement.classList.add('back-transition')
 
+      // Re-dispatch inside the view transition so TanStack Router processes the navigation
       const transition = document.startViewTransition(async () => {
-        // Re-dispatch so TanStack Router processes the navigation
         isRedispatching = true
-        globalThis.dispatchEvent(new PopStateEvent('popstate', { state: event.state }))
+        redispatchPopstate(event.state)
         isRedispatching = false
 
-        await new Promise<void>((resolve) => {
-          const unsub = router.subscribe('onResolved', () => {
-            unsub()
-            resolve()
-          })
-        })
+        await waitForRouterResolved(router)
       })
 
       void transition.finished.then(() => {
