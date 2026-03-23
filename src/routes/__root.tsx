@@ -115,7 +115,7 @@ export const Route = createRootRouteWithContext<{
         charSet: 'utf8',
       },
       {
-        content: 'width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover',
+        content: 'width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content',
         name: 'viewport',
       },
       {
