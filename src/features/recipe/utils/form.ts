@@ -9,6 +9,7 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
       _key: crypto.randomUUID(),
       ingredients: [
         {
+          _key: crypto.randomUUID(),
           id: -1,
           quantity: 0,
         },

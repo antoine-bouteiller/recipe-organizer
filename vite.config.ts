@@ -102,6 +102,7 @@ const viteConfig = defineConfig({
     experimentalTailwindcss: {
       stylesheet: 'src/styles/app.css',
     },
+    ignorePatterns: ['src/routeTree.gen.ts'],
   },
   resolve: {
     tsconfigPaths: true,

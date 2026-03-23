@@ -8,7 +8,6 @@ import { useEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
-import { NavigationProgressBar } from '@/components/navigation/navigation-progress-bar'
 import { TabBar } from '@/components/navigation/tabbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
@@ -54,7 +53,6 @@ const RootComponent = () => {
             <Outlet />
           </main>
           <div className="fixed bottom-0 z-10 w-full md:hidden">
-            <NavigationProgressBar />
             <TabBar />
           </div>
         </ToastProvider>
