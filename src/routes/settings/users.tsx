@@ -101,5 +101,9 @@ const RouteComponent = () => <UsersManagement />
 
 export const Route = createFileRoute('/settings/users')({
   component: RouteComponent,
-  loader: ({ context }) => context.queryClient.ensureQueryData(getUserListOptions('active')),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(getUserListOptions('active'))
+    await context.queryClient.ensureQueryData(getUserListOptions('blocked'))
+    await context.queryClient.ensureQueryData(getUserListOptions('pending'))
+  },
 })
