@@ -22,6 +22,8 @@ interface DeleteDialogProps {
   description: string
   icon?: ElementType
   onDelete: () => Promise<void> | void
+  onOpenChange?: (open: boolean) => void
+  open?: boolean
   title: string
   trigger?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
@@ -32,11 +34,21 @@ export const DeleteDialog = ({
   description,
   icon,
   onDelete,
+  onOpenChange: onOpenChangeProp,
+  open: openProp,
   title,
   trigger = <Button size="icon" variant="destructive" />,
 }: DeleteDialogProps) => {
   const TriggerIcon = icon ?? TrashIcon
-  const [isOpen, setIsOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = openProp !== undefined
+  const isOpen = isControlled ? openProp : internalOpen
+  const setIsOpen = (value: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(value)
+    }
+    onOpenChangeProp?.(value)
+  }
   const [isLoading, startTransition] = useTransition()
 
   const handleDelete = () => {
@@ -48,9 +60,11 @@ export const DeleteDialog = ({
 
   return (
     <ResponsiveDialog onOpenChange={setIsOpen} open={isOpen}>
-      <ResponsiveDialogTrigger render={trigger}>
-        <TriggerIcon /> {deleteButtonLabel}
-      </ResponsiveDialogTrigger>
+      {!isControlled && (
+        <ResponsiveDialogTrigger render={trigger}>
+          <TriggerIcon /> {deleteButtonLabel}
+        </ResponsiveDialogTrigger>
+      )}
       <ResponsiveDialogPopup>
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
