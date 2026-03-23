@@ -11,7 +11,6 @@ import { Navbar } from '@/components/navigation/navbar'
 import { TabBar } from '@/components/navigation/tabbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
-import { useBackViewTransition } from '@/hooks/use-back-view-transition'
 import { getTheme } from '@/lib/theme'
 
 import appCss from '../styles/app.css?url'
@@ -21,8 +20,6 @@ type Theme = ReturnType<typeof getTheme>
 
 const RootComponent = () => {
   const { theme } = Route.useRouteContext()
-
-  useBackViewTransition()
 
   useEffect(() => {
     const registerServiceWorker = async () => {
