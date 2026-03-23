@@ -41,7 +41,7 @@ const RecipeList = () => {
 export const Route = createFileRoute('/')({
   component: RecipeList,
   loader: async ({ context }) => {
-    await context.queryClient.prefetchQuery(getRecipeListOptions())
+    await context.queryClient.ensureQueryData(getRecipeListOptions())
   },
   validateSearch: (search) => {
     const result = searchSchema.safeParse(search)

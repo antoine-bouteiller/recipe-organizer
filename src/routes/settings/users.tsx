@@ -68,7 +68,7 @@ const UsersManagement = () => {
 
       <div className="px-4">
         <Tabs defaultValue="active">
-          <TabsList className="mb-4 w-full">
+          <TabsList className="w-full">
             <TabsTab value="active">Actifs</TabsTab>
             <TabsTab value="pending">En attente</TabsTab>
             <TabsTab value="blocked">Bloqués</TabsTab>
