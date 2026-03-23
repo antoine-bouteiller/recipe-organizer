@@ -83,7 +83,7 @@ const viteConfig = defineConfig({
       'no-magic-numbers': 'off',
       'sort-imports': 'off',
       'sort-keys': 'off',
-      'id-length': ['error', { exceptions: ['v', 'T'] }],
+      'id-length': ['error', { exceptions: ['T', 'x'] }],
       'no-ternary': 'off',
       'no-duplicate-imports': 'off',
       'max-params': 'off',

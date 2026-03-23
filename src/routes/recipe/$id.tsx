@@ -1,13 +1,14 @@
 import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { ClientOnly, createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { motion } from 'motion/react'
 import { z } from 'zod'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger } from '@/components/ui/responsive-popover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
@@ -15,6 +16,7 @@ import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-sect
 import { recipeExtensions } from '@/features/recipe/components/tiptap/extensions'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
+import { useSwipeTabs } from '@/hooks/use-swipe-tabs'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
 
 const RecipeDetailPending = () => {
@@ -90,6 +92,10 @@ const RecipePage = () => {
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe?.id, recipe?.servings)
   const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
   const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
+  const { activeTab, containerRef, x, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
+    ['ingredients', 'preparation'] as const,
+    'ingredients'
+  )
 
   if (!recipe) {
     return null
@@ -146,22 +152,25 @@ const RecipePage = () => {
         </Button>
       </div>
 
-      <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
-        <div className="px-4 pb-4 md:hidden">
-          <Tabs defaultValue="ingredients">
+      <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
+        <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 md:hidden">
+          <Tabs className="flex min-h-0 flex-1 flex-col" onValueChange={(value) => goTo(value as 'ingredients' | 'preparation')} value={activeTab}>
             <TabsList className="w-full">
               <TabsTab value="ingredients">Ingrédients</TabsTab>
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>
-            <TabsPanel className="px-2" value="ingredients">
-              <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
-            </TabsPanel>
-
-            <TabsPanel className="p-2" value="preparation">
-              <Tiptap content={recipe.instructions} extensions={recipeExtensions} readOnly>
-                <TiptapContent />
-              </Tiptap>
-            </TabsPanel>
+            <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
+              <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x }}>
+                <div className="min-w-full overflow-y-auto px-2">
+                  <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
+                </div>
+                <div className="min-w-full overflow-y-auto p-2">
+                  <Tiptap content={recipe.instructions} readOnly>
+                    <TiptapContent />
+                  </Tiptap>
+                </div>
+              </motion.div>
+            </div>
           </Tabs>
         </div>
 

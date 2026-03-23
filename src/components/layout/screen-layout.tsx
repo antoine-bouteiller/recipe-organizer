@@ -31,7 +31,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backg
         <h1 className="z-10 min-w-0 flex-1 truncate font-heading text-2xl">{title}</h1>
         {headerEndItem && <div className="z-10">{headerEndItem}</div>}
       </div>
-      <div className="z-10 -mt-10 w-full flex-1 overflow-y-auto rounded-t-3xl bg-background md:mt-0 md:max-w-5xl md:overflow-y-visible">
+      <div className="z-10 -mt-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto rounded-t-3xl bg-background md:mt-0 md:max-w-5xl md:overflow-y-visible">
         {children}
       </div>
     </div>
