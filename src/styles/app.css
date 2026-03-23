@@ -162,3 +162,83 @@
     }
   }
 }
+
+/* View Transitions - mobile only */
+@media (max-width: 767px) {
+  @keyframes slide-in-from-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out-to-left {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-30%);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes slide-in-from-left {
+    from {
+      transform: translateX(-30%);
+      opacity: 0.8;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-out-to-right {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Forward navigation (push) */
+  ::view-transition-old(root) {
+    animation: slide-out-to-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  ::view-transition-new(root) {
+    animation: slide-in-from-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  /* Back navigation */
+  .back-transition::view-transition-old(root) {
+    animation: slide-out-to-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    z-index: 1;
+  }
+
+  .back-transition::view-transition-new(root) {
+    animation: slide-in-from-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    z-index: 0;
+  }
+
+  ::view-transition-group(tabbar) {
+    animation: none;
+  }
+
+  ::view-transition-old(tabbar),
+  ::view-transition-new(tabbar) {
+    animation: none;
+  }
+}
+
+/* Disable view transitions on desktop */
+@media (min-width: 768px) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

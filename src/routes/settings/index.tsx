@@ -57,7 +57,7 @@ const RouteComponent = () => {
         {visibleSections.map((section) => {
           const Icon = section.icon
           return (
-            <Link key={section.id} to={section.path}>
+            <Link key={section.id} to={section.path} viewTransition>
               <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
                 <div className="flex items-start justify-between">
                   <div className="flex flex-1 items-start gap-3">

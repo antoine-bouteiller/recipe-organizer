@@ -24,7 +24,7 @@ const RouteComponent = () => {
       <ItemGroup className="flex-1 justify-end px-4">
         {filteredRecipes.map((recipe, index) => (
           <Fragment key={recipe.id}>
-            <Item render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" />}>
+            <Item render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition />}>
               <ItemContent>{recipe.name}</ItemContent>
               <ItemMedia>
                 <ArrowRightIcon />

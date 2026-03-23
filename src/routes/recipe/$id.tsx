@@ -125,7 +125,7 @@ const RecipePage = () => {
               <div className="flex flex-col items-start gap-2 p-4 md:p-0">
                 <Button
                   className="w-full justify-start"
-                  render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" />}
+                  render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
                   variant="ghost"
                 >
                   <PencilSimpleIcon className="size-4" />

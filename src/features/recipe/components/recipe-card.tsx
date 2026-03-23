@@ -31,7 +31,7 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.servings)
 
   return (
-    <Link params={{ id: recipe.id.toString() }} to="/recipe/$id">
+    <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition>
       <Card className="relative min-h-60 cursor-pointer justify-end gap-2 overflow-hidden bg-center py-4" key={recipe.id}>
         <img src={recipe.image} alt={recipe.name} className="absolute inset-0 h-full w-full object-cover" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-4/5 rounded-b-2xl bg-white/30 mask-[linear-gradient(to_bottom,transparent,black_40%)] backdrop-blur-sm" />

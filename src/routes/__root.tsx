@@ -52,7 +52,7 @@ const RootComponent = () => {
           <main className="flex min-h-0 flex-1 flex-col pb-14 md:pb-0">
             <Outlet />
           </main>
-          <div className="fixed bottom-0 z-10 w-full md:hidden">
+          <div className="fixed bottom-0 z-10 w-full md:hidden" style={{ viewTransitionName: 'tabbar' }}>
             <TabBar />
           </div>
         </ToastProvider>

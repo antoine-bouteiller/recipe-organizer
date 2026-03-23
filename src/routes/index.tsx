@@ -27,7 +27,7 @@ const RecipeList = () => {
         ))}
       </div>
       {authUser && (
-        <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" />} size="icon-xl">
+        <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" viewTransition />} size="icon-xl">
           <BookIcon className="size-5" />
           <div className="absolute right-1.75 bottom-1.75 rounded-full border border-primary-foreground bg-primary p-0.5">
             <PlusIcon className="size-1.5" />

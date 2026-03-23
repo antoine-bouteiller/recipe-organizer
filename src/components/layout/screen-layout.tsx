@@ -24,7 +24,31 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backg
           </>
         )}
         {withGoBack && (
-          <Button onClick={() => router.history.back()} variant="ghost" size="icon" className="-ml-4 text-white">
+          <Button
+            onClick={() => {
+              if (!document.startViewTransition) {
+                router.history.back()
+                return
+              }
+
+              document.documentElement.classList.add('back-transition')
+              const transition = document.startViewTransition(async () => {
+                router.history.back()
+                await new Promise<void>((resolve) => {
+                  const unsub = router.subscribe('onResolved', () => {
+                    unsub()
+                    resolve()
+                  })
+                })
+              })
+              void transition.finished.then(() => {
+                document.documentElement.classList.remove('back-transition')
+              })
+            }}
+            variant="ghost"
+            size="icon"
+            className="-ml-4 text-white"
+          >
             <ArrowLeftIcon />
           </Button>
         )}
