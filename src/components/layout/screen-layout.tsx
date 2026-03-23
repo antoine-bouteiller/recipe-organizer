@@ -2,6 +2,7 @@ import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { useRouter } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
+import { useBackViewTransition } from '@/hooks/use-back-view-transition'
 
 interface ScreenLayoutProps {
   children: React.ReactNode
@@ -13,6 +14,8 @@ interface ScreenLayoutProps {
 
 export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backgroundImage }: ScreenLayoutProps) => {
   const router = useRouter()
+
+  useBackViewTransition(Boolean(withGoBack))
 
   return (
     <div className="relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-background pt-0 md:overflow-y-auto">
