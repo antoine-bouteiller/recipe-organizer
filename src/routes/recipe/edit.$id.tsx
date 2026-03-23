@@ -27,6 +27,7 @@ const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   _key: crypto.randomUUID(),
   groupName: group.groupName ?? '',
   ingredients: group.groupIngredients.map((ingredient) => ({
+    _key: crypto.randomUUID(),
     id: ingredient.ingredient.id,
     quantity: ingredient.quantity,
     unitId: ingredient.unit?.id,

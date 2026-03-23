@@ -24,6 +24,7 @@ const recipeSchema = z.object({
       groupName: z.string().optional(),
       ingredients: z.array(
         z.object({
+          _key: z.string(),
           id: z.number().min(0),
           quantity: z.number().min(0),
           unitId: z.number().min(0).optional(),

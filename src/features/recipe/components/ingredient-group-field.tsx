@@ -32,7 +32,7 @@ export const IngredientGroupField = withForm({
           <div className="flex w-full flex-col gap-2 pt-2">
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
-              <Fragment key={ingredient.id}>
+              <Fragment key={ingredient._key}>
                 <div className="flex gap-2">
                   <div className="flex w-full flex-1 flex-col items-start justify-between gap-2 md:flex-row">
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
@@ -93,6 +93,7 @@ export const IngredientGroupField = withForm({
               disabled={isSubmitting}
               onClick={() => {
                 field.pushValue({
+                  _key: crypto.randomUUID(),
                   id: -1,
                   quantity: 0,
                 })
