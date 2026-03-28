@@ -1,4 +1,5 @@
 import type { Recipe, RecipeIngredientGroup } from '@/features/recipe/api/get-one'
+import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { formatNumber } from '@/utils/number'
 
 interface RecipeGroupIngredientsProps {
@@ -25,16 +26,19 @@ const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: Re
   )
 
 interface RecipeIngredientGroupsProps {
-  baseServings: number
-  ingredientGroups: Recipe['ingredientGroups']
-  servings: number
+  readonly recipeId: number
+  readonly baseServings: number
+  readonly ingredientGroups: Recipe['ingredientGroups']
 }
 
-export const RecipeIngredientGroups = ({ baseServings, ingredientGroups, servings }: RecipeIngredientGroupsProps) =>
-  ingredientGroups.map((group) => (
+export const RecipeIngredientGroups = ({ recipeId, baseServings, ingredientGroups }: RecipeIngredientGroupsProps) => {
+  const { quantity } = useRecipeQuantities(recipeId, baseServings)
+
+  return ingredientGroups.map((group) => (
     <div key={group.id}>
       {group.groupName && <div className="font-semibold">{group.groupName}</div>}
 
-      <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} servings={servings} />
+      <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} servings={quantity} />
     </div>
   ))
+}

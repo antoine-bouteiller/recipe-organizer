@@ -1,6 +1,6 @@
-import { ArrowLeftIcon, DotsThreeVerticalIcon, MinusIcon, PencilSimpleIcon, PlusIcon } from '@phosphor-icons/react'
+import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
-import { ClientOnly, createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { ClientOnly, createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'motion/react'
 import { z } from 'zod'
 
@@ -12,86 +12,16 @@ import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
+import { QuantityControls } from '@/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
 import { recipeExtensions } from '@/features/recipe/components/tiptap/extensions'
-import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
-import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { useSwipeTabs } from '@/hooks/use-swipe-tabs'
-import { useShoppingListStore } from '@/stores/shopping-list.store'
-
-const RecipeDetailPending = () => {
-  const router = useRouter()
-
-  return (
-    <div className="flex w-full justify-center overflow-auto md:pb-4">
-      <div className="relative h-fit w-full md:max-w-5xl md:rounded-2xl md:border md:bg-card md:shadow-sm">
-        <Button className="absolute top-4 left-4 rounded-full" onClick={() => router.history.back()} size="icon" variant="outline">
-          <ArrowLeftIcon className="size-4" />
-        </Button>
-
-        <div className="p-0">
-          <div className="mb-6 flex aspect-16/6 w-full items-center justify-center overflow-hidden md:rounded-t-md">
-            <Skeleton className="h-full w-full" />
-          </div>
-          <div className="px-6">
-            <Skeleton className="h-8 w-3/4" />
-          </div>
-          <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">
-            <Skeleton className="size-10" />
-            <Skeleton className="h-6 w-8" />
-            <Skeleton className="size-10" />
-            <Skeleton className="h-10 w-48" />
-          </div>
-        </div>
-
-        <div className="prose prose-sm flex max-w-none flex-1 flex-col text-foreground">
-          <div className="px-4 pb-4 md:hidden">
-            <Skeleton className="mb-4 h-10 w-full" />
-            <div className="flex flex-col gap-3 px-2">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-5/6" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-4/5" />
-            </div>
-          </div>
-
-          <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
-            <div className="col-span-2 flex flex-col gap-4 rounded-xl border px-8 py-4">
-              <Skeleton className="h-8 w-32" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-5/6" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-4/5" />
-            </div>
-
-            <div className="col-span-3 flex flex-col gap-4 rounded-xl border px-8 py-4">
-              <Skeleton className="h-8 w-32" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-11/12" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-5/6" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-10/12" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
   const { data: recipe } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
-  const isInShoppingList = useIsInShoppingList(id)
 
-  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe?.id, recipe?.servings)
-  const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
-  const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
   const { activeTab, containerRef, x, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
     ['ingredients', 'preparation'] as const,
     'ingredients'
@@ -139,18 +69,22 @@ const RecipePage = () => {
       }
     >
       <h1 className="hidden px-4 py-2 font-heading text-3xl md:block">{recipe.name}</h1>
-      <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">
-        <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon" variant="outline">
-          <MinusIcon />
-        </Button>
-        {quantity}
-        <Button onClick={incrementQuantity} size="icon" variant="outline">
-          <PlusIcon />
-        </Button>
-        <Button onClick={() => (isInShoppingList ? removeFromShoppingList(id) : addToShoppingList(id))} variant="outline">
-          {isInShoppingList ? 'Supprimer de la liste' : 'Ajouter à la liste'}
-        </Button>
-      </div>
+      <ClientOnly
+        fallback={
+          <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">
+            <Skeleton className="size-10" />
+            <Skeleton className="h-6 w-8" />
+            <Skeleton className="size-10" />
+            <Skeleton className="h-10 w-48" />
+          </div>
+        }
+      >
+        <QuantityControls
+          className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start"
+          recipeId={id}
+          servings={recipe.servings}
+        />
+      </ClientOnly>
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 md:hidden">
@@ -162,7 +96,9 @@ const RecipePage = () => {
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
               <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x }}>
                 <div className="min-w-full overflow-y-auto px-2">
-                  <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
+                  <ClientOnly>
+                    <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
+                  </ClientOnly>
                 </div>
                 <div className="min-w-full overflow-y-auto p-2">
                   <Tiptap content={recipe.instructions} readOnly>
@@ -177,7 +113,9 @@ const RecipePage = () => {
         <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
           <div className="col-span-2 rounded-xl border px-8 pb-8">
             <h2>Ingrédients</h2>
-            <RecipeIngredientGroups baseServings={recipe.servings} ingredientGroups={ingredientGroups} servings={quantity} />
+            <ClientOnly>
+              <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
+            </ClientOnly>
           </div>
 
           <div className="col-span-3 rounded-xl border px-8 pb-8">
@@ -197,11 +135,7 @@ const paramsSchema = z.object({
 })
 
 export const Route = createFileRoute('/recipe/$id')({
-  component: () => (
-    <ClientOnly fallback={<RecipeDetailPending />}>
-      <RecipePage />
-    </ClientOnly>
-  ),
+  component: RecipePage,
   loader: async ({ context, params }) => {
     const result = paramsSchema.safeParse(params)
     if (!result.success) {

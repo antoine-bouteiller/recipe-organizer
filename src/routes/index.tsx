@@ -1,13 +1,12 @@
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { ClientOnly, createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/components/recipe-card'
-import { RecipeCardSkeleton } from '@/features/recipe/components/recipe-card-skeleton'
 
 const searchSchema = z.object({
   search: z.boolean().optional(),
@@ -21,9 +20,7 @@ const RecipeList = () => {
     <ScreenLayout title="Recettes">
       <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
         {recipes.map((recipe) => (
-          <ClientOnly fallback={<RecipeCardSkeleton />} key={recipe.id}>
-            <RecipeCard recipe={recipe} />
-          </ClientOnly>
+          <RecipeCard recipe={recipe} key={recipe.id} />
         ))}
       </div>
       {authUser && (

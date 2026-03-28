@@ -1,35 +1,19 @@
-import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
-import { Link } from '@tanstack/react-router'
+import { ClientOnly, Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { useShoppingListStore } from '@/stores/shopping-list.store'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/utils/cn'
 
-import '@tanstack/react-start/client-only'
 import type { ReducedRecipe } from '../api/get-all'
-import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
-import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 import { RECIPE_TAG_LABELS } from '../utils/constants'
+import { QuantityControls } from './quantity-controls'
 
 interface RecipeCardProps {
   readonly recipe: ReducedRecipe
 }
 
-const handleClick = (callback: () => void) => (event: React.MouseEvent<HTMLButtonElement>) => {
-  event.preventDefault()
-  event.stopPropagation()
-  callback()
-}
-
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
-  const isInShoppingList = useIsInShoppingList(recipe.id)
-  const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
-  const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
-
-  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipe.id, recipe.servings)
-
   return (
     <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition>
       <Card className="relative min-h-60 cursor-pointer justify-end gap-2 overflow-hidden bg-center py-4" key={recipe.id}>
@@ -48,24 +32,14 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
           </CardDescription>
         </CardHeader>
         <CardFooter className="relative flex-none px-4 py-0">
-          {isInShoppingList ? (
-            <div className="flex w-full items-center justify-between gap-2">
-              <Button disabled={quantity === 1} onClick={handleClick(decrementQuantity)} size="icon" variant="outline">
-                <MinusIcon />
-              </Button>
-              <span className="text-white">{quantity}</span>
-              <Button onClick={handleClick(incrementQuantity)} size="icon" variant="outline">
-                <PlusIcon />
-              </Button>
-              <Button onClick={handleClick(() => removeFromShoppingList(recipe.id))} variant="outline">
-                Supprimer de la liste
-              </Button>
-            </div>
-          ) : (
-            <Button onClick={handleClick(() => addToShoppingList(recipe.id))} variant="outline" className="w-full">
-              Ajouter à la liste de courses
-            </Button>
-          )}
+          <ClientOnly fallback={<Skeleton className="h-8 w-full rounded-md" />}>
+            <QuantityControls
+              className="flex w-full items-center justify-between gap-2"
+              recipeId={recipe.id}
+              servings={recipe.servings}
+              variant="card"
+            />
+          </ClientOnly>
         </CardFooter>
       </Card>
     </Link>

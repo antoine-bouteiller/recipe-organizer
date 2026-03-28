@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vp build && bun run typecheck",
-    "dev": "vp dev",
+    "build": "vp build",
+    "dev": "CLOUDFLARE_ENV=dev vp dev",
     "check": "vp check --fix",
     "serve": "vp preview",
     "cf-typegen": "wrangler types",
