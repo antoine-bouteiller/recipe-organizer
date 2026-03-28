@@ -1,5 +1,5 @@
-import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon, UsersIcon } from '@phosphor-icons/react'
 import type { IconProps } from '@phosphor-icons/react'
+import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon, UsersIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -52,7 +52,7 @@ const RouteComponent = () => {
   const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
 
   return (
-    <ScreenLayout title="Paramètres">
+    <ScreenLayout title="Paramètres" isRootPage>
       <div className="grid gap-4 p-4 md:grid-cols-2">
         {visibleSections.map((section) => {
           const Icon = section.icon

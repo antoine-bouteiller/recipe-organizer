@@ -8,7 +8,6 @@ import { useEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
-import { TabBar } from '@/components/navigation/tabbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
@@ -49,12 +48,9 @@ const RootComponent = () => {
           <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
             <Navbar />
           </header>
-          <main className="flex min-h-0 flex-1 flex-col pb-14 md:pb-0">
+          <main className="flex min-h-0 flex-1 flex-col md:pb-0">
             <Outlet />
           </main>
-          <div className="fixed bottom-0 z-10 w-full md:hidden" style={{ viewTransitionName: 'tabbar' }}>
-            <TabBar />
-          </div>
         </ToastProvider>
         <Scripts />
         <TanStackDevtools

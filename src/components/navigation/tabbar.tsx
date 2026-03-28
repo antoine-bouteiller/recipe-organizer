@@ -10,7 +10,10 @@ export const TabBar = () => {
   const location = useLocation()
 
   return (
-    <Tabs className="flex h-14 flex-1 items-center border-t bg-background px-4" value={location.href}>
+    <Tabs
+      className="fixed bottom-0 z-10 flex h-14 w-full flex-1 items-center border-t bg-background px-4 transition-transform duration-300 ease-out md:hidden"
+      value={location.href}
+    >
       <TabsList variant="tabbar">
         {items.map((item) => (
           <TabsTab

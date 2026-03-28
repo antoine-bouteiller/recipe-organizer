@@ -121,7 +121,9 @@ const viteConfig = defineConfig({
       injectionPoint: 'self.__SW_MANIFEST',
       rollupFormat: 'iife',
     }),
-    devtools(),
+    devtools({
+      injectSource: { enabled: false },
+    }),
     babel({ presets: [reactCompilerPreset()] }),
   ],
   server: {

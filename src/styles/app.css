@@ -165,34 +165,13 @@
 
 /* View Transitions - mobile only */
 @media (max-width: 767px) {
+  /* Foreground animations (the view sliding over) */
   @keyframes slide-in-from-right {
     from {
       transform: translateX(100%);
     }
     to {
       transform: translateX(0);
-    }
-  }
-
-  @keyframes slide-out-to-left {
-    from {
-      transform: translateX(0);
-      opacity: 1;
-    }
-    to {
-      transform: translateX(-30%);
-      opacity: 0.8;
-    }
-  }
-
-  @keyframes slide-in-from-left {
-    from {
-      transform: translateX(-30%);
-      opacity: 0.8;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
     }
   }
 
@@ -205,9 +184,32 @@
     }
   }
 
+  /* Background animations (the view receding/expanding) */
+  @keyframes scale-down-to-back {
+    from {
+      transform: scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: scale(0.92); /* Shrinks slightly */
+      opacity: 0.7; /* Fades out slightly to simulate depth */
+    }
+  }
+
+  @keyframes scale-up-from-back {
+    from {
+      transform: scale(0.92);
+      opacity: 0.7;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
   /* Forward navigation (push) */
   ::view-transition-old(root) {
-    animation: slide-out-to-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: scale-down-to-back 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
   }
 
   ::view-transition-new(root) {
@@ -221,17 +223,8 @@
   }
 
   .back-transition::view-transition-new(root) {
-    animation: slide-in-from-left 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation: scale-up-from-back 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
     z-index: 0;
-  }
-
-  ::view-transition-group(tabbar) {
-    animation: none;
-  }
-
-  ::view-transition-old(tabbar),
-  ::view-transition-new(tabbar) {
-    animation: none;
   }
 }
 
