@@ -13,10 +13,10 @@ interface ScreenLayoutProps {
   title: string
   withGoBack?: boolean
   backgroundImage?: string
-  isRootPage?: boolean
+  pageKey?: string
 }
 
-export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backgroundImage, isRootPage }: ScreenLayoutProps) => {
+export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backgroundImage, pageKey }: ScreenLayoutProps) => {
   const router = useRouter()
 
   useBackViewTransition(Boolean(withGoBack))
@@ -25,7 +25,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backg
     <div
       className={cn(
         'relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-background pt-0 md:overflow-y-auto',
-        isRootPage ? 'pb-14' : ''
+        pageKey ? 'pb-14' : ''
       )}
     >
       <div className="relative flex w-full shrink-0 items-center gap-2 overflow-hidden bg-linear-to-b from-violet-950 to-primary px-6 pt-safe-4 pb-12 text-primary-foreground md:hidden">
@@ -70,7 +70,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backg
       <div className="z-10 -mt-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto rounded-t-3xl bg-background md:mt-0 md:max-w-5xl md:overflow-y-visible">
         {children}
       </div>
-      {isRootPage && <TabBar />}
+      {pageKey && <TabBar activePage={pageKey} />}
     </div>
   )
 }

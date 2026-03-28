@@ -17,7 +17,7 @@ const RouteComponent = () => {
   const filteredRecipes = recipes.filter((recipe) => recipe.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <ScreenLayout title="Rechercher" isRootPage>
+    <ScreenLayout title="Rechercher" pageKey="/search">
       <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
         <SearchInput autoFocus search={search} setSearch={setSearch} />
       </div>

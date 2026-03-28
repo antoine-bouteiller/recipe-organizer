@@ -17,7 +17,7 @@ const RecipeList = () => {
   const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
 
   return (
-    <ScreenLayout title="Recettes" isRootPage>
+    <ScreenLayout title="Recettes" pageKey="/">
       <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
         {recipes.map((recipe) => (
           <RecipeCard recipe={recipe} key={recipe.id} />

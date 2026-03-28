@@ -52,7 +52,7 @@ const RouteComponent = () => {
   const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
 
   return (
-    <ScreenLayout title="Paramètres" isRootPage>
+    <ScreenLayout title="Paramètres" pageKey="/settings">
       <div className="grid gap-4 p-4 md:grid-cols-2">
         {visibleSections.map((section) => {
           const Icon = section.icon

@@ -21,7 +21,7 @@ const ShoppingListPending = () =>
 
 const ShoppingListPage = () => (
   <ScreenLayout
-    isRootPage
+    pageKey="/shopping-list"
     headerEndItem={
       <ClientOnly>
         <ResetCartButton />
