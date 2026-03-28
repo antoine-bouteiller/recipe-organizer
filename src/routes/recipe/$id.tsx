@@ -213,4 +213,7 @@ export const Route = createFileRoute('/recipe/$id')({
 
     return { id }
   },
+  headers: () => ({
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+  }),
 })

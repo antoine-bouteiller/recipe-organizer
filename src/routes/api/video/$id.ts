@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { createR2GetHandler, createR2HeadHandler } from '@/lib/r2-handler'
+import { createR2GetHandler, createR2HeadHandler } from '@/lib/r2'
 
 export const Route = createFileRoute('/api/video/$id')({
   server: {
