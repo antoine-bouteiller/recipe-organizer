@@ -1,5 +1,6 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { motion } from 'motion/react'
 import type React from 'react'
 
 import { cn } from '@/utils/cn'
@@ -35,8 +36,7 @@ const tabIndicatorVariants = cva(
   `
   absolute bottom-0 left-0 h-(--active-tab-height)
   w-(--active-tab-width) translate-x-(--active-tab-left)
-  -translate-y-(--active-tab-bottom) transition-[width,translate]
-  duration-200 ease-in-out
+  -translate-y-(--active-tab-bottom)
 `,
   {
     defaultVariants: {
@@ -67,11 +67,16 @@ export const TabsList = ({
   variant = 'default',
   className,
   children,
+  indicatorLayoutId,
   ...props
-}: TabsPrimitive.List.Props & VariantProps<typeof tabListVariants>): React.ReactElement => (
+}: TabsPrimitive.List.Props & VariantProps<typeof tabListVariants> & { indicatorLayoutId?: string }): React.ReactElement => (
   <TabsPrimitive.List className={cn(tabListVariants({ variant }), className)} data-slot="tabs-list" {...props}>
     {children}
-    <TabsPrimitive.Indicator className={cn(tabIndicatorVariants({ variant }))} data-slot="tab-indicator" />
+    <TabsPrimitive.Indicator
+      data-slot="tab-indicator"
+      render={<motion.span layoutId={indicatorLayoutId} layout transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }} />}
+      className={cn(tabIndicatorVariants({ variant }))}
+    />
   </TabsPrimitive.List>
 )
 
