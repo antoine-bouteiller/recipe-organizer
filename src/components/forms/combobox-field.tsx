@@ -226,4 +226,3 @@ const MobileCombobox = <TValue extends ValueOptions>({
 }
 
 export { ComboboxField }
-export type { ComboboxFieldProps }

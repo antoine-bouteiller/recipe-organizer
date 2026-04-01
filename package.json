@@ -41,8 +41,6 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.30.3",
-    "@commitlint/cli": "^20.5.0",
-    "@commitlint/config-conventional": "^20.5.0",
     "@rolldown/plugin-babel": "^0.2.2",
     "@serwist/vite": "^9.5.7",
     "@serwist/window": "^9.5.7",
@@ -55,7 +53,6 @@
     "@tsconfig/vite-react": "^7.0.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@typescript/native-preview": "7.0.0-dev.20260401.1",
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "drizzle-kit": "1.0.0-beta.20",
