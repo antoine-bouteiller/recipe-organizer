@@ -127,8 +127,8 @@ importers:
         specifier: 1.0.0-beta.20
         version: 1.0.0-beta.20
       knip:
-        specifier: ^6.1.1
-        version: 6.1.1(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)
+        specifier: ^6.2.0
+        version: 6.2.0(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)
       serwist:
         specifier: ^9.5.7
         version: 9.5.7(browserslist@4.28.1)(typescript@6.0.2)
@@ -3140,8 +3140,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@6.1.1:
-    resolution: {integrity: sha512-BC/kbdxwCgv+p/3YkGbtlLxbOXhQDuR+CeKKFEpJyKb3BFwG1gZa+CMWSqAnPi+kUexz74m327d3zWxyn2fMew==}
+  knip@6.2.0:
+    resolution: {integrity: sha512-4OMUMJARvNble8e8TeFv12flp4fKzAITrQec1eKO4g2eA4HnNqEa8CXy2UOPLjuYuAETpe0N0r25jF9yY9FLig==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -3665,6 +3665,11 @@ packages:
 
   srvx@0.11.13:
     resolution: {integrity: sha512-oknN6qduuMPafxKtHucUeG32Q963pjriA5g3/Bl05cwEsUe5VVbIU4qR9LrALHbipSCyBe+VmfDGGydqazDRkw==}
+    engines: {node: '>=20.16.0'}
+    hasBin: true
+
+  srvx@0.11.14:
+    resolution: {integrity: sha512-mx+pKrWJCzo5m6uXqyB7n4VA81mpdFRroSWsVTQTYqCZE65hFJ+jtVIeyhtL2/kvtDMrHdbA0hWEUh/vu0+Viw==}
     engines: {node: '>=20.16.0'}
     hasBin: true
 
@@ -6356,7 +6361,7 @@ snapshots:
   h3@2.0.1-rc.16:
     dependencies:
       rou3: 0.8.1
-      srvx: 0.11.13
+      srvx: 0.11.14
 
   htmlparser2@10.1.0:
     dependencies:
@@ -6471,7 +6476,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@6.1.1(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1):
+  knip@6.2.0(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
       fast-glob: 3.3.3
@@ -7111,6 +7116,8 @@ snapshots:
   sprintf-js@1.1.3: {}
 
   srvx@0.11.13: {}
+
+  srvx@0.11.14: {}
 
   std-env@4.0.0: {}
 
