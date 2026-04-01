@@ -58,7 +58,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260319.1",
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
-    "drizzle-kit": "1.0.0-beta.9-e89174b",
+    "drizzle-kit": "1.0.0-beta.20",
     "knip": "^6.0.3",
     "serwist": "^9.5.7",
     "tailwindcss": "^4.2.2",
