@@ -3,9 +3,6 @@ name: Quality Checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - src/**/*
-      - .github/workflows/quality-checks.yaml
     branches:
       - main
   workflow_call:
