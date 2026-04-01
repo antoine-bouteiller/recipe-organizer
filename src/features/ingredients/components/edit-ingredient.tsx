@@ -6,10 +6,10 @@ import { useState } from 'react'
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
 import { ingredientSchema } from '@/features/ingredients/api/create'
-import { type UpdateIngredientFormInput, updateIngredientOptions, updateIngredientSchema } from '@/features/ingredients/api/update'
+import { updateIngredientOptions, updateIngredientSchema, type UpdateIngredientFormInput } from '@/features/ingredients/api/update'
 import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
-import type { Ingredient } from '@/types/ingredient'
+import { type Ingredient } from '@/types/ingredient'
 
 interface EditIngredientProps {
   ingredient: Ingredient

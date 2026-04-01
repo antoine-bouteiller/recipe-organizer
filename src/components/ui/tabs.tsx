@@ -74,7 +74,7 @@ export const TabsList = ({
     {children}
     <TabsPrimitive.Indicator
       data-slot="tab-indicator"
-      render={<motion.span layoutId={indicatorLayoutId} layout transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }} />}
+      render={<motion.span layoutId={indicatorLayoutId} layout transition={{ bounce: 0.15, duration: 0.3, type: 'spring' }} />}
       className={cn(tabIndicatorVariants({ variant }))}
     />
   </TabsPrimitive.List>

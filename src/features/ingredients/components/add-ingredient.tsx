@@ -1,9 +1,9 @@
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { type JSX, useState } from 'react'
+import { useState, type JSX } from 'react'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { createIngredientOptions, type IngredientFormInput, ingredientSchema } from '@/features/ingredients/api/create'
+import { createIngredientOptions, ingredientSchema, type IngredientFormInput } from '@/features/ingredients/api/create'
 import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 

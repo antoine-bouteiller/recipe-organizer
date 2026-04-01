@@ -22,7 +22,7 @@ const RecipePage = () => {
   const { data: recipe } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
 
-  const { activeTab, containerRef, x, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
+  const { activeTab, containerRef, swipeX, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
     ['ingredients', 'preparation'] as const,
     'ingredients'
   )
@@ -94,7 +94,7 @@ const RecipePage = () => {
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
-              <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x }}>
+              <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x: swipeX }}>
                 <div className="min-w-full overflow-y-auto px-2">
                   <ClientOnly>
                     <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
@@ -136,6 +136,9 @@ const paramsSchema = z.object({
 
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
+  headers: () => ({
+    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+  }),
   loader: async ({ context, params }) => {
     const result = paramsSchema.safeParse(params)
     if (!result.success) {
@@ -147,7 +150,4 @@ export const Route = createFileRoute('/recipe/$id')({
 
     return { id }
   },
-  headers: () => ({
-    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-  }),
 })

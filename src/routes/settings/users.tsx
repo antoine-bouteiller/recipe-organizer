@@ -2,8 +2,7 @@ import { PlusIcon, ProhibitIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { animate, motion, useMotionValue, useTransform } from 'motion/react'
-import * as React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
@@ -25,16 +24,16 @@ const roleLabels: Record<string, string> = {
 }
 
 const SwipeToBlock = ({ children, userEmail, userId }: { children: React.ReactNode; userEmail: string; userId: string }) => {
-  const x = useMotionValue(0)
+  const swipeX = useMotionValue(0)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const buttonWidth = useTransform(x, (val) => Math.max(0, -val))
+  const buttonWidth = useTransform(swipeX, (val) => Math.max(0, -val))
 
   const handleDragEnd = () => {
-    if (x.get() < SWIPE_THRESHOLD) {
-      animate(x, 0, { type: 'spring', stiffness: 300, damping: 30 })
+    if (swipeX.get() < SWIPE_THRESHOLD) {
+      animate(swipeX, 0, { damping: 30, stiffness: 300, type: 'spring' })
       setDialogOpen(true)
     } else {
-      animate(x, 0, { type: 'spring', stiffness: 300, damping: 30 })
+      animate(swipeX, 0, { damping: 30, stiffness: 300, type: 'spring' })
     }
   }
 
@@ -52,7 +51,7 @@ const SwipeToBlock = ({ children, userEmail, userId }: { children: React.ReactNo
         dragConstraints={{ left: -150, right: 0 }}
         dragElastic={0.1}
         onDragEnd={handleDragEnd}
-        style={{ x }}
+        style={{ x: swipeX }}
       >
         {children}
       </motion.div>

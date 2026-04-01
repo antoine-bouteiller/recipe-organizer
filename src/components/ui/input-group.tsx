@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import type React from 'react'
 
 import { Input, type InputProps } from '@/components/ui/input'
 import { Textarea, type TextareaProps } from '@/components/ui/textarea'

@@ -9,22 +9,22 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { useIsMobile } from '@/hooks/use-is-mobile'
-import type { Option } from '@/hooks/use-options'
+import { type Option } from '@/hooks/use-options'
 import { cn } from '@/utils/cn'
 
 type ValueOptions = number | string | undefined
 
-interface ComboboxFieldProps<T extends ValueOptions> {
+interface ComboboxFieldProps<TValue extends ValueOptions> {
   addNew?: (inputValue: string) => ReactNode
   disabled?: boolean
   className?: string
   label?: string
-  options: Option<T>[]
+  options: Option<TValue>[]
   placeholder?: string
   searchPlaceholder?: string
 }
 
-const ComboboxField = <T extends ValueOptions>({
+const ComboboxField = <TValue extends ValueOptions>({
   addNew,
   disabled,
   className,
@@ -32,14 +32,14 @@ const ComboboxField = <T extends ValueOptions>({
   options,
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
-}: ComboboxFieldProps<T>) => {
-  const field = useFieldContext<T | undefined>()
+}: ComboboxFieldProps<TValue>) => {
+  const field = useFieldContext<TValue | undefined>()
   const isMobile = useIsMobile()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
   const selectedOption = useMemo(() => options.find((opt) => opt.value === field.store.state.value), [options, field.store.state.value])
 
-  const handleSelect = (option: Option<T> | null) => {
+  const handleSelect = (option: Option<TValue> | null) => {
     if (option === null || option.value === field.store.state.value || option.value === undefined) {
       field.setValue(undefined)
     } else {
@@ -84,17 +84,17 @@ const ComboboxField = <T extends ValueOptions>({
   )
 }
 
-interface DesktopComboboxProps<T extends ValueOptions> {
+interface DesktopComboboxProps<TValue extends ValueOptions> {
   addNew?: (inputValue: string) => ReactNode
   disabled?: boolean
   isInvalid: boolean
-  onChange: (option: Option<T> | null) => void
-  options: Option<T>[]
+  onChange: (option: Option<TValue> | null) => void
+  options: Option<TValue>[]
   placeholder: string
-  selectedOption: Option<T> | undefined
+  selectedOption: Option<TValue> | undefined
 }
 
-const DesktopCombobox = <T extends ValueOptions>({
+const DesktopCombobox = <TValue extends ValueOptions>({
   addNew,
   disabled,
   isInvalid,
@@ -102,11 +102,11 @@ const DesktopCombobox = <T extends ValueOptions>({
   options,
   placeholder,
   selectedOption,
-}: DesktopComboboxProps<T>) => {
+}: DesktopComboboxProps<TValue>) => {
   const [inputValue, setInputValue] = useState('')
 
   return (
-    <Combobox<Option<T>>
+    <Combobox<Option<TValue>>
       aria-invalid={isInvalid || undefined}
       disabled={disabled}
       items={options}
@@ -135,19 +135,19 @@ const DesktopCombobox = <T extends ValueOptions>({
   )
 }
 
-interface MobileComboboxProps<T extends ValueOptions> {
+interface MobileComboboxProps<TValue extends ValueOptions> {
   addNew?: (inputValue: string) => ReactNode
   disabled?: boolean
   isInvalid: boolean
-  onChange: (option: Option<T> | null) => void
-  options: Option<T>[]
+  onChange: (option: Option<TValue> | null) => void
+  options: Option<TValue>[]
   placeholder: string
   searchPlaceholder: string
-  selectedOption: Option<T> | undefined
+  selectedOption: Option<TValue> | undefined
   title: string
 }
 
-const MobileCombobox = <T extends ValueOptions>({
+const MobileCombobox = <TValue extends ValueOptions>({
   addNew,
   disabled,
   isInvalid,
@@ -157,7 +157,7 @@ const MobileCombobox = <T extends ValueOptions>({
   searchPlaceholder,
   selectedOption,
   title,
-}: MobileComboboxProps<T>) => {
+}: MobileComboboxProps<TValue>) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
 

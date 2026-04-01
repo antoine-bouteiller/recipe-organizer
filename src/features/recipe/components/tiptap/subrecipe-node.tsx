@@ -4,7 +4,7 @@ import { mergeAttributes, Node, NodeViewWrapper, ReactNodeViewRenderer as reactN
 import { Spinner } from '@/components/ui/spinner'
 import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeInstructionsOptions } from '@/features/recipe/api/get-instructions'
-import type { SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
+import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 
 import { SubrecipeDialog } from './subrecipe-dialog'
 

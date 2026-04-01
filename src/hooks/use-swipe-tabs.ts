@@ -1,27 +1,27 @@
 import { animate, useMotionValue } from 'motion/react'
-import { type TouchEvent, useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState, type TouchEvent } from 'react'
 
 const SWIPE_THRESHOLD = 50
 const VELOCITY_THRESHOLD = 500
 const DIRECTION_LOCK_THRESHOLD = 5
 const ELASTIC_FACTOR = 0.15
 
-const SPRING_CONFIG = { type: 'spring' as const, bounce: 0, duration: 0.35 }
+const SPRING_CONFIG = { bounce: 0, duration: 0.35, type: 'spring' as const }
 
-export const useSwipeTabs = <T extends string>(tabs: readonly T[], defaultTab: T) => {
-  const [activeTab, setActiveTab] = useState<T>(defaultTab)
+export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], defaultTab: TTab) => {
+  const [activeTab, setActiveTab] = useState<TTab>(defaultTab)
   const [containerWidth, setContainerWidth] = useState(0)
 
   const activeIndex = tabs.indexOf(activeTab)
 
-  const x = useMotionValue(-activeIndex * containerWidth)
+  const swipeX = useMotionValue(-activeIndex * containerWidth)
 
   const touchState = useRef({
+    baseX: 0,
+    direction: null as 'horizontal' | 'vertical' | null,
+    startTime: 0,
     startX: 0,
     startY: 0,
-    startTime: 0,
-    direction: null as 'horizontal' | 'vertical' | null,
-    baseX: 0,
   })
 
   const containerRef = useCallback((node: HTMLDivElement | null) => {
@@ -31,12 +31,12 @@ export const useSwipeTabs = <T extends string>(tabs: readonly T[], defaultTab: T
   }, [])
 
   const goTo = useCallback(
-    (tab: T) => {
+    (tab: TTab) => {
       const newIndex = tabs.indexOf(tab)
       setActiveTab(tab)
-      animate(x, -newIndex * containerWidth, SPRING_CONFIG)
+      animate(swipeX, -newIndex * containerWidth, SPRING_CONFIG)
     },
-    [tabs, containerWidth, x]
+    [tabs, containerWidth, swipeX]
   )
 
   const clampX = useCallback(
@@ -61,14 +61,14 @@ export const useSwipeTabs = <T extends string>(tabs: readonly T[], defaultTab: T
         return
       }
       touchState.current = {
+        baseX: swipeX.get(),
+        direction: null,
+        startTime: Date.now(),
         startX: touch.clientX,
         startY: touch.clientY,
-        startTime: Date.now(),
-        direction: null,
-        baseX: x.get(),
       }
     },
-    [x]
+    [swipeX]
   )
 
   const onTouchMove = useCallback(
@@ -90,10 +90,10 @@ export const useSwipeTabs = <T extends string>(tabs: readonly T[], defaultTab: T
 
       if (state.direction === 'horizontal') {
         event.preventDefault()
-        x.set(clampX(state.baseX + dx))
+        swipeX.set(clampX(state.baseX + dx))
       }
     },
-    [x, clampX]
+    [swipeX, clampX]
   )
 
   const onTouchEnd = useCallback(
@@ -122,10 +122,10 @@ export const useSwipeTabs = <T extends string>(tabs: readonly T[], defaultTab: T
       }
 
       setActiveTab(tabs[newIndex])
-      animate(x, -newIndex * containerWidth, SPRING_CONFIG)
+      animate(swipeX, -newIndex * containerWidth, SPRING_CONFIG)
     },
-    [activeTab, tabs, containerWidth, x]
+    [activeTab, tabs, containerWidth, swipeX]
   )
 
-  return { activeIndex, activeTab, containerRef, x, goTo, onTouchStart, onTouchMove, onTouchEnd }
+  return { activeIndex, activeTab, containerRef, goTo, onTouchEnd, onTouchMove, onTouchStart, swipeX }
 }

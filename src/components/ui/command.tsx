@@ -1,6 +1,6 @@
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
-import type * as React from 'react'
+import React from 'react'
 
 import {
   Autocomplete,

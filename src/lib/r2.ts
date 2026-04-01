@@ -57,8 +57,8 @@ export const createR2GetHandler =
 
       return new Response(file.body, {
         headers: {
-          'Content-Type': file.httpMetadata?.contentType ?? defaultContentType,
           'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+          'Content-Type': file.httpMetadata?.contentType ?? defaultContentType,
         },
       })
     })
@@ -78,10 +78,10 @@ export const createR2HeadHandler =
 
       return new Response(null, {
         headers: {
-          'Content-Type': file.httpMetadata?.contentType ?? defaultContentType,
-          'Content-Length': file.size.toString(),
           'Accept-Ranges': 'bytes',
           'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+          'Content-Length': file.size.toString(),
+          'Content-Type': file.httpMetadata?.contentType ?? defaultContentType,
         },
       })
     })

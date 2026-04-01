@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
-import type { FileMetadata } from '@/hooks/use-file-upload'
+import { type FileMetadata } from '@/hooks/use-file-upload'
 import { useRecipeOptions } from '@/hooks/use-options'
 
 import { RECIPE_TAG_LABELS, RECIPE_TAGS } from '../utils/constants'

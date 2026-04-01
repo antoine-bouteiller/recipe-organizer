@@ -12,10 +12,10 @@ interface ShoppingListState {
 export const useShoppingListStore = create<ShoppingListState>()(
   persist(
     (set) => ({
-      shoppingList: [],
       addToShoppingList: (recipeId) => set(({ shoppingList }) => ({ shoppingList: [...shoppingList, recipeId] })),
       removeFromShoppingList: (recipeId) => set(({ shoppingList }) => ({ shoppingList: shoppingList.filter((id) => id !== recipeId) })),
       resetShoppingList: () => set({ shoppingList: [] }),
+      shoppingList: [],
     }),
     {
       name: 'shopping-list',

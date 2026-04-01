@@ -5,7 +5,7 @@ import { join } from 'node:path'
 const SOURCE_DIR = 'migrations'
 const TMP_DIR = 'migrations_tmp'
 
-rmSync(TMP_DIR, { recursive: true, force: true })
+rmSync(TMP_DIR, { force: true, recursive: true })
 mkdirSync(TMP_DIR, { recursive: true })
 
 const folders = readdirSync(SOURCE_DIR, { withFileTypes: true })
@@ -28,4 +28,4 @@ for (const folder of folders) {
 }
 
 execSync('wrangler d1 migrations apply recipe-organizer')
-rmSync(TMP_DIR, { recursive: true, force: true })
+rmSync(TMP_DIR, { force: true, recursive: true })

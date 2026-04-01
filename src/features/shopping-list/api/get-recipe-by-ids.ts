@@ -19,14 +19,14 @@ const getRecipesByIds = createServerFn({
   .handler(
     withServerError(async ({ data }) => {
       const rows = await getDb().query.recipe.findMany({
+        columns: {
+          id: true,
+          servings: true,
+        },
         where: {
           id: {
             in: data.ids,
           },
-        },
-        columns: {
-          id: true,
-          servings: true,
         },
         with: {
           ingredientGroups: {

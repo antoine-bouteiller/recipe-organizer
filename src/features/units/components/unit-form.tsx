@@ -1,10 +1,10 @@
 import { createFieldMap, useStore } from '@tanstack/react-form'
 
-import type { Unit } from '@/features/units/api/get-all'
+import { type Unit } from '@/features/units/api/get-all'
 import { withForm } from '@/hooks/use-app-form'
 import { useUnitOptions } from '@/hooks/use-options'
 
-import type { UnitFormInput } from '../api/create'
+import { type UnitFormInput } from '../api/create'
 
 export const unitDefaultValues: UnitFormInput = {
   factor: undefined,

@@ -20,13 +20,13 @@ const deleteRecipe = createServerFn({
   .handler(
     withServerError(async ({ data: id, context }) => {
       const currentRecipe = await getDb().query.recipe.findFirst({
-        where: {
-          id,
-        },
         columns: {
           createdBy: true,
           id: true,
           image: true,
+        },
+        where: {
+          id,
         },
         with: {
           ingredientGroups: {

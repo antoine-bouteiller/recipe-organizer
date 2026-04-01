@@ -1,8 +1,7 @@
 import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import * as React from 'react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'

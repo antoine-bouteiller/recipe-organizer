@@ -1,25 +1,32 @@
-import type { getDb } from '@/lib/db'
+import { type getDb } from '@/lib/db'
 
 export const ingredientGroupSelect = {
+  columns: {
+    groupName: true,
+    id: true,
+  },
   orderBy: {
     isDefault: 'desc',
-  },
-  columns: {
-    id: true,
-    groupName: true,
   },
   with: {
     groupIngredients: {
       columns: {
-        quantity: true,
         id: true,
+        quantity: true,
+      },
+      where: {
+        ingredient: {
+          category: {
+            NOT: 'spices',
+          },
+        },
       },
       with: {
         ingredient: {
           columns: {
+            category: true,
             id: true,
             name: true,
-            category: true,
             parentId: true,
           },
         },
@@ -27,13 +34,6 @@ export const ingredientGroupSelect = {
           columns: {
             id: true,
             name: true,
-          },
-        },
-      },
-      where: {
-        ingredient: {
-          category: {
-            NOT: 'spices',
           },
         },
       },

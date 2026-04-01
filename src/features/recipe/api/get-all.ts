@@ -11,15 +11,15 @@ const getAllRecipes = createServerFn({
 }).handler(
   withServerError(async () => {
     const rows = await getDb().query.recipe.findMany({
-      orderBy: {
-        name: 'asc',
-      },
       columns: {
         id: true,
-        name: true,
         image: true,
+        name: true,
         servings: true,
         tags: true,
+      },
+      orderBy: {
+        name: 'asc',
       },
     })
 

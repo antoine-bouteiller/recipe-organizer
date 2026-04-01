@@ -1,15 +1,15 @@
-import type { getDb } from '@/lib/db'
+import { type getDb } from '@/lib/db'
 
 export const ingredientGroupSelect = {
   columns: {
-    id: true,
     groupName: true,
+    id: true,
   },
   with: {
     groupIngredients: {
       columns: {
-        quantity: true,
         id: true,
+        quantity: true,
       },
       with: {
         ingredient: {

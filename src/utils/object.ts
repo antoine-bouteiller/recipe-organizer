@@ -1,1 +1,1 @@
-export const typedEntriesOf = <T extends object>(obj: T) => Object.entries(obj) as [keyof T, T[keyof T]][]
+export const typedEntriesOf = <TObj extends object>(obj: TObj) => Object.entries(obj) as [keyof TObj, TObj[keyof TObj]][]

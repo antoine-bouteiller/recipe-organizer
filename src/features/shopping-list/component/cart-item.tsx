@@ -4,7 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
 
-import type { IngredientCartItem } from '../types/ingredient-cart-item'
+import { type IngredientCartItem } from '../types/ingredient-cart-item'
 
 export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => {
   const [isChecked, setIsChecked] = useState(false)

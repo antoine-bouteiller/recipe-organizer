@@ -1,7 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import { cva, type VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
 
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/utils/cn'
@@ -65,6 +64,7 @@ export const Button = ({
   const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
 
   const defaultProps = {
+    'aria-disabled': loading || undefined,
     children: (
       <>
         {children}
@@ -72,7 +72,6 @@ export const Button = ({
       </>
     ),
     className: cn(buttonVariants({ className, size, variant })),
-    'aria-disabled': loading || undefined,
     'data-loading': loading ? '' : undefined,
     'data-slot': 'button',
     disabled: isDisabled,

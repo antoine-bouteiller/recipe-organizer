@@ -19,7 +19,7 @@ import {
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
-import type { Recipe } from '@/types/recipe'
+import { type Recipe } from '@/types/recipe'
 
 export const SearchBar = () => {
   const [open, setOpen] = useState(false)

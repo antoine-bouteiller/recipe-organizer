@@ -4,9 +4,9 @@ import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getUnitsListOptions } from '@/features/units/api/get-all'
 
-export interface Option<T = number | undefined> {
+export interface Option<TValue = number | undefined> {
   label: string
-  value: T
+  value: TValue
 }
 
 const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(

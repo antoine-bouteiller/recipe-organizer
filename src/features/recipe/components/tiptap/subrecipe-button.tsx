@@ -3,7 +3,7 @@ import { EditorContext } from '@tiptap/react'
 import { useContext } from 'react'
 
 import { Toggle } from '@/components/ui/toggle'
-import type { SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
+import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 
 import { SubrecipeDialog } from './subrecipe-dialog'
 

@@ -10,8 +10,8 @@ export const getAuthUser = createServerFn({ method: 'GET' }).handler(
 
     if (import.meta.env.DEV) {
       return {
-        id: 'string',
         email: 'admin@test.fr',
+        id: 'string',
         role: 'admin',
         status: 'active' as const,
       }

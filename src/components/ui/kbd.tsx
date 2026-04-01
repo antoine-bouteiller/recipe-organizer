@@ -1,5 +1,3 @@
-import type * as React from 'react'
-
 import { cn } from '@/utils/cn'
 
 export const Kbd = ({ className, ...props }: React.ComponentProps<'kbd'>): React.ReactElement => (

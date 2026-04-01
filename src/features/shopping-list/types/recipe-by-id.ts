@@ -1,4 +1,4 @@
-import type { IngredientCategory } from '@/types/ingredient'
+import { type IngredientCategory } from '@/types/ingredient'
 
 export interface RecipeById {
   id: number

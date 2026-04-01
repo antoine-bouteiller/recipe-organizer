@@ -1,5 +1,4 @@
-import type { AnyRouter } from '@tanstack/react-router'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, type AnyRouter } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
 const waitForRouterResolved = (router: AnyRouter) =>

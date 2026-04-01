@@ -1,8 +1,7 @@
-import type { Popover as PopoverPrimitive } from '@base-ui/react/popover'
+import { type Popover as PopoverPrimitive } from '@base-ui/react/popover'
 import { createContext, useContext, type ReactNode } from 'react'
 
-import type { DrawerPrimitive } from '@/components/ui/drawer'
-import { Drawer, DrawerPopup, DrawerTrigger } from '@/components/ui/drawer'
+import { Drawer, DrawerPopup, DrawerTrigger, type DrawerPrimitive } from '@/components/ui/drawer'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 

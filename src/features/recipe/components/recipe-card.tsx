@@ -5,7 +5,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/comp
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/utils/cn'
 
-import type { ReducedRecipe } from '../api/get-all'
+import { type ReducedRecipe } from '../api/get-all'
 import { RECIPE_TAG_LABELS } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
 

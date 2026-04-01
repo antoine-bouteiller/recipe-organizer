@@ -13,7 +13,7 @@ import {
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 
-import type { DialogTrigger } from '../ui/dialog'
+import { type DialogTrigger } from '../ui/dialog'
 import { Spinner } from '../ui/spinner'
 
 interface DeleteDialogProps {

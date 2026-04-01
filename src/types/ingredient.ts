@@ -1,6 +1,6 @@
-import type { InferSelectModel } from 'drizzle-orm'
+import { type InferSelectModel } from 'drizzle-orm'
 
-import type { ingredient, ingredientCategory } from '@/lib/db/schema'
+import { type ingredient, type ingredientCategory } from '@/lib/db/schema'
 
 export type Ingredient = InferSelectModel<typeof ingredient>
 

@@ -2,7 +2,7 @@ import { useStore } from '@tanstack/react-form'
 
 import { withForm } from '@/hooks/use-app-form'
 
-import type { UserFormInput } from '../api/create'
+import { type UserFormInput } from '../api/create'
 
 const roleOptions = [
   { label: 'Utilisateur', value: 'user' },

@@ -1,6 +1,14 @@
-import type { AnyExtension, CanCommands, ChainedCommands, EditorContentProps } from '@tiptap/react'
-import { EditorContent, EditorContext, useEditor, useEditorState } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
+import {
+  EditorContent,
+  EditorContext,
+  useEditor,
+  useEditorState,
+  type AnyExtension,
+  type CanCommands,
+  type ChainedCommands,
+  type EditorContentProps,
+} from '@tiptap/react'
+import { StarterKit } from '@tiptap/starter-kit'
 import { useContext, useMemo } from 'react'
 
 import { Toggle } from '@/components/ui/toggle'

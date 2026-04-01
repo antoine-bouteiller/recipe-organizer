@@ -16,13 +16,54 @@ import { isNotEmpty } from '@/utils/array'
 import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
-import type { RecipeTag } from '../utils/constants'
+import { type RecipeTag } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
 
 const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
 
 type UpdateRecipeFormValues = z.infer<typeof updateRecipeSchema>
 type UpdateRecipeFormInput = Partial<UpdateRecipeFormValues>
+
+const resolveImageKey = async (image: UpdateRecipeFormValues['image'], currentKey: string | null): Promise<string> => {
+  if (image instanceof File) {
+    if (currentKey) {
+      await deleteFile(currentKey)
+    }
+    return uploadFile(image)
+  }
+  return currentKey ?? ''
+}
+
+const resolveVideoKey = async (video: UpdateRecipeFormValues['video'], currentKey: string | null | undefined): Promise<string | null | undefined> => {
+  if (video instanceof File) {
+    if (currentKey) {
+      await deleteFile(currentKey)
+    }
+    return uploadVideo(video)
+  }
+  if (video === undefined) {
+    return currentKey
+  }
+  return video?.id
+}
+
+const computeAutoTags = (
+  ingredientCategories: { category: string | null }[],
+  linkedRecipesData: { tags: string[] | null }[],
+  instructions: string,
+  tags: string[]
+): RecipeTag[] => {
+  const ownVegetarian = ingredientCategories.every((item) => item.category !== 'meat' && item.category !== 'fish')
+  const linkedVegetarian = linkedRecipesData.every((item) => item.tags?.includes('vegetarian'))
+  const autoTags: RecipeTag[] = []
+  if (ownVegetarian && linkedVegetarian && !tags.includes('dessert')) {
+    autoTags.push('vegetarian')
+  }
+  if (instructions.includes('data-type="magimix-program"')) {
+    autoTags.push('magimix')
+  }
+  return autoTags
+}
 
 const updateRecipe = createServerFn({
   method: 'POST',
@@ -52,23 +93,8 @@ const updateRecipe = createServerFn({
         throw new Error('Permission denied')
       }
 
-      let imageKey = currentRecipe.image
-
-      if (image instanceof File) {
-        await deleteFile(imageKey)
-        imageKey = await uploadFile(image)
-      }
-
-      let videoKey = currentRecipe.video
-
-      if (video instanceof File) {
-        if (videoKey) {
-          await deleteFile(videoKey)
-        }
-        videoKey = await uploadVideo(video)
-      } else if (video !== undefined) {
-        videoKey = video?.id
-      }
+      const imageKey = await resolveImageKey(image, currentRecipe.image)
+      const videoKey = await resolveVideoKey(video, currentRecipe.video)
 
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
@@ -78,20 +104,7 @@ const updateRecipe = createServerFn({
         getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
 
-      const ownIngredientsVegetarian = ingredientCategories.every(
-        (ingredientItem) => ingredientItem.category !== 'meat' && ingredientItem.category !== 'fish'
-      )
-      const linkedRecipesVegetarian = linkedRecipesData.every((recipeItem) => recipeItem.tags?.includes('vegetarian'))
-      const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
-      const isMagimix = instructions.includes('data-type="magimix-program"')
-
-      const autoTags: RecipeTag[] = []
-      if (isVegetarian && !tags.includes('dessert')) {
-        autoTags.push('vegetarian')
-      }
-      if (isMagimix) {
-        autoTags.push('magimix')
-      }
+      const autoTags = computeAutoTags(ingredientCategories, linkedRecipesData, instructions, tags)
 
       await getDb().batch([
         getDb()

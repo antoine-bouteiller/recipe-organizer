@@ -1,6 +1,6 @@
 import { createFieldMap } from '@tanstack/react-form'
 
-import type { RecipeFormInput } from '../api/create'
+import { type RecipeFormInput } from '../api/create'
 
 export const recipeDefaultValues: Partial<RecipeFormInput> = {
   image: undefined,

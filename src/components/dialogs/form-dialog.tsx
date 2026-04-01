@@ -27,7 +27,7 @@ interface FormModalProps {
   trigger: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-export const getFormDialog = <T,>(defaultValues: T) =>
+export const getFormDialog = <TValues,>(defaultValues: TValues) =>
   withForm({
     defaultValues,
     props: {} as FormModalProps,

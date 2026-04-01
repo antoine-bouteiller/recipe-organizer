@@ -12,11 +12,11 @@ export const authGuard = (role?: string) =>
     }
 
     if (user.status === 'blocked') {
-      throw redirect({ to: '/auth/login', search: { error: 'account_blocked' } })
+      throw redirect({ search: { error: 'account_blocked' }, to: '/auth/login' })
     }
 
     if (user.status === 'pending') {
-      throw redirect({ to: '/auth/login', search: { error: 'account_pending' } })
+      throw redirect({ search: { error: 'account_pending' }, to: '/auth/login' })
     }
 
     if (role === 'admin' && user?.role !== 'admin') {

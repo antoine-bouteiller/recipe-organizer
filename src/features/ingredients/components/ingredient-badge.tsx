@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import type { IngredientCategory } from '@/types/ingredient'
+import { type IngredientCategory } from '@/types/ingredient'
 import { cn } from '@/utils/cn'
 
 const categoryStyles: Record<IngredientCategory, string> = {

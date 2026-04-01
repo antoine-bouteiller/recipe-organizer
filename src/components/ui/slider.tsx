@@ -1,5 +1,5 @@
 import { Slider as SliderPrimitive } from '@base-ui/react/slider'
-import * as React from 'react'
+import React from 'react'
 
 import { cn } from '@/utils/cn'
 

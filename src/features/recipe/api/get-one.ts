@@ -53,13 +53,13 @@ const getRecipe = createServerFn({
       return {
         id: result.id,
         image: getImageUrl(result.image),
+        ingredientGroups: result.ingredientGroups,
         instructions: result.instructions,
+        linkedRecipes: result.linkedRecipes,
         name: result.name,
         servings: result.servings,
         tags: result.tags,
         video: result.video,
-        ingredientGroups: result.ingredientGroups,
-        linkedRecipes: result.linkedRecipes,
       }
     })
   )

@@ -3,7 +3,6 @@ import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { useRender } from '@base-ui/react/use-render'
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
 
 import { cn } from '@/utils/cn'
 
@@ -173,4 +172,4 @@ export const SelectGroupLabel = (props: SelectPrimitive.GroupLabel.Props): React
   <SelectPrimitive.GroupLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground" data-slot="select-group-label" {...props} />
 )
 
-export { SelectPrimitive, SelectPopup as SelectContent }
+export { SelectPopup as SelectContent, SelectPrimitive }

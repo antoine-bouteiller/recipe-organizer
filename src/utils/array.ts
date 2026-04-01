@@ -1,4 +1,4 @@
-export const isNotEmpty = <T extends unknown[] | FileList>(array: T | null | undefined): array is T => {
+export const isNotEmpty = <TArray extends unknown[] | FileList>(array: TArray | null | undefined): array is TArray => {
   if (!array) {
     return false
   }

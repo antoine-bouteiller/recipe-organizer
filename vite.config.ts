@@ -11,7 +11,7 @@ const viteConfig = defineConfig({
   staged: { '*': 'vp check --fix' },
   lint: {
     options: { typeAware: true, typeCheck: true },
-    plugins: ['typescript', 'react', 'unicorn'],
+    plugins: ['typescript', 'react', 'unicorn', 'import'],
     categories: {
       correctness: 'error',
       suspicious: 'error',
@@ -25,16 +25,7 @@ const viteConfig = defineConfig({
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: [
-      '**/*.js',
-      '**/dist/**',
-      '**/routeTree.gen.ts',
-      '**/build/**',
-      '**/.adonisjs/api.ts',
-      '**/.adonisjs/prisma.ts',
-      '**/.prisma/client/**',
-      '**/*.d.ts',
-    ],
+    ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
     overrides: [
       {
         files: ['**/use-file-upload.ts'],
@@ -56,6 +47,7 @@ const viteConfig = defineConfig({
       'no-array-for-each': 'error',
       'prefer-modern-math-apis': 'error',
       'prefer-number-properties': 'error',
+      complexity: ['error', 15],
 
       // Suspicious
       'react-in-jsx-scope': 'off',
@@ -66,10 +58,13 @@ const viteConfig = defineConfig({
 
       // Pedantic
       'no-deprecated': 'error',
+      'no-negated-condition': 'error',
+      'prefer-string-replace-all': 'error',
+
+      // Suspicious
+      'no-unassigned-import': 'off',
 
       // Style
-      'prefer-template': 'error',
-      'jsx-curly-brace-presence': 'error',
       'filename-case': [
         'error',
         {
@@ -82,15 +77,18 @@ const viteConfig = defineConfig({
       'prefer-default-export': 'off',
       'no-magic-numbers': 'off',
       'sort-imports': 'off',
-      'sort-keys': 'off',
-      'id-length': ['error', { exceptions: ['T', 'x'] }],
+      'id-length': ['error', { exceptions: ['x'] }],
       'no-ternary': 'off',
-      'no-duplicate-imports': 'off',
       'max-params': 'off',
       'jsx-max-depth': 'off',
       'jsx-props-no-spreading': 'off',
       'max-statements': 'off',
       'no-null': 'off',
+      'no-nodejs-modules': 'off',
+      'no-named-export': 'off',
+      'group-exports': 'off',
+      'consistent-type-specifier-style': ['error', 'prefer-inline'],
+      'exports-last': 'off',
     },
   },
   fmt: {

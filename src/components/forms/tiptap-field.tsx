@@ -1,6 +1,6 @@
 import { ArrowUUpLeftIcon, ArrowUUpRightIcon, ListBulletsIcon, TextBolderIcon, TextItalicIcon, TextUnderlineIcon } from '@phosphor-icons/react'
-import type { AnyExtension } from '@tiptap/react'
-import type { ReactNode } from 'react'
+import { type AnyExtension } from '@tiptap/react'
+import { type ReactNode } from 'react'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Tiptap, TiptapButton, TiptapContent } from '@/components/ui/tiptap'

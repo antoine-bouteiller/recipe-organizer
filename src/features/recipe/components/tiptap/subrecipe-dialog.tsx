@@ -2,7 +2,7 @@ import { useMemo, useState, type ComponentPropsWithoutRef, type ReactNode } from
 
 import { Button } from '@/components/ui/button'
 import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/components/ui/combobox'
-import type { DialogTrigger } from '@/components/ui/dialog'
+import { type DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -15,9 +15,8 @@ import {
   ResponsiveDialogTrigger,
 } from '@/components/ui/responsive-dialog'
 import { useLinkedRecipes } from '@/contexts/linked-recipes-context'
-import type { SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
-import type { Option } from '@/hooks/use-options'
-import { useRecipeOptions } from '@/hooks/use-options'
+import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
+import { useRecipeOptions, type Option } from '@/hooks/use-options'
 
 interface SubrecipeDialogProps {
   children: ReactNode

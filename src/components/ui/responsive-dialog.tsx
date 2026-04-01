@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef, createContext, type ReactNode, useContext } from 'react'
+import { createContext, useContext, type ComponentPropsWithoutRef, type ReactNode } from 'react'
 
 import { Dialog, DialogClose, DialogFooter, DialogHeader, DialogPanel, DialogPopup, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Drawer, DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
@@ -163,10 +163,10 @@ const ResponsiveDialogClose = ({ children, ...props }: ResponsiveDialogCloseProp
 export {
   ResponsiveDialog,
   ResponsiveDialogClose,
-  ResponsiveDialogPanel,
-  ResponsiveDialogPopup,
   ResponsiveDialogFooter,
   ResponsiveDialogHeader,
+  ResponsiveDialogPanel,
+  ResponsiveDialogPopup,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
 }

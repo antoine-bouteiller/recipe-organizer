@@ -1,5 +1,4 @@
-import type { IconProps } from '@phosphor-icons/react'
-import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon, UsersIcon } from '@phosphor-icons/react'
+import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'

@@ -1,4 +1,4 @@
-import type { Recipe, RecipeIngredientGroup } from '@/features/recipe/api/get-one'
+import { type Recipe, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
 import { formatNumber } from '@/utils/number'
 

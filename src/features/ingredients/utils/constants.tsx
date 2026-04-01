@@ -1,7 +1,7 @@
 import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@phosphor-icons/react'
-import type { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
-import type { IngredientCategory } from '@/types/ingredient'
+import { type IngredientCategory } from '@/types/ingredient'
 
 export const ingredientCategoryLabels: Record<IngredientCategory, string> = {
   fish: 'Poissons',

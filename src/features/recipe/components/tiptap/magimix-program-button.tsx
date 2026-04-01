@@ -3,7 +3,7 @@ import { EditorContext } from '@tiptap/react'
 import { useContext } from 'react'
 
 import { Toggle } from '@/components/ui/toggle'
-import type { MagimixProgramData } from '@/features/recipe/types/magimix'
+import { type MagimixProgramData } from '@/features/recipe/types/magimix'
 
 import { MagimixProgramDialog } from './magimix-program-dialog'
 

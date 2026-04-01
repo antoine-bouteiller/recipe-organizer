@@ -1,5 +1,5 @@
-import { GearIcon, HouseIcon, type Icon, type IconProps, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@phosphor-icons/react'
-import type { LinkProps } from '@tanstack/react-router'
+import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon, type Icon, type IconProps } from '@phosphor-icons/react'
+import { type LinkProps } from '@tanstack/react-router'
 
 interface MenuItem {
   display?: 'desktop' | 'mobile'

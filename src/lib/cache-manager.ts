@@ -20,8 +20,8 @@ class CacheManager {
       if (cachedResponse) {
         return new Response(cachedResponse?.body, {
           headers: {
-            'Cache-Control': cacheControl,
             'CF-Cache-Status': 'HIT',
+            'Cache-Control': cacheControl,
             'Content-Type': 'image/webp',
             ...Object.fromEntries(cachedResponse.headers.entries()),
           },
@@ -33,8 +33,8 @@ class CacheManager {
 
       return new Response(response.body, {
         headers: {
-          'Cache-Control': cacheControl,
           'CF-Cache-Status': 'MISS',
+          'Cache-Control': cacheControl,
           'Content-Type': 'image/webp',
           ...Object.fromEntries(response.headers.entries()),
         },
