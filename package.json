@@ -23,10 +23,10 @@
     "@tanstack/react-router": "^1.168.10",
     "@tanstack/react-router-ssr-query": "^1.166.10",
     "@tanstack/react-start": "^1.167.16",
-    "@tiptap/core": "^3.22.0",
-    "@tiptap/pm": "^3.22.0",
-    "@tiptap/react": "^3.22.0",
-    "@tiptap/starter-kit": "^3.22.0",
+    "@tiptap/core": "^3.22.1",
+    "@tiptap/pm": "^3.22.1",
+    "@tiptap/react": "^3.22.1",
+    "@tiptap/starter-kit": "^3.22.1",
     "@vidstack/react": "^1.12.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -40,7 +40,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.30.3",
+    "@cloudflare/vite-plugin": "^1.31.0",
     "@rolldown/plugin-babel": "^0.2.2",
     "@serwist/vite": "^9.5.7",
     "@serwist/window": "^9.5.7",
@@ -61,7 +61,7 @@
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.2",
     "vite-plus": "latest",
-    "wrangler": "^4.79.0"
+    "wrangler": "^4.80.0"
   },
   "commitlint": {
     "extends": [
