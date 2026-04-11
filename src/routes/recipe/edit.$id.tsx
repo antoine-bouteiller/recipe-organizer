@@ -22,10 +22,10 @@ import { formatFormErrors } from '@/utils/format-form-errors'
 import { getVideoUrl } from '@/utils/get-file-url'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
-  _key: crypto.randomUUID(),
+  _key: Math.random().toString(36).substring(7),
   groupName: group.groupName ?? '',
   ingredients: group.groupIngredients.map((ingredient) => ({
-    _key: crypto.randomUUID(),
+    _key: Math.random().toString(36).substring(7),
     id: ingredient.ingredient.id,
     quantity: ingredient.quantity,
     unitId: ingredient.unit?.id,

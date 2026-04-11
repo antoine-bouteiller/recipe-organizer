@@ -126,7 +126,7 @@ export const RecipeForm = withForm({
                   disabled={isSubmitting}
                   onClick={() => {
                     field.pushValue({
-                      _key: crypto.randomUUID(),
+                      _key: Math.random().toString(36).substring(7),
                       groupName: undefined,
                       ingredients: [],
                     })

@@ -93,7 +93,7 @@ export const IngredientGroupField = withForm({
               disabled={isSubmitting}
               onClick={() => {
                 field.pushValue({
-                  _key: crypto.randomUUID(),
+                  _key: Math.random().toString(36).substring(7),
                   id: -1,
                   quantity: 0,
                 })
