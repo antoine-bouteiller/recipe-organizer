@@ -16,10 +16,10 @@ interface ScreenLayoutProps {
   pageKey?: string
 }
 
-export const ScreenLayout = ({ children, headerEndItem, title, withGoBack, backgroundImage, pageKey }: ScreenLayoutProps) => {
+export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = false, backgroundImage, pageKey }: ScreenLayoutProps) => {
   const router = useRouter()
 
-  useBackViewTransition(Boolean(withGoBack))
+  useBackViewTransition(withGoBack)
 
   return (
     <div
