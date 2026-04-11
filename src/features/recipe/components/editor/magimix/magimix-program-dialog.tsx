@@ -39,6 +39,8 @@ const programItems = Object.entries(magimixProgramLabels).map(([value, label]) =
   value,
 }))
 
+const FormDialog = getFormDialog(magimixProgramDefaultValues)
+
 export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: MagimixProgramDialogProps) => {
   const [open, setOpen] = useState(false)
 
@@ -63,8 +65,6 @@ export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title
       onDynamic: magimixProgramSchema,
     },
   })
-
-  const FormDialog = getFormDialog(magimixProgramDefaultValues)
 
   const { isSubmitting } = useStore(form.store, (state) => ({
     isSubmitting: state.isSubmitting,

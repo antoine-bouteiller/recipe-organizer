@@ -1,21 +1,22 @@
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $insertNodeToNearestRoot } from '@lexical/utils'
 import { CookingPotIcon } from '@phosphor-icons/react'
-import { EditorContext } from '@tiptap/react'
-import { useContext } from 'react'
 
 import { Toggle } from '@/components/ui/toggle'
 import { type MagimixProgramData } from '@/features/recipe/types/magimix'
 
 import { MagimixProgramDialog } from './magimix-program-dialog'
+import { $createMagimixProgramNode } from './magimix-program-node'
 
 export const MagimixProgramButton = () => {
-  const { editor } = useContext(EditorContext)
+  const [editor] = useLexicalComposerContext()
 
   const handleInsert = (data: MagimixProgramData) => {
-    if (!editor) {
-      return
-    }
-
-    editor.chain().focus().setMagimixProgram(data).run()
+    editor.update(() => {
+      const node = $createMagimixProgramNode(data)
+      $insertNodeToNearestRoot(node)
+    })
+    editor.focus()
   }
 
   return (

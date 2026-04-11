@@ -6,15 +6,15 @@ import { z } from 'zod'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
+import { Editor, EditorContent } from '@/components/ui/editor'
 import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger } from '@/components/ui/responsive-popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
-import { Tiptap, TiptapContent } from '@/components/ui/tiptap'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
+import { recipeNodes } from '@/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
-import { recipeExtensions } from '@/features/recipe/components/tiptap/extensions'
 import { useSwipeTabs } from '@/hooks/use-swipe-tabs'
 
 const RecipePage = () => {
@@ -101,9 +101,11 @@ const RecipePage = () => {
                   </ClientOnly>
                 </div>
                 <div className="min-w-full overflow-y-auto p-2">
-                  <Tiptap content={recipe.instructions} readOnly>
-                    <TiptapContent />
-                  </Tiptap>
+                  <ClientOnly>
+                    <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                      <EditorContent />
+                    </Editor>
+                  </ClientOnly>
                 </div>
               </motion.div>
             </div>
@@ -120,9 +122,11 @@ const RecipePage = () => {
 
           <div className="col-span-3 rounded-xl border px-8 pb-8">
             <h2>Préparation</h2>
-            <Tiptap content={recipe.instructions} extensions={recipeExtensions} readOnly>
-              <TiptapContent className="pb-4" />
-            </Tiptap>
+            <ClientOnly>
+              <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                <EditorContent className="pb-4" />
+              </Editor>
+            </ClientOnly>
           </div>
         </div>
       </div>

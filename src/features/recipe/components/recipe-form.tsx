@@ -11,10 +11,10 @@ import { useRecipeOptions } from '@/hooks/use-options'
 
 import { RECIPE_TAG_LABELS, RECIPE_TAGS } from '../utils/constants'
 import { recipeDefaultValues } from '../utils/form'
+import { recipeNodes } from './editor/extensions'
+import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
+import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
 import { IngredientGroupField } from './ingredient-group-field'
-import { recipeExtensions } from './tiptap/extensions'
-import { MagimixProgramButton } from './tiptap/magimix-program-button'
-import { SubrecipeButton } from './tiptap/subrecipe-button'
 
 const tagItems = RECIPE_TAGS.map((tag) => ({
   label: RECIPE_TAG_LABELS[tag],
@@ -144,10 +144,10 @@ export const RecipeForm = withForm({
 
         <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
           <AppField name="instructions">
-            {({ TiptapField }) => (
-              <TiptapField
+            {({ EditorField }) => (
+              <EditorField
                 disabled={isSubmitting}
-                extensions={recipeExtensions}
+                nodes={recipeNodes}
                 extraToolbar={
                   <>
                     <ToolbarSeparator />

@@ -2,12 +2,12 @@ import { createFormHook } from '@tanstack/react-form'
 
 import { CheckboxField } from '@/components/forms/checkbox-field'
 import { ComboboxField } from '@/components/forms/combobox-field'
+import EditorField from '@/components/forms/editor-field'
 import { FormSubmit } from '@/components/forms/form-submit'
 import { ImageField } from '@/components/forms/image-field'
 import { NumberField } from '@/components/forms/number-field'
 import { SelectField } from '@/components/forms/select-field'
 import { TextField } from '@/components/forms/text-field'
-import TiptapField from '@/components/forms/tiptap-field'
 import { ToggleGroupField } from '@/components/forms/toggle-group-field'
 import { VideoField } from '@/components/forms/video-field'
 import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
@@ -17,6 +17,7 @@ const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     CheckboxField,
     ComboboxField,
+    EditorField,
     Field,
     FieldControl,
     FieldDescription,
@@ -26,7 +27,6 @@ const { useAppForm, withForm } = createFormHook({
     NumberField,
     SelectField,
     TextField,
-    TiptapField,
     ToggleGroupField,
     VideoField,
   },
