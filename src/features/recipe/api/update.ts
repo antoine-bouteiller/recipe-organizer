@@ -59,7 +59,7 @@ const computeAutoTags = (
   if (ownVegetarian && linkedVegetarian && !tags.includes('dessert')) {
     autoTags.push('vegetarian')
   }
-  if (instructions.includes('data-type="magimix-program"')) {
+  if (instructions.includes('"types":"magimixProgram"')) {
     autoTags.push('magimix')
   }
   return autoTags

@@ -10,6 +10,7 @@ import {
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
+  type SerializedEditorState,
   type SerializedLexicalNode,
   type Spread,
 } from 'lexical'
@@ -38,26 +39,18 @@ const $createSubrecipeNode = (data: SubrecipeNodeData): SubrecipeNodeType =>
 
 const $isSubrecipeNode = (node: LexicalNode | null | undefined): node is SubrecipeNodeType => node instanceof SubrecipeNodeType
 
-const filterNodes = (instructions: string, hideFirstNodes: number, hideLastNodes: number): string => {
-  try {
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(instructions, 'text/html')
-    const children = [...doc.body.children]
-    const totalNodes = children.length - 1
-    const startIndex = hideFirstNodes ?? 0
-    const endIndex = hideLastNodes === undefined ? totalNodes : totalNodes - hideLastNodes
+const filterNodes = (state: string, hideFirstNodes: number, hideLastNodes: number): string => {
+  const parsedState = JSON.parse(state) as SerializedEditorState
+  const { children } = parsedState.root
+  const totalNodes = children.length - 1
+  const startIndex = hideFirstNodes ?? 0
+  const endIndex = hideLastNodes === undefined ? totalNodes : totalNodes - hideLastNodes
 
-    if (startIndex >= endIndex || startIndex >= totalNodes) {
-      return ''
-    }
-
-    return children
-      .slice(startIndex, endIndex)
-      .map((element) => element.outerHTML)
-      .join('')
-  } catch {
-    return instructions
+  if (startIndex >= endIndex || startIndex >= totalNodes) {
+    return JSON.stringify({ root: { ...parsedState.root, children: [] } })
   }
+
+  return JSON.stringify({ root: { ...parsedState.root, children: children.slice(startIndex, endIndex) } })
 }
 
 const SubrecipeInstructionsContent = ({

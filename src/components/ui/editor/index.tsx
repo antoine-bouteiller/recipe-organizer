@@ -1,5 +1,3 @@
-import '@tanstack/react-start/client-only'
-import { $generateNodesFromDOM } from '@lexical/html'
 import { $isListNode, INSERT_UNORDERED_LIST_COMMAND, ListItemNode, ListNode, REMOVE_LIST_COMMAND } from '@lexical/list'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import { LexicalComposer, type InitialConfigType } from '@lexical/react/LexicalComposer'
@@ -11,7 +9,6 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
 import {
-  $getRoot,
   $getSelection,
   $isRangeSelection,
   CAN_REDO_COMMAND,
@@ -170,16 +167,7 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
   const initialConfig = useMemo<InitialConfigType>(
     () => ({
       editable: !readOnly,
-      editorState: content
-        ? (editor) => {
-            const parser = new DOMParser()
-            const dom = parser.parseFromString(content, 'text/html')
-            const nodes = $generateNodesFromDOM(editor, dom)
-            const root = $getRoot()
-            root.clear()
-            root.append(...nodes)
-          }
-        : undefined,
+      editorState: content,
       namespace: 'RecipeEditor',
       nodes: allNodes,
       onError: (error: Error) => {

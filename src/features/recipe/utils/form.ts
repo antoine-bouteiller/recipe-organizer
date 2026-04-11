@@ -16,7 +16,7 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
       ],
     },
   ],
-  instructions: '',
+  instructions: undefined,
   linkedRecipes: [],
   name: '',
   servings: 4,

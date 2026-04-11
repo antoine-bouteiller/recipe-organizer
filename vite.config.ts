@@ -77,7 +77,7 @@ const viteConfig = defineConfig({
       'prefer-default-export': 'off',
       'no-magic-numbers': 'off',
       'sort-imports': 'off',
-      'id-length': ['error', { exceptions: ['x'] }],
+      'id-length': ['error', { exceptions: ['x', '$'] }],
       'no-ternary': 'off',
       'max-params': 'off',
       'jsx-max-depth': 'off',

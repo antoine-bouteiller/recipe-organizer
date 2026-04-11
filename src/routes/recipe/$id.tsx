@@ -101,11 +101,9 @@ const RecipePage = () => {
                   </ClientOnly>
                 </div>
                 <div className="min-w-full overflow-y-auto p-2">
-                  <ClientOnly>
-                    <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                      <EditorContent />
-                    </Editor>
-                  </ClientOnly>
+                  <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                    <EditorContent />
+                  </Editor>
                 </div>
               </motion.div>
             </div>
@@ -122,11 +120,9 @@ const RecipePage = () => {
 
           <div className="col-span-3 rounded-xl border px-8 pb-8">
             <h2>Préparation</h2>
-            <ClientOnly>
-              <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                <EditorContent className="pb-4" />
-              </Editor>
-            </ClientOnly>
+            <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+              <EditorContent className="pb-4" />
+            </Editor>
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-import { $generateHtmlFromNodes } from '@lexical/html'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEffect } from 'react'
 
@@ -11,10 +10,7 @@ export const OnChangePlugin = ({ onChange }: { onChange?: (content: string) => v
     }
 
     return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        const html = $generateHtmlFromNodes(editor)
-        onChange(html)
-      })
+      onChange(JSON.stringify(editorState.toJSON()))
     })
   }, [editor, onChange])
 
