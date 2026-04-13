@@ -1,0 +1,26 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  packageRules: [
+    {
+      description: 'Drizzle Group',
+      groupName: 'drizzle',
+      matchPackageNames: ['drizzle-orm', 'drizzle-kit'],
+      versioning: 'docker',
+    },
+    {
+      description: 'Lexical Group',
+      groupName: 'lexical',
+      matchPackageNames: ['lexical', '@lexical/**'],
+    },
+    {
+      description: 'React Group',
+      groupName: 'react',
+      matchPackageNames: ['react', 'react-dom', '@types/react', '@types/react-dom'],
+    },
+    {
+      description: 'Tanstack Group',
+      groupName: 'tanstack',
+      matchPackageNames: ['@tanstack/**'],
+    },
+  ],
+}
