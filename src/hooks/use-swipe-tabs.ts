@@ -9,7 +9,7 @@ const ELASTIC_FACTOR = 0.15
 const SPRING_CONFIG = { bounce: 0, duration: 0.35, type: 'spring' as const }
 
 export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], defaultTab: TTab) => {
-  const [activeTab, setActiveTab] = useState<TTab>(defaultTab)
+  const [activeTab, setActiveTab] = useState(defaultTab)
   const [containerWidth, setContainerWidth] = useState(0)
 
   const activeIndex = tabs.indexOf(activeTab)

@@ -1,16 +1,8 @@
 import { useSession } from '@tanstack/react-start/server'
 import { env } from 'cloudflare:workers'
 
-interface AppSessionData {
-  userId?: string
-}
-
-interface OAuthSessionData {
-  oauthState?: string
-}
-
 export const useAppSession = () =>
-  useSession<AppSessionData>({
+  useSession({
     cookie: {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 30, // 7 days
@@ -22,7 +14,7 @@ export const useAppSession = () =>
   })
 
 export const useOAuthSession = () =>
-  useSession<OAuthSessionData>({
+  useSession({
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
