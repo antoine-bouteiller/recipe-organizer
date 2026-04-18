@@ -1,6 +1,6 @@
 ---
 title: File structure & module organization
-status: draft
+status: amended
 author: Antoine Bouteiller
 date: 2026-04-18
 related:
@@ -23,22 +23,22 @@ couple unrelated code. This spec codifies where code lives and why.
 - `[G-4]` Make the difference between routes (URLs), features (domain), and components (UI primitives)
   obvious to newcomers.
 - `[G-5]` Document generated files so they are never hand-edited.
-- `[G-6]` Supersede `agents_doc/file_structure.md`, which is generic and partially stale.
+- `[G-6]` Serve as the authoritative layout reference for the repo.
 
 ## 3. Key Design Decisions
 
-| Decision                                         | Choice                                                            | Rationale                                                                                       |
-| ------------------------------------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `[KD-1]` Feature-folder layout                   | One folder per domain under `src/features/<name>/`                | Aligns with `[PI-2]` in `index.spec.md`: each feature owns its API, components, hooks, types.   |
-| `[KD-2]` Routes folder is URL-shaped only        | `src/routes/` mirrors URL paths (TanStack Start file routes)      | File path = URL path; no domain logic beyond loaders and the route shell.                       |
-| `[KD-3]` Shared UI under `src/components/`       | UI primitives (shadcn-based) + form fields + layout + icons       | Used by many features; kept feature-agnostic so features never import one another via UI.       |
-| `[KD-4]` Shared runtime helpers under `src/lib/` | DB instance, R2 helpers, session, query-keys, cache manager, etc. | Cross-cutting runtime concerns that are not React components.                                   |
-| `[KD-5]` Shared hooks under `src/hooks/`         | Hooks usable by any feature (`useAppForm`, `useIsMobile`, …)      | Feature-scoped hooks live under `src/features/<name>/hooks/`.                                   |
-| `[KD-6]` Global stores under `src/stores/`       | Zustand stores whose state is consumed across features            | Cart and `recipe-quantities` are inherently cross-page — see `client-state.spec.md`.            |
-| `[KD-7]` No barrel files                         | Every module imports from the file path, not `index.ts`           | Better tree-shaking; fewer circular-import traps (see `agents_doc/file_structure.md`).          |
-| `[KD-8]` Co-located specs                        | `*.spec.md` lives with the feature; cross-cutting in `docs/infrastructure/` | Specs travel with the code they describe (see `index.spec.md`).                                 |
-| `[KD-9]` Generated files are off-limits          | `routeTree.gen.ts`, `worker-configuration.d.ts`, `migrations/*`   | Hand edits are overwritten by their generators.                                                 |
-| `[KD-10]` `agents_doc/` is onboarding, not truth | Canonical answers live in `docs/infrastructure/` specs             | `agents_doc/` is generic and partially stale — see `index.spec.md` `[C-2]`.                     |
+| Decision                                         | Choice                                                                                | Rationale                                                                                     |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `[KD-1]` Feature-folder layout                   | One folder per domain under `src/features/<name>/`                                    | Aligns with `[PI-2]` in `index.spec.md`: each feature owns its API, components, hooks, types. |
+| `[KD-2]` Routes folder is URL-shaped only        | `src/routes/` mirrors URL paths (TanStack Start file routes)                          | File path = URL path; no domain logic beyond loaders and the route shell.                     |
+| `[KD-3]` Shared UI under `src/components/`       | UI primitives (shadcn-based) + form fields + layout + icons                           | Used by many features; kept feature-agnostic so features never import one another via UI.     |
+| `[KD-4]` Shared runtime helpers under `src/lib/` | DB instance, R2 helpers, session, query-keys, cache manager, etc.                     | Cross-cutting runtime concerns that are not React components.                                 |
+| `[KD-5]` Shared hooks under `src/hooks/`         | Hooks usable by any feature (`useAppForm`, `useIsMobile`, …)                          | Feature-scoped hooks live under `src/features/<name>/hooks/`.                                 |
+| `[KD-6]` Global stores under `src/stores/`       | Zustand stores whose state is consumed across features                                | Cart and `recipe-quantities` are inherently cross-page — see `client-state.spec.md`.          |
+| `[KD-7]` No barrel files                         | Every module imports from the file path, not `index.ts`                               | Better tree-shaking; fewer circular-import traps.                                             |
+| `[KD-8]` Co-located specs                        | `*.spec.md` lives with the feature; cross-cutting in `docs/` + `docs/infrastructure/` | Specs travel with the code they describe (see `infrastructure/index.spec.md`).                |
+| `[KD-9]` Generated files are off-limits          | `routeTree.gen.ts`, `worker-configuration.d.ts`, `migrations/*`                       | Hand edits are overwritten by their generators.                                               |
+| `[KD-10]` Specs are the single source of truth   | Architecture/layout knowledge lives exclusively in `docs/**/*.spec.md`                | One canonical tree avoids drift between onboarding prose and living specs.                    |
 
 ## 4. Principles & Intents
 
@@ -59,12 +59,10 @@ couple unrelated code. This spec codifies where code lives and why.
 - `[NG-1]` Defining a `src/api/` top-level folder. All API declarations live inside features
   (`src/features/<name>/api/`).
 - `[NG-2]` Introducing a monorepo (`packages/`, `apps/`). This is a single Cloudflare Worker + Vite+ project.
-- `[NG-3]` Enforcing the layout via path-based ESLint `no-restricted-imports`. Convention + code review
-  suffice at current scale.
+- `[NG-3]` Enforcing the layout via path-based lint rules. The Oxlint stack does not ship a
+  `no-restricted-imports` equivalent (see `[C-6]`); convention + code review carry the invariant.
 - `[NG-4]` Documenting every file. This spec describes the folder contract; individual files are self-explanatory
   via names + types.
-- `[NG-5]` Replacing `agents_doc/file_structure.md`. That file stays as a high-level primer; this spec is the
-  authoritative layout reference.
 
 ## 6. Caveats
 
@@ -74,17 +72,17 @@ couple unrelated code. This spec codifies where code lives and why.
   `recipe/spec/editor.spec.md`.
 - `[C-2]` `src/features/recipe/spec/` is a directory (not a single `recipe.spec.md`) because the Recipe spec
   was split per `spec.md` "Splitting a spec" rule. Other features have a single `*.spec.md`.
-- `[C-3]` `agents_doc/file_structure.md` predates the current layout and says "`src/testing`", "`src/config`",
-  and "feature `api` = client API hooks". The current layout has none of those; server functions, not REST
-  hooks, live under `features/*/api/`.
-- `[C-4]` Generated files — **do not edit**:
+- `[C-3]` Generated files — **do not edit**:
   - `src/routeTree.gen.ts` (TanStack Router route generation)
   - `worker-configuration.d.ts` (Wrangler bindings)
   - `migrations/*.sql` (Drizzle migrations — produced by `drizzle-kit generate`)
-- `[C-5]` `migrations_tmp/` is a Wrangler dev-only pointer; `migrations/` is canonical. See `platform.spec.md`
-  `[C-1]`.
-- `[C-6]` `src/utils/` holds tiny pure helpers (`cn`, `is-null-or-undefined`, `number`, `string`, …). If a
-  helper starts to grow runtime dependencies (DB, R2, fetch), promote it to `src/lib/`.
+- `[C-4]` `migrations_tmp/` is a Wrangler dev-only pointer; `migrations/` is canonical. See
+  `infrastructure/platform.spec.md` `[C-1]`.
+- `[C-5]` `src/utils/` holds tiny pure helpers (`cn`, `is-null-or-undefined`, `number`, `string`, …). If a
+  helper grows runtime dependencies (DB, R2, fetch), promote it to `src/lib/`.
+- `[C-6]` Oxlint (the linter Vite+ bundles) ships no `no-restricted-imports` rule. Feature isolation
+  (`[PI-1]`) and the import-direction invariant (`[VC-2]`) are enforced by convention; machine enforcement
+  waits on upstream support.
 
 ## 7. High-Level Components
 
@@ -92,15 +90,16 @@ couple unrelated code. This spec codifies where code lives and why.
 
 ```text
 recipe-organizer/
-├── agents_doc/                 # Onboarding docs for agents (non-authoritative)
 ├── docs/
-│   └── infrastructure/          # Cross-cutting specs (this directory)
+│   ├── file-structure.spec.md  # This spec
+│   └── infrastructure/         # Cross-cutting specs (platform, data-layer, forms, …)
 ├── migrations/                 # D1 migrations (generated by Drizzle; canonical)
-├── migrations_tmp/             # Wrangler dev-only migrations pointer (see platform.spec.md [C-1])
+├── migrations_tmp/             # Wrangler dev-only migrations pointer (see infrastructure/platform.spec.md [C-1])
 ├── public/                     # Static assets served verbatim by the Worker
 ├── src/                        # Application source (see below)
 ├── scripts/                    # One-off scripts (e.g. Lexical migration)
-├── CLAUDE.md                   # Project entry for Claude (see project CLAUDE.md)
+├── AGENTS.md                   # Agent-facing project entry (symlinked to CLAUDE.md)
+├── CLAUDE.md                   # Project entry for Claude (symlink target of AGENTS.md)
 ├── wrangler.jsonc              # Cloudflare Worker bindings + compat flags
 ├── vite.config.ts              # Vite+ config
 └── package.json
@@ -119,7 +118,6 @@ src/
 │   ├── layout/          # Theme provider, screen layout
 │   ├── navigation/      # Navbar, tabbar, nav constants
 │   └── icons/           # App icon set
-├── contexts/            # React context providers (small, cross-feature)
 ├── features/            # Feature domains (see below)
 ├── hooks/               # Shared hooks (useAppForm, useIsMobile, useFileUpload, …)
 ├── lib/                 # Cross-cutting runtime helpers
@@ -155,6 +153,7 @@ src/
 src/features/<feature>/
 ├── api/             # Server functions (createServerFn entry points)
 ├── components/      # React components scoped to this feature
+├── contexts/        # React contexts scoped to this feature
 ├── hooks/           # Hooks scoped to this feature
 ├── types/           # Local types (if not promoted to src/types/)
 ├── utils/           # Local utils
@@ -164,47 +163,48 @@ src/features/<feature>/
 
 Not every feature uses every subfolder. Inventory:
 
-| Feature         | Subfolders present                                   | Spec shape                       |
-| --------------- | ---------------------------------------------------- | -------------------------------- |
-| `auth`          | `api/`, `lib/`                                       | `auth.spec.md`                   |
-| `ingredients`   | `api/`, `components/`, `hooks/`, `utils/`            | `ingredients.spec.md`            |
-| `units`         | `api/`, `components/`                                | `units.spec.md`                  |
-| `users`         | `api/`, `components/`                                | `users.spec.md`                  |
-| `shopping-list` | `api/`, `components/`, `hooks/`, `utils/`            | `shopping-list.spec.md`          |
-| `recipe`        | `api/`, `components/`, `hooks/`, `types/`, `utils/`  | `spec/` dir (index + 3 subspecs) |
+| Feature         | Subfolders present                                               | Spec shape                       |
+| --------------- | ---------------------------------------------------------------- | -------------------------------- |
+| `auth`          | `api/`, `lib/`                                                   | `auth.spec.md`                   |
+| `ingredients`   | `api/`, `components/`, `hooks/`, `utils/`                        | `ingredients.spec.md`            |
+| `units`         | `api/`, `components/`                                            | `units.spec.md`                  |
+| `users`         | `api/`, `components/`                                            | `users.spec.md`                  |
+| `shopping-list` | `api/`, `components/`, `hooks/`, `utils/`                        | `shopping-list.spec.md`          |
+| `recipe`        | `api/`, `components/`, `contexts/`, `hooks/`, `types/`, `utils/` | `spec/` dir (index + 3 subspecs) |
 
 ### Component inventory (this spec's own module surface)
 
-| Component                  | Module type                | Responsibility                                                                        | Public surface                                                                     |
-| -------------------------- | -------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Repo layout                | Directory contract         | Top-level folders (src, docs, migrations, public, scripts, agents_doc, wrangler)      | Directory tree above                                                               |
-| `src/` layout              | Directory contract         | Split between shared UI / runtime / routes / features / stores / utils                | Tree above                                                                         |
-| Feature folder shape       | Convention                 | `<feature>/api`, `components`, `hooks`, `utils`, `types`, `lib`, `*.spec.md`          | Tree above                                                                         |
-| Routes mapping             | TanStack Start file routes | Route paths mirror URL structure                                                      | `src/routes/**/*.tsx` → URLs                                                       |
-| Generated file ledger      | Documentation              | Enumerates files produced by tooling                                                  | `routeTree.gen.ts`, `worker-configuration.d.ts`, `migrations/*.sql`                |
+| Component             | Module type                | Responsibility                                                               | Public surface                                                      |
+| --------------------- | -------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Repo layout           | Directory contract         | Top-level folders (src, docs, migrations, public, scripts, wrangler)         | Directory tree above                                                |
+| `src/` layout         | Directory contract         | Split between shared UI / runtime / routes / features / stores / utils       | Tree above                                                          |
+| Feature folder shape  | Convention                 | `<feature>/api`, `components`, `hooks`, `utils`, `types`, `lib`, `*.spec.md` | Tree above                                                          |
+| Routes mapping        | TanStack Start file routes | Route paths mirror URL structure                                             | `src/routes/**/*.tsx` → URLs                                        |
+| Generated file ledger | Documentation              | Enumerates files produced by tooling                                         | `routeTree.gen.ts`, `worker-configuration.d.ts`, `migrations/*.sql` |
 
 ## 8. Detailed Design
 
 ### Where does X go?
 
-| You're adding…                                         | Put it in…                                                     | Notes                                                      |
-| ------------------------------------------------------ | -------------------------------------------------------------- | ---------------------------------------------------------- |
-| A new URL (page)                                       | `src/routes/<path>.tsx`                                        | Re-run `vp dev` to regenerate `routeTree.gen.ts`.          |
-| A new feature domain                                   | `src/features/<name>/` + `<name>.spec.md`                      | Follow feature shape above.                                |
-| A server function for an existing feature              | `src/features/<feature>/api/<verb>.ts`                         | Use `createServerFn` + `authGuard` + `withServerError`.    |
-| A shared shadcn primitive                              | `src/components/ui/`                                           | `vp dlx shadcn@latest add @coss/<name>` where possible.    |
-| A form field wrapper                                   | `src/components/forms/<name>-field.tsx`                        | Used by `useAppForm` — see `forms.spec.md`.                |
-| A Lexical editor plugin shared by any form             | `src/components/forms/editor/`                                 | Shared rich-text host.                                     |
-| A Lexical decorator node specific to recipes           | `src/features/recipe/components/editor/`                       | E.g. Magimix, Subrecipe.                                   |
-| A cross-cutting helper (DB, R2, session, query keys)   | `src/lib/`                                                     | Not a component; not tied to one feature.                  |
-| A helper used by one feature                           | `src/features/<feature>/utils/` or `hooks/`                    | Promote to `src/lib/` only when a second feature needs it. |
-| A tiny pure helper (`cn`, `isNullOrUndefined`, …)      | `src/utils/`                                                   | No runtime deps (no DB/R2/fetch).                          |
-| A Zustand store used by multiple features              | `src/stores/`                                                  | See `client-state.spec.md`.                                |
-| A shared type                                          | `src/types/` if used across features; else `features/*/types/` |                                                            |
-| A one-off script (data migration, maintenance)         | `scripts/`                                                     | Not shipped in the Worker bundle.                          |
-| A Drizzle schema change                                | `src/lib/db/schema/` + `vp run db:generate`                    | See `data-layer.spec.md`.                                  |
-| A spec covering one feature                            | `src/features/<feature>/<feature>.spec.md`                     | Split into `spec/` dir when >300 lines / >3 components.    |
-| A cross-cutting spec                                   | `docs/infrastructure/<name>.spec.md`                            | Link from `docs/infrastructure/index.spec.md`.              |
+| You're adding…                                       | Put it in…                                                     | Notes                                                      |
+| ---------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| A new URL (page)                                     | `src/routes/<path>.tsx`                                        | Re-run `vp dev` to regenerate `routeTree.gen.ts`.          |
+| A new feature domain                                 | `src/features/<name>/` + `<name>.spec.md`                      | Follow feature shape above.                                |
+| A server function for an existing feature            | `src/features/<feature>/api/<verb>.ts`                         | Use `createServerFn` + `authGuard` + `withServerError`.    |
+| A shared shadcn primitive                            | `src/components/ui/`                                           | `vp dlx shadcn@latest add @coss/<name>` where possible.    |
+| A form field wrapper                                 | `src/components/forms/<name>-field.tsx`                        | Used by `useAppForm` — see `infrastructure/forms.spec.md`. |
+| A Lexical editor plugin shared by any form           | `src/components/forms/editor/`                                 | Shared rich-text host.                                     |
+| A Lexical decorator node specific to recipes         | `src/features/recipe/components/editor/`                       | E.g. Magimix, Subrecipe.                                   |
+| A cross-cutting helper (DB, R2, session, query keys) | `src/lib/`                                                     | Not a component; not tied to one feature.                  |
+| A helper used by one feature                         | `src/features/<feature>/utils/` or `hooks/`                    | Promote to `src/lib/` only when a second feature needs it. |
+| A React context scoped to one feature                | `src/features/<feature>/contexts/`                             | E.g. `recipe/contexts/linked-recipes-context.tsx`.         |
+| A tiny pure helper (`cn`, `isNullOrUndefined`, …)    | `src/utils/`                                                   | No runtime deps (no DB/R2/fetch).                          |
+| A Zustand store used by multiple features            | `src/stores/`                                                  | See `infrastructure/client-state.spec.md`.                 |
+| A shared type                                        | `src/types/` if used across features; else `features/*/types/` |                                                            |
+| A one-off script (data migration, maintenance)       | `scripts/`                                                     | Not shipped in the Worker bundle.                          |
+| A Drizzle schema change                              | `src/lib/db/schema/` + `vp run db:generate`                    | See `infrastructure/data-layer.spec.md`.                   |
+| A spec covering one feature                          | `src/features/<feature>/<feature>.spec.md`                     | Split into `spec/` dir when >300 lines / >3 components.    |
+| A cross-cutting spec                                 | `docs/infrastructure/<name>.spec.md`                           | Link from `docs/infrastructure/index.spec.md`.             |
 
 ### Import direction
 
@@ -227,11 +227,11 @@ features/<Y>/ ─────┘   ⛔  feature-to-feature imports are forbidden
 
 ### Generated files (do not edit)
 
-| File                           | Generator                              | Regenerate with               |
-| ------------------------------ | -------------------------------------- | ----------------------------- |
-| `src/routeTree.gen.ts`         | `@tanstack/react-router` Vite plugin   | `vp dev` / `vp build`         |
-| `worker-configuration.d.ts`    | `wrangler types`                       | `wrangler types`              |
-| `migrations/*.sql`             | `drizzle-kit generate`                 | `vp run db:generate`          |
+| File                        | Generator                            | Regenerate with       |
+| --------------------------- | ------------------------------------ | --------------------- |
+| `src/routeTree.gen.ts`      | `@tanstack/react-router` Vite plugin | `vp dev` / `vp build` |
+| `worker-configuration.d.ts` | `wrangler types`                     | `wrangler types`      |
+| `migrations/*.sql`          | `drizzle-kit generate`               | `vp run db:generate`  |
 
 ## 9. Verification Criteria
 
@@ -248,12 +248,14 @@ features/<Y>/ ─────┘   ⛔  feature-to-feature imports are forbidden
   output).
 - `[VC-6]` `vp check` passes (lint + format + typecheck) with no import-path violations.
 - `[VC-7]` `docs/infrastructure/index.spec.md` section 7 links to this spec.
+- `[VC-8]` Feature-scoped React contexts live under `src/features/<feature>/contexts/`.
 
 ## 10. Open Questions
 
-- `[OQ-1]` Should we add ESLint `no-restricted-imports` rules to machine-enforce `[PI-1]` (feature isolation)
-  and the import-direction invariant in `[VC-2]`?
-- `[OQ-2]` Should `agents_doc/file_structure.md` be retired in favor of this spec, or kept as a pared-down
-  pointer to it (mirroring `[OQ-1]` in `index.spec.md` re: `database.md`)?
-- `[OQ-3]` `src/contexts/` currently holds a single file (`linked-recipes-context.tsx`). Keep the folder, or
-  fold the file into its single consumer (`src/features/recipe/`)?
+N/A.
+
+## Changelog
+
+| Date       | Amendment                                                                                                                                                                                                                                                               | Sections affected    | Reason                                                                                                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-04-18 | Deleted `agents_doc/`; relocated `linked-recipes-context.tsx` from `src/contexts/` to `src/features/recipe/contexts/`; noted Oxlint has no `no-restricted-imports`; stripped historical breadcrumbs from body per spec rule §5 and removed resolved `[OQ-1..3]` per §6. | 2, 3, 5, 6, 7, 9, 10 | Consolidating all layout/architecture knowledge in `docs/**/*.spec.md`; resolving the singleton `src/contexts/` anomaly; recording the linter gap that blocks machine-enforcement of `[PI-1]` / `[VC-2]`. |
