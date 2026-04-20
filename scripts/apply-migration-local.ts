@@ -27,5 +27,5 @@ for (const folder of folders) {
   }
 }
 
-execSync('wrangler d1 migrations apply recipe-organizer')
+execSync('pnpm wrangler d1 migrations apply recipe-organizer')
 rmSync(TMP_DIR, { force: true, recursive: true })

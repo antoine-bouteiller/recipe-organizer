@@ -59,22 +59,28 @@ const getRecipesByIds = createServerFn({
             .flatMap((group) => group.groupIngredients)
             .map((groupIngredient) => ({
               category: groupIngredient.ingredient.category,
+              countWeightG: groupIngredient.ingredient.countWeightG,
+              densityGPerMl: groupIngredient.ingredient.densityGPerMl,
               id: groupIngredient.ingredient.id,
               name: groupIngredient.ingredient.name,
               parentId: groupIngredient.ingredient.parentId,
+              preferredUnitSlug: groupIngredient.ingredient.preferredUnitSlug,
               quantity: groupIngredient.quantity,
-              unit: groupIngredient.unit?.name,
+              unitSlug: groupIngredient.unitSlug,
             })),
           ...row.linkedRecipes.flatMap(({ linkedRecipe, ratio }) =>
             linkedRecipe.ingredientGroups
               .flatMap((group) => group.groupIngredients)
               .map((groupIngredient) => ({
                 category: groupIngredient.ingredient.category,
+                countWeightG: groupIngredient.ingredient.countWeightG,
+                densityGPerMl: groupIngredient.ingredient.densityGPerMl,
                 id: groupIngredient.ingredient.id,
                 name: groupIngredient.ingredient.name,
                 parentId: groupIngredient.ingredient.parentId,
+                preferredUnitSlug: groupIngredient.ingredient.preferredUnitSlug,
                 quantity: (groupIngredient.quantity * ratio) / linkedRecipe.servings,
-                unit: groupIngredient.unit?.name,
+                unitSlug: groupIngredient.unitSlug,
               }))
           ),
         ],

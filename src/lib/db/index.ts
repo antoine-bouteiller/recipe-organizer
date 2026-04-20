@@ -2,10 +2,10 @@ import { env as cloudflareEnv } from 'cloudflare:workers'
 import { defineRelations } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/d1'
 
-import { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, unit, user } from './schema'
+import { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, user } from './schema'
 
 const relations = defineRelations(
-  { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, unit, user },
+  { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, user },
   (relation) => ({
     groupIngredient: {
       group: relation.one.recipeIngredientGroup({
@@ -16,10 +16,6 @@ const relations = defineRelations(
         from: relation.groupIngredient.ingredientId,
         optional: false,
         to: relation.ingredient.id,
-      }),
-      unit: relation.one.unit({
-        from: relation.groupIngredient.unitId,
-        to: relation.unit.id,
       }),
     },
     ingredient: {
@@ -61,12 +57,6 @@ const relations = defineRelations(
         from: relation.recipeLinkedRecipes.recipeId,
         optional: false,
         to: relation.recipe.id,
-      }),
-    },
-    unit: {
-      parent: relation.one.unit({
-        from: relation.unit.parentId,
-        to: relation.unit.id,
       }),
     },
     user: {

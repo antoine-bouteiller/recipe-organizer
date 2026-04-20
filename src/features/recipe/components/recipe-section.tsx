@@ -1,5 +1,6 @@
 import { type Recipe, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
+import { UNITS } from '@/lib/db/schema/unit'
 import { formatNumber } from '@/utils/number'
 
 interface RecipeGroupIngredientsProps {
@@ -17,7 +18,7 @@ const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: Re
             <div>{groupIngredient.ingredient.name}</div>
             <div className="font-medium">
               {formatNumber((groupIngredient.quantity * servings) / baseServings)}
-              {groupIngredient.unit && ` ${groupIngredient.unit.name}`}
+              {groupIngredient.unitSlug && ` ${UNITS[groupIngredient.unitSlug]?.name ?? ''}`}
             </div>
           </div>
         </li>

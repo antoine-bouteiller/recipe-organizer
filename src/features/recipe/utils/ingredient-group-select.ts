@@ -10,15 +10,10 @@ export const ingredientGroupSelect = {
       columns: {
         id: true,
         quantity: true,
+        unitSlug: true,
       },
       with: {
         ingredient: {
-          columns: {
-            id: true,
-            name: true,
-          },
-        },
-        unit: {
           columns: {
             id: true,
             name: true,

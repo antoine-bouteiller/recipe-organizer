@@ -167,7 +167,6 @@ Not every feature uses every subfolder. Inventory:
 | --------------- | ---------------------------------------------------------------- | -------------------------------- |
 | `auth`          | `api/`, `lib/`                                                   | `auth.spec.md`                   |
 | `ingredients`   | `api/`, `components/`, `hooks/`, `utils/`                        | `ingredients.spec.md`            |
-| `units`         | `api/`, `components/`                                            | `units.spec.md`                  |
 | `users`         | `api/`, `components/`                                            | `users.spec.md`                  |
 | `shopping-list` | `api/`, `components/`, `hooks/`, `utils/`                        | `shopping-list.spec.md`          |
 | `recipe`        | `api/`, `components/`, `contexts/`, `hooks/`, `types/`, `utils/` | `spec/` dir (index + 3 subspecs) |

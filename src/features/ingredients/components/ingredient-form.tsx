@@ -2,14 +2,20 @@ import { useStore } from '@tanstack/react-form'
 
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
+import { unitOptions } from '@/lib/db/schema/unit'
 
 import { type IngredientFormInput } from '../api/create'
 import { ingredientsCategoryOptions } from '../utils/constants'
 
 export const ingredientDefaultValues: IngredientFormInput = {
   category: undefined,
+  countWeightG: null,
+  densityGPerMl: null,
   name: '',
+  preferredUnitSlug: null,
 }
+
+const preferredUnitOptions = [{ label: 'Aucune', value: '' }, ...unitOptions]
 
 export const IngredientForm = withForm({
   defaultValues: ingredientDefaultValues,
@@ -30,6 +36,15 @@ export const IngredientForm = withForm({
         </AppField>
         <AppField name="parentId">
           {({ ComboboxField }) => <ComboboxField disabled={isSubmitting} label="Ingrédient parent" options={ingredientOptions} />}
+        </AppField>
+        <AppField name="densityGPerMl">
+          {({ NumberField }) => <NumberField allowDecimals disabled={isSubmitting} label="Densité (g/ml)" min={0} placeholder="Ex: 0.55" />}
+        </AppField>
+        <AppField name="countWeightG">
+          {({ NumberField }) => <NumberField allowDecimals disabled={isSubmitting} label="Poids unitaire (g)" min={0} placeholder="Ex: 50" />}
+        </AppField>
+        <AppField name="preferredUnitSlug">
+          {({ SelectField }) => <SelectField disabled={isSubmitting} items={preferredUnitOptions} label="Unité préférée (liste de courses)" />}
         </AppField>
       </>
     )

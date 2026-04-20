@@ -150,7 +150,7 @@ const updateRecipe = createServerFn({
                   groupId: updatedGroup.id,
                   ingredientId: ingredientEntry.id,
                   quantity: ingredientEntry.quantity,
-                  unitId: ingredientEntry.unitId ?? undefined,
+                  unitSlug: ingredientEntry.unitSlug ?? undefined,
                 }))
               )
           }

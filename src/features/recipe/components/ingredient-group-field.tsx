@@ -6,15 +6,17 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
-import { AddUnit } from '@/features/units/components/add-unit'
 import { withForm } from '@/hooks/use-app-form'
-import { useIngredientOptions, useUnitOptions } from '@/hooks/use-options'
+import { useIngredientOptions } from '@/hooks/use-options'
+import { unitOptions } from '@/lib/db/schema/unit'
 
 import { recipeDefaultValues } from '../utils/form'
 
 interface IngredientFormProps {
   groupIndex: number
 }
+
+const unitPickerItems = [{ label: 'Aucune', value: '' }, ...unitOptions]
 
 export const IngredientGroupField = withForm({
   defaultValues: recipeDefaultValues,
@@ -24,7 +26,6 @@ export const IngredientGroupField = withForm({
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
     const ingredientsOptions = useIngredientOptions()
-    const unitsOptions = useUnitOptions({ allowEmpty: true })
 
     return (
       <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
@@ -56,23 +57,8 @@ export const IngredientGroupField = withForm({
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].quantity`}>
                       {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Quantité" allowDecimals />}
                     </AppField>
-                    <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].unitId`}>
-                      {({ ComboboxField }) => (
-                        <ComboboxField
-                          addNew={(inputValue: string) => (
-                            <AddUnit defaultValue={inputValue} key={inputValue}>
-                              <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
-                                <PlusIcon aria-hidden="true" className="size-4" />
-                                Nouvelle unité: {inputValue}
-                              </Button>
-                            </AddUnit>
-                          )}
-                          disabled={isSubmitting}
-                          options={unitsOptions}
-                          placeholder="Sélectionner une unité"
-                          searchPlaceholder="Rechercher une unité"
-                        />
-                      )}
+                    <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].unitSlug`}>
+                      {({ SelectField }) => <SelectField disabled={isSubmitting} items={unitPickerItems} />}
                     </AppField>
                   </div>
                   <Button

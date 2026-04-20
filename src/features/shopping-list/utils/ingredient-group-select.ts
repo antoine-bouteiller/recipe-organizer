@@ -13,6 +13,7 @@ export const ingredientGroupSelect = {
       columns: {
         id: true,
         quantity: true,
+        unitSlug: true,
       },
       where: {
         ingredient: {
@@ -25,15 +26,12 @@ export const ingredientGroupSelect = {
         ingredient: {
           columns: {
             category: true,
+            countWeightG: true,
+            densityGPerMl: true,
             id: true,
             name: true,
             parentId: true,
-          },
-        },
-        unit: {
-          columns: {
-            id: true,
-            name: true,
+            preferredUnitSlug: true,
           },
         },
       },

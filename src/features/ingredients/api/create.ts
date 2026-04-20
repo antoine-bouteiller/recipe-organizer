@@ -6,13 +6,17 @@ import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient, ingredientCategory } from '@/lib/db/schema'
+import { unitSlugSchema } from '@/lib/db/schema/unit'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 
 const ingredientSchema = z.object({
   category: z.enum(ingredientCategory),
+  countWeightG: z.number().positive().nullable().optional(),
+  densityGPerMl: z.number().positive().nullable().optional(),
   name: z.string().min(2),
   parentId: z.number().optional(),
+  preferredUnitSlug: unitSlugSchema.nullable().optional(),
 })
 
 export type IngredientFormValues = z.infer<typeof ingredientSchema>

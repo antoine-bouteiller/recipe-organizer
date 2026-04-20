@@ -7,6 +7,7 @@ import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
+import { unitSlugSchema } from '@/lib/db/schema/unit'
 import { queryKeys } from '@/lib/query-keys'
 import { uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
@@ -27,7 +28,7 @@ const recipeSchema = z.object({
           _key: z.string(),
           id: z.number().min(0),
           quantity: z.number().min(0),
-          unitId: z.number().min(0).optional(),
+          unitSlug: unitSlugSchema.optional(),
         })
       ),
     })
@@ -135,7 +136,7 @@ const createRecipe = createServerFn({
                 groupId: createdGroup.id,
                 ingredientId: ingredientEntry.id,
                 quantity: ingredientEntry.quantity,
-                unitId: ingredientEntry.unitId ?? undefined,
+                unitSlug: ingredientEntry.unitSlug ?? undefined,
               }))
             )
         }
