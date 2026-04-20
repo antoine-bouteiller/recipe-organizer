@@ -1,8 +1,10 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useStore } from '@tanstack/react-form'
+import { Suspense } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/features/recipe/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
@@ -145,20 +147,22 @@ export const RecipeForm = withForm({
         <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
           <AppField name="instructions">
             {({ EditorField }) => (
-              <EditorField
-                disabled={isSubmitting}
-                nodes={recipeNodes}
-                extraToolbar={
-                  <>
-                    <ToolbarSeparator />
-                    <ToolbarGroup>
-                      <MagimixProgramButton />
-                      <SubrecipeButton />
-                    </ToolbarGroup>
-                  </>
-                }
-                label="Instructions"
-              />
+              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+                <EditorField
+                  disabled={isSubmitting}
+                  nodes={recipeNodes}
+                  extraToolbar={
+                    <>
+                      <ToolbarSeparator />
+                      <ToolbarGroup>
+                        <MagimixProgramButton />
+                        <SubrecipeButton />
+                      </ToolbarGroup>
+                    </>
+                  }
+                  label="Instructions"
+                />
+              </Suspense>
             )}
           </AppField>
         </LinkedRecipesProvider>
