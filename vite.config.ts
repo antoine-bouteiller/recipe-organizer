@@ -1,11 +1,12 @@
 import { cloudflare } from '@cloudflare/vite-plugin'
 import babel from '@rolldown/plugin-babel'
-import { serwist } from '@serwist/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
+
+import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
 
 const viteConfig = defineConfig({
   staged: { '*': 'vp check --fix' },
@@ -112,13 +113,7 @@ const viteConfig = defineConfig({
       viteEnvironment: { name: 'ssr' },
     }),
     tailwindcss(),
-    serwist({
-      swSrc: 'src/sw.ts',
-      swDest: 'sw.js',
-      globDirectory: 'dist',
-      injectionPoint: 'self.__SW_MANIFEST',
-      rollupFormat: 'iife',
-    }),
+    tanstackSerwistPlugin(),
     devtools({
       injectSource: { enabled: false },
     }),
