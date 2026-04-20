@@ -7,17 +7,17 @@ export type UnitSlug =
   | 'kg'
   | 'ml'
   | 'l'
-  | 'cas'
-  | 'cac'
+  | 'tbsp'
+  | 'tsp'
   | 'piece'
-  | 'pincee'
+  | 'pinch'
   | 'cube'
-  | 'bouteille'
-  | 'feuille'
-  | 'boite'
-  | 'conserve'
-  | 'poignee'
-  | 'sachet'
+  | 'bottle'
+  | 'sheet'
+  | 'box'
+  | 'can'
+  | 'handful'
+  | 'packet'
   | 'cm'
 
 export interface Unit {
@@ -30,22 +30,22 @@ export interface Unit {
 
 /* eslint-disable id-length */
 export const UNITS = {
-  boite: { dimension: 'count', factor: null, name: 'boite(s)', parent: null, slug: 'boite' },
-  bouteille: { dimension: 'count', factor: null, name: 'bouteille(s)', parent: null, slug: 'bouteille' },
-  cac: { dimension: 'volume', factor: 5, name: 'CàC', parent: 'ml', slug: 'cac' },
-  cas: { dimension: 'volume', factor: 15, name: 'CàS', parent: 'ml', slug: 'cas' },
+  bottle: { dimension: 'count', factor: null, name: 'bottle(s)', parent: null, slug: 'bottle' },
+  box: { dimension: 'count', factor: null, name: 'box(es)', parent: null, slug: 'box' },
+  can: { dimension: 'count', factor: null, name: 'can(s)', parent: null, slug: 'can' },
   cm: { dimension: 'length', factor: null, name: 'cm', parent: null, slug: 'cm' },
-  conserve: { dimension: 'count', factor: null, name: 'conserve(s)', parent: null, slug: 'conserve' },
   cube: { dimension: 'count', factor: null, name: 'cube(s)', parent: null, slug: 'cube' },
-  feuille: { dimension: 'count', factor: null, name: 'feuille(s)', parent: null, slug: 'feuille' },
   g: { dimension: 'mass', factor: null, name: 'g', parent: null, slug: 'g' },
+  handful: { dimension: 'count', factor: null, name: 'handful(s)', parent: null, slug: 'handful' },
   kg: { dimension: 'mass', factor: 1000, name: 'kg', parent: 'g', slug: 'kg' },
   l: { dimension: 'volume', factor: 1000, name: 'L', parent: 'ml', slug: 'l' },
   ml: { dimension: 'volume', factor: null, name: 'mL', parent: null, slug: 'ml' },
-  piece: { dimension: 'count', factor: null, name: 'pièce(s)', parent: null, slug: 'piece' },
-  pincee: { dimension: 'count', factor: null, name: 'pincée(s)', parent: null, slug: 'pincee' },
-  poignee: { dimension: 'count', factor: null, name: 'poignée(s)', parent: null, slug: 'poignee' },
-  sachet: { dimension: 'count', factor: null, name: 'sachet(s)', parent: null, slug: 'sachet' },
+  packet: { dimension: 'count', factor: null, name: 'packet(s)', parent: null, slug: 'packet' },
+  piece: { dimension: 'count', factor: null, name: 'piece(s)', parent: null, slug: 'piece' },
+  pinch: { dimension: 'count', factor: null, name: 'pinch(es)', parent: null, slug: 'pinch' },
+  sheet: { dimension: 'count', factor: null, name: 'sheet(s)', parent: null, slug: 'sheet' },
+  tbsp: { dimension: 'volume', factor: 15, name: 'tbsp', parent: 'ml', slug: 'tbsp' },
+  tsp: { dimension: 'volume', factor: 5, name: 'tsp', parent: 'ml', slug: 'tsp' },
 } as const satisfies Record<UnitSlug, Unit>
 /* eslint-enable id-length */
 

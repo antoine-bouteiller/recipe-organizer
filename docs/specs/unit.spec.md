@@ -34,7 +34,7 @@ Recipes mix unit systems — `200 g` flour in one recipe, `2 CàS` in another, `
 | Decision                                   | Choice                                                                                          | Rationale                                                                                                                                |
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `[KD-1]` Hardcoded catalog                 | `UNITS` constant in `src/lib/db/schema/unit.ts` + `UnitSlug` string-union type                  | Units are a closed, slow-changing vocabulary. Compile-time data removes CRUD, admin auth, and runtime roundtrips.                        |
-| `[KD-2]` Slug-based identity               | `UnitSlug = 'g' \| 'kg' \| 'ml' \| 'l' \| 'cas' \| 'cac' \| 'piece' \| 'pincee'`                | String slugs persist stably in `group_ingredients.unit_slug TEXT`; renames become explicit migrations rather than numeric-ID reshuffles. |
+| `[KD-2]` Slug-based identity               | `UnitSlug = 'g' \| 'kg' \| 'ml' \| 'l' \| 'tbsp' \| 'tsp' \| 'piece' \| 'pinch'`                | String slugs persist stably in `group_ingredients.unit_slug TEXT`; renames become explicit migrations rather than numeric-ID reshuffles. |
 | `[KD-3]` Hierarchical with factor          | Each unit declares `parent: UnitSlug \| null` + `factor: number \| null`                        | `factor` = "how many parent units per this unit". Non-base units MUST declare both.                                                      |
 | `[KD-4]` Dimension-classified              | `dimension: 'mass' \| 'volume' \| 'count'`                                                      | Same-dimension conversion is universal (factor chain); cross-dimension requires ingredient metadata.                                     |
 | `[KD-5]` One base per dimension            | Exactly one unit per dimension has `parent: null` — `g`, `ml`, `piece`                          | Conversion walks `parent` toward the base; a second disconnected base would not be reachable.                                            |
@@ -56,7 +56,7 @@ Recipes mix unit systems — `200 g` flour in one recipe, `2 CàS` in another, `
 - `[PI-3]` **Parent and child share a dimension** — enforced structurally in the catalog file. A runtime check
   in the conversion engine still returns `null` on violation as defense in depth.
 - `[PI-4]` **One base unit per dimension** — `g`, `ml`, `piece`. The conversion engine relies on this invariant.
-- `[PI-5]` **Renames are migrations** — renaming a slug ("cas" → "tbsp") requires a DB backfill on
+- `[PI-5]` **Renames are migrations** — renaming a slug ("tbsp" → "tablespoon") requires a DB backfill on
   `group_ingredients.unit_slug` and `ingredient.preferred_unit_slug` plus the catalog edit. Treat slug strings
   as forever-stable.
 - `[PI-6]` **`convert` is pure** — same arguments ⇒ same result, always. No hidden state, no side effects.
@@ -144,10 +144,10 @@ export type UnitSlug =
   | 'kg'
   | 'ml'
   | 'l'
-  | 'cas' // cuillère à soupe
-  | 'cac' // cuillère à café
+  | 'tbsp' // tablespoon
+  | 'tsp' // teaspoon
   | 'piece'
-  | 'pincee'
+  | 'pinch'
 
 export type Unit = {
   readonly slug: UnitSlug
@@ -162,10 +162,10 @@ export const UNITS = {
   kg: { slug: 'kg', name: 'kg', dimension: 'mass', parent: 'g', factor: 1000 },
   ml: { slug: 'ml', name: 'ml', dimension: 'volume', parent: null, factor: null },
   l: { slug: 'l', name: 'L', dimension: 'volume', parent: 'ml', factor: 1000 },
-  cas: { slug: 'cas', name: 'CàS', dimension: 'volume', parent: 'ml', factor: 15 },
-  cac: { slug: 'cac', name: 'CàC', dimension: 'volume', parent: 'ml', factor: 5 },
-  piece: { slug: 'piece', name: 'pièce', dimension: 'count', parent: null, factor: null },
-  pincee: { slug: 'pincee', name: 'pincée', dimension: 'count', parent: null, factor: null },
+  tbsp: { slug: 'tbsp', name: 'tbsp', dimension: 'volume', parent: 'ml', factor: 15 },
+  tsp: { slug: 'tsp', name: 'tsp', dimension: 'volume', parent: 'ml', factor: 5 },
+  piece: { slug: 'piece', name: 'piece', dimension: 'count', parent: null, factor: null },
+  pinch: { slug: 'pinch', name: 'pinch', dimension: 'count', parent: null, factor: null },
 } as const satisfies Record<UnitSlug, Unit>
 
 export function getUnit(slug: UnitSlug): Unit {
@@ -292,24 +292,24 @@ const tomato = { densityGPerMl: null, countWeightG: null } // no bridge metadata
 
 // Same dimension, different unit
 convert(0.5, 'kg', 'g', flour) // => 500
-convert(2, 'cas', 'ml', flour) // => 30
+convert(2, 'tbsp', 'ml', flour) // => 30
 
 // Cross-dimension with density
-convert(2, 'cas', 'g', flour) // => 2 * 15 * 0.55 = 16.5
+convert(2, 'tbsp', 'g', flour) // => 2 * 15 * 0.55 = 16.5
 
 // Cross-dimension with count weight
 convert(3, 'piece', 'g', egg) // => 150
 convert(100, 'g', 'piece', egg) // => 2
 
 // Volume ↔ count (chain through mass)
-convert(2, 'cas', 'piece', { densityGPerMl: 0.55, countWeightG: 50 })
+convert(2, 'tbsp', 'piece', { densityGPerMl: 0.55, countWeightG: 50 })
 // => (2 * 15 * 0.55) / 50 ≈ 0.33
 
 // Missing metadata ⇒ null
-convert(2, 'cas', 'g', tomato) // => null
+convert(2, 'tbsp', 'g', tomato) // => null
 
 // Trivial same-unit: works even without metadata
-convert(5, 'cas', 'cas', tomato) // => 5
+convert(5, 'tbsp', 'tbsp', tomato) // => 5
 
 // Unknown slug ⇒ null (cast required to pass type check)
 convert(1, 'bogus' as UnitSlug, 'g', flour) // => null
@@ -338,7 +338,7 @@ convert(1, 'bogus' as UnitSlug, 'g', flour) // => null
   `1e-9`).
 - `[VC-8]` Mass↔volume with density: `convert(100, 'ml', 'g', { densityGPerMl: 0.8 }) === 80`.
 - `[VC-9]` Mass↔count with count weight: `convert(3, 'piece', 'g', { countWeightG: 50 }) === 150`.
-- `[VC-10]` Volume↔count via mass: `convert(2, 'cas', 'piece', { densityGPerMl: 0.55, countWeightG: 50 })`
+- `[VC-10]` Volume↔count via mass: `convert(2, 'tbsp', 'piece', { densityGPerMl: 0.55, countWeightG: 50 })`
   returns `2 * 15 * 0.55 / 50 ≈ 0.33` (± 1e-9).
 - `[VC-11]` Returns `null` when density is required and missing.
 - `[VC-12]` Returns `null` when count weight is required and missing.
