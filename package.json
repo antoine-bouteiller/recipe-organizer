@@ -63,7 +63,7 @@
     "tailwindcss": "4.2.2",
     "typescript": "6.0.3",
     "vite-plus": "0.1.18",
-    "wrangler": "4.83.0"
+    "wrangler": "4.84.0"
   },
   "commitlint": {
     "extends": [
