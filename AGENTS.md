@@ -20,12 +20,18 @@ Full-stack recipe management app built with TanStack Start, deployed on Cloudfla
 
 ## Guidelines
 
-- [Project Structure](agents_doc/file_structure.md)
-- [Database Schema](agents_doc/database.md)
-- [Form Patterns](agents_doc/forms.md)
-- [Code Quality & Linting](agents_doc/code-quality.md)
-- [Architecture](agents_doc/architecture.md)
-- [Deployment & Git](agents_doc/deployment.md)
+Canonical reference = the `*.spec.md` files under `docs/` + `docs/infrastructure/` and the per-feature specs
+colocated with the code.
+
+- [Project Structure](docs/file-structure.spec.md)
+- [Architecture Index](docs/infrastructure/index.spec.md)
+- [Platform (Cloudflare Workers)](docs/infrastructure/platform.spec.md)
+- [Data Layer (Drizzle + D1)](docs/infrastructure/data-layer.spec.md)
+- [Server Functions](docs/infrastructure/server-functions.spec.md)
+- [Form Patterns](docs/infrastructure/forms.spec.md)
+- [Client State Layering](docs/infrastructure/client-state.spec.md)
+- [Routing & SSR](docs/infrastructure/routing-ssr.spec.md)
+- Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 
 <!--VITE PLUS START-->
 

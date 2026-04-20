@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { type DialogTrigger } from '@/components/ui/dialog'
-import { useLinkedRecipes } from '@/contexts/linked-recipes-context'
+import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 import { useAppForm } from '@/hooks/use-app-form'
 import { useRecipeOptions } from '@/hooks/use-options'
