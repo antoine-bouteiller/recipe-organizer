@@ -10,7 +10,6 @@ import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
 import { recipeDefaultValues, recipeFormFields } from '@/features/recipe/utils/form'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
@@ -70,6 +69,5 @@ export const Route = createFileRoute('/recipe/new')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())
-    await context.queryClient.ensureQueryData(getUnitsListOptions())
   },
 })

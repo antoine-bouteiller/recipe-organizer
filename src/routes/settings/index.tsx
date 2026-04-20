@@ -1,4 +1,4 @@
-import { CaretRightIcon, CookieIcon, ScalesIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
+import { CaretRightIcon, CookieIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -27,13 +27,6 @@ const settingsSections: SettingsSection[] = [
     id: 'ingredients',
     path: '/settings/ingredients',
     title: 'Ingrédients',
-  },
-  {
-    description: 'Gérer les unités de mesure disponibles',
-    icon: ScalesIcon,
-    id: 'units',
-    path: '/settings/units',
-    title: 'Unités de mesure',
   },
   {
     adminOnly: true,

@@ -8,8 +8,8 @@ related:
   - ./editor.spec.md
   - ./display.spec.md
   - ../../ingredients/ingredients.spec.md
-  - ../../units/units.spec.md
   - ../../shopping-list/shopping-list.spec.md
+  - ../../../../docs/specs/unit.spec.md
 ---
 
 ## 2. Problem Statement

@@ -2,7 +2,7 @@ import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core
 
 import { ingredient } from '@/lib/db/schema/ingredient'
 import { recipe } from '@/lib/db/schema/recipe'
-import { unit } from '@/lib/db/schema/unit'
+import { type UnitSlug } from '@/lib/db/schema/unit'
 
 export const recipeIngredientGroup = sqliteTable(
   'recipe_ingredient_groups',
@@ -31,9 +31,7 @@ export const groupIngredient = sqliteTable(
       .references(() => ingredient.id, { onDelete: 'restrict' })
       .notNull(),
     quantity: real('quantity').notNull(),
-    unitId: integer('unit_id').references(() => unit.id, {
-      onDelete: 'set null',
-    }),
+    unitSlug: text('unit_slug').$type<UnitSlug>(),
   },
   (table) => [index('idx_group_ingredients_group_id').on(table.groupId), index('idx_group_ingredients_ingredient_id').on(table.ingredientId)]
 )

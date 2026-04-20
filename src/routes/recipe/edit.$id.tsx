@@ -15,7 +15,6 @@ import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } f
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
 import { AUTO_TAGS, type RECIPE_TAGS } from '@/features/recipe/utils/constants'
 import { recipeFormFields } from '@/features/recipe/utils/form'
-import { getUnitsListOptions } from '@/features/units/api/get-all'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
@@ -28,7 +27,7 @@ const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
     _key: Math.random().toString(36).substring(7),
     id: ingredient.ingredient.id,
     quantity: ingredient.quantity,
-    unitId: ingredient.unit?.id,
+    unitSlug: ingredient.unitSlug ?? undefined,
   })),
 })
 
@@ -143,7 +142,6 @@ export const Route = createFileRoute('/recipe/edit/$id')({
     await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
     await context.queryClient.ensureQueryData(getIngredientListOptions())
     await context.queryClient.ensureQueryData(getRecipeListOptions())
-    await context.queryClient.ensureQueryData(getUnitsListOptions())
 
     return { id }
   },
