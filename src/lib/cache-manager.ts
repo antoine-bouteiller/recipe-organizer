@@ -46,12 +46,16 @@ class CacheManager {
     if (this.cache) {
       return this.cache.match(key)
     }
+
+    return null
   }
 
   private put(key: string, value: Response) {
     if (this.cache) {
       return this.cache.put(key, value)
     }
+
+    return null
   }
 }
 

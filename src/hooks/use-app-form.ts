@@ -30,11 +30,11 @@ const { useAppForm, withForm } = createFormHook({
     ToggleGroupField,
     VideoField,
   },
-  fieldContext: fieldContext,
+  fieldContext,
   formComponents: {
     FormSubmit,
   },
-  formContext: formContext,
+  formContext,
 })
 
 export { useAppForm, withForm }

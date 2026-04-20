@@ -171,7 +171,7 @@ class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {
     element.setAttribute('data-type', 'magimix-program')
     element.setAttribute('data-program', this.__program)
     if (this.__rotationSpeed !== undefined) {
-      element.setAttribute('data-rotation-speed', String(this.__rotationSpeed))
+      element.setAttribute('data-rotation-speed', this.__rotationSpeed)
     }
     if (this.__temperature !== undefined) {
       element.setAttribute('data-temperature', String(this.__temperature))

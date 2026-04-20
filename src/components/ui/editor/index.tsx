@@ -190,7 +190,7 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
       <ListPlugin />
       <CheckListPlugin />
       <HistoryPlugin />
-      <OnChangePlugin onChange={onChange} />
+      {onChange && <OnChangePlugin onChange={onChange} />}
       {children}
     </LexicalComposer>
   )

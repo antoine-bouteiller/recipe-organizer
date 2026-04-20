@@ -102,7 +102,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const validateFile = (file: File): string | undefined => {
+  const validateFile = (file: File): string | null => {
     if (file.size > maxSize) {
       return `Le fichier "${file.name}" dépasse la taille maximale de ${formatBytes(maxSize)}.`
     }
@@ -127,6 +127,8 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
         return `Le fichier "${file.name}" n'est pas un type de fichier accepté.`
       }
     }
+
+    return null
   }
 
   const clearFiles = () => {

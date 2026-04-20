@@ -22,7 +22,7 @@ export const useBackViewTransition = (isEnabled: boolean) => {
 
   useEffect(() => {
     if (!isEnabled || !document.startViewTransition) {
-      return
+      return undefined
     }
 
     let isRedispatching = false
@@ -32,12 +32,10 @@ export const useBackViewTransition = (isEnabled: boolean) => {
         return
       }
 
-      // Prevent TanStack Router from processing this popstate immediately
       event.stopImmediatePropagation()
 
       document.documentElement.classList.add('back-transition')
 
-      // Re-dispatch inside the view transition so TanStack Router processes the navigation
       const transition = document.startViewTransition(async () => {
         isRedispatching = true
         redispatchPopstate(event.state)

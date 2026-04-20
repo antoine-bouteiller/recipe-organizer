@@ -70,11 +70,7 @@ export const Command = ({
   <Autocomplete autoHighlight={autoHighlight} inline keepHighlight={keepHighlight} open {...props} />
 )
 
-export const CommandInput = ({
-  className,
-  placeholder = undefined,
-  ...props
-}: React.ComponentProps<typeof AutocompleteInput>): React.ReactElement => (
+export const CommandInput = ({ className, placeholder, ...props }: React.ComponentProps<typeof AutocompleteInput>): React.ReactElement => (
   <div className="px-2.5 py-1.5">
     <AutocompleteInput
       autoFocus

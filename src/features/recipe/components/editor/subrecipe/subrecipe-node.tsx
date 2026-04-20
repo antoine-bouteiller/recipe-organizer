@@ -102,7 +102,7 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
   }
 
   if (!recipe) {
-    return
+    return null
   }
 
   const content = (
