@@ -23,9 +23,12 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
 
   const initialValues: UpdateIngredientFormInput = {
     category: ingredient.category,
+    countWeightG: ingredient.countWeightG,
+    densityGPerMl: ingredient.densityGPerMl,
     id: ingredient.id,
     name: ingredient.name,
     parentId: ingredient.parentId ?? undefined,
+    preferredUnitSlug: ingredient.preferredUnitSlug,
   }
 
   const form = useAppForm({
