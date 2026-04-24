@@ -41,7 +41,7 @@
     "zustand": "5.0.12"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.33.1",
+    "@cloudflare/vite-plugin": "1.33.2",
     "@rolldown/plugin-babel": "0.2.3",
     "@serwist/build": "9.5.7",
     "@serwist/vite": "9.5.7",
