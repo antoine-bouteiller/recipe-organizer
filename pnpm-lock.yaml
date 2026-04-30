@@ -91,8 +91,8 @@ importers:
         specifier: 9.5.8
         version: 9.5.8(browserslist@4.28.1)(typescript@6.0.3)
       '@serwist/vite':
-        specifier: 9.5.8
-        version: 9.5.8(browserslist@4.28.1)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
+        specifier: 9.5.9
+        version: 9.5.9(browserslist@4.28.1)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
       '@serwist/window':
         specifier: 9.5.7
         version: 9.5.7(browserslist@4.28.1)(typescript@6.0.3)
@@ -1863,6 +1863,15 @@ packages:
       typescript:
         optional: true
 
+  '@serwist/build@9.5.9':
+    resolution: {integrity: sha512-FkQWH4zCpGC91zfmZdQleRc3tCIfV4FAExmOD3+NDV6kD/zh0qw901agewOU5YS5fwgKD8scwLd1sWnoWhaJ1Q==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: '>=5.0.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   '@serwist/utils@9.5.7':
     resolution: {integrity: sha512-OmMfa9W8MDI6+2DM6fD8Ou0bXSV++P1DHfrcPlLsROEvRHYqV44yF0f/U3RYNA1JDy7iFLNyVnK7zARKjhQayQ==}
     peerDependencies:
@@ -1879,8 +1888,16 @@ packages:
       browserslist:
         optional: true
 
-  '@serwist/vite@9.5.8':
-    resolution: {integrity: sha512-nBt7L1ShiOzo3DTq9P2SVFovKX0M5AeO7M1M3zlCBhmFy0BZ0QSAqZkL9Yjrn1SGMWcGZRzxDnDcv4+HsKheaw==}
+  '@serwist/utils@9.5.9':
+    resolution: {integrity: sha512-WUsxogHrW9DBVIJZOYxrQmQ3SBRaMugCi7daFumHPU1KOfBJIuJpXZQ/yJItz58h8g9572skfoZwrIYv4rxbPQ==}
+    peerDependencies:
+      browserslist: '>=4'
+    peerDependenciesMeta:
+      browserslist:
+        optional: true
+
+  '@serwist/vite@9.5.9':
+    resolution: {integrity: sha512-ZL0zSoF8PzXFTEUSLhITRzDr0rcA3Ar7xg0aGZLM5gBGakhowrJq90BM3MrAfNwStIrr96QRn9W7rheYe1TcUg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       rollup: '>=4.0.0'
@@ -3473,8 +3490,8 @@ packages:
       typescript:
         optional: true
 
-  serwist@9.5.8:
-    resolution: {integrity: sha512-64yeCt0Mjufy+GhfotIQw/KRcJmUOqzUaGNUQkF7sl1upmau6sH/H3M29do0ilWgeELRYP5PAEYdSZtp3pHncQ==}
+  serwist@9.5.9:
+    resolution: {integrity: sha512-au/rwvxTfgorH6y4Z74my1t24sorYCiOtpvS0USSXUWuE1Qx5w7YhsU0gOVhGI2NcgU46XS6VMuXMrWr2VxkKQ==}
     peerDependencies:
       typescript: '>=5.0.0'
     peerDependenciesMeta:
@@ -5191,6 +5208,20 @@ snapshots:
     transitivePeerDependencies:
       - browserslist
 
+  '@serwist/build@9.5.9(browserslist@4.28.1)(typescript@6.0.3)':
+    dependencies:
+      '@serwist/utils': 9.5.9(browserslist@4.28.1)
+      common-tags: 1.8.2
+      glob: 10.5.0
+      pretty-bytes: 6.1.1
+      source-map: 0.8.0-beta.0
+      type-fest: 5.6.0
+      zod: 4.3.6
+    optionalDependencies:
+      typescript: 6.0.3
+    transitivePeerDependencies:
+      - browserslist
+
   '@serwist/utils@9.5.7(browserslist@4.28.1)':
     optionalDependencies:
       browserslist: 4.28.1
@@ -5199,13 +5230,17 @@ snapshots:
     optionalDependencies:
       browserslist: 4.28.1
 
-  '@serwist/vite@9.5.8(browserslist@4.28.1)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))':
+  '@serwist/utils@9.5.9(browserslist@4.28.1)':
+    optionalDependencies:
+      browserslist: 4.28.1
+
+  '@serwist/vite@9.5.9(browserslist@4.28.1)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))':
     dependencies:
-      '@serwist/build': 9.5.8(browserslist@4.28.1)(typescript@6.0.3)
-      '@serwist/utils': 9.5.8(browserslist@4.28.1)
+      '@serwist/build': 9.5.9(browserslist@4.28.1)(typescript@6.0.3)
+      '@serwist/utils': 9.5.9(browserslist@4.28.1)
       glob: 10.5.0
       kolorist: 1.8.0
-      serwist: 9.5.8(browserslist@4.28.1)(typescript@6.0.3)
+      serwist: 9.5.9(browserslist@4.28.1)(typescript@6.0.3)
       vite: 8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
       zod: 4.3.6
     optionalDependencies:
@@ -6824,9 +6859,9 @@ snapshots:
     transitivePeerDependencies:
       - browserslist
 
-  serwist@9.5.8(browserslist@4.28.1)(typescript@6.0.3):
+  serwist@9.5.9(browserslist@4.28.1)(typescript@6.0.3):
     dependencies:
-      '@serwist/utils': 9.5.8(browserslist@4.28.1)
+      '@serwist/utils': 9.5.9(browserslist@4.28.1)
       idb: 8.0.3
     optionalDependencies:
       typescript: 6.0.3
