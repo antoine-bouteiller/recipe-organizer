@@ -44,7 +44,7 @@
     "@cloudflare/vite-plugin": "1.34.0",
     "@rolldown/plugin-babel": "0.2.3",
     "@serwist/build": "9.5.8",
-    "@serwist/vite": "9.5.7",
+    "@serwist/vite": "9.5.8",
     "@serwist/window": "9.5.7",
     "@tailwindcss/typography": "0.5.19",
     "@tailwindcss/vite": "4.2.4",
