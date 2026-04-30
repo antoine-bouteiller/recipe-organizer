@@ -18,6 +18,11 @@
       matchPackageNames: ['react', 'react-dom', '@types/react', '@types/react-dom'],
     },
     {
+      description: 'Serwist Group',
+      groupName: 'serwist',
+      matchPackageNames: ['serwist', '@serwist/**'],
+    },
+    {
       description: 'Tanstack Group',
       groupName: 'tanstack',
       matchPackageNames: ['@tanstack/**'],
