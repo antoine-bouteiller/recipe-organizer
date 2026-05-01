@@ -2,6 +2,11 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   packageRules: [
     {
+      description: 'Cloudflare Group',
+      groupName: 'cloudflare',
+      matchPackageNames: ['wrangler', '@cloudflare/vite-plugin'],
+    },
+    {
       description: 'Drizzle Group',
       groupName: 'drizzle',
       matchPackageNames: ['drizzle-orm', 'drizzle-kit'],
