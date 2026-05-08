@@ -15,7 +15,7 @@ import { ingredientSchema } from './create'
 
 const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
 
-export type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
+type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
 export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 
 const updateIngredient = createServerFn()

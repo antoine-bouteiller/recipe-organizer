@@ -1,4 +1,4 @@
-export const authErrors = {
+const authErrors = {
   account_blocked: 'account_blocked',
   account_pending: 'account_pending',
   email_not_verified: 'email_not_verified',
