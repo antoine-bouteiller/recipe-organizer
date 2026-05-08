@@ -52,19 +52,19 @@ add the recipe to a shopping list, and edit or delete it.
 
 ## 2. Definitions
 
-| Term                       | Meaning                                                                                                                                                                                                  |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Recipe                     | A row in `recipes(id, name, image, instructions, servings, tags JSON, video, createdBy)`.                                                                                                                |
-| Ingredient group           | A bag of ingredients inside a recipe (`recipe_ingredient_groups`). The first group is `isDefault = true` and has no `groupName`.                                                                         |
-| Group ingredient           | A row in `group_ingredients(id, groupId, ingredientId, quantity, unitSlug)`.                                                                                                                             |
-| Linked recipe / sub-recipe | A row in `recipe_linked_recipes(recipeId, linkedRecipeId, ratio)` declaring that a recipe re-uses another recipe (with a quantity ratio).                                                                |
-| Manual tag                 | A tag in `RECIPE_TAGS = ['dessert','mediterranean','chinese','japanese','indian','mexican','italian','french']`, picked by the user in the form.                                                         |
-| Auto tag                   | A tag in `AUTO_TAGS = ['vegetarian','magimix']`, computed server-side on every create/update.                                                                                                            |
-| `RecipeTag`                | Union of manual and auto tags. Stored mixed in `recipes.tags` (JSON).                                                                                                                                    |
-| Magimix program            | A Lexical node representing a Magimix Cook Expert program (program, time, rotation speed, optional temperature). Detected via the substring `"types":"magimixProgram"` in the serialized `instructions`. |
-| Subrecipe node             | A Lexical node embedding another recipe's instructions inline, with `hideFirstNodes` / `hideLastNodes` slicing controls.                                                                                 |
-| Recipe quantity            | A client-only multiplier of the base `servings`, kept per-recipe in the `recipe-quantities` Zustand store.                                                                                               |
-| Shopping list membership   | Whether a `recipeId` is currently in `shopping-list` Zustand store; toggles the `QuantityControls` UI.                                                                                                   |
+| Term                       | Meaning                                                                                                                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Recipe                     | A row in `recipes(id, name, image, instructions, servings, tags JSON, video, createdBy)`.                                                                                                               |
+| Ingredient group           | A bag of ingredients inside a recipe (`recipe_ingredient_groups`). The first group is `isDefault = true` and has no `groupName`.                                                                        |
+| Group ingredient           | A row in `group_ingredients(id, groupId, ingredientId, quantity, unitSlug)`.                                                                                                                            |
+| Linked recipe / sub-recipe | A row in `recipe_linked_recipes(recipeId, linkedRecipeId, ratio)` declaring that a recipe re-uses another recipe (with a quantity ratio).                                                               |
+| Manual tag                 | A tag in `RECIPE_TAGS = ['dessert','mediterranean','chinese','japanese','indian','mexican','italian','french']`, picked by the user in the form.                                                        |
+| Auto tag                   | A tag in `AUTO_TAGS = ['vegetarian','magimix']`, computed server-side on every create/update.                                                                                                           |
+| `RecipeTag`                | Union of manual and auto tags. Stored mixed in `recipes.tags` (JSON).                                                                                                                                   |
+| Magimix program            | A Lexical node representing a Magimix Cook Expert program (program, time, rotation speed, optional temperature). Detected via the substring `"type":"magimixProgram"` in the serialized `instructions`. |
+| Subrecipe node             | A Lexical node embedding another recipe's instructions inline, with `hideFirstNodes` / `hideLastNodes` slicing controls.                                                                                |
+| Recipe quantity            | A client-only multiplier of the base `servings`, kept per-recipe in the `recipe-quantities` Zustand store.                                                                                              |
+| Shopping list membership   | Whether a `recipeId` is currently in `shopping-list` Zustand store; toggles the `QuantityControls` UI.                                                                                                  |
 
 ## 3. Requirements, Constraints & Guidelines
 
@@ -76,7 +76,7 @@ add the recipe to a shopping list, and edit or delete it.
   `currentRecipe.createdBy === user.id || user.role === 'admin'`. Listing and detail are public.
 - **REQ-003** Auto-tag computation is centralized in `crud.spec.md`; the editor feature MUST NOT
   compute tags client-side. The editor's only tag side effect is writing the substring
-  `"types":"magimixProgram"` into the serialized instructions JSON.
+  `"type":"magimixProgram"` into the serialized instructions JSON.
 - **REQ-004** The list query (`getRecipeListOptions`) MUST be invalidated by every recipe mutation
   via `queryKeys.allRecipes` / `queryKeys.recipeLists()`.
 - **REQ-005** Recipe routes MUST cache via `Cache-Control: public, max-age=86400,
@@ -161,7 +161,7 @@ recipe_linked_recipes (recipeId FK→recipes ON DELETE RESTRICT,
 Splitting the spec into one index + three topical sub-specs mirrors the on-disk structure (`api/`,
 `components/`, `components/editor/`) and lets each consumer load only what they need. The
 auto-tag contract sits in `crud.spec.md` because tags are derived server-side at write-time; the
-editor only contributes the _substring marker_ `"types":"magimixProgram"`. Listing and detail are
+editor only contributes the _substring marker_ `"type":"magimixProgram"`. Listing and detail are
 read-only and stable enough to live together in `display.spec.md`. The Lexical editor is rich and
 isolated enough to deserve its own spec.
 

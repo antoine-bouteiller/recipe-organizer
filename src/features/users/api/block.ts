@@ -9,6 +9,7 @@ import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
+import { withServerError } from '@/utils/error-handler'
 
 const blockUserSchema = z.object({
   id: z.string(),
@@ -17,10 +18,12 @@ const blockUserSchema = z.object({
 const blockUser = createServerFn()
   .middleware([authGuard('admin')])
   .inputValidator(blockUserSchema)
-  .handler(async ({ data }) => {
-    const { id } = data
-    await getDb().update(user).set({ status: 'blocked' }).where(eq(user.id, id))
-  })
+  .handler(
+    withServerError(async ({ data }) => {
+      const { id } = data
+      await getDb().update(user).set({ status: 'blocked' }).where(eq(user.id, id))
+    })
+  )
 
 const blockUserOptions = () =>
   mutationOptions({

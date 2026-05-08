@@ -9,6 +9,7 @@ import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
+import { withServerError } from '@/utils/error-handler'
 
 import { ingredientSchema } from './create'
 
@@ -20,11 +21,13 @@ export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 const updateIngredient = createServerFn()
   .middleware([authGuard()])
   .inputValidator(updateIngredientSchema)
-  .handler(async ({ data }) => {
-    const { id, ...newIngredient } = data
+  .handler(
+    withServerError(async ({ data }) => {
+      const { id, ...newIngredient } = data
 
-    await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
-  })
+      await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
+    })
+  )
 
 const updateIngredientOptions = () =>
   mutationOptions({

@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { useAppSession } from '@/lib/session'
 import { withServerError } from '@/utils/error-handler'
 
-export const logout = createServerFn({ method: 'POST' }).handler(
+export const logout = createServerFn().handler(
   withServerError(async () => {
     const session = await useAppSession()
 

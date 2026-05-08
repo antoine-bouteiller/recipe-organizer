@@ -8,6 +8,7 @@ import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
+import { withServerError } from '@/utils/error-handler'
 
 const userSchema = z.object({
   email: z.email(),
@@ -20,11 +21,13 @@ export type UserFormInput = Partial<UserFormValues>
 const createUser = createServerFn()
   .middleware([authGuard('admin')])
   .inputValidator(userSchema)
-  .handler(async ({ data }) => {
-    await getDb()
-      .insert(user)
-      .values({ ...data, id: crypto.randomUUID() })
-  })
+  .handler(
+    withServerError(async ({ data }) => {
+      await getDb()
+        .insert(user)
+        .values({ ...data, id: crypto.randomUUID() })
+    })
+  )
 
 const createUserOptions = () =>
   mutationOptions({

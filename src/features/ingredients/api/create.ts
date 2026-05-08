@@ -9,6 +9,7 @@ import { ingredient, ingredientCategory } from '@/lib/db/schema'
 import { unitSlugSchema } from '@/lib/db/schema/unit'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
+import { withServerError } from '@/utils/error-handler'
 
 const ingredientSchema = z.object({
   category: z.enum(ingredientCategory),
@@ -25,9 +26,11 @@ export type IngredientFormInput = Partial<IngredientFormValues>
 const createIngredient = createServerFn()
   .middleware([authGuard()])
   .inputValidator(ingredientSchema)
-  .handler(async ({ data }) => {
-    await getDb().insert(ingredient).values(data)
-  })
+  .handler(
+    withServerError(async ({ data }) => {
+      await getDb().insert(ingredient).values(data)
+    })
+  )
 
 const createIngredientOptions = () =>
   mutationOptions({

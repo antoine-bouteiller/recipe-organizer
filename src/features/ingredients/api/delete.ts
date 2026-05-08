@@ -7,6 +7,7 @@ import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
+import { withServerError } from '@/utils/error-handler'
 
 const deleteIngredientSchema = z.object({
   id: z.number(),
@@ -15,10 +16,12 @@ const deleteIngredientSchema = z.object({
 const deleteIngredient = createServerFn()
   .middleware([authGuard('admin')])
   .inputValidator(deleteIngredientSchema)
-  .handler(async ({ data }) => {
-    const { id } = data
-    await getDb().delete(ingredient).where(eq(ingredient.id, id))
-  })
+  .handler(
+    withServerError(async ({ data }) => {
+      const { id } = data
+      await getDb().delete(ingredient).where(eq(ingredient.id, id))
+    })
+  )
 
 const deleteIngredientOptions = () =>
   mutationOptions({

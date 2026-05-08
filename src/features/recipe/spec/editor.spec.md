@@ -16,7 +16,7 @@ domain nodes: `MagimixProgramNode` and `SubrecipeNode`. Both are registered thro
 `recipeNodes` array and surfaced as toolbar buttons in edit mode.
 
 The editor is also the producer side of the auto-`magimix` tag: it writes the marker substring
-`"types":"magimixProgram"` into the serialized JSON state, which the server-side
+`"type":"magimixProgram"` into the serialized JSON state, which the server-side
 `computeAutoTags` (see [crud.spec.md](./crud.spec.md)) detects via `String.includes`.
 
 Source files:
@@ -55,7 +55,7 @@ Provide a rich-text editing experience for recipe instructions that:
 | `recipeNodes`          | `readonly Klass<LexicalNode>[]` exported from `editor/extensions.ts`, registered with the shared `Editor` whenever recipe instructions are rendered or edited. |
 | `MagimixProgramNode`   | `DecoratorNode` with type string `'magimixProgram'`, exported as `MagimixProgramNode` (alias of `MagimixProgramNodeType`).                                     |
 | `SubrecipeNode`        | `DecoratorNode` with type string `'subrecipe'`, exported as `SubrecipeNode` (alias of `SubrecipeNodeType`).                                                    |
-| Marker substring       | The literal `"types":"magimixProgram"` that appears in any serialized state containing at least one Magimix node.                                              |
+| Marker substring       | The literal `"type":"magimixProgram"` that appears in any serialized state containing at least one Magimix node.                                               |
 | `MagimixProgramData`   | `{ program, rotationSpeed, time, temperature? }` from `types/magimix.ts`.                                                                                      |
 | `SubrecipeNodeData`    | `{ recipeId, hideFirstNodes, hideLastNodes }` from `types/subrecipe.ts`.                                                                                       |
 | `LinkedRecipesContext` | React context providing `linkedRecipeIds: number[]` (the form's currently-selected linked recipes) so the SubrecipeDialog can restrict its picker.             |
@@ -152,9 +152,9 @@ z.number().min(0), recipeId: z.number() })`;
   `linkedRecipeIds = form.values.linkedRecipes.map(lr => lr.id).filter(id => id > 0)` so newly
   added unselected linked rows (`id === -1`) are excluded.
 - **REQ-013** Auto-`magimix` tag contract: at least one `MagimixProgramNode` in the serialized
-  state implies the substring `"types":"magimixProgram"` appears in the `instructions` string.
+  state implies the substring `"type":"magimixProgram"` appears in the `instructions` string.
   This MUST hold regardless of editor formatting (no whitespace, no key-reordering between
-  `type` and the value). The server's `instructions.includes('"types":"magimixProgram"')` check
+  `type` and the value). The server's `instructions.includes('"type":"magimixProgram"')` check
   depends on this.
 - **REQ-014** `MagimixProgramNode.exportJSON()` MUST emit `type: 'magimixProgram'` (the marker)
   AND `version: 1`. Lexical serializers consistently emit `"type":"<value>"` without
@@ -172,12 +172,9 @@ z.number().min(0), recipeId: z.number() })`;
   may lag for up to 5 min after the linked recipe is edited; acceptable for now.
 - **CON-004** `linkedRecipeIds` is reactive via `useStore(form.store, ...)`; switching a linked
   row from one recipe to another updates the SubrecipeDialog's pickable list immediately.
-- **CON-005** The Magimix marker substring MUST not appear naturally in user-typed text. The
-  literal characters `"types":"magimixProgram"` (including quotes) inside a paragraph would NOT
-  match because Lexical serializes paragraph text into an entirely different shape — the user
-  would have to type `"type":"magimixProgram"` (with `type` not `types`); the actual marker is
-  `"types":"magimixProgram"` which is unique to the `exportJSON` shape... NOTE: see §9 EC-005
-  for the actual literal in source.
+- **CON-005** The Magimix marker substring MUST not appear naturally in user-typed text. Lexical
+  serializes paragraph text into a different JSON shape (`{ "type": "paragraph", ... }`), so the
+  literal `"type":"magimixProgram"` only appears when a `MagimixProgramNode` is present.
 
 ### Guidelines
 
@@ -318,7 +315,7 @@ useLinkedRecipes(): number[]
 - **PAT-004** Component test for `SubrecipeDialog`: with `linkedRecipeIds = [3, 5]`, the picker
   shows only those two options.
 - **PAT-005** Round-trip test: render the editor with a fixture state, programmatically insert a
-  Magimix node, serialize, and assert the substring `"types":"magimixProgram"` appears.
+  Magimix node, serialize, and assert the substring `"type":"magimixProgram"` appears.
 
 ## 7. Rationale & Context
 
@@ -370,14 +367,12 @@ useLinkedRecipes(): number[]
   is possible.
 - **EC-004** A subrecipe with `hideFirstNodes >= total - 1`: `filterNodes` returns an empty
   `children` array; the embedded `<Editor>` renders nothing under the `<strong>` heading.
-- **EC-005** False positive auto-`magimix`? The literal marker `"types":"magimixProgram"` is
-  the precise substring emitted by `exportJSON()` (key `type`, value `magimixProgram`, plus
-  Lexical's serialization quirks make `"types"` actually `"type"`). The implementation in
-  `api/{create,update}.ts` uses the literal `'"types":"magimixProgram"'`. Either the marker
-  works because Lexical's output happens to include this exact substring when a Magimix node is
-  present, or there is a bug. Track in the backlog: validate the literal against an actual
-  `editor.toJSON()` output and adjust either the producer (the `type` key) or the consumer
-  (the substring) accordingly.
+- **EC-005** Auto-`magimix` detection relies on string matching: `MagimixProgramNode.exportJSON()`
+  emits a node whose `type` field is `magimixProgram`, producing the exact substring
+  `"type":"magimixProgram"` (whitespace-free, since `JSON.stringify` defaults to no spaces) in the
+  serialized state. `api/{create,update}.ts` uses `instructions.includes('"type":"magimixProgram"')`
+  for the marker. If a future change pretty-prints the JSON, the substring check would break;
+  prefer parsing JSON if formatting may vary.
 - **EC-006** Pasting a `<div data-type="magimix-program" data-program="expert" data-time="60">`
   HTML fragment into the editor: `importDOM` reconstructs a `MagimixProgramNode` with default
   rotation speed `'auto'`.

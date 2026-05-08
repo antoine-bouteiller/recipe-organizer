@@ -5,7 +5,7 @@ export const useAppSession = () =>
   useSession({
     cookie: {
       httpOnly: true,
-      maxAge: 60 * 60 * 24 * 30, // 7 days
+      maxAge: 60 * 60 * 24 * 30, // 30 days
       sameSite: 'lax',
       secure: import.meta.env.PROD,
     },

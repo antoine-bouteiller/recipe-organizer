@@ -26,7 +26,7 @@ const redirectWithError = (errorMessage: AuthError) => {
   })
 }
 
-export const initiateGoogleAuth = createServerFn({ method: 'POST' }).handler(async () => {
+export const initiateGoogleAuth = createServerFn().handler(async () => {
   const state = generateState()
   const redirectUri = `${import.meta.env.VITE_PUBLIC_URL}/api/auth/google/callback`
 
@@ -105,10 +105,15 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
     id?: string
     name?: string
     picture?: string
+    verified_email?: boolean
   }
 
   if (!userInfo.id || !userInfo.email || !userInfo.name) {
     throw redirectWithError('error_communicating_with_google')
+  }
+
+  if (userInfo.verified_email !== true) {
+    throw redirectWithError('email_not_verified')
   }
 
   // Find or create user

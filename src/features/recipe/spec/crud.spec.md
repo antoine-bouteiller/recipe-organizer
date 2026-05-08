@@ -98,7 +98,7 @@ httpMetadata: { contentType: optimizedImage.contentType() } })` where `key = ran
     `ingredientCategories.every(c.category !== 'meat' && c.category !== 'fish')`
     AND `linkedRecipesData.every(r.tags?.includes('vegetarian'))`
     AND `!tags.includes('dessert')`.
-  - `magimix` is added IFF `instructions.includes('"types":"magimixProgram"')`.
+  - `magimix` is added IFF `instructions.includes('"type":"magimixProgram"')`.
 - **REQ-009** The update batch MUST execute these statements atomically, in this order:
   1. `update(recipe).set(...).where(eq(recipe.id, id)).returning(...)`,
   2. `delete(groupIngredient).where(inArray(groupIngredient.groupId, currentRecipe.ingredientGroups.map(...)))`,
@@ -142,14 +142,14 @@ delete(recipe)`. After the batch resolves, `deleteFile(currentRecipe.image)` is 
 ### Server functions
 
 ```ts
-const createRecipe = createServerFn({ method: 'POST' })
+const createRecipe = createServerFn()
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data, context }) => {
     /* ... */
   })
 
-const updateRecipe = createServerFn({ method: 'POST' })
+const updateRecipe = createServerFn()
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
@@ -158,7 +158,7 @@ const updateRecipe = createServerFn({ method: 'POST' })
     })
   )
 
-const deleteRecipe = createServerFn({ method: 'POST' })
+const deleteRecipe = createServerFn()
   .middleware([authGuard()])
   .inputValidator(z.number())
   .handler(
@@ -202,7 +202,7 @@ deleteFile(key: string): Promise<void>
 - **AC-004** A successful `createRecipe` with all-vegetable ingredients and no `dessert` tag
   persists `tags: [...userTags, 'vegetarian']`.
 - **AC-005** A successful `createRecipe` whose `instructions` contains the literal substring
-  `"types":"magimixProgram"` persists `tags` including `'magimix'`.
+  `"type":"magimixProgram"` persists `tags` including `'magimix'`.
 - **AC-006** `updateRecipe` invoked by a non-owner non-admin throws `'Permission denied'` and
   performs no writes.
 - **AC-007** `updateRecipe` with `image` as a `{ id, url }` object preserves the existing
@@ -241,7 +241,7 @@ deleteFile(key: string): Promise<void>
 - **Why image optimization to webp/1024?** The shopping app's hero card needs to look acceptable
   on mobile data. 1024px wide @ webp/q80 gives a ~5–10× size reduction over the original upload.
 - **Why store `instructions` as a JSON string?** Lexical's serialized state is a JSON tree; we
-  persist it verbatim to round-trip exactly. The substring marker `"types":"magimixProgram"`
+  persist it verbatim to round-trip exactly. The substring marker `"type":"magimixProgram"`
   intentionally piggy-backs on this serialization to avoid a separate scan pass.
 - **Why drop the entire ingredient/linked graph on update?** The form is the source of truth and
   diffing structured rows against the current DB state would be more code than a batched replace,
@@ -296,7 +296,7 @@ deleteFile(key: string): Promise<void>
 - [./display.spec.md](./display.spec.md) — read-side counterpart; explains how the persisted graph
   is consumed.
 - [./editor.spec.md](./editor.spec.md) — defines the editor side of the auto-magimix contract
-  (the `"types":"magimixProgram"` substring marker).
+  (the `"type":"magimixProgram"` substring marker).
 - [../../../../docs/architecture.spec.md](../../../../docs/architecture.spec.md)
 - [../../../../docs/infrastructure/data-layer.spec.md](../../../../docs/infrastructure/data-layer.spec.md)
 - [../../../../docs/infrastructure/server-functions.spec.md](../../../../docs/infrastructure/server-functions.spec.md)

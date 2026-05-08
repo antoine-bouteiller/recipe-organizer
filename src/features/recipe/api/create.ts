@@ -94,7 +94,7 @@ const createRecipe = createServerFn({
     }
 
     const isVegetarian = ownIngredientsVegetarian && linkedRecipesVegetarian
-    const isMagimix = instructions.includes('"types":"magimixProgram"')
+    const isMagimix = instructions.includes('"type":"magimixProgram"')
 
     const autoTags: RecipeTag[] = []
     if (isVegetarian && !tags.includes('dessert')) {

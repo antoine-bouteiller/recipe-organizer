@@ -1,6 +1,6 @@
 import { PlusIcon, ProhibitIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { animate, motion, useMotionValue, useTransform } from 'motion/react'
 import React, { useState } from 'react'
 
@@ -155,6 +155,11 @@ const UsersManagement = () => {
 const RouteComponent = () => <UsersManagement />
 
 export const Route = createFileRoute('/settings/users')({
+  beforeLoad: ({ context }) => {
+    if (context.authUser?.role !== 'admin') {
+      throw redirect({ to: '/settings' })
+    }
+  },
   component: RouteComponent,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getUserListOptions('active'))

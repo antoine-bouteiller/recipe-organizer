@@ -196,9 +196,9 @@ Define the authoritative behavior, contracts, constraints, and acceptance criter
 authErrors = {
   account_blocked,
   account_pending,
+  email_not_verified,
   error_communicating_with_google,
   invalid_state,
-  signup_disabled,
 }
 type AuthError = keyof typeof authErrors
 ```
@@ -207,14 +207,13 @@ The login page maps these to French messages:
 
 | Code                              | Message (FR)                                                      |
 | --------------------------------- | ----------------------------------------------------------------- |
-| `signup_disabled`                 | "Veuillez contacter l'administrateur pour vous inscrire"          |
 | `account_pending`                 | "Votre compte est en attente d'approbation par un administrateur" |
 | `account_blocked`                 | "Votre compte a ete bloque. Veuillez contacter un administrateur" |
+| `email_not_verified`              | "Votre adresse e-mail Google n'est pas verifiee"                  |
 | `error_communicating_with_google` | "Une erreur est survenue" (default fallback)                      |
 | `invalid_state`                   | "Une erreur est survenue" (default fallback)                      |
 
-Note: `signup_disabled` is defined in the enum but is not currently produced by `handleGoogleCallback`; it is
-reserved for future use.
+`email_not_verified` is emitted when the Google userinfo response has `verified_email !== true`.
 
 ### 4.4 Session Cookies
 
@@ -457,7 +456,7 @@ const searchSchema = z.object({ error: z.string().optional() })
   remains active. Operators must reconcile manually via the users feature.
 - **User row deleted while `app-session` is live**: `getAuthUser` returns `undefined`; `authGuard` redirects to
   `/auth/login`.
-- **Userinfo returns `email_verified=false`**: Not currently checked. (Future hardening: reject unverified emails.)
+- **Userinfo returns `verified_email !== true`**: `handleGoogleCallback` redirects to `/auth/login?error=email_not_verified` and creates no user row.
 - **`prompt=select_account` with single Google session**: Google still shows the account picker UI, which is
   acceptable.
 - **DEV bypass in tests**: Tests that exercise the production path must run with `import.meta.env.DEV === false`.
