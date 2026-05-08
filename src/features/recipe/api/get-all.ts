@@ -33,12 +33,10 @@ const getAllRecipes = createServerFn({
   })
 )
 
-const getRecipeListOptions = () =>
+export const getRecipeListOptions = () =>
   queryOptions({
     queryFn: getAllRecipes,
     queryKey: queryKeys.recipeList(),
   })
 
 export type ReducedRecipe = Awaited<ReturnType<typeof getAllRecipes>>[number]
-
-export { getAllRecipes, getRecipeListOptions }

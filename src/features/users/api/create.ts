@@ -14,7 +14,7 @@ const userSchema = z.object({
   role: z.enum(['user', 'admin']),
 })
 
-export type UserFormValues = z.infer<typeof userSchema>
+type UserFormValues = z.infer<typeof userSchema>
 export type UserFormInput = Partial<UserFormValues>
 
 const createUser = createServerFn()

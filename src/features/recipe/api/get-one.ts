@@ -67,10 +67,8 @@ const getRecipe = createServerFn({
 export type Recipe = Awaited<ReturnType<typeof getRecipe>>
 export type RecipeIngredientGroup = Recipe['ingredientGroups'][number]
 
-const getRecipeDetailsOptions = (id: number) =>
+export const getRecipeDetailsOptions = (id: number) =>
   queryOptions({
     queryFn: () => getRecipe({ data: id }),
     queryKey: queryKeys.recipeDetail(id),
   })
-
-export { getRecipe, getRecipeDetailsOptions }

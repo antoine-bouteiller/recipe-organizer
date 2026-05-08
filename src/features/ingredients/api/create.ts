@@ -19,7 +19,7 @@ const ingredientSchema = z.object({
   preferredUnitSlug: unitSlugSchema.nullable().optional(),
 })
 
-export type IngredientFormValues = z.infer<typeof ingredientSchema>
+type IngredientFormValues = z.infer<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>
 
 const createIngredient = createServerFn()
