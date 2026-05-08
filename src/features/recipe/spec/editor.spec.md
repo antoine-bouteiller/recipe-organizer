@@ -1,152 +1,409 @@
 ---
-title: Recipe editor (Lexical) & decorator nodes
-status: condensed
-author: Antoine Bouteiller
-date: 2026-04-16
-related: [./index.spec.md, ./crud.spec.md]
+title: Recipe Feature - Rich Text Editor (Lexical, Magimix, Subrecipe)
+version: 1.0
+date_created: 2026-05-08
+last_updated: 2026-05-08
+owner: recipe-organizer
+tags: [feature, recipe, editor, lexical, magimix, subrecipe]
 ---
 
-## 2. Problem Statement
+# Introduction
 
-Recipe instructions are richer than plain text: they must support embedded Magimix programs (with
-program / speed / temperature / time) and cross-recipe sub-recipe embeds (click-through preview). The app:
+This spec covers the rich-text editor that produces and renders `recipes.instructions`. The
+editor is built on Lexical (`lexical`, `@lexical/react`, `@lexical/utils`) and is shared via the
+`Editor` component in `src/components/ui/editor`. The recipe feature contributes two custom
+domain nodes: `MagimixProgramNode` and `SubrecipeNode`. Both are registered through the
+`recipeNodes` array and surfaced as toolbar buttons in edit mode.
 
-- `[G-1]` Provides a Lexical-based rich-text editor for authoring instructions, with bold/italic/bullet-list and
-  two custom decorator nodes: Magimix program and Subrecipe.
-- `[G-2]` Renders the same document tree in read-only mode on the recipe detail page, with the same decorator
-  components (inert but visually identical).
-- `[G-3]` Stores the editor content as `SerializedEditorState` JSON in `recipe.instructions` (text column).
-- `[G-4]` Surfaces toolbar buttons to insert a new Magimix program or Subrecipe via dialogs.
-- `[G-5]` Integrates with TanStack Form's `EditorField` so validation / submission work like any other form field.
-- `[G-6]` Migrated from Tiptap v3 to Lexical in Apr 2026, with a one-off HTML → Lexical JSON migration script
-  under `scripts/`.
+The editor is also the producer side of the auto-`magimix` tag: it writes the marker substring
+`"types":"magimixProgram"` into the serialized JSON state, which the server-side
+`computeAutoTags` (see [crud.spec.md](./crud.spec.md)) detects via `String.includes`.
 
-## 3. Key Design Decisions
+Source files:
 
-| Decision                                     | Choice                                                                                   | Rationale                                                                                                         |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Editor engine                       | Lexical (migrated from Tiptap v3, Apr 2026)                                              | First-class decorator nodes in React, better SSR story, clean JSON serialization.                                 |
-| `[KD-2]` Serialization format                | `SerializedEditorState` JSON string → stored in `recipe.instructions` (text)             | Keeps the DB column type `text`; Drizzle types the field via custom `EditorState` type. No HTML in DB.            |
-| `[KD-3]` Custom nodes as `DecoratorNode`     | `MagimixProgramNode` and `SubrecipeNode` extend `DecoratorNode` with React components    | Decorator nodes render arbitrary React inside the editor; double-click opens an edit dialog.                      |
-| `[KD-4]` Node registry                       | `recipeNodes` array exported from `components/editor/extensions.ts`                      | Single import point for both the authoring editor and the read-only detail render, so they share node resolution. |
-| `[KD-5]` `OnChangePlugin` → form             | Custom `OnChangePlugin` serializes `SerializedEditorState` on every editor change        | Bridges Lexical state into TanStack Form's `EditorField` value.                                                   |
-| `[KD-6]` Server-side magimix detection       | Substring search `instructions.includes('"types":"magimixProgram"')` during auto-tagging | Cheaper than a Lexical traversal on the server (which would require bundling Lexical in the Worker).              |
-| `[KD-7]` Bullet list + basic formatting only | Toolbar exposes bold, italic, bullet list, Magimix, Subrecipe                            | Keeps authoring surface small; no headings / tables / images-in-text.                                             |
+- `src/features/recipe/components/editor/extensions.ts`
+- `src/features/recipe/components/editor/magimix/{magimix-program-button,magimix-program-dialog,magimix-program-node}.tsx`
+- `src/features/recipe/components/editor/subrecipe/{subrecipe-button,subrecipe-dialog,subrecipe-node}.tsx`
+- `src/features/recipe/types/{magimix,subrecipe}.ts`
+- `src/features/recipe/contexts/linked-recipes-context.tsx`
+- `src/features/recipe/components/recipe-form.tsx` (toolbar wiring)
 
-## 4. Principles & Intents
+## 1. Purpose & Scope
 
-- `[PI-1]` **Shared node registry** — editor and read-only view MUST both import the same `recipeNodes` array so
-  a Magimix block renders identically in both modes.
-- `[PI-2]` **Read-only is not a different widget** — we use the same `<Editor>` component with `readOnly`, not a
-  separate renderer. Avoids the two-renderer maintenance burden.
-- `[PI-3]` **Lexical JSON is authoritative** — no "display HTML" stored separately. If the server needs to reason
-  about the doc, it does so on the JSON string (cheap substring matches) or punt to the client.
-- `[PI-4]` **Decorator dialogs own their validation** — Magimix and Subrecipe dialogs each have their own Zod
-  schema; they pre-fill from the node's current data when editing.
+### Purpose
 
-## 5. Non-Goals
+Provide a rich-text editing experience for recipe instructions that:
 
-- `[NG-1]` Collaborative editing (CRDT, presence).
-- `[NG-2]` Inline images inside the editor.
-- `[NG-3]` Tables, headings H1–H6, code blocks.
-- `[NG-4]` Keyboard-driven programmatic formatting beyond Lexical defaults.
-- `[NG-5]` Markdown import/export.
+- supports the standard Lexical formatting from the shared `Editor` component;
+- lets the user insert and edit _Magimix programs_ (a structured Cook Expert step) inline;
+- lets the user embed _another recipe's instructions_ inline, optionally hiding leading/trailing
+  paragraphs;
+- serializes deterministically so the server-side magimix-detection regex-free check is reliable;
+- renders identically in read-only mode on the recipe detail page.
 
-## 6. Caveats
+### Out of scope
 
-- `[C-1]` Auto-tag substring mismatch — the auto-tag code in `api/create.ts` and `api/update.ts` looks for
-  `"types":"magimixProgram"` (plural `types`), but the Lexical `MagimixProgramNode` serializes its `type` key as
-  singular `"type":"magimixProgram"`. This means the `magimix` auto-tag may never fire for Lexical-authored
-  recipes, and only fires for legacy content migrated from Tiptap (which used `types` plural). Confirmed by
-  grepping both files. **Fix candidate**: change the server check to look for `"type":"magimixProgram"` (or
-  both). Not changed here — track as `[OQ-1]`.
-- `[C-2]` `SubrecipeNode` filters its preview content via the recipe's own ingredient-group JSON, so changes to
-  the sub-recipe's structure propagate through on next render. Correctness depends on the sub-recipe being
-  available in the TanStack Query cache (fetched via `getRecipeInstructionsOptions`).
-- `[C-3]` Lexical requires a Suspense / ErrorBoundary parent. The editor component handles this internally, but
-  don't strip it.
-- `[C-4]` The migration script at `scripts/migrate-instructions-to-lexical.ts` is one-off; do not run it against
-  already-migrated data.
+- The shared `Editor` core (`src/components/ui/editor/`); this spec only covers the recipe-feature
+  nodes and the recipe form's toolbar wiring.
+- Auto-tag _computation_ on save (owned by [crud.spec.md](./crud.spec.md)); this spec only
+  guarantees the marker substring contract.
 
-## 7. High-Level Components
+## 2. Definitions
 
-| Component                 | Module type       | Responsibility                                                                        | Public API surface                                            |
-| ------------------------- | ----------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Node registry             | TS export         | Array of custom Lexical node classes to register on both authoring + readonly editors | `recipeNodes`                                                 |
-| `MagimixProgramNode`      | Lexical node      | Decorator node: renders Magimix program card; opens dialog on interaction             | `MagimixProgramNode` (class)                                  |
-| `MagimixProgramDialog`    | React dialog      | Form to create/edit Magimix program data; Zod-validated                               | `<MagimixProgramDialog />`, `MagimixProgramFormInput`         |
-| `MagimixProgramButton`    | React toolbar btn | Toolbar entry point to insert a new Magimix program node                              | `<MagimixProgramButton />`                                    |
-| `SubrecipeNode`           | Lexical node      | Decorator node: renders sub-recipe preview via `getRecipeInstructionsOptions`         | `SubrecipeNode` (class)                                       |
-| `SubrecipeDialog`         | React dialog      | Form to pick a sub-recipe to embed                                                    | `<SubrecipeDialog />`                                         |
-| `SubrecipeButton`         | React toolbar btn | Toolbar entry point to insert a new sub-recipe node                                   | `<SubrecipeButton />`                                         |
-| Shared `<Editor>`         | UI component      | Wraps Lexical composer, plugins, toolbar, read-only mode                              | `<Editor>`, `<EditorContent />` from `@/components/ui/editor` |
-| `OnChangePlugin` (custom) | Lexical plugin    | Emits `SerializedEditorState` on every state change                                   | Used internally by `<EditorField>`                            |
-| `EditorField`             | Form component    | TanStack Form wrapper around `<Editor>` for `instructions` field                      | `<EditorField />` from `@/components/forms/*`                 |
+| Term                   | Meaning                                                                                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `recipeNodes`          | `readonly Klass<LexicalNode>[]` exported from `editor/extensions.ts`, registered with the shared `Editor` whenever recipe instructions are rendered or edited. |
+| `MagimixProgramNode`   | `DecoratorNode` with type string `'magimixProgram'`, exported as `MagimixProgramNode` (alias of `MagimixProgramNodeType`).                                     |
+| `SubrecipeNode`        | `DecoratorNode` with type string `'subrecipe'`, exported as `SubrecipeNode` (alias of `SubrecipeNodeType`).                                                    |
+| Marker substring       | The literal `"types":"magimixProgram"` that appears in any serialized state containing at least one Magimix node.                                              |
+| `MagimixProgramData`   | `{ program, rotationSpeed, time, temperature? }` from `types/magimix.ts`.                                                                                      |
+| `SubrecipeNodeData`    | `{ recipeId, hideFirstNodes, hideLastNodes }` from `types/subrecipe.ts`.                                                                                       |
+| `LinkedRecipesContext` | React context providing `linkedRecipeIds: number[]` (the form's currently-selected linked recipes) so the SubrecipeDialog can restrict its picker.             |
 
-## 8. Detailed Design
+## 3. Requirements, Constraints & Guidelines
 
-| Concern                            | Entry point                                                                             |
-| ---------------------------------- | --------------------------------------------------------------------------------------- |
-| Node registry                      | `src/features/recipe/components/editor/extensions.ts` → `recipeNodes`                   |
-| Magimix node                       | `src/features/recipe/components/editor/magimix/magimix-program-node.tsx`                |
-| Magimix dialog                     | `src/features/recipe/components/editor/magimix/magimix-program-dialog.tsx`              |
-| Magimix toolbar button             | `src/features/recipe/components/editor/magimix/magimix-program-button.tsx`              |
-| Subrecipe node                     | `src/features/recipe/components/editor/subrecipe/subrecipe-node.tsx`                    |
-| Subrecipe dialog                   | `src/features/recipe/components/editor/subrecipe/subrecipe-dialog.tsx`                  |
-| Subrecipe toolbar button           | `src/features/recipe/components/editor/subrecipe/subrecipe-button.tsx`                  |
-| Magimix data types                 | `src/features/recipe/types/magimix.ts` → `magimixProgram`, `MagimixProgramData`, labels |
-| Subrecipe metadata types           | `src/features/recipe/types/subrecipe.ts`                                                |
-| Shared editor component            | `src/components/ui/editor/*`                                                            |
-| `OnChangePlugin`                   | Bundled in `@/components/ui/editor` package                                             |
-| Form field integration             | `src/components/forms/editor-field.tsx` (referenced via `useAppForm`)                   |
-| HTML → Lexical migration (one-off) | `scripts/migrate-instructions-to-lexical.ts`                                            |
+### Requirements
 
-Serialized shape of a Magimix node (for reference):
+- **REQ-001** `recipeNodes` MUST export both `MagimixProgramNode` and `SubrecipeNode`:
 
-```typescript
+  ```ts
+  export const recipeNodes: readonly Klass<LexicalNode>[] = [MagimixProgramNode, SubrecipeNode]
+  ```
+
+- **REQ-002** Every consumer that renders recipe instructions (read-only or editable) MUST pass
+  `nodes={recipeNodes}` to the shared `<Editor>`. Current call sites:
+  - `recipe-form.tsx` → `<EditorField nodes={recipeNodes} extraToolbar={...}>` (editable);
+  - `routes/recipe/$id.tsx` → `<Editor nodes={recipeNodes} readOnly>` (mobile and desktop);
+  - `subrecipe-node.tsx` → `<Editor nodes={recipeNodes} readOnly>` for the embedded preview.
+- **REQ-003** The `RecipeForm` toolbar MUST render `<MagimixProgramButton />` and
+  `<SubrecipeButton />` inside an `extraToolbar` slot composed of `ToolbarSeparator` +
+  `ToolbarGroup`.
+- **REQ-004** `MagimixProgramNode` MUST implement, via `DecoratorNode<React.ReactElement>`:
+  - `static getType() === 'magimixProgram'`,
+  - `static clone(node)` preserving `__program, __rotationSpeed, __time, __temperature, __key`,
+  - `static importDOM()` recognizing `<div data-type="magimix-program">` with optional
+    `data-program`, `data-rotation-speed`, `data-temperature`, `data-time` attributes,
+  - `exportDOM()` writing the same `data-*` attributes,
+  - `static importJSON(json)` and `exportJSON()` returning a
+    `SerializedMagimixProgramNode = Spread<{ program, rotationSpeed, temperature?, time, type:
+'magimixProgram', version: 1 }, SerializedLexicalNode>`,
+  - `isInline() === false`,
+  - `createDOM()` returns a `div` with `style.display = 'contents'` (transparent layout),
+  - `decorate(editor)` returns `<MagimixProgramComponent isEditable={editor.isEditable()} ...>`.
+- **REQ-005** `MagimixProgramComponent`:
+  - displays an `<Item>` with the program icon (`/magimix/{program}.png`), label
+    (`magimixProgramLabels[program]`), formatted time (`Xmin Ys` / `Ys` / `Xmin`), capitalized
+    rotation speed, and temperature with `°C` suffix;
+  - in editable mode, wraps the `Item` in `<MagimixProgramDialog>` (initialized from current
+    attrs, `submitLabel="Enregistrer"`, `title="Modifier le programme Magimix"`);
+  - on submit, calls `editor.update(() => { node.getWritable().__program = ... })` to mutate the
+    node in place.
+- **REQ-006** `MagimixProgramButton`:
+  - calls `useLexicalComposerContext()` for the editor reference;
+  - opens `MagimixProgramDialog` (`title="Ajouter un programme Magimix"`,
+    `submitLabel="Insérer"`);
+  - on submit, runs `editor.update(() => $insertNodeToNearestRoot($createMagimixProgramNode(data)))`
+    and refocuses the editor.
+- **REQ-007** `MagimixProgramDialog` validates with the Zod schema:
+
+  ```ts
+  z.object({
+    program: z.enum(magimixProgram),
+    rotationSpeed: z.enum(allowedRotationSpeed),
+    temperature: z.number().min(0).max(200).optional(),
+    timeMinutes: z.number().min(0).max(60),
+    timeSeconds: z.number().min(0).max(60),
+  })
+  ```
+
+  and computes `time = timeMinutes * 60 + timeSeconds` before invoking `onSubmit`.
+
+- **REQ-008** `SubrecipeNode` MUST mirror the `MagimixProgramNode` decorator-node pattern:
+  - `static getType() === 'subrecipe'`,
+  - `static clone(node)` preserving `__recipeId, __hideFirstNodes, __hideLastNodes, __key`,
+  - `importDOM` recognizes `<div data-type="subrecipe">` with `data-recipe-id`,
+    `data-hide-first-nodes` (default 0), `data-hide-last-nodes` (default 0);
+  - `exportDOM` only emits `data-hide-first-nodes`/`data-hide-last-nodes` when non-zero;
+  - `importJSON`/`exportJSON` round-trips
+    `SerializedSubrecipeNode = Spread<{ hideFirstNodes, hideLastNodes, recipeId, type:
+'subrecipe', version: 1 }, SerializedLexicalNode>`.
+- **REQ-009** `SubrecipeComponent`:
+  - calls `useQuery(getRecipeInstructionsOptions(recipeId))` to fetch the linked recipe's name
+    and instructions;
+  - returns `null` until the query has data;
+  - in editable mode, wraps the preview in a dashed-border button rendered as the
+    `SubrecipeDialog` trigger;
+  - in read-only mode, renders the `<strong>{recipe.name}</strong>` heading followed by a nested
+    read-only `<Editor content={filteredInstructions} nodes={recipeNodes} readOnly>`.
+- **REQ-010** `filterNodes(state, hideFirstNodes, hideLastNodes)`:
+  - parses the JSON, slices `root.children` from `startIndex = hideFirstNodes ?? 0` to
+    `endIndex = totalNodes - hideLastNodes` (where `totalNodes = children.length - 1`),
+  - returns a stringified state with empty `children` if `startIndex >= endIndex || startIndex >=
+totalNodes`,
+  - otherwise returns the sliced children.
+- **REQ-011** `SubrecipeDialog`:
+  - validates with `z.object({ hideFirstNodes: z.number().min(0), hideLastNodes:
+z.number().min(0), recipeId: z.number() })`;
+  - uses `useRecipeOptions({ filter: r => linkedRecipeIds.includes(r.id) })` from
+    `useLinkedRecipes()` so the user can only pick recipes that are already linked at the form
+    level;
+  - exposes a `<ComboboxField label="Recette">` plus two `<NumberField>`s.
+- **REQ-012** `LinkedRecipesProvider` MUST wrap the editor field in `recipe-form.tsx` with
+  `linkedRecipeIds = form.values.linkedRecipes.map(lr => lr.id).filter(id => id > 0)` so newly
+  added unselected linked rows (`id === -1`) are excluded.
+- **REQ-013** Auto-`magimix` tag contract: at least one `MagimixProgramNode` in the serialized
+  state implies the substring `"types":"magimixProgram"` appears in the `instructions` string.
+  This MUST hold regardless of editor formatting (no whitespace, no key-reordering between
+  `type` and the value). The server's `instructions.includes('"types":"magimixProgram"')` check
+  depends on this.
+- **REQ-014** `MagimixProgramNode.exportJSON()` MUST emit `type: 'magimixProgram'` (the marker)
+  AND `version: 1`. Lexical serializers consistently emit `"type":"<value>"` without
+  intervening whitespace.
+
+### Constraints
+
+- **CON-001** `MagimixProgramDialog` and `SubrecipeDialog` are TanStack React Form forms that
+  spawn from inside Lexical's React tree. Updates MUST go through `editor.update(...)` +
+  `getWritable()` to be tracked.
+- **CON-002** The `display: contents` outer `div` is intentional: Lexical wants a single root
+  element per decorator, but the visual tree is owned by the inner `MagimixProgramComponent` /
+  `SubrecipeComponent`.
+- **CON-003** `getRecipeInstructionsOptions(id)` has `staleTime: 5 minutes`. Subrecipe content
+  may lag for up to 5 min after the linked recipe is edited; acceptable for now.
+- **CON-004** `linkedRecipeIds` is reactive via `useStore(form.store, ...)`; switching a linked
+  row from one recipe to another updates the SubrecipeDialog's pickable list immediately.
+- **CON-005** The Magimix marker substring MUST not appear naturally in user-typed text. The
+  literal characters `"types":"magimixProgram"` (including quotes) inside a paragraph would NOT
+  match because Lexical serializes paragraph text into an entirely different shape — the user
+  would have to type `"type":"magimixProgram"` (with `type` not `types`); the actual marker is
+  `"types":"magimixProgram"` which is unique to the `exportJSON` shape... NOTE: see §9 EC-005
+  for the actual literal in source.
+
+### Guidelines
+
+- **GUD-001** Always check `editor.isEditable()` from `decorate(editor)` before rendering the
+  edit-affordance variant of a decorator component. Read-only renders MUST NOT mount any dialog.
+- **GUD-002** When mutating decorator state, batch all writes inside a single
+  `editor.update(() => { ... node.getWritable() ... })` call.
+- **GUD-003** Add new domain nodes by extending `recipeNodes`; do NOT register them on the
+  shared `Editor` directly.
+
+## 4. Interfaces & Data Contracts
+
+### Type exports
+
+```ts
+// types/magimix.ts
+export const magimixProgram = [
+  'expert',
+  'pureed-soup',
+  'cream-soup',
+  'simmer',
+  'stir-fry',
+  'steam',
+  'frozen-dessert',
+  'crushed-ice',
+  'smoothie',
+  'pastry-cake',
+  'beaten-egg-white',
+  'bread-brioche',
+  'robot',
+  'chocolate',
+  'pizza',
+] as const
+export type MagimixProgram = (typeof magimixProgram)[number]
+export const allowedRotationSpeed = ['1A', '2A', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', 'auto'] as const
+export interface MagimixProgramData {
+  program: MagimixProgram
+  rotationSpeed: (typeof allowedRotationSpeed)[number]
+  temperature?: number
+  time: number // seconds
+}
+export const magimixProgramLabels: Record<MagimixProgram, string>
+
+// types/subrecipe.ts
+export interface SubrecipeNodeData {
+  hideFirstNodes: number
+  hideLastNodes: number
+  recipeId: number
+}
+```
+
+### Serialized node JSON
+
+```ts
+// MagimixProgramNode
 type SerializedMagimixProgramNode = Spread<
   {
-    type: 'magimixProgram'
-    version: 1
     program: string
     rotationSpeed: string
-    time: number
     temperature?: number
+    time: number
+    type: 'magimixProgram'
+    version: 1
+  },
+  SerializedLexicalNode
+>
+
+// SubrecipeNode
+type SerializedSubrecipeNode = Spread<
+  {
+    hideFirstNodes: number
+    hideLastNodes: number
+    recipeId: number
+    type: 'subrecipe'
+    version: 1
   },
   SerializedLexicalNode
 >
 ```
 
-## 9. Verification Criteria
+### Component signatures
 
-- `[VC-1]` Typing text in the editor updates the `instructions` field in the parent form (TanStack Form value
-  reflects the Lexical state).
-- `[VC-2]` Clicking the Magimix toolbar button opens `MagimixProgramDialog`; submitting inserts a
-  `MagimixProgramNode` into the document.
-- `[VC-3]` Double-clicking an existing Magimix node opens the dialog pre-filled with the node's current data;
-  saving replaces the node in place.
-- `[VC-4]` The Subrecipe toolbar button lists existing recipes (via `getRecipeListOptions` or equivalent) and
-  inserts a `SubrecipeNode` referencing the chosen recipe id.
-- `[VC-5]` The same editor in `readOnly` mode renders Magimix and Subrecipe nodes with the same visual layout
-  but without dialog triggers / editing affordances.
-- `[VC-6]` `recipe.instructions` round-trips: load → mount editor → serialize → save produces an equivalent
-  JSON (semantic equality, not byte-identical).
-- `[VC-7]` Auto-tag firing for Magimix content: authoring a recipe with at least one `MagimixProgramNode` and
-  saving it results in `tags` containing `magimix`. **This VC currently fails** — see caveat `[C-1]`; track via
-  `[OQ-1]`. Once the server substring is corrected, re-verify.
-- `[VC-8]` Lint + typecheck pass.
+```tsx
+<MagimixProgramButton />                         // toolbar button, no props
+<SubrecipeButton />                              // toolbar button, no props
 
-## 10. Open Questions
+<MagimixProgramDialog
+  initialData?: MagimixProgramFormInput
+  onSubmit: (data: MagimixProgramData) => void
+  submitLabel: string
+  title: string
+  triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
+/>
 
-- `[OQ-1]` Fix the Magimix auto-tag substring on the server: `"types":"magimixProgram"` →
-  `"type":"magimixProgram"`. Do we need a data migration to re-run auto-tagging on all existing recipes after
-  the fix?
-- `[OQ-2]` Should we consider Lexical → HTML pre-rendering at write time for email / PDF export, or compute at
-  export time?
+<SubrecipeDialog
+  initialData?: SubrecipeFormInput
+  onSubmit: (data: SubrecipeNodeData) => void
+  submitLabel: string
+  title: string
+  triggerRender?: ...
+/>
 
-## Changelog
+<LinkedRecipesProvider linkedRecipeIds={number[]}>{children}</LinkedRecipesProvider>
+useLinkedRecipes(): number[]
+```
 
-| Date       | Amendment                               | Sections affected | Reason                                                            |
-| ---------- | --------------------------------------- | ----------------- | ----------------------------------------------------------------- |
-| 2026-04-11 | Tiptap v3 → Lexical migration           | 3, 7, 8           | Better SSR, decorator nodes, typed JSON serialization             |
-| 2026-04-11 | Instructions serialization: HTML → JSON | 3, 6, 8           | Schema column now types `instructions` as `SerializedEditorState` |
+## 5. Acceptance Criteria
+
+- **AC-001** Inserting a Magimix program via the toolbar produces a new `MagimixProgramNode` at
+  the nearest root, and the editor immediately renders the program card.
+- **AC-002** Clicking an existing Magimix card in edit mode opens `MagimixProgramDialog`
+  pre-filled with the current attributes; submitting writes the new attributes through
+  `node.getWritable()`.
+- **AC-003** Saving a recipe whose instructions contain at least one Magimix node persists
+  `tags` including `'magimix'` (verified end-to-end with [crud.spec.md](./crud.spec.md)).
+- **AC-004** Inserting a subrecipe restricted to a recipe in `linkedRecipeIds` produces a
+  `SubrecipeNode`; on the detail page, the embedded recipe's filtered instructions render inside
+  the parent.
+- **AC-005** `hideFirstNodes = N` causes the embedded preview to skip the first `N`
+  paragraphs of the linked recipe's instructions; `hideLastNodes = M` skips the last `M`.
+- **AC-006** Round-tripping a recipe through save → load → render produces an editor state
+  byte-identical to the saved JSON (Lexical serialization is deterministic and the marker
+  survives).
+- **AC-007** In read-only mode (recipe detail page), neither the Magimix card nor the subrecipe
+  preview opens its editing dialog on click.
+- **AC-008** `SubrecipeDialog` only lists recipes whose ids are present in
+  `useLinkedRecipes()`; selecting one whose id is `-1` (placeholder) is impossible because the
+  list filters them out.
+
+## 6. Test Automation Strategy
+
+- **PAT-001** Snapshot the `exportJSON()` output of `MagimixProgramNode` and `SubrecipeNode` for
+  representative inputs and assert the marker substring on the Magimix snapshot.
+- **PAT-002** Test `filterNodes(state, hideFirstNodes, hideLastNodes)` directly with crafted
+  serialized states (boundary cases: full hide, no hide, both hides exceeding total).
+- **PAT-003** Component test for `MagimixProgramDialog`: invalid `timeSeconds = 65` rejects;
+  valid `timeMinutes = 2, timeSeconds = 30` invokes `onSubmit({ time: 150, ... })`.
+- **PAT-004** Component test for `SubrecipeDialog`: with `linkedRecipeIds = [3, 5]`, the picker
+  shows only those two options.
+- **PAT-005** Round-trip test: render the editor with a fixture state, programmatically insert a
+  Magimix node, serialize, and assert the substring `"types":"magimixProgram"` appears.
+
+## 7. Rationale & Context
+
+- **Why decorator nodes instead of element nodes?** Magimix programs and subrecipes are atomic,
+  non-text inserts: the user cannot type inside them, and they have a fully custom UI. Lexical's
+  `DecoratorNode` is the right primitive — Lexical owns the placement, React owns the rendering.
+- **Why the substring marker for the magimix tag?** The server doesn't load Lexical to inspect
+  the editor state; a `String.includes` is O(n) and zero-dependency. The marker piggy-backs on
+  Lexical's deterministic serialization.
+- **Why fetch the linked recipe's instructions on render?** Embedding the JSON inline in the
+  parent would duplicate state and break when the linked recipe is edited. Fetching by id keeps
+  the preview live (within the 5-minute `staleTime`).
+- **Why a `LinkedRecipesContext`?** The SubrecipeDialog lives deep inside the Lexical decorator
+  tree; passing the `linkedRecipeIds` array down via context avoids prop-drilling through
+  Lexical's plugin API.
+- **Why `display: contents` on the wrapper?** Lexical insists on one DOM element per node;
+  `display: contents` makes that element layout-invisible so the decorator's children participate
+  in the parent's flow naturally.
+
+## 8. Dependencies & External Integrations
+
+- **`lexical`** core — `DecoratorNode`, `$getNodeByKey`, types `LexicalNode`,
+  `SerializedLexicalNode`, `Spread`, `EditorConfig`, `LexicalEditor`, `NodeKey`,
+  `DOMConversionMap`, `DOMConversionOutput`, `DOMExportOutput`.
+- **`@lexical/react/LexicalComposerContext`** — `useLexicalComposerContext()` for editor
+  references in toolbar buttons and decorator components.
+- **`@lexical/utils`** — `$insertNodeToNearestRoot`.
+- **`@phosphor-icons/react`** — `CookingPotIcon`, `BookOpenIcon`, `SpinnerGapIcon`,
+  `ThermometerIcon`, `TimerIcon`.
+- **`@tanstack/react-form`** + **`zod`** — both dialog forms.
+- **`@tanstack/react-query`** — `useQuery(getRecipeInstructionsOptions(recipeId))` inside
+  `SubrecipeNode`.
+- **Shared editor** (`@/components/ui/editor`) — `Editor`, `EditorContent` for the read-only
+  embedded subrecipe render.
+- **`@/hooks/use-options`** — `useRecipeOptions({ filter })` for the SubrecipeDialog's combobox.
+- **`@/components/dialogs/form-dialog`** — `getFormDialog(defaults)` factory.
+
+## 9. Examples & Edge Cases
+
+- **EC-001** A program with `time = 0`: the dialog's two `NumberField`s both 0; `formatTime(0)`
+  returns `"0s"`.
+- **EC-002** A program with `temperature` undefined: `exportDOM` skips the attribute;
+  `exportJSON` emits `temperature: undefined` (which JSON.stringify drops). The display falls
+  back to the `__` placeholder.
+- **EC-003** `SubrecipeNode` for a recipe id that no longer exists (deleted upstream): the
+  `useQuery` returns `undefined`, the component returns `null`, leaving a silent gap.
+  Mitigation: `delete(recipe)` is restricted by `recipe_linked_recipes` FK at the form-level
+  ratio links — but the Lexical reference is opaque to FK constraints, so a stale `__recipeId`
+  is possible.
+- **EC-004** A subrecipe with `hideFirstNodes >= total - 1`: `filterNodes` returns an empty
+  `children` array; the embedded `<Editor>` renders nothing under the `<strong>` heading.
+- **EC-005** False positive auto-`magimix`? The literal marker `"types":"magimixProgram"` is
+  the precise substring emitted by `exportJSON()` (key `type`, value `magimixProgram`, plus
+  Lexical's serialization quirks make `"types"` actually `"type"`). The implementation in
+  `api/{create,update}.ts` uses the literal `'"types":"magimixProgram"'`. Either the marker
+  works because Lexical's output happens to include this exact substring when a Magimix node is
+  present, or there is a bug. Track in the backlog: validate the literal against an actual
+  `editor.toJSON()` output and adjust either the producer (the `type` key) or the consumer
+  (the substring) accordingly.
+- **EC-006** Pasting a `<div data-type="magimix-program" data-program="expert" data-time="60">`
+  HTML fragment into the editor: `importDOM` reconstructs a `MagimixProgramNode` with default
+  rotation speed `'auto'`.
+
+## 10. Validation Criteria
+
+- The exported `recipeNodes` array MUST contain exactly `[MagimixProgramNode, SubrecipeNode]`.
+- Both nodes MUST extend `DecoratorNode<React.ReactElement>` and implement the full
+  import/export contract (DOM and JSON).
+- Both dialogs MUST use Zod via TanStack React Form's `revalidateLogic()` and `onDynamic`.
+- The `SubrecipeDialog` MUST consume `useLinkedRecipes()` and use it to filter
+  `useRecipeOptions(...)`.
+- The `MagimixProgramComponent`'s `isEditable` branch MUST mount `MagimixProgramDialog` exactly
+  once around the visual `Item`; the read-only branch MUST mount `<Item>` directly.
+
+## 11. Related Specifications / Further Reading
+
+- [./index.spec.md](./index.spec.md)
+- [./crud.spec.md](./crud.spec.md) — defines the auto-`magimix` tag contract that consumes the
+  marker substring this spec produces.
+- [./display.spec.md](./display.spec.md) — describes the read-only render of the editor on the
+  detail page.
+- [../../../../docs/architecture.spec.md](../../../../docs/architecture.spec.md)
+- [../../../../docs/infrastructure/data-layer.spec.md](../../../../docs/infrastructure/data-layer.spec.md)
+- [../../../../docs/infrastructure/server-functions.spec.md](../../../../docs/infrastructure/server-functions.spec.md)
+- [../../../../docs/infrastructure/forms.spec.md](../../../../docs/infrastructure/forms.spec.md)
+- [../../../../docs/infrastructure/routing-ssr.spec.md](../../../../docs/infrastructure/routing-ssr.spec.md)
+- [../../shopping-list/shopping-list.spec.md](../../shopping-list/shopping-list.spec.md)
+- [../../ingredients/ingredients.spec.md](../../ingredients/ingredients.spec.md)

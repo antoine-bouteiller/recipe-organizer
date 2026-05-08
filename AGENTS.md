@@ -4,19 +4,22 @@ Full-stack recipe management app built with TanStack Start, deployed on Cloudfla
 
 ## Quick Reference
 
-- **Package Manager:** Bun (never npm/yarn)
-- **Dev:** `bun dev`
-- **Build:** `bun run build`
-- **Test:** `bun test`
-- **Typecheck:** `bun typecheck`
-- **Lint:** `bun lint`
-- **Format:** `bun format`
+- **Toolchain:** Vite+ (`vp`) wrapping pnpm + Vite + Vitest + Oxlint + Oxfmt
+- **Dev:** `pnpm dev` (sets `CLOUDFLARE_ENV=dev`, then runs `vp dev`)
+- **Build:** `vp build`
+- **Test:** `vp test`
+- **Check (fmt + lint + types):** `vp check`
+- **Lint:** `vp lint`
+- **Format:** `vp fmt`
+
+See the Vite+ section below for the full command reference.
 
 ## Critical Rules
 
-- **Always lint before committing:** `bun lint`
-- **Route changes require regeneration:** Run `bun dev` after adding/moving routes
-- **Add Shadcn components:** `bunx shadcn@latest add @coss/<component-name>`
+- **Always run `vp check` before committing.**
+- **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
+- **Add Shadcn components:** `vp dlx shadcn@latest add @coss/<component-name>`.
+- **DB migrations:** `pnpm migration:apply:local` (local D1) / `pnpm migration:apply:remote` (production D1).
 
 ## Guidelines
 
@@ -24,7 +27,6 @@ Canonical reference = the `*.spec.md` files under `docs/` + `docs/infrastructure
 colocated with the code.
 
 - [Project Structure](docs/file-structure.spec.md)
-- [Architecture Index](docs/infrastructure/index.spec.md)
 - [Platform (Cloudflare Workers)](docs/infrastructure/platform.spec.md)
 - [Data Layer (Drizzle + D1)](docs/infrastructure/data-layer.spec.md)
 - [Server Functions](docs/infrastructure/server-functions.spec.md)

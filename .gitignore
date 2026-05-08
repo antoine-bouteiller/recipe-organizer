@@ -16,3 +16,4 @@ public/swe-worker*
 # Misc
 .env
 .DS_Store
+scheduled_tasks.lock

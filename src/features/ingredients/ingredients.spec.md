@@ -1,158 +1,377 @@
 ---
-title: Ingredients
-status: amended
-author: Antoine Bouteiller
-date: 2026-04-18
-related: [../recipe/spec/index.spec.md, ../shopping-list/shopping-list.spec.md, ../../../docs/specs/unit.spec.md]
+title: Ingredients Feature Specification
+version: 1.0
+date_created: 2026-05-08
+last_updated: 2026-05-08
+owner: recipe-organizer
+tags: [feature, ingredients, crud, units]
 ---
 
-## 2. Problem Statement
+# Introduction
 
-Recipes reference ingredients as structured data, not free text, so the app can:
+This specification documents the `ingredients` feature of `recipe-organizer`, a TanStack Start + Cloudflare
+Workers application. The feature provides the canonical catalogue of ingredients used by recipes and the
+shopping list. It owns the ingredient entity and its associated unit metadata (density, unit weight,
+preferred shopping unit), the CRUD server functions backing the catalogue, the UI for the
+`/settings/ingredients` administration screen, and the unit-conversion utilities used by other features.
 
-- `[G-1]` Group shopping-list items by ingredient category (meat, fish, vegetables, spices, other).
-- `[G-2]` Auto-tag a recipe as `vegetarian` by checking whether any of its ingredients (or linked sub-recipe
-  ingredients) fall in `meat` / `fish`. See `[KD-2]` of recipe spec.
-- `[G-3]` Collapse ingredient variants (e.g., "cherry tomato" → parent "tomato") so a shopping list adding multiple
-  recipes that each use a different tomato variant does not show three separate lines.
-- `[G-4]` Let any authenticated user add a new ingredient on the fly while editing a recipe, without needing admin
-  privileges — friction-free recipe entry matters more than perfect taxonomy hygiene.
-- `[G-5]` Carry per-ingredient conversion metadata (density, count weight, preferred display unit) so the
-  shopping list can aggregate quantities across unit dimensions and present a single meaningful "buy this much"
-  value per ingredient.
+## 1. Purpose & Scope
 
-## 3. Key Design Decisions
+- **Purpose.** Maintain a single, validated, queryable list of ingredients with category, hierarchy
+  (parent / child), and unit-conversion metadata so recipes and shopping list aggregation can reason about
+  quantities across mass, volume, and count dimensions.
+- **In scope.**
+  - Ingredient entity definition and persistence (Drizzle + Cloudflare D1).
+  - Server functions: list, create, update, delete.
+  - Form, dialogs, and badge components used by the settings page.
+  - Category metadata (labels, icons, color styles) and combobox option hook.
+  - Unit catalogue (`UNITS`, `UnitSlug`, `unitOptions`, `unitSlugSchema`) and `convert()` helper.
+- **Out of scope.**
+  - Recipe ingredient lines and recipe-level quantities (see `../recipe/spec/index.spec.md`).
+  - Shopping list aggregation rules beyond the spice exclusion noted here (see
+    `../shopping-list/shopping-list.spec.md`).
+  - Authentication and authorization mechanics (see `../auth`).
 
-| Decision                                   | Choice                                                                                      | Rationale                                                                                                                                                                                                                                                           |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------ | --------------------- | ----------------------------------------------------------------------------------------- |
-| `[KD-1]` Flat table, optional `parentId`   | Self-referential `ingredient.parent_id` (no depth limit enforced, but used as single level) | Simplest model that covers the variant case without requiring a separate taxonomy system.                                                                                                                                                                           |
-| `[KD-2]` Closed category set               | `meat                                                                                       | fish                                                                                                                                                                                                                                                                | vegetables | spices | other` (Drizzle enum) | Categories drive auto-tagging and UI icons; an open set would break vegetarian detection. |
-| `[KD-3]` Create/update = any auth user     | `authGuard()` (no role)                                                                     | Recipe editing flow needs inline ingredient creation.                                                                                                                                                                                                               |
-| `[KD-4]` Delete = admin only               | `authGuard('admin')`                                                                        | Deletes are referenced by `group_ingredients.ingredient_id` with `onDelete: 'restrict'` — breaking data is admin-only.                                                                                                                                              |
-| `[KD-5]` Indexed by category               | `idx_ingredients_category`                                                                  | Shopping list groups by category; queries on large ingredient tables stay fast.                                                                                                                                                                                     |
-| `[KD-6]` Conversion metadata on ingredient | `density_g_per_ml`, `count_weight_g`, `preferred_unit_slug` — all nullable                  | Per-ingredient physical properties belong to the ingredient, not the unit (1 g of flour ≠ 1 g of honey). Nullable so ingredients can be added without blocking on unknown data. `preferred_unit_slug` references the hardcoded unit catalog by slug, with no DB FK. |
+## 2. Definitions
 
-## 4. Principles & Intents
+| Term                   | Definition                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Ingredient             | A row in the `ingredients` table representing a foodstuff usable in recipes.                                                                           |
+| Category               | One of `meat`, `fish`, `vegetables`, `spices`, `other` — controls grouping, badge, and shopping-list rules.                                            |
+| Parent ingredient      | An optional self-referencing pointer (`parentId`) used to group variants (e.g. `tomato` as parent of `cherry tomato`).                                 |
+| `densityGPerMl`        | Density in grams per millilitre; enables volume ↔ mass conversion.                                                                                     |
+| `countWeightG`         | Average mass in grams of one unit/piece of the ingredient; enables count ↔ mass conversion.                                                            |
+| `preferredUnitSlug`    | The unit the shopping list prefers when displaying this ingredient.                                                                                    |
+| Unit                   | A measurement entry from `UNITS` carrying `slug`, `name`, `dimension`, `parent`, and `factor`.                                                         |
+| `Dimension`            | One of `mass`, `volume`, `count`, `length`.                                                                                                            |
+| Canonical base unit    | A unit whose `parent` is `null` within its dimension (`g` for mass, `ml` for volume, each count/length unit).                                          |
+| `UnitSlug`             | Discriminated string union: `g`, `kg`, `ml`, `l`, `tbsp`, `tsp`, `piece`, `pinch`, `cube`, `bottle`, `sheet`, `box`, `can`, `handful`, `packet`, `cm`. |
+| `convert()`            | Function that converts a quantity between two `UnitSlug`s using ingredient density / count weight to bridge dimensions through grams.                  |
+| `useIngredientOptions` | Hook returning the ingredient list shaped as combobox options for forms.                                                                               |
+| Admin                  | A user whose route context exposes `isAdmin === true`; required for `deleteIngredient` and for the Edit/Delete actions on the settings page.           |
 
-- `[PI-1]` **Ingredients are shared, not per-user** — there is no `createdBy` field and no per-user visibility. The
-  catalog is a single shared vocabulary.
-- `[PI-2]` **Categories are the contract** — auto-tagging, icon selection, and shopping-list grouping all depend on
-  the 5-value enum. Adding a new category is a breaking change that requires updating `isVegetarian` logic,
-  `ingredientCategoryIcons`, and `ingredientCategoryLabels`.
-- `[PI-3]` **Parent–child is for variants only** — "cherry tomato" → "tomato", not a general taxonomy. The child
-  inherits nothing automatically (not even category); both rows are independent records.
-- `[PI-4]` **Conversion metadata is best-effort, not required** — shopping-list aggregation must keep working when
-  density / count weight / preferred unit are absent; the conversion engine falls back to a per-unit breakdown.
-  Missing metadata is a nudge to the admin, not a blocker for recipe entry.
-- `[PI-5]` **One density per ingredient** — packed-vs-sifted flour, melted-vs-solid butter etc. collapse into a
-  single representative value. Precision is deliberately traded for simplicity.
+## 3. Requirements, Constraints & Guidelines
 
-## 5. Non-Goals
+### 3.1 Functional Requirements
 
-- `[NG-1]` Per-user ingredient catalogs.
-- `[NG-2]` Nutritional data, allergen tracking, or pricing — density and count weight are the only physical
-  metadata stored.
-- `[NG-3]` Ingredient aliases / synonyms — use parent/child for variants, not for aliasing.
-- `[NG-4]` Bulk import / CSV seeding UI (may exist in `scripts/` as a dev-only tool, but not a product feature).
-- `[NG-5]` State-dependent density (packed / sifted / melted variants). One value per ingredient; see `[PI-5]`.
-- `[NG-6]` Per-ingredient unit overrides beyond the three scalar fields (density, count weight, preferred unit).
-  A richer `ingredient_unit_overrides` table is explicitly not in scope.
+- **REQ-001.** The `ingredients` table MUST persist columns `id` (integer primary key), `name` (text, not
+  null), `category` (text enum, not null, default `other`), `parentId` (integer, nullable),
+  `densityGPerMl` (real, nullable), `countWeightG` (real, nullable), `preferredUnitSlug` (text, nullable,
+  typed as `UnitSlug`).
+- **REQ-002.** The `ingredients` table MUST declare an index `idx_ingredients_category` on `category`.
+- **REQ-003.** The category enum MUST be exactly `['meat', 'fish', 'vegetables', 'spices', 'other']`.
+- **REQ-004.** `getIngredientsList` MUST be a `GET` server function that returns all ingredients ordered by
+  `name` ascending and MUST NOT require authentication.
+- **REQ-005.** `getIngredientListOptions()` MUST return TanStack Query `queryOptions` keyed by
+  `queryKeys.listIngredients()` and using `getIngredientsList` as `queryFn`.
+- **REQ-006.** `createIngredient` MUST require authentication via `authGuard()` and validate input with
+  `ingredientSchema`.
+- **REQ-007.** `updateIngredient` MUST require authentication via `authGuard()` and validate input with
+  `updateIngredientSchema` (which extends `ingredientSchema` with `id: number`).
+- **REQ-008.** `deleteIngredient` MUST require admin authorization via `authGuard('admin')` and validate
+  input with `{ id: number }`.
+- **REQ-009.** `ingredientSchema` MUST enforce: `name` string of min length 2; `category` enum from
+  `ingredientCategory`; `densityGPerMl` and `countWeightG` positive numbers, nullable, optional;
+  `parentId` number, optional; `preferredUnitSlug` validated by `unitSlugSchema`, nullable, optional.
+- **REQ-010.** Mutations (`createIngredient`, `updateIngredient`, `deleteIngredient`) MUST invalidate
+  `queryKeys.listIngredients()` on success.
+- **REQ-011.** `createIngredient` and `updateIngredient` MUST display a French success toast referencing
+  the ingredient name and a French error toast on failure via `toastError`.
+- **REQ-012.** `IngredientForm` MUST render fields for `name`, `category`, `parentId`, `densityGPerMl`,
+  `countWeightG`, and `preferredUnitSlug`, with French labels.
+- **REQ-013.** The `preferredUnitSlug` select MUST include an `Aucune` (empty value) option in addition to
+  `unitOptions`.
+- **REQ-014.** `AddIngredient` MUST accept an optional `defaultValue` prop that pre-fills the `name` field.
+- **REQ-015.** `AddIngredient` and `EditIngredient` MUST use `useAppForm` with
+  `validationLogic: revalidateLogic()` and `validators.onDynamic: ingredientSchema`, and MUST be wrapped in
+  the dialog returned by `getFormDialog(ingredientDefaultValues)`.
+- **REQ-016.** On successful submit both dialogs MUST reset the form and close (`setOpen(false)`).
+- **REQ-017.** `EditIngredient` MUST hydrate the form from the supplied `Ingredient`, mapping `parentId`
+  `null` to `undefined`.
+- **REQ-018.** `DeleteIngredient` MUST render a `DeleteDialog` with French copy and call
+  `deleteMutation.mutate({ data: { id: ingredientId } })`.
+- **REQ-019.** The `/settings/ingredients` route MUST preload `getIngredientListOptions()` via the route
+  `loader` using `context.queryClient.ensureQueryData`.
+- **REQ-020.** The settings page MUST filter ingredients case-insensitively by both `name` and `category`
+  using a single search input.
+- **REQ-021.** Edit and Delete actions on the settings page MUST be visible only when
+  `Route.useRouteContext().isAdmin === true`.
+- **REQ-022.** Each row MUST render an `IngredientBadge` with the category icon and (on viewports `md` and
+  larger) the French category label.
+- **REQ-023.** When the filtered list is empty, the page MUST show a French empty-state message
+  distinguishing between "no search results" and "no ingredients yet".
+- **REQ-024.** `useIngredientOptions` MUST expose ingredients as combobox `{ label, value }` options for
+  reuse by recipes; the `parentId` field of `IngredientForm` MUST consume it with `allowEmpty: true`.
 
-## 6. Caveats
+### 3.2 Unit & Conversion Requirements
 
-- `[C-1]` `parentId` is an integer with no FK reference declared in the Drizzle schema (see
-  `src/lib/db/schema/ingredient.ts`). Orphaned parent references are possible if an admin deletes a parent
-  ingredient that has children. Intentionally relaxed — children should be re-parented or deleted by hand.
-- `[C-2]` Delete is hard — `onDelete: 'restrict'` on `group_ingredients.ingredient_id` means deletion fails if any
-  recipe still references the ingredient. The UI must surface this error cleanly.
-- `[C-3]` There is no uniqueness constraint on `name`. Duplicate names (same or different category) are permitted
-  by the schema. The UI should dedupe by ID, not by name.
-- `[C-4]` `preferred_unit_slug` is validated against the hardcoded `UNITS` catalog at the API boundary via
-  `unitSlugSchema`. Rows written before a slug is removed from the catalog may become orphans; the conversion
-  engine tolerates this by treating an unknown slug as "no preferred unit" and falling back to the first seen
-  unit across the cart.
-- `[C-5]` `density_g_per_ml` and `count_weight_g` are free-form positive reals with no sanity range. Entering
-  `100` grams per egg is accepted by the schema; operator error is the user's problem.
+- **REQ-025.** `UNITS` MUST contain exactly the 16 entries defined in `src/lib/db/schema/unit.ts` with
+  their declared `dimension`, `parent`, and `factor` values.
+- **REQ-026.** `kg` MUST resolve to `g` via factor `1000`; `l` MUST resolve to `ml` via factor `1000`;
+  `tbsp` MUST resolve to `ml` via factor `15`; `tsp` MUST resolve to `ml` via factor `5`. All other units
+  MUST be canonical (`parent: null`, `factor: null`).
+- **REQ-027.** `unitSlugSchema` MUST be a Zod enum derived from the keys of `UNITS`.
+- **REQ-028.** `convert(quantity, fromSlug, toSlug, ingredient)` MUST return `null` when:
+  - `quantity` is not finite;
+  - `fromSlug` or `toSlug` is unknown;
+  - the unit chain exceeds `MAX_CHAIN_DEPTH` (16) without reaching a base;
+  - a chain hop has a non-positive / non-finite `factor`;
+  - bridging dimensions requires a missing or non-positive `densityGPerMl` (volume) or `countWeightG`
+    (count);
+  - converting to/from `length` from another dimension (no bridge defined).
+- **REQ-029.** `convert()` MUST return the input quantity unchanged when `fromSlug === toSlug` and the
+  slug exists in `UNITS`.
+- **REQ-030.** Cross-dimension conversions MUST bridge through grams using `densityGPerMl` (volume ↔ mass)
+  or `countWeightG` (count ↔ mass).
 
-## 7. High-Level Components
+### 3.3 Constraints
 
-| Component               | Module type      | Responsibility                                                 | Public API surface                                                                                                |
-| ----------------------- | ---------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Ingredients list reader | Server function  | Return all ingredients (with optional parent info)             | `getIngredientsList()`                                                                                            |
-| Ingredient CRUD         | Server functions | Create / update / delete ingredients                           | `createIngredientOptions()`, `updateIngredientOptions()`, `deleteIngredientOptions()` (mutation option factories) |
-| Ingredient form         | React component  | Reusable field group for add + edit dialogs                    | `<IngredientForm />` via `withFieldGroup`                                                                         |
-| Add/Edit/Delete dialogs | React components | Dialog wrappers around the form + mutation                     | `<AddIngredient />`, `<EditIngredient />`, `<DeleteIngredient />`                                                 |
-| Category badge          | React component  | Render a category pill with icon (used in lists + forms)       | `<IngredientBadge />`                                                                                             |
-| Settings page           | Route            | Searchable list + CRUD entry points                            | `GET /settings/ingredients`                                                                                       |
-| Zod schemas             | Shared           | `ingredientSchema`, `updateIngredientSchema` (create + update) | Exported from `api/create.ts`, `api/update.ts`                                                                    |
+- **CON-001.** Persistence runs on Cloudflare D1 via Drizzle (see `../../docs/infrastructure/data-layer.spec.md`).
+- **CON-002.** Server-only modules (API files) MUST use `createServerFn` from `@tanstack/react-start` and
+  obtain the database via `getDb()`.
+- **CON-003.** All user-facing copy MUST be French; identifier strings (slugs, enum values) remain
+  English.
+- **CON-004.** Forms MUST go through `useAppForm`/`withForm` and the shared `getFormDialog` wrapper; no
+  ad-hoc dialog or form state is permitted.
+- **CON-005.** Only admins may delete ingredients; the server enforces this independently of the UI gate.
+- **CON-006.** The ingredient `category` column has a database default of `other`; client code MUST NOT
+  rely on missing-category behaviour beyond that default.
+- **CON-007.** `parentId` is a plain integer column without a foreign-key constraint; orphan handling on
+  parent deletion is not defined here.
 
-## 8. Detailed Design
+### 3.4 Guidelines
 
-| Component               | Entry point                                                                                    |
-| ----------------------- | ---------------------------------------------------------------------------------------------- |
-| List reader             | `src/features/ingredients/api/get-all.ts` → `getIngredientsList`                               |
-| Create                  | `src/features/ingredients/api/create.ts` → `createIngredientOptions`, `ingredientSchema`       |
-| Update                  | `src/features/ingredients/api/update.ts` → `updateIngredientOptions`, `updateIngredientSchema` |
-| Delete                  | `src/features/ingredients/api/delete.ts` → `deleteIngredientOptions`                           |
-| Form (field group)      | `src/features/ingredients/components/ingredient-form.tsx`                                      |
-| Add dialog              | `src/features/ingredients/components/add-ingredient.tsx`                                       |
-| Edit dialog             | `src/features/ingredients/components/edit-ingredient.tsx`                                      |
-| Delete confirmation     | `src/features/ingredients/components/delete-ingredient.tsx`                                    |
-| Category badge          | `src/features/ingredients/components/ingredient-badge.tsx`                                     |
-| Category labels / icons | `src/features/ingredients/utils/constants.tsx`                                                 |
-| Settings route          | `src/routes/settings/ingredients.tsx`                                                          |
-| DB schema               | `src/lib/db/schema/ingredient.ts` (`ingredientCategory` enum + table)                          |
-| Query key               | `src/lib/query-keys.ts` → `queryKeys.listIngredients()`                                        |
+- **GUD-001.** Reuse `IngredientForm` (a `withForm` definition) for both add and edit flows; do not
+  duplicate field markup.
+- **GUD-002.** Toast helpers (`toastManager.add`, `toastError`) are the canonical user-feedback channel
+  for ingredient mutations.
+- **GUD-003.** Prefer `ingredientCategoryLabels` and `ingredientCategoryIcons` for any UI rendering of a
+  category to keep mapping centralised.
+- **GUD-004.** Surface ingredients to other features through `useIngredientOptions` rather than re-reading
+  the query directly when combobox options are needed.
 
-Validation rules baked into `ingredientSchema` (any change needs spec update):
+### 3.5 Patterns
 
-- `name`: string, min length 2.
-- `category`: must be one of `ingredientCategory`.
-- `parentId`: optional integer.
-- `densityGPerMl`: optional positive number (`> 0`). Typical range `0.3 – 1.5`, but not enforced.
-- `countWeightG`: optional positive number (`> 0`).
-- `preferredUnitSlug`: optional `UnitSlug` — validated via `unitSlugSchema` (Zod enum over `UNITS` keys). Stored
-  as `TEXT` with no DB FK.
-- Update schema extends create with required `id: number`.
+- **PAT-001.** Server function = `createServerFn().middleware([authGuard(...)]).inputValidator(zodSchema).handler(...)`.
+- **PAT-002.** Mutation hook = `mutationOptions({ mutationFn, onError: toastError(..), onSuccess: invalidateQueries + toastManager.add })`.
+- **PAT-003.** Form dialog = `getFormDialog(defaults)` + `useAppForm({ validationLogic: revalidateLogic(), validators: { onDynamic: schema } })` + `IngredientForm` body.
+- **PAT-004.** Category metadata fan-out via three keyed records (`Labels`, `Icons`, badge `categoryStyles`) keyed by `IngredientCategory`.
 
-The schema persists conversion metadata but does not perform the conversion. All conversion logic lives in
-`docs/specs/unit.spec.md` and its implementation at `src/utils/unit-converter.ts`.
+## 4. Interfaces & Data Contracts
 
-## 9. Verification Criteria
+### 4.1 Database Schema (`ingredients`)
 
-- `[VC-1]` `createIngredient` rejects `name` shorter than 2 chars with a Zod validation error.
-- `[VC-2]` `createIngredient` rejects an unknown `category`.
-- `[VC-3]` Non-admin authenticated users CAN create and update ingredients (`authGuard()` with no role).
-- `[VC-4]` Non-admin authenticated users CANNOT delete ingredients (`authGuard('admin')` throws
-  `Permission denied`).
-- `[VC-5]` Deleting an ingredient that is still referenced by any `group_ingredients` row fails (DB FK
-  `restrict`); the UI surfaces the error via `toastError`.
-- `[VC-6]` After create/update/delete, `queryKeys.listIngredients()` is invalidated and the settings list
-  re-renders.
-- `[VC-7]` Success toasts include the ingredient name (create + update), failure toasts include a French error
-  string.
-- `[VC-8]` `/settings/ingredients` search filters by name prefix match case-insensitively.
-- `[VC-9]` `createIngredient` and `updateIngredient` accept `densityGPerMl` and `countWeightG` when absent,
-  null, or positive numeric; reject `0` or negative values.
-- `[VC-10]` `createIngredient` and `updateIngredient` reject a `preferredUnitSlug` that is not a key of `UNITS`
-  via `unitSlugSchema`.
-- `[VC-11]` `updateIngredient` tolerates a pre-existing `preferredUnitSlug` value that is no longer in `UNITS`
-  (row is not rewritten on read); the ingredient form exposes the value as "unit introuvable" and lets the
-  admin clear or replace it.
-- `[VC-12]` The ingredient form in `/settings/ingredients` exposes three new fields: density, count weight,
-  preferred unit (select populated from `UNITS`, grouped by dimension).
-- `[VC-13]` Lint + typecheck pass: `pnpm lint`, `pnpm typecheck`.
+| Column                | Type              | Nullable | Default   | Notes                                                            |
+| --------------------- | ----------------- | -------- | --------- | ---------------------------------------------------------------- |
+| `id`                  | integer (PK)      | no       | —         | Primary key.                                                     |
+| `name`                | text              | no       | —         | Display name.                                                    |
+| `category`            | text enum         | no       | `'other'` | One of `meat`, `fish`, `vegetables`, `spices`, `other`. Indexed. |
+| `parent_id`           | integer           | yes      | —         | Self-reference; no FK constraint.                                |
+| `density_g_per_ml`    | real              | yes      | —         | Grams per millilitre.                                            |
+| `count_weight_g`      | real              | yes      | —         | Grams per piece.                                                 |
+| `preferred_unit_slug` | text (`UnitSlug`) | yes      | —         | Preferred shopping unit.                                         |
 
-## 10. Open Questions
+Index: `idx_ingredients_category` on `category`.
 
-- `[OQ-1]` Should delete cascade to `group_ingredients` instead of restricting? Today the admin must manually
-  clean up references. No change planned until it becomes a real pain point.
-- `[OQ-2]` Should we enforce uniqueness on `(name, category, parentId)` or similar, to prevent accidental
-  duplicates?
+### 4.2 Zod Schemas
 
-## Changelog
+```ts
+ingredientSchema = z.object({
+  category: z.enum(ingredientCategory),
+  countWeightG: z.number().positive().nullable().optional(),
+  densityGPerMl: z.number().positive().nullable().optional(),
+  name: z.string().min(2),
+  parentId: z.number().optional(),
+  preferredUnitSlug: unitSlugSchema.nullable().optional(),
+})
 
-| Date       | Amendment                                                                           | Sections affected   | Reason                                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------- |
-| 2026-04-18 | Add `density_g_per_ml`, `count_weight_g`, `preferred_unit_id` to the ingredient row | 2, 3, 4, 5, 6, 8, 9 | Feeds the shopping-list conversion engine (`docs/specs/unit.spec.md`) so aggregated quantities are actionable. |
-| 2026-04-18 | Rename `preferred_unit_id INT` → `preferred_unit_slug TEXT`; drop DB FK             | 3, 6, 8, 9          | Units moved to a hardcoded catalog (`src/lib/db/schema/unit.ts`); slug is now the stable persisted identity.   |
+updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
+
+deleteIngredientSchema = z.object({ id: z.number() })
+```
+
+### 4.3 Server Functions
+
+| Name                 | HTTP | Auth                 | Input                    | Effect                                         |
+| -------------------- | ---- | -------------------- | ------------------------ | ---------------------------------------------- |
+| `getIngredientsList` | GET  | none                 | —                        | Returns all ingredients ordered by `name` asc. |
+| `createIngredient`   | POST | `authGuard()`        | `ingredientSchema`       | Inserts a new row.                             |
+| `updateIngredient`   | POST | `authGuard()`        | `updateIngredientSchema` | Updates row by `id`.                           |
+| `deleteIngredient`   | POST | `authGuard('admin')` | `{ id }`                 | Deletes row by `id`.                           |
+
+### 4.4 Query Keys & Mutation Side Effects
+
+- Read key: `queryKeys.listIngredients()`.
+- After `createIngredient` success: invalidate `listIngredients`; toast `Ingrédient {name} créé`.
+- After `updateIngredient` success: invalidate `listIngredients`; toast `Ingrédient {name} mis à jour`.
+- After `deleteIngredient` success: invalidate `listIngredients` (no toast).
+- Errors:
+  - create: `toastError("Erreur lors de la création de l'ingrédient", error)`.
+  - update: `toastError("Erreur lors de la mise à jour de l'ingrédient {name}", error)`.
+
+### 4.5 TypeScript Types
+
+```ts
+type Ingredient = InferSelectModel<typeof ingredient>
+type IngredientCategory = (typeof ingredientCategory)[number]
+type IngredientFormValues = z.infer<typeof ingredientSchema>
+type IngredientFormInput = Partial<IngredientFormValues>
+type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
+type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
+```
+
+### 4.6 Category Presentation
+
+| Category     | French label          | Icon          | Badge classes                     |
+| ------------ | --------------------- | ------------- | --------------------------------- |
+| `meat`       | `Viandes`             | `CowIcon`     | `bg-red-200 text-red-600`         |
+| `fish`       | `Poissons`            | `FishIcon`    | `bg-blue-200 text-blue-600`       |
+| `vegetables` | `Légumes`             | `CarrotIcon`  | `bg-emerald-100 text-emerald-600` |
+| `spices`     | `Epices & Condiments` | `PepperIcon`  | `bg-yellow-200 text-yellow-600`   |
+| `other`      | `Autres`              | `PackageIcon` | `bg-zinc-200 text-zinc-700`       |
+
+`ingredientsCategoryOptions` MUST be derived from `ingredientCategoryLabels` as `{ label, value }` pairs.
+
+### 4.7 Unit Catalogue
+
+| Slug      | Name         | Dimension | Parent | Factor |
+| --------- | ------------ | --------- | ------ | ------ |
+| `g`       | `g`          | mass      | —      | —      |
+| `kg`      | `kg`         | mass      | `g`    | 1000   |
+| `ml`      | `mL`         | volume    | —      | —      |
+| `l`       | `L`          | volume    | `ml`   | 1000   |
+| `tbsp`    | `tbsp`       | volume    | `ml`   | 15     |
+| `tsp`     | `tsp`        | volume    | `ml`   | 5      |
+| `piece`   | `piece(s)`   | count     | —      | —      |
+| `pinch`   | `pinch(es)`  | count     | —      | —      |
+| `cube`    | `cube(s)`    | count     | —      | —      |
+| `bottle`  | `bottle(s)`  | count     | —      | —      |
+| `sheet`   | `sheet(s)`   | count     | —      | —      |
+| `box`     | `box(es)`    | count     | —      | —      |
+| `can`     | `can(s)`     | count     | —      | —      |
+| `handful` | `handful(s)` | count     | —      | —      |
+| `packet`  | `packet(s)`  | count     | —      | —      |
+| `cm`      | `cm`         | length    | —      | —      |
+
+### 4.8 `convert()` Signature
+
+```ts
+convert(
+  quantity: number,
+  fromSlug: UnitSlug,
+  toSlug: UnitSlug,
+  ingredient: { densityGPerMl: number | null; countWeightG: number | null },
+): number | null
+```
+
+Returns the converted quantity, or `null` when conversion is impossible (see REQ-028).
+
+## 5. Acceptance Criteria
+
+- **AC-001.** **Given** an authenticated user submits the add dialog with a valid name and category,
+  **when** `createIngredient` resolves, **then** the ingredient is inserted, `listIngredients` is
+  invalidated, a French success toast appears, the form resets, and the dialog closes.
+- **AC-002.** **Given** an unauthenticated request to `createIngredient` or `updateIngredient`, **when**
+  the server function executes, **then** `authGuard()` rejects the call before reaching the handler.
+- **AC-003.** **Given** a non-admin user invokes `deleteIngredient`, **when** the server function
+  executes, **then** `authGuard('admin')` rejects the call.
+- **AC-004.** **Given** the user types a name shorter than 2 characters, **when** the form revalidates
+  dynamically, **then** Zod reports a `name` validation error and submission is blocked.
+- **AC-005.** **Given** an ingredient has `densityGPerMl = 0.55`, **when** `convert(100, 'ml', 'g',
+ingredient)` is called, **then** it returns `55`.
+- **AC-006.** **Given** an ingredient has `countWeightG = 50`, **when** `convert(2, 'piece', 'g',
+ingredient)` is called, **then** it returns `100`.
+- **AC-007.** **Given** an ingredient has `densityGPerMl = null`, **when** `convert(1, 'ml', 'g',
+ingredient)` is called, **then** it returns `null`.
+- **AC-008.** **Given** `convert(1, 'kg', 'g', _)` is called, **then** it returns `1000`; **given**
+  `convert(1, 'tbsp', 'ml', _)`, **then** it returns `15`.
+- **AC-009.** **Given** the settings page renders for a non-admin user, **when** the list is shown,
+  **then** no Edit or Delete buttons appear on any row.
+- **AC-010.** **Given** an admin types `poiss` in the search input, **when** the list re-renders,
+  **then** only ingredients whose `name` or `category` contains `poiss` (case-insensitive) remain.
+- **AC-011.** **Given** an admin opens the edit dialog for an ingredient with `parentId = null`,
+  **when** the form initialises, **then** `parentId` is `undefined` (not `null`).
+- **AC-012.** **Given** the create form is submitted, **when** `onSuccess` fires, **then**
+  `queryKeys.listIngredients()` is invalidated and `getIngredientsList` is refetched.
+
+## 6. Test Automation Strategy
+
+- **Unit tests (Vitest, `vp test`).**
+  - `convert()` covers same-unit, intra-dimension scaling (kg↔g, l↔ml, tbsp/tsp↔ml), volume↔mass via
+    density, count↔mass via count weight, missing metadata returning `null`, unknown slugs, non-finite
+    inputs.
+  - `ingredientSchema` rejects invalid `name`, non-positive numerics, unknown category, unknown
+    `preferredUnitSlug`.
+- **Component tests.** Render `IngredientForm` inside an `useAppForm` host, verify field labels,
+  default values, and disabled state during `isSubmitting`.
+- **Integration / route tests.** Test the `/settings/ingredients` route with mocked
+  `getIngredientListOptions` and route context to validate admin gating, search filtering, and
+  empty-state messages.
+- **Server function tests.** Exercise `createIngredient`, `updateIngredient`, `deleteIngredient` with the
+  in-memory D1 binding to assert auth gating and DB effects, plus query invalidation on the client side.
+
+## 7. Rationale & Context
+
+- Storing `densityGPerMl` and `countWeightG` per ingredient lets recipes mix mass, volume, and count
+  freely while letting the shopping list aggregate by a single canonical unit (grams).
+- A self-referential `parentId` keeps variants browsable from a single root (e.g. tomato → cherry tomato)
+  without modelling tags.
+- The category enum is intentionally small and stable; an index on `category` keeps filtered fetches and
+  shopping-list grouping cheap on D1.
+- Spices are excluded from shopping list aggregation (see `../shopping-list/shopping-list.spec.md`)
+  because their quantities are typically negligible and unhelpful in a buy-list.
+- Read access is unauthenticated so any visitor (including SSR pre-render) can browse recipes and the
+  ingredient catalogue; write access is gated, with deletion restricted to admins to protect referential
+  integrity in absence of a database FK constraint.
+- The form layer relies on TanStack Form's `revalidateLogic()` + `onDynamic` Zod validators so the same
+  schema drives both client validation and server input validation.
+
+## 8. Dependencies & External Integrations
+
+- **Runtime.** Cloudflare Workers via TanStack Start.
+- **Database.** Cloudflare D1 accessed through Drizzle ORM (`@/lib/db`, `getDb()`).
+- **Server functions.** `@tanstack/react-start` (`createServerFn`).
+- **Auth.** `@/features/auth/lib/auth-guard` (`authGuard`, `authGuard('admin')`).
+- **State.** `@tanstack/react-query` (`queryOptions`, `mutationOptions`, `useMutation`,
+  `useSuspenseQuery`).
+- **Forms.** `@tanstack/react-form` (`revalidateLogic`, `useStore`), `useAppForm`/`withForm` from
+  `@/hooks/use-app-form`, shared `getFormDialog` from `@/components/dialogs/form-dialog`.
+- **UI.** `@phosphor-icons/react` (Carrot, Cow, Fish, Package, Pepper, Pencil, Plus), Shadcn-derived
+  components (`Badge`, `Button`, `Item*`, `SearchInput`, `ScreenLayout`).
+- **Validation.** `zod`.
+
+## 9. Examples & Edge Cases
+
+- **Hierarchy.** Creating "cherry tomato" with `parentId` pointing at "tomato" groups variants under a
+  shared parent. The parent reference is informational and does not cascade on delete.
+- **Empty preferred unit.** Selecting the `Aucune` option clears `preferredUnitSlug`; the schema accepts
+  `null`/`undefined`.
+- **Pre-fill from search.** Passing `defaultValue` to `<AddIngredient>` pre-populates the `name` field —
+  used by recipe editors when a typed ingredient does not yet exist.
+- **Unknown slug at runtime.** `convert()` defensively returns `null` if either slug is missing from
+  `UNITS`, even though `unitSlugSchema` should prevent persisted unknown values.
+- **Cross-dimension count↔volume.** Bridging count to volume requires both `countWeightG` and
+  `densityGPerMl`; if either is missing, `convert()` returns `null`.
+- **Length conversions.** `cm` has no bridge to mass/volume/count; cross-dimension conversions involving
+  `cm` always return `null`.
+- **Category-only search.** Searching `viand` (a substring of `viandes` is not stored) returns empty
+  because filtering compares against the English enum value, not the French label; users should search
+  by name or by enum slug (`meat`).
+
+## 10. Validation Criteria
+
+- All requirements (REQ-001 to REQ-030) are exercised by automated tests or covered by static schema
+  guarantees.
+- `vp check` and `vp test` pass after any change to ingredient code paths.
+- The `ingredients` table migration matches the columns and index in section 4.1.
+- The settings route loads, filters, and gates admin actions per REQ-019 to REQ-023.
+- `convert()` round-trips known fixtures (e.g. `convert(1000, 'g', 'kg', _) === 1`).
+- Mutation hooks invalidate `queryKeys.listIngredients()` and emit the specified French toasts.
+
+## 11. Related Specifications / Further Reading
+
+- [Application Architecture](../../docs/architecture.spec.md)
+- [Data Layer (Drizzle + D1)](../../docs/infrastructure/data-layer.spec.md)
+- [Form Patterns](../../docs/infrastructure/forms.spec.md)
+- [Recipe Feature](../recipe/spec/index.spec.md)
+- [Shopping List Feature](../shopping-list/shopping-list.spec.md)

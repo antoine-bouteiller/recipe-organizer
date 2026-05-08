@@ -1,148 +1,216 @@
 ---
-title: Recipe (index)
-status: condensed
-author: Antoine Bouteiller
-date: 2026-04-16
-related:
-  - ./crud.spec.md
-  - ./editor.spec.md
-  - ./display.spec.md
-  - ../../ingredients/ingredients.spec.md
-  - ../../shopping-list/shopping-list.spec.md
-  - ../../../../docs/specs/unit.spec.md
+title: Recipe Feature - Overview
+version: 1.0
+date_created: 2026-05-08
+last_updated: 2026-05-08
+owner: recipe-organizer
+tags: [feature, recipe, overview, index]
 ---
 
-## 2. Problem Statement
+# Introduction
 
-Recipes are the central artifact of the app. A recipe is more than a blob of markdown — it must carry structured
-ingredients (so shopping lists can aggregate), structured sub-recipe links (so a "pizza" can reuse "dough"), rich
-text for instructions (so users can embed Magimix programs and cross-references), and media (image required,
-video optional).
+The `recipe` feature is the largest and most central feature of the recipe-organizer app. It owns the
+recipe domain (recipes, ingredient groups, linked sub-recipes, instructions), the rich-text editor
+(Lexical with custom Magimix and Subrecipe nodes), the recipe listing/detail UI, the search bar, and
+the integration with the shopping list and ingredient features.
 
-- `[G-1]` Authenticated users can create, read, update, and delete recipes.
-- `[G-2]` A recipe's ingredients are grouped ("for the dough" / "for the sauce") and each line has a typed
-  ingredient, quantity, and optional unit.
-- `[G-3]` A recipe can link to other recipes as sub-components, with a ratio (e.g., "use 0.5× of the pizza dough
-  recipe"). Sub-recipe ingredients flow through to the shopping list.
-- `[G-4]` Instructions are a Lexical rich-text document (migrated from Tiptap in Apr 2026) with custom decorator
-  nodes for Magimix programs and sub-recipe insertions.
-- `[G-5]` The app auto-derives `vegetarian` and `magimix` tags from structured data on every create/update, so
-  users don't have to tag manually.
-- `[G-6]` The recipe detail page lets users scale ingredient quantities live (via a client-side per-recipe
-  servings override) without mutating the recipe.
-- `[G-7]` The recipe list / detail pages use HTTP cache headers + TanStack Query for fast repeat loads, since
-  recipes rarely change.
+This index spec is the entry point. It describes the feature topology, the cross-feature flows, and
+the canonical glossary. Implementation detail lives in the three sub-specs colocated with the code:
 
-## 3. Key Design Decisions
+- [crud.spec.md](./crud.spec.md) — create / update / delete server functions, R2 uploads, auto-tag
+  computation, batched relational deletes, ownership checks.
+- [display.spec.md](./display.spec.md) — list page, detail page (mobile tabs+swipe / desktop
+  two-column grid), recipe card, search bar, quantity controls, shopping-list integration.
+- [editor.spec.md](./editor.spec.md) — Lexical editor integration, custom `MagimixProgramNode`,
+  custom `SubrecipeNode`, dialogs, JSON serialization round-trip, auto-tag detection contract.
 
-| Decision                                                | Choice                                                                                                                                                                                                                         | Rationale                                                                                                                               |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Structured ingredients                         | 3-table model: `recipe` → `recipe_ingredient_groups` → `group_ingredients`                                                                                                                                                     | Enables groupings + shopping-list aggregation without HTML parsing.                                                                     |
-| `[KD-2]` Auto-tag derivation                            | Server-side computation on every `create`/`update`: `vegetarian` if no meat/fish ingredients (and no meat/fish in linked recipes) and not tagged `dessert`; `magimix` if instructions JSON contains `"types":"magimixProgram"` | Keeps tags accurate as content changes; `dessert` exclusion avoids mis-tagging sweet recipes that happen to have no meat.               |
-| `[KD-3]` Linked recipes with ratio                      | `recipe_linked_recipes(recipeId, linkedRecipeId, ratio)`                                                                                                                                                                       | "This recipe uses half of the dough recipe" is a common pattern; a single float ratio is simpler than re-entering ingredients.          |
-| `[KD-4]` Instructions as Lexical JSON                   | Column `instructions text` stores `SerializedEditorState` JSON (migrated from HTML Apr 2026)                                                                                                                                   | Lexical supports typed decorator nodes (Magimix program, sub-recipe embed) and clean SSR; the `magimix` auto-tag greps the JSON string. |
-| `[KD-5]` FormData, not JSON, for submit                 | `inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))`                                                                                                                                          | Image + video uploads require multipart; the rest of the form hitches a ride on the same request.                                       |
-| `[KD-6]` Update = replace                               | Update wipes all `recipe_ingredient_groups` + `group_ingredients` + `recipe_linked_recipes` and re-inserts                                                                                                                     | Simpler than diffing; ingredient groups don't have stable IDs the UI can trust across edits.                                            |
-| `[KD-7]` Creator-or-admin for mutations                 | `update` + `delete` check `recipe.createdBy === userId` OR `role === 'admin'`                                                                                                                                                  | Prevents a user from editing another user's recipe; admin override for moderation.                                                      |
-| `[KD-8]` Live scaling is client-side                    | `useRecipeQuantitiesStore` (Zustand + persist) holds `{recipeId → servings}` per browser                                                                                                                                       | Scaling is a personal preference ("I'm cooking for 4 tonight"), not a recipe edit.                                                      |
-| `[KD-9]` Detail page is cacheable                       | `Cache-Control: public, max-age=86400, stale-while-revalidate=604800` on `GET /recipe/$id`                                                                                                                                     | Recipes change rarely; aggressive caching is safe, invalidation happens via TanStack Query on mutation.                                 |
-| `[KD-10]` Variant collapsing in shopping list, not here | The shopping-list feature collapses cherry-tomato into tomato                                                                                                                                                                  | Keeps the recipe feature focused on authoring; aggregation logic is downstream.                                                         |
+## 1. Purpose & Scope
 
-## 4. Principles & Intents
+### Purpose
 
-- `[PI-1]` **Structured > free-form** — anything the shopping list needs to reason about (ingredients, sub-recipes)
-  lives in typed tables, never in free text.
-- `[PI-2]` **Auto-tags are derived, not stored-by-user** — users can add cuisine tags (`french`, `italian`, ...),
-  but `vegetarian` and `magimix` are overwritten every write. See `constants.ts` → `AUTO_TAGS`.
-- `[PI-3]` **Media deletion is the server's responsibility** — when update replaces an image or delete removes a
-  recipe, the server calls `deleteFile(...)` on R2. Orphaned R2 objects are a bug.
-- `[PI-4]` **Creator-or-admin, at the server** — UI hides actions for non-creators, but the server re-validates.
-  The UI is not the source of truth for permissions.
-- `[PI-5]` **Lexical JSON is opaque to almost everything** — the only server-side inspection is a substring
-  search for `"types":"magimixProgram"`. No HTML parsing, no schema validation of the JSON beyond Zod
-  `z.string()`.
+Provide the end-user with the complete recipe lifecycle: create a recipe with structured ingredients,
+embed Magimix programs and other recipes inside its instructions, browse a card grid, scale servings,
+add the recipe to a shopping list, and edit or delete it.
 
-## 5. Non-Goals
+### In scope
 
-- `[NG-1]` Recipe versioning / edit history.
-- `[NG-2]` Recipe sharing or publication outside the single tenant (see auth `[NG-3]`).
-- `[NG-3]` Ingredient quantity arithmetic on the server (unit conversion, density, etc.) — display uses raw
-  stored values.
-- `[NG-4]` Server-side full-text search — the search page filters a client-side list of lightweight recipe rows.
-- `[NG-5]` Tagging beyond the fixed `RECIPE_TAGS` + `AUTO_TAGS` sets.
-- `[NG-6]` Offline authoring (create/edit while offline). Read via service worker is fine.
+- `src/features/recipe/**` (api, components, contexts, hooks, types, utils)
+- `src/routes/recipe/{$id,edit.$id,new}.tsx` (recipe routes)
+- `src/routes/index.tsx` (recipe list home page)
+- `src/routes/search.tsx` (recipe search list)
+- `src/lib/db/schema/{recipe,recipe-ingredients,recipe-linked-recipes}.ts` (DB shape)
+- The R2 upload contract used by the recipe feature (`src/lib/r2.ts`,
+  `src/routes/api/{image,video}/$id.ts`).
 
-## 6. Caveats
+### Out of scope
 
-- `[C-1]` Update always deletes + re-inserts all ingredient groups (see `[KD-6]`). Any future per-row ID
-  references by other tables would break.
-- `[C-2]` The `magimix` auto-tag uses a raw `includes('"types":"magimixProgram"')` string match on the Lexical
-  JSON. Renaming the decorator node's `type` field (e.g., switching from `types` to `type`) breaks this
-  detection silently. See caveat in editor spec.
-- `[C-3]` The `vegetarian` auto-tag treats a recipe with zero ingredients AND zero linked recipes as vegetarian
-  (vacuous truth). Unlikely in practice but worth noting.
-- `[C-4]` `recipe.createdBy` has a DB default of `'1'` and no FK to `user.id`. Pre-existing rows may reference
-  users who no longer exist. Do not rely on this column as a strong FK.
-- `[C-5]` `recipe.tags` is stored as JSON in a text column (`{ mode: 'json' }`). Drizzle types it as
-  `RecipeTag[]` but nothing enforces the set at the DB level — a bad write could store arbitrary strings.
-- `[C-6]` R2 cleanup on delete is best-effort: if `deleteFile` fails after the DB batch succeeds, the object is
-  orphaned. No retry today.
-- `[C-7]` Video is optional and deletable — `resolveVideoKey` in `update.ts` treats `video === undefined` as
-  "keep current", whereas a new `File` replaces and deletes the old one. There is no "explicit clear" path from
-  the form today.
+- Authentication and `authGuard` middleware (see `src/features/auth/`).
+- Ingredient catalog management (see `src/features/ingredients/`).
+- Shopping list page UI and aggregation logic (see `src/features/shopping-list/`).
+- The shared Lexical `Editor` component itself (see `src/components/ui/editor/`); only the recipe
+  feature's custom nodes registered through `recipeNodes` are owned here.
 
-## 7. High-Level Components
+## 2. Definitions
 
-| Component           | Module type          | Responsibility                                                                         | Public API surface                                                                                                                                     |
-| ------------------- | -------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Recipe CRUD         | Server functions     | Create / update / delete / list / detail / instructions-only                           | `createRecipeOptions`, `updateRecipeOptions`, `deleteRecipeOptions`, `getRecipeListOptions`, `getRecipeDetailsOptions`, `getRecipeInstructionsOptions` |
-| Recipe form         | React                | Reusable create + edit form (`withForm`), with ingredient-group + linked-recipe arrays | `<RecipeForm />`, `recipeSchema`, `updateRecipeSchema`                                                                                                 |
-| Rich-text editor    | React                | Lexical editor with Magimix + Subrecipe decorator nodes, shared readonly render        | `recipeNodes`, `<MagimixProgramNode>`, `<SubrecipeNode>`, `<MagimixProgramButton>`, `<SubrecipeButton>`                                                |
-| Detail page         | Route                | Render recipe with ingredient groups + instructions + live scaling + edit/delete menu  | `GET /recipe/$id`                                                                                                                                      |
-| Edit / New pages    | Routes               | Pre-filled form (edit) / empty form (new); submit via FormData                         | `POST /recipe/new`, `POST /recipe/edit/$id`                                                                                                            |
-| Home / Search pages | Routes               | Grid of recipe cards and free-text filter UI                                           | `GET /`, `GET /search`                                                                                                                                 |
-| Client scaling      | Hook + Zustand store | Per-recipe persisted "desired servings" override used on detail page + shopping list   | `useRecipeQuantities(recipeId, base)`, `useRecipeQuantitiesStore`                                                                                      |
-| Auto-tag logic      | Server helpers       | `computeAutoTags(...)` + inline computation in `create.ts`                             | Internal to `api/create.ts`, `api/update.ts`                                                                                                           |
+| Term                       | Meaning                                                                                                                                                                                                  |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Recipe                     | A row in `recipes(id, name, image, instructions, servings, tags JSON, video, createdBy)`.                                                                                                                |
+| Ingredient group           | A bag of ingredients inside a recipe (`recipe_ingredient_groups`). The first group is `isDefault = true` and has no `groupName`.                                                                         |
+| Group ingredient           | A row in `group_ingredients(id, groupId, ingredientId, quantity, unitSlug)`.                                                                                                                             |
+| Linked recipe / sub-recipe | A row in `recipe_linked_recipes(recipeId, linkedRecipeId, ratio)` declaring that a recipe re-uses another recipe (with a quantity ratio).                                                                |
+| Manual tag                 | A tag in `RECIPE_TAGS = ['dessert','mediterranean','chinese','japanese','indian','mexican','italian','french']`, picked by the user in the form.                                                         |
+| Auto tag                   | A tag in `AUTO_TAGS = ['vegetarian','magimix']`, computed server-side on every create/update.                                                                                                            |
+| `RecipeTag`                | Union of manual and auto tags. Stored mixed in `recipes.tags` (JSON).                                                                                                                                    |
+| Magimix program            | A Lexical node representing a Magimix Cook Expert program (program, time, rotation speed, optional temperature). Detected via the substring `"types":"magimixProgram"` in the serialized `instructions`. |
+| Subrecipe node             | A Lexical node embedding another recipe's instructions inline, with `hideFirstNodes` / `hideLastNodes` slicing controls.                                                                                 |
+| Recipe quantity            | A client-only multiplier of the base `servings`, kept per-recipe in the `recipe-quantities` Zustand store.                                                                                               |
+| Shopping list membership   | Whether a `recipeId` is currently in `shopping-list` Zustand store; toggles the `QuantityControls` UI.                                                                                                   |
 
-Detailed per-component specs:
+## 3. Requirements, Constraints & Guidelines
 
-- [CRUD + server API](./crud.spec.md)
-- [Editor (Lexical) + decorator nodes](./editor.spec.md)
-- [Display + scaling + list / search / detail UI](./display.spec.md)
+### Cross-feature requirements
 
-## 8. Detailed Design
+- **REQ-001** All recipe mutations (create, update, delete) MUST be `createServerFn` instances
+  guarded by `authGuard()` middleware and validated with Zod via `parseFormData(formData)`.
+- **REQ-002** Update and delete MUST enforce
+  `currentRecipe.createdBy === user.id || user.role === 'admin'`. Listing and detail are public.
+- **REQ-003** Auto-tag computation is centralized in `crud.spec.md`; the editor feature MUST NOT
+  compute tags client-side. The editor's only tag side effect is writing the substring
+  `"types":"magimixProgram"` into the serialized instructions JSON.
+- **REQ-004** The list query (`getRecipeListOptions`) MUST be invalidated by every recipe mutation
+  via `queryKeys.allRecipes` / `queryKeys.recipeLists()`.
+- **REQ-005** Recipe routes MUST cache via `Cache-Control: public, max-age=86400,
+stale-while-revalidate=604800`.
 
-See component specs in this directory. Cross-cutting entry points:
+### Constraints
 
-| Concern                      | Entry point                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DB schema                    | `src/lib/db/schema/recipe.ts`, `src/lib/db/schema/recipe-ingredients.ts`, `src/lib/db/schema/recipe-linked-recipes.ts`                                  |
-| Query keys                   | `src/lib/query-keys.ts` → `queryKeys.recipeList()`, `recipeDetail(id)`, `recipeInstructions(id)`, `recipeListByIds(ids)`, `allRecipes`, `recipeLists()` |
-| Tag taxonomy                 | `src/features/recipe/utils/constants.ts` → `RECIPE_TAGS`, `AUTO_TAGS`, `RECIPE_TAG_LABELS`                                                              |
-| Form defaults                | `src/features/recipe/utils/form.ts`                                                                                                                     |
-| Ingredient-group read helper | `src/features/recipe/utils/ingredient-group-select.ts`                                                                                                  |
+- **CON-001** All foreign keys in `recipe_ingredient_groups`, `group_ingredients`, and
+  `recipe_linked_recipes` are `ON DELETE RESTRICT`. The delete server function MUST therefore
+  remove children explicitly in a `getDb().batch([...])` before deleting the recipe row.
+- **CON-002** Recipe images and videos are stored in R2 keyed by `randomUUID()`. The display layer
+  MUST resolve URLs through `getImageUrl`/`getVideoUrl` so that the dev environment substitutes
+  picsum placeholders.
+- **CON-003** The recipe form is a TanStack React Form, serialized to a `FormData` via
+  `objectToFormData` and parsed back with `parseFormData`. Files travel as `File` instances; all
+  other fields travel as JSON-stringified values.
 
-## 9. Verification Criteria
+### Guidelines
 
-Per-component VCs live in the component specs. Cross-cutting checks:
+- **GUD-001** Sub-spec files cross-reference each other; do not duplicate detail across them.
+- **GUD-002** Type identifiers exported from this feature: `Recipe`, `RecipeIngredientGroup`,
+  `ReducedRecipe`, `RecipeTag`, `MagimixProgram`, `MagimixProgramData`, `SubrecipeNodeData`,
+  `RecipeFormInput`, `UpdateRecipeFormInput`.
 
-- `[VC-1]` Every server function in `src/features/recipe/api/` applies `authGuard()` unless it is intentionally
-  public read (list + detail + instructions are public reads; CRUD is auth-gated).
-- `[VC-2]` `updateRecipe` and `deleteRecipe` throw `Permission denied` for a non-admin whose `userId` does not
-  match `recipe.createdBy`.
-- `[VC-3]` After any recipe mutation, at minimum `queryKeys.allRecipes` (or `recipeLists()` for `create`) is
-  invalidated so the home / search / detail views reflect the change.
-- `[VC-4]` Auto-tag computation: given a recipe with at least one `meat`/`fish` ingredient, the result does NOT
-  include `vegetarian`; given instructions JSON containing `"types":"magimixProgram"`, the result includes
-  `magimix`.
-- `[VC-5]` The `dessert`-tagged recipe with all-veg ingredients is NOT auto-tagged `vegetarian` (see `[KD-2]`).
-- `[VC-6]` `bun lint` / `bun typecheck` / `bun test` pass.
+## 4. Interfaces & Data Contracts
 
-## 10. Open Questions
+### Public API surface (re-exported from sub-modules)
 
-- `[OQ-1]` Should we diff ingredient groups on update instead of wipe-and-insert? Only if some future feature
-  pins identity to `group.id` across edits.
-- `[OQ-2]` Should `magimix` detection move from string-match on JSON to a Lexical traversal? Cheaper today but
-  fragile; see `[C-2]`.
-- `[OQ-3]` Should `recipe.createdBy` gain a FK to `user.id` with `ON DELETE SET NULL`? Currently blocked by the
-  "never hard-delete users" policy, but the FK would be sound either way.
+| Symbol                                                                    | Source                                | Purpose                                                                        |
+| ------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------ |
+| `getAllRecipes`, `getRecipeListOptions`, `ReducedRecipe`                  | `api/get-all.ts`                      | List query for cards and search.                                               |
+| `getRecipe`, `getRecipeDetailsOptions`, `Recipe`, `RecipeIngredientGroup` | `api/get-one.ts`                      | Detail query.                                                                  |
+| `getRecipeInstructionsOptions`                                            | `api/get-instructions.ts`             | Lazy fetch used by `SubrecipeNode`.                                            |
+| `createRecipeOptions`, `recipeSchema`, `RecipeFormInput`                  | `api/create.ts`                       | Create mutation.                                                               |
+| `updateRecipeOptions`, `updateRecipeSchema`, `UpdateRecipeFormInput`      | `api/update.ts`                       | Update mutation.                                                               |
+| `deleteRecipeOptions`                                                     | `api/delete.ts`                       | Delete mutation.                                                               |
+| `RECIPE_TAGS`, `AUTO_TAGS`, `RECIPE_TAG_LABELS`, `RecipeTag`              | `utils/constants.ts`                  | Tag taxonomy.                                                                  |
+| `recipeDefaultValues`, `recipeFormFields`                                 | `utils/form.ts`                       | Form initialization.                                                           |
+| `recipeNodes`                                                             | `components/editor/extensions.ts`     | Custom Lexical nodes for the editor.                                           |
+| `useIsInShoppingList`, `useRecipeQuantities`                              | `hooks/`                              | Display-side scaling and shopping-list integration.                            |
+| `LinkedRecipesProvider`, `useLinkedRecipes`                               | `contexts/linked-recipes-context.tsx` | Lets the SubrecipeDialog know which recipe ids are already linked in the form. |
+
+### Database tables owned by this feature
+
+```ts
+recipes        (id, name, image, instructions, servings, tags JSON RecipeTag[], video?, createdBy)
+recipe_ingredient_groups (id, recipeId FK→recipes ON DELETE RESTRICT, groupName?, isDefault)
+group_ingredients (id, groupId FK→recipe_ingredient_groups ON DELETE RESTRICT,
+                  ingredientId FK→ingredients ON DELETE RESTRICT, quantity, unitSlug?)
+recipe_linked_recipes (recipeId FK→recipes ON DELETE RESTRICT,
+                       linkedRecipeId FK→recipes ON DELETE RESTRICT, ratio default 1)
+```
+
+## 5. Acceptance Criteria
+
+- **AC-001** A signed-in user can navigate `/ → /recipe/new → /` and see their new card with
+  all server-computed auto-tags applied.
+- **AC-002** A signed-in owner (or admin) can navigate
+  `/recipe/$id → /recipe/edit/$id → back` with the recipe successfully updated and the list
+  query invalidated.
+- **AC-003** Deleting a recipe removes it and its dependent rows
+  (`recipe_ingredient_groups`, `group_ingredients`, `recipe_linked_recipes`) and its R2 image.
+- **AC-004** A recipe with at least one Magimix program node in its instructions automatically
+  gains the `magimix` tag on save and shows the badge on its card.
+- **AC-005** The detail page renders ingredients on the left/desktop or first-tab/mobile, with
+  quantities scaled by `useRecipeQuantities`.
+- **AC-006** Adding a recipe to the shopping list from a card flips the card footer from
+  "Ajouter à la liste de courses" to a `−/+/Supprimer de la liste` control row.
+
+## 6. Test Automation Strategy
+
+- **PAT-001** Server functions (CRUD, get-all, get-one, get-instructions) MUST be tested in
+  isolation with mocked `getDb()` and mocked R2 bindings. Verify the `getDb().batch([...])` call
+  order in update/delete and verify the auto-tag matrix.
+- **PAT-002** Components are tested with React Testing Library, querying via roles/labels (no
+  `data-testid`). The Lexical editor and dialogs receive their own focused tests.
+- **PAT-003** Each sub-spec lists its own automation patterns (see `crud.spec.md` §6,
+  `display.spec.md` §6, `editor.spec.md` §6).
+
+## 7. Rationale & Context
+
+Splitting the spec into one index + three topical sub-specs mirrors the on-disk structure (`api/`,
+`components/`, `components/editor/`) and lets each consumer load only what they need. The
+auto-tag contract sits in `crud.spec.md` because tags are derived server-side at write-time; the
+editor only contributes the _substring marker_ `"types":"magimixProgram"`. Listing and detail are
+read-only and stable enough to live together in `display.spec.md`. The Lexical editor is rich and
+isolated enough to deserve its own spec.
+
+## 8. Dependencies & External Integrations
+
+- **Cloudflare D1** via Drizzle (`getDb()`); see `docs/infrastructure/data-layer.spec.md`.
+- **Cloudflare R2** + Cloudflare Images for image optimization (`env.IMAGES.input(...).transform(...).output(...)`).
+- **TanStack Start** server functions and routing (`docs/infrastructure/server-functions.spec.md`,
+  `docs/infrastructure/routing-ssr.spec.md`).
+- **TanStack React Form** for `RecipeForm`, `MagimixProgramDialog`, `SubrecipeDialog`
+  (`docs/infrastructure/forms.spec.md`).
+- **Lexical** + `@lexical/react` + `@lexical/utils` for the rich-text editor.
+- **Zustand** stores: `shopping-list.store`, `recipe-quantities.store`
+  (`docs/infrastructure/client-state.spec.md`).
+- **Auth feature** (`src/features/auth/lib/auth-guard.ts`) for write-side authentication.
+- **Ingredients feature** (`src/features/ingredients/`) for the ingredient picker and `AddIngredient`
+  inline dialog.
+- **Shopping list feature** (`src/features/shopping-list/`) consumes recipe ids stored in the
+  shopping-list Zustand store.
+
+## 9. Examples & Edge Cases
+
+- **EC-001** A recipe with no own ingredients but a linked recipe whose tags include `vegetarian`:
+  auto-tagged `vegetarian` (unless `dessert` is also picked).
+- **EC-002** A recipe tagged `dessert` with no meat or fish ingredients: NOT auto-tagged
+  `vegetarian` (`dessert` short-circuits the rule).
+- **EC-003** Editing a recipe and removing all Magimix nodes: the `magimix` auto-tag is recomputed
+  to absent on save.
+- **EC-004** Deleting a recipe that is referenced by another recipe via `recipe_linked_recipes`:
+  the delete fails because of `ON DELETE RESTRICT` on `linkedRecipeId`. The user must remove the
+  link from the parent first.
+
+## 10. Validation Criteria
+
+- All four spec files (this one and the three sub-specs) MUST exist and reference each other in
+  their §11.
+- The exported types and helpers in §4 MUST match the actual exports in source.
+- The DB schema in §4 MUST match `src/lib/db/schema/{recipe,recipe-ingredients,recipe-linked-recipes}.ts`.
+- The auto-tag rules MUST be consistent with the implementation in `api/create.ts` and `api/update.ts`.
+
+## 11. Related Specifications / Further Reading
+
+- [./crud.spec.md](./crud.spec.md)
+- [./display.spec.md](./display.spec.md)
+- [./editor.spec.md](./editor.spec.md)
+- [../../../../docs/architecture.spec.md](../../../../docs/architecture.spec.md)
+- [../../../../docs/infrastructure/data-layer.spec.md](../../../../docs/infrastructure/data-layer.spec.md)
+- [../../../../docs/infrastructure/server-functions.spec.md](../../../../docs/infrastructure/server-functions.spec.md)
+- [../../../../docs/infrastructure/forms.spec.md](../../../../docs/infrastructure/forms.spec.md)
+- [../../../../docs/infrastructure/routing-ssr.spec.md](../../../../docs/infrastructure/routing-ssr.spec.md)
+- [../../shopping-list/shopping-list.spec.md](../../shopping-list/shopping-list.spec.md)
+- [../../ingredients/ingredients.spec.md](../../ingredients/ingredients.spec.md)
