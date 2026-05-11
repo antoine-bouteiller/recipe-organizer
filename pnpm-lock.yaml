@@ -41,6 +41,9 @@ importers:
       '@tanstack/react-start':
         specifier: 1.167.65
         version: 1.167.65(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))
+      '@valibot/i18n':
+        specifier: 1.0.0
+        version: 1.0.0(valibot@1.2.0(typescript@6.0.3))
       '@vidstack/react':
         specifier: 1.12.13
         version: 1.12.13(@types/react@19.2.14)(react@19.2.6)
@@ -52,7 +55,7 @@ importers:
         version: 2.1.1
       drizzle-orm:
         specifier: 1.0.0-beta.22
-        version: 1.0.0-beta.22(@cloudflare/workers-types@4.20260510.1)(arktype@2.2.0)(better-sqlite3@12.9.0)(pg@8.20.0)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3)
+        version: 1.0.0-beta.22(@cloudflare/workers-types@4.20260510.1)(arktype@2.2.0)(better-sqlite3@12.9.0)(pg@8.20.0)(valibot@1.2.0(typescript@6.0.3))(zod@4.4.3)
       lexical:
         specifier: 0.44.0
         version: 0.44.0
@@ -71,9 +74,9 @@ importers:
       tw-animate-css:
         specifier: 1.4.0
         version: 1.4.0
-      zod:
-        specifier: 4.4.3
-        version: 4.4.3
+      valibot:
+        specifier: 1.2.0
+        version: 1.2.0(typescript@6.0.3)
       zustand:
         specifier: 5.0.13
         version: 5.0.13(@types/react@19.2.14)(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6))
@@ -149,7 +152,7 @@ importers:
         version: 0.1.20(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(typescript@6.0.3)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))(yaml@2.8.3)
       void:
         specifier: ^0.7.3
-        version: 0.7.3(@tanstack/react-start@1.167.65(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3)))(arktype@2.2.0)(kysely@0.28.17)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(solid-js@1.9.11)(valibot@1.4.0(typescript@6.0.3))(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))(workerd@1.20260507.1)(zod@4.4.3)
+        version: 0.7.3(@tanstack/react-start@1.167.65(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3)))(arktype@2.2.0)(kysely@0.28.17)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(solid-js@1.9.11)(valibot@1.2.0(typescript@6.0.3))(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))(workerd@1.20260507.1)(zod@4.4.3)
       wrangler:
         specifier: 4.90.0
         version: 4.90.0(@cloudflare/workers-types@4.20260510.1)
@@ -2408,6 +2411,11 @@ packages:
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
+  '@valibot/i18n@1.0.0':
+    resolution: {integrity: sha512-daCwLqQOHAbUAWtWm1zE2JV6Gn3lqS3Qw/Rm4s+FGbwyfrk3ljee2eiZBVACFet3oanB2TZpZeLssppH3YxfiQ==}
+    peerDependencies:
+      valibot: ^1.0.0
+
   '@vidstack/react@1.12.13':
     resolution: {integrity: sha512-zyNydy1+HtoK6cJ8EmqFNkPPGHIFMrr2KH+ef3654EqXx4IcJ8A5LCNMXBuALQE8IMxtk040JMoR9OKyeXjBOQ==}
     engines: {node: '>=18'}
@@ -3901,8 +3909,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  valibot@1.4.0:
-    resolution: {integrity: sha512-iC/x7fVcSyOwlm/VSt7RlHnzNGLGvR9GnxdifUeWoCJo0q4ZZvrVkIHC6faTlkxG47I2Y4UrFquPuVHCrOnrLg==}
+  valibot@1.2.0:
+    resolution: {integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -5874,6 +5882,10 @@ snapshots:
 
   '@types/trusted-types@2.0.7': {}
 
+  '@valibot/i18n@1.0.0(valibot@1.2.0(typescript@6.0.3))':
+    dependencies:
+      valibot: 1.2.0(typescript@6.0.3)
+
   '@vidstack/react@1.12.13(@types/react@19.2.14)(react@19.2.6)':
     dependencies:
       '@floating-ui/dom': 1.7.6
@@ -6230,19 +6242,19 @@ snapshots:
       kysely: 0.28.17
       pg: 8.20.0
 
-  drizzle-orm@1.0.0-beta.22(@cloudflare/workers-types@4.20260510.1)(arktype@2.2.0)(better-sqlite3@12.9.0)(pg@8.20.0)(valibot@1.4.0(typescript@6.0.3))(zod@4.4.3):
+  drizzle-orm@1.0.0-beta.22(@cloudflare/workers-types@4.20260510.1)(arktype@2.2.0)(better-sqlite3@12.9.0)(pg@8.20.0)(valibot@1.2.0(typescript@6.0.3))(zod@4.4.3):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260510.1
       arktype: 2.2.0
       better-sqlite3: 12.9.0
       pg: 8.20.0
-      valibot: 1.4.0(typescript@6.0.3)
+      valibot: 1.2.0(typescript@6.0.3)
       zod: 4.4.3
 
-  drizzle-valibot@0.4.2(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))(valibot@1.4.0(typescript@6.0.3)):
+  drizzle-valibot@0.4.2(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))(valibot@1.2.0(typescript@6.0.3)):
     dependencies:
       drizzle-orm: 0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0)
-      valibot: 1.4.0(typescript@6.0.3)
+      valibot: 1.2.0(typescript@6.0.3)
 
   drizzle-zod@0.8.3(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))(zod@4.4.3):
     dependencies:
@@ -7149,7 +7161,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  valibot@1.4.0(typescript@6.0.3):
+  valibot@1.2.0(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
@@ -7222,7 +7234,7 @@ snapshots:
     optionalDependencies:
       vite: 8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3)
 
-  void@0.7.3(@tanstack/react-start@1.167.65(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3)))(arktype@2.2.0)(kysely@0.28.17)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(solid-js@1.9.11)(valibot@1.4.0(typescript@6.0.3))(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))(workerd@1.20260507.1)(zod@4.4.3):
+  void@0.7.3(@tanstack/react-start@1.167.65(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3)))(arktype@2.2.0)(kysely@0.28.17)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(solid-js@1.9.11)(valibot@1.2.0(typescript@6.0.3))(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))(workerd@1.20260507.1)(zod@4.4.3):
     dependencies:
       '@cloudflare/sandbox': 0.10.0
       '@cloudflare/vite-plugin': 1.36.3(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.6.2)(esbuild@0.27.3)(jiti@2.7.0)(tsx@4.21.0)(yaml@2.8.3))(workerd@1.20260507.1)(wrangler@4.90.0(@cloudflare/workers-types@4.20260510.1))
@@ -7235,7 +7247,7 @@ snapshots:
       drizzle-arktype: 0.1.3(arktype@2.2.0)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))
       drizzle-kit: 0.31.10
       drizzle-orm: 0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0)
-      drizzle-valibot: 0.4.2(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))(valibot@1.4.0(typescript@6.0.3))
+      drizzle-valibot: 0.4.2(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))(valibot@1.2.0(typescript@6.0.3))
       drizzle-zod: 0.8.3(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260510.1)(better-sqlite3@12.9.0)(kysely@0.28.17)(pg@8.20.0))(zod@4.4.3)
       hono: 4.12.18
       ignore: 7.0.5
@@ -7245,7 +7257,7 @@ snapshots:
       wrangler: 4.90.0(@cloudflare/workers-types@4.20260510.1)
     optionalDependencies:
       arktype: 2.2.0
-      valibot: 1.4.0(typescript@6.0.3)
+      valibot: 1.2.0(typescript@6.0.3)
       zod: 4.4.3
     transitivePeerDependencies:
       - '@aws-sdk/client-rds-data'

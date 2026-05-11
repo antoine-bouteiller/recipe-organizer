@@ -1,14 +1,14 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardPanel, CardTitle } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
-const searchSchema = z.object({ error: z.string().optional() })
+const searchSchema = v.object({ error: v.optional(v.string()) })
 
 const getErrorMessage = (error: string) => {
   if (error === 'account_pending') {
@@ -60,5 +60,5 @@ export const Route = createFileRoute('/auth/login')({
     }
   },
   component: LoginPage,
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: (search) => v.parse(searchSchema, search),
 })

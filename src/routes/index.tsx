@@ -1,15 +1,15 @@
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/components/recipe-card'
 
-const searchSchema = z.object({
-  search: z.boolean().optional(),
+const searchSchema = v.object({
+  search: v.optional(v.boolean()),
 })
 
 const RecipeList = () => {
@@ -44,10 +44,10 @@ export const Route = createFileRoute('/')({
     await context.queryClient.ensureQueryData(getRecipeListOptions())
   },
   validateSearch: (search) => {
-    const result = searchSchema.safeParse(search)
+    const result = v.safeParse(searchSchema, search)
     if (!result.success) {
-      throw new Error(result.error?.issues[0]?.message ?? 'Invalid search params')
+      throw new Error(result.issues[0]?.message ?? 'Invalid search params')
     }
-    return result.data
+    return result.output
   },
 })

@@ -1,7 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
@@ -11,8 +11,8 @@ import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
 
-const approveUserSchema = z.object({
-  id: z.string(),
+const approveUserSchema = v.object({
+  id: v.string(),
 })
 
 const approveUser = createServerFn()

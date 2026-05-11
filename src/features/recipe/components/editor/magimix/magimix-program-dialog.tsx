@@ -1,6 +1,6 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
 import { useState, type ComponentPropsWithoutRef } from 'react'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { type DialogTrigger } from '@/components/ui/dialog'
@@ -16,15 +16,15 @@ interface MagimixProgramDialogProps {
   triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
-const magimixProgramSchema = z.object({
-  program: z.enum(magimixProgram),
-  rotationSpeed: z.enum(allowedRotationSpeed),
-  temperature: z.number().min(0).max(200).optional(),
-  timeMinutes: z.number().min(0).max(60),
-  timeSeconds: z.number().min(0).max(60),
+const magimixProgramSchema = v.object({
+  program: v.picklist([...magimixProgram]),
+  rotationSpeed: v.picklist([...allowedRotationSpeed]),
+  temperature: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(200))),
+  timeMinutes: v.pipe(v.number(), v.minValue(0), v.maxValue(60)),
+  timeSeconds: v.pipe(v.number(), v.minValue(0), v.maxValue(60)),
 })
 
-export type MagimixProgramFormInput = z.infer<typeof magimixProgramSchema>
+export type MagimixProgramFormInput = v.InferOutput<typeof magimixProgramSchema>
 
 const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
@@ -47,7 +47,7 @@ export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title
   const form = useAppForm({
     defaultValues: initialData ?? magimixProgramDefaultValues,
     onSubmit: async ({ value }) => {
-      const validated = magimixProgramSchema.parse(value)
+      const validated = v.parse(magimixProgramSchema, value)
 
       const time = validated.timeMinutes * 60 + validated.timeSeconds
 

@@ -1,5 +1,5 @@
 import { isNotFound, isRedirect } from '@tanstack/react-router'
-import { ZodError } from 'zod'
+import { ValiError } from 'valibot'
 
 export const withServerError =
   <TContext, TResult>(handler: (ctx: TContext) => Promise<TResult> | TResult) =>
@@ -11,7 +11,7 @@ export const withServerError =
         throw error
       }
 
-      if (error instanceof ZodError) {
+      if (error instanceof ValiError) {
         throw new Error(`Invalid Schema; ${error.message}`, { cause: error })
       }
 
