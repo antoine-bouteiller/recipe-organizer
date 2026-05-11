@@ -33,7 +33,7 @@ error display, and field groups.
 | `form.handleSubmit`                   | `<form action={form.post}>` (React) or `form.post()`/`form.put()` programmatic  |
 | `form.Field({ name })` render-prop    | Controlled inputs reading `form.data.foo` + `form.setData('foo', value)`        |
 | `form.Subscribe(...)`                 | Read reactive `form.data` / `form.errors` / `form.pending` directly             |
-| `validators: { onChange: zodSchema }` | Server-side via `defineHandler.withValidator({ body: schema })`                 |
+| `validators: { onChange: schema }`    | Server-side via `defineHandler.withValidator({ body: schema })` (Valibot)       |
 | `form.state.values`                   | `form.data`                                                                     |
 | `form.state.errors`                   | `form.errors` (field-level) + `form.error` (call-site-level)                    |
 | `form.useStore(...)`                  | n/a — `form.data` is reactive directly                                          |
@@ -62,24 +62,29 @@ const form = useForm('/recipe/new', defaultValues)
 // <form action={form.post}>… submits to pages/recipe/new.server.ts action
 ```
 
-On success, the loader re-runs and the page receives fresh props. The
-toast-on-success behavior (e.g. "Recette créée") needs to be reattached.
-Three options:
+On success, the loader re-runs and the page receives fresh props. **Success
+toasts are dropped entirely (D18)** — the navigation/loader-refresh is the
+feedback. Concretely:
 
-- **`form.recentlySuccessful`** — boolean true for ~2s after submit. Watch
-  in `useEffect`, fire toast there.
-- **`action()` helper** instead of `useForm` for actions without form state.
-  `const result = await action('/recipe/edit/:id?delete', { method: 'DELETE', params: { id } }); if (result.ok) toastSuccess(...)`.
-- **Redirect on success** via `c.redirect('/?created=1')` and read the
-  search param in the destination page.
+- **Recipe create** — action returns `c.redirect('/recipe/:id')`.
+  Landing on the detail page IS the confirmation.
+- **Recipe update** — action returns nothing; loader re-runs, the page
+  re-renders with the saved values. The form's `wasSuccessful` may be
+  used to disable the submit button momentarily but no toast fires.
+- **Approve / block / delete** — use the `action()` helper. The list page
+  re-renders with the row updated/gone. No success toast.
 
-**Recommended:**
+Errors still surface as feedback:
 
-- For recipe create/update → `action: defineHandler(...)` returns
-  `c.redirect('/recipe/:id')`, destination shows a "just-created" toast
-  via a one-shot search-param flag.
-- For approve/block/delete → use the `action()` helper, fire toast on the
-  result.
+- **Field validation errors** (`form.errors.foo`) render inline at the
+  offending input.
+- **Call-site errors** (`form.error` or `result.error` from `action()`) —
+  render a single error banner next to the form, OR toast for
+  button-style actions where no form is visible.
+- **Boundary errors** (401/403/500) — propagate to the framework error
+  boundary (already wired by `@void/react`).
+
+See [00-decisions → D18](./00-decisions.spec.md#d18--no-success-toasts).
 
 ## File uploads
 
@@ -125,10 +130,13 @@ top-level error block.
 
 ## Validation library
 
-Existing schemas (`recipeSchema`, `unitSlugSchema`, etc.) are written in
-Zod. They stay as-is and become the server `withValidator` input. No
-client-side validator needed unless we want immediate field errors before
-submission.
+The codebase uses Valibot end-to-end (no `zod` left). Existing schemas
+(`recipeSchema`, `unitSlugSchema`, etc.) stay as-is and become the server
+`withValidator` input. Schema-derived validators come from
+`void/drizzle-valibot` — see
+[02-data-layer → Schema-derived validators](./02-data-layer.spec.md#schema-derived-validators).
+No client-side validator is needed unless we want immediate field errors
+before submission.
 
 ## Components to rebuild
 

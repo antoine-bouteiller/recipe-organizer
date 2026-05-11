@@ -106,42 +106,45 @@ vp dev           # smoke-test the affected URLs in a browser
 Once Phase 5 is partway done, also run:
 
 ```bash
-npx void deploy --project <preview-slug>
+vite build && wrangler deploy
 ```
 
-…against a preview project linked to a separate D1 / R2 / domain. This
-catches deploy-time issues (env validation, migration drift, binding
-inference) without touching production.
+…against a **preview Worker** (separate `name`/env in `wrangler.jsonc`,
+separate D1 / R2 / IMAGES resources). This catches deploy-time issues
+(binding inference, wrangler merge, migration drift) without touching
+production. See
+[08-deployment-and-ops](./08-deployment-and-ops.spec.md#deploy-flow).
 
 ## Rollback
 
 If the merge has shipped and a regression appears:
 
-- **Via Void Cloud:** `void project rollback` — KV-routing swap, takes
-  seconds. Verify the previous deployment is still retained on the
-  current plan.
-- **Via git:** Revert the merge commit. Old `wrangler deploy` flow is
-  still usable from the reverted state. D1 schema must be reverted too
-  (Better Auth tables added by the migration won't break existing
-  Cloudflare deploys, but the `user.status`/`role` `additionalFields`
-  columns on Better Auth's `user` table replace the legacy `user` table —
-  see [04-auth → existing user data migration](./04-auth.spec.md#existing-user-data-migration)).
+- **Tag-and-redeploy:** every successful deploy gets a git tag
+  (`deploy-<timestamp>`). To roll back: check out the previous tag,
+  `vite build && wrangler deploy`. Cloudflare Workers' dashboard also
+  exposes a deployment-history rollback that swaps the live script
+  without a rebuild.
+- **Git revert:** revert the merge commit. D1 schema must be reverted
+  too if the prior deploy doesn't tolerate the new schema (Better Auth
+  tables added by the migration replace the legacy `user` table — see
+  [04-auth → existing user data migration](./04-auth.spec.md#existing-user-data-migration)).
 
-**Recommended pre-merge:** take a `wrangler d1 export` snapshot of
-production D1 before running `void db migrate --remote` for the first
-time on the live database.
+**Pre-merge gate:** take a `wrangler d1 export` snapshot of production
+D1 before running `wrangler d1 migrations apply DB --remote` for the
+first time on the live database.
 
 ## Risk register
 
-| Risk                                                                             | Mitigation                                                                                                                |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Better Auth migration loses or corrupts existing users                           | Backfill script tested against a dump of prod D1 before running on live; snapshot first                                   |
-| Cloudflare Images decision (D5) forces deploy-target change mid-migration        | Resolve D5 in Phase 0, **before** Phase 1                                                                                 |
-| `db.query.*` relational queries not auto-injected under Void's plugin            | Validate at Phase 2 with a single throwaway loader; fall back to `db.select().from(...).leftJoin(...)` rewrites           |
-| `useForm` cannot model nested-array errors (ingredient groups)                   | Verify at start of Phase 6 with a tiny prototype; fall back to top-level `form.error` if needed                           |
-| Service worker's precache manifest goes out of date under Void build output      | Verify at Phase 9; patch `tanstackSerwistPlugin` glob paths                                                               |
-| TanStack `viewTransition` UX regresses under Void Router                         | Accept temporarily; address as a follow-up using Void's view-transitions docs (`guide/pages-routing/view-transitions.md`) |
-| Production D1 migration history shape (Path A) incompatible with Void's migrator | Choose Path B (baseline reset) — recorded in [02-data-layer](./02-data-layer.spec.md#migrating-the-deployed-d1)           |
+| Risk                                                                        | Mitigation                                                                                                                             |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Better Auth migration loses or corrupts existing users                      | Backfill script tested against a dump of prod D1 before running on live; snapshot first                                                |
+| `wrangler d1 migrations apply` rejects Void's flat migration shape          | Validate at Phase 2 against a preview D1; fall back to `wrangler d1 execute` per-file if needed                                        |
+| `db.query.*` relational queries not auto-injected under Void's plugin       | Validate at Phase 2 with a single throwaway loader; fall back to `db.select().from(...).leftJoin(...)` rewrites                        |
+| `useForm` cannot model nested-array errors (ingredient groups)              | Verify at start of Phase 6 with a tiny prototype; fall back to top-level `form.error` if needed                                        |
+| Service worker's precache manifest goes out of date under Void build output | Verify at Phase 9; patch `tanstackSerwistPlugin` glob paths                                                                            |
+| TanStack `viewTransition` UX regresses under Void Router                    | Accept temporarily; address as a follow-up using Void's view-transitions docs (`guide/pages-routing/view-transitions.md`)              |
+| Flattened migration set drifts from current schema or replays differently   | `void db reset` (clean local replay) + `void db generate` (must emit zero new migrations) gate the flatten before cutover              |
+| Production D1 tracking-table reconciliation fails or partially applies      | Snapshot D1 with `wrangler d1 export` immediately before cutover; project owner verifies row count + ordering before `wrangler deploy` |
 
 ## Out-of-scope follow-ups
 
@@ -149,11 +152,13 @@ These are explicitly **not** part of the migration. They are good
 follow-up PRs:
 
 - Rewrite `docs/architecture.spec.md`, `docs/file-structure.spec.md`,
-  `docs/infrastructure/*.spec.md`, and per-feature
-  `src/features/*/spec/*.spec.md` to describe the Void-based reality.
-- Migrate Zod validators to Valibot (and drop `zod` from deps).
+`docs/infrastructure/*.spec.md`, and per-feature
+`src/features/*/spec/*.spec.md` to describe the Void-based reality.
+<!-- Zod → Valibot migration already done in advance of the Void migration. -->
+
 - Adopt `routing.revalidate` ISR for read-heavy pages.
-- Replace inline `console.*` with `logger.*` from `void/log`.
+<!-- console.* → void/log logger.* covered by D20 in the main migration scope. -->
+
 - Reconsider state stores: Zustand could potentially be replaced by
   `useShared()` for genuinely global state and local component state
   elsewhere.
@@ -166,11 +171,13 @@ follow-up PRs:
 - [ ] `vp dev` exercises every URL in
       [05 → Route inventory](./05-routing-and-pages.spec.md#route-inventory)
       without errors
-- [ ] Preview deployment via `void deploy --project <preview-slug>`
-      succeeds and round-trips a recipe with image upload
+- [ ] Preview deployment via `wrangler deploy` against a preview Worker
+      succeeds and round-trips a recipe with an image upload through
+      `env.IMAGES` + R2
 - [ ] Sign-in / pending / blocked / active / admin flows all behave
-- [ ] Removed packages and the `wrangler` artefacts are gone from the
-      repo (or the D5-B retention is recorded)
+- [ ] TanStack/CF artefacts (router, start, form, `@cloudflare/vite-plugin`)
+      removed from `package.json`; `wrangler` and `wrangler.jsonc` retained
+      (D8)
 - [ ] Production D1 snapshot taken
 - [ ] Production migrated (or scheduled migration window agreed)
-- [ ] Merge commit and post-merge `void deploy` to production
+- [ ] Merge commit and post-merge `wrangler deploy` to production

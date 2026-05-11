@@ -98,40 +98,38 @@ the `getDb()` rewrite happens as part of that relocation.
 
 ## Migrations directory
 
-Migration file shape changes from directory-per-migration to file-per-migration.
+Migration file shape changes from directory-per-migration to
+file-per-migration. The lineage is **preserved** (D11) — one new
+`db/migrations/<timestamp>_<name>.sql` per existing
+`migrations/<dir>/migration.sql`, keeping the original timestamp ordering.
 
-**Action:**
+**Action (local repo):**
 
-1. Run `void db generate` against the migrated schema. This emits a fresh
-   `db/migrations/<timestamp>_<name>.sql` representing the **current state**
-   of the schema.
-2. Diff the generated SQL against the union of all existing
-   `migrations/*/migration.sql` files to confirm equivalence.
-3. **For local dev:** acceptable to drop and re-run from scratch (`void db reset`).
-4. **For production data:** see [03b — migrating existing remote D1](#migrating-the-deployed-d1).
+1. For each existing `migrations/<timestamp>_<name>/migration.sql`, copy
+   the SQL body into `db/migrations/<timestamp>_<name>.sql`. Drop the
+   per-migration directory and its `meta/` siblings — Void manages
+   migration metadata via its own tracking table.
+2. Run `void db reset` to validate the flattened set replays cleanly
+   against a fresh local D1.
+3. Run `void db generate` afterward. It must report **no drift** — if it
+   emits an additional migration, the flatten was incomplete.
+4. From this point forward, all schema changes go through
+   `void db generate`, producing new file-per-migration entries.
 
-### Migrating the deployed D1
+**Action (remote/production D1 tracking table):**
 
-Two acceptable paths, decided at implementation time:
+The Cloudflare-side reconciliation — populating Void's migration tracking
+table with the existing applied migrations so `void db migrate --remote`
+treats them as already-applied — is **handled out of band by the
+project owner** and is not scripted by this migration spec. The user has
+explicitly taken ownership of this step (D11). Coordinate the cutover
+window:
 
-- **Path A — "Continue lineage":** Manually copy each `migrations/<dir>/migration.sql`
-  to `db/migrations/<same-timestamp>_<name>.sql` (flattening the per-dir
-  shape) plus the `__drizzle_migrations` tracking table that drizzle-kit
-  uses. Then run `void db rename-migrations` (per
-  `node_modules/void/skills/void/docs/reference/cli.md`) to convert any
-  numeric-prefix legacy entries. Risk: the drizzle-kit tracking table
-  shape may not align with what Void's migrator expects — verify before
-  prod.
-- **Path B — "Baseline reset":** Generate one consolidated initial
-  migration from current schema, mark it as already applied on production
-  D1 via direct `wrangler d1 execute` insert into `__drizzle_migrations`,
-  then continue with normal `void db migrate --remote`. Lower fidelity but
-  simpler. Acceptable because the migration files are not used for
-  rollback in this project.
-
-**Recommendation: Path B** unless we discover that Void's migrator strictly
-requires the original timestamp lineage. The recipe data is the source of
-truth — migration history is metadata.
+- Last `wrangler d1 export` snapshot taken before cutover.
+- Project owner runs the manual reconciliation SQL on production D1.
+- Then a `void db status --remote` (or equivalent) is run from the
+  branch to confirm the remote shows "no pending migrations".
+- Only then is `wrangler deploy` to production unblocked.
 
 ## Path alias and import-from-`@schema`
 
@@ -150,42 +148,57 @@ imports for non-schema things.
 
 ## Schema-derived validators
 
-Today's `create.ts` / `update.ts` for recipe define a full `recipeSchema`
-manually. Where shapes align with the DB, switch to `void/drizzle-zod`:
+The codebase already validates with Valibot end-to-end. Where shapes align
+with the DB, switch hand-written object schemas to `void/drizzle-valibot`
+so the validator stays in sync with the table.
 
 ```ts
 // db/schema/recipe.ts (excerpt)
-import { createInsertSchema, createUpdateSchema } from 'void/drizzle-zod'
+import { sqliteTable, text, integer } from 'void/schema-d1'
+import { createInsertSchema, createUpdateSchema } from 'void/drizzle-valibot'
+import { pipe, minLength, minValue } from 'valibot'
+
+export const recipe = sqliteTable('recipe', {
+  /* … */
+})
 
 export const insertRecipeSchema = createInsertSchema(recipe, {
-  name: (s) => s.min(2),
-  servings: (s) => s.min(0),
+  name: (schema) => pipe(schema, minLength(2)),
+  servings: (schema) => pipe(schema, minValue(0)),
 })
 export const updateRecipeSchema = createUpdateSchema(recipe)
 ```
 
-Then in the action handler:
+Then in the action handler, extend the derived schema with the bespoke
+non-DB fields (image, ingredient groups, linked recipes):
 
 ```ts
 // pages/recipe/new.server.ts
 import { defineHandler } from 'void'
 import { db } from 'void/db'
 import { recipe, insertRecipeSchema } from '@schema'
+import * as v from 'valibot'
 
-export const action = defineHandler.withValidator({
-  body: insertRecipeSchema.extend({
-    image: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]),
-    ingredientGroups: z.array(/* … */),
-    /* … */
-  }),
-})(async (c, { body }) => {
+const createRecipeSchema = v.object({
+  ...insertRecipeSchema.entries,
+  image: v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })]),
+  ingredientGroups: v.array(
+    v.object({
+      /* … */
+    })
+  ),
+  // … linked recipes, video …
+})
+
+export const action = defineHandler.withValidator({ body: createRecipeSchema })(async (c, { body }) => {
   /* … */
 })
 ```
 
 The complex non-DB parts (`image`, `ingredientGroups`, `linkedRecipes`) stay
-as bespoke Zod. The derived part keeps `name`, `servings`, `instructions`,
-`tags` in sync with the table. The current `recipeSchema` is migrated by
+as bespoke Valibot. The derived part keeps `name`, `servings`,
+`instructions`, `tags` in sync with the table. The existing Valibot
+`recipeSchema` in `src/features/recipe/api/create.ts` is migrated by
 extending the derived insert schema with the complex extras rather than
 re-declaring DB fields.
 

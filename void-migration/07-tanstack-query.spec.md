@@ -49,20 +49,24 @@ If after migration this section is still empty:
 
 ## Toast-on-mutation pattern
 
-The Query mutation `onSuccess` toasts ("Recette créée") needs a replacement:
+Per [D18](./00-decisions.spec.md#d18--no-success-toasts), **success toasts
+are dropped**. The Query mutation `onSuccess` toasts (e.g. "Recette
+créée") have no direct replacement — the redirect / loader re-render
+delivers the feedback instead.
 
-- **For `useForm`** — watch `form.recentlySuccessful` in a `useEffect`:
-  ```tsx
-  useEffect(() => {
-    if (form.recentlySuccessful) toastManager.add({ type: 'success', title: 'Recette créée' })
-  }, [form.recentlySuccessful])
+**Error** toasts still fire:
+
+- For `action()`-style calls, wrap the result:
+  ```ts
+  const r = await action(...)
+  if (!r.ok) toastError(r.error.message)
   ```
-- **For `action()` helper** — wrap call: `const r = await action(...); if (r.ok) toastSuccess(...); else toastError(r.error.message)`.
-- **For error toasts** — `form.error` is reactive; fire on transition from
-  `null` to non-null.
+- For `useForm`, render `form.error` as an inline banner near the form,
+  or watch transitions from `null` to non-null in a `useEffect` and
+  toast on those.
 
 Keep `src/lib/toast-helpers.ts` and `src/components/ui/toast.tsx` — they
-are independent of Query.
+are independent of Query and are still used for error surfacing.
 
 ## SSR-Query bridge
 

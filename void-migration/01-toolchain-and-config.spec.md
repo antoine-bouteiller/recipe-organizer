@@ -16,43 +16,32 @@ do this phase first.
 | `@tanstack/react-router-devtools`  | Router devtools, irrelevant                          |
 | `@tanstack/react-start`            | Replaced by Pages mode loaders/actions               |
 | `@tanstack/react-form`             | Replaced by `useForm` from `@void/react`             |
-| `wrangler`                         | Replaced by `void` CLI (unless D5 picks (b))         |
 | `@tanstack/devtools-vite`          | Vite plugin specific to TanStack devtools            |
 | `@tanstack/react-devtools`         | TanStack devtools UI                                 |
+| `@tanstack/react-query`            | Replaced by Pages-mode loaders + `useForm` (D19)     |
+| `@tanstack/react-query-devtools`   | Goes with `react-query`                              |
 
-### Conditionally remove (after [07-tanstack-query](./07-tanstack-query.spec.md))
-
-| Package                          | Condition                                    |
-| -------------------------------- | -------------------------------------------- |
-| `@tanstack/react-query`          | Remove if no retained usage                  |
-| `@tanstack/react-query-devtools` | Always removed when `react-query` is removed |
+`wrangler` **stays** as a devDependency (D8 — direct `wrangler deploy` is
+the deploy path).
 
 ### Add
 
-| Package       | Reason                                                                                          |
-| ------------- | ----------------------------------------------------------------------------------------------- |
-| `@void/react` | Pages mode adapter (provides `useForm`, `Link`, `useRouter`, `useShared`, etc.)                 |
-| `valibot`     | Action body validators in `.server.ts` (lighter than `zod`; matches Void's documented examples) |
+| Package       | Reason                                                                          |
+| ------------- | ------------------------------------------------------------------------------- |
+| `@void/react` | Pages mode adapter (provides `useForm`, `Link`, `useRouter`, `useShared`, etc.) |
 
-Note: `void` is already in devDependencies (`^0.7.3`). `drizzle-orm` and
-`drizzle-kit` are already pinned but Void also re-exports them via `void/db`
-— direct imports of `drizzle-orm` outside of `db/schema.ts` should be ported
-to `void/db` (see [02-data-layer](./02-data-layer.spec.md#imports-cleanup)).
+Notes:
 
-### Decision: `valibot` vs `zod` for new validators
-
-The codebase currently uses `zod@4.4.3` extensively. Two paths:
-
-- **Migrate to `valibot`** for new server validators (matches Void docs and
-  the schema-derived helpers it ships under `void/drizzle-valibot`). Existing
-  client-side `zod` usage (e.g. route search params, form parsers) stays
-  during the migration; remove `zod` only once nothing imports it.
-- **Stay on `zod`** via `void/drizzle-zod`. Lower churn. Both are
-  Standard-Schema compliant so `useForm`/`withValidator()` accept either.
-
-**Recommended: stay on `zod`.** The existing schemas are non-trivial
-(`recipeSchema`, `unitSlugSchema`, parsers in routes). Migrating the
-validator library is a separate, optional task with its own risk.
+- `void` is already in devDependencies (`^0.7.3`).
+- `drizzle-orm` / `drizzle-kit` are already pinned, but Void also re-exports
+  them via `void/db` — direct imports of `drizzle-orm` outside of
+  `db/schema.ts` should be ported to `void/db` (see
+  [02-data-layer](./02-data-layer.spec.md#imports-cleanup)).
+- `valibot` (`1.2.0`) is already a runtime dependency — every validator in
+  the codebase already uses it. Schema-derived helpers come from
+  `void/drizzle-valibot` (see
+  [02-data-layer → Schema-derived validators](./02-data-layer.spec.md#schema-derived-validators)).
+  No `zod` left in the project; do not reintroduce it.
 
 ### Scripts
 
@@ -65,10 +54,10 @@ validator library is a separate, optional task with its own risk.
     "serve": "vp preview",
     "knip": "knip",
     "prepare": "vp config && void prepare", // ← void prepare generates .void/*.d.ts before typecheck
-    "deploy": "void deploy", // ← new
+    "deploy": "vite build && wrangler deploy", // ← D8: direct Cloudflare deploy
     "db:generate": "void db generate", // ← replaces drizzle-kit usage
     "db:migrate:local": "void db migrate", // ← replaces apply-migration-local.ts
-    "db:migrate:remote": "void db migrate --remote",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote", // ← D8/D11
     "db:studio": "void db studio",
     "db:reset": "void db reset",
   },
@@ -143,9 +132,11 @@ New file at project root.
 
 - `auth.providers: ["google"]` — no email/password.
 - `worker.compatibility_date` carried over from `wrangler.jsonc`.
-- `inference.bindings` is set explicitly to make the binding contract
-  unambiguous; without it, inference scans `src/`, `pages/`, `routes/`,
-  `middleware/`. Either works.
+- `inference.bindings` is **declared explicitly** (D10). The contract is
+  visible at the top of `void.json` rather than emergent from imports, so
+  a future code change can't silently drop a binding by removing its last
+  import site. Runtime behavior is identical to auto-inference for the
+  current binding set.
 - **No** `routing.redirects`/`rewrites` are needed at migration time. The
   current app has no static redirect rules.
 
@@ -211,8 +202,9 @@ export default defineEnv({
 - `VITE_PUBLIC_URL` keeps its current name and stays public.
 
 Run `void env example` to write the marker-delimited block into `.env.example`.
-Run `void secret sync .env.production.local` (or `void secret put ...`) once
-to upload prod secrets after first `void project link`.
+Upload prod secrets to Cloudflare with `wrangler secret put <name>` or
+`wrangler secret bulk .env.production.local` — see
+[08-deployment](./08-deployment-and-ops.spec.md#secrets) for the full flow.
 
 ## `.gitignore`
 
@@ -220,23 +212,31 @@ Add (if not present):
 
 ```
 .void/
-!.void/project.json
 ```
 
-`.void/project.json` is the project link state — keep it committed so CI/teammates
-hit the same Void project.
+`.void/` holds auto-generated typings (`routes.d.ts`, `db.d.ts`,
+`queues.d.ts`, `env.d.ts`, `tsconfig.json`). No `project.json` to commit
+(no Void Cloud project link — D8).
 
-The `wrangler` artefacts (`.wrangler/`, `worker-configuration.d.ts`) can be
-removed entirely once auth migration is verified.
+The existing `.wrangler/` ignore (Cloudflare local-state dir) stays.
 
 ## Files deleted at the end of this phase
 
-- `wrangler.jsonc` (only if D5 = (a) or (c))
-- `.wrangler/` directory
-- `worker-configuration.d.ts`
-- `drizzle.config.ts` (replaced by Void's bundled drizzle-kit + `void db generate`)
+- `drizzle.config.ts` (replaced by Void's bundled drizzle-kit +
+  `void db generate`)
 - `scripts/apply-migration-local.ts`
-- `database.sql` (kept for emergency restore; consider archiving outside the repo)
+- `database.sql` (kept for emergency restore; consider archiving outside
+  the repo)
+
+## Files kept (D5 / D8)
+
+- `wrangler.jsonc` — updated per [03-bindings](./03-bindings.spec.md#wranglerjsonc)
+  with renamed `STORAGE`, `migrations_dir: "db/migrations"`, and the
+  `images: { binding: "IMAGES" }` block
+- `.wrangler/` — Cloudflare local state for `vp dev` / `wrangler dev`
+- `worker-configuration.d.ts` — wrangler-generated typings for
+  `Cloudflare.Env` (keep so `c.env.IMAGES` types correctly without manual
+  augmentation)
 
 ## Verification gate
 

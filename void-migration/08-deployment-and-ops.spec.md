@@ -1,49 +1,96 @@
 # 08 — Deployment & Operations
 
+Per [D8](./00-decisions.spec.md#d8--deploy-target): the project deploys
+**directly to its own Cloudflare account via `wrangler deploy`**. Void
+Cloud is not used. The `void` CLI is still used for non-deploy concerns
+(typegen, local dev, schema scaffolding, env checks).
+
 ## Deploy flow
 
-**Default (per [D8](./00-decisions.spec.md#d8--deploy-target)):**
-
 ```bash
-void auth login          # one-time, per machine
-void project link        # one-time, links repo to a Void Cloud project
-void deploy              # build + deploy
-```
+# one-time
+wrangler login
 
-`void deploy` runs:
-
-1. Drizzle schema-drift check (refuses to deploy if a pending migration is
-   uncommitted — run `void db generate` and commit first).
-2. `vite build` (via the Void pipeline).
-3. Bundles routes, pages, middleware, crons, queues.
-4. Validates `env.ts` schema against `.env.production` + remote secrets.
-5. Uploads.
-6. Applies migrations on remote D1 (using `db/migrations/*.sql`).
-
-CI sets `VOID_PROJECT=<slug>` (or `--project <slug>`) and uses
-`VOID_TOKEN` (saved via `void auth token`) for non-interactive auth.
-
-### Alternative: direct `wrangler deploy`
-
-If [D5 = Option B](./03-bindings.spec.md#option-b-keep-images-binding-via-wranglerjsonc)
-ends up the decision (keep Cloudflare Images binding), deploy goes via
-direct Cloudflare:
-
-```bash
+# every deploy
+pnpm run check                              # vp check
+pnpm run test                               # vp test
+wrangler d1 migrations apply DB --remote    # if pending — see below
 vite build
-wrangler d1 migrations apply DB --remote   # only if Void's flat migration shape works with wrangler
 wrangler deploy
 ```
 
-The Void plugin still merges inferred bindings into the generated
-`wrangler.json` under `dist/`, so `wrangler deploy` picks them up. Keep
-`wrangler` as a devDependency in this case.
+What happens during `vite build`:
+
+1. `voidPlugin()` runs binding inference and merges with `wrangler.jsonc`
+   (per Void's documented wrangler-merge behavior). `DB` and `STORAGE`
+   in `wrangler.jsonc` keep their real IDs; `IMAGES` passes through
+   unchanged.
+2. The merged config is written to `dist/wrangler.json`.
+3. Static assets are emitted under `dist/client/` and the worker bundle
+   under `dist/<worker>`.
+
+`wrangler deploy` then reads `dist/wrangler.json` and ships the worker.
+
+## Database migrations on remote D1
+
+Apply with `wrangler`, which reads the `migrations_dir: "db/migrations"`
+field declared in `wrangler.jsonc`:
+
+```bash
+wrangler d1 migrations apply DB --remote
+```
+
+**Open verification:** confirm at implementation that `wrangler d1 migrations apply`
+accepts Void's flat `<timestamp>_<name>.sql` shape. Drizzle-kit also
+emits this shape, so it should work. If wrangler's parser requires a
+specific naming or metadata format, document the workaround here.
+
+For the **initial cutover** (legacy `migrations/<dir>/migration.sql` →
+flat `db/migrations/<ts>_<name>.sql`), the tracking-table reconciliation
+on remote D1 is owned by the project owner (D11). See
+[02-data-layer → Migrations directory](./02-data-layer.spec.md#migrations-directory).
+
+| Command (local dev) | Use                                                                |
+| ------------------- | ------------------------------------------------------------------ |
+| `void db generate`  | After schema changes — produces `db/migrations/<ts>_<name>.sql`    |
+| `void db migrate`   | Apply pending migrations locally (against the Miniflare-backed D1) |
+| `void db reset`     | Drop + reapply all migrations locally                              |
+| `void db seed`      | Reset + run `db/seed.ts` or `db/seed.sql`                          |
+| `void db studio`    | Open Drizzle Studio on local DB                                    |
+
+`void db migrate --remote` is **not used** — it requires Void Cloud
+auth + project link.
 
 ## Secrets
 
-**Local development:**
+`wrangler.jsonc` declares no `vars`. Secrets are pushed individually
+via `wrangler secret put`:
 
+```bash
+wrangler secret put BETTER_AUTH_SECRET
+wrangler secret put AUTH_GOOGLE_CLIENT_ID
+wrangler secret put AUTH_GOOGLE_CLIENT_SECRET
 ```
+
+`wrangler` reads values from stdin/prompt; for non-interactive CI, pipe:
+
+```bash
+echo -n "$BETTER_AUTH_SECRET" | wrangler secret put BETTER_AUTH_SECRET
+```
+
+Bulk upload:
+
+```bash
+wrangler secret bulk .env.production.local
+```
+
+`void env check` (local) still validates `env.ts` against `.env*` files
+and is worth running pre-deploy to catch missing keys. It cannot validate
+remote secrets in this flow (no Void Cloud secret list to consult).
+
+### Local development
+
+```ini
 # .env.local (gitignored)
 BETTER_AUTH_SECRET=…
 AUTH_GOOGLE_CLIENT_ID=…
@@ -51,144 +98,164 @@ AUTH_GOOGLE_CLIENT_SECRET=…
 VITE_PUBLIC_URL=http://localhost:3000
 ```
 
-**Production:**
+`vp dev` reads these via Vite's `loadEnv`, which the Void plugin forwards
+into the worker's `vars` block at dev time.
 
-```bash
-void secret put BETTER_AUTH_SECRET
-void secret put AUTH_GOOGLE_CLIENT_ID
-void secret put AUTH_GOOGLE_CLIENT_SECRET
-# OR bulk:
-void secret sync .env.production.local
-```
+### Migration-time cleanup
 
-`void deploy` will hard-fail before upload if any required `env.ts` key is
-missing from the union of `.env*` + remote secrets.
+Existing Cloudflare Workers secrets to retire:
 
-Migration-time check: ensure the existing **Cloudflare Workers Secrets**
-(`SESSION_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`) are either
-re-uploaded under their new names (`BETTER_AUTH_SECRET`, `AUTH_GOOGLE_*`)
-or migrated. `SESSION_SECRET` becomes orphaned — delete it after Better
-Auth is live to avoid confusion.
-
-## Database migrations
-
-| Command                    | Use                                                                    |
-| -------------------------- | ---------------------------------------------------------------------- |
-| `void db generate`         | After schema changes — produces `db/migrations/<ts>_<name>.sql`        |
-| `void db migrate`          | Apply pending migrations locally                                       |
-| `void db migrate --remote` | Apply pending migrations on production D1 (requires `void auth login`) |
-| `void db reset`            | Drop + reapply all migrations locally (dev only)                       |
-| `void db seed`             | Reset + run `db/seed.ts` or `db/seed.sql`                              |
-| `void db studio`           | Open Drizzle Studio on local DB                                        |
-| `void db export`           | Dump local DB as SQL (replacement for current `db:dump`)               |
-
-For the **initial** migration from the legacy `migrations/<dir>/migration.sql`
-shape, see [02-data-layer → Migrating the deployed D1](./02-data-layer.spec.md#migrating-the-deployed-d1).
+- `SESSION_SECRET` — orphaned once Better Auth is live; delete via
+  `wrangler secret delete SESSION_SECRET`.
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — re-upload as
+  `AUTH_GOOGLE_CLIENT_ID` / `AUTH_GOOGLE_CLIENT_SECRET`; delete the old
+  names after Better Auth's Google flow is verified on prod.
 
 ## Logs
 
-`console.log/warn/error` from worker code reach Cloudflare Tail. To pull
-them locally:
+Cloudflare Tail is the source of truth. Use either:
 
 ```bash
-void project logs --range 1h
-void project logs --level error --range 24h
-void project logs --filter recipe
+wrangler tail
+wrangler tail --format=pretty
+wrangler tail --status error
 ```
 
-The current app uses `console` directly in several places (search via
-`grep -rn 'console\.' src/`) — those continue to work without changes.
+The current app uses `console.*` directly in several places — those
+continue to work and show up in `wrangler tail`. Errors caught and only
+persisted to the DB are invisible to Tail; surface them with
+`console.error(...)` so they're observable.
 
-Errors caught and persisted only to the DB are **invisible** to Tail; if any
-exist (search for `try { … } catch { /* db write only */ }` patterns),
-wrap with `console.error(...)` or `import { logger } from 'void/log'` so
-they show in `void project logs --level error`.
+`void project logs` is **not used** — it queries Void Cloud's log store.
 
-## Lint of `no-console`
+## Logging discipline
 
-The current ESLint config has `'no-console': 'error'`. If migrating to
-explicit `logger.*` from `void/log`, that rule stays in place and forbids
-inline `console`. If keeping the existing tolerance, the rule already
-matches reality.
+Per [D20](./00-decisions.spec.md#d20--logging-discipline):
 
-**Recommended:** keep `'no-console': 'error'` and adopt `void/log`'s
-`logger` for the few places we need observability. Lower cost than
-refactoring later.
+- `'no-console': 'error'` stays in `vite.config.ts` lint rules.
+- Server-side intentional logs use `logger.*` from `void/log`:
+
+  ```ts
+  import { logger } from 'void/log'
+
+  logger.error('failed to fetch ingredient', { recipeId, err })
+  logger.warn('cache miss spiked', { route })
+  logger.info('user signed in', { userId })
+  ```
+
+- `void/log` writes via `console.*` on the worker, so output surfaces in
+  `wrangler tail` and any Cloudflare log destination configured on the
+  account.
+- Migration-time sweep: `grep -rn 'console\.' src/` after the cutover;
+  every remaining hit is either deleted or replaced with `logger.*`.
 
 ## CI
 
-Existing CI (in `.github/workflows/`):
-
-- Replace `wrangler deploy` step with `npx void deploy --project <slug>`
-- Add `npx void env check --remote` as a pre-deploy gate
-- Authenticate with `VOID_TOKEN` env variable (CI secret)
+`.github/workflows/deploy.yml` (sketch):
 
 ```yaml
-# .github/workflows/deploy.yml (sketch)
-- run: pnpm install --frozen-lockfile
-- run: pnpm run prepare # vp config + void prepare
-- run: pnpm run check # vp check
-- run: pnpm run test # vp test (if applicable)
-- run: npx void env check --remote
-  env:
-    VOID_TOKEN: ${{ secrets.VOID_TOKEN }}
-- run: npx void deploy --project recipe-organizer
-  env:
-    VOID_TOKEN: ${{ secrets.VOID_TOKEN }}
+name: deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run prepare # vp config && void prepare
+      - run: pnpm run check # vp check
+      - run: pnpm run test # if applicable
+      - run: pnpm exec wrangler d1 migrations apply DB --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - run: pnpm exec vite build
+      - run: pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 ```
 
-Use `void init --github` to scaffold this if there's no existing workflow.
+Secrets needed in CI:
+
+- `CLOUDFLARE_API_TOKEN` — scoped to Workers Scripts Edit + D1 Edit + R2 Edit + Images
+- `CLOUDFLARE_ACCOUNT_ID`
+
+`void deploy` is **not** in CI.
 
 ## Rollback
 
-`void project rollback [deployId]` rolls back to a prior deployment by
-KV-routing swap. Free plan retains 1 deployment, solo 5, pro 25 (per
-`reference/cli.md`). Verify what plan we're on.
+`wrangler deploy` doesn't have a built-in rollback. Two patterns:
 
-If running on direct `wrangler deploy`, rollback is via redeploying a
-previous tagged build.
+- **Tag every deploy:** push a git tag on every successful deploy
+  (`v<timestamp>`). To roll back, check out the tag and run `wrangler deploy`
+  again from that working tree.
+- **Cloudflare dashboard rollback:** Workers' deployment history in the
+  dashboard supports a click-to-rollback for the worker script (does not
+  roll back D1 schema).
+
+D1 schema rollbacks are not automatic. If a deploy includes a destructive
+migration, prepare a hand-written reverse migration before the cutover.
 
 ## Local dev parity
 
 `vp dev` boots:
 
-- Miniflare for D1, R2 (`STORAGE`), KV
-- The Void Vite plugin handles route discovery, page hydration
-- Auth runs against local Better Auth tables in the local D1
-- Hot reload works for `pages/`, `routes/`, `middleware/`, `src/`
+- Miniflare for D1, R2 (`STORAGE`), KV — including a local IMAGES emulator
+  (verify at implementation; if Miniflare doesn't emulate Cloudflare Images,
+  dev needs to either guard the call-site against missing IMAGES or run
+  against remote via `wrangler dev --remote`).
+- The Void Vite plugin handles route discovery and page hydration.
+- Auth runs against local Better Auth tables in local D1.
+- Hot reload works for `pages/`, `routes/`, `middleware/`, `src/`.
 
-To test against **remote** D1/R2 from local dev:
+To run against remote D1/R2/IMAGES from local dev (debug-only):
 
-```json
-// void.json
-{ "remote": true }
+```bash
+wrangler dev --remote
 ```
 
-…or `VOID_REMOTE=1 pnpm dev`. Requires `void auth login` + linked project.
-Useful for debugging prod-only data. **Do not** commit `remote: true`.
+`void.json` `remote: true` is **not** applicable here (it routes through
+Void Cloud's proxy).
 
 ## Domain / DNS
 
-If a custom domain is configured on Cloudflare today, it needs to be:
+The current `wrangler.jsonc` has no `routes` block, so the worker is
+served from the default `<name>.<subdomain>.workers.dev` URL.
 
-- Re-added via `void domain add <hostname>` on the Void Cloud project, or
-- Kept on Cloudflare if using direct `wrangler deploy` (D5 Option B)
+To wire a custom domain:
 
-The current routes file `wrangler.jsonc` doesn't list a `routes` block,
-so there's probably no custom domain in play yet. Confirm.
+```jsonc
+{
+  "routes": [{ "pattern": "recipes.example.com", "custom_domain": true }],
+}
+```
+
+Cloudflare provisions the cert and DNS automatically when the apex zone
+is on the same account.
 
 ## Verification gate
 
 This phase is "done" when:
 
-- A `void deploy` to a **preview** Void Cloud project succeeds end-to-end
-- The deployed app:
-  - Renders all pages
-  - Signs in with Google
-  - Persists a new recipe with an image upload (full round-trip through
-    R2 / IMAGES as configured)
-  - Shows up under `void project logs` for at least one info log
-- CI runs `void env check --remote` and `void deploy` non-interactively
-- All references to `wrangler` are either removed from `package.json` and
-  CI **or** explicitly retained for the D5-B scenario with the reason
-  recorded in [00-decisions](./00-decisions.spec.md)
+- `wrangler deploy` succeeds against a **preview** Worker (different
+  `name` or env in `wrangler.jsonc`) with the full app:
+  - All pages render
+  - Sign in with Google works end-to-end
+  - Creating a recipe with an image upload exercises
+    `c.env.IMAGES.transform(...)` and persists the WebP to R2
+  - Errors show up in `wrangler tail --status error`
+- CI runs `wrangler d1 migrations apply DB --remote` + `wrangler deploy`
+  non-interactively using `CLOUDFLARE_API_TOKEN`
+- `void deploy` / Void Cloud is not referenced anywhere in the build or
+  deploy path
+- `wrangler` is retained in `devDependencies` (D8)
+- The `void` CLI is still used for `void prepare`, `void db generate`,
+  `void db studio`, `void env check`, `void env types`
