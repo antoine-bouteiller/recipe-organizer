@@ -1,0 +1,176 @@
+# 10 — Migration Plan (sequencing, gates, rollback)
+
+How to execute the work without breaking main. Reference for the agent
+or human doing the actual migration.
+
+## Branching strategy
+
+Single long-lived branch off `main`:
+
+```
+main ──────────────────────────────────────────────────
+       \                                              /
+        refactor/migrate-to-void  ──── (PR + merge) ──
+```
+
+The migration can **not** be split into independent PRs because the
+intermediate states (e.g. "data layer migrated but routing still on
+TanStack") would be broken builds. The branch already exists
+(`refactor/migrate-to-void`, per current git status).
+
+Cap PR size to one branch merge. Reviewer reads
+`void-migration/*.spec.md` for context; the actual diff is large but
+explained per-section.
+
+## Phase ordering
+
+Phases run sequentially. Each phase has a verification gate (defined in
+its spec file). Do not start phase N+1 with phase N's gate red.
+
+```
+Phase 0: Resolve blocking decisions       (void-migration/index.spec.md § Open decisions)
+   │
+Phase 1: Toolchain & config                (01-toolchain-and-config.spec.md)
+   │
+Phase 2: Data layer                        (02-data-layer.spec.md)
+   │
+Phase 3: Bindings                          (03-bindings.spec.md)
+   │
+Phase 4: Auth                              (04-auth.spec.md)
+   │
+Phase 5: Routing & pages                   (05-routing-and-pages.spec.md)
+   │
+Phase 6: Forms                             (06-forms.spec.md)
+   │
+Phase 7: TanStack Query removal            (07-tanstack-query.spec.md)
+   │
+Phase 8: Deployment                        (08-deployment-and-ops.spec.md)
+   │
+Phase 9: Misc cleanup                      (09-misc-cleanup.spec.md)
+```
+
+### Why this order
+
+- **Phase 0** unblocks Phase 3 (IMAGES) and Phase 4 (data migration) —
+  both can have several days of work depending on the choice.
+- **Phase 1** must precede everything: no Void runtime, no Void imports.
+- **Phase 2** before **Phase 3**: `void/db` import sites are the simpler
+  rewrite; touching them early de-risks the bindings work.
+- **Phase 4 before Phase 5**: Pages-mode loaders use `requireAuth` /
+  `getUser` from `void/auth`. Wiring them after auth means writing
+  loaders against the real auth surface, not stubs.
+- **Phase 5 and Phase 6 are tightly coupled** — a form lives inside a
+  page. Sequence them by feature (recipe list, recipe view, recipe edit,
+  recipe new, users, ingredients) so each feature can be verified
+  end-to-end before moving on.
+- **Phase 7** (Query removal) happens _as part of_ Phase 5+6 in practice;
+  it's broken out as its own spec because the decision and the leftover
+  cleanup are distinct concerns.
+- **Phase 8** can preview-deploy during Phases 5–7 to catch
+  configuration drift early.
+
+## Sub-phasing within Phase 5 (Pages)
+
+Migrate routes in this order, each with its own
+verify-locally-then-commit cycle:
+
+1. `pages/layout.tsx` + `middleware/01.theme.ts` + `middleware/02.account-status.ts`
+   — shell + globals
+2. `pages/auth/login.tsx` + `pages/auth/pending.tsx` — auth UI
+3. `pages/index.tsx` — read-only list, smallest loader, validates the
+   loader+component pattern
+4. `pages/search.tsx` — adds query-param validation
+5. `pages/recipe/[id].tsx` — relational query, larger loader
+6. `routes/api/image/[id].ts` and `routes/api/video/[id].ts` — non-page
+   API routes
+7. `pages/recipe/new.tsx` — first form (action + useForm)
+8. `pages/recipe/edit/[id].tsx` — form with prefill
+9. `pages/settings/users.tsx` — multi-action page
+10. `pages/settings/ingredients.tsx`, `pages/settings/account.tsx`,
+    `pages/shopping-list.tsx`, `pages/settings.tsx`
+
+After step 3, `vp dev` should fully boot. After step 10, the old
+`src/routes/` directory can be deleted.
+
+## Branch-local sanity loop
+
+After every spec phase:
+
+```bash
+vp install
+vp check         # fmt + lint + types
+vp test          # if applicable
+vp dev           # smoke-test the affected URLs in a browser
+```
+
+Once Phase 5 is partway done, also run:
+
+```bash
+npx void deploy --project <preview-slug>
+```
+
+…against a preview project linked to a separate D1 / R2 / domain. This
+catches deploy-time issues (env validation, migration drift, binding
+inference) without touching production.
+
+## Rollback
+
+If the merge has shipped and a regression appears:
+
+- **Via Void Cloud:** `void project rollback` — KV-routing swap, takes
+  seconds. Verify the previous deployment is still retained on the
+  current plan.
+- **Via git:** Revert the merge commit. Old `wrangler deploy` flow is
+  still usable from the reverted state. D1 schema must be reverted too
+  (Better Auth tables added by the migration won't break existing
+  Cloudflare deploys, but the `user.status`/`role` `additionalFields`
+  columns on Better Auth's `user` table replace the legacy `user` table —
+  see [04-auth → existing user data migration](./04-auth.spec.md#existing-user-data-migration)).
+
+**Recommended pre-merge:** take a `wrangler d1 export` snapshot of
+production D1 before running `void db migrate --remote` for the first
+time on the live database.
+
+## Risk register
+
+| Risk                                                                             | Mitigation                                                                                                                |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Better Auth migration loses or corrupts existing users                           | Backfill script tested against a dump of prod D1 before running on live; snapshot first                                   |
+| Cloudflare Images decision (D5) forces deploy-target change mid-migration        | Resolve D5 in Phase 0, **before** Phase 1                                                                                 |
+| `db.query.*` relational queries not auto-injected under Void's plugin            | Validate at Phase 2 with a single throwaway loader; fall back to `db.select().from(...).leftJoin(...)` rewrites           |
+| `useForm` cannot model nested-array errors (ingredient groups)                   | Verify at start of Phase 6 with a tiny prototype; fall back to top-level `form.error` if needed                           |
+| Service worker's precache manifest goes out of date under Void build output      | Verify at Phase 9; patch `tanstackSerwistPlugin` glob paths                                                               |
+| TanStack `viewTransition` UX regresses under Void Router                         | Accept temporarily; address as a follow-up using Void's view-transitions docs (`guide/pages-routing/view-transitions.md`) |
+| Production D1 migration history shape (Path A) incompatible with Void's migrator | Choose Path B (baseline reset) — recorded in [02-data-layer](./02-data-layer.spec.md#migrating-the-deployed-d1)           |
+
+## Out-of-scope follow-ups
+
+These are explicitly **not** part of the migration. They are good
+follow-up PRs:
+
+- Rewrite `docs/architecture.spec.md`, `docs/file-structure.spec.md`,
+  `docs/infrastructure/*.spec.md`, and per-feature
+  `src/features/*/spec/*.spec.md` to describe the Void-based reality.
+- Migrate Zod validators to Valibot (and drop `zod` from deps).
+- Adopt `routing.revalidate` ISR for read-heavy pages.
+- Replace inline `console.*` with `logger.*` from `void/log`.
+- Reconsider state stores: Zustand could potentially be replaced by
+  `useShared()` for genuinely global state and local component state
+  elsewhere.
+
+## "Done" checklist (mirrors [index.spec.md → Success criteria](./index.spec.md#success-criteria))
+
+- [ ] All decisions in [00-decisions.spec.md](./00-decisions.spec.md) are
+      resolved (no remaining "OPEN")
+- [ ] `vp check` and `vp test` pass on the branch
+- [ ] `vp dev` exercises every URL in
+      [05 → Route inventory](./05-routing-and-pages.spec.md#route-inventory)
+      without errors
+- [ ] Preview deployment via `void deploy --project <preview-slug>`
+      succeeds and round-trips a recipe with image upload
+- [ ] Sign-in / pending / blocked / active / admin flows all behave
+- [ ] Removed packages and the `wrangler` artefacts are gone from the
+      repo (or the D5-B retention is recorded)
+- [ ] Production D1 snapshot taken
+- [ ] Production migrated (or scheduled migration window agreed)
+- [ ] Merge commit and post-merge `void deploy` to production
