@@ -71,7 +71,7 @@
       "@commitlint/config-conventional"
     ]
   },
-  "packageManager": "pnpm@11.2.1",
+  "packageManager": "pnpm@11.2.2",
   "pnpm": {
     "overrides": {
       "vite": "npm:@voidzero-dev/vite-plus-core@latest"
