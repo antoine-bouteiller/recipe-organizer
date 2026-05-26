@@ -42,8 +42,8 @@ importers:
         specifier: 1.168.12
         version: 1.168.12(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vite@8.0.3(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@types/node@25.9.1)(esbuild@0.27.3)(jiti@2.7.0)(yaml@2.9.0))
       '@vidstack/react':
-        specifier: 1.12.13
-        version: 1.12.13(@types/react@19.2.15)(react@19.2.6)
+        specifier: 1.13.0
+        version: 1.13.0(@types/react@19.2.15)(react@19.2.6)
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -2184,8 +2184,8 @@ packages:
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
-  '@vidstack/react@1.12.13':
-    resolution: {integrity: sha512-zyNydy1+HtoK6cJ8EmqFNkPPGHIFMrr2KH+ef3654EqXx4IcJ8A5LCNMXBuALQE8IMxtk040JMoR9OKyeXjBOQ==}
+  '@vidstack/react@1.13.0':
+    resolution: {integrity: sha512-gLITjW0prge5stf8DVCTdZusDL/CZHvZKG70DZ+9u2AJWQi2DMJ5CK7LsC6sTxhbB9udDdPRGt6tbIwxzwSPMw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/react': ^18.0.0 || ^19.0.0
@@ -4936,7 +4936,7 @@ snapshots:
 
   '@types/trusted-types@2.0.7': {}
 
-  '@vidstack/react@1.12.13(@types/react@19.2.15)(react@19.2.6)':
+  '@vidstack/react@1.13.0(@types/react@19.2.15)(react@19.2.6)':
     dependencies:
       '@floating-ui/dom': 1.7.6
       '@types/react': 19.2.15
