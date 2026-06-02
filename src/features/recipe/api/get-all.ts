@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { db } from 'void/db'
 
-import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 import { getImageUrl } from '@/utils/get-file-url'
@@ -10,7 +10,7 @@ const getAllRecipes = createServerFn({
   method: 'GET',
 }).handler(
   withServerError(async () => {
-    const rows = await getDb().query.recipe.findMany({
+    const rows = await db.query.recipe.findMany({
       columns: {
         id: true,
         image: true,
@@ -18,9 +18,7 @@ const getAllRecipes = createServerFn({
         servings: true,
         tags: true,
       },
-      orderBy: {
-        name: 'asc',
-      },
+      orderBy: (fields, { asc }) => asc(fields.name),
     })
 
     return rows.map((row) => ({

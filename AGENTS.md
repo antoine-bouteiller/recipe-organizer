@@ -19,7 +19,7 @@ See the Vite+ section below for the full command reference.
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
 - **Add Shadcn components:** `vp dlx shadcn@latest add @coss/<component-name>`.
-- **DB migrations:** `pnpm migration:apply:local` (local D1) / `pnpm migration:apply:remote` (production D1).
+- **DB migrations:** `pnpm void db migrate` (local D1) / `pnpm db:migrate:remote` (production D1).
 
 ## Guidelines
 

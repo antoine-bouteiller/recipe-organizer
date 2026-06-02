@@ -1,9 +1,9 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
+import { db } from 'void/db'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 
 const getUsersListSchema = v.object({
@@ -16,11 +16,9 @@ const getUsersList = createServerFn({
   .middleware([authGuard('admin')])
   .inputValidator(getUsersListSchema)
   .handler(({ data }) =>
-    getDb().query.user.findMany({
-      orderBy: {
-        email: 'asc',
-      },
-      where: { status: data.status },
+    db.query.user.findMany({
+      orderBy: (fields, { asc }) => asc(fields.email),
+      where: (fields, { eq }) => eq(fields.status, data.status),
     })
   )
 

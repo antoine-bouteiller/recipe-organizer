@@ -1,5 +1,5 @@
 import { useSession } from '@tanstack/react-start/server'
-import { env } from 'cloudflare:workers'
+import { env } from 'void/env'
 
 export const useAppSession = () =>
   useSession({

@@ -1,16 +1,14 @@
+import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { eq, inArray } from 'drizzle-orm'
 import * as v from 'valibot'
+import { db, eq, inArray } from 'void/db'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
-import { getDb } from '@/lib/db'
-import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { deleteFile, uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
 import { isNotEmpty } from '@/utils/array'
 import { withServerError } from '@/utils/error-handler'
@@ -18,6 +16,7 @@ import { parseFormData } from '@/utils/form-data'
 
 import { type RecipeTag } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
+import { deleteFile, uploadImage, uploadVideo } from '../utils/storage'
 
 const updateRecipeSchema = v.object({ ...recipeSchema.entries, id: v.number() })
 
@@ -29,7 +28,7 @@ const resolveImageKey = async (image: UpdateRecipeFormValues['image'], currentKe
     if (currentKey) {
       await deleteFile(currentKey)
     }
-    return uploadFile(image)
+    return uploadImage(image)
   }
   return currentKey ?? ''
 }
@@ -74,8 +73,8 @@ const updateRecipe = createServerFn({
     withServerError(async ({ data, context }) => {
       const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
 
-      const currentRecipe = await getDb().query.recipe.findFirst({
-        where: { id },
+      const currentRecipe = await db.query.recipe.findFirst({
+        where: eq(recipe.id, id),
         with: {
           ingredientGroups: {
             columns: {
@@ -99,15 +98,15 @@ const updateRecipe = createServerFn({
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
-      const [ingredientCategories, linkedRecipesData] = await getDb().batch([
-        getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-        getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+      const [ingredientCategories, linkedRecipesData] = await db.batch([
+        db.select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
+        db.select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
 
       const autoTags = computeAutoTags(ingredientCategories, linkedRecipesData, instructions, tags)
 
-      await getDb().batch([
-        getDb()
+      await db.batch([
+        db
           .update(recipe)
           .set({
             image: imageKey,
@@ -119,21 +118,19 @@ const updateRecipe = createServerFn({
           })
           .where(eq(recipe.id, id))
           .returning({ id: recipe.id }),
-        getDb()
-          .delete(groupIngredient)
-          .where(
-            inArray(
-              groupIngredient.groupId,
-              currentRecipe.ingredientGroups.map(({ id: ingredientGroupId }) => ingredientGroupId)
-            )
-          ),
-        getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
-        getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
+        db.delete(groupIngredient).where(
+          inArray(
+            groupIngredient.groupId,
+            currentRecipe.ingredientGroups.map(({ id: ingredientGroupId }) => ingredientGroupId)
+          )
+        ),
+        db.delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
+        db.delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
       ])
 
       await Promise.all(
         ingredientGroups.map(async (group, index) => {
-          const [updatedGroup] = await getDb()
+          const [updatedGroup] = await db
             .insert(recipeIngredientGroup)
             .values({
               groupName: group.groupName,
@@ -143,30 +140,26 @@ const updateRecipe = createServerFn({
             .returning()
 
           if (group.ingredients.length > 0) {
-            await getDb()
-              .insert(groupIngredient)
-              .values(
-                group.ingredients.map((ingredientEntry) => ({
-                  groupId: updatedGroup.id,
-                  ingredientId: ingredientEntry.id,
-                  quantity: ingredientEntry.quantity,
-                  unitSlug: ingredientEntry.unitSlug ?? undefined,
-                }))
-              )
+            await db.insert(groupIngredient).values(
+              group.ingredients.map((ingredientEntry) => ({
+                groupId: updatedGroup.id,
+                ingredientId: ingredientEntry.id,
+                quantity: ingredientEntry.quantity,
+                unitSlug: ingredientEntry.unitSlug ?? undefined,
+              }))
+            )
           }
         })
       )
 
       if (isNotEmpty(linkedRecipes)) {
-        await getDb()
-          .insert(recipeLinkedRecipes)
-          .values(
-            linkedRecipes.map((lr) => ({
-              linkedRecipeId: lr.id,
-              ratio: lr.ratio,
-              recipeId: currentRecipe.id,
-            }))
-          )
+        await db.insert(recipeLinkedRecipes).values(
+          linkedRecipes.map((lr) => ({
+            linkedRecipeId: lr.id,
+            ratio: lr.ratio,
+            recipeId: currentRecipe.id,
+          }))
+        )
       }
 
       return id

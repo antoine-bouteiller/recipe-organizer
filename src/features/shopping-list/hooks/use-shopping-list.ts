@@ -1,7 +1,7 @@
+import { type UnitSlug } from '@schema'
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
-import { type UnitSlug } from '@/lib/db/schema/unit'
 import { useRecipeQuantitiesStore } from '@/stores/recipe-quantities.store'
 import { type IngredientCategory } from '@/types/ingredient'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'

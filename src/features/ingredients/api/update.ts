@@ -1,12 +1,11 @@
+import { ingredient } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
 import * as v from 'valibot'
+import { db, eq } from 'void/db'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
-import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
@@ -28,7 +27,7 @@ const updateIngredient = createServerFn()
     withServerError(async ({ data }) => {
       const { id, ...newIngredient } = data
 
-      await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
+      await db.update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
     })
   )
 

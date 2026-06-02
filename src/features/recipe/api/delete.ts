@@ -1,14 +1,14 @@
+import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { eq, inArray } from 'drizzle-orm'
 import * as v from 'valibot'
+import { db, eq, inArray } from 'void/db'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
-import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
-import { deleteFile } from '@/lib/r2'
 import { withServerError } from '@/utils/error-handler'
+
+import { deleteFile } from '../utils/storage'
 
 const deleteRecipeSchema = v.number()
 
@@ -19,15 +19,13 @@ const deleteRecipe = createServerFn({
   .inputValidator(deleteRecipeSchema)
   .handler(
     withServerError(async ({ data: id, context }) => {
-      const currentRecipe = await getDb().query.recipe.findFirst({
+      const currentRecipe = await db.query.recipe.findFirst({
         columns: {
           createdBy: true,
           id: true,
           image: true,
         },
-        where: {
-          id,
-        },
+        where: eq(recipe.id, id),
         with: {
           ingredientGroups: {
             columns: {
@@ -45,18 +43,16 @@ const deleteRecipe = createServerFn({
         throw new Error('Permission denied')
       }
 
-      await getDb().batch([
-        getDb()
-          .delete(groupIngredient)
-          .where(
-            inArray(
-              groupIngredient.groupId,
-              currentRecipe.ingredientGroups.map(({ id: groupId }) => groupId)
-            )
-          ),
-        getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
-        getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
-        getDb().delete(recipe).where(eq(recipe.id, id)),
+      await db.batch([
+        db.delete(groupIngredient).where(
+          inArray(
+            groupIngredient.groupId,
+            currentRecipe.ingredientGroups.map(({ id: groupId }) => groupId)
+          )
+        ),
+        db.delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
+        db.delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
+        db.delete(recipe).where(eq(recipe.id, id)),
       ])
       await deleteFile(currentRecipe.image)
     })

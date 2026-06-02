@@ -2,8 +2,8 @@ import { queryOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
+import { db } from 'void/db'
 
-import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 import { getImageUrl } from '@/utils/get-file-url'
@@ -18,13 +18,11 @@ const getRecipe = createServerFn({
   .inputValidator(getRecipeSchema)
   .handler(
     withServerError(async ({ data: id }) => {
-      const result = await getDb().query.recipe.findFirst({
-        where: { id },
+      const result = await db.query.recipe.findFirst({
+        where: (fields, { eq }) => eq(fields.id, id),
         with: {
           ingredientGroups: {
-            orderBy: {
-              isDefault: 'desc',
-            },
+            orderBy: (fields, { desc }) => desc(fields.isDefault),
             ...ingredientGroupSelect,
           },
           linkedRecipes: {
@@ -37,7 +35,7 @@ const getRecipe = createServerFn({
                 with: {
                   ingredientGroups: {
                     ...ingredientGroupSelect,
-                    where: { isDefault: true },
+                    where: (fields, { eq }) => eq(fields.isDefault, true),
                   },
                 },
               },

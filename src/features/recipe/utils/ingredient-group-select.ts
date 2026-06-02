@@ -1,4 +1,4 @@
-import { type getDb } from '@/lib/db'
+import { type db } from 'void/db'
 
 export const ingredientGroupSelect = {
   columns: {
@@ -22,4 +22,4 @@ export const ingredientGroupSelect = {
       },
     },
   },
-} satisfies Parameters<ReturnType<typeof getDb>['query']['recipeIngredientGroup']['findMany']>[0]
+} satisfies Parameters<typeof db.query.recipeIngredientGroup.findMany>[0]

@@ -1,21 +1,19 @@
+import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes, unitSlugSchema } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { inArray } from 'drizzle-orm'
 import * as v from 'valibot'
+import { db, inArray } from 'void/db'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
-import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
-import { unitSlugSchema } from '@/lib/db/schema/unit'
 import { queryKeys } from '@/lib/query-keys'
-import { uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
 import { isNotEmpty } from '@/utils/array'
 import { parseFormData } from '@/utils/form-data'
 
 import { RECIPE_TAGS, type RecipeTag } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
+import { uploadImage, uploadVideo } from '../utils/storage'
 
 const recipeSchema = v.object({
   image: v.union([v.instance(File), v.object({ id: v.string(), url: v.string() })]),
@@ -59,7 +57,7 @@ const createRecipe = createServerFn({
   .inputValidator((formData: FormData) => v.parse(recipeSchema, parseFormData(formData)))
   .handler(async ({ data, context }) => {
     const { image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
-    const imageKey = image instanceof File ? await uploadFile(image) : image.id
+    const imageKey = image instanceof File ? await uploadImage(image) : image.id
     const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
 
     const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
@@ -72,24 +70,21 @@ const createRecipe = createServerFn({
     let linkedRecipesVegetarian = true
 
     if (hasIngredients && hasLinkedRecipes) {
-      const [ingredientCategories, linkedRecipesData] = await getDb().batch([
-        getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-        getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+      const [ingredientCategories, linkedRecipesData] = await db.batch([
+        db.select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
+        db.select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
       ])
       ownIngredientsVegetarian = ingredientCategories.every(
         (ingredientItem) => ingredientItem.category !== 'meat' && ingredientItem.category !== 'fish'
       )
       linkedRecipesVegetarian = linkedRecipesData.every((recipeItem) => recipeItem.tags?.includes('vegetarian'))
     } else if (hasIngredients) {
-      const ingredientCategories = await getDb()
-        .select({ category: ingredient.category })
-        .from(ingredient)
-        .where(inArray(ingredient.id, allIngredientIds))
+      const ingredientCategories = await db.select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds))
       ownIngredientsVegetarian = ingredientCategories.every(
         (ingredientItem) => ingredientItem.category !== 'meat' && ingredientItem.category !== 'fish'
       )
     } else if (hasLinkedRecipes) {
-      const linkedRecipesData = await getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds))
+      const linkedRecipesData = await db.select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds))
       linkedRecipesVegetarian = linkedRecipesData.every((recipeItem) => recipeItem.tags?.includes('vegetarian'))
     }
 
@@ -104,7 +99,7 @@ const createRecipe = createServerFn({
       autoTags.push('magimix')
     }
 
-    const [createdRecipe] = await getDb()
+    const [createdRecipe] = await db
       .insert(recipe)
       .values({
         createdBy: context.user.id,
@@ -119,7 +114,7 @@ const createRecipe = createServerFn({
 
     await Promise.all(
       ingredientGroups.map(async (group, index) => {
-        const [createdGroup] = await getDb()
+        const [createdGroup] = await db
           .insert(recipeIngredientGroup)
           .values({
             groupName: group.groupName,
@@ -129,30 +124,26 @@ const createRecipe = createServerFn({
           .returning()
 
         if (group.ingredients.length > 0) {
-          await getDb()
-            .insert(groupIngredient)
-            .values(
-              group.ingredients.map((ingredientEntry) => ({
-                groupId: createdGroup.id,
-                ingredientId: ingredientEntry.id,
-                quantity: ingredientEntry.quantity,
-                unitSlug: ingredientEntry.unitSlug ?? undefined,
-              }))
-            )
+          await db.insert(groupIngredient).values(
+            group.ingredients.map((ingredientEntry) => ({
+              groupId: createdGroup.id,
+              ingredientId: ingredientEntry.id,
+              quantity: ingredientEntry.quantity,
+              unitSlug: ingredientEntry.unitSlug ?? undefined,
+            }))
+          )
         }
       })
     )
 
     if (isNotEmpty(linkedRecipes)) {
-      await getDb()
-        .insert(recipeLinkedRecipes)
-        .values(
-          linkedRecipes.map((lr) => ({
-            linkedRecipeId: lr.id,
-            ratio: lr.ratio,
-            recipeId: createdRecipe.id,
-          }))
-        )
+      await db.insert(recipeLinkedRecipes).values(
+        linkedRecipes.map((lr) => ({
+          linkedRecipeId: lr.id,
+          ratio: lr.ratio,
+          recipeId: createdRecipe.id,
+        }))
+      )
     }
   })
 

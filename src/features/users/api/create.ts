@@ -1,11 +1,11 @@
+import { user } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
+import { db } from 'void/db'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
-import { user } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
@@ -23,9 +23,7 @@ const createUser = createServerFn()
   .inputValidator(userSchema)
   .handler(
     withServerError(async ({ data }) => {
-      await getDb()
-        .insert(user)
-        .values({ ...data, id: crypto.randomUUID() })
+      await db.insert(user).values({ ...data, id: crypto.randomUUID() })
     })
   )
 

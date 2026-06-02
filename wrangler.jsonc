@@ -3,7 +3,6 @@
   "name": "recipe-organizer",
   "main": "@tanstack/react-start/server-entry",
   "compatibility_date": "2026-01-28",
-  "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "logs": {
       "enabled": true,
@@ -13,18 +12,21 @@
       "enabled": false,
     },
   },
-  "env": {},
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "recipe-organizer",
-      "database_id": "542863e2-5f6d-4ef7-9fd0-84b673f76f43",
-      "migrations_dir": "migrations_tmp",
+  "env": {
+    "production": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "recipe-organizer",
+          "database_id": "542863e2-5f6d-4ef7-9fd0-84b673f76f43",
+          "migrations_dir": "db/migrations",
+        },
+      ],
     },
-  ],
+  },
   "r2_buckets": [
     {
-      "binding": "R2_BUCKET",
+      "binding": "STORAGE",
       "bucket_name": "recipe-organizer",
     },
   ],

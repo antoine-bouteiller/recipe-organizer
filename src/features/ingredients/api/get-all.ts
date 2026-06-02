@@ -1,16 +1,14 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { db } from 'void/db'
 
-import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 
 const getIngredientsList = createServerFn({
   method: 'GET',
 }).handler(() =>
-  getDb().query.ingredient.findMany({
-    orderBy: {
-      name: 'asc',
-    },
+  db.query.ingredient.findMany({
+    orderBy: (fields, { asc }) => asc(fields.name),
   })
 )
 

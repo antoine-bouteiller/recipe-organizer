@@ -1,13 +1,11 @@
-import { type getDb } from '@/lib/db'
+import { type db } from 'void/db'
 
 export const ingredientGroupSelect = {
   columns: {
     groupName: true,
     id: true,
   },
-  orderBy: {
-    isDefault: 'desc',
-  },
+  orderBy: (fields, { desc }) => desc(fields.isDefault),
   with: {
     groupIngredients: {
       columns: {
@@ -15,13 +13,9 @@ export const ingredientGroupSelect = {
         quantity: true,
         unitSlug: true,
       },
-      where: {
-        ingredient: {
-          category: {
-            NOT: 'spices',
-          },
-        },
-      },
+      // Drizzle V1 rewrites table aliases on `${column}` interpolations inside `with`, so we use
+      // Literal identifiers for the subquery to keep the inner refs pointing at the real ingredients table.
+      where: (fields, { notInArray, sql }) => notInArray(fields.ingredientId, sql`(SELECT "id" FROM "ingredients" WHERE "category" = 'spices')`),
       with: {
         ingredient: {
           columns: {
@@ -37,4 +31,4 @@ export const ingredientGroupSelect = {
       },
     },
   },
-} satisfies Parameters<ReturnType<typeof getDb>['query']['recipeIngredientGroup']['findMany']>[0]
+} satisfies Parameters<typeof db.query.recipeIngredientGroup.findMany>[0]

@@ -1,7 +1,7 @@
+import { UNITS, type UnitSlug } from '@schema'
 import { useState } from 'react'
 
 import { Checkbox } from '@/components/ui/checkbox'
-import { UNITS, type UnitSlug } from '@/lib/db/schema/unit'
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
 

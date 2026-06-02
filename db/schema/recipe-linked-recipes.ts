@@ -1,6 +1,6 @@
-import { index, integer, real, sqliteTable } from 'drizzle-orm/sqlite-core'
+import { index, integer, real, sqliteTable } from 'void/schema-d1'
 
-import { recipe } from '@/lib/db/schema/recipe'
+import { recipe } from './recipe'
 
 export const recipeLinkedRecipes = sqliteTable(
   'recipe_linked_recipes',

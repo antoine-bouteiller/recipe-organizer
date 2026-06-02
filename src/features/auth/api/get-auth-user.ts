@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
+import { db } from 'void/db'
 
-import { getDb } from '@/lib/db'
 import { useAppSession } from '@/lib/session'
 import { withServerError } from '@/utils/error-handler'
 
@@ -21,8 +21,8 @@ export const getAuthUser = createServerFn({ method: 'GET' }).handler(
       return undefined
     }
 
-    const authUser = await getDb().query.user.findFirst({
-      where: { id: session.data?.userId },
+    const authUser = await db.query.user.findFirst({
+      where: (fields, { eq }) => eq(fields.id, session.data.userId),
     })
 
     if (!authUser) {

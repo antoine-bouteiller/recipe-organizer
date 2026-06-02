@@ -1,8 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
+import { db } from 'void/db'
 
-import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
@@ -18,16 +18,12 @@ const getRecipesByIds = createServerFn({
   .inputValidator(getRecipesByIdsSchema)
   .handler(
     withServerError(async ({ data }) => {
-      const rows = await getDb().query.recipe.findMany({
+      const rows = await db.query.recipe.findMany({
         columns: {
           id: true,
           servings: true,
         },
-        where: {
-          id: {
-            in: data.ids,
-          },
-        },
+        where: (fields, { inArray }) => inArray(fields.id, data.ids),
         with: {
           ingredientGroups: {
             ...ingredientGroupSelect,

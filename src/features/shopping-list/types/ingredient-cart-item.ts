@@ -1,4 +1,5 @@
-import { type UnitSlug } from '@/lib/db/schema/unit'
+import { type UnitSlug } from '@schema'
+
 import { type IngredientCategory } from '@/types/ingredient'
 
 export interface AggregatedIngredient {

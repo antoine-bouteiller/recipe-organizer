@@ -1,10 +1,10 @@
-import { cloudflare } from '@cloudflare/vite-plugin'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
+import { voidPlugin } from 'void'
 
 import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
 
@@ -108,11 +108,9 @@ const viteConfig = defineConfig({
     tsconfigPaths: true,
   },
   plugins: [
+    voidPlugin(),
     tanstackStart(),
     react(),
-    cloudflare({
-      viteEnvironment: { name: 'ssr' },
-    }),
     tailwindcss(),
     tanstackSerwistPlugin(),
     devtools({

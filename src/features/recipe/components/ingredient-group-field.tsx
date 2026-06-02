@@ -1,4 +1,5 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { unitOptions } from '@schema'
 import { useStore } from '@tanstack/react-form'
 import { Fragment } from 'react/jsx-runtime'
 
@@ -8,7 +9,6 @@ import { Separator } from '@/components/ui/separator'
 import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
-import { unitOptions } from '@/lib/db/schema/unit'
 
 import { recipeDefaultValues } from '../utils/form'
 

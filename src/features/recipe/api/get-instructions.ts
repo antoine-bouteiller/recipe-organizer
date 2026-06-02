@@ -1,8 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
+import { db } from 'void/db'
 
-import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
@@ -14,9 +14,9 @@ const getRecipeInstructions = createServerFn({
   .inputValidator(getRecipeInstructionsSchema)
   .handler(
     withServerError(async ({ data }) => {
-      const result = await getDb().query.recipe.findFirst({
+      const result = await db.query.recipe.findFirst({
         columns: { id: true, instructions: true, name: true },
-        where: { id: data },
+        where: (fields, { eq }) => eq(fields.id, data),
       })
 
       return result ?? undefined

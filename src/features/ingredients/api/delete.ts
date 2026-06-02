@@ -1,11 +1,10 @@
+import { ingredient } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
 import * as v from 'valibot'
+import { db, eq } from 'void/db'
 
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
-import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
 
@@ -19,7 +18,7 @@ const deleteIngredient = createServerFn()
   .handler(
     withServerError(async ({ data }) => {
       const { id } = data
-      await getDb().delete(ingredient).where(eq(ingredient.id, id))
+      await db.delete(ingredient).where(eq(ingredient.id, id))
     })
   )
 

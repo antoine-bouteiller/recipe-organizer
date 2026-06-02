@@ -1,12 +1,46 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, notFound } from '@tanstack/react-router'
+import * as v from 'valibot'
+import { storage } from 'void/storage'
 
-import { createR2GetHandler, createR2HeadHandler } from '@/lib/r2'
+import { cache } from '@/lib/cache-manager'
+
+const paramsSchema = v.object({ id: v.string() })
 
 export const Route = createFileRoute('/api/video/$id')({
   server: {
     handlers: {
-      GET: createR2GetHandler('video/mp4'),
-      HEAD: createR2HeadHandler('video/mp4'),
+      GET: ({ params, request }) => {
+        const { id } = v.parse(paramsSchema, params)
+        return cache.getWithCache(request.url)(async () => {
+          const file = await storage.get(id)
+          if (!file) {
+            throw notFound()
+          }
+          return new Response(file.body, {
+            headers: {
+              'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+              'Content-Type': file.httpMetadata?.contentType ?? 'video/mp4',
+            },
+          })
+        })
+      },
+      HEAD: ({ params, request }) => {
+        const { id } = v.parse(paramsSchema, params)
+        return cache.getWithCache(request.url)(async () => {
+          const file = await storage.head(id)
+          if (!file) {
+            throw notFound()
+          }
+          return new Response(null, {
+            headers: {
+              'Accept-Ranges': 'bytes',
+              'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+              'Content-Length': file.size.toString(),
+              'Content-Type': file.httpMetadata?.contentType ?? 'video/mp4',
+            },
+          })
+        })
+      },
     },
   },
 })

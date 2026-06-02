@@ -1,9 +1,9 @@
+import { user } from '@schema'
 import { redirect } from '@tanstack/react-router'
 import { createServerFn, createServerOnlyFn } from '@tanstack/react-start'
-import { env } from 'cloudflare:workers'
+import { db, eq } from 'void/db'
+import { env } from 'void/env'
 
-import { getDb } from '@/lib/db'
-import { user } from '@/lib/db/schema'
 import { useAppSession, useOAuthSession } from '@/lib/session'
 
 import { type AuthError } from './constants'
@@ -117,10 +117,8 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
   }
 
   // Find or create user
-  const existingUser = await getDb().query.user.findFirst({
-    where: {
-      email: userInfo.email,
-    },
+  const existingUser = await db.query.user.findFirst({
+    where: eq(user.email, userInfo.email),
   })
 
   if (!existingUser) {
@@ -131,7 +129,7 @@ export const handleGoogleCallback = createServerOnlyFn(async (code: string, stat
       role: 'user' as const,
       status: 'pending' as const,
     }
-    await getDb().insert(user).values(newUser)
+    await db.insert(user).values(newUser)
     throw redirectWithError('account_pending')
   }
 

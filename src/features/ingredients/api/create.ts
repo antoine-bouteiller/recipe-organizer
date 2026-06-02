@@ -1,12 +1,11 @@
+import { ingredient, ingredientCategory, unitSlugSchema } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
+import { db } from 'void/db'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
-import { getDb } from '@/lib/db'
-import { ingredient, ingredientCategory } from '@/lib/db/schema'
-import { unitSlugSchema } from '@/lib/db/schema/unit'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
@@ -42,7 +41,7 @@ const createIngredient = createServerFn()
   .inputValidator(ingredientSchema)
   .handler(
     withServerError(async ({ data }) => {
-      await getDb().insert(ingredient).values(data)
+      await db.insert(ingredient).values(data)
     })
   )
 
