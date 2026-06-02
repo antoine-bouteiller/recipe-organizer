@@ -18,10 +18,19 @@ interface IngredientFormProps {
 
 const unitPickerItems = [{ label: 'Aucune', value: '' }, ...unitOptions]
 
+const addNewIngredient = (inputValue: string) => (
+  <AddIngredient defaultValue={inputValue} key={inputValue}>
+    <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
+      <PlusIcon aria-hidden="true" className="size-4" />
+      Nouvel ingrédient: {inputValue}
+    </Button>
+  </AddIngredient>
+)
+
 export const IngredientGroupField = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as IngredientFormProps,
-  render: function Render({ form, groupIndex }) {
+  render: ({ form, groupIndex }) => {
     const { AppField } = form
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
@@ -39,14 +48,7 @@ export const IngredientGroupField = withForm({
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
-                          addNew={(inputValue) => (
-                            <AddIngredient defaultValue={inputValue} key={inputValue}>
-                              <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
-                                <PlusIcon aria-hidden="true" className="size-4" />
-                                Nouvel ingrédient: {inputValue}
-                              </Button>
-                            </AddIngredient>
-                          )}
+                          addNew={addNewIngredient}
                           disabled={isSubmitting}
                           options={ingredientsOptions}
                           placeholder="Sélectionner un ingrédient"

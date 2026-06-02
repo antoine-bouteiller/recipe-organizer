@@ -16,7 +16,7 @@ export const userDefaultValues: UserFormInput = {
 
 export const UserForm = withForm({
   defaultValues: userDefaultValues,
-  render: function Render({ form }) {
+  render: ({ form }) => {
     const { AppField } = form
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
 
