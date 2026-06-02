@@ -31,7 +31,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
   withForm({
     defaultValues,
     props: {} as FormModalProps,
-    render: function Render({ children, form, open, setOpen, submitLabel, title, trigger }) {
+    render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
       const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
 
       return (

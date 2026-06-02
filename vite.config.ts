@@ -90,6 +90,7 @@ const viteConfig = defineConfig({
       'group-exports': 'off',
       'consistent-type-specifier-style': ['error', 'prefer-inline'],
       'exports-last': 'off',
+      'no-underscore-dangle': 'off',
     },
   },
   fmt: {

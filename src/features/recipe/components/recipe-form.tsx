@@ -32,7 +32,7 @@ interface RecipeFormProps extends Record<string, unknown> {
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
-  render: function Render({ form, initialImage, initialVideo, id }) {
+  render: ({ form, initialImage, initialVideo, id }) => {
     const { AppField, Field } = form
 
     const isSubmitting = useStore(form.store, (state) => state.isSubmitting)

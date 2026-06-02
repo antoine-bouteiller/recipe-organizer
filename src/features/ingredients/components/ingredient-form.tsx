@@ -19,7 +19,7 @@ const preferredUnitOptions = [{ label: 'Aucune', value: '' }, ...unitOptions]
 
 export const IngredientForm = withForm({
   defaultValues: ingredientDefaultValues,
-  render: function Render({ form }) {
+  render: ({ form }) => {
     const { AppField } = form
     const ingredientOptions = useIngredientOptions({ allowEmpty: true })
 

@@ -1,5 +1,6 @@
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import '@tanstack/react-start/client-only'
+
 import { Button } from '@/components/ui/button'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
 

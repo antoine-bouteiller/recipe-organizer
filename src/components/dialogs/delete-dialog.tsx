@@ -28,6 +28,8 @@ interface DeleteDialogProps {
   trigger?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
 }
 
+const DefaultTrigger = <Button size="icon" variant="destructive" />
+
 export const DeleteDialog = ({
   actionLabel = 'Supprimer',
   deleteButtonLabel,
@@ -37,7 +39,7 @@ export const DeleteDialog = ({
   onOpenChange: onOpenChangeProp,
   open: openProp,
   title,
-  trigger = <Button size="icon" variant="destructive" />,
+  trigger = DefaultTrigger,
 }: DeleteDialogProps) => {
   const TriggerIcon = icon ?? TrashIcon
   const [internalOpen, setInternalOpen] = useState(false)
