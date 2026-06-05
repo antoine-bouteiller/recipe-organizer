@@ -16,7 +16,7 @@ interface IngredientFormProps {
   groupIndex: number
 }
 
-const unitPickerItems = [{ label: 'Aucune', value: '' }, ...unitOptions]
+const unitPickerItems = [{ label: 'Aucune', value: null }, ...unitOptions]
 
 const addNewIngredient = (inputValue: string) => (
   <AddIngredient defaultValue={inputValue} key={inputValue}>

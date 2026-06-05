@@ -5,23 +5,23 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '../
 
 interface SelectFieldProps {
   disabled?: boolean
-  items: { label: string; value: string }[]
+  items: { label: string; value: string | null }[]
   label?: string
 }
 
 const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
-  const field = useFieldContext<string | undefined>()
+  const field = useFieldContext<string | null | undefined>()
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       {label && <FieldLabel>{label}</FieldLabel>}
-      <Select disabled={disabled} items={items} onValueChange={(value) => field.setValue(value ?? undefined)} value={field.store.state.value}>
+      <Select disabled={disabled} items={items} onValueChange={(value) => field.setValue(value ?? undefined)} value={field.store.state.value ?? null}>
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
           {items.map(({ label: itemLabel, value }) => (
-            <SelectItem className="justify-start" key={value} value={value}>
+            <SelectItem className="justify-start" key={value ?? 'none'} value={value}>
               {itemLabel}
             </SelectItem>
           ))}
