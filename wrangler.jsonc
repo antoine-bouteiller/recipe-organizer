@@ -13,7 +13,6 @@
       "enabled": false,
     },
   },
-  "env": {},
   "d1_databases": [
     {
       "binding": "DB",
