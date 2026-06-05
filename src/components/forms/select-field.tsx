@@ -1,7 +1,7 @@
 import { useFieldContext } from '@/hooks/use-form-context'
 
 import { Field, FieldError, FieldLabel } from '../ui/field'
-import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '../ui/select'
+import { ResponsiveSelect } from '../ui/responsive-select'
 
 interface SelectFieldProps {
   disabled?: boolean
@@ -15,18 +15,13 @@ const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       {label && <FieldLabel>{label}</FieldLabel>}
-      <Select disabled={disabled} items={items} onValueChange={(value) => field.setValue(value ?? undefined)} value={field.store.state.value ?? null}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectPopup>
-          {items.map(({ label: itemLabel, value }) => (
-            <SelectItem className="justify-start" key={value ?? 'none'} value={value}>
-              {itemLabel}
-            </SelectItem>
-          ))}
-        </SelectPopup>
-      </Select>
+      <ResponsiveSelect
+        disabled={disabled}
+        items={items}
+        onValueChange={(value) => field.setValue(value ?? undefined)}
+        title={label}
+        value={field.store.state.value ?? null}
+      />
       <FieldError />
     </Field>
   )

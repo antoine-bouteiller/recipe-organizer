@@ -76,9 +76,9 @@ Contributors and AI agents implementing or modifying the search/filter page and 
   candidate are normalized identically before comparison).
 - **REQ-004**: An empty query (after trimming) MUST NOT restrict results by text (it matches every recipe).
 - **REQ-005**: The tag filter MUST allow selecting zero or more tags from the union of `RECIPE_TAGS` and `AUTO_TAGS`,
-  each rendered with its `RECIPE_TAG_LABELS` label, as a multi-select bound to component-local state. The control is a
-  clickable chip (the collapsible content) that opens a responsive multi-select via `ResponsivePopover` — a popover on
-  desktop and a drawer on mobile (`useIsMobile`); selecting a tag toggles it without closing the surface.
+  each rendered with its `RECIPE_TAG_LABELS` label, as a multi-select bound to component-local state. The control (the
+  collapsible content) is a shared `ResponsiveSelect` in `multiple` mode — a Select popover on desktop and a drawer on
+  mobile (`useIsMobile`) — whose trigger always shows the selected values (comma-joined) or the placeholder when empty.
 - **REQ-006**: When one or more tags are selected, a recipe MUST match only if its `tags` array contains **every**
   selected tag (AND semantics). When no tag is selected, the tag predicate matches every recipe.
 - **REQ-007**: When filters are active, the content area MUST show the recipes satisfying BOTH the query predicate and
@@ -129,9 +129,9 @@ Contributors and AI agents implementing or modifying the search/filter page and 
 - **GUD-001**: Derive the tag toggle items from `RECIPE_TAGS`/`AUTO_TAGS` + `RECIPE_TAG_LABELS`; do not hardcode tag
   lists in the search components.
 - **GUD-002**: Build the category control by reusing existing primitives: `Collapsible` (`@/components/ui/collapsible`)
-  for the reveal, a `Badge` chip as the `ResponsivePopover` trigger, and `ResponsivePopover`
-  (`@/components/ui/responsive-popover`) for the responsive popover/drawer multi-select. Reuse `SearchInput`,
-  `ScreenLayout`, and `Item`/`ItemGroup` for the rest. Do not use form-bound wrappers (`ToggleGroupField`).
+  for the reveal and the shared `ResponsiveSelect` (`@/components/ui/responsive-select`) in `multiple` mode for the
+  multi-select itself (Select popover on desktop, drawer on mobile). Reuse `SearchInput`, `ScreenLayout`, and
+  `Item`/`ItemGroup` for the rest. Do not use form-bound wrappers (`ToggleGroupField`).
 - **GUD-003**: Keep the pure matching/normalization logic in `src/features/search/utils/` so it is unit-testable
   without React or the DB.
 - **GUD-004**: Memoize the filtered result derivation (`useMemo`) keyed on `[recipes, query, tags]` to avoid
@@ -279,7 +279,7 @@ src/features/search/
   components/
     search-page.tsx           // composes layout, filters, content area
     search-filters.tsx        // search input + filter button revealing the category chip (Collapsible)
-    category-select.tsx       // chip trigger + responsive multi-select (ResponsivePopover: popover/drawer)
+    category-select.tsx       // multi-select of categories via shared ResponsiveSelect (popover/drawer)
     search-results.tsx        // filtered results or empty state (clear-all action)
     recent-recipes.tsx        // ClientOnly wrapper (skeleton fallback) — server-safe
     recent-recipes-content.tsx// client-only: reads store, resolves recents, fallback to catalogue
