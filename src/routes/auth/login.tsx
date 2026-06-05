@@ -1,10 +1,11 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { ArrowLeftIcon } from '@phosphor-icons/react'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardDescription, CardHeader, CardPanel, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardFooter, CardHeader, CardPanel, CardTitle } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
@@ -48,6 +49,12 @@ const LoginPage = () => {
             Google
           </Button>
         </CardPanel>
+        <CardFooter className="justify-center">
+          <Button render={<Link to="/" />} size="sm" variant="ghost">
+            <ArrowLeftIcon className="h-4 w-4" />
+            Retour à l&apos;accueil
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   )
