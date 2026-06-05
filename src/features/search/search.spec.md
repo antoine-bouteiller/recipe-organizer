@@ -67,16 +67,18 @@ Contributors and AI agents implementing or modifying the search/filter page and 
 ### 3.1 Functional Requirements
 
 - **REQ-001**: The route `/search` MUST render a search input, a tag filter control, and a content area within the
-  standard `ScreenLayout` (`title="Rechercher"`, `pageKey="/search"`). The input and tag control are always visible;
-  the content area swaps between recents, filtered results, and the empty state.
+  standard `ScreenLayout` (`title="Rechercher"`, `pageKey="/search"`). The search input is always visible with a filter
+  button beside it; that button toggles a `Collapsible` revealing the category-select chip. The content area swaps
+  between recents, filtered results, and the empty state.
 - **REQ-002**: The query MUST match a recipe when the normalized query is a substring of the recipe's normalized
   `name`. (Ingredient-name matching is deferred; see §1.3 / §11.)
 - **REQ-003**: Text matching MUST be case-insensitive AND accent/diacritic-insensitive in both directions (query and
   candidate are normalized identically before comparison).
 - **REQ-004**: An empty query (after trimming) MUST NOT restrict results by text (it matches every recipe).
 - **REQ-005**: The tag filter MUST allow selecting zero or more tags from the union of `RECIPE_TAGS` and `AUTO_TAGS`,
-  each rendered with its `RECIPE_TAG_LABELS` label, using the base `ToggleGroup`/`Toggle` primitive in `multiple` mode
-  bound to component-local state.
+  each rendered with its `RECIPE_TAG_LABELS` label, as a multi-select bound to component-local state. The control is a
+  clickable chip (the collapsible content) that opens a responsive multi-select via `ResponsivePopover` — a popover on
+  desktop and a drawer on mobile (`useIsMobile`); selecting a tag toggles it without closing the surface.
 - **REQ-006**: When one or more tags are selected, a recipe MUST match only if its `tags` array contains **every**
   selected tag (AND semantics). When no tag is selected, the tag predicate matches every recipe.
 - **REQ-007**: When filters are active, the content area MUST show the recipes satisfying BOTH the query predicate and
@@ -126,9 +128,10 @@ Contributors and AI agents implementing or modifying the search/filter page and 
 
 - **GUD-001**: Derive the tag toggle items from `RECIPE_TAGS`/`AUTO_TAGS` + `RECIPE_TAG_LABELS`; do not hardcode tag
   lists in the search components.
-- **GUD-002**: Build the tag control from the base `ToggleGroup`/`Toggle` primitive (`@/components/ui/toggle-group`)
-  with local state — NOT `ToggleGroupField`, which is a form-bound wrapper. Reuse `SearchInput`, `ScreenLayout`, and
-  `Item`/`ItemGroup` for the rest.
+- **GUD-002**: Build the category control by reusing existing primitives: `Collapsible` (`@/components/ui/collapsible`)
+  for the reveal, a `Badge` chip as the `ResponsivePopover` trigger, and `ResponsivePopover`
+  (`@/components/ui/responsive-popover`) for the responsive popover/drawer multi-select. Reuse `SearchInput`,
+  `ScreenLayout`, and `Item`/`ItemGroup` for the rest. Do not use form-bound wrappers (`ToggleGroupField`).
 - **GUD-003**: Keep the pure matching/normalization logic in `src/features/search/utils/` so it is unit-testable
   without React or the DB.
 - **GUD-004**: Memoize the filtered result derivation (`useMemo`) keyed on `[recipes, query, tags]` to avoid
@@ -274,18 +277,26 @@ const content = hasActiveFilters(filters)
 ```
 src/features/search/
   components/
-    search-page.tsx        // composes layout, input, tag filter, content area
-    tag-filter.tsx         // base ToggleGroup/Toggle, local state
-    search-results.tsx     // ItemGroup list + per-row Link (records recent on activate)
-    recent-recipes.tsx     // ClientOnly "Recherches récentes" section (skeleton fallback)
+    search-page.tsx           // composes layout, filters, content area
+    search-filters.tsx        // search input + filter button revealing the category chip (Collapsible)
+    category-select.tsx       // chip trigger + responsive multi-select (ResponsivePopover: popover/drawer)
+    search-results.tsx        // filtered results or empty state (clear-all action)
+    recent-recipes.tsx        // ClientOnly wrapper (skeleton fallback) — server-safe
+    recent-recipes-content.tsx// client-only: reads store, resolves recents, fallback to catalogue
+    recipe-list.tsx           // client-only: ItemGroup of per-row Links (records recent on activate)
   utils/
-    filter.ts              // matchesQuery / matchesTags / filterRecipes
-    normalize.ts           // normalize()
-  search.spec.md           // this file (single-file feature spec, REQ-013 of file-structure spec)
+    filter.ts                 // matchesQuery / matchesTags / filterRecipes
+    normalize.ts              // normalize()
+  search.spec.md              // this file (single-file feature spec, REQ-013 of file-structure spec)
 
 src/stores/
-  recent-recipes.store.ts  // useRecentRecipesStore (persisted, ids only) — see §4.7
+  recent-recipes.store.ts     // useRecentRecipesStore (persisted, ids only) — see §4.7
 ```
+
+> Client-only boundary: any module that statically imports the persisted store (`recipe-list.tsx`,
+> `recent-recipes-content.tsx`) MUST begin with `import '@tanstack/react-start/client-only'` and be rendered only
+> inside `<ClientOnly>`, so it is dropped from the server bundle (mirrors `quantity-controls.tsx`). The results branch
+> is therefore wrapped in `<ClientOnly>` in `search-page.tsx`; active filters only ever occur after hydration.
 
 > Note: per file-structure REQ-013 this single-file feature spec lives at `src/features/search/search.spec.md`. If the
 > feature later grows multiple specs, it MAY move to `src/features/search/spec/index.spec.md` plus sub-specs.

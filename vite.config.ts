@@ -8,6 +8,8 @@ import { defineConfig } from 'vite-plus'
 
 import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
 
+const isTest = Boolean(process.env.VITEST)
+
 const viteConfig = defineConfig({
   staged: { '*': 'vp check --fix' },
   lint: {
@@ -110,11 +112,9 @@ const viteConfig = defineConfig({
   plugins: [
     tanstackStart(),
     react(),
-    cloudflare({
-      viteEnvironment: { name: 'ssr' },
-    }),
+    ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),
     tailwindcss(),
-    tanstackSerwistPlugin(),
+    ...(isTest ? [] : [tanstackSerwistPlugin()]),
     devtools({
       injectSource: { enabled: false },
     }),
@@ -122,6 +122,9 @@ const viteConfig = defineConfig({
   ],
   server: {
     port: 3000,
+  },
+  test: {
+    include: ['src/**/*.test.ts'],
   },
 })
 
