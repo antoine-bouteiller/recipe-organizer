@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
 
-import { Skeleton } from '@/components/common/skeleton'
 import { ScreenLayout } from '@/components/layout/screen-layout'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ResetCartButton } from '@/features/shopping-list/component/reset-cart-button'
 import { ShoppingList } from '@/features/shopping-list/component/shopping-list'
 import { incrementalArray } from '@/utils/array'

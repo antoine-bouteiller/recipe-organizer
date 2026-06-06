@@ -1,6 +1,6 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/common/input-group'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 
 interface InputProps {
   autoFocus?: boolean

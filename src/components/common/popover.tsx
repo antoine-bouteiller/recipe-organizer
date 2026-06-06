@@ -1,74 +1,34 @@
-import { type Popover as PopoverPrimitive } from '@base-ui/react/popover'
-import { createContext, useContext, type ReactNode } from 'react'
+import { type ReactElement, type ReactNode } from 'react'
 
-import { Drawer, DrawerPopup, DrawerTrigger, type DrawerPrimitive } from '@/components/ui/drawer'
-import { PopoverContent as PopoverContentPrimitive, Popover as PopoverRoot, PopoverTrigger as PopoverTriggerPrimitive } from '@/components/ui/popover'
+import { Drawer as DrawerRoot, DrawerPopup, DrawerTrigger } from '@/components/ui/drawer'
+import { PopoverContent, Popover as PopoverRoot, PopoverTrigger } from '@/components/ui/popover'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
-interface PopoverContextValue {
-  isMobile: boolean
-}
-
-const PopoverContext = createContext<PopoverContextValue>({
-  isMobile: false,
-})
-
-const usePopoverContext = () => {
-  const context = useContext(PopoverContext)
-  if (!context) {
-    throw new Error('usePopoverContext must be used within a Popover')
-  }
-  return context
-}
-
 interface PopoverProps {
-  children?: ReactNode
+  trigger: ReactElement
+  children: ReactNode
+  open?: boolean
   defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
-  open?: boolean
+  contentClassName?: string
 }
 
-const PopoverComponent = ({ ...props }: PopoverProps) => {
+export const Popover = ({ trigger, children, open, defaultOpen, onOpenChange, contentClassName }: PopoverProps): ReactElement => {
   const isMobile = useIsMobile()
 
   if (isMobile) {
     return (
-      <PopoverContext.Provider value={{ isMobile }}>
-        <Drawer {...props} />
-      </PopoverContext.Provider>
+      <DrawerRoot defaultOpen={defaultOpen} onOpenChange={onOpenChange} open={open}>
+        <DrawerTrigger render={trigger} />
+        <DrawerPopup className={contentClassName}>{children}</DrawerPopup>
+      </DrawerRoot>
     )
   }
 
   return (
-    <PopoverContext.Provider value={{ isMobile }}>
-      <PopoverRoot {...props} />
-    </PopoverContext.Provider>
+    <PopoverRoot defaultOpen={defaultOpen} onOpenChange={onOpenChange ? (next) => onOpenChange(next) : undefined} open={open}>
+      <PopoverTrigger render={trigger} />
+      <PopoverContent className={contentClassName}>{children}</PopoverContent>
+    </PopoverRoot>
   )
 }
-
-const PopoverTrigger = ({ ...props }: DrawerPrimitive.Trigger.Props & PopoverPrimitive.Trigger.Props) => {
-  const { isMobile } = usePopoverContext()
-
-  if (isMobile) {
-    return <DrawerTrigger {...props} />
-  }
-
-  return <PopoverTriggerPrimitive {...props} />
-}
-
-const PopoverContent = (props: PopoverPrimitive.Popup.Props & DrawerPrimitive.Content.Props) => {
-  const { isMobile } = usePopoverContext()
-
-  if (isMobile) {
-    return <DrawerPopup {...props} />
-  }
-
-  return <PopoverContentPrimitive {...props} />
-}
-
-const Popover = Object.assign(PopoverComponent, {
-  Content: PopoverContent,
-  Trigger: PopoverTrigger,
-})
-
-export { Popover }

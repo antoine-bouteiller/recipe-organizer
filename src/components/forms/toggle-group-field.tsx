@@ -1,5 +1,5 @@
-import { Field } from '@/components/common/field'
 import { ToggleGroup } from '@/components/common/toggle-group'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface ToggleGroupFieldProps {
@@ -20,9 +20,9 @@ export const ToggleGroupField = ({ className, disabled, items, label }: ToggleGr
       name={field.name}
       touched={field.state.meta.isTouched}
     >
-      {label && <Field.Label>{label}</Field.Label>}
+      {label && <FieldLabel>{label}</FieldLabel>}
       <ToggleGroup disabled={disabled} items={items} onValueChange={(value) => field.handleChange(value)} value={field.state.value ?? []} />
-      <Field.Error />
+      <FieldError />
     </Field>
   )
 }

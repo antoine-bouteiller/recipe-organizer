@@ -1,8 +1,8 @@
 import { ProhibitIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 
-import { Button } from '@/components/common/button'
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
+import { Button } from '@/components/ui/button'
 import { blockUserOptions } from '@/features/users/api/block'
 
 interface BlockUserProps {

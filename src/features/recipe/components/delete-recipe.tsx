@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 
-import { Button } from '@/components/common/button'
-import { toastManager } from '@/components/common/toast'
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
+import { Button } from '@/components/ui/button'
+import { toastManager } from '@/components/ui/toast'
 import { deleteRecipeOptions } from '@/features/recipe/api/delete'
 
 interface DeleteRecipeProps {

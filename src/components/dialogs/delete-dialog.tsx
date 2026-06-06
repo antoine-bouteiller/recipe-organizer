@@ -1,9 +1,9 @@
 import { TrashIcon } from '@phosphor-icons/react'
-import { useState, useTransition, type ComponentPropsWithoutRef, type ElementType } from 'react'
+import { cloneElement, useState, useTransition, type ElementType, type ReactElement } from 'react'
 
-import { Button } from '@/components/common/button'
 import { Dialog } from '@/components/common/dialog'
-import { Spinner } from '@/components/common/spinner'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 
 interface DeleteDialogProps {
   actionLabel?: string
@@ -14,7 +14,7 @@ interface DeleteDialogProps {
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title: string
-  trigger?: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
+  trigger?: ReactElement
 }
 
 const DefaultTrigger = <Button size="icon" variant="destructive" />
@@ -49,25 +49,30 @@ export const DeleteDialog = ({
     })
   }
 
-  return (
-    <Dialog onOpenChange={setIsOpen} open={isOpen}>
-      {!isControlled && (
-        <Dialog.Trigger render={trigger}>
+  const triggerNode = isControlled
+    ? undefined
+    : cloneElement(
+        trigger,
+        undefined,
+        <>
           <TriggerIcon /> {deleteButtonLabel}
-        </Dialog.Trigger>
-      )}
-      <Dialog.Popup>
-        <Dialog.Header>
-          <Dialog.Title>{title}</Dialog.Title>
-        </Dialog.Header>
-        <Dialog.Panel>{description}</Dialog.Panel>
-        <Dialog.Footer>
-          <Dialog.Close render={<Button variant="outline" />}>Annuler</Dialog.Close>
-          <Button disabled={isLoading} onClick={handleDelete} variant="destructive">
-            {isLoading && <Spinner />} {actionLabel}
-          </Button>
-        </Dialog.Footer>
-      </Dialog.Popup>
+        </>
+      )
+
+  return (
+    <Dialog
+      cancelLabel="Annuler"
+      footer={
+        <Button disabled={isLoading} onClick={handleDelete} variant="destructive">
+          {isLoading && <Spinner />} {actionLabel}
+        </Button>
+      }
+      onOpenChange={setIsOpen}
+      open={isOpen}
+      title={title}
+      trigger={triggerNode}
+    >
+      {description}
     </Dialog>
   )
 }

@@ -1,4 +1,4 @@
-import { Badge } from '@/components/common/badge'
+import { Badge } from '@/components/ui/badge'
 import { type IngredientCategory } from '@/types/ingredient'
 import { cn } from '@/utils/cn'
 

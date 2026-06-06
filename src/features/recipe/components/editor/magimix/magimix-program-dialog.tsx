@@ -1,8 +1,7 @@
 import { revalidateLogic, useStore } from '@tanstack/react-form'
-import { useState, type ComponentPropsWithoutRef } from 'react'
+import { useState, type ReactElement } from 'react'
 import { z } from 'zod'
 
-import { type Dialog } from '@/components/common/dialog'
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -13,7 +12,7 @@ interface MagimixProgramDialogProps {
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
-  triggerRender?: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
+  triggerRender?: ReactElement
 }
 
 const magimixProgramSchema = z.object({

@@ -1,6 +1,6 @@
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/common/button'
+import { Button } from '@/components/ui/button'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'

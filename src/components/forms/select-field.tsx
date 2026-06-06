@@ -1,5 +1,5 @@
-import { Field } from '@/components/common/field'
 import { Select } from '@/components/common/select'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface SelectFieldProps {
@@ -13,7 +13,7 @@ const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
-      {label && <Field.Label>{label}</Field.Label>}
+      {label && <FieldLabel>{label}</FieldLabel>}
       <Select
         disabled={disabled}
         items={items}
@@ -21,7 +21,7 @@ const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
         title={label}
         value={field.store.state.value ?? null}
       />
-      <Field.Error />
+      <FieldError />
     </Field>
   )
 }

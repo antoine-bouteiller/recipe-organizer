@@ -1,5 +1,5 @@
-import { Field } from '@/components/common/field'
 import { NumberInput } from '@/components/common/number-input'
+import { Field, FieldError } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface NumberFieldProps {
@@ -34,7 +34,7 @@ export const NumberField = ({ allowDecimals = false, disabled, label, max, min, 
         step={allowDecimals ? 0.25 : 1}
         value={field.state.value}
       />
-      <Field.Error />
+      <FieldError />
     </Field>
   )
 }

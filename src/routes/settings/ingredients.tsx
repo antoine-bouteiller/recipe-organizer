@@ -3,10 +3,11 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
-import { Button } from '@/components/common/button'
 import { Item } from '@/components/common/item'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
+import { Button } from '@/components/ui/button'
+import { ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/components/delete-ingredient'
@@ -42,30 +43,33 @@ const IngredientsManagement = () => {
             {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
           </p>
         ) : (
-          <Item.Group>
+          <ItemGroup>
             {filteredIngredients.map((ingredient, index) => (
               <React.Fragment key={ingredient.id}>
-                <Item className="flex-nowrap">
-                  <Item.Content>
-                    <Item.Title>
+                <Item
+                  actions={
+                    isAdmin ? (
+                      <>
+                        <EditIngredient ingredient={ingredient} />
+                        <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
+                      </>
+                    ) : undefined
+                  }
+                  className="flex-nowrap"
+                  title={
+                    <>
                       <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
                       <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
                         {ingredientCategoryIcons[ingredient.category]}
                         <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
                       </IngredientBadge>
-                    </Item.Title>
-                  </Item.Content>
-                  {isAdmin && (
-                    <Item.Actions>
-                      <EditIngredient ingredient={ingredient} />
-                      <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
-                    </Item.Actions>
-                  )}
-                </Item>
-                {index !== filteredIngredients.length - 1 && <Item.Separator />}
+                    </>
+                  }
+                />
+                {index !== filteredIngredients.length - 1 && <ItemSeparator />}
               </React.Fragment>
             ))}
-          </Item.Group>
+          </ItemGroup>
         )}
       </div>
     </ScreenLayout>

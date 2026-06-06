@@ -16,7 +16,7 @@ import {
 } from 'lexical'
 
 import { Editor, EditorContent } from '@/components/common/editor'
-import { Spinner } from '@/components/common/spinner'
+import { Spinner } from '@/components/ui/spinner'
 import { getRecipeInstructionsOptions } from '@/features/recipe/api/get-instructions'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 

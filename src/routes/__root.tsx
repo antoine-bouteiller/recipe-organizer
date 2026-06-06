@@ -6,9 +6,9 @@ import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanst
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { useEffect } from 'react'
 
-import { ToastProvider } from '@/components/common/toast'
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
+import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/features/auth/api/get-auth-user'
 import { getTheme } from '@/lib/theme'
 

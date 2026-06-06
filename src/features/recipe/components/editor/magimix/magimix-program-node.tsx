@@ -14,7 +14,7 @@ import {
   type Spread,
 } from 'lexical'
 
-import { Item } from '@/components/common/item'
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
 import { magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'
 
@@ -86,12 +86,12 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
 
   const content = (
     <>
-      <Item.Media>
+      <ItemMedia>
         <img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />
-      </Item.Media>
-      <Item.Content>
-        <Item.Title>{label}</Item.Title>
-        <Item.Description className="not-prose my-0 flex items-center gap-1">
+      </ItemMedia>
+      <ItemContent>
+        <ItemTitle>{label}</ItemTitle>
+        <ItemDescription className="not-prose my-0 flex items-center gap-1">
           <TimerIcon className="size-4" />
           <span>{formatTime(time)}</span>/
           <SpinnerGapIcon className="size-4" />
@@ -99,8 +99,8 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
           /
           <ThermometerIcon className="size-4" />
           <span>{temperature ?? '__'}°C</span>
-        </Item.Description>
-      </Item.Content>
+        </ItemDescription>
+      </ItemContent>
     </>
   )
 

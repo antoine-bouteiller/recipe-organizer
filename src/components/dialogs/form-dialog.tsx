@@ -1,19 +1,18 @@
 import { useStore } from '@tanstack/react-form'
-import { type ComponentPropsWithoutRef } from 'react'
+import { type ReactElement, type ReactNode } from 'react'
 
-import { Button } from '@/components/common/button'
 import { Dialog } from '@/components/common/dialog'
-import { Form } from '@/components/common/form'
+import { Form } from '@/components/ui/form'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
 
 interface FormModalProps {
-  children: React.ReactNode
+  children: ReactNode
   open: boolean
   setOpen: (open: boolean) => void
   submitLabel: string
   title: string
-  trigger: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
+  trigger?: ReactElement
 }
 
 export const getFormDialog = <TValues,>(defaultValues: TValues) =>
@@ -24,10 +23,10 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
       const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
 
       return (
-        <Dialog onOpenChange={setOpen} open={open}>
-          <Dialog.Trigger render={trigger} />
-
-          <Dialog.Popup>
+        <Dialog
+          cancelDisabled={form.state.isSubmitting}
+          cancelLabel="Annuler"
+          contentRender={(content) => (
             <Form
               className="contents"
               errors={errors}
@@ -37,18 +36,21 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
                 await form.handleSubmit()
               }}
             >
-              <Dialog.Header>
-                <Dialog.Title>{title}</Dialog.Title>
-              </Dialog.Header>
-              <Dialog.Panel className="flex flex-col gap-4">{children}</Dialog.Panel>
-              <Dialog.Footer>
-                <Dialog.Close render={<Button disabled={form.state.isSubmitting} variant="outline" />}>Annuler</Dialog.Close>
-                <form.AppForm>
-                  <form.FormSubmit label={submitLabel} />
-                </form.AppForm>
-              </Dialog.Footer>
+              {content}
             </Form>
-          </Dialog.Popup>
+          )}
+          footer={
+            <form.AppForm>
+              <form.FormSubmit label={submitLabel} />
+            </form.AppForm>
+          }
+          onOpenChange={setOpen}
+          open={open}
+          panelClassName="flex flex-col gap-4"
+          title={title}
+          trigger={trigger}
+        >
+          {children}
         </Dialog>
       )
     },

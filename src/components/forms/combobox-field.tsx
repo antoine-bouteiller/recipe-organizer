@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 
 import { Combobox } from '@/components/common/combobox'
-import { Field } from '@/components/common/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { type Option } from '@/hooks/use-options'
 
@@ -44,7 +44,7 @@ const ComboboxField = <TValue extends ValueOptions>({
       name={field.name}
       touched={field.state.meta.isTouched}
     >
-      {label && <Field.Label>{label}</Field.Label>}
+      {label && <FieldLabel>{label}</FieldLabel>}
       <Combobox
         addNew={addNew}
         disabled={disabled}
@@ -56,7 +56,7 @@ const ComboboxField = <TValue extends ValueOptions>({
         title={label ?? placeholder}
         value={field.store.state.value}
       />
-      <Field.Error />
+      <FieldError />
     </Field>
   )
 }

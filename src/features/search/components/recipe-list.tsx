@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { Fragment } from 'react/jsx-runtime'
 
 import { Item } from '@/components/common/item'
+import { ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { type ReducedRecipe } from '@/features/recipe/api/get-all'
 import { useRecentRecipesStore } from '@/stores/recent-recipes.store'
 
@@ -11,20 +12,17 @@ interface RecipeListProps {
 }
 
 export const RecipeList = ({ recipes }: RecipeListProps) => (
-  <Item.Group className="flex-1 justify-end px-4">
+  <ItemGroup className="flex-1 justify-end px-4">
     {recipes.map((recipe, index) => (
       <Fragment key={recipe.id}>
         <Item
+          content={recipe.name}
+          media={<ArrowRightIcon />}
           onClick={() => useRecentRecipesStore.getState().addRecentRecipe(recipe.id)}
           render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition />}
-        >
-          <Item.Content>{recipe.name}</Item.Content>
-          <Item.Media>
-            <ArrowRightIcon />
-          </Item.Media>
-        </Item>
-        {index !== recipes.length - 1 && <Item.Separator />}
+        />
+        {index !== recipes.length - 1 && <ItemSeparator />}
       </Fragment>
     ))}
-  </Item.Group>
+  </ItemGroup>
 )

@@ -2,7 +2,7 @@ import { CheckIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/react-query'
 import { useTransition } from 'react'
 
-import { Button } from '@/components/common/button'
+import { Button } from '@/components/ui/button'
 import { approveUserOptions } from '@/features/users/api/approve'
 
 interface ApproveUserProps {

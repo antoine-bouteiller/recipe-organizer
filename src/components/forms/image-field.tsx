@@ -1,7 +1,7 @@
 import { ImageIcon, XIcon } from '@phosphor-icons/react'
 
-import { Field } from '@/components/common/field'
-import { Kbd } from '@/components/common/kbd'
+import { Field, FieldControl, FieldError, FieldLabel } from '@/components/ui/field'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platfom'
@@ -29,8 +29,8 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
-      <Field.Label>{label}</Field.Label>
-      <Field.Label
+      <FieldLabel>{label}</FieldLabel>
+      <FieldLabel
         className="relative flex min-h-52 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive data-[dragging=true]:bg-accent/50"
         data-dragging={isDragging || undefined}
       >
@@ -44,10 +44,10 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
               <ImageIcon className="size-4 opacity-60" />
             </div>
             <p className="mb-1.5 text-sm font-medium">Déposez votre image ou cliquez pour parcourir</p>
-            <Kbd.Group className="hidden items-center gap-1 md:flex">
+            <KbdGroup className="hidden items-center gap-1 md:flex">
               <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
               <Kbd className="aspect-square">V</Kbd>
-            </Kbd.Group>
+            </KbdGroup>
           </div>
         )}
         {previewUrl && (
@@ -66,9 +66,9 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
             </button>
           </div>
         )}
-      </Field.Label>
-      <Field.Control className="hidden" disabled={disabled} type="file" {...getInputProps()} />
-      <Field.Error />
+      </FieldLabel>
+      <FieldControl className="hidden" disabled={disabled} type="file" {...getInputProps()} />
+      <FieldError />
     </Field>
   )
 }

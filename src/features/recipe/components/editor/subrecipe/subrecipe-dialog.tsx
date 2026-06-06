@@ -1,8 +1,7 @@
 import { revalidateLogic } from '@tanstack/react-form'
-import { useState, type ComponentPropsWithoutRef } from 'react'
+import { useState, type ReactElement } from 'react'
 import { z } from 'zod'
 
-import { type Dialog } from '@/components/common/dialog'
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
@@ -22,7 +21,7 @@ interface SubrecipeDialogProps {
   onSubmit: (data: SubrecipeNodeData) => void
   submitLabel: string
   title: string
-  triggerRender?: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
+  triggerRender?: ReactElement
 }
 
 const subrecipeDefaultValues: SubrecipeFormInput = {

@@ -2,10 +2,10 @@ import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useStore } from '@tanstack/react-form'
 import { Suspense } from 'react'
 
-import { Button } from '@/components/common/button'
-import { Label } from '@/components/common/label'
-import { Skeleton } from '@/components/common/skeleton'
-import { Toolbar } from '@/components/common/toolbar'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/features/recipe/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
 import { type FileMetadata } from '@/hooks/use-file-upload'
@@ -153,11 +153,11 @@ export const RecipeForm = withForm({
                   nodes={recipeNodes}
                   extraToolbar={
                     <>
-                      <Toolbar.Separator />
-                      <Toolbar.Group>
+                      <ToolbarSeparator />
+                      <ToolbarGroup>
                         <MagimixProgramButton />
                         <SubrecipeButton />
-                      </Toolbar.Group>
+                      </ToolbarGroup>
                     </>
                   }
                   label="Instructions"

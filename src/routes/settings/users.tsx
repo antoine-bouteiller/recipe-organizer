@@ -4,12 +4,13 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { animate, motion, useMotionValue, useTransform } from 'motion/react'
 import React, { useState } from 'react'
 
-import { Badge } from '@/components/common/badge'
-import { Button } from '@/components/common/button'
 import { Item } from '@/components/common/item'
 import { Tabs } from '@/components/common/tabs'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { getUserListOptions } from '@/features/users/api/get-all'
 import { AddUser } from '@/features/users/components/add-user'
 import { ApproveUser } from '@/features/users/components/approve-user'
@@ -73,21 +74,24 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
   const showBlockButton = status === 'active' || status === 'pending'
 
   return (
-    <Item.Group>
+    <ItemGroup>
       {filteredUsers.map((userItem, index) => {
         const item = (
-          <Item className="flex-nowrap">
-            <Item.Content>
-              <Item.Title>
+          <Item
+            actions={
+              <>
+                {(status === 'blocked' || status === 'pending') && <ApproveUser userId={userItem.id} />}
+                {!isMobile && showBlockButton && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
+              </>
+            }
+            className="flex-nowrap"
+            title={
+              <>
                 <span className="text-nowrap text-ellipsis">{userItem.email}</span>
                 <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[userItem.role]}</Badge>
-              </Item.Title>
-            </Item.Content>
-            <Item.Actions>
-              {(status === 'blocked' || status === 'pending') && <ApproveUser userId={userItem.id} />}
-              {!isMobile && showBlockButton && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
-            </Item.Actions>
-          </Item>
+              </>
+            }
+          />
         )
 
         return (
@@ -99,11 +103,11 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
             ) : (
               item
             )}
-            {index !== filteredUsers.length - 1 && <Item.Separator />}
+            {index !== filteredUsers.length - 1 && <ItemSeparator />}
           </React.Fragment>
         )
       })}
-    </Item.Group>
+    </ItemGroup>
   )
 }
 
@@ -122,31 +126,39 @@ const UsersManagement = () => {
       </div>
 
       <div className="px-4">
-        <Tabs defaultValue="active">
-          <Tabs.List className="w-full">
-            <Tabs.Tab value="active">Actifs</Tabs.Tab>
-            <Tabs.Tab value="pending">En attente</Tabs.Tab>
-            <Tabs.Tab value="blocked">Bloqués</Tabs.Tab>
-          </Tabs.List>
-
-          <Tabs.Panel value="active">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
-            </React.Suspense>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="pending">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-            </React.Suspense>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="blocked">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-            </React.Suspense>
-          </Tabs.Panel>
-        </Tabs>
+        <Tabs
+          defaultValue="active"
+          items={[
+            {
+              content: (
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+                </React.Suspense>
+              ),
+              label: 'Actifs',
+              value: 'active',
+            },
+            {
+              content: (
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
+                </React.Suspense>
+              ),
+              label: 'En attente',
+              value: 'pending',
+            },
+            {
+              content: (
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+                </React.Suspense>
+              ),
+              label: 'Bloqués',
+              value: 'blocked',
+            },
+          ]}
+          listClassName="w-full"
+        />
       </div>
     </ScreenLayout>
   )

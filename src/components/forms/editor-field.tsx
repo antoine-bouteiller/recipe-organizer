@@ -3,8 +3,8 @@ import { type Klass, type LexicalNode } from 'lexical'
 import { type ReactNode } from 'react'
 
 import { Editor, EditorContent, EditorToolbarButton } from '@/components/common/editor'
-import { Field } from '@/components/common/field'
-import { Toolbar } from '@/components/common/toolbar'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Toolbar, ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface EditorFieldProps {
@@ -19,19 +19,19 @@ const EditorField = ({ disabled, extraToolbar, label, nodes }: EditorFieldProps)
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
-      <Field.Label>{label}</Field.Label>
+      <FieldLabel>{label}</FieldLabel>
       <Editor content={field.state.value} nodes={nodes} onChange={field.handleChange}>
         <Toolbar>
-          <Toolbar.Group>
+          <ToolbarGroup>
             <EditorToolbarButton command="undo">
               <ArrowUUpLeftIcon />
             </EditorToolbarButton>
             <EditorToolbarButton command="redo">
               <ArrowUUpRightIcon />
             </EditorToolbarButton>
-          </Toolbar.Group>
-          <Toolbar.Separator />
-          <Toolbar.Group>
+          </ToolbarGroup>
+          <ToolbarSeparator />
+          <ToolbarGroup>
             <EditorToolbarButton command="bold">
               <TextBolderIcon />
             </EditorToolbarButton>
@@ -44,12 +44,12 @@ const EditorField = ({ disabled, extraToolbar, label, nodes }: EditorFieldProps)
             <EditorToolbarButton command="bulletList">
               <ListBulletsIcon />
             </EditorToolbarButton>
-          </Toolbar.Group>
+          </ToolbarGroup>
           {extraToolbar}
         </Toolbar>
         <EditorContent disabled={disabled} />
       </Editor>
-      <Field.Error />
+      <FieldError />
     </Field>
   )
 }

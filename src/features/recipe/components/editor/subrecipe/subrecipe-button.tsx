@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $insertNodeToNearestRoot } from '@lexical/utils'
 import { BookOpenIcon } from '@phosphor-icons/react'
 
-import { Toggle } from '@/components/common/toggle'
+import { Toggle } from '@/components/ui/toggle'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 
 import { SubrecipeDialog } from './subrecipe-dialog'

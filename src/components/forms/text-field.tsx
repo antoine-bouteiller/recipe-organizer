@@ -1,5 +1,5 @@
-import { Field } from '@/components/common/field'
-import { Input } from '@/components/common/input'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface TextFieldProps {
@@ -20,9 +20,9 @@ export const TextField = ({ className, disabled, label, placeholder }: TextField
       name={field.name}
       touched={field.state.meta.isTouched}
     >
-      {label && <Field.Label>{label}</Field.Label>}
+      {label && <FieldLabel>{label}</FieldLabel>}
       <Input disabled={disabled} onChange={(event) => field.handleChange(event.target.value)} placeholder={placeholder} value={field.state.value} />
-      <Field.Error />
+      <FieldError />
     </Field>
   )
 }

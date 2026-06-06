@@ -1,8 +1,8 @@
 import { Link, useLocation, useRouter } from '@tanstack/react-router'
 
-import { Button } from '@/components/common/button'
 import { Tabs } from '@/components/common/tabs'
 import { ThemeIcon } from '@/components/icons/theme'
+import { Button } from '@/components/ui/button'
 import { SearchBar } from '@/features/recipe/components/search-bar'
 import { toggleTheme } from '@/lib/theme'
 
@@ -15,17 +15,18 @@ export const Navbar = () => {
 
   return (
     <div className="flex h-14 items-center gap-2 px-6">
-      <Tabs value={location.href}>
-        <Tabs.List variant="underline">
-          {menuItems
-            .filter((item) => item.display !== 'mobile')
-            .map((item) => (
-              <Tabs.Tab key={item.label} nativeButton={false} render={<Link {...item.linkProps} />} value={item.linkProps.to}>
-                {item.label}
-              </Tabs.Tab>
-            ))}
-        </Tabs.List>
-      </Tabs>
+      <Tabs
+        items={menuItems
+          .filter((item) => item.display !== 'mobile')
+          .map((item) => ({
+            label: item.label,
+            nativeButton: false,
+            render: <Link {...item.linkProps} />,
+            value: item.linkProps.to,
+          }))}
+        value={location.href}
+        variant="underline"
+      />
       <div className="flex flex-1 items-center justify-end gap-2">
         <SearchBar />
         <Button
