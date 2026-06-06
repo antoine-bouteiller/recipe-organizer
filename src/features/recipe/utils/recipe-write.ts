@@ -5,8 +5,6 @@ import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinke
 import { type UnitSlug } from '@/lib/db/schema/unit'
 import { isNotEmpty } from '@/utils/array'
 
-import { type RecipeTag } from './constants'
-
 interface IngredientGroupWrite {
   readonly groupName?: string
   readonly ingredients: readonly { readonly id: number; readonly quantity: number; readonly unitSlug?: UnitSlug }[]
@@ -17,38 +15,39 @@ interface LinkedRecipeWrite {
   readonly ratio: number
 }
 
-interface ResolveAutoTagsInput {
+interface ResolveAutoFlagsInput {
   readonly allIngredientIds: number[]
   readonly linkedRecipeIds: number[]
   readonly instructions: string
-  readonly tags: string[]
+  readonly meals: string[]
 }
 
-const computeAutoTags = (
+interface AutoFlags {
+  readonly isMagimix: boolean
+  readonly isVegetarian: boolean
+}
+
+const computeAutoFlags = (
   ingredientCategories: { category: string | null }[],
-  linkedRecipesData: { tags: string[] | null }[],
+  linkedRecipesData: { isVegetarian: boolean }[],
   instructions: string,
-  tags: string[]
-): RecipeTag[] => {
+  meals: string[]
+): AutoFlags => {
   const ownVegetarian = ingredientCategories.every((item) => item.category !== 'meat' && item.category !== 'fish')
-  const linkedVegetarian = linkedRecipesData.every((item) => item.tags?.includes('vegetarian'))
-  const autoTags: RecipeTag[] = []
-  if (ownVegetarian && linkedVegetarian && !tags.includes('dessert')) {
-    autoTags.push('vegetarian')
+  const linkedVegetarian = linkedRecipesData.every((item) => item.isVegetarian)
+  return {
+    isMagimix: instructions.includes('"type":"magimixProgram"'),
+    isVegetarian: ownVegetarian && linkedVegetarian && !meals.includes('dessert'),
   }
-  if (instructions.includes('"type":"magimixProgram"')) {
-    autoTags.push('magimix')
-  }
-  return autoTags
 }
 
-export const resolveAutoTags = async ({ allIngredientIds, linkedRecipeIds, instructions, tags }: ResolveAutoTagsInput): Promise<RecipeTag[]> => {
+export const resolveAutoFlags = async ({ allIngredientIds, linkedRecipeIds, instructions, meals }: ResolveAutoFlagsInput): Promise<AutoFlags> => {
   const [ingredientCategories, linkedRecipesData] = await getDb().batch([
     getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-    getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+    getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
   ])
 
-  return computeAutoTags(ingredientCategories, linkedRecipesData, instructions, tags)
+  return computeAutoFlags(ingredientCategories, linkedRecipesData, instructions, meals)
 }
 
 export const writeRecipeIngredientGraph = async (

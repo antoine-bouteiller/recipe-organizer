@@ -11,16 +11,21 @@ import { withForm } from '@/hooks/use-app-form'
 import { type FileMetadata } from '@/hooks/use-file-upload'
 import { useRecipeOptions } from '@/hooks/use-options'
 
-import { RECIPE_TAG_LABELS, RECIPE_TAGS } from '../utils/constants'
+import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '../utils/constants'
 import { recipeDefaultValues } from '../utils/form'
 import { recipeNodes } from './editor/extensions'
 import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
 import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
 import { IngredientGroupField } from './ingredient-group-field'
 
-const tagItems = RECIPE_TAGS.map((tag) => ({
-  label: RECIPE_TAG_LABELS[tag],
-  value: tag,
+const cuisineTypeItems = CUISINE_TYPES.map((cuisineType) => ({
+  label: CUISINE_TYPE_LABELS[cuisineType],
+  value: cuisineType,
+}))
+
+const mealItems = MEALS.map((meal) => ({
+  label: MEAL_LABELS[meal],
+  value: meal,
 }))
 
 interface RecipeFormProps extends Record<string, unknown> {
@@ -45,7 +50,11 @@ export const RecipeForm = withForm({
 
         <AppField name="servings">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Portions" min={0} />}</AppField>
 
-        <AppField name="tags">{({ ToggleGroupField }) => <ToggleGroupField disabled={isSubmitting} items={tagItems} label="Tags" />}</AppField>
+        <AppField name="meals">{({ ToggleGroupField }) => <ToggleGroupField disabled={isSubmitting} items={mealItems} label="Repas" />}</AppField>
+
+        <AppField name="cuisineTypes">
+          {({ ToggleGroupField }) => <ToggleGroupField disabled={isSubmitting} items={cuisineTypeItems} label="Cuisines" />}
+        </AppField>
 
         <div className="flex flex-col gap-2">
           <Label>Sous-recettes liées</Label>

@@ -17,7 +17,7 @@ import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
 import { getTitle } from '../utils/get-recipe-title'
-import { resolveAutoTags, writeRecipeIngredientGraph } from '../utils/recipe-write'
+import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write'
 
 const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
 
@@ -54,7 +54,7 @@ const updateRecipe = createServerFn({
   .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerError(async ({ data, context }) => {
-      const { id, image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
+      const { cuisineTypes, id, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data
 
       const currentRecipe = await getDb().query.recipe.findFirst({
         where: { id },
@@ -79,17 +79,20 @@ const updateRecipe = createServerFn({
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
-      const autoTags = await resolveAutoTags({ allIngredientIds, instructions, linkedRecipeIds, tags })
+      const { isMagimix, isVegetarian } = await resolveAutoFlags({ allIngredientIds, instructions, linkedRecipeIds, meals })
 
       await getDb().batch([
         getDb()
           .update(recipe)
           .set({
+            cuisineTypes,
             image: imageKey,
             instructions,
+            isMagimix,
+            isVegetarian,
+            meals,
             name,
             servings,
-            tags: [...tags, ...autoTags],
             video: videoKey,
           })
           .where(eq(recipe.id, id))

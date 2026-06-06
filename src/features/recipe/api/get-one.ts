@@ -51,14 +51,17 @@ const getRecipe = createServerFn({
       }
 
       return {
+        cuisineTypes: result.cuisineTypes,
         id: result.id,
         image: getImageUrl(result.image),
         ingredientGroups: result.ingredientGroups,
         instructions: result.instructions,
+        isMagimix: result.isMagimix,
+        isVegetarian: result.isVegetarian,
         linkedRecipes: result.linkedRecipes,
+        meals: result.meals,
         name: result.name,
         servings: result.servings,
-        tags: result.tags,
         video: result.video,
       }
     })

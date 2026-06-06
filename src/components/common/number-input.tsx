@@ -1,11 +1,11 @@
 import { type ComponentProps, type ReactElement } from 'react'
 
 import {
-  NumberInput as NumberInputRoot,
   NumberInputDecrement,
   NumberInputField,
   NumberInputGroup,
   NumberInputIncrement,
+  NumberInput as NumberInputRoot,
   NumberInputScrubArea,
 } from '@/components/ui/number-input'
 

@@ -1,16 +1,26 @@
 import { Select } from '@/components/common/select'
-import { RECIPE_TAGS, RECIPE_TAG_LABELS, type RecipeTag } from '@/features/recipe/utils/constants'
+import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS, type CuisineType, type Meal } from '@/features/recipe/utils/constants'
 
-const categoryItems = RECIPE_TAGS.map((tag) => ({
-  label: RECIPE_TAG_LABELS[tag],
-  value: tag,
+const cuisineItems = CUISINE_TYPES.map((cuisineType) => ({
+  label: CUISINE_TYPE_LABELS[cuisineType],
+  value: cuisineType,
+}))
+
+const mealItems = MEALS.map((meal) => ({
+  label: MEAL_LABELS[meal],
+  value: meal,
 }))
 
 interface CategorySelectProps {
-  tags: RecipeTag[]
-  onTagsChange: (tags: RecipeTag[]) => void
+  cuisineTypes: CuisineType[]
+  meals: Meal[]
+  onCuisineTypesChange: (cuisineTypes: CuisineType[]) => void
+  onMealsChange: (meals: Meal[]) => void
 }
 
-export const CategorySelect = ({ tags, onTagsChange }: CategorySelectProps) => (
-  <Select items={categoryItems} multiple onValueChange={(value) => onTagsChange(value)} placeholder="Catégories" title="Catégories" value={tags} />
+export const CategorySelect = ({ cuisineTypes, meals, onCuisineTypesChange, onMealsChange }: CategorySelectProps) => (
+  <>
+    <Select items={mealItems} multiple onValueChange={onMealsChange} placeholder="Repas" title="Repas" value={meals} />
+    <Select items={cuisineItems} multiple onValueChange={onCuisineTypesChange} placeholder="Cuisines" title="Cuisines" value={cuisineTypes} />
+  </>
 )

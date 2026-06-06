@@ -12,11 +12,14 @@ const getAllRecipes = createServerFn({
   withServerError(async () => {
     const rows = await getDb().query.recipe.findMany({
       columns: {
+        cuisineTypes: true,
         id: true,
         image: true,
+        isMagimix: true,
+        isVegetarian: true,
+        meals: true,
         name: true,
         servings: true,
-        tags: true,
       },
       orderBy: {
         name: 'asc',
@@ -24,11 +27,14 @@ const getAllRecipes = createServerFn({
     })
 
     return rows.map((row) => ({
+      cuisineTypes: row.cuisineTypes ?? [],
       id: row.id,
       image: getImageUrl(row.image),
+      isMagimix: row.isMagimix,
+      isVegetarian: row.isVegetarian,
+      meals: row.meals ?? [],
       name: row.name,
       servings: row.servings,
-      tags: row.tags ?? [],
     }))
   })
 )

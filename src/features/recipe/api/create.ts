@@ -12,11 +12,12 @@ import { uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
 import { parseFormData } from '@/utils/form-data'
 
-import { RECIPE_TAGS } from '../utils/constants'
+import { CUISINE_TYPES, MEALS } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
-import { resolveAutoTags, writeRecipeIngredientGraph } from '../utils/recipe-write'
+import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write'
 
 const recipeSchema = z.object({
+  cuisineTypes: z.array(z.enum(CUISINE_TYPES)),
   image: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]),
   ingredientGroups: z.array(
     z.object({
@@ -42,9 +43,9 @@ const recipeSchema = z.object({
       })
     )
     .optional(),
+  meals: z.array(z.enum(MEALS)),
   name: z.string().min(2),
   servings: z.number().min(0),
-  tags: z.array(z.enum(RECIPE_TAGS)),
   video: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]).optional(),
 })
 
@@ -57,24 +58,27 @@ const createRecipe = createServerFn({
   .middleware([authGuard()])
   .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data, context }) => {
-    const { image, ingredientGroups, instructions, linkedRecipes, name, servings, tags, video } = data
+    const { cuisineTypes, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data
     const imageKey = image instanceof File ? await uploadFile(image) : image.id
     const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
 
     const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
     const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
-    const autoTags = await resolveAutoTags({ allIngredientIds, instructions, linkedRecipeIds, tags })
+    const { isMagimix, isVegetarian } = await resolveAutoFlags({ allIngredientIds, instructions, linkedRecipeIds, meals })
 
     const [createdRecipe] = await getDb()
       .insert(recipe)
       .values({
         createdBy: context.user.id,
+        cuisineTypes,
         image: imageKey,
         instructions,
+        isMagimix,
+        isVegetarian,
+        meals,
         name,
         servings,
-        tags: [...tags, ...autoTags],
         video: videoKey,
       })
       .returning({ id: recipe.id })

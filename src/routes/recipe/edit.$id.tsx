@@ -13,7 +13,6 @@ import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
-import { AUTO_TAGS, type RECIPE_TAGS } from '@/features/recipe/utils/constants'
 import { recipeFormFields } from '@/features/recipe/utils/form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
@@ -39,6 +38,7 @@ const EditRecipePage = () => {
 
   const initialValues: UpdateRecipeFormInput = recipe
     ? {
+        cuisineTypes: recipe.cuisineTypes,
         id: recipe.id,
         image: {
           id: recipe.image,
@@ -50,9 +50,9 @@ const EditRecipePage = () => {
           id: linkedRecipe.linkedRecipe.id,
           ratio: linkedRecipe.ratio,
         })),
+        meals: recipe.meals,
         name: recipe.name,
         servings: recipe.servings,
-        tags: recipe.tags.filter((tag) => !AUTO_TAGS.includes(tag as (typeof AUTO_TAGS)[number])) as (typeof RECIPE_TAGS)[number][],
         video: recipe.video
           ? {
               id: recipe.video,

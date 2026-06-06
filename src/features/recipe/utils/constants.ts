@@ -1,18 +1,26 @@
-export const RECIPE_TAGS = ['dessert', 'mediterranean', 'chinese', 'japanese', 'indian', 'mexican', 'italian', 'french'] as const
+export const CUISINE_TYPES = ['mediterranean', 'chinese', 'japanese', 'indian', 'mexican', 'italian', 'french'] as const
 
-export type RecipeTag = (typeof RECIPE_TAGS)[number] | (typeof AUTO_TAGS)[number]
+export const MEALS = ['breakfast', 'lunch', 'diner', 'dessert'] as const
 
-export const RECIPE_TAG_LABELS: Record<RecipeTag, string> = {
+export type CuisineType = (typeof CUISINE_TYPES)[number]
+export type Meal = (typeof MEALS)[number]
+
+export const CUISINE_TYPE_LABELS: Record<CuisineType, string> = {
   chinese: 'Chinois',
-  dessert: 'Dessert',
   french: 'Français',
   indian: 'Indien',
   italian: 'Italien',
   japanese: 'Japonais',
-  magimix: 'Magimix',
   mediterranean: 'Méditerranéen',
   mexican: 'Mexicain',
-  vegetarian: 'Végétarien',
 }
 
-export const AUTO_TAGS = ['vegetarian', 'magimix'] as const
+export const MEAL_LABELS: Record<Meal, string> = {
+  breakfast: 'Petit-déjeuner',
+  dessert: 'Dessert',
+  diner: 'Dîner',
+  lunch: 'Déjeuner',
+}
+
+export const VEGETARIAN_LABEL = 'Végétarien'
+export const MAGIMIX_LABEL = 'Magimix'

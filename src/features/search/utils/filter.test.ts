@@ -2,60 +2,78 @@ import { describe, expect, it } from 'vite-plus/test'
 
 import { type ReducedRecipe } from '@/features/recipe/api/get-all'
 
-import { filterRecipes, hasActiveFilters } from './filter'
+import { EMPTY_FILTERS, filterRecipes, hasActiveFilters, type SearchFilters } from './filter'
 
 const recipes: ReducedRecipe[] = [
-  { id: 1, image: '', name: 'Crème brûlée', servings: 4, tags: ['dessert', 'french'] },
-  { id: 2, image: '', name: 'Pesto pasta', servings: 2, tags: ['italian', 'vegetarian'] },
-  { id: 3, image: '', name: 'Steak frites', servings: 2, tags: ['french'] },
+  { cuisineTypes: ['french'], id: 1, image: '', isMagimix: false, isVegetarian: false, meals: ['dessert'], name: 'Crème brûlée', servings: 4 },
+  { cuisineTypes: ['italian'], id: 2, image: '', isMagimix: false, isVegetarian: true, meals: [], name: 'Pesto pasta', servings: 2 },
+  { cuisineTypes: ['french'], id: 3, image: '', isMagimix: true, isVegetarian: false, meals: [], name: 'Steak frites', servings: 2 },
 ]
+
+const filters = (overrides: Partial<SearchFilters>): SearchFilters => ({ ...EMPTY_FILTERS, ...overrides })
 
 const ids = (result: ReducedRecipe[]) => result.map((recipe) => recipe.id)
 
 describe('filterRecipes', () => {
   it('matches names accent- and case-insensitively', () => {
-    expect(ids(filterRecipes(recipes, { query: 'CREME', tags: [] }))).toEqual([1])
+    expect(ids(filterRecipes(recipes, filters({ query: 'CREME' })))).toEqual([1])
   })
 
   it('returns every recipe for an empty query', () => {
-    expect(ids(filterRecipes(recipes, { query: '', tags: [] }))).toEqual([1, 2, 3])
+    expect(ids(filterRecipes(recipes, filters({ query: '' })))).toEqual([1, 2, 3])
   })
 
   it('ignores a whitespace-only query', () => {
-    expect(ids(filterRecipes(recipes, { query: '   ', tags: [] }))).toEqual([1, 2, 3])
+    expect(ids(filterRecipes(recipes, filters({ query: '   ' })))).toEqual([1, 2, 3])
   })
 
-  it('filters by a single tag', () => {
-    expect(ids(filterRecipes(recipes, { query: '', tags: ['vegetarian'] }))).toEqual([2])
+  it('filters by the vegetarian flag', () => {
+    expect(ids(filterRecipes(recipes, filters({ isVegetarian: true })))).toEqual([2])
   })
 
-  it('AND-combines multiple tags', () => {
-    expect(ids(filterRecipes(recipes, { query: '', tags: ['italian', 'vegetarian'] }))).toEqual([2])
+  it('filters by the magimix flag', () => {
+    expect(ids(filterRecipes(recipes, filters({ isMagimix: true })))).toEqual([3])
   })
 
-  it('returns no match when tags cannot co-occur', () => {
-    expect(filterRecipes(recipes, { query: '', tags: ['italian', 'dessert'] })).toEqual([])
+  it('filters by a cuisine type', () => {
+    expect(ids(filterRecipes(recipes, filters({ cuisineTypes: ['french'] })))).toEqual([1, 3])
   })
 
-  it('combines query and tag predicates', () => {
-    expect(ids(filterRecipes(recipes, { query: 'steak', tags: ['french'] }))).toEqual([3])
+  it('filters by a meal', () => {
+    expect(ids(filterRecipes(recipes, filters({ meals: ['dessert'] })))).toEqual([1])
+  })
+
+  it('AND-combines a cuisine type and the vegetarian flag', () => {
+    expect(ids(filterRecipes(recipes, filters({ cuisineTypes: ['italian'], isVegetarian: true })))).toEqual([2])
+  })
+
+  it('returns no match when filters cannot co-occur', () => {
+    expect(filterRecipes(recipes, filters({ cuisineTypes: ['italian'], meals: ['dessert'] }))).toEqual([])
+  })
+
+  it('combines query and filter predicates', () => {
+    expect(ids(filterRecipes(recipes, filters({ cuisineTypes: ['french'], query: 'steak' })))).toEqual([3])
   })
 })
 
 describe('hasActiveFilters', () => {
   it('is false for empty filters', () => {
-    expect(hasActiveFilters({ query: '', tags: [] })).toBe(false)
+    expect(hasActiveFilters(EMPTY_FILTERS)).toBe(false)
   })
 
   it('is false for a whitespace-only query', () => {
-    expect(hasActiveFilters({ query: '   ', tags: [] })).toBe(false)
+    expect(hasActiveFilters(filters({ query: '   ' }))).toBe(false)
   })
 
   it('is true when a query is present', () => {
-    expect(hasActiveFilters({ query: 'pasta', tags: [] })).toBe(true)
+    expect(hasActiveFilters(filters({ query: 'pasta' }))).toBe(true)
   })
 
-  it('is true when a tag is selected', () => {
-    expect(hasActiveFilters({ query: '', tags: ['french'] })).toBe(true)
+  it('is true when a cuisine type is selected', () => {
+    expect(hasActiveFilters(filters({ cuisineTypes: ['french'] }))).toBe(true)
+  })
+
+  it('is true when the vegetarian flag is active', () => {
+    expect(hasActiveFilters(filters({ isVegetarian: true }))).toBe(true)
   })
 })

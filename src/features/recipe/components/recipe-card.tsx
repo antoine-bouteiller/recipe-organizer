@@ -2,10 +2,9 @@ import { Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { cn } from '@/utils/cn'
 
 import { type ReducedRecipe } from '../api/get-all'
-import { RECIPE_TAG_LABELS } from '../utils/constants'
+import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
 
 interface RecipeCardProps {
@@ -23,9 +22,20 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
             <h2 className="overflow-hidden text-2xl font-semibold text-nowrap text-ellipsis text-white">{recipe.name}</h2>
           </CardTitle>
           <CardDescription className="flex flex-wrap gap-2">
-            {recipe.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className={cn(tag === 'vegetarian' && 'bg-emerald-100 text-emerald-600')}>
-                {RECIPE_TAG_LABELS[tag]}
+            {recipe.isVegetarian && (
+              <Badge variant="outline" className="bg-emerald-100 text-emerald-600">
+                {VEGETARIAN_LABEL}
+              </Badge>
+            )}
+            {recipe.isMagimix && <Badge variant="outline">{MAGIMIX_LABEL}</Badge>}
+            {recipe.meals.map((meal) => (
+              <Badge key={meal} variant="outline">
+                {MEAL_LABELS[meal]}
+              </Badge>
+            ))}
+            {recipe.cuisineTypes.map((cuisineType) => (
+              <Badge key={cuisineType} variant="outline">
+                {CUISINE_TYPE_LABELS[cuisineType]}
               </Badge>
             ))}
           </CardDescription>
