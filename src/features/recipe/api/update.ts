@@ -8,15 +8,14 @@ import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
-import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
+import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile, uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
-import { isNotEmpty } from '@/utils/array'
 import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
-import { type RecipeTag } from '../utils/constants'
+import { resolveAutoTags, writeRecipeIngredientGraph } from '../lib/recipe-write'
 import { getTitle } from '../utils/get-recipe-title'
 
 const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
@@ -45,24 +44,6 @@ const resolveVideoKey = async (video: UpdateRecipeFormValues['video'], currentKe
     return currentKey
   }
   return video?.id
-}
-
-const computeAutoTags = (
-  ingredientCategories: { category: string | null }[],
-  linkedRecipesData: { tags: string[] | null }[],
-  instructions: string,
-  tags: string[]
-): RecipeTag[] => {
-  const ownVegetarian = ingredientCategories.every((item) => item.category !== 'meat' && item.category !== 'fish')
-  const linkedVegetarian = linkedRecipesData.every((item) => item.tags?.includes('vegetarian'))
-  const autoTags: RecipeTag[] = []
-  if (ownVegetarian && linkedVegetarian && !tags.includes('dessert')) {
-    autoTags.push('vegetarian')
-  }
-  if (instructions.includes('"type":"magimixProgram"')) {
-    autoTags.push('magimix')
-  }
-  return autoTags
 }
 
 const updateRecipe = createServerFn({
@@ -99,12 +80,7 @@ const updateRecipe = createServerFn({
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
-      const [ingredientCategories, linkedRecipesData] = await getDb().batch([
-        getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-        getDb().select({ tags: recipe.tags }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
-      ])
-
-      const autoTags = computeAutoTags(ingredientCategories, linkedRecipesData, instructions, tags)
+      const autoTags = await resolveAutoTags({ allIngredientIds, instructions, linkedRecipeIds, tags })
 
       await getDb().batch([
         getDb()
@@ -131,43 +107,7 @@ const updateRecipe = createServerFn({
         getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
       ])
 
-      await Promise.all(
-        ingredientGroups.map(async (group, index) => {
-          const [updatedGroup] = await getDb()
-            .insert(recipeIngredientGroup)
-            .values({
-              groupName: group.groupName,
-              isDefault: index === 0,
-              recipeId: currentRecipe.id,
-            })
-            .returning()
-
-          if (group.ingredients.length > 0) {
-            await getDb()
-              .insert(groupIngredient)
-              .values(
-                group.ingredients.map((ingredientEntry) => ({
-                  groupId: updatedGroup.id,
-                  ingredientId: ingredientEntry.id,
-                  quantity: ingredientEntry.quantity,
-                  unitSlug: ingredientEntry.unitSlug ?? undefined,
-                }))
-              )
-          }
-        })
-      )
-
-      if (isNotEmpty(linkedRecipes)) {
-        await getDb()
-          .insert(recipeLinkedRecipes)
-          .values(
-            linkedRecipes.map((lr) => ({
-              linkedRecipeId: lr.id,
-              ratio: lr.ratio,
-              recipeId: currentRecipe.id,
-            }))
-          )
-      }
+      await writeRecipeIngredientGraph(currentRecipe.id, ingredientGroups, linkedRecipes)
 
       return id
     })
