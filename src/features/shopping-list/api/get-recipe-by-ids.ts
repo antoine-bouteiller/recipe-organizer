@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { withServerError } from '@/utils/error-handler'
+import { scaleQuantity } from '@/utils/scale-quantity'
 
 import { ingredientGroupSelect } from '../utils/ingredient-group-select'
 
@@ -79,7 +80,7 @@ const getRecipesByIds = createServerFn({
                 name: groupIngredient.ingredient.name,
                 parentId: groupIngredient.ingredient.parentId,
                 preferredUnitSlug: groupIngredient.ingredient.preferredUnitSlug,
-                quantity: (groupIngredient.quantity * ratio) / linkedRecipe.servings,
+                quantity: scaleQuantity(groupIngredient.quantity, ratio, linkedRecipe.servings),
                 unitSlug: groupIngredient.unitSlug,
               }))
           ),

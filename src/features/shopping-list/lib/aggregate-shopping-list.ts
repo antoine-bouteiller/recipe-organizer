@@ -1,6 +1,7 @@
 import { type UnitSlug } from '@/lib/db/schema/unit'
 import { type IngredientCategory } from '@/types/ingredient'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
+import { scaleQuantity } from '@/utils/scale-quantity'
 import { convert } from '@/utils/unit-converter'
 
 import { type AggregatedIngredient, type IngredientCartItem } from '../types/ingredient-cart-item'
@@ -86,7 +87,7 @@ const accumulateIngredients = (
     const wantedQuantity = isNullOrUndefined(recipesQuantities[recipe.id]) ? recipe.servings : recipesQuantities[recipe.id]
 
     for (const ingredient of recipe.ingredients) {
-      const scaledQty = (ingredient.quantity * wantedQuantity) / recipe.servings
+      const scaledQty = scaleQuantity(ingredient.quantity, wantedQuantity, recipe.servings)
       const existing = ingredientsMap.get(ingredient.id)
       if (existing) {
         existing.lines.push({ quantity: scaledQty, unitSlug: ingredient.unitSlug })
