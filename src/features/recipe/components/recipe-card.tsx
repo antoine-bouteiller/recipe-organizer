@@ -1,8 +1,7 @@
-import { ClientOnly, Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/utils/cn'
 
 import { type ReducedRecipe } from '../api/get-all'
@@ -32,14 +31,12 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
           </Card.Description>
         </Card.Header>
         <Card.Footer className="relative flex-none px-4 py-0">
-          <ClientOnly fallback={<Skeleton className="h-8 w-full rounded-md" />}>
-            <QuantityControls
-              className="flex w-full items-center justify-between gap-2"
-              recipeId={recipe.id}
-              servings={recipe.servings}
-              variant="card"
-            />
-          </ClientOnly>
+          <QuantityControls
+            className="flex w-full items-center justify-between gap-2"
+            recipeId={recipe.id}
+            servings={recipe.servings}
+            variant="card"
+          />
         </Card.Footer>
       </Card>
     </Link>

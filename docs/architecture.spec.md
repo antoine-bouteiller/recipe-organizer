@@ -36,7 +36,7 @@ This specification describes the high-level architecture of the `recipe-organize
 ### Architectural requirements
 
 - **REQ-001**: The application MUST run as a single Cloudflare Worker. The worker entry point is `@tanstack/react-start/server-entry`, configured in `wrangler.jsonc`.
-- **REQ-002**: SSR MUST be enabled for every page route. Initial HTML is rendered on the worker; the client hydrates in place. Loaders prefetch data via `context.queryClient.ensureQueryData(...)`.
+- **REQ-002**: The app runs in client-only render mode: `src/start.ts` sets `defaultSsr: false` and the root route opts into `ssr: true`. The worker renders only the document shell (and resolves auth in the root `beforeLoad`) per request; all page-route content renders on the client. Loaders prefetch data via `context.queryClient.ensureQueryData(...)` (on the client for client-only routes).
 - **REQ-003**: The application MUST be a Progressive Web App: a `manifest.json` is linked from the root route, and a Serwist service worker provides offline shell + asset caching.
 - **REQ-004**: All persistent data MUST live in Cloudflare D1 (relational data) or R2 (binary blobs: images, videos). No external database.
 - **REQ-005**: All cross-cutting concerns (auth, data layer, server functions, forms, client state, routing/SSR, platform) MUST have a corresponding `docs/infrastructure/<topic>.spec.md` and respect the rules therein.
@@ -60,7 +60,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **CON-001**: The worker has the standard Cloudflare Workers limits — there is no long-running process, no filesystem, and no `Buffer` unless `nodejs_compat` is enabled (it is, per `wrangler.jsonc`).
 - **CON-002**: D1 has SQLite semantics (no `RETURNING *` in some flows, integer-only PKs by convention here). Multi-row atomicity uses `getDb().batch([...])`.
 - **CON-003**: TanStack Router's route tree is generated at build/dev time (`src/routeTree.gen.ts`). New route files require a dev-server restart.
-- **CON-004**: Persistent client state (Zustand `persist`) is `localStorage`-based and therefore client-only — consumers MUST be wrapped in `<ClientOnly>` to avoid SSR hydration mismatch.
+- **CON-004**: Persistent client state (Zustand `persist`) is `localStorage`-based and therefore client-only. The app renders all route content client-only (`src/start.ts` `defaultSsr: false`; root `ssr: true`), so consumers render directly — no `<ClientOnly>` boundary or `client-only` directive is used.
 - **CON-005**: `compatibility_date` is `2026-01-28` with `nodejs_compat` enabled; do not regress these without auditing the Worker runtime APIs the app relies on (e.g. `node:crypto`).
 
 ### Guidelines
@@ -131,7 +131,7 @@ This specification describes the high-level architecture of the `recipe-organize
    - `loader` calls `context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))`.
    - That option is backed by `getRecipe` (a `createServerFn`) which queries D1 via Drizzle and returns a serialized recipe.
 4. Worker renders the React tree to HTML and ships it back along with the query cache as a serialized payload.
-5. Client hydrates: `useQuery(getRecipeDetailsOptions(id))` reads from the warmed cache. `useShoppingListStore` (Zustand) is read inside `<ClientOnly>` to avoid mismatches.
+5. Client hydrates and runs the (client-only) route loader/component: `useQuery(getRecipeDetailsOptions(id))` and `useShoppingListStore` (Zustand) are read directly on the client — no `<ClientOnly>` needed, since the route never rendered on the server.
 6. User actions (add to shopping list, update quantity) write to Zustand stores; `localStorage` persists the change.
 
 ### Cross-feature data flow (mutation)
@@ -145,7 +145,7 @@ This specification describes the high-level architecture of the `recipe-organize
 
 - `tanstackSerwistPlugin` (in `scripts/generate-sw.ts`) emits `/sw.js` from `src/sw.ts` at build time.
 - Client registers `new Serwist('/sw.js', { scope: '/', type: 'module' })` from the root route.
-- Defaults: `clientsClaim`, `navigationPreload`, `skipWaiting`, Serwist `defaultCache`. SSR responses with `Cache-Control: public, max-age=86400, stale-while-revalidate=604800` are cacheable.
+- Defaults: `clientsClaim`, `navigationPreload`, `skipWaiting`, Serwist `defaultCache`. Page navigations return a per-request, auth-dependent shell and are not publicly cacheable; R2 asset responses under `/api/*` still set `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`.
 
 ## 5. Acceptance Criteria
 
@@ -242,9 +242,9 @@ This specification describes the high-level architecture of the `recipe-organize
   onSuccess → invalidate queryKeys.recipeLists() → toastSuccess → router.navigate('/')
 ```
 
-### Edge: SSR + persistent stores
+### Edge: persistent stores under client-only rendering
 
-`QuantityControls` reads from `useRecipeQuantitiesStore`. The `__root.tsx` server render can't see localStorage, so the component is wrapped in `<ClientOnly fallback={<Skeleton/>}>` (see `recipe-card.tsx`). The fallback ships in SSR HTML; the real component swaps in after hydration.
+`QuantityControls` reads from `useRecipeQuantitiesStore` (`localStorage`). Because the app runs in client-only render mode (`src/start.ts` `defaultSsr: false`; only the root shell is SSR'd), `QuantityControls` and other store-backed components never render on the server — they render directly on the client with no `<ClientOnly>` wrapper and no hydration mismatch.
 
 ### Edge: Worker stateless lifetime
 

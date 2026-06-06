@@ -1,6 +1,6 @@
 import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
-import { ClientOnly, createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'motion/react'
 import { z } from 'zod'
 
@@ -8,7 +8,6 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Editor, EditorContent } from '@/components/ui/editor'
 import { Popover } from '@/components/ui/popover'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
@@ -69,22 +68,11 @@ const RecipePage = () => {
       }
     >
       <h1 className="hidden px-4 py-2 font-heading text-3xl md:block">{recipe.name}</h1>
-      <ClientOnly
-        fallback={
-          <div className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start">
-            <Skeleton className="size-10" />
-            <Skeleton className="h-6 w-8" />
-            <Skeleton className="size-10" />
-            <Skeleton className="h-10 w-48" />
-          </div>
-        }
-      >
-        <QuantityControls
-          className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start"
-          recipeId={id}
-          servings={recipe.servings}
-        />
-      </ClientOnly>
+      <QuantityControls
+        className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start"
+        recipeId={id}
+        servings={recipe.servings}
+      />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 md:hidden">
@@ -96,9 +84,7 @@ const RecipePage = () => {
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
               <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x: swipeX }}>
                 <div className="min-w-full overflow-y-auto px-2">
-                  <ClientOnly>
-                    <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-                  </ClientOnly>
+                  <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
                 </div>
                 <div className="min-w-full overflow-y-auto p-2">
                   <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
@@ -113,9 +99,7 @@ const RecipePage = () => {
         <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
           <div className="col-span-2 rounded-xl border px-8 pb-8">
             <h2>Ingrédients</h2>
-            <ClientOnly>
-              <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-            </ClientOnly>
+            <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
           </div>
 
           <div className="col-span-3 rounded-xl border px-8 pb-8">
@@ -136,9 +120,6 @@ const paramsSchema = z.object({
 
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
-  headers: () => ({
-    'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-  }),
   loader: async ({ context, params }) => {
     const result = paramsSchema.safeParse(params)
     if (!result.success) {

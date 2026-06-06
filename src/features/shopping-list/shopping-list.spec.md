@@ -63,7 +63,7 @@ Provide a deterministic, client-rendered shopping list that:
 | **IngredientCategory**      | The enum used to group items in the cart. Drives the `<h2>` icon + label per group.                                                                                        |
 | **UnitSlug**                | One of: `g`, `kg`, `ml`, `l`, `tbsp`, `tsp`, `piece`, `pinch`, `cube`, `bottle`, `sheet`, `box`, `can`, `handful`, `packet`, `cm`.                                         |
 | **Dimension**               | One of `mass                                                                                                                                                               | volume | count | length`. Conversion across dimensions requires `densityGPerMl`(volume <-> mass) or`countWeightG` (count <-> mass). |
-| **ClientOnly**              | TanStack Start render boundary used to skip a subtree during SSR.                                                                                                          |
+| **Client-only render mode** | `src/start.ts` sets `defaultSsr: false`; all route content (including this feature) renders on the client. No `<ClientOnly>` boundary or `client-only` directive is used.  |
 
 ## 3. Requirements, Constraints & Guidelines
 
@@ -72,7 +72,7 @@ Provide a deterministic, client-rendered shopping list that:
 - **REQ-001**: The selection of recipes MUST be stored in a Zustand store named `shoppingList` (key `shopping-list` in `localStorage`) as `shoppingList: number[]`.
 - **REQ-002**: Per-recipe servings overrides MUST be stored in a Zustand store named `recipe-quantities` as `recipesQuantities: Record<number, number>`.
 - **REQ-003**: Both stores MUST use `zustand/middleware`'s `persist` with `partialize` exposing only `shoppingList` and `recipesQuantities` respectively.
-- **REQ-004**: Both store modules MUST import `'@tanstack/react-start/client-only'` so they never load during SSR.
+- **REQ-004**: Both store modules MUST be plain modules with no `'@tanstack/react-start/client-only'` directive. They are never read during SSR because their consuming routes are client-only (`defaultSsr: false`).
 - **REQ-005**: `addToShoppingList(recipeId)` MUST append to `shoppingList`. `removeFromShoppingList(recipeId)` MUST filter by id. `resetShoppingList()` MUST set `shoppingList` to `[]`.
 - **REQ-006**: `setRecipesQuantities(recipeId, quantity)` MUST upsert the value at `recipesQuantities[recipeId]`.
 - **REQ-007**: A server function `getRecipesByIds` MUST exist (`createServerFn({ method: 'GET' })`) accepting `{ ids: number[] }` validated by Zod (`z.object({ ids: z.array(z.number()) })`). It MUST NOT require authentication.
@@ -89,7 +89,7 @@ Provide a deterministic, client-rendered shopping list that:
 - **REQ-018**: If `tryConvert` returns `null`, the line MUST be added to a `fallbackMap` keyed by its original `unitSlug`. Otherwise the converted value MUST be added to `primaryQuantity`.
 - **REQ-019**: After aggregation, child ingredients (`parentId !== null`) MUST be excluded from the final list, and the parent's `primary.quantity` MUST be increased by `Math.max(currentMax, childPrimary)` across all of that parent's children (i.e. parent receives the largest single child's primary quantity, not their sum).
 - **REQ-020**: The final list MUST be reduced to `Partial<Record<IngredientCategory, IngredientCartItem[]>>` keyed by `ingredient.category`.
-- **REQ-021**: The route file `src/routes/shopping-list.tsx` MUST wrap `<ShoppingList />` in `<ClientOnly fallback={<ShoppingListPending />}>` AND `<Suspense fallback={<ShoppingListPending />}>`. The `<ResetCartButton />` MUST also be inside a `<ClientOnly>`.
+- **REQ-021**: The route file `src/routes/shopping-list.tsx` MUST wrap `<ShoppingList />` in `<Suspense fallback={<ShoppingListPending />}>` to defer the suspended query. No `<ClientOnly>` is used — the whole route is client-only via `defaultSsr: false`. `<ResetCartButton />` renders directly.
 - **REQ-022**: `<ShoppingList />` MUST iterate categories with `typedEntriesOf(shoppingListIngredients)`, render `ingredientCategoryIcons[key]` and `ingredientCategoryLabels[key]` inside an `<h2>`, and render one `<CartItem />` per ingredient.
 - **REQ-023**: `<CartItem />` MUST render a `<Checkbox>` controlled by local component state, apply `line-through` styling when checked, render the primary quantity + unit on the first line, and render each fallback entry on its own muted line prefixed with `+ `.
 - **REQ-024**: Quantity formatting MUST use `formatNumber` from `@/utils/number` and unit display MUST use `UNITS[slug].name`. A `null` `unitSlug` MUST render only the quantity (no unit label).
@@ -97,7 +97,7 @@ Provide a deterministic, client-rendered shopping list that:
 
 ### 3.2 Constraints
 
-- **CON-001**: Both stores are client-only; reading them during SSR is forbidden by the `'@tanstack/react-start/client-only'` import directive.
+- **CON-001**: Both stores are read only on the client. This is guaranteed by client-only render mode (`defaultSsr: false`), not by a `client-only` import directive. Do not render a store consumer inside the SSR'd root shell.
 - **CON-002**: The shopping-list cache key embeds the full ids array. Adding/removing a recipe creates a new cache entry; consumers MUST be aware of cache growth implications.
 - **CON-003**: `convert(...)` may return `null` when no conversion path exists (e.g. count -> mass with no `countWeightG`, volume -> mass with no `densityGPerMl`, or two unrelated dimensionless count units). Fallback handling is the only acceptable behavior; the system MUST NOT throw.
 - **CON-004**: `tryConvert` short-circuits to `null` when either side is a `null` unit. A line with `unitSlug === null` is only considered convertible when the target is also `null` (in which case quantities sum directly).
@@ -118,7 +118,7 @@ Provide a deterministic, client-rendered shopping list that:
 
 - **PAT-001**: Two-store separation — selection (`shoppingList`) and per-recipe servings (`recipesQuantities`) are two independent stores so quantity overrides survive removing/re-adding a recipe.
 - **PAT-002**: Server projects, client aggregates — the server returns flat per-recipe ingredient arrays; the client owns scaling, conversion, rollup, and grouping.
-- **PAT-003**: Suspense + ClientOnly composition — the page reads from persisted state that doesn't exist on the server, so the subtree is double-wrapped: `ClientOnly` skips SSR, `Suspense` defers the suspended query.
+- **PAT-003**: Suspense for the suspended query — the route is client-only, so persisted state is read directly on the client; `<Suspense fallback={<ShoppingListPending />}>` defers rendering until `useSuspenseQuery` resolves.
 - **PAT-004**: Primary + fallback aggregation — every aggregated ingredient has exactly one `primary` line and zero or more `fallback` lines for unconvertible residuals.
 
 ## 4. Interfaces & Data Contracts
@@ -337,7 +337,7 @@ Conversion-relevant entries (parent/factor):
 - **AC-005**: Given an ingredient line in `piece` with no `countWeightG` and a `preferredUnitSlug = 'g'`, When aggregation runs, Then the line is placed in `fallback` keyed by `'piece'` and is not added to `primary`.
 - **AC-006**: Given two child ingredients of parent `P` with primary quantities `100` and `250`, When parent rollup runs, Then `P.primary.quantity` is increased by `250` (the max), the children are removed from the final list, and any pre-existing parent quantity is preserved.
 - **AC-007**: Given a recipe with a `linkedRecipe` whose `servings = 4` and `ratio = 2` and a linked ingredient `300 g`, When projected by `getRecipesByIds`, Then the parent's flattened line for that ingredient has `quantity = (300 * 2) / 4 = 150 g`.
-- **AC-008**: Given the page loads at `/shopping-list` with an empty selection, When SSR renders the document, Then no shopping-list content is server-rendered and `<ShoppingListPending />` is shown until the client hydrates.
+- **AC-008**: Given the page loads at `/shopping-list`, When the worker renders the document, Then it returns the root shell with an empty `<main>` (the route is client-only); the content — `<ShoppingListPending />` then the populated list — renders on the client.
 - **AC-009**: Given the cart has at least one ingredient, When `<CartItem>`'s checkbox is checked, Then the row text receives `line-through` styling and the primary + fallback lines remain visible.
 - **AC-010**: Given the user clicks `<ResetCartButton />`, When the click is handled, Then `shoppingList` becomes `[]` and the rendered groups are cleared (subject to query refetch on the new key `[]`).
 - **AC-011**: Given an ingredient where `preferredUnitSlug` is `null`, When aggregation picks `targetSlug`, Then it falls back to the first line's `unitSlug` (which may itself be `null`).
@@ -366,12 +366,11 @@ cart membership.
 
 ### 7.2 Why client-only
 
-Both stores rely on `localStorage`, which is unavailable on the server. The `'@tanstack/react-start/client-only'`
-import directive tells the bundler to keep the module out of the SSR bundle. The `/shopping-list` route
-double-wraps its content in `<ClientOnly>` + `<Suspense>` so that:
-
-1. SSR renders the `<ShoppingListPending />` skeleton instead of attempting to read missing state.
-2. The client-side `useSuspenseQuery` can suspend cleanly until the projection resolves.
+Both stores rely on `localStorage`, which is unavailable on the server. Client-only render mode
+(`defaultSsr: false` in `src/start.ts`) means the `/shopping-list` route never renders server-side, so
+the stores are only ever read on the client — no `client-only` directive or `<ClientOnly>` boundary is
+needed. The route still wraps its content in `<Suspense fallback={<ShoppingListPending />}>` so the
+client-side `useSuspenseQuery` can suspend cleanly until the projection resolves.
 
 ### 7.3 Why server projects, client aggregates
 
@@ -397,23 +396,23 @@ the primary, surfaces the partial information without polluting the primary aggr
 
 ## 8. Dependencies & External Integrations
 
-| Dependency                                                                                 | Role                                                                   |
-| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `zustand` + `zustand/middleware`                                                           | Client store + `localStorage` persistence.                             |
-| `@tanstack/react-start`                                                                    | Server function (`createServerFn`) and `client-only` import directive. |
-| `@tanstack/react-router`                                                                   | `createFileRoute` + `ClientOnly`.                                      |
-| `@tanstack/react-query`                                                                    | `queryOptions` + `useSuspenseQuery`.                                   |
-| `zod`                                                                                      | Input validation for `getRecipesByIds`.                                |
-| `drizzle-orm` (via `getDb`)                                                                | Relational query for recipes + ingredient groups + linked recipes.     |
-| `@phosphor-icons/react`                                                                    | `ArrowCounterClockwiseIcon` in `ResetCartButton`.                      |
-| Internal: `@/lib/db/schema/unit`                                                           | `UNITS`, `UnitSlug`, `Dimension`.                                      |
-| Internal: `@/utils/unit-converter`                                                         | `convert(...)`.                                                        |
-| Internal: `@/utils/error-handler`                                                          | `withServerError` wrapper.                                             |
-| Internal: `@/lib/query-keys`                                                               | `queryKeys.recipeListByIds`.                                           |
-| Internal: `@/features/ingredients/utils/constants`                                         | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                 |
-| Internal: `@/components/ui/checkbox`, `@/components/ui/button`, `@/components/ui/skeleton` | UI primitives.                                                         |
-| Internal: `@/utils/number`                                                                 | `formatNumber`.                                                        |
-| Internal: `@/utils/object`                                                                 | `typedEntriesOf`.                                                      |
+| Dependency                                                                                 | Role                                                                     |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `zustand` + `zustand/middleware`                                                           | Client store + `localStorage` persistence.                               |
+| `@tanstack/react-start`                                                                    | Server function (`createServerFn`); `createStart` (`defaultSsr: false`). |
+| `@tanstack/react-router`                                                                   | `createFileRoute`.                                                       |
+| `@tanstack/react-query`                                                                    | `queryOptions` + `useSuspenseQuery`.                                     |
+| `zod`                                                                                      | Input validation for `getRecipesByIds`.                                  |
+| `drizzle-orm` (via `getDb`)                                                                | Relational query for recipes + ingredient groups + linked recipes.       |
+| `@phosphor-icons/react`                                                                    | `ArrowCounterClockwiseIcon` in `ResetCartButton`.                        |
+| Internal: `@/lib/db/schema/unit`                                                           | `UNITS`, `UnitSlug`, `Dimension`.                                        |
+| Internal: `@/utils/unit-converter`                                                         | `convert(...)`.                                                          |
+| Internal: `@/utils/error-handler`                                                          | `withServerError` wrapper.                                               |
+| Internal: `@/lib/query-keys`                                                               | `queryKeys.recipeListByIds`.                                             |
+| Internal: `@/features/ingredients/utils/constants`                                         | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                   |
+| Internal: `@/components/ui/checkbox`, `@/components/ui/button`, `@/components/ui/skeleton` | UI primitives.                                                           |
+| Internal: `@/utils/number`                                                                 | `formatNumber`.                                                          |
+| Internal: `@/utils/object`                                                                 | `typedEntriesOf`.                                                        |
 
 ## 9. Examples & Edge Cases
 
@@ -474,7 +473,7 @@ Flattened into parent: (300 * 2) / 4 = 150 g
 - **VAL-001**: `vp check` passes (format + lint + types) for all files in `src/features/shopping-list/**`, `src/stores/{shopping-list,recipe-quantities}.store.ts`, `src/utils/unit-converter.ts`, and `src/routes/shopping-list.tsx`.
 - **VAL-002**: `vp test` passes the suites described in section 6.
 - **VAL-003**: Manual smoke: navigate to a recipe detail, change wanted servings via the quantity control (writes `recipesQuantities`), click "add to list" (writes `shoppingList`), navigate to `/shopping-list`. The list reflects the chosen servings, groups by category, and the reset button empties the list.
-- **VAL-004**: SSR sanity: the first server response for `/shopping-list` MUST NOT contain any rendered `<CartItem>` (only the skeleton fallback).
+- **VAL-004**: SSR sanity: the first server response for `/shopping-list` MUST be the root shell with an empty `<main>` — no `<CartItem>` and no route content is server-rendered (the route is client-only).
 - **VAL-005**: Persistence: after a hard reload, `shoppingList` and `recipesQuantities` are restored from `localStorage` keys `shopping-list` and `recipe-quantities`.
 - **VAL-006**: Spices invariant: a recipe containing only `spices`-category ingredients results in zero entries in the cart for that recipe (linked recipes included).
 

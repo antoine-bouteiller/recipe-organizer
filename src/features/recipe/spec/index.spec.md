@@ -79,8 +79,10 @@ add the recipe to a shopping list, and edit or delete it.
   `"type":"magimixProgram"` into the serialized instructions JSON.
 - **REQ-004** The list query (`getRecipeListOptions`) MUST be invalidated by every recipe mutation
   via `queryKeys.allRecipes` / `queryKeys.recipeLists()`.
-- **REQ-005** Recipe routes MUST cache via `Cache-Control: public, max-age=86400,
-stale-while-revalidate=604800`.
+- **REQ-005** Recipe routes MUST NOT set public `Cache-Control` headers. They are client-only routes
+  (`defaultSsr: false`); the worker emits only a per-request, auth-dependent shell that is not
+  publicly cacheable. (R2 asset handlers under `/api/*` keep their own cache headers — see
+  `display.spec.md` REQ-004.)
 
 ### Constraints
 

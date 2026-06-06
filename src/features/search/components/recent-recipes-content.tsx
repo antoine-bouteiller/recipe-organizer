@@ -1,4 +1,3 @@
-import '@tanstack/react-start/client-only'
 import { type ReducedRecipe } from '@/features/recipe/api/get-all'
 import { useRecentRecipesStore } from '@/stores/recent-recipes.store'
 

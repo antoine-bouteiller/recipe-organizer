@@ -22,7 +22,7 @@ encrypted server sessions, and shared form context. This document specifies:
 
 - The canonical state layers and their priority order.
 - Where to put a given piece of state ("decision tree").
-- The hydration model (loaders, `ensureQueryData`, `ClientOnly` boundaries).
+- The hydration model (loaders, `ensureQueryData`, client-only render mode).
 - The conventions that prevent server/client mismatches and stale duplicates
   of server data.
 
@@ -52,9 +52,13 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 - **Query key** — A tuple identifying a server resource. All keys are
   produced by helpers in `src/lib/query-keys.ts`.
 - **Loader** — A TanStack Router `loader`/`beforeLoad` function that runs
-  before a route renders, on both server and client.
-- **`ClientOnly`** — A TanStack Start boundary component that suppresses
-  SSR for its subtree.
+  before a route renders. With client-only render mode (below), child-route
+  loaders run on the client; the root's `beforeLoad` runs on the server.
+- **Client-only render mode** — `src/start.ts` sets `defaultSsr: false` and
+  the root route opts back in with `ssr: true`. The worker renders only the
+  document shell; all child-route content renders on the client. This removes
+  the need for `<ClientOnly>` boundaries and the
+  `'@tanstack/react-start/client-only'` directive. See `./routing-ssr.spec.md`.
 - **`createIsomorphicFn`** — TanStack Start helper exposing a function
   with separate server and client implementations (`utils/cookie.ts`).
 
@@ -72,9 +76,10 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   `getRouter()` so that data prefetched in loaders via
   `context.queryClient.ensureQueryData(...)` hydrates the client.
 - **REQ-005:** Persistent client-only state MUST live in `src/stores/*` as
-  Zustand stores using the `persist` middleware. Each store file MUST
-  begin with `import '@tanstack/react-start/client-only'` so that it is
-  excluded from server bundles.
+  Zustand stores using the `persist` middleware. Store files MUST NOT carry
+  the `'@tanstack/react-start/client-only'` directive — under client-only
+  render mode they are never rendered server-side, and Zustand `persist`
+  tolerates the absence of `localStorage` during server module evaluation.
 - **REQ-006:** Each persisted store MUST declare an explicit `partialize`
   that restricts persisted keys to user-controlled state.
 - **REQ-007:** URL/search state MUST be declared per-route via
@@ -91,9 +96,10 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   in `src/features/recipe/contexts/linked-recipes-context.tsx`) MUST be
   used only for values that need to be threaded through a deep subtree
   within a single feature. Cross-feature contexts are prohibited.
-- **REQ-011:** Any component reading a Zustand store MUST be wrapped in
-  `<ClientOnly>` (or be unreachable during SSR) to avoid hydration
-  mismatch from `localStorage`-backed defaults.
+- **REQ-011:** Components reading a Zustand store render normally inside
+  their (client-only) route. They MUST NOT be wrapped in `<ClientOnly>`;
+  client-only render mode already guarantees they never run during SSR, so
+  there is no `localStorage`-backed hydration mismatch.
 - **REQ-012:** Mutations MUST invalidate the affected query keys on
   success using `queryClient.invalidateQueries({ queryKey: ... })`.
 
@@ -102,9 +108,10 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 - **CON-001:** Server data MUST NOT be duplicated into Zustand. The
   shopping list stores recipe ids only; recipes are loaded via
   `queryKeys.recipeListByIds(ids)`.
-- **CON-002:** Zustand stores MUST NOT be read during SSR. They fall back
-  to default values on the server, which differ from the rehydrated
-  client state and produce hydration mismatches.
+- **CON-002:** Zustand stores are never read during SSR because the routes
+  that consume them are client-only (`defaultSsr: false`). Do not move a
+  store consumer into the root shell (`ssr: true`); doing so would read the
+  server default (empty) and reintroduce a hydration mismatch.
 - **CON-003:** Persisted state MUST exclude derived values, server data,
   and ephemeral UI state. Use `partialize` to enforce this.
 - **CON-004:** New global React Contexts are prohibited. Prefer route
@@ -138,8 +145,8 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   then calls `useSuspenseQuery(getXOptions(...))` and renders without a
   loading state.
 - **PAT-002:** _Persisted Zustand store._ `create(persist(initializer,
-{ name, partialize }))` colocated under `src/stores/`, gated by
-  `import '@tanstack/react-start/client-only'`.
+{ name, partialize }))` colocated under `src/stores/`. No client-only
+  directive — consumers live in client-only routes.
 - **PAT-003:** _Hybrid local + server._ Combine a Zustand id list with a
   server query keyed by those ids. See
   `src/features/shopping-list/hooks/use-shopping-list.ts` (selection from
@@ -186,10 +193,10 @@ Two stores live under `src/stores/`:
   shopping list. Persisted under key `shopping-list`, partialized to
   `{ shoppingList }`.
 
-Both files start with `import '@tanstack/react-start/client-only'` so the
-module is omitted from server bundles. Consumer components must be
-rendered inside `<ClientOnly>` (e.g., `routes/shopping-list.tsx` and the
-`QuantityControls` block in `recipe-card.tsx`).
+These are plain modules (no client-only directive). Their consumers
+(`routes/shopping-list.tsx`, the `QuantityControls` block in
+`recipe-card.tsx`, etc.) live in client-only routes, so the stores are only
+ever read on the client — no `<ClientOnly>` boundary is needed.
 
 ### 4.3 URL/Search state — TanStack Router
 
@@ -234,11 +241,11 @@ provider is mounted inside the recipe editor; consumers call
   the cache within `staleTime` (5m).
 - Mutations call `queryClient.invalidateQueries({ queryKey: ... })` on
   success to trigger background refetch.
-- Zustand stores depend on `localStorage`. Their initial state on the
-  server is the default (empty), which would mismatch the rehydrated
-  client value. Therefore any consumer MUST be wrapped in `<ClientOnly>`.
+- Zustand stores depend on `localStorage`. Because their consumers live in
+  client-only routes (`defaultSsr: false`), they are only read on the client,
+  so there is no SSR default to mismatch — no `<ClientOnly>` is needed.
 - Cookie-backed values (theme) are read isomorphically and pass through
-  route context, so they are SSR-safe without `<ClientOnly>`.
+  route context; they render in the SSR'd root shell (`ssr: true`).
 
 ## 6. State Ownership Table
 
@@ -274,8 +281,8 @@ Q2. Should it be shareable, bookmarkable, or survive back/forward
 Q3. Must it survive page reload as a user-controlled preference, with
     no need to share it across devices?
     └── Yes → Persistent Zustand store under src/stores/, persisted via
-              persist middleware with explicit partialize. Wrap consumers
-              in <ClientOnly>.
+              persist middleware with explicit partialize. Consumers render
+              normally (client-only routes; no <ClientOnly> needed).
     └── No  → continue.
 
 Q4. Must it be readable on the server (SSR loaders, server functions)?
@@ -308,10 +315,10 @@ Defaults when unsure:
   When the route renders on the client,
   Then the corresponding component using `useSuspenseQuery(getXOptions)`
   resolves synchronously without a loading boundary trigger.
-- **AC-002:** Given a Zustand store consumer rendered inside
-  `<ClientOnly>`, When the user reloads the page,
-  Then the persisted value is restored from `localStorage` without
-  hydration warnings in the console.
+- **AC-002:** Given a Zustand store consumer in a client-only route, When
+  the user reloads the page, Then the worker returns the shell (empty
+  `<main>`), the persisted value is restored from `localStorage` on the
+  client, and there are no hydration warnings in the console.
 - **AC-003:** Given a successful mutation invalidating
   `queryKeys.recipeList()`, When the recipe list is visible,
   Then it refetches in the background and shows the updated data.
@@ -343,8 +350,10 @@ Defaults when unsure:
   - `useShoppingList()` with a stubbed query returns the merged
     `recipesWithQuantities` shape.
 - **SSR smoke**:
-  - Verify that store modules are not bundled in the server graph (the
-    `@tanstack/react-start/client-only` import would error if reached).
+  - Verify the worker returns the shell with an empty `<main>` for a
+    store-backed route (e.g. `/shopping-list`) and that the build/runtime
+    does not throw (Zustand `persist` tolerates the missing `localStorage`
+    when the store module is evaluated server-side).
 - **Manual checks before merge**: `vp check` (format, lint, types) and
   `vp test`.
 
@@ -362,8 +371,10 @@ Defaults when unsure:
 - Zustand stores are kept narrow and id-shaped (shopping list ids,
   quantities by id) so server data is never copied into the client
   store. Server data stays in the query cache where invalidation works.
-- The `client-only` import on stores plus the `<ClientOnly>` boundary
-  on consumers eliminates the most common SSR hydration mismatch class.
+- Client-only render mode (`defaultSsr: false`) eliminates the most common
+  SSR hydration mismatch class outright: store-backed page content never
+  renders on the server, so no `client-only` directive or `<ClientOnly>`
+  boundary is required.
 - Theme is intentionally a cookie rather than a Zustand store because it
   must be readable during SSR to render `<html className={theme}>`
   without a flash of incorrect theme.
@@ -379,8 +390,8 @@ Defaults when unsure:
   `@tanstack/react-router-ssr-query` — routing, route context, and the
   SSR/Query bridge (`setupRouterSsrQueryIntegration`).
 - **LIB-003:** `@tanstack/react-start` — isomorphic helpers
-  (`createIsomorphicFn`), `client-only` marker, sessions
-  (`useSession`), and `<ClientOnly>` boundary.
+  (`createIsomorphicFn`), sessions (`useSession`), and `createStart`
+  (`src/start.ts`, `defaultSsr: false`).
 - **LIB-004:** `zustand` and `zustand/middleware` — persistent
   client-only stores.
 - **LIB-005:** `zod` — schema validation for `validateSearch` and

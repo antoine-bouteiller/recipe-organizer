@@ -1,9 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { ClientOnly } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
-import { Skeleton } from '@/components/ui/skeleton'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { type RecipeTag } from '@/features/recipe/utils/constants'
 
@@ -31,13 +29,7 @@ export const SearchPage = () => {
       <div className="sticky top-0 z-10 flex flex-col gap-2 bg-background px-4 pt-4 pb-2">
         <SearchFilters onTagsChange={setTags} query={query} setQuery={setQuery} tags={tags} />
       </div>
-      {hasActiveFilters(filters) ? (
-        <ClientOnly fallback={<Skeleton className="mx-4 h-40 rounded-md" />}>
-          <SearchResults onClearFilters={clearFilters} recipes={filtered} />
-        </ClientOnly>
-      ) : (
-        <RecentRecipes recipes={recipes} />
-      )}
+      {hasActiveFilters(filters) ? <SearchResults onClearFilters={clearFilters} recipes={filtered} /> : <RecentRecipes recipes={recipes} />}
     </ScreenLayout>
   )
 }

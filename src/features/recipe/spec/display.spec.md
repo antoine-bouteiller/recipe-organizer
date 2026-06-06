@@ -64,9 +64,9 @@ headers.
   `ingredientGroups` (ordered `isDefault desc`, with the `ingredientGroupSelect` shape) and its
   `linkedRecipes` (each `linkedRecipe` selects `{ id, name }` and its default ingredient group).
   Returns 404 via `notFound()` if absent.
-- **REQ-003** The home page (`/`) and the detail page (`/recipe/$id`) MUST set
-  `Cache-Control: public, max-age=86400, stale-while-revalidate=604800` via the route's
-  `headers()`.
+- **REQ-003** The home page (`/`) and the detail page (`/recipe/$id`) MUST NOT set public
+  `Cache-Control` `headers()`. They are client-only routes (`defaultSsr: false`); the worker emits
+  only a per-request, auth-dependent shell, which is not publicly cacheable.
 - **REQ-004** R2 GET handlers (`/api/image/$id`, `/api/video/$id`) MUST respond with the same
   cache header and resolve content-type from `httpMetadata.contentType` with fallbacks
   `image/webp` and `video/mp4` respectively. Responses are wrapped through
@@ -79,7 +79,8 @@ headers.
 mask-[linear-gradient(...)] backdrop-blur-sm`) for legibility;
   - lists `recipe.tags` as `Badge`s with `vegetarian` highlighted in `bg-emerald-100
 text-emerald-600`;
-  - renders `<QuantityControls variant="card" recipeId servings />` inside `<ClientOnly fallback>`.
+  - renders `<QuantityControls variant="card" recipeId servings />` directly (the route is
+    client-only, so no `<ClientOnly>` wrapper is needed).
 - **REQ-007** `QuantityControls`:
   - renders an "Ajouter à la liste de courses" button (`variant="outline"`, full width) when
     `variant === 'card' && !isInShoppingList(recipeId)`;
@@ -127,11 +128,12 @@ text-emerald-600`;
 
 ### Constraints
 
-- **CON-001** The detail page's loader MUST use `ensureQueryData(getRecipeDetailsOptions(id))` so
-  the SSR pass has the data.
-- **CON-002** `<RecipeIngredientGroups />` and `<QuantityControls />` rely on Zustand stores that
-  are client-only; they MUST be wrapped in `<ClientOnly />` (with a `Skeleton` fallback for the
-  card footer to avoid layout shift).
+- **CON-001** The detail page's loader MUST use `ensureQueryData(getRecipeDetailsOptions(id))`. The
+  route is client-only (`defaultSsr: false`), so the loader runs on the client before the component
+  renders.
+- **CON-002** `<RecipeIngredientGroups />` and `<QuantityControls />` rely on Zustand stores. They
+  render directly (no `<ClientOnly />`) because their routes are client-only and never run during
+  SSR.
 - **CON-003** In dev (`import.meta.env.DEV`), `getImageUrl(key)` returns
   `https://picsum.photos/seed/${key}/300/200` instead of `/api/image/${key}`. Tests that hit
   image URLs MUST account for this.
@@ -245,9 +247,10 @@ useIsInShoppingList(recipeId: number): boolean
 - **Why two layouts on the detail page?** Ingredient density vs. instruction reading is very
   different on phone and desktop. On phone, a single column with swipeable tabs keeps the screen
   uncluttered; on desktop, the side-by-side grid lets the cook keep both visible while working.
-- **Why `<ClientOnly>` for the card footer?** `useShoppingListStore` and
-  `useRecipeQuantitiesStore` read from `localStorage`. Rendering them during SSR would either
-  hydrate-mismatch or force a serialized empty state that flickers.
+- **Why no `<ClientOnly>` for the card footer?** `useShoppingListStore` and
+  `useRecipeQuantitiesStore` read from `localStorage`. Client-only render mode (`defaultSsr: false`)
+  means these components never render during SSR, so they read the store directly on the client with
+  no hydration mismatch — `<ClientOnly>` is unnecessary.
 - **Why merge linked recipes into the displayed ingredient groups?** Cooks expect to see the
   full ingredient list of a composite dish (e.g. "Tagliatelles + sauce bolognaise"). The detail
   loader fetches each linked recipe's _default_ group only; non-default groups are intentionally

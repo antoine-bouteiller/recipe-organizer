@@ -1,4 +1,3 @@
-import '@tanstack/react-start/client-only'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 

@@ -1,4 +1,4 @@
-import { ClientOnly, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { Suspense } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -20,21 +20,11 @@ const ShoppingListPending = () =>
   ))
 
 const ShoppingListPage = () => (
-  <ScreenLayout
-    pageKey="/shopping-list"
-    headerEndItem={
-      <ClientOnly>
-        <ResetCartButton />
-      </ClientOnly>
-    }
-    title="Liste de courses"
-  >
+  <ScreenLayout pageKey="/shopping-list" headerEndItem={<ResetCartButton />} title="Liste de courses">
     <div className="space-y-4 p-8">
-      <ClientOnly fallback={<ShoppingListPending />}>
-        <Suspense fallback={<ShoppingListPending />}>
-          <ShoppingList />
-        </Suspense>
-      </ClientOnly>
+      <Suspense fallback={<ShoppingListPending />}>
+        <ShoppingList />
+      </Suspense>
     </div>
   </ScreenLayout>
 )

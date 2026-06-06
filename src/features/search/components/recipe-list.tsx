@@ -1,4 +1,3 @@
-import '@tanstack/react-start/client-only'
 import { ArrowRightIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import { Fragment } from 'react/jsx-runtime'

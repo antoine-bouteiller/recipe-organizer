@@ -103,10 +103,11 @@ Contributors and AI agents implementing or modifying the search/filter page and 
   tail.
 - **REQ-015**: The recent-recipes state MUST be a persisted Zustand store at `src/stores/recent-recipes.store.ts`
   (`useRecentRecipesStore`) holding ids only (`number[]`), following the persisted-store convention in the client-state
-  spec (first line `import '@tanstack/react-start/client-only'`, `persist` middleware, explicit `partialize`).
-- **REQ-016**: The recents section MUST be wrapped in `<ClientOnly fallback={<Skeleton …/>}>`; it MUST NOT read the
-  store during SSR. On empty history (`recentRecipeIds` resolves to zero recipes), it MUST fall back to the full
-  catalogue in `name` ascending order so the default view is never empty on first use.
+  spec (`persist` middleware, explicit `partialize`, no `client-only` directive).
+- **REQ-016**: The recents section renders directly (no `<ClientOnly>`): the `/search` route is client-only
+  (`defaultSsr: false`), so the store is read only on the client. On empty history (`recentRecipeIds` resolves to zero
+  recipes), it MUST fall back to the full catalogue in `name` ascending order so the default view is never empty on
+  first use.
 
 ### 3.2 Constraints
 
@@ -121,8 +122,8 @@ Contributors and AI agents implementing or modifying the search/filter page and 
 - **CON-005**: All new files MUST be kebab-case TypeScript (`.ts` for non-JSX, `.tsx` for JSX) per repo lint rules.
 - **CON-006**: Recent recipes MUST persist ids only (never full recipe snapshots); the display always resolves ids
   against the live `getRecipeListOptions` cache so renamed/edited recipes show current data and deleted recipes vanish.
-- **CON-007**: The recent-recipes store is browser-local (`localStorage`) and MUST NOT be read during SSR; consumers
-  satisfy this via `<ClientOnly>` per REQ-016 (matches the client-state spec hydration rule).
+- **CON-007**: The recent-recipes store is browser-local (`localStorage`) and is read only on the client because the
+  `/search` route is client-only (`defaultSsr: false`); no `<ClientOnly>` is needed (matches the client-state spec).
 
 ### 3.3 Guidelines
 
@@ -229,7 +230,6 @@ export const normalize = (value: string): string =>
 
 ```ts
 // src/stores/recent-recipes.store.ts
-import '@tanstack/react-start/client-only'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -260,7 +260,7 @@ export const useRecentRecipesStore = create<RecentRecipesState>()(
 ### 4.8 Content-area selection & recents resolution
 
 ```ts
-// Inside <ClientOnly fallback={<Skeleton/>}> for the recents branch:
+// Recents branch (client-only route — read store directly):
 const recentRecipes = recentRecipeIds
   .map((id) => recipes.find((recipe) => recipe.id === id))
   .filter((recipe): recipe is ReducedRecipe => recipe !== undefined) // skip stale/deleted ids
@@ -281,9 +281,9 @@ src/features/search/
     search-filters.tsx        // search input + filter button revealing the category chip (Collapsible)
     category-select.tsx       // multi-select of categories via shared ResponsiveSelect (popover/drawer)
     search-results.tsx        // filtered results or empty state (clear-all action)
-    recent-recipes.tsx        // ClientOnly wrapper (skeleton fallback) — server-safe
-    recent-recipes-content.tsx// client-only: reads store, resolves recents, fallback to catalogue
-    recipe-list.tsx           // client-only: ItemGroup of per-row Links (records recent on activate)
+    recent-recipes.tsx        // thin wrapper rendering recent-recipes-content
+    recent-recipes-content.tsx// reads store, resolves recents, fallback to catalogue
+    recipe-list.tsx           // ItemGroup of per-row Links (records recent on activate)
   utils/
     filter.ts                 // matchesQuery / matchesTags / filterRecipes
     normalize.ts              // normalize()
@@ -293,10 +293,9 @@ src/stores/
   recent-recipes.store.ts     // useRecentRecipesStore (persisted, ids only) — see §4.7
 ```
 
-> Client-only boundary: any module that statically imports the persisted store (`recipe-list.tsx`,
-> `recent-recipes-content.tsx`) MUST begin with `import '@tanstack/react-start/client-only'` and be rendered only
-> inside `<ClientOnly>`, so it is dropped from the server bundle (mirrors `quantity-controls.tsx`). The results branch
-> is therefore wrapped in `<ClientOnly>` in `search-page.tsx`; active filters only ever occur after hydration.
+> Client-only rendering: the `/search` route is client-only (`defaultSsr: false`), so modules that read the persisted
+> store (`recipe-list.tsx`, `recent-recipes-content.tsx`) run only on the client. No `client-only` directive or
+> `<ClientOnly>` boundary is needed — both branches (results and recents) render directly.
 
 > Note: per file-structure REQ-013 this single-file feature spec lives at `src/features/search/search.spec.md`. If the
 > feature later grows multiple specs, it MAY move to `src/features/search/spec/index.spec.md` plus sub-specs.
@@ -325,8 +324,9 @@ src/stores/
   oldest is dropped (cap = `MAX_RECENT_RECIPES`).
 - **AC-011**: Given a `recentRecipeIds` entry whose recipe was deleted (absent from the cached list), When the recent
   section renders, Then that id is skipped and no broken row is shown.
-- **AC-012**: Given the page is server-rendered, Then the recents section renders its `<Skeleton>` fallback until the
-  store hydrates, with no SSR hydration mismatch; after hydration `recentRecipeIds` is restored from `localStorage`.
+- **AC-012**: Given the page is requested, Then the worker returns the root shell with an empty `<main>` (the `/search`
+  route is client-only); the recents section renders on the client with no hydration mismatch, and `recentRecipeIds` is
+  restored from `localStorage`.
 - **AC-013**: Given the same data, When `getRecipeListOptions` is queried, Then its shape and key
   (`queryKeys.recipeList()`) are unchanged, so the home list, command palette, and recipe-form combobox behave
   identically.
@@ -362,9 +362,9 @@ src/stores/
 - **7.7 Why `localStorage` and `/search`-only recording for v1** — Recent recipes are a low-stakes per-device
   convenience; `localStorage` via Zustand `persist` needs no schema, migration, or auth. Recording only from `/search`
   keeps the feature self-contained (no edits into the command palette); both are easy future extensions.
-- **7.8 Why `<ClientOnly>` + skeleton** — The store reads `localStorage`, unavailable at SSR; a skeleton fallback
-  matches the existing `recipe-card.tsx` pattern and avoids a full-catalogue → recents content flash for returning
-  users.
+- **7.8 Why client-only rendering** — The store reads `localStorage`, unavailable at SSR. Client-only render mode
+  (`defaultSsr: false`) means the `/search` route never renders server-side, so the store is read directly on the
+  client with no hydration mismatch and no `<ClientOnly>` boundary.
 
 ## 8. Dependencies & External Integrations
 
@@ -379,12 +379,12 @@ src/stores/
 
 ### Technology Platform Dependencies
 
-- **PLT-001**: TanStack Start/Router (route, loader, `Link`, `ClientOnly`) and TanStack React Query
-  (`getRecipeListOptions`, `ensureQueryData`).
+- **PLT-001**: TanStack Start/Router (route, loader, `Link`; client-only render via `createStart`'s `defaultSsr: false`)
+  and TanStack React Query (`getRecipeListOptions`, `ensureQueryData`).
 - **PLT-002**: ECMAScript `String.prototype.normalize('NFD')` and Unicode property escapes (`\p{Diacritic}`), available
   in the Workers runtime and target browsers.
-- **PLT-003**: Zustand + `zustand/middleware` `persist` over the browser `localStorage` API (recent-recipes store);
-  `@tanstack/react-start/client-only` to keep the store out of SSR.
+- **PLT-003**: Zustand + `zustand/middleware` `persist` over the browser `localStorage` API (recent-recipes store).
+  The store is read only on the client because `/search` is a client-only route.
 
 ### Compliance Dependencies
 
@@ -436,9 +436,9 @@ Edge cases:
 - **VAL-003**: This spec parses against the front-matter and eleven-section schema in `docs/file-structure.spec.md` §4.
 - **VAL-004**: `getRecipeListOptions` and `ReducedRecipe` are byte-for-byte unchanged by this feature (no projection or
   key churn); existing consumers compile and behave identically.
-- **VAL-005**: `src/stores/recent-recipes.store.ts` begins with `import '@tanstack/react-start/client-only'`, uses the
-  `persist` middleware with `name: 'recent-recipes'` and an explicit `partialize` exposing only `recentRecipeIds`, and
-  every consumer is wrapped in `<ClientOnly>`.
+- **VAL-005**: `src/stores/recent-recipes.store.ts` is a plain module (no `client-only` directive) using the `persist`
+  middleware with `name: 'recent-recipes'` and an explicit `partialize` exposing only `recentRecipeIds`; consumers
+  render directly within the client-only `/search` route (no `<ClientOnly>`).
 - **VAL-006**: Manual check — typing an accented vs unaccented query yields identical results; multiple tags narrow
   results; clearing filters returns to recents; a zero-match filter shows the empty state; opening recipes from
   `/search` populates "Recherches récentes" most-recent-first; re-opening reorders without duplicating; the list never
@@ -451,7 +451,7 @@ Edge cases:
 - [Data Layer (Drizzle + D1)](../../../docs/infrastructure/data-layer.spec.md) — relational `with` projection (for the
   deferred ingredient-search increment)
 - [Server Functions](../../../docs/infrastructure/server-functions.spec.md)
-- [Client State Layering](../../../docs/infrastructure/client-state.spec.md) — persisted store + `<ClientOnly>` rules
+- [Client State Layering](../../../docs/infrastructure/client-state.spec.md) — persisted store + client-only render rules
 - [Routing & SSR](../../../docs/infrastructure/routing-ssr.spec.md)
 - [Project File Structure Spec](../../../docs/file-structure.spec.md) — §4 spec template
 

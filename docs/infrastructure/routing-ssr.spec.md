@@ -55,6 +55,9 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
 - TanStack Start owns the SSR runtime; the Cloudflare Worker entrypoint is
   `@tanstack/react-start/server-entry` (see `wrangler.jsonc`).
 - The QueryClient/Router SSR hydration is performed by `setupRouterSsrQueryIntegration`.
+- The app runs in **client-only render mode**: `src/start.ts` sets `defaultSsr: false`, and the root
+  route opts back into SSR (`ssr: true`). The worker therefore renders only the document shell (root)
+  per request; all child-route content renders on the client.
 
 ## 2. Definitions
 
@@ -99,7 +102,14 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
   serialized and rehydrated on the client.
 - **REQ-004** — The root route MUST be declared via
   `createRootRouteWithContext<{ authUser: AuthUser; queryClient: QueryClient; theme: Theme }>()`
-  and MUST set `shellComponent` (not `component`) so it owns the `<html>` element.
+  and MUST set `shellComponent` (not `component`) so it owns the `<html>` element. It MUST set
+  `ssr: true` so the document shell (and the root `beforeLoad` auth resolution) renders server-side
+  per request even though `defaultSsr` is `false`.
+- **REQ-004a** — `src/start.ts` MUST export a Start instance created with
+  `createStart(() => ({ defaultSsr: false }))`. This makes every route client-only by default; only
+  the root (REQ-004) renders server-side. Consequently child-route components, including ones that
+  read persisted (`localStorage`-backed) Zustand stores, render exclusively on the client — no
+  `<ClientOnly>` boundary or `'@tanstack/react-start/client-only'` directive is required.
 - **REQ-005** — The root `beforeLoad` MUST resolve `getAuthUser()` and `getTheme()` and return
   `{ authUser, isAdmin: authUser?.role === 'admin', theme }` so child routes can gate on
   `context.authUser` and `context.isAdmin`.
@@ -145,9 +155,11 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
 - **REQ-017** — `validateSearch` MUST be a Zod parser. Routes that declare it:
   - `/`: `z.object({ search: z.boolean().optional() })`
   - `/auth/login`: `z.object({ error: z.string().optional() })` (rendered as a toast on mount).
-- **REQ-018** — Pages whose payload is publicly cacheable MUST set
-  `headers: () => ({ 'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800' })`.
-  Currently applied to `/` and `/recipe/$id`.
+- **REQ-018** — Routes MUST NOT set public `Cache-Control` `headers()`. Because route content is
+  client-only (REQ-004a), the worker emits only a per-request, auth-dependent shell, which is not
+  safe to cache publicly. (Historically `/` and `/recipe/$id` set
+  `public, max-age=86400, stale-while-revalidate=604800`; this was removed with the move to
+  client-only rendering.)
 - **REQ-019** — API routes MUST be declared as `createFileRoute('/api/<path>')({ server: {
 handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-keyed
   `Request -> Response` handlers. Existing API routes:
@@ -204,9 +216,9 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
 - **CON-009** — The OAuth callback (`/api/auth/google/callback`) finishes by `throw redirect({ to:
 '/' })`. The `throw` form is required so TanStack Router serializes the redirect; returning a
   redirect object would render the route component instead.
-- **CON-010** — Cache headers from `headers()` are emitted on the SSR HTML response only. They do
-  NOT flow through to subsequent client-side navigations (which are JSON loader fetches managed by
-  the router/Query cache).
+- **CON-010** — The worker-rendered shell is per-request and auth-dependent (the root resolves
+  `authUser` server-side), so it MUST NOT be served with public cache headers. Edge/CDN caching of
+  navigations is not used.
 - **CON-011** — `validateSearch` runs on every navigation, including programmatic ones. It must be
   total — `safeParse` is required when malformed input is plausible (e.g. `/`'s `search`
   param), `parse` is acceptable when the value is always controlled (e.g. `/auth/login`'s
@@ -233,8 +245,11 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
 - **GUD-004** — Use `useSuspenseQuery` when the loader has guaranteed prefetch and the consuming
   component is happy to suspend (most pages). Use `useQuery` when nullable rendering is desired
   (e.g. recipe detail's `if (!recipe) return null`).
-- **GUD-005** — Use `<ClientOnly>` for components that depend on client-only state
-  (`localStorage`, `navigator.onLine`, motion, swipe gestures) to avoid SSR hydration mismatches.
+- **GUD-005** — Do NOT use `<ClientOnly>` or the `'@tanstack/react-start/client-only'` directive for
+  components depending on client-only state (`localStorage`, motion, swipe gestures). Client-only
+  rendering (REQ-004a) already guarantees these never run server-side. The exception is anything that
+  must render inside the root shell itself (e.g. `OfflineBanner`), which guards on client mount
+  directly.
 - **GUD-006** — When forwarding a `<Button>` to a `<Link>`, use the `render` prop pattern:
   `render={<Link to=... viewTransition />}`. This preserves Button styling while delegating
   navigation.
@@ -258,14 +273,13 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
   })
   ```
 
-- **PAT-002** — _Public, cache-headed listing page with search params._
+- **PAT-002** — _Public listing page with search params (client-only render)._
 
   ```tsx
   const searchSchema = z.object({ search: z.boolean().optional() })
 
   export const Route = createFileRoute('/')({
     component: RecipeList,
-    headers: () => ({ 'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800' }),
     loader: async ({ context }) => {
       await context.queryClient.ensureQueryData(getRecipeListOptions())
     },
@@ -277,14 +291,13 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
   })
   ```
 
-- **PAT-003** — _Detail page with parsed numeric param + cache headers._
+- **PAT-003** — _Detail page with parsed numeric param (client-only render)._
 
   ```tsx
   const paramsSchema = z.object({ id: z.string().transform((s) => Number.parseInt(s, 10)) })
 
   export const Route = createFileRoute('/recipe/$id')({
     component: RecipePage,
-    headers: () => ({ 'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800' }),
     loader: async ({ context, params }) => {
       const result = paramsSchema.safeParse(params)
       if (!result.success) throw new Error(result.error?.issues[0]?.message ?? 'Invalid id')
@@ -361,23 +374,23 @@ The following table is exhaustive for routes currently defined under `src/routes
 `beforeLoad` redirects unauthenticated users. "Admin (UI)" = component branches on
 `context.isAdmin` for write actions but does not redirect.
 
-| Path                        | File                                 | Auth                                          | Loader prefetch                                                                       | Search / Params                                       | Cache-Control                                          |
-| --------------------------- | ------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| `/` (index)                 | `routes/index.tsx`                   | Public                                        | `getRecipeListOptions()`                                                              | `searchSchema = { search?: boolean }` (safeParse)     | `public, max-age=86400, stale-while-revalidate=604800` |
-| `/search`                   | `routes/search.tsx`                  | Public                                        | `getRecipeListOptions()`                                                              | —                                                     | —                                                      |
-| `/shopping-list`            | `routes/shopping-list.tsx`           | Public                                        | — (client-only data via `<ClientOnly>` + Suspense)                                    | —                                                     | —                                                      |
-| `/auth/login`               | `routes/auth/login.tsx`              | Anti-auth (redirects to `/` if signed in)     | —                                                                                     | `searchSchema = { error?: string }` (parse)           | —                                                      |
-| `/recipe/$id`               | `routes/recipe/$id.tsx`              | Public                                        | `getRecipeDetailsOptions(id)`                                                         | `paramsSchema = { id: string -> number }` (in loader) | `public, max-age=86400, stale-while-revalidate=604800` |
-| `/recipe/new`               | `routes/recipe/new.tsx`              | Required                                      | `getIngredientListOptions()`, `getRecipeListOptions()`                                | —                                                     | —                                                      |
-| `/recipe/edit/$id`          | `routes/recipe/edit.$id.tsx`         | Required                                      | `getRecipeDetailsOptions(id)`, `getIngredientListOptions()`, `getRecipeListOptions()` | `paramsSchema = { id: string -> number }` (in loader) | —                                                      |
-| `/settings` (layout)        | `routes/settings.tsx`                | Required                                      | —                                                                                     | —                                                     | —                                                      |
-| `/settings/` (index)        | `routes/settings/index.tsx`          | Inherits                                      | —                                                                                     | —                                                     | —                                                      |
-| `/settings/account`         | `routes/settings/account.tsx`        | Inherits                                      | —                                                                                     | —                                                     | —                                                      |
-| `/settings/ingredients`     | `routes/settings/ingredients.tsx`    | Inherits                                      | `getIngredientListOptions()`                                                          | —                                                     | —                                                      |
-| `/settings/users`           | `routes/settings/users.tsx`          | Admin (own `beforeLoad` redirects non-admins) | `getUserListOptions('active')`, `('blocked')`, `('pending')`                          | —                                                     | —                                                      |
-| `/api/auth/google/callback` | `routes/api/auth/google/callback.ts` | n/a (server)                                  | `GET` — exchanges OAuth code/state then `throw redirect({ to: '/' })`                 | URL search params: `code`, `state` (raw)              | n/a                                                    |
-| `/api/image/$id`            | `routes/api/image/$id.ts`            | n/a (server)                                  | `GET = createR2GetHandler('image/webp')`                                              | Path: `$id`                                           | Set by R2 helper                                       |
-| `/api/video/$id`            | `routes/api/video/$id.ts`            | n/a (server)                                  | `GET = createR2GetHandler('video/mp4')`, `HEAD = createR2HeadHandler('video/mp4')`    | Path: `$id`                                           | Set by R2 helper                                       |
+| Path                        | File                                 | Auth                                          | Loader prefetch                                                                       | Search / Params                                       | Cache-Control    |
+| --------------------------- | ------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------- |
+| `/` (index)                 | `routes/index.tsx`                   | Public                                        | `getRecipeListOptions()`                                                              | `searchSchema = { search?: boolean }` (safeParse)     | —                |
+| `/search`                   | `routes/search.tsx`                  | Public                                        | `getRecipeListOptions()`                                                              | —                                                     | —                |
+| `/shopping-list`            | `routes/shopping-list.tsx`           | Public                                        | — (client-only route; store data via Suspense)                                        | —                                                     | —                |
+| `/auth/login`               | `routes/auth/login.tsx`              | Anti-auth (redirects to `/` if signed in)     | —                                                                                     | `searchSchema = { error?: string }` (parse)           | —                |
+| `/recipe/$id`               | `routes/recipe/$id.tsx`              | Public                                        | `getRecipeDetailsOptions(id)`                                                         | `paramsSchema = { id: string -> number }` (in loader) | —                |
+| `/recipe/new`               | `routes/recipe/new.tsx`              | Required                                      | `getIngredientListOptions()`, `getRecipeListOptions()`                                | —                                                     | —                |
+| `/recipe/edit/$id`          | `routes/recipe/edit.$id.tsx`         | Required                                      | `getRecipeDetailsOptions(id)`, `getIngredientListOptions()`, `getRecipeListOptions()` | `paramsSchema = { id: string -> number }` (in loader) | —                |
+| `/settings` (layout)        | `routes/settings.tsx`                | Required                                      | —                                                                                     | —                                                     | —                |
+| `/settings/` (index)        | `routes/settings/index.tsx`          | Inherits                                      | —                                                                                     | —                                                     | —                |
+| `/settings/account`         | `routes/settings/account.tsx`        | Inherits                                      | —                                                                                     | —                                                     | —                |
+| `/settings/ingredients`     | `routes/settings/ingredients.tsx`    | Inherits                                      | `getIngredientListOptions()`                                                          | —                                                     | —                |
+| `/settings/users`           | `routes/settings/users.tsx`          | Admin (own `beforeLoad` redirects non-admins) | `getUserListOptions('active')`, `('blocked')`, `('pending')`                          | —                                                     | —                |
+| `/api/auth/google/callback` | `routes/api/auth/google/callback.ts` | n/a (server)                                  | `GET` — exchanges OAuth code/state then `throw redirect({ to: '/' })`                 | URL search params: `code`, `state` (raw)              | n/a              |
+| `/api/image/$id`            | `routes/api/image/$id.ts`            | n/a (server)                                  | `GET = createR2GetHandler('image/webp')`                                              | Path: `$id`                                           | Set by R2 helper |
+| `/api/video/$id`            | `routes/api/video/$id.ts`            | n/a (server)                                  | `GET = createR2GetHandler('video/mp4')`, `HEAD = createR2HeadHandler('video/mp4')`    | Path: `$id`                                           | Set by R2 helper |
 
 Notes:
 
@@ -411,20 +424,22 @@ type ResolvedRootContext = RootContext & { isAdmin: boolean }
 - The actual values are computed in the root `beforeLoad` and merged into the context for all
   descendants.
 
-### 5.2 SSR pipeline
+### 5.2 SSR pipeline (client-only render mode)
 
 1. **Cloudflare Worker** invokes `@tanstack/react-start/server-entry` (the package main, see
    `wrangler.jsonc`).
 2. **TanStack Start** calls `getRouter()` per request → fresh `QueryClient` + `Router` with the
    generated tree.
-3. **Router resolution** runs `__root#beforeLoad` (auth + theme), then matched-route `beforeLoad`s
-   (auth gates), then matched-route loaders (query prefetch via `ensureQueryData`).
-4. **`setupRouterSsrQueryIntegration`** wires the QueryClient cache into the SSR stream so
-   prefetched queries are dehydrated alongside the router state.
-5. **Render** emits the document HTML. The root sets `Cache-Control` (when defined per route via
-   `headers()`).
-6. **Client hydration** rehydrates router state and Query cache from `<Scripts />`. The root's
-   `useEffect` registers the service worker.
+3. **Shell render.** Because `defaultSsr: false` (`src/start.ts`), only the root route (`ssr: true`)
+   renders server-side. The worker runs `__root#beforeLoad` (auth + theme) per request and emits the
+   document shell (`<html>`, head, `<Navbar>`, empty `<main>` boundary, `<Scripts />`). Child-route
+   `beforeLoad`s and loaders do NOT run on the server.
+4. **Client takeover.** After hydration, the router runs the matched child route's `beforeLoad`
+   (auth gates) and loader (`ensureQueryData`) in the browser, then renders the route content. Auth
+   gates read `context.authUser` resolved by the SSR'd root and inherited by descendants.
+5. **`setupRouterSsrQueryIntegration`** wires the QueryClient cache into the router on both sides;
+   for client-only routes the prefetch/consume cycle runs entirely in the browser.
+6. **Service worker.** The root's `useEffect` registers the service worker on client mount.
 
 ### 5.3 Service worker
 
@@ -469,8 +484,9 @@ type ResolvedRootContext = RootContext & { isAdmin: boolean }
   it; navigation from a `<Link to="/foo/bar" />` triggers prefetching on hover.
 - **AC-002** — Visiting `/recipe/new` while signed-out produces a redirect to `/auth/login` with
   no flicker; visiting `/auth/login` while signed-in produces a redirect to `/`.
-- **AC-003** — A signed-out visit to `/` SSR-renders the recipe list (queries are dehydrated) and
-  the response carries `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`.
+- **AC-003** — A signed-out visit to `/` returns the worker-rendered shell with an empty `<main>`
+  (route content is client-only); the recipe list then renders on the client after hydration. The
+  response carries no public `Cache-Control` header.
 - **AC-004** — A `<Link to="/recipe/$id" viewTransition>` in the recipe list triggers a
   view-transition animation in Chromium; pressing the browser back button on the detail page
   triggers the `back-transition` slide animation via `useBackViewTransition`.
@@ -523,8 +539,13 @@ type ResolvedRootContext = RootContext & { isAdmin: boolean }
   inherit the auth gate without each having to re-declare it.
 - **Anonymous read for recipes.** Treating `/`, `/recipe/$id`, `/search` as public allows
   unauthenticated users to browse content while still hiding write affordances behind
-  `authUser`/`isAdmin` UI checks. This is also why those routes carry HTTP cache headers — they
-  are safe to cache at edges/CDN.
+  `authUser`/`isAdmin` UI checks.
+- **Client-only render mode.** `defaultSsr: false` (with the root opted into SSR) renders all page
+  content on the client. This removes the whole class of SSR hydration mismatches around
+  `localStorage`-backed stores — so `<ClientOnly>` boundaries and `'@tanstack/react-start/client-only'`
+  directives are no longer needed — while the worker still produces a real per-request shell that
+  resolves auth server-side. The trade-off (no edge-cacheable HTML, worker runs per navigation) is
+  acceptable for a personal app with no SEO requirement.
 - **Service worker silent-fail.** Offline support is a progressive enhancement; a registration
   failure (e.g. browsers that reject module SW types) must not crash the app shell.
 
