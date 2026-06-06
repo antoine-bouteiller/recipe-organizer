@@ -1,12 +1,30 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@tsconfig/vite-react/tsconfig.json",
   "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "es2023",
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "webworker"],
+    "types": ["vite-plus/client", "@serwist/vite/typings"],
+    "module": "esnext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "lib": ["ESNext", "DOM", "DOM.Iterable", "webworker"],
-    "types": ["vite-plus/client", "@serwist/vite/typings"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
   "files": ["worker-configuration.d.ts"]

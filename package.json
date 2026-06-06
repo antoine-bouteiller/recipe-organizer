@@ -52,7 +52,6 @@
     "@tanstack/react-devtools": "0.10.5",
     "@tanstack/react-query-devtools": "5.100.14",
     "@tanstack/react-router-devtools": "1.167.0",
-    "@tsconfig/vite-react": "7.0.2",
     "@types/node": "25.9.1",
     "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
