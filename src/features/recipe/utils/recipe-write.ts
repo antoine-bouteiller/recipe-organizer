@@ -5,7 +5,7 @@ import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinke
 import { type UnitSlug } from '@/lib/db/schema/unit'
 import { isNotEmpty } from '@/utils/array'
 
-import { type RecipeTag } from '../utils/constants'
+import { type RecipeTag } from './constants'
 
 interface IngredientGroupWrite {
   readonly groupName?: string

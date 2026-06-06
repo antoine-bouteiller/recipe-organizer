@@ -16,8 +16,8 @@ import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
-import { resolveAutoTags, writeRecipeIngredientGraph } from '../lib/recipe-write'
 import { getTitle } from '../utils/get-recipe-title'
+import { resolveAutoTags, writeRecipeIngredientGraph } from '../utils/recipe-write'
 
 const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
 

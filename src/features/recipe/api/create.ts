@@ -12,9 +12,9 @@ import { uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
 import { parseFormData } from '@/utils/form-data'
 
-import { resolveAutoTags, writeRecipeIngredientGraph } from '../lib/recipe-write'
 import { RECIPE_TAGS } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
+import { resolveAutoTags, writeRecipeIngredientGraph } from '../utils/recipe-write'
 
 const recipeSchema = z.object({
   image: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]),
