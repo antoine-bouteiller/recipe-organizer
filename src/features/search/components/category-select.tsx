@@ -1,7 +1,7 @@
 import { Select } from '@/components/common/select'
-import { AUTO_TAGS, RECIPE_TAGS, RECIPE_TAG_LABELS, type RecipeTag } from '@/features/recipe/utils/constants'
+import { RECIPE_TAGS, RECIPE_TAG_LABELS, type RecipeTag } from '@/features/recipe/utils/constants'
 
-const categoryItems = [...RECIPE_TAGS, ...AUTO_TAGS].map((tag) => ({
+const categoryItems = RECIPE_TAGS.map((tag) => ({
   label: RECIPE_TAG_LABELS[tag],
   value: tag,
 }))

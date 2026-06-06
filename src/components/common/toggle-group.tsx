@@ -10,7 +10,7 @@ interface ToggleGroupProps {
   className?: string
 }
 
-export const ToggleGroup = ({ items, value, onValueChange, disabled, className = 'flex-wrap' }: ToggleGroupProps): ReactElement => (
+export const ToggleGroup = ({ items, value, onValueChange, disabled, className }: ToggleGroupProps): ReactElement => (
   <ToggleGroupRoot className={className} disabled={disabled} multiple onValueChange={onValueChange} value={value}>
     {items.map(({ label, value: itemValue }) => (
       <Toggle key={itemValue} value={itemValue}>
