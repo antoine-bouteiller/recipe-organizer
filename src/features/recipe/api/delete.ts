@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 
+import { assertOwnerOrAdmin } from '@/features/auth/lib/assert-owner-or-admin'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
@@ -41,9 +42,7 @@ const deleteRecipe = createServerFn({
         throw new Error('Recipe not found')
       }
 
-      if (context.user.role !== 'admin' && currentRecipe.createdBy !== context.user.id) {
-        throw new Error('Permission denied')
-      }
+      assertOwnerOrAdmin(context.user, currentRecipe)
 
       await getDb().batch([
         getDb()

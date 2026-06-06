@@ -5,6 +5,7 @@ import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
+import { assertOwnerOrAdmin } from '@/features/auth/lib/assert-owner-or-admin'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'
 import { getDb } from '@/lib/db'
@@ -70,9 +71,7 @@ const updateRecipe = createServerFn({
         throw notFound()
       }
 
-      if (context.user.role !== 'admin' && currentRecipe.createdBy !== context.user.id) {
-        throw new Error('Permission denied')
-      }
+      assertOwnerOrAdmin(context.user, currentRecipe)
 
       const imageKey = await resolveImageKey(image, currentRecipe.image)
       const videoKey = await resolveVideoKey(video, currentRecipe.video)
