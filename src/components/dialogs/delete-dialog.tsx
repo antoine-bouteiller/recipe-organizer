@@ -1,10 +1,9 @@
 import { TrashIcon } from '@phosphor-icons/react'
 import { useState, useTransition, type ComponentPropsWithoutRef, type ElementType } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
-
-import { Spinner } from '../ui/spinner'
+import { Button } from '@/components/common/button'
+import { Dialog } from '@/components/common/dialog'
+import { Spinner } from '@/components/common/spinner'
 
 interface DeleteDialogProps {
   actionLabel?: string

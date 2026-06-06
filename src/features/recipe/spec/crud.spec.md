@@ -257,7 +257,7 @@ deleteFile(key: string): Promise<void>
 - **`@/utils/error-handler`** for `withServerError`.
 - **`zod`** for input validation.
 - **`@tanstack/react-query`** for `mutationOptions` and the invalidation contract.
-- **`@/components/ui/toast`** + **`@/lib/toast-helpers`** for user feedback (`toastError`, success
+- **`@/components/common/toast`** + **`@/lib/toast-helpers`** for user feedback (`toastError`, success
   toasts on create/update).
 
 ## 9. Examples & Edge Cases

@@ -1,6 +1,6 @@
 import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/common/button'
 import { useShoppingListStore } from '@/stores/shopping-list.store'
 
 export const ResetCartButton = () => {

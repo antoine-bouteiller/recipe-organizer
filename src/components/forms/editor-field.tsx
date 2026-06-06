@@ -2,9 +2,9 @@ import { ArrowUUpLeftIcon, ArrowUUpRightIcon, ListBulletsIcon, TextBolderIcon, T
 import { type Klass, type LexicalNode } from 'lexical'
 import { type ReactNode } from 'react'
 
-import { Editor, EditorContent, EditorToolbarButton } from '@/components/ui/editor'
-import { Field } from '@/components/ui/field'
-import { Toolbar } from '@/components/ui/toolbar'
+import { Editor, EditorContent, EditorToolbarButton } from '@/components/common/editor'
+import { Field } from '@/components/common/field'
+import { Toolbar } from '@/components/common/toolbar'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface EditorFieldProps {

@@ -443,7 +443,7 @@ denied'`). One positive path per function.
 | Internal | `@/lib/db` (`getDb`)                                                                           | Drizzle D1 client                       |
 | Internal | `@/lib/db/schema` (`user`)                                                                     | Drizzle table definition                |
 | Internal | `@/lib/query-keys` (`queryKeys.allUsers`, `queryKeys.listUsers`)                               | React Query key factory                 |
-| Internal | `@/components/ui/toast` (`toastManager`) and `@/lib/toast-helpers` (`toastError`)              | User feedback                           |
+| Internal | `@/components/common/toast` (`toastManager`) and `@/lib/toast-helpers` (`toastError`)          | User feedback                           |
 | Internal | `@/components/dialogs/delete-dialog` (`DeleteDialog`)                                          | Confirmation UX for `BlockUser`         |
 | Internal | `@/components/dialogs/form-dialog` (`getFormDialog`)                                           | Form host for `AddUser`                 |
 | Internal | `@/hooks/use-app-form` (`useAppForm`, `withForm`)                                              | TanStack Form integration               |

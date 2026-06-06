@@ -24,8 +24,8 @@ import {
 } from 'lexical'
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-import { Toggle } from '@/components/ui/primitive/toggle'
-import { ToolbarButton } from '@/components/ui/primitive/toolbar'
+import { Toggle } from '@/components/ui/toggle'
+import { ToolbarButton } from '@/components/ui/toolbar'
 import { cn } from '@/utils/cn'
 
 import { OnChangePlugin } from './plugins/on-change-plugin'

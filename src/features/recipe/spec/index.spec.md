@@ -47,7 +47,7 @@ add the recipe to a shopping list, and edit or delete it.
 - Authentication and `authGuard` middleware (see `src/features/auth/`).
 - Ingredient catalog management (see `src/features/ingredients/`).
 - Shopping list page UI and aggregation logic (see `src/features/shopping-list/`).
-- The shared Lexical `Editor` component itself (see `src/components/ui/editor/`); only the recipe
+- The shared Lexical `Editor` component itself (see `src/components/common/editor/`); only the recipe
   feature's custom nodes registered through `recipeNodes` are owned here.
 
 ## 2. Definitions

@@ -396,23 +396,23 @@ the primary, surfaces the partial information without polluting the primary aggr
 
 ## 8. Dependencies & External Integrations
 
-| Dependency                                                                                 | Role                                                                     |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `zustand` + `zustand/middleware`                                                           | Client store + `localStorage` persistence.                               |
-| `@tanstack/react-start`                                                                    | Server function (`createServerFn`); `createStart` (`defaultSsr: false`). |
-| `@tanstack/react-router`                                                                   | `createFileRoute`.                                                       |
-| `@tanstack/react-query`                                                                    | `queryOptions` + `useSuspenseQuery`.                                     |
-| `zod`                                                                                      | Input validation for `getRecipesByIds`.                                  |
-| `drizzle-orm` (via `getDb`)                                                                | Relational query for recipes + ingredient groups + linked recipes.       |
-| `@phosphor-icons/react`                                                                    | `ArrowCounterClockwiseIcon` in `ResetCartButton`.                        |
-| Internal: `@/lib/db/schema/unit`                                                           | `UNITS`, `UnitSlug`, `Dimension`.                                        |
-| Internal: `@/utils/unit-converter`                                                         | `convert(...)`.                                                          |
-| Internal: `@/utils/error-handler`                                                          | `withServerError` wrapper.                                               |
-| Internal: `@/lib/query-keys`                                                               | `queryKeys.recipeListByIds`.                                             |
-| Internal: `@/features/ingredients/utils/constants`                                         | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                   |
-| Internal: `@/components/ui/checkbox`, `@/components/ui/button`, `@/components/ui/skeleton` | UI primitives.                                                           |
-| Internal: `@/utils/number`                                                                 | `formatNumber`.                                                          |
-| Internal: `@/utils/object`                                                                 | `typedEntriesOf`.                                                        |
+| Dependency                                                                                             | Role                                                                     |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `zustand` + `zustand/middleware`                                                                       | Client store + `localStorage` persistence.                               |
+| `@tanstack/react-start`                                                                                | Server function (`createServerFn`); `createStart` (`defaultSsr: false`). |
+| `@tanstack/react-router`                                                                               | `createFileRoute`.                                                       |
+| `@tanstack/react-query`                                                                                | `queryOptions` + `useSuspenseQuery`.                                     |
+| `zod`                                                                                                  | Input validation for `getRecipesByIds`.                                  |
+| `drizzle-orm` (via `getDb`)                                                                            | Relational query for recipes + ingredient groups + linked recipes.       |
+| `@phosphor-icons/react`                                                                                | `ArrowCounterClockwiseIcon` in `ResetCartButton`.                        |
+| Internal: `@/lib/db/schema/unit`                                                                       | `UNITS`, `UnitSlug`, `Dimension`.                                        |
+| Internal: `@/utils/unit-converter`                                                                     | `convert(...)`.                                                          |
+| Internal: `@/utils/error-handler`                                                                      | `withServerError` wrapper.                                               |
+| Internal: `@/lib/query-keys`                                                                           | `queryKeys.recipeListByIds`.                                             |
+| Internal: `@/features/ingredients/utils/constants`                                                     | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                   |
+| Internal: `@/components/common/checkbox`, `@/components/common/button`, `@/components/common/skeleton` | UI primitives.                                                           |
+| Internal: `@/utils/number`                                                                             | `formatNumber`.                                                          |
+| Internal: `@/utils/object`                                                                             | `typedEntriesOf`.                                                        |
 
 ## 9. Examples & Edge Cases
 

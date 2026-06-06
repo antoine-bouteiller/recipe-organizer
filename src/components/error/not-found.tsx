@@ -1,7 +1,7 @@
 import { CaretLeftIcon } from '@phosphor-icons/react/dist/ssr'
 import { Link } from '@tanstack/react-router'
 
-import { Button } from '../ui/button'
+import { Button } from '@/components/common/button'
 
 export const NotFound = () => (
   <div className="my-auto flex items-center justify-center bg-background">

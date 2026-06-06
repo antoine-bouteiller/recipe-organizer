@@ -1,5 +1,5 @@
-import { Checkbox } from '@/components/ui/checkbox'
-import { Field } from '@/components/ui/field'
+import { Checkbox } from '@/components/common/checkbox'
+import { Field } from '@/components/common/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface CheckboxFieldProps {

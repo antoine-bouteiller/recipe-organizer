@@ -1,6 +1,6 @@
 import { ZodError } from 'zod'
 
-import { toastManager } from '@/components/ui/toast'
+import { toastManager } from '@/components/common/toast'
 
 export const toastError = (message: string, error?: unknown) => {
   if (error instanceof ZodError) {

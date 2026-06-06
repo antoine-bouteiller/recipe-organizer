@@ -1,5 +1,5 @@
-import { Field } from '@/components/ui/field'
-import { ToggleGroup } from '@/components/ui/toggle-group'
+import { Field } from '@/components/common/field'
+import { ToggleGroup } from '@/components/common/toggle-group'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface ToggleGroupFieldProps {

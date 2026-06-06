@@ -1,6 +1,7 @@
 import { createFormHook } from '@tanstack/react-form'
 import { lazy } from 'react'
 
+import { Field } from '@/components/common/field'
 import { CheckboxField } from '@/components/forms/checkbox-field'
 import { ComboboxField } from '@/components/forms/combobox-field'
 import { FormSubmit } from '@/components/forms/form-submit'
@@ -10,7 +11,6 @@ import { SelectField } from '@/components/forms/select-field'
 import { TextField } from '@/components/forms/text-field'
 import { ToggleGroupField } from '@/components/forms/toggle-group-field'
 import { VideoField } from '@/components/forms/video-field'
-import { Field } from '@/components/ui/field'
 import { fieldContext, formContext } from '@/hooks/use-form-context'
 
 const EditorField = lazy(() => import('@/components/forms/editor-field'))

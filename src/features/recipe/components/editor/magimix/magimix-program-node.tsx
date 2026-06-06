@@ -14,7 +14,7 @@ import {
   type Spread,
 } from 'lexical'
 
-import { Item } from '@/components/ui/item'
+import { Item } from '@/components/common/item'
 import { magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'
 

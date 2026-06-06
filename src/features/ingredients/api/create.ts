@@ -2,7 +2,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { toastManager } from '@/components/ui/toast'
+import { toastManager } from '@/components/common/toast'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient, ingredientCategory } from '@/lib/db/schema'

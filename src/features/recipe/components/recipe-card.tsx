@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
-import { Badge } from '@/components/ui/badge'
-import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/common/badge'
+import { Card } from '@/components/common/card'
 import { cn } from '@/utils/cn'
 
 import { type ReducedRecipe } from '../api/get-all'

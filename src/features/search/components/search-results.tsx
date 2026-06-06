@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/common/button'
 import { type ReducedRecipe } from '@/features/recipe/api/get-all'
 
 import { RecipeList } from './recipe-list'

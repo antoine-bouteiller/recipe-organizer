@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/ui/spinner'
+import { Button } from '@/components/common/button'
+import { Spinner } from '@/components/common/spinner'
 import { useFormContext } from '@/hooks/use-form-context'
 
 export const FormSubmit = ({ label }: { label: string }) => {

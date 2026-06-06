@@ -1,11 +1,11 @@
 import { Link, useLocation, useRouter } from '@tanstack/react-router'
 
+import { Button } from '@/components/common/button'
+import { Tabs } from '@/components/common/tabs'
 import { ThemeIcon } from '@/components/icons/theme'
-import { Button } from '@/components/ui/button'
 import { SearchBar } from '@/features/recipe/components/search-bar'
 import { toggleTheme } from '@/lib/theme'
 
-import { Tabs } from '../ui/tabs'
 import { menuItems } from './constants'
 
 export const Navbar = () => {

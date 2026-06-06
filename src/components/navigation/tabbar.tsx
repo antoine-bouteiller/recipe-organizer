@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
-import { Tabs } from '@/components/ui/tabs'
+import { Tabs } from '@/components/common/tabs'
 
 import { menuItems } from './constants'
 

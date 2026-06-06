@@ -1,7 +1,7 @@
 import { ImageIcon, XIcon } from '@phosphor-icons/react'
 
-import { Field } from '@/components/ui/field'
-import { Kbd } from '@/components/ui/kbd'
+import { Field } from '@/components/common/field'
+import { Kbd } from '@/components/common/kbd'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platfom'

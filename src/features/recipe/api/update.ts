@@ -4,7 +4,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { toastManager } from '@/components/ui/toast'
+import { toastManager } from '@/components/common/toast'
 import { assertOwnerOrAdmin } from '@/features/auth/lib/assert-owner-or-admin'
 import { authGuard } from '@/features/auth/lib/auth-guard'
 import { recipeSchema } from '@/features/recipe/api/create'

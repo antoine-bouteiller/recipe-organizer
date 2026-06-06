@@ -1,7 +1,7 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { useRouter } from '@tanstack/react-router'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/common/button'
 import { useBackViewTransition } from '@/hooks/use-back-view-transition'
 import { cn } from '@/utils/cn'
 

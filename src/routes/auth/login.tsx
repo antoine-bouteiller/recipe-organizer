@@ -4,9 +4,9 @@ import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { toastManager } from '@/components/ui/toast'
+import { Button } from '@/components/common/button'
+import { Card } from '@/components/common/card'
+import { toastManager } from '@/components/common/toast'
 import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
 
 const searchSchema = z.object({ error: z.string().optional() })

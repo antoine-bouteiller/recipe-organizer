@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react'
 
-import { Combobox } from '@/components/ui/combobox'
-import { Field } from '@/components/ui/field'
+import { Combobox } from '@/components/common/combobox'
+import { Field } from '@/components/common/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { type Option } from '@/hooks/use-options'
 

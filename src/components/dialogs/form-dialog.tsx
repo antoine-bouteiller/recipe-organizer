@@ -1,12 +1,11 @@
 import { useStore } from '@tanstack/react-form'
 import { type ComponentPropsWithoutRef } from 'react'
 
+import { Button } from '@/components/common/button'
+import { Dialog } from '@/components/common/dialog'
+import { Form } from '@/components/common/form'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
-
-import { Button } from '../ui/button'
-import { Dialog } from '../ui/dialog'
-import { Form } from '../ui/form'
 
 interface FormModalProps {
   children: React.ReactNode

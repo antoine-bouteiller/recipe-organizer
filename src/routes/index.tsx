@@ -3,8 +3,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
+import { Button } from '@/components/common/button'
 import { ScreenLayout } from '@/components/layout/screen-layout'
-import { Button } from '@/components/ui/button'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import RecipeCard from '@/features/recipe/components/recipe-card'
 

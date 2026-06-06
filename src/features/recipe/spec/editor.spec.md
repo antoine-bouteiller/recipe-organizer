@@ -348,7 +348,7 @@ useLinkedRecipes(): number[]
 - **`@tanstack/react-form`** + **`zod`** — both dialog forms.
 - **`@tanstack/react-query`** — `useQuery(getRecipeInstructionsOptions(recipeId))` inside
   `SubrecipeNode`.
-- **Shared editor** (`@/components/ui/editor`) — `Editor`, `EditorContent` for the read-only
+- **Shared editor** (`@/components/common/editor`) — `Editor`, `EditorContent` for the read-only
   embedded subrecipe render.
 - **`@/hooks/use-options`** — `useRecipeOptions({ filter })` for the SubrecipeDialog's combobox.
 - **`@/components/dialogs/form-dialog`** — `getFormDialog(defaults)` factory.

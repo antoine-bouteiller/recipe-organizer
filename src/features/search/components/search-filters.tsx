@@ -1,9 +1,9 @@
 import { FunnelSimpleIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
+import { Button } from '@/components/common/button'
+import { Collapsible } from '@/components/common/collapsible'
 import { SearchInput } from '@/components/search-input'
-import { Button } from '@/components/ui/button'
-import { Collapsible } from '@/components/ui/collapsible'
 import { type RecipeTag } from '@/features/recipe/utils/constants'
 
 import { CategorySelect } from './category-select'

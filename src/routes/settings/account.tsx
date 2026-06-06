@@ -1,9 +1,9 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useServerFn } from '@tanstack/react-start'
 
+import { Button } from '@/components/common/button'
+import { Card } from '@/components/common/card'
 import { ScreenLayout } from '@/components/layout/screen-layout'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { logout } from '@/features/auth/api/logout'
 
 const RouteComponent = () => {

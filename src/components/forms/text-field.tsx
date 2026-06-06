@@ -1,5 +1,5 @@
-import { Field } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { Field } from '@/components/common/field'
+import { Input } from '@/components/common/input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface TextFieldProps {
