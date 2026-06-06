@@ -7,8 +7,8 @@ import { useRender } from '@base-ui/react/use-render'
 import { CaretRightIcon, XIcon } from '@phosphor-icons/react'
 import { createContext, useContext } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Button } from '@/components/ui/primitive/button'
+import { ScrollArea } from '@/components/ui/primitive/scroll-area'
 import { cn } from '@/utils/cn'
 
 type DrawerPosition = 'right' | 'left' | 'top' | 'bottom'

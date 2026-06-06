@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
-import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
+import { Tabs } from '@/components/ui/tabs'
 
 import { menuItems } from './constants'
 
@@ -11,9 +11,9 @@ export const TabBar = ({ activePage }: { activePage: string }) => (
     className="fixed bottom-0 z-10 flex h-14 w-full flex-1 items-center border-t bg-background px-4 transition-transform duration-300 ease-out md:hidden"
     value={activePage}
   >
-    <TabsList variant="tabbar" indicatorLayoutId="tabbar-indicator">
+    <Tabs.List variant="tabbar" indicatorLayoutId="tabbar-indicator">
       {items.map((item) => (
-        <TabsTab
+        <Tabs.Tab
           className="h-11 text-primary data-active:text-primary"
           key={item.label}
           nativeButton={false}
@@ -21,8 +21,8 @@ export const TabBar = ({ activePage }: { activePage: string }) => (
           value={item.linkProps.to}
         >
           <item.icon className="size-6" {...(item.linkProps.to === activePage ? item.iconFilledProps : {})} />
-        </TabsTab>
+        </Tabs.Tab>
       ))}
-    </TabsList>
+    </Tabs.List>
   </Tabs>
 )

@@ -3,7 +3,7 @@ import { useState, type ComponentPropsWithoutRef } from 'react'
 import { z } from 'zod'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { type DialogTrigger } from '@/components/ui/dialog'
+import { type Dialog } from '@/components/ui/dialog'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
@@ -13,7 +13,7 @@ interface MagimixProgramDialogProps {
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
-  triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
+  triggerRender?: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
 }
 
 const magimixProgramSchema = z.object({

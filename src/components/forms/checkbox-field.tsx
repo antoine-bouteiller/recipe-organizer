@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface CheckboxFieldProps {
@@ -21,9 +21,9 @@ export const CheckboxField = ({ className, disabled, label }: CheckboxFieldProps
     >
       <div className="flex items-center gap-2">
         <Checkbox checked={field.state.value ?? false} disabled={disabled} onCheckedChange={(checked) => field.handleChange(checked)} />
-        {label && <FieldLabel className="cursor-pointer">{label}</FieldLabel>}
+        {label && <Field.Label className="cursor-pointer">{label}</Field.Label>}
       </div>
-      <FieldError />
+      <Field.Error />
     </Field>
   )
 }

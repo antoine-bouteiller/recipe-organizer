@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Collapsible } from '@/components/ui/collapsible'
 import { type RecipeTag } from '@/features/recipe/utils/constants'
 
 import { CategorySelect } from './category-select'
@@ -24,13 +24,13 @@ export const SearchFilters = ({ query, setQuery, tags, onTagsChange }: SearchFil
         <div className="flex-1">
           <SearchInput autoFocus search={query} setSearch={setQuery} />
         </div>
-        <CollapsibleTrigger render={<Button aria-label="Filtrer par catégorie" size="icon-lg" variant={tags.length > 0 ? 'default' : 'outline'} />}>
+        <Collapsible.Trigger render={<Button aria-label="Filtrer par catégorie" size="icon-lg" variant={tags.length > 0 ? 'default' : 'outline'} />}>
           <FunnelSimpleIcon />
-        </CollapsibleTrigger>
+        </Collapsible.Trigger>
       </div>
-      <CollapsibleContent className="pt-2">
+      <Collapsible.Content className="pt-2">
         <CategorySelect onTagsChange={onTagsChange} tags={tags} />
-      </CollapsibleContent>
+      </Collapsible.Content>
     </Collapsible>
   )
 }

@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
+import { Toolbar } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/features/recipe/contexts/linked-recipes-context'
 import { withForm } from '@/hooks/use-app-form'
 import { type FileMetadata } from '@/hooks/use-file-upload'
@@ -153,11 +153,11 @@ export const RecipeForm = withForm({
                   nodes={recipeNodes}
                   extraToolbar={
                     <>
-                      <ToolbarSeparator />
-                      <ToolbarGroup>
+                      <Toolbar.Separator />
+                      <Toolbar.Group>
                         <MagimixProgramButton />
                         <SubrecipeButton />
-                      </ToolbarGroup>
+                      </Toolbar.Group>
                     </>
                   }
                   label="Instructions"

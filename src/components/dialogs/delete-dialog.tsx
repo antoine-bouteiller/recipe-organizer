@@ -2,18 +2,8 @@ import { TrashIcon } from '@phosphor-icons/react'
 import { useState, useTransition, type ComponentPropsWithoutRef, type ElementType } from 'react'
 
 import { Button } from '@/components/ui/button'
-import {
-  ResponsiveDialog,
-  ResponsiveDialogClose,
-  ResponsiveDialogFooter,
-  ResponsiveDialogHeader,
-  ResponsiveDialogPanel,
-  ResponsiveDialogPopup,
-  ResponsiveDialogTitle,
-  ResponsiveDialogTrigger,
-} from '@/components/ui/responsive-dialog'
+import { Dialog } from '@/components/ui/dialog'
 
-import { type DialogTrigger } from '../ui/dialog'
 import { Spinner } from '../ui/spinner'
 
 interface DeleteDialogProps {
@@ -25,7 +15,7 @@ interface DeleteDialogProps {
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title: string
-  trigger?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
+  trigger?: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
 }
 
 const DefaultTrigger = <Button size="icon" variant="destructive" />
@@ -61,24 +51,24 @@ export const DeleteDialog = ({
   }
 
   return (
-    <ResponsiveDialog onOpenChange={setIsOpen} open={isOpen}>
+    <Dialog onOpenChange={setIsOpen} open={isOpen}>
       {!isControlled && (
-        <ResponsiveDialogTrigger render={trigger}>
+        <Dialog.Trigger render={trigger}>
           <TriggerIcon /> {deleteButtonLabel}
-        </ResponsiveDialogTrigger>
+        </Dialog.Trigger>
       )}
-      <ResponsiveDialogPopup>
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
-        </ResponsiveDialogHeader>
-        <ResponsiveDialogPanel>{description}</ResponsiveDialogPanel>
-        <ResponsiveDialogFooter>
-          <ResponsiveDialogClose render={<Button variant="outline" />}>Annuler</ResponsiveDialogClose>
+      <Dialog.Popup>
+        <Dialog.Header>
+          <Dialog.Title>{title}</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Panel>{description}</Dialog.Panel>
+        <Dialog.Footer>
+          <Dialog.Close render={<Button variant="outline" />}>Annuler</Dialog.Close>
           <Button disabled={isLoading} onClick={handleDelete} variant="destructive">
             {isLoading && <Spinner />} {actionLabel}
           </Button>
-        </ResponsiveDialogFooter>
-      </ResponsiveDialogPopup>
-    </ResponsiveDialog>
+        </Dialog.Footer>
+      </Dialog.Popup>
+    </Dialog>
   )
 }

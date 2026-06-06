@@ -1,7 +1,6 @@
+import { Field } from '@/components/ui/field'
+import { Select } from '@/components/ui/select'
 import { useFieldContext } from '@/hooks/use-form-context'
-
-import { Field, FieldError, FieldLabel } from '../ui/field'
-import { ResponsiveSelect } from '../ui/responsive-select'
 
 interface SelectFieldProps {
   disabled?: boolean
@@ -14,15 +13,15 @@ const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
-      {label && <FieldLabel>{label}</FieldLabel>}
-      <ResponsiveSelect
+      {label && <Field.Label>{label}</Field.Label>}
+      <Select
         disabled={disabled}
         items={items}
         onValueChange={(value) => field.setValue(value ?? undefined)}
         title={label}
         value={field.store.state.value ?? null}
       />
-      <FieldError />
+      <Field.Error />
     </Field>
   )
 }

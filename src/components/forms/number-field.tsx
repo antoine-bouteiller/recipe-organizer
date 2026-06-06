@@ -1,12 +1,5 @@
-import { Field, FieldError } from '@/components/ui/field'
-import {
-  NumberInput,
-  NumberInputDecrement,
-  NumberInputField,
-  NumberInputGroup,
-  NumberInputIncrement,
-  NumberInputScrubArea,
-} from '@/components/ui/number-input'
+import { Field } from '@/components/ui/field'
+import { NumberInput } from '@/components/ui/number-input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface NumberFieldProps {
@@ -33,20 +26,15 @@ export const NumberField = ({ allowDecimals = false, disabled, label, max, min, 
       <NumberInput
         defaultValue={field.state.value}
         disabled={disabled}
+        label={label}
         max={max}
         min={min}
         onValueChange={(value) => field.handleChange(value ?? undefined)}
+        placeholder={placeholder}
         step={allowDecimals ? 0.25 : 1}
         value={field.state.value}
-      >
-        {label && <NumberInputScrubArea label={label} />}
-        <NumberInputGroup>
-          <NumberInputDecrement />
-          <NumberInputField placeholder={placeholder} />
-          <NumberInputIncrement />
-        </NumberInputGroup>
-      </NumberInput>
-      <FieldError />
+      />
+      <Field.Error />
     </Field>
   )
 }

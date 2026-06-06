@@ -3,7 +3,7 @@ import { useState, type ComponentPropsWithoutRef } from 'react'
 import { z } from 'zod'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { type DialogTrigger } from '@/components/ui/dialog'
+import { type Dialog } from '@/components/ui/dialog'
 import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -22,7 +22,7 @@ interface SubrecipeDialogProps {
   onSubmit: (data: SubrecipeNodeData) => void
   submitLabel: string
   title: string
-  triggerRender?: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
+  triggerRender?: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
 }
 
 const subrecipeDefaultValues: SubrecipeFormInput = {

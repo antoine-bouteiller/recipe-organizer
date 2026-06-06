@@ -5,18 +5,8 @@ import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
 
 import { Button } from '../ui/button'
-import { type DialogTrigger } from '../ui/dialog'
+import { Dialog } from '../ui/dialog'
 import { Form } from '../ui/form'
-import {
-  ResponsiveDialog,
-  ResponsiveDialogClose,
-  ResponsiveDialogFooter,
-  ResponsiveDialogHeader,
-  ResponsiveDialogPanel,
-  ResponsiveDialogPopup,
-  ResponsiveDialogTitle,
-  ResponsiveDialogTrigger,
-} from '../ui/responsive-dialog'
 
 interface FormModalProps {
   children: React.ReactNode
@@ -24,7 +14,7 @@ interface FormModalProps {
   setOpen: (open: boolean) => void
   submitLabel: string
   title: string
-  trigger: ComponentPropsWithoutRef<typeof DialogTrigger>['render']
+  trigger: ComponentPropsWithoutRef<typeof Dialog.Trigger>['render']
 }
 
 export const getFormDialog = <TValues,>(defaultValues: TValues) =>
@@ -35,10 +25,10 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
       const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
 
       return (
-        <ResponsiveDialog onOpenChange={setOpen} open={open}>
-          <ResponsiveDialogTrigger render={trigger} />
+        <Dialog onOpenChange={setOpen} open={open}>
+          <Dialog.Trigger render={trigger} />
 
-          <ResponsiveDialogPopup>
+          <Dialog.Popup>
             <Form
               className="contents"
               errors={errors}
@@ -48,19 +38,19 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
                 await form.handleSubmit()
               }}
             >
-              <ResponsiveDialogHeader>
-                <ResponsiveDialogTitle>{title}</ResponsiveDialogTitle>
-              </ResponsiveDialogHeader>
-              <ResponsiveDialogPanel className="flex flex-col gap-4">{children}</ResponsiveDialogPanel>
-              <ResponsiveDialogFooter>
-                <ResponsiveDialogClose render={<Button disabled={form.state.isSubmitting} variant="outline" />}>Annuler</ResponsiveDialogClose>
+              <Dialog.Header>
+                <Dialog.Title>{title}</Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Panel className="flex flex-col gap-4">{children}</Dialog.Panel>
+              <Dialog.Footer>
+                <Dialog.Close render={<Button disabled={form.state.isSubmitting} variant="outline" />}>Annuler</Dialog.Close>
                 <form.AppForm>
                   <form.FormSubmit label={submitLabel} />
                 </form.AppForm>
-              </ResponsiveDialogFooter>
+              </Dialog.Footer>
             </Form>
-          </ResponsiveDialogPopup>
-        </ResponsiveDialog>
+          </Dialog.Popup>
+        </Dialog>
       )
     },
   })

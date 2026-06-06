@@ -8,8 +8,8 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Item, ItemActions, ItemContent, ItemGroup, ItemSeparator, ItemTitle } from '@/components/ui/item'
-import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
+import { Item } from '@/components/ui/item'
+import { Tabs } from '@/components/ui/tabs'
 import { getUserListOptions } from '@/features/users/api/get-all'
 import { AddUser } from '@/features/users/components/add-user'
 import { ApproveUser } from '@/features/users/components/approve-user'
@@ -73,20 +73,20 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
   const showBlockButton = status === 'active' || status === 'pending'
 
   return (
-    <ItemGroup>
+    <Item.Group>
       {filteredUsers.map((userItem, index) => {
         const item = (
           <Item className="flex-nowrap">
-            <ItemContent>
-              <ItemTitle>
+            <Item.Content>
+              <Item.Title>
                 <span className="text-nowrap text-ellipsis">{userItem.email}</span>
                 <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[userItem.role]}</Badge>
-              </ItemTitle>
-            </ItemContent>
-            <ItemActions>
+              </Item.Title>
+            </Item.Content>
+            <Item.Actions>
               {(status === 'blocked' || status === 'pending') && <ApproveUser userId={userItem.id} />}
               {!isMobile && showBlockButton && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
-            </ItemActions>
+            </Item.Actions>
           </Item>
         )
 
@@ -99,11 +99,11 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
             ) : (
               item
             )}
-            {index !== filteredUsers.length - 1 && <ItemSeparator />}
+            {index !== filteredUsers.length - 1 && <Item.Separator />}
           </React.Fragment>
         )
       })}
-    </ItemGroup>
+    </Item.Group>
   )
 }
 
@@ -123,29 +123,29 @@ const UsersManagement = () => {
 
       <div className="px-4">
         <Tabs defaultValue="active">
-          <TabsList className="w-full">
-            <TabsTab value="active">Actifs</TabsTab>
-            <TabsTab value="pending">En attente</TabsTab>
-            <TabsTab value="blocked">Bloqués</TabsTab>
-          </TabsList>
+          <Tabs.List className="w-full">
+            <Tabs.Tab value="active">Actifs</Tabs.Tab>
+            <Tabs.Tab value="pending">En attente</Tabs.Tab>
+            <Tabs.Tab value="blocked">Bloqués</Tabs.Tab>
+          </Tabs.List>
 
-          <TabsPanel value="active">
+          <Tabs.Panel value="active">
             <React.Suspense fallback={null}>
               <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
             </React.Suspense>
-          </TabsPanel>
+          </Tabs.Panel>
 
-          <TabsPanel value="pending">
+          <Tabs.Panel value="pending">
             <React.Suspense fallback={null}>
               <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
             </React.Suspense>
-          </TabsPanel>
+          </Tabs.Panel>
 
-          <TabsPanel value="blocked">
+          <Tabs.Panel value="blocked">
             <React.Suspense fallback={null}>
               <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
             </React.Suspense>
-          </TabsPanel>
+          </Tabs.Panel>
         </Tabs>
       </div>
     </ScreenLayout>

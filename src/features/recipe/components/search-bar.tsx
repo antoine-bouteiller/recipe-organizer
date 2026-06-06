@@ -4,19 +4,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Command,
-  CommandDialog,
-  CommandDialogPopup,
-  CommandDialogTrigger,
-  CommandEmpty,
-  CommandFooter,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandPanel,
-} from '@/components/ui/command'
-import { Kbd, KbdGroup } from '@/components/ui/kbd'
+import { Command } from '@/components/ui/command'
+import { Kbd } from '@/components/ui/kbd'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
 import { type Recipe } from '@/types/recipe'
@@ -41,22 +30,22 @@ export const SearchBar = () => {
   }, [])
 
   return (
-    <CommandDialog onOpenChange={setOpen} open={open}>
-      <CommandDialogTrigger className="w-56 justify-start pl-2.5 font-normal shadow-none" render={<Button variant="outline" />}>
+    <Command.Dialog onOpenChange={setOpen} open={open}>
+      <Command.DialogTrigger className="w-56 justify-start pl-2.5 font-normal shadow-none" render={<Button variant="outline" />}>
         Recherche une recette...
-        <KbdGroup className="absolute top-1.5 right-1.5 gap-1">
+        <Kbd.Group className="absolute top-1.5 right-1.5 gap-1">
           <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
           <Kbd className="aspect-square">K</Kbd>
-        </KbdGroup>
-      </CommandDialogTrigger>
-      <CommandDialogPopup>
+        </Kbd.Group>
+      </Command.DialogTrigger>
+      <Command.DialogPopup>
         <Command items={recipes}>
-          <CommandInput placeholder="Rechercher une recette" />
-          <CommandPanel>
-            <CommandEmpty>Aucun résultats trouvé.</CommandEmpty>
-            <CommandList>
+          <Command.Input placeholder="Rechercher une recette" />
+          <Command.Panel>
+            <Command.Empty>Aucun résultats trouvé.</Command.Empty>
+            <Command.List>
               {(recipe: Recipe) => (
-                <CommandItem
+                <Command.Item
                   key={recipe.id}
                   onClick={() => {
                     setOpen(false)
@@ -68,20 +57,20 @@ export const SearchBar = () => {
                   value={recipe.name}
                 >
                   {recipe.name}
-                </CommandItem>
+                </Command.Item>
               )}
-            </CommandList>
-          </CommandPanel>
-          <CommandFooter>
+            </Command.List>
+          </Command.Panel>
+          <Command.Footer>
             <div className="flex items-center gap-2">
               <Kbd>
                 <ArrowElbowDownLeftIcon />
               </Kbd>
               <span>Open</span>
             </div>
-          </CommandFooter>
+          </Command.Footer>
         </Command>
-      </CommandDialogPopup>
-    </CommandDialog>
+      </Command.DialogPopup>
+    </Command.Dialog>
   )
 }

@@ -10,7 +10,7 @@ import { SelectField } from '@/components/forms/select-field'
 import { TextField } from '@/components/forms/text-field'
 import { ToggleGroupField } from '@/components/forms/toggle-group-field'
 import { VideoField } from '@/components/forms/video-field'
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field } from '@/components/ui/field'
 import { fieldContext, formContext } from '@/hooks/use-form-context'
 
 const EditorField = lazy(() => import('@/components/forms/editor-field'))
@@ -21,10 +21,10 @@ const { useAppForm, withForm } = createFormHook({
     ComboboxField,
     EditorField,
     Field,
-    FieldControl,
-    FieldDescription,
-    FieldError,
-    FieldLabel,
+    FieldControl: Field.Control,
+    FieldDescription: Field.Description,
+    FieldError: Field.Error,
+    FieldLabel: Field.Label,
     ImageField,
     NumberField,
     SelectField,

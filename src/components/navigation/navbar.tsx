@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { SearchBar } from '@/features/recipe/components/search-bar'
 import { toggleTheme } from '@/lib/theme'
 
-import { Tabs, TabsList, TabsTab } from '../ui/tabs'
+import { Tabs } from '../ui/tabs'
 import { menuItems } from './constants'
 
 export const Navbar = () => {
@@ -16,15 +16,15 @@ export const Navbar = () => {
   return (
     <div className="flex h-14 items-center gap-2 px-6">
       <Tabs value={location.href}>
-        <TabsList variant="underline">
+        <Tabs.List variant="underline">
           {menuItems
             .filter((item) => item.display !== 'mobile')
             .map((item) => (
-              <TabsTab key={item.label} nativeButton={false} render={<Link {...item.linkProps} />} value={item.linkProps.to}>
+              <Tabs.Tab key={item.label} nativeButton={false} render={<Link {...item.linkProps} />} value={item.linkProps.to}>
                 {item.label}
-              </TabsTab>
+              </Tabs.Tab>
             ))}
-        </TabsList>
+        </Tabs.List>
       </Tabs>
       <div className="flex flex-1 items-center justify-end gap-2">
         <SearchBar />

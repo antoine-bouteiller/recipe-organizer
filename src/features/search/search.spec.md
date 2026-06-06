@@ -129,7 +129,7 @@ Contributors and AI agents implementing or modifying the search/filter page and 
 - **GUD-001**: Derive the tag toggle items from `RECIPE_TAGS`/`AUTO_TAGS` + `RECIPE_TAG_LABELS`; do not hardcode tag
   lists in the search components.
 - **GUD-002**: Build the category control by reusing existing primitives: `Collapsible` (`@/components/ui/collapsible`)
-  for the reveal and the shared `ResponsiveSelect` (`@/components/ui/responsive-select`) in `multiple` mode for the
+  for the reveal and the shared `Select` (`@/components/ui/select`) in `multiple` mode for the
   multi-select itself (Select popover on desktop, drawer on mobile). Reuse `SearchInput`, `ScreenLayout`, and
   `Item`/`ItemGroup` for the rest. Do not use form-bound wrappers (`ToggleGroupField`).
 - **GUD-003**: Keep the pure matching/normalization logic in `src/features/search/utils/` so it is unit-testable

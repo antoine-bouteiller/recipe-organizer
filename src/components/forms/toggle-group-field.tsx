@@ -1,5 +1,5 @@
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Toggle, ToggleGroup } from '@/components/ui/toggle-group'
+import { Field } from '@/components/ui/field'
+import { ToggleGroup } from '@/components/ui/toggle-group'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface ToggleGroupFieldProps {
@@ -20,21 +20,9 @@ export const ToggleGroupField = ({ className, disabled, items, label }: ToggleGr
       name={field.name}
       touched={field.state.meta.isTouched}
     >
-      {label && <FieldLabel>{label}</FieldLabel>}
-      <ToggleGroup
-        className="flex-wrap"
-        disabled={disabled}
-        multiple
-        onValueChange={(value) => field.handleChange(value)}
-        value={field.state.value ?? []}
-      >
-        {items.map(({ label: itemLabel, value }) => (
-          <Toggle key={value} value={value}>
-            {itemLabel}
-          </Toggle>
-        ))}
-      </ToggleGroup>
-      <FieldError />
+      {label && <Field.Label>{label}</Field.Label>}
+      <ToggleGroup disabled={disabled} items={items} onValueChange={(value) => field.handleChange(value)} value={field.state.value ?? []} />
+      <Field.Error />
     </Field>
   )
 }

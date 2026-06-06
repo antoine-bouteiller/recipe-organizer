@@ -7,9 +7,9 @@ import { z } from 'zod'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Editor, EditorContent } from '@/components/ui/editor'
-import { ResponsivePopover, ResponsivePopoverContent, ResponsivePopoverTrigger } from '@/components/ui/responsive-popover'
+import { Popover } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
+import { Tabs } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@/features/recipe/components/editor/extensions'
@@ -47,11 +47,11 @@ const RecipePage = () => {
       backgroundImage={recipe.image}
       headerEndItem={
         authUser && (
-          <ResponsivePopover>
-            <ResponsivePopoverTrigger render={<Button size="icon" variant="outline" />}>
+          <Popover>
+            <Popover.Trigger render={<Button size="icon" variant="outline" />}>
               <DotsThreeVerticalIcon className="text-primary" weight="bold" />
-            </ResponsivePopoverTrigger>
-            <ResponsivePopoverContent>
+            </Popover.Trigger>
+            <Popover.Content>
               <div className="flex flex-col items-start gap-2 p-4 md:p-0">
                 <Button
                   className="w-full justify-start"
@@ -63,8 +63,8 @@ const RecipePage = () => {
                 </Button>
                 <DeleteRecipe recipeId={recipe.id} recipeName={recipe.name} />
               </div>
-            </ResponsivePopoverContent>
-          </ResponsivePopover>
+            </Popover.Content>
+          </Popover>
         )
       }
     >
@@ -89,10 +89,10 @@ const RecipePage = () => {
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 md:hidden">
           <Tabs className="flex min-h-0 flex-1 flex-col" onValueChange={(value) => goTo(value as 'ingredients' | 'preparation')} value={activeTab}>
-            <TabsList className="w-full">
-              <TabsTab value="ingredients">Ingrédients</TabsTab>
-              <TabsTab value="preparation">Préparation</TabsTab>
-            </TabsList>
+            <Tabs.List className="w-full">
+              <Tabs.Tab value="ingredients">Ingrédients</Tabs.Tab>
+              <Tabs.Tab value="preparation">Préparation</Tabs.Tab>
+            </Tabs.List>
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
               <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x: swipeX }}>
                 <div className="min-w-full overflow-y-auto px-2">

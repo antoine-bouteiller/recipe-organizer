@@ -1,4 +1,4 @@
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
@@ -20,9 +20,9 @@ export const TextField = ({ className, disabled, label, placeholder }: TextField
       name={field.name}
       touched={field.state.meta.isTouched}
     >
-      {label && <FieldLabel>{label}</FieldLabel>}
+      {label && <Field.Label>{label}</Field.Label>}
       <Input disabled={disabled} onChange={(event) => field.handleChange(event.target.value)} placeholder={placeholder} value={field.state.value} />
-      <FieldError />
+      <Field.Error />
     </Field>
   )
 }
