@@ -12,8 +12,7 @@
     "db:migrate:remote": "drizzle-kit migrate",
     "db:dump": "rm -f database.sql && wrangler d1 export recipe-organizer --output=./database.sql --no-schema",
     "db:import": "wrangler d1 execute recipe-organizer --file ./database.sql",
-    "knip": "knip",
-    "prepare": "vp config"
+    "knip": "knip"
   },
   "dependencies": {
     "@base-ui/react": "1.5.0",
@@ -42,6 +41,8 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.40.0",
+    "@commitlint/cli": "21.0.2",
+    "@commitlint/config-conventional": "21.0.2",
     "@rolldown/plugin-babel": "0.2.3",
     "@serwist/build": "9.5.11",
     "@serwist/vite": "9.5.11",
@@ -59,6 +60,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "1.0.0-beta.22",
     "knip": "6.16.0",
+    "lefthook": "2.1.9",
     "serwist": "9.5.11",
     "tailwindcss": "4.3.0",
     "typescript": "6.0.3",

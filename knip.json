@@ -3,5 +3,5 @@
   "tags": ["-lintignore"],
   "entry": ["src/sw.ts", "vite.config.ts", "src/**/*.test.ts"],
   "ignore": ["src/components/ui/**"],
-  "ignoreDependencies": ["cloudflare"]
+  "ignoreDependencies": ["cloudflare", "@commitlint/cli"]
 }

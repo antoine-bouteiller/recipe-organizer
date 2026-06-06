@@ -11,7 +11,6 @@ import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
 const isTest = Boolean(process.env.VITEST)
 
 const viteConfig = defineConfig({
-  staged: { '*': 'vp check --fix' },
   lint: {
     options: { typeAware: true, typeCheck: true },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
