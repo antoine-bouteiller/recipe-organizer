@@ -38,10 +38,10 @@ export const IngredientForm = withForm({
           {({ ComboboxField }) => <ComboboxField disabled={isSubmitting} label="Ingrédient parent" options={ingredientOptions} />}
         </AppField>
         <AppField name="densityGPerMl">
-          {({ NumberField }) => <NumberField allowDecimals disabled={isSubmitting} label="Densité (g/ml)" min={0} placeholder="Ex: 0.55" />}
+          {({ NumberField }) => <NumberField disabled={isSubmitting} label="Densité (g/ml)" min={0} placeholder="Ex: 0.55" />}
         </AppField>
         <AppField name="countWeightG">
-          {({ NumberField }) => <NumberField allowDecimals disabled={isSubmitting} label="Poids unitaire (g)" min={0} placeholder="Ex: 50" />}
+          {({ NumberField }) => <NumberField disabled={isSubmitting} label="Poids unitaire (g)" min={0} placeholder="Ex: 50" />}
         </AppField>
         <AppField name="preferredUnitSlug">
           {({ SelectField }) => <SelectField disabled={isSubmitting} items={preferredUnitOptions} label="Unité préférée (liste de courses)" />}

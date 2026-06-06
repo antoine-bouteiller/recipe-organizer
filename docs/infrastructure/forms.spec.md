@@ -219,7 +219,7 @@ Add/Remove buttons that call field.pushValue / field.removeValue}</AppField>`.
 | Component          | Field value type                | Underlying primitive (Base UI / project)                                        | Key props                                                                                                                                       |
 | ------------------ | ------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `TextField`        | `string`                        | `Input` (`components/ui/input`)                                                 | `label?`, `placeholder?`, `disabled?`, `className?`                                                                                             |
-| `NumberField`      | `number \| undefined`           | `NumberInput*` (`components/ui/number-input`)                                   | `label?`, `placeholder?`, `min?`, `max?`, `allowDecimals?` (default `false`, step `0.25` when `true`), `disabled?`                              |
+| `NumberField`      | `number \| undefined`           | `NumberInput*` (`components/ui/number-input`)                                   | `label?`, `placeholder?`, `min?`, `max?`, `disabled?`                                                                                           |
 | `SelectField`      | `string \| undefined`           | `Select*` (`components/ui/select`, Base UI Select)                              | `items: { label: string; value: string }[]`, `label?`, `disabled?`                                                                              |
 | `ComboboxField`    | `number \| string \| undefined` | `Combobox*` (desktop) / `Drawer*` (mobile)                                      | `options: Option<TValue>[]`, `addNew?: (input: string) => ReactNode`, `label?`, `placeholder?`, `searchPlaceholder?`, `disabled?`, `className?` |
 | `CheckboxField`    | `boolean`                       | `Checkbox` (`components/ui/checkbox`)                                           | `label?`, `disabled?`, `className?`                                                                                                             |
@@ -445,7 +445,6 @@ The route imports both, passes `defaultValues` to `useAppForm` and `fields={reci
   data attributes consistent with `field.state.meta`.
 - **AC-004** When the user edits a `TextField` and the corresponding Zod check fails on `onDynamic`, the
   `<FieldError />` slot displays the first Zod issue message after the field is touched.
-- **AC-005** `NumberField` with `allowDecimals: true` advances by `0.25` per increment; with `allowDecimals: false`
   (default) it advances by `1`.
 - **AC-006** `ComboboxField` renders the desktop popup on viewports above the mobile breakpoint and the bottom
   drawer otherwise (`useIsMobile`).
