@@ -106,7 +106,7 @@ recipe-organizer/
 ├── migrations_tmp/           wrangler-managed (do NOT edit)
 ├── public/                   Static assets served from /
 ├── scripts/
-│   ├── apply-migration-local.ts      `pnpm migration:apply:local`
+│   ├── apply-migration-local.ts      `pnpm db:migrate:local`
 │   └── generate-sw.ts                Service worker plugin
 ├── src/
 │   ├── components/
@@ -267,7 +267,7 @@ Every spec MUST contain sections numbered 1–11 with these exact headings:
 - **Test Levels**: Linting (oxlint via `vp lint`), formatting (oxfmt via `vp fmt`), type checking (`vp check`), unit/integration tests (Vitest via `vp test`).
 - **Frameworks**: Vite+ wraps Oxlint, Oxfmt, Vitest. Test utilities import from `vite-plus/test`, never `vitest`.
 - **Test data management**: D1 local snapshot via `pnpm db:dump` / `pnpm db:import`; tests SHOULD use ephemeral fixtures.
-- **CI/CD integration**: GitHub Actions runs `vp install`, `vp check`, `vp test` (see CLAUDE.md). Migrations applied during deployment (`pnpm migration:apply:remote`).
+- **CI/CD integration**: GitHub Actions runs `vp install`, `vp check`, `vp test` (see CLAUDE.md). Migrations applied during deployment (`pnpm db:migrate:remote`).
 - **Coverage requirements**: not enforced; smoke-test critical flows.
 - **Performance testing**: not in scope.
 

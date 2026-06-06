@@ -162,7 +162,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **Test Levels**: lint (`vp lint`), format (`vp fmt`), type-check (`vp check`), unit/integration via Vitest (`vp test`), manual smoke (browser).
 - **Frameworks**: Oxlint (with TS + React + Unicorn + Import plugins), Oxfmt, Vitest (`vite-plus/test`), Wrangler `dev` for local Worker emulation.
 - **Test Data Management**: D1 dump/restore via `pnpm db:dump` / `pnpm db:import` (`wrangler d1 export/execute`).
-- **CI/CD Integration**: GitHub Actions with `voidzero-dev/setup-vp@v1`, `vp install`, `vp check`, `vp test`. Migrations applied to remote D1 during deploy (`pnpm migration:apply:remote` → `drizzle-kit migrate`).
+- **CI/CD Integration**: GitHub Actions with `voidzero-dev/setup-vp@v1`, `vp install`, `vp check`, `vp test`. Migrations applied to remote D1 during deploy (`pnpm db:migrate:remote` → `drizzle-kit migrate`).
 - **Coverage Requirements**: not enforced; cover unit-converter, shopping list aggregation, auth guard.
 - **Performance Testing**: not in scope; observability comes from Cloudflare Worker logs (`observability.logs.enabled = true`).
 
@@ -259,7 +259,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **VAL-001**: `vp check` passes — type-check, lint, format are green.
 - **VAL-002**: `vp test` passes.
 - **VAL-003**: `wrangler deploy --dry-run` succeeds with the configured bindings.
-- **VAL-004**: A fresh local checkout can run `vp install`, `pnpm migration:apply:local`, `pnpm dev`, and serve `/` without errors.
+- **VAL-004**: A fresh local checkout can run `vp install`, `pnpm db:migrate:local`, `pnpm dev`, and serve `/` without errors.
 - **VAL-005**: All sibling specs referenced under §11 exist and validate against the spec template (front matter + 11 sections).
 
 ## 11. Related Specifications / Further Reading

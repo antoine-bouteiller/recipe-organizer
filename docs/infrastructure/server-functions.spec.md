@@ -431,7 +431,7 @@ await Promise.all(
   `cloudflare:workers` `env` with module mocks; provide a fake `R2_BUCKET` and `IMAGES`
   binding.
 - **Test data management**: Use Drizzle migrations against a per-test sqlite/D1 instance
-  (`pnpm migration:apply:local`). Each test seeds its own rows; do not rely on shared
+  (`pnpm db:migrate:local`). Each test seeds its own rows; do not rely on shared
   fixtures.
 - **CI/CD**: `vp check` and `vp test` MUST pass before merge (see `CLAUDE.md`). New server
   functions MUST have at least one happy-path integration test plus one auth/authz test.

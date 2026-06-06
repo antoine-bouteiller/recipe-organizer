@@ -216,10 +216,10 @@ Dev server listens on port `3000`. Lint config is Oxlint with `typeAware: true` 
 - **AC-006** — Given the SW is served from `/sw.js`, when the client root mounts, then registration
   MUST be attempted with `scope: '/'` and `type: 'module'`; failure MUST be swallowed (no
   user-visible error).
-- **AC-007** — Given `pnpm migration:apply:local`, when the script runs to completion, then
+- **AC-007** — Given `pnpm db:migrate:local`, when the script runs to completion, then
   `migrations_tmp/` MUST be removed regardless of success or failure of `wrangler d1 migrations apply`
   (idempotent re-run).
-- **AC-008** — Given `pnpm migration:apply:remote`, when invoked with the
+- **AC-008** — Given `pnpm db:migrate:remote`, when invoked with the
   `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_DATABASE_ID` / `CLOUDFLARE_D1_TOKEN` env vars set, then
   Drizzle-Kit MUST apply pending migrations to the production D1 database via the `d1-http` driver.
 - **AC-009** — Given a request to a route that requires authentication, when no `app-session` cookie
@@ -233,7 +233,7 @@ Dev server listens on port `3000`. Lint config is Oxlint with `typeAware: true` 
 - **Frameworks** — Vitest (bundled by Vite+); `@cloudflare/vitest-pool-workers` is **not** currently
   configured — D1/R2/Images-touching code paths are exercised manually or via deploy preview.
 - **Test data management** — Local D1 is reset by reapplying migrations
-  (`pnpm migration:apply:local`); `wrangler d1 export` / `wrangler d1 execute` (the
+  (`pnpm db:migrate:local`); `wrangler d1 export` / `wrangler d1 execute` (the
   `db:dump` / `db:import` scripts) are used to snapshot/restore.
 - **CI/CD** — GitHub Actions runs `vp install`, `vp check`, `vp test`. Production migrations are
   applied during deployment (see commit `c85f857` "ci: apply migrations during deployment").
@@ -288,7 +288,7 @@ Dev server listens on port `3000`. Lint config is Oxlint with `typeAware: true` 
   `wrangler d1 export`, `wrangler d1 execute`, `wrangler types`, and (optionally) `wrangler deploy`.
 - **INF-002 — pnpm 10.33.0.** Pinned via `packageManager`; consumed transparently through `vp`.
 - **INF-003 — Bun.** Used to execute `scripts/apply-migration-local.ts`
-  (`pnpm migration:apply:local` runs `bun run ./scripts/apply-migration-local.ts`).
+  (`pnpm db:migrate:local` runs `bun run ./scripts/apply-migration-local.ts`).
 
 ### Data dependencies
 
@@ -371,7 +371,7 @@ return cache.getWithCache(request.url)(async () => {
   `self.__SW_MANIFEST`.
 - **VAL-004** — `pnpm cf-typegen` MUST be re-run whenever `wrangler.jsonc` bindings change; the
   generated `worker-configuration.d.ts` MUST be committed.
-- **VAL-005** — `pnpm migration:apply:remote` MUST be run as part of the deploy pipeline; the
+- **VAL-005** — `pnpm db:migrate:remote` MUST be run as part of the deploy pipeline; the
   application MUST NOT issue queries against a D1 schema older than the latest committed migration.
 - **VAL-006** — `SESSION_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` MUST be set via
   `wrangler secret put` in production; deploys without them MUST be rejected by smoke tests.

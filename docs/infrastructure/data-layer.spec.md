@@ -86,7 +86,7 @@ Audience: contributors and AI agents modifying schema, writing queries, or evolv
   migration mechanism. The authoritative migration directory for drizzle-kit is `migrations/` (per
   `drizzle.config.ts`). Do not conflate the two.
 - **CON-007**: Local migration apply uses a project-specific Bun script invoked via
-  `pnpm migration:apply:local`. Remote apply runs `drizzle-kit migrate` in CI (`pnpm migration:apply:remote`).
+  `pnpm db:migrate:local`. Remote apply runs `drizzle-kit migrate` in CI (`pnpm db:migrate:remote`).
 - **CON-008**: drizzle-kit credentials come from `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_DATABASE_ID`, and
   `CLOUDFLARE_D1_TOKEN` env vars. They MUST NOT be committed.
 
@@ -206,7 +206,7 @@ export const queryKeys = {
   pre-fetched via `context.queryClient.ensureQueryData(<*Options>)`.
 - **AC-006**: Given any change under `src/lib/db/`, when CI runs `vp check` and `vp test`, then both succeed before
   merge.
-- **AC-007**: Given a deployed environment, when `pnpm migration:apply:remote` is invoked in CI, then
+- **AC-007**: Given a deployed environment, when `pnpm db:migrate:remote` is invoked in CI, then
   `drizzle-kit migrate` applies pending `migrations/*.sql` files against the configured D1 database.
 
 ## 6. Test Automation Strategy
@@ -218,7 +218,7 @@ export const queryKeys = {
   deletes obey FK ordering.
 - **Type tests**: rely on TS to catch divergence between `defineRelations(...)` keys and `with: { ... }` usage.
   `vp check` runs the type-aware lint pass.
-- **Manual verification**: after migration changes, run `pnpm migration:apply:local` and exercise the affected
+- **Manual verification**: after migration changes, run `pnpm db:migrate:local` and exercise the affected
   flows in `pnpm dev` before pushing.
 
 ## 7. Rationale & Context
@@ -256,7 +256,7 @@ export const queryKeys = {
 - **DEP-006**: `drizzle-kit` (invoked through `vp dlx`) — schema diff, migration generation, and remote apply.
 - **DEP-007**: `wrangler` — local D1 (`wrangler d1 execute`), import/export (`wrangler d1 export ... --no-schema`),
   and deployment.
-- **DEP-008**: Custom Bun script behind `pnpm migration:apply:local`.
+- **DEP-008**: Custom Bun script behind `pnpm db:migrate:local`.
 
 ### 8.3 External Services
 
@@ -333,7 +333,7 @@ The `--no-schema` flag exports data only; the receiving database must already ha
 - **VAL-005**: Every mutation in `src/features/**/api/{create,update,delete}.ts` invalidates an appropriate key
   from `src/lib/query-keys.ts` in `onSuccess`.
 - **VAL-006**: Every FK in `src/lib/db/schema/*.ts` declares `{ onDelete: 'restrict' }`.
-- **VAL-007**: After running `pnpm migration:apply:local`, the local D1 schema matches the schema in
+- **VAL-007**: After running `pnpm db:migrate:local`, the local D1 schema matches the schema in
   `src/lib/db/schema/`.
 
 ## 11. Data Dictionary
