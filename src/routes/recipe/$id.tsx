@@ -132,4 +132,5 @@ export const Route = createFileRoute('/recipe/$id')({
 
     return { id }
   },
+  ssr: 'data-only',
 })

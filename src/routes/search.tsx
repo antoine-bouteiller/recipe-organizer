@@ -33,4 +33,5 @@ export const Route = createFileRoute('/search')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getRecipeListOptions())
   },
+  ssr: 'data-only',
 })

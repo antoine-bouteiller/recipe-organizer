@@ -40,6 +40,7 @@ export const Route = createFileRoute('/')({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getRecipeListOptions())
   },
+  ssr: 'data-only',
   validateSearch: (search) => {
     const result = searchSchema.safeParse(search)
     if (!result.success) {
