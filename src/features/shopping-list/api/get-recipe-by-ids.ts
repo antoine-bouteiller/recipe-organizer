@@ -92,6 +92,7 @@ const getRecipesByIds = createServerFn({
 
 const getRecipeByIdsOptions = (ids: number[]) =>
   queryOptions({
+    enabled: ids.length > 0,
     queryFn: () => getRecipesByIds({ data: { ids } }),
     queryKey: queryKeys.recipeListByIds(ids),
   })
