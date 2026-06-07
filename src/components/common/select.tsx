@@ -35,7 +35,7 @@ export const Select = <TValue extends string>(props: SelectProps<TValue>): React
 
   const selectedLabels = items.filter((item) => isSelected(item.value)).map((item) => item.label)
   const isEmpty = selectedLabels.length === 0
-  const displayLabel = isEmpty ? placeholder : selectedLabels.join(', ')
+  const displayLabel = isEmpty ? placeholder : selectedLabels[0] + (selectedLabels.length > 1 ? ` (+${selectedLabels.length - 1})` : '')
 
   if (isMobile) {
     const handleSelect = (value: TValue | null) => {

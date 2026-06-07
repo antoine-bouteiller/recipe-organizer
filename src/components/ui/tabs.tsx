@@ -49,7 +49,7 @@ const tabIndicatorVariants = cva(
           dark:bg-accent
         `,
         tabbar: `
-          -z-1 rounded-full bg-accent
+          -z-1 rounded-full bg-primary/7
         `,
         underline: `
           z-10 bg-primary

@@ -113,7 +113,7 @@ const viteConfig = defineConfig({
     react(),
     ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),
     tailwindcss(),
-    ...(isTest ? [] : [tanstackSerwistPlugin()]),
+    tanstackSerwistPlugin(),
     devtools({
       injectSource: { enabled: false },
     }),

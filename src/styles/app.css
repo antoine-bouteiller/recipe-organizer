@@ -49,25 +49,25 @@
   --radius: 0.625rem;
 
   --background: var(--color-white);
-  --foreground: var(--color-zinc-900);
+  --foreground: var(--color-neutral-800);
 
   --card: var(--color-white);
-  --card-foreground: var(--color-zinc-900);
+  --card-foreground: var(--color-neutral-800);
 
   --popover: var(--color-white);
-  --popover-foreground: var(--color-zinc-900);
+  --popover-foreground: var(--color-neutral-800);
 
   --primary: color-mix(in oklch, var(--color-violet-700) 90%, var(--color-zinc-700));
-  --primary-foreground: var(--color-zinc-50);
+  --primary-foreground: var(--color-neutral-50);
 
   --secondary: var(--color-gray-600);
   --secondary-foreground: var(--color-white);
 
-  --muted: --alpha(var(--color-gray-100) / 50%);
-  --muted-foreground: var(--color-gray-600);
+  --muted: --alpha(var(--color-black) / 4%);
+  --muted-foreground: color-mix(in srgb, var(--color-neutral-500) 90%, var(--color-black));
 
-  --accent: --alpha(var(--color-violet-300) / 30%);
-  --accent-foreground: var(--color-violet-900);
+  --accent: var(--color-neutral-100);
+  --accent-foreground: var(--color-neutral-900);
 
   --destructive: var(--color-red-500);
   --destructive-foreground: var(--color-red-700);
@@ -81,35 +81,35 @@
   --warning: var(--color-amber-500);
   --warning-foreground: var(--color-amber-700);
 
-  --border: --alpha(var(--color-black) / 12%);
-  --input: --alpha(var(--color-black) / 12%);
-  --ring: var(--color-zinc-400);
+  --border: --alpha(var(--color-black) / 8%);
+  --input: --alpha(var(--color-black) / 10%);
+  --ring: var(--color-neutral-400);
 
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
-  --background: var(--color-zinc-950);
-  --foreground: var(--color-zinc-100);
+  --background: color-mix(in srgb, var(--color-neutral-950) 95%, var(--color-white));
+  --foreground: var(--color-neutral-100);
 
-  --card: color-mix(in srgb, var(--color-zinc-900) 80%, var(--color-zinc-950));
-  --card-foreground: var(--color-zinc-100);
+  --card: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --card-foreground: var(--color-neutral-100);
 
-  --popover: var(--color-zinc-900);
-  --popover-foreground: var(--color-zinc-100);
+  --popover: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --popover-foreground: var(--color-neutral-100);
 
-  --primary: var(--color-zinc-100);
-  --primary-foreground: var(--color-zinc-900);
+  --primary: color-mix(in oklch, var(--color-violet-700) 90%, var(--color-zinc-700));
+  --primary-foreground: var(--color-neutral-800);
 
   --secondary: --alpha(var(--color-white) / 8%);
   --secondary-foreground: var(--color-zinc-100);
 
-  --muted: --alpha(var(--color-white) / 8%);
-  --muted-foreground: var(--color-zinc-400);
+  --muted: --alpha(var(--color-white) / 4%);
+  --muted-foreground: color-mix(in srgb, var(--color-neutral-500) 90%, var(--color-white));
 
-  --accent: --alpha(var(--color-white) / 8%);
-  --accent-foreground: var(--color-zinc-100);
+  --accent: --alpha(var(--color-white) / 4%);
+  --accent-foreground: var(--color-neutral-100);
 
   --destructive: var(--color-red-500);
   --destructive-foreground: var(--color-red-400);
@@ -123,9 +123,9 @@
   --warning: var(--color-amber-500);
   --warning-foreground: var(--color-amber-400);
 
-  --border: --alpha(var(--color-white) / 12%);
-  --input: --alpha(var(--color-white) / 12%);
-  --ring: var(--color-zinc-500);
+  --border: --alpha(var(--color-white) / 6%);
+  --input: --alpha(var(--color-white) / 8%);
+  --ring: var(--color-neutral-500);
 
   --ease-out-snappy: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out-bounce: cubic-bezier(0.45, 1.005, 0, 1.005);
