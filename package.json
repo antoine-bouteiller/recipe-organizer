@@ -47,7 +47,7 @@
     "@serwist/build": "9.5.11",
     "@serwist/vite": "9.5.11",
     "@serwist/window": "9.5.11",
-    "@tailwindcss/typography": "0.5.19",
+    "@tailwindcss/typography": "0.5.20",
     "@tailwindcss/vite": "4.3.0",
     "@tanstack/devtools-vite": "0.7.0",
     "@tanstack/react-devtools": "0.10.5",
