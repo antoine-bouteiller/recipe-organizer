@@ -24,6 +24,7 @@ interface ResolveAutoFlagsInput {
 
 interface AutoFlags {
   readonly isMagimix: boolean
+  readonly isSpice: boolean
   readonly isVegetarian: boolean
 }
 
@@ -37,6 +38,7 @@ const computeAutoFlags = (
   const linkedVegetarian = linkedRecipesData.every((item) => item.isVegetarian)
   return {
     isMagimix: instructions.includes('"type":"magimixProgram"'),
+    isSpice: ingredientCategories.length > 0 && ingredientCategories.every((item) => item.category === 'spices'),
     isVegetarian: ownVegetarian && linkedVegetarian && !meals.includes('dessert'),
   }
 }

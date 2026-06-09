@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { type ReducedRecipe } from '../api/get-all'
-import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '../utils/constants'
+import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
 
 interface RecipeCardProps {
@@ -28,6 +28,7 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
               </Badge>
             )}
             {recipe.isMagimix && <Badge variant="outline">{MAGIMIX_LABEL}</Badge>}
+            {recipe.isSpice && <Badge variant="outline">{SPICE_LABEL}</Badge>}
             {recipe.meals.map((meal) => (
               <Badge key={meal} variant="outline">
                 {MEAL_LABELS[meal]}

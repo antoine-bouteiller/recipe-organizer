@@ -31,6 +31,7 @@ const SearchPage = () => {
   const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
 
   const filtered = useMemo(() => filterRecipes(recipes, filters), [recipes, filters])
+  const nonSpiceRecipes = useMemo(() => recipes.filter((recipe) => !recipe.isSpice), [recipes])
 
   const clearFilters = () => setFilters(EMPTY_FILTERS)
 
@@ -75,10 +76,13 @@ const SearchPage = () => {
             <Toggle className="shrink-0" pressed={filters.isMagimix} onPressedChange={(pressed) => setFilters({ ...filters, isMagimix: pressed })}>
               Magimix
             </Toggle>
+            <Toggle className="shrink-0" pressed={filters.isSpice} onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}>
+              Épices
+            </Toggle>
           </CollapsibleContent>
         </Collapsible>
       </div>
-      {hasActiveFilters(filters) ? <SearchResults onClearFilters={clearFilters} recipes={filtered} /> : <RecentRecipes recipes={recipes} />}
+      {hasActiveFilters(filters) ? <SearchResults onClearFilters={clearFilters} recipes={filtered} /> : <RecentRecipes recipes={nonSpiceRecipes} />}
     </ScreenLayout>
   )
 }

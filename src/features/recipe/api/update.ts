@@ -79,7 +79,7 @@ const updateRecipe = createServerFn({
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
-      const { isMagimix, isVegetarian } = await resolveAutoFlags({ allIngredientIds, instructions, linkedRecipeIds, meals })
+      const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags({ allIngredientIds, instructions, linkedRecipeIds, meals })
 
       await getDb().batch([
         getDb()
@@ -89,6 +89,7 @@ const updateRecipe = createServerFn({
             image: imageKey,
             instructions,
             isMagimix,
+            isSpice,
             isVegetarian,
             meals,
             name,

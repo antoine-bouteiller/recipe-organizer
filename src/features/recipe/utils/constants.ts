@@ -24,3 +24,4 @@ export const MEAL_LABELS: Record<Meal, string> = {
 
 export const VEGETARIAN_LABEL = 'Végétarien'
 export const MAGIMIX_LABEL = 'Magimix'
+export const SPICE_LABEL = 'Épices'

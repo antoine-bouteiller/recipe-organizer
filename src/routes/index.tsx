@@ -19,9 +19,11 @@ const RecipeList = () => {
   return (
     <ScreenLayout title="Recettes" pageKey="/">
       <div className="flex flex-col gap-8 p-4 sm:grid-cols-2 md:grid lg:grid-cols-3">
-        {recipes.map((recipe) => (
-          <RecipeCard recipe={recipe} key={recipe.id} />
-        ))}
+        {recipes
+          .filter((recipe) => !recipe.isSpice)
+          .map((recipe) => (
+            <RecipeCard recipe={recipe} key={recipe.id} />
+          ))}
       </div>
       {authUser && (
         <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" viewTransition />} size="icon-xl">
