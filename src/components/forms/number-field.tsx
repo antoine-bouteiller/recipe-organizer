@@ -28,6 +28,7 @@ export const NumberField = ({ disabled, label, max, min, placeholder, className 
         label={label}
         max={max}
         min={min}
+        step="any"
         onValueChange={(value) => field.handleChange(value ?? undefined)}
         placeholder={placeholder}
         value={field.state.value}
