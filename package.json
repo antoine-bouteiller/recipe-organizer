@@ -41,8 +41,8 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.42.1",
-    "@commitlint/cli": "21.0.2",
-    "@commitlint/config-conventional": "21.0.2",
+    "@commitlint/cli": "21.1.0",
+    "@commitlint/config-conventional": "21.1.0",
     "@rolldown/plugin-babel": "0.2.3",
     "@serwist/build": "9.5.11",
     "@serwist/vite": "9.5.11",
