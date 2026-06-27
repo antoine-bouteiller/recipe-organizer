@@ -35,8 +35,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: Roboto, sans-serif;
-  --font-heading: 'Cal Sans', sans-serif;
+  --font-sans: 'Bricolage Grotesque', sans-serif;
+  --font-heading: 'Bricolage Grotesque', sans-serif;
   --animate-skeleton: skeleton 2s -1s infinite linear;
   @keyframes skeleton {
     to {
@@ -48,26 +48,26 @@
 :root {
   --radius: 0.625rem;
 
-  --background: var(--color-white);
-  --foreground: var(--color-neutral-800);
+  --background: #f3f4f1;
+  --foreground: #18302e;
 
   --card: var(--color-white);
-  --card-foreground: var(--color-neutral-800);
+  --card-foreground: #18302e;
 
   --popover: var(--color-white);
-  --popover-foreground: var(--color-neutral-800);
+  --popover-foreground: #18302e;
 
-  --primary: color-mix(in oklch, var(--color-violet-700) 90%, var(--color-zinc-700));
-  --primary-foreground: var(--color-neutral-50);
+  --primary: #0e6e7e;
+  --primary-foreground: var(--color-white);
 
-  --secondary: var(--color-gray-600);
-  --secondary-foreground: var(--color-white);
+  --secondary: #eaf2f2;
+  --secondary-foreground: #2a4644;
 
-  --muted: --alpha(var(--color-black) / 4%);
-  --muted-foreground: color-mix(in srgb, var(--color-neutral-500) 90%, var(--color-black));
+  --muted: #eaeeed;
+  --muted-foreground: #6e807e;
 
-  --accent: var(--color-neutral-100);
-  --accent-foreground: var(--color-neutral-900);
+  --accent: #dcefef;
+  --accent-foreground: #0e6e7e;
 
   --destructive: var(--color-red-500);
   --destructive-foreground: var(--color-red-700);
@@ -81,34 +81,34 @@
   --warning: var(--color-amber-500);
   --warning-foreground: var(--color-amber-700);
 
-  --border: --alpha(var(--color-black) / 8%);
-  --input: --alpha(var(--color-black) / 10%);
-  --ring: var(--color-neutral-400);
+  --border: #e7ecea;
+  --input: #e2e8e7;
+  --ring: #0e6e7e;
 
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
-  --background: color-mix(in srgb, var(--color-neutral-950) 95%, var(--color-white));
-  --foreground: var(--color-neutral-100);
+  --background: #0d1416;
+  --foreground: #fbfcfb;
 
-  --card: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --card: #1b2426;
   --card-foreground: var(--color-neutral-100);
 
-  --popover: color-mix(in srgb, var(--background) 98%, var(--color-white));
+  --popover: #1b2426;
   --popover-foreground: var(--color-neutral-100);
 
-  --primary: color-mix(in oklch, var(--color-violet-700) 90%, var(--color-zinc-700));
-  --primary-foreground: var(--color-neutral-800);
+  --primary: #0e6e7e;
+  --primary-foreground: var(--color-white);
 
   --secondary: --alpha(var(--color-white) / 8%);
   --secondary-foreground: var(--color-zinc-100);
 
   --muted: --alpha(var(--color-white) / 4%);
-  --muted-foreground: color-mix(in srgb, var(--color-neutral-500) 90%, var(--color-white));
+  --muted-foreground: #8aa0a0;
 
-  --accent: --alpha(var(--color-white) / 4%);
+  --accent: --alpha(var(--color-white) / 8%);
   --accent-foreground: var(--color-neutral-100);
 
   --destructive: var(--color-red-500);
