@@ -76,4 +76,4 @@ export const PopoverDescription = ({ className, ...props }: PopoverPrimitive.Des
   <PopoverPrimitive.Description className={cn('text-muted-foreground text-sm', className)} data-slot="popover-description" {...props} />
 )
 
-export { PopoverPrimitive, PopoverPopup as PopoverContent }
+export { PopoverPopup as PopoverContent }

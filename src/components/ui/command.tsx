@@ -136,5 +136,3 @@ export const CommandFooter = ({ className, ...props }: React.ComponentProps<'div
     {...props}
   />
 )
-
-export { CommandDialogPrimitive }

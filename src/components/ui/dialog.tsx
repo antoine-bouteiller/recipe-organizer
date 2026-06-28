@@ -148,4 +148,4 @@ export const DialogPanel = ({
   )
 }
 
-export { DialogPopup as DialogContent, DialogBackdrop as DialogOverlay, DialogPrimitive }
+export { DialogPopup as DialogContent, DialogBackdrop as DialogOverlay }

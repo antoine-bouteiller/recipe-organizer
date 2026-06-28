@@ -73,7 +73,6 @@ const viteConfig = defineConfig({
           cases: {
             kebabCase: true,
           },
-          ignore: '\\[.+\\]\\.tsx',
         },
       ],
       'prefer-default-export': 'off',

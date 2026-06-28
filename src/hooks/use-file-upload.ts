@@ -53,7 +53,7 @@ const isImageUrl = (url: string): boolean => {
     const parsedUrl = new URL(url)
     const pathname = parsedUrl.pathname.toLowerCase()
     return (
-      /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(pathname) ||
+      /\.(?<ext>jpg|jpeg|png|gif|webp|svg)$/i.test(pathname) ||
       parsedUrl.hostname.includes('imgur') ||
       parsedUrl.hostname.includes('unsplash') ||
       parsedUrl.hostname.includes('pexels')

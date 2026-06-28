@@ -82,5 +82,3 @@ export const ToggleGroupSeparator = ({
     {...props}
   />
 )
-
-export { ToggleGroupPrimitive }

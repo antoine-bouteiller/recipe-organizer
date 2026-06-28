@@ -216,5 +216,3 @@ export const AnchoredToastProvider = ({ children, ...props }: Toast.Provider.Pro
     <AnchoredToasts />
   </Toast.Provider>
 )
-
-export { Toast as ToastPrimitive }

@@ -29,5 +29,3 @@ export const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props):
 
 export const FieldControl: typeof FieldPrimitive.Control = FieldPrimitive.Control
 export const FieldValidity: typeof FieldPrimitive.Validity = FieldPrimitive.Validity
-
-export { FieldPrimitive }

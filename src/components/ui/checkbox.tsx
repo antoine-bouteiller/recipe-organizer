@@ -55,5 +55,3 @@ export const Checkbox = ({ className, ...props }: CheckboxPrimitive.Root.Props):
     />
   </CheckboxPrimitive.Root>
 )
-
-export { CheckboxPrimitive }
