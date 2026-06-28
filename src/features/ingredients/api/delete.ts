@@ -15,7 +15,7 @@ const deleteIngredientSchema = z.object({
 
 const deleteIngredient = createServerFn()
   .middleware([authGuard('admin')])
-  .inputValidator(deleteIngredientSchema)
+  .validator(deleteIngredientSchema)
   .handler(
     withServerError(async ({ data }) => {
       const { id } = data

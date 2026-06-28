@@ -17,7 +17,7 @@ const deleteRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .inputValidator(deleteRecipeSchema)
+  .validator(deleteRecipeSchema)
   .handler(
     withServerError(async ({ data: id, context }) => {
       const currentRecipe = await getDb().query.recipe.findFirst({

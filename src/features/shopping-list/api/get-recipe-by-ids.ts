@@ -16,7 +16,7 @@ const getRecipesByIdsSchema = z.object({
 const getRecipesByIds = createServerFn({
   method: 'GET',
 })
-  .inputValidator(getRecipesByIdsSchema)
+  .validator(getRecipesByIdsSchema)
   .handler(
     withServerError(async ({ data }) => {
       const rows = await getDb().query.recipe.findMany({

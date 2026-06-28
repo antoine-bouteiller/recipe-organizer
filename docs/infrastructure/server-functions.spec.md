@@ -37,7 +37,7 @@ Assumptions:
 - **Middleware**: a function-type middleware created with
   `createMiddleware({ type: 'function' }).server(...)`. Runs before the handler and may inject
   values into `context`.
-- **Input Validator**: a Zod schema or transformer function passed to `.inputValidator(...)`
+- **Input Validator**: a Zod schema or transformer function passed to `.validator(...)`
   that parses and types the `data` argument of the handler.
 - **Query Options Factory**: a function named `get<X>Options(...)` returning
   `queryOptions({ queryKey, queryFn })`, exported alongside the read server function.
@@ -80,10 +80,10 @@ Assumptions:
 
 ### 3.2 Input validation
 
-- **REQ-010**: All server functions taking input MUST declare an `.inputValidator(...)`. JSON
-  inputs MUST pass a Zod schema directly (e.g. `.inputValidator(updateIngredientSchema)`).
+- **REQ-010**: All server functions taking input MUST declare an `.validator(...)`. JSON
+  inputs MUST pass a Zod schema directly (e.g. `.validator(updateIngredientSchema)`).
 - **REQ-011**: FormData / multipart inputs MUST use the function form
-  `.inputValidator((formData: FormData) => schema.parse(parseFormData(formData)))`. Reference:
+  `.validator((formData: FormData) => schema.parse(parseFormData(formData)))`. Reference:
   `src/features/recipe/api/create.ts`, `update.ts`.
 - **REQ-012**: The FormData round-trip MUST use the helpers in `src/utils/form-data.ts`:
   - Client serialisation: `objectToFormData(values)` — `File` values are appended as `File`,
@@ -261,7 +261,7 @@ API route handlers (low-level):
 
 ```ts
 const getX = createServerFn({ method: 'GET' })
-  .inputValidator(xSchema)
+  .validator(xSchema)
   .handler(
     withServerError(async ({ data }) => {
       /* ... */
@@ -282,7 +282,7 @@ export { getXOptions }
 ```ts
 const createX = createServerFn()
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => xSchema.parse(parseFormData(formData)))
+  .validator((formData: FormData) => xSchema.parse(parseFormData(formData)))
   .handler(async ({ data, context }) => {
     /* ... */
   })
@@ -384,7 +384,7 @@ await Promise.all(
 
 ## 6. Acceptance Criteria
 
-- **AC-001 (REQ-010, REQ-013)**: Given a server function with `.inputValidator(zodSchema)`,
+- **AC-001 (REQ-010, REQ-013)**: Given a server function with `.validator(zodSchema)`,
   when called with malformed JSON input, then the framework throws a `ZodError` and the
   client receives `Error('Invalid Schema; <message>')`.
 - **AC-002 (REQ-011, REQ-012)**: Given a recipe form submitted as `FormData` produced by
@@ -591,7 +591,7 @@ it to the string `'42'`, not the number 42. Schemas MUST therefore declare numer
   or a server-only helper (no orphaned server functions).
 - **VAL-002**: Every write server function attaches `authGuard()` or `authGuard('admin')` as
   the first middleware.
-- **VAL-003**: Every server function consuming inputs declares `.inputValidator(...)`.
+- **VAL-003**: Every server function consuming inputs declares `.validator(...)`.
 - **VAL-004**: Every read server function (or its handler body) returns a value compatible
   with the `queryFn` contract — no `void` returns from reads.
 - **VAL-005**: Every mutation factory invalidates at least one query key from

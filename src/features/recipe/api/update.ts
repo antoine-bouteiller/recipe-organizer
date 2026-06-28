@@ -51,7 +51,7 @@ const updateRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
+  .validator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerError(async ({ data, context }) => {
       const { cuisineTypes, id, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data

@@ -207,7 +207,7 @@ Define the authoritative behavior, contracts, constraints, and acceptance criter
 - **PAT-005 (Dynamic array)** `<AppField mode="array" name="path">{(field) => field.state.value?.map(...) +
 Add/Remove buttons that call field.pushValue / field.removeValue}</AppField>`.
 - **PAT-006 (File-bearing submit)** `const formData = objectToFormData(value); await mutate({ data: formData })` on
-  the client; `inputValidator((fd: FormData) => schema.parse(parseFormData(fd)))` on the server.
+  the client; `validator((fd: FormData) => schema.parse(parseFormData(fd)))` on the server.
 - **PAT-007 (Error projection)** `const errors = useStore(form.store, (s) => formatFormErrors(s.errors))` ->
   `<Form errors={errors}>`. Base UI matches each `errors[name]` to the matching `<Field name>` and renders it via
   `<FieldError />`.
@@ -328,7 +328,7 @@ for (const [key, value] of formData.entries()) {
 Server function pattern (matches `src/features/recipe/api/create.ts`):
 
 ```
-.inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
+.validator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
 ```
 
 Schema unions for file fields (`File | FileMetadata`):

@@ -57,7 +57,7 @@ Provide a single, authoritative server-side write path for recipes that:
 
 ### Requirements
 
-- **REQ-001** `createRecipe` is `POST` + `authGuard()` + `inputValidator(formData =>
+- **REQ-001** `createRecipe` is `POST` + `authGuard()` + `validator(formData =>
 recipeSchema.parse(parseFormData(formData)))`. It MUST set `recipes.createdBy = context.user.id`.
 - **REQ-002** `updateRecipe` re-uses `recipeSchema.extend({ id: z.number() })` and MUST throw
   `notFound()` if the row doesn't exist, then throw `'Permission denied'` unless
@@ -144,14 +144,14 @@ delete(recipe)`. After the batch resolves, `deleteFile(currentRecipe.image)` is 
 ```ts
 const createRecipe = createServerFn()
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
+  .validator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
   .handler(async ({ data, context }) => {
     /* ... */
   })
 
 const updateRecipe = createServerFn()
   .middleware([authGuard()])
-  .inputValidator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
+  .validator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerError(async ({ data, context }) => {
       /* ... returns id */
@@ -160,7 +160,7 @@ const updateRecipe = createServerFn()
 
 const deleteRecipe = createServerFn()
   .middleware([authGuard()])
-  .inputValidator(z.number())
+  .validator(z.number())
   .handler(
     withServerError(async ({ data: id, context }) => {
       /* ... */

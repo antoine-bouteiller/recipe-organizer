@@ -51,7 +51,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **SEC-001**: Sessions MUST be encrypted server-side (TanStack `useSession`, keyed by `SESSION_SECRET`). Cookies MUST be `httpOnly`, `sameSite=lax`, and `secure` in production.
 - **SEC-002**: OAuth state MUST be validated against an `oauth-session` cookie before exchanging the code (CSRF defense).
 - **SEC-003**: Admin-only operations MUST use `authGuard('admin')`; failing the role check MUST throw `Permission denied`.
-- **SEC-004**: User-supplied content MUST be validated server-side with Zod before reaching the database (every `createServerFn` write uses `.inputValidator(schema)`).
+- **SEC-004**: User-supplied content MUST be validated server-side with Zod before reaching the database (every `createServerFn` write uses `.validator(schema)`).
 - **SEC-005**: R2 file keys MUST be `crypto.randomUUID()` to prevent guessable URLs.
 - **SEC-006**: Secrets (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET`) MUST be configured as Cloudflare Worker secrets — never committed.
 
@@ -229,7 +229,7 @@ This specification describes the high-level architecture of the `recipe-organize
 [Worker]
   createServerFn({ method:'POST' })
     .middleware([authGuard()])
-    .inputValidator((fd) => recipeSchema.parse(parseFormData(fd)))
+    .validator((fd) => recipeSchema.parse(parseFormData(fd)))
     .handler(async ({ data, context }) => {
       const imageKey = await uploadFile(data.image)         // R2 + IMAGES
       // …compute autoTags…

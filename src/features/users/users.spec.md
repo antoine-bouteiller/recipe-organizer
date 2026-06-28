@@ -184,7 +184,7 @@ Engineers and LLM coding agents working on the recipe-organizer codebase.
   ```ts
   const approveUser = createServerFn()
     .middleware([authGuard('admin')])
-    .inputValidator(approveUserSchema)
+    .validator(approveUserSchema)
     .handler(async ({ data }) => {
       /* ... */
     })
