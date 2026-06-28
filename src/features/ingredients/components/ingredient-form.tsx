@@ -1,4 +1,4 @@
-import { useStore } from '@tanstack/react-form'
+import { useSelector } from '@tanstack/react-store'
 
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
@@ -23,7 +23,7 @@ export const IngredientForm = withForm({
     const { AppField } = form
     const ingredientOptions = useIngredientOptions({ allowEmpty: true })
 
-    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
+    const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
     return (
       <>

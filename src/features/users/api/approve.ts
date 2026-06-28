@@ -17,7 +17,7 @@ const approveUserSchema = z.object({
 
 const approveUser = createServerFn()
   .middleware([authGuard('admin')])
-  .inputValidator(approveUserSchema)
+  .validator(approveUserSchema)
   .handler(
     withServerError(async ({ data }) => {
       const { id } = data

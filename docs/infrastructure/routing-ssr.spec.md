@@ -108,7 +108,7 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
 - **REQ-004a** — `src/start.ts` MUST export a Start instance created with
   `createStart(() => ({ defaultSsr: false }))`. This makes every route client-only by default; only
   the root (REQ-004) renders server-side. Consequently child-route components, including ones that
-  read persisted (`localStorage`-backed) Zustand stores, render exclusively on the client — no
+  read persisted (`localStorage`-backed) TanStack Store stores, render exclusively on the client — no
   `<ClientOnly>` boundary or `'@tanstack/react-start/client-only'` directive is required.
 - **REQ-005** — The root `beforeLoad` MUST resolve `getAuthUser()` and `getTheme()` and return
   `{ authUser, isAdmin: authUser?.role === 'admin', theme }` so child routes can gate on

@@ -1,5 +1,5 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
-import { useStore } from '@tanstack/react-form'
+import { useSelector } from '@tanstack/react-store'
 import { Fragment } from 'react/jsx-runtime'
 
 import { Button } from '@/components/ui/button'
@@ -32,7 +32,7 @@ export const IngredientGroupField = withForm({
   props: {} as IngredientFormProps,
   render: ({ form, groupIndex }) => {
     const { AppField } = form
-    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
+    const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
     const ingredientsOptions = useIngredientOptions()
 

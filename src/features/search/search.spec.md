@@ -97,13 +97,13 @@ Contributors and AI agents implementing or modifying the search/filter page and 
   the full catalogue: the recipes referenced by `recentRecipeIds`, resolved against the cached list, in stored order
   (most-recent-first). Stale ids (absent from the cached list) MUST be skipped during rendering.
 - **REQ-013**: Activating any recipe row on `/search` MUST record that recipe via
-  `useRecentRecipesStore.addRecentRecipe(id)` before/at navigation, so the recipe becomes the most-recent entry.
+  `addRecentRecipe(id)` before/at navigation, so the recipe becomes the most-recent entry.
 - **REQ-014**: `addRecentRecipe(id)` MUST keep `recentRecipeIds` most-recent-first, de-duplicated (an existing id is
   moved to the front, not duplicated), and capped at `MAX_RECENT_RECIPES` (10); ids beyond the cap are dropped from the
   tail.
-- **REQ-015**: The recent-recipes state MUST be a persisted Zustand store at `src/stores/recent-recipes.store.ts`
-  (`useRecentRecipesStore`) holding ids only (`number[]`), following the persisted-store convention in the client-state
-  spec (`persist` middleware, explicit `partialize`, no `client-only` directive).
+- **REQ-015**: The recent-recipes state MUST be a persisted TanStack Store at `src/stores/recent-recipes.store.ts`
+  (`recentRecipesStore` + `useRecentRecipeIds()`) holding ids only (`number[]`), following the persisted-store convention
+  in the client-state spec (shared `persistedStore` helper, whole-state persistence, no `client-only` directive).
 - **REQ-016**: The recents section renders directly (no `<ClientOnly>`): the `/search` route is client-only
   (`defaultSsr: false`), so the store is read only on the client. On empty history (`recentRecipeIds` resolves to zero
   recipes), it MUST fall back to the full catalogue in `name` ascending order so the default view is never empty on
@@ -137,7 +137,7 @@ Contributors and AI agents implementing or modifying the search/filter page and 
   without React or the DB.
 - **GUD-004**: Memoize the filtered result derivation (`useMemo`) keyed on `[recipes, query, tags]` to avoid
   recomputing on unrelated renders.
-- **GUD-005**: Mirror the existing `useShoppingListStore` shape and the id→recipe resolution pattern (resolve ids
+- **GUD-005**: Mirror the existing `shoppingListStore` shape and the id→recipe resolution pattern (resolve ids
   against the cached list); do not invent a new persistence mechanism.
 
 ### 3.4 Patterns
@@ -230,32 +230,23 @@ export const normalize = (value: string): string =>
 
 ```ts
 // src/stores/recent-recipes.store.ts
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { useSelector } from '@tanstack/react-store'
+
+import { persistedStore } from '@/lib/persisted-store'
 
 const MAX_RECENT_RECIPES = 10
 
-interface RecentRecipesState {
-  recentRecipeIds: number[] // most-recent-first, deduped, length ≤ MAX_RECENT_RECIPES
-  addRecentRecipe: (recipeId: number) => void
-}
+export const recentRecipesStore = persistedStore<number[]>('recent-recipes', [])
 
-export const useRecentRecipesStore = create<RecentRecipesState>()(
-  persist(
-    (set) => ({
-      addRecentRecipe: (recipeId) =>
-        set(({ recentRecipeIds }) => ({
-          recentRecipeIds: [recipeId, ...recentRecipeIds.filter((id) => id !== recipeId)].slice(0, MAX_RECENT_RECIPES),
-        })),
-      recentRecipeIds: [],
-    }),
-    {
-      name: 'recent-recipes',
-      partialize: (state) => ({ recentRecipeIds: state.recentRecipeIds }),
-    }
-  )
-)
+export const useRecentRecipeIds = () => useSelector(recentRecipesStore)
+
+export const addRecentRecipe = (recipeId: number) =>
+  recentRecipesStore.setState((ids) => [recipeId, ...ids.filter((id) => id !== recipeId)].slice(0, MAX_RECENT_RECIPES))
 ```
+
+The state is `number[]` (ids only, most-recent-first, deduped, length ≤ `MAX_RECENT_RECIPES`). Persistence to
+`localStorage` is handled by the shared `persistedStore` helper (`src/lib/persisted-store.ts`), which tolerates a
+missing `localStorage` during server module eval.
 
 ### 4.8 Content-area selection & recents resolution
 
@@ -290,7 +281,7 @@ src/features/search/
   search.spec.md              // this file (single-file feature spec, REQ-013 of file-structure spec)
 
 src/stores/
-  recent-recipes.store.ts     // useRecentRecipesStore (persisted, ids only) — see §4.7
+  recent-recipes.store.ts     // recentRecipesStore + useRecentRecipeIds (persisted, ids only) — see §4.7
 ```
 
 > Client-only rendering: the `/search` route is client-only (`defaultSsr: false`), so modules that read the persisted
@@ -358,9 +349,9 @@ src/stores/
   repeating it on `/search` duplicates home and buries the recents. A focused "jump back in" list gives `/search` a
   distinct purpose, while the full-list fallback keeps first-time users (no history) from seeing an empty page.
 - **7.6 Why store recent ids, not snapshots** — Ids resolved against the live query cache keep recent rows in sync with
-  edits/renames and let deleted recipes drop out automatically; it mirrors `useShoppingListStore`.
+  edits/renames and let deleted recipes drop out automatically; it mirrors `shoppingListStore`.
 - **7.7 Why `localStorage` and `/search`-only recording for v1** — Recent recipes are a low-stakes per-device
-  convenience; `localStorage` via Zustand `persist` needs no schema, migration, or auth. Recording only from `/search`
+  convenience; `localStorage` via the `persistedStore` helper needs no schema, migration, or auth. Recording only from `/search`
   keeps the feature self-contained (no edits into the command palette); both are easy future extensions.
 - **7.8 Why client-only rendering** — The store reads `localStorage`, unavailable at SSR. Client-only render mode
   (`defaultSsr: false`) means the `/search` route never renders server-side, so the store is read directly on the
@@ -383,8 +374,9 @@ src/stores/
   and TanStack React Query (`getRecipeListOptions`, `ensureQueryData`).
 - **PLT-002**: ECMAScript `String.prototype.normalize('NFD')` and Unicode property escapes (`\p{Diacritic}`), available
   in the Workers runtime and target browsers.
-- **PLT-003**: Zustand + `zustand/middleware` `persist` over the browser `localStorage` API (recent-recipes store).
-  The store is read only on the client because `/search` is a client-only route.
+- **PLT-003**: TanStack Store (`@tanstack/react-store`) over the browser `localStorage` API via the shared
+  `persistedStore` helper (recent-recipes store). The store is read only on the client because `/search` is a
+  client-only route.
 
 ### Compliance Dependencies
 
@@ -436,9 +428,9 @@ Edge cases:
 - **VAL-003**: This spec parses against the front-matter and eleven-section schema in `docs/file-structure.spec.md` §4.
 - **VAL-004**: `getRecipeListOptions` and `ReducedRecipe` are byte-for-byte unchanged by this feature (no projection or
   key churn); existing consumers compile and behave identically.
-- **VAL-005**: `src/stores/recent-recipes.store.ts` is a plain module (no `client-only` directive) using the `persist`
-  middleware with `name: 'recent-recipes'` and an explicit `partialize` exposing only `recentRecipeIds`; consumers
-  render directly within the client-only `/search` route (no `<ClientOnly>`).
+- **VAL-005**: `src/stores/recent-recipes.store.ts` is a plain module (no `client-only` directive) using the
+  `persistedStore` helper with key `recent-recipes` (state is `number[]`); consumers render directly within the
+  client-only `/search` route (no `<ClientOnly>`).
 - **VAL-006**: Manual check — typing an accented vs unaccented query yields identical results; multiple tags narrow
   results; clearing filters returns to recents; a zero-match filter shows the empty state; opening recipes from
   `/search` populates "Recherches récentes" most-recent-first; re-opening reorders without duplicating; the list never

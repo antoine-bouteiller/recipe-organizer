@@ -1,23 +1,10 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { useSelector } from '@tanstack/react-store'
 
-interface RecipeQuantitiesState {
-  recipesQuantities: Record<number, number>
-  setRecipesQuantities: (recipeId: number, quantity: number) => void
-}
+import { persistedStore } from '@/lib/persisted-store'
 
-export const useRecipeQuantitiesStore = create<RecipeQuantitiesState>()(
-  persist(
-    (set) => ({
-      recipesQuantities: {},
-      setRecipesQuantities: (recipeId, quantity) =>
-        set(({ recipesQuantities }) => ({
-          recipesQuantities: { ...recipesQuantities, [recipeId]: quantity },
-        })),
-    }),
-    {
-      name: 'recipe-quantities',
-      partialize: (state) => ({ recipesQuantities: state.recipesQuantities }),
-    }
-  )
-)
+const recipeQuantitiesStore = persistedStore<Record<number, number>>('recipe-quantities', {})
+
+export const useRecipeQuantitiesState = () => useSelector(recipeQuantitiesStore)
+
+export const setRecipesQuantities = (recipeId: number, quantity: number) =>
+  recipeQuantitiesStore.setState((quantities) => ({ ...quantities, [recipeId]: quantity }))

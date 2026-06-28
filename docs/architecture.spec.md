@@ -51,7 +51,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **SEC-001**: Sessions MUST be encrypted server-side (TanStack `useSession`, keyed by `SESSION_SECRET`). Cookies MUST be `httpOnly`, `sameSite=lax`, and `secure` in production.
 - **SEC-002**: OAuth state MUST be validated against an `oauth-session` cookie before exchanging the code (CSRF defense).
 - **SEC-003**: Admin-only operations MUST use `authGuard('admin')`; failing the role check MUST throw `Permission denied`.
-- **SEC-004**: User-supplied content MUST be validated server-side with Zod before reaching the database (every `createServerFn` write uses `.inputValidator(schema)`).
+- **SEC-004**: User-supplied content MUST be validated server-side with Zod before reaching the database (every `createServerFn` write uses `.validator(schema)`).
 - **SEC-005**: R2 file keys MUST be `crypto.randomUUID()` to prevent guessable URLs.
 - **SEC-006**: Secrets (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET`) MUST be configured as Cloudflare Worker secrets — never committed.
 
@@ -60,14 +60,14 @@ This specification describes the high-level architecture of the `recipe-organize
 - **CON-001**: The worker has the standard Cloudflare Workers limits — there is no long-running process, no filesystem, and no `Buffer` unless `nodejs_compat` is enabled (it is, per `wrangler.jsonc`).
 - **CON-002**: D1 has SQLite semantics (no `RETURNING *` in some flows, integer-only PKs by convention here). Multi-row atomicity uses `getDb().batch([...])`.
 - **CON-003**: TanStack Router's route tree is generated at build/dev time (`src/routeTree.gen.ts`). New route files require a dev-server restart.
-- **CON-004**: Persistent client state (Zustand `persist`) is `localStorage`-based and therefore client-only. The app renders all route content client-only (`src/start.ts` `defaultSsr: false`; root `ssr: true`), so consumers render directly — no `<ClientOnly>` boundary or `client-only` directive is used.
+- **CON-004**: Persistent client state (TanStack Store via the `persistedStore` helper) is `localStorage`-based and therefore client-only. The app renders all route content client-only (`src/start.ts` `defaultSsr: false`; root `ssr: true`), so consumers render directly — no `<ClientOnly>` boundary or `client-only` directive is used.
 - **CON-005**: `compatibility_date` is `2026-01-28` with `nodejs_compat` enabled; do not regress these without auditing the Worker runtime APIs the app relies on (e.g. `node:crypto`).
 
 ### Guidelines
 
 - **GUD-001**: Prefer reads via TanStack Query loaders; prefer writes via mutations with `mutationOptions(...)` factories that handle cache invalidation and toasts in one place.
 - **GUD-002**: Keep server functions thin: validation → DB → optional R2 → return. Push expensive logic to dedicated helpers in `src/lib/`.
-- **GUD-003**: Don't duplicate server data in Zustand. Stores hold ids/selections; the actual data comes back from queries keyed by those ids.
+- **GUD-003**: Don't duplicate server data in a client store. Stores hold ids/selections; the actual data comes back from queries keyed by those ids.
 - **GUD-004**: Use the relational query API (`getDb().query.<table>.findMany({ with, columns, where, orderBy })`) instead of hand-rolling joins. Keep relations in `defineRelations` in sync.
 - **GUD-005**: Surface user-visible errors via `toastManager`; let server function failures bubble up as plain `Error("Une erreur est survenue")` thanks to `withServerError(...)`.
 
@@ -110,18 +110,18 @@ This specification describes the high-level architecture of the `recipe-organize
 
 ### Layered overview
 
-| Layer                   | Lives in                                                    | Responsibility                                                                                  |
-| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **UI primitives**       | `src/components/ui/`                                        | Base UI (Base UI / Shadcn-flavored) — buttons, dialogs, fields. No data dependencies.           |
-| **Form fields**         | `src/components/forms/`                                     | TanStack Form-aware fields built on UI primitives.                                              |
-| **Layout / Navigation** | `src/components/layout/`, `src/components/navigation/`      | Mobile/desktop chrome (`ScreenLayout`, `Navbar`, `TabBar`).                                     |
-| **Feature components**  | `src/features/<name>/components/`                           | Feature-specific UI: forms, dialogs, lists, editors.                                            |
-| **Hooks & contexts**    | `src/hooks/`, `src/features/<name>/{hooks,contexts}/`       | Cross-cutting hooks (forms, file upload, swipe), feature-scoped contexts (e.g. linked recipes). |
-| **Server functions**    | `src/features/<name>/api/`                                  | Validation + DB/R2 + cache invalidation.                                                        |
-| **Data layer**          | `src/lib/db/`                                               | Drizzle schema, relations, `getDb()`.                                                           |
-| **Platform helpers**    | `src/lib/{r2,session,cache-manager,theme,toast-helpers}.ts` | R2 upload/download + edge cache, session helpers, theme/toast plumbing.                         |
-| **Stores**              | `src/stores/`                                               | Persistent client-only Zustand stores (shopping list, recipe quantities).                       |
-| **Routes**              | `src/routes/`                                               | File-based pages and API handlers; SSR loaders prefetch queries.                                |
+| Layer                   | Lives in                                                    | Responsibility                                                                                   |
+| ----------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **UI primitives**       | `src/components/ui/`                                        | Base UI (Base UI / Shadcn-flavored) — buttons, dialogs, fields. No data dependencies.            |
+| **Form fields**         | `src/components/forms/`                                     | TanStack Form-aware fields built on UI primitives.                                               |
+| **Layout / Navigation** | `src/components/layout/`, `src/components/navigation/`      | Mobile/desktop chrome (`ScreenLayout`, `Navbar`, `TabBar`).                                      |
+| **Feature components**  | `src/features/<name>/components/`                           | Feature-specific UI: forms, dialogs, lists, editors.                                             |
+| **Hooks & contexts**    | `src/hooks/`, `src/features/<name>/{hooks,contexts}/`       | Cross-cutting hooks (forms, file upload, swipe), feature-scoped contexts (e.g. linked recipes).  |
+| **Server functions**    | `src/features/<name>/api/`                                  | Validation + DB/R2 + cache invalidation.                                                         |
+| **Data layer**          | `src/lib/db/`                                               | Drizzle schema, relations, `getDb()`.                                                            |
+| **Platform helpers**    | `src/lib/{r2,session,cache-manager,theme,toast-helpers}.ts` | R2 upload/download + edge cache, session helpers, theme/toast plumbing.                          |
+| **Stores**              | `src/stores/`                                               | Persistent client-only TanStack Store stores (shopping list, recipe quantities, recent recipes). |
+| **Routes**              | `src/routes/`                                               | File-based pages and API handlers; SSR loaders prefetch queries.                                 |
 
 ### Cross-feature data flow (page render)
 
@@ -131,8 +131,8 @@ This specification describes the high-level architecture of the `recipe-organize
    - `loader` calls `context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))`.
    - That option is backed by `getRecipe` (a `createServerFn`) which queries D1 via Drizzle and returns a serialized recipe.
 4. Worker renders the React tree to HTML and ships it back along with the query cache as a serialized payload.
-5. Client hydrates and runs the (client-only) route loader/component: `useQuery(getRecipeDetailsOptions(id))` and `useShoppingListStore` (Zustand) are read directly on the client — no `<ClientOnly>` needed, since the route never rendered on the server.
-6. User actions (add to shopping list, update quantity) write to Zustand stores; `localStorage` persists the change.
+5. Client hydrates and runs the (client-only) route loader/component: `useQuery(getRecipeDetailsOptions(id))` and `useShoppingListIds()` (TanStack Store) are read directly on the client — no `<ClientOnly>` needed, since the route never rendered on the server.
+6. User actions (add to shopping list, update quantity) call store action functions (e.g. `addToShoppingList(id)`) that run `store.setState(...)`; `localStorage` persists the change.
 
 ### Cross-feature data flow (mutation)
 
@@ -170,7 +170,7 @@ This specification describes the high-level architecture of the `recipe-organize
 
 - **Why TanStack Start + Cloudflare Workers**: same TS code on edge SSR and client; no separate API service. Loaders + Query make optimistic SSR cheap. D1/R2/Images keep all infra in one provider.
 - **Why D1 + Drizzle**: SQLite at the edge avoids cold-start connections. Drizzle gives type-safe relational queries with `defineRelations`. `batch([...])` provides multi-statement atomicity.
-- **Why Zustand for selected client state**: we need persisted UI state (shopping list, per-recipe servings). React Query is for server state, not for "this user picked these recipes". The two never overlap (PAT-005 in client-state spec).
+- **Why TanStack Store for selected client state**: we need persisted UI state (shopping list, per-recipe servings). React Query is for server state, not for "this user picked these recipes". The two never overlap (PAT-005 in client-state spec). `@tanstack/react-store` is already in the tree (TanStack React Form/Router depend on it), so it adds no new dependency.
 - **Why Cloudflare Images for uploads**: zero-effort WebP conversion + resize at the edge. Avoids storing huge JPEGs in R2 and serves the optimization tax once at upload time.
 - **Why Lexical for instructions**: rich-text editor with first-class custom-node support, used to embed Magimix programs and subrecipes inside instructions.
 - **Why French-only UI**: the app targets French-speaking users (Pelico domain context). All copy and validation messages are localized.
@@ -210,7 +210,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **PLT-001**: TanStack Start + Router (1.16x) + React Query (5.99) + React 19.
 - **PLT-002**: Drizzle ORM 1.0 beta + Drizzle Kit 1.0 beta (D1 dialect).
 - **PLT-003**: Vite+ 0.1.18 (wrapping Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt).
-- **PLT-004**: TypeScript 6, React 19.2, Tailwind 4.2, Zustand 5, Zod 4.
+- **PLT-004**: TypeScript 6, React 19.2, Tailwind 4.2, TanStack Store (`@tanstack/react-store` 0.11), Zod 4.
 - **PLT-005**: Lexical 0.43 (rich-text editor) + Vidstack 1.12 (video player).
 
 ### Compliance Dependencies
@@ -229,7 +229,7 @@ This specification describes the high-level architecture of the `recipe-organize
 [Worker]
   createServerFn({ method:'POST' })
     .middleware([authGuard()])
-    .inputValidator((fd) => recipeSchema.parse(parseFormData(fd)))
+    .validator((fd) => recipeSchema.parse(parseFormData(fd)))
     .handler(async ({ data, context }) => {
       const imageKey = await uploadFile(data.image)         // R2 + IMAGES
       // …compute autoTags…
@@ -244,7 +244,7 @@ This specification describes the high-level architecture of the `recipe-organize
 
 ### Edge: persistent stores under client-only rendering
 
-`QuantityControls` reads from `useRecipeQuantitiesStore` (`localStorage`). Because the app runs in client-only render mode (`src/start.ts` `defaultSsr: false`; only the root shell is SSR'd), `QuantityControls` and other store-backed components never render on the server — they render directly on the client with no `<ClientOnly>` wrapper and no hydration mismatch.
+`QuantityControls` reads from `useRecipeQuantitiesState()` (`localStorage`). Because the app runs in client-only render mode (`src/start.ts` `defaultSsr: false`; only the root shell is SSR'd), `QuantityControls` and other store-backed components never render on the server — they render directly on the client with no `<ClientOnly>` wrapper and no hydration mismatch.
 
 ### Edge: Worker stateless lifetime
 

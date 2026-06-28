@@ -4,7 +4,7 @@ version: 1.0
 date_created: 2026-05-08
 last_updated: 2026-05-08
 owner: recipe-organizer
-tags: [infrastructure, state, zustand, tanstack-query, ssr, persistence]
+tags: [infrastructure, state, tanstack-store, tanstack-query, ssr, persistence]
 ---
 
 # Client State Layering Specification
@@ -26,8 +26,8 @@ encrypted server sessions, and shared form context. This document specifies:
 - The conventions that prevent server/client mismatches and stale duplicates
   of server data.
 
-In scope: client-side state organization, TanStack Query usage, Zustand
-stores, URL search state, theme cookie, and feature-scoped React context.
+In scope: client-side state organization, TanStack Query usage, TanStack
+Store stores, URL search state, theme cookie, and feature-scoped React context.
 
 Out of scope: encrypted server sessions (see `./server-functions.spec.md`),
 form state internals (see `./forms.spec.md`), and the routing/SSR mechanics
@@ -41,7 +41,7 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   the client by TanStack Query.
 - **Persistent client-only state** — User-controlled, browser-local
   preferences (e.g., shopping list selection) stored in `localStorage` via
-  Zustand `persist`.
+  the shared `persistedStore` helper (`src/lib/persisted-store.ts`).
 - **URL/Search state** — State encoded in the URL via TanStack Router
   `validateSearch` (Zod schemas). Shareable, bookmarkable, SSR-safe.
 - **Cookie state** — Isomorphic key/value pairs readable on both server and
@@ -76,12 +76,16 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   `getRouter()` so that data prefetched in loaders via
   `context.queryClient.ensureQueryData(...)` hydrates the client.
 - **REQ-005:** Persistent client-only state MUST live in `src/stores/*` as
-  Zustand stores using the `persist` middleware. Store files MUST NOT carry
-  the `'@tanstack/react-start/client-only'` directive — under client-only
-  render mode they are never rendered server-side, and Zustand `persist`
+  TanStack Store instances created via the shared `persistedStore` helper
+  (`src/lib/persisted-store.ts`). Store files MUST NOT carry the
+  `'@tanstack/react-start/client-only'` directive — under client-only render
+  mode they are never rendered server-side, and `persistedStore` guards every
+  `localStorage` access with `typeof localStorage !== 'undefined'`, so it
   tolerates the absence of `localStorage` during server module evaluation.
-- **REQ-006:** Each persisted store MUST declare an explicit `partialize`
-  that restricts persisted keys to user-controlled state.
+- **REQ-006:** Each store MUST hold DATA ONLY (no actions in state); actions
+  are separate exported functions calling `store.setState(...)`. Because the
+  state is data-only, the whole state is persisted — there is no `partialize`
+  and nothing to exclude.
 - **REQ-007:** URL/search state MUST be declared per-route via
   `validateSearch` using a Zod schema (e.g., the home route declares
   `searchSchema = z.object({ search: z.boolean().optional() })`).
@@ -91,12 +95,12 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   `beforeLoad` and surfaced through route context.
 - **REQ-009:** Server-encrypted session state MUST go through
   `useAppSession`/`useOAuthSession` (TanStack Start `useSession`). It MUST
-  NOT be mirrored into Zustand or React Context.
+  NOT be mirrored into a TanStack Store or React Context.
 - **REQ-010:** Feature-scoped React Context (e.g., `LinkedRecipesProvider`
   in `src/features/recipe/contexts/linked-recipes-context.tsx`) MUST be
   used only for values that need to be threaded through a deep subtree
   within a single feature. Cross-feature contexts are prohibited.
-- **REQ-011:** Components reading a Zustand store render normally inside
+- **REQ-011:** Components reading a store render normally inside
   their (client-only) route. They MUST NOT be wrapped in `<ClientOnly>`;
   client-only render mode already guarantees they never run during SSR, so
   there is no `localStorage`-backed hydration mismatch.
@@ -105,15 +109,16 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 
 ### Constraints
 
-- **CON-001:** Server data MUST NOT be duplicated into Zustand. The
+- **CON-001:** Server data MUST NOT be duplicated into a store. The
   shopping list stores recipe ids only; recipes are loaded via
   `queryKeys.recipeListByIds(ids)`.
-- **CON-002:** Zustand stores are never read during SSR because the routes
+- **CON-002:** Stores are never read during SSR because the routes
   that consume them are client-only (`defaultSsr: false`). Do not move a
   store consumer into the root shell (`ssr: true`); doing so would read the
   server default (empty) and reintroduce a hydration mismatch.
-- **CON-003:** Persisted state MUST exclude derived values, server data,
-  and ephemeral UI state. Use `partialize` to enforce this.
+- **CON-003:** Stores MUST hold only user-controlled data — never derived
+  values, server data, or ephemeral UI state. Keep the store state shape
+  minimal; everything in it is persisted (no `partialize`).
 - **CON-004:** New global React Contexts are prohibited. Prefer route
   context (TanStack Router) for app-wide values, and feature-scoped
   Context for local subtree wiring.
@@ -126,14 +131,14 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 
 ### Guidelines
 
-- **GUD-001:** Prefer URL search state over Zustand for anything a user
-  might want to share, bookmark, or back/forward through.
+- **GUD-001:** Prefer URL search state over a persistent store for anything
+  a user might want to share, bookmark, or back/forward through.
 - **GUD-002:** Prefer `useSuspenseQuery` in components rendered inside a
   route whose loader has already prefetched the resource via
   `ensureQueryData`. Use `useQuery` when the data is optional.
-- **GUD-003:** Keep selectors narrow when subscribing to a Zustand store
-  (e.g., `useShoppingListStore((s) => s.shoppingList)`) to avoid
-  unnecessary re-renders.
+- **GUD-003:** Read a store through its dedicated `useSelector`-backed hook
+  (e.g., `useShoppingListIds()`) rather than subscribing to unrelated state,
+  to avoid unnecessary re-renders.
 - **GUD-004:** Co-locate the `*Options(...)` query factories with the
   feature (e.g., `features/shopping-list/api/get-recipe-by-ids.ts`) and
   reference `queryKeys.*` from `src/lib/query-keys.ts`.
@@ -144,10 +149,12 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   `context.queryClient.ensureQueryData(getXOptions(...))`; the component
   then calls `useSuspenseQuery(getXOptions(...))` and renders without a
   loading state.
-- **PAT-002:** _Persisted Zustand store._ `create(persist(initializer,
-{ name, partialize }))` colocated under `src/stores/`. No client-only
-  directive — consumers live in client-only routes.
-- **PAT-003:** _Hybrid local + server._ Combine a Zustand id list with a
+- **PAT-002:** _Persisted store._ `persistedStore<T>(key, initial)` from
+  `src/lib/persisted-store.ts` returns a data-only `Store<T>`; the file
+  also exports a `useSelector`-based read hook and plain action functions
+  that call `store.setState(...)`. Colocated under `src/stores/`. No
+  client-only directive — consumers live in client-only routes.
+- **PAT-003:** _Hybrid local + server._ Combine a store id list with a
   server query keyed by those ids. See
   `src/features/shopping-list/hooks/use-shopping-list.ts` (selection from
   store, recipes from `getRecipeByIdsOptions(shoppingList)`).
@@ -164,7 +171,8 @@ State priority order (when deciding where to put X, walk the list top to
 bottom and stop at the first match):
 
 1. **Server state** — TanStack Query. Source of truth: the database.
-2. **Persistent client-only state** — Zustand `persist` stores.
+2. **Persistent client-only state** — TanStack Store stores via the
+   `persistedStore` helper.
 3. **URL/Search state** — TanStack Router `validateSearch` (Zod).
 4. **Cookies** — Isomorphic for shareable preferences (theme); encrypted
    for sessions.
@@ -182,19 +190,27 @@ bottom and stop at the first match):
   `queryKeys.recipeListByIds(ids)`, `queryKeys.listIngredients()`, etc.).
 - Mutations invalidate the affected key on success.
 
-### 4.2 Persistent client-only state — Zustand
+### 4.2 Persistent client-only state — TanStack Store
 
-Two stores live under `src/stores/`:
+Stores live under `src/stores/`, each created with the shared
+`persistedStore` helper and exporting a data-only store instance, a
+`useSelector`-based read hook, and plain action functions:
 
-- `recipe-quantities.store.ts` — `Record<recipeId, number>` of
-  user-overridden serving counts. Persisted under key
-  `recipe-quantities`, partialized to `{ recipesQuantities }`.
-- `shopping-list.store.ts` — `number[]` of recipe ids selected for the
-  shopping list. Persisted under key `shopping-list`, partialized to
-  `{ shoppingList }`.
+- `recipe-quantities.store.ts` — `recipeQuantitiesStore`
+  (`Record<recipeId, number>` of user-overridden serving counts) persisted
+  under key `recipe-quantities`. Hook `useRecipeQuantitiesState()`; action
+  `setRecipesQuantities(id, qty)`.
+- `shopping-list.store.ts` — `shoppingListStore` (`number[]` of recipe ids
+  selected for the shopping list) persisted under key `shopping-list`. Hook
+  `useShoppingListIds()`; actions `addToShoppingList(id)`,
+  `removeFromShoppingList(id)`, `resetShoppingList()`.
+- `recent-recipes.store.ts` — `recentRecipesStore` (`number[]` of recently
+  opened recipe ids, capped at 10) persisted under key `recent-recipes`.
+  Hook `useRecentRecipeIds()`; action `addRecentRecipe(id)`.
 
-These are plain modules (no client-only directive). Their consumers
-(`routes/shopping-list.tsx`, the `QuantityControls` block in
+The whole state is data-only, so it is persisted in full — there is no
+`partialize`. These are plain modules (no client-only directive). Their
+consumers (`routes/shopping-list.tsx`, the `QuantityControls` block in
 `recipe-card.tsx`, etc.) live in client-only routes, so the stores are only
 ever read on the client — no `<ClientOnly>` boundary is needed.
 
@@ -241,29 +257,31 @@ provider is mounted inside the recipe editor; consumers call
   the cache within `staleTime` (5m).
 - Mutations call `queryClient.invalidateQueries({ queryKey: ... })` on
   success to trigger background refetch.
-- Zustand stores depend on `localStorage`. Because their consumers live in
+- Stores depend on `localStorage`. Because their consumers live in
   client-only routes (`defaultSsr: false`), they are only read on the client,
-  so there is no SSR default to mismatch — no `<ClientOnly>` is needed.
+  so there is no SSR default to mismatch — no `<ClientOnly>` is needed. The
+  `persistedStore` helper also guards `localStorage` access, so the module
+  evaluates harmlessly on the server.
 - Cookie-backed values (theme) are read isomorphically and pass through
   route context; they render in the SSR'd root shell (`ssr: true`).
 
 ## 6. State Ownership Table
 
-| State                                             | Layer                   | Mechanism                                                            | Notes                                                          |
-| ------------------------------------------------- | ----------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Auth user                                         | Route context           | `beforeLoad` in `__root.tsx` resolving `getAuthUser()`               | Surfaced via `Route.useRouteContext().authUser`.               |
-| Recipe list                                       | Server state            | `useQuery(getRecipeListOptions())` keyed by `queryKeys.recipeList()` | Loader prefetches via `ensureQueryData`.                       |
-| Recipe detail                                     | Server state            | `useSuspenseQuery` keyed by `queryKeys.recipeDetail(id)`             | Loader prefetches by id.                                       |
-| Recipe instructions                               | Server state            | `queryKeys.recipeInstructions(id)`                                   | Independent key for partial reload.                            |
-| Ingredient list/detail                            | Server state            | `queryKeys.listIngredients()`, `queryKeys.detailIngredient(id)`      |                                                                |
-| Theme                                             | Cookie + route context  | `ui-theme` cookie via `lib/theme.ts`, surfaced in route context      | SSR-safe; toggles via `toggleTheme()`.                         |
-| Selected recipes for shopping list                | Persistent client-only  | `useShoppingListStore` (`number[]`)                                  | Stores ids only; recipes via `queryKeys.recipeListByIds(ids)`. |
-| Quantities per recipe                             | Persistent client-only  | `useRecipeQuantitiesStore` (`Record<id, number>`)                    | Falls back to recipe `servings`.                               |
-| Editor toolbar state (e.g., active formatting)    | Component-local         | `useState`                                                           | Ephemeral.                                                     |
-| Linked recipe ids (within editor)                 | Feature context         | `LinkedRecipesProvider`                                              | Scoped to the recipe form subtree.                             |
-| Dialog open/close                                 | Component-local         | `useState`                                                           | Ephemeral.                                                     |
-| Route search params (e.g., search bar visibility) | URL/Search              | `validateSearch` Zod schema                                          | Shareable/bookmarkable.                                        |
-| Session (auth tokens)                             | Server-encrypted cookie | `useAppSession`/`useOAuthSession`                                    | See `./server-functions.spec.md`.                              |
+| State                                             | Layer                   | Mechanism                                                                     | Notes                                                          |
+| ------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Auth user                                         | Route context           | `beforeLoad` in `__root.tsx` resolving `getAuthUser()`                        | Surfaced via `Route.useRouteContext().authUser`.               |
+| Recipe list                                       | Server state            | `useQuery(getRecipeListOptions())` keyed by `queryKeys.recipeList()`          | Loader prefetches via `ensureQueryData`.                       |
+| Recipe detail                                     | Server state            | `useSuspenseQuery` keyed by `queryKeys.recipeDetail(id)`                      | Loader prefetches by id.                                       |
+| Recipe instructions                               | Server state            | `queryKeys.recipeInstructions(id)`                                            | Independent key for partial reload.                            |
+| Ingredient list/detail                            | Server state            | `queryKeys.listIngredients()`, `queryKeys.detailIngredient(id)`               |                                                                |
+| Theme                                             | Cookie + route context  | `ui-theme` cookie via `lib/theme.ts`, surfaced in route context               | SSR-safe; toggles via `toggleTheme()`.                         |
+| Selected recipes for shopping list                | Persistent client-only  | `shoppingListStore` / `useShoppingListIds()` (`number[]`)                     | Stores ids only; recipes via `queryKeys.recipeListByIds(ids)`. |
+| Quantities per recipe                             | Persistent client-only  | `recipeQuantitiesStore` / `useRecipeQuantitiesState()` (`Record<id, number>`) | Falls back to recipe `servings`.                               |
+| Editor toolbar state (e.g., active formatting)    | Component-local         | `useState`                                                                    | Ephemeral.                                                     |
+| Linked recipe ids (within editor)                 | Feature context         | `LinkedRecipesProvider`                                                       | Scoped to the recipe form subtree.                             |
+| Dialog open/close                                 | Component-local         | `useState`                                                                    | Ephemeral.                                                     |
+| Route search params (e.g., search bar visibility) | URL/Search              | `validateSearch` Zod schema                                                   | Shareable/bookmarkable.                                        |
+| Session (auth tokens)                             | Server-encrypted cookie | `useAppSession`/`useOAuthSession`                                             | See `./server-functions.spec.md`.                              |
 
 ## 7. Decision Tree: Where Do I Put X?
 
@@ -280,9 +298,10 @@ Q2. Should it be shareable, bookmarkable, or survive back/forward
 
 Q3. Must it survive page reload as a user-controlled preference, with
     no need to share it across devices?
-    └── Yes → Persistent Zustand store under src/stores/, persisted via
-              persist middleware with explicit partialize. Consumers render
-              normally (client-only routes; no <ClientOnly> needed).
+    └── Yes → Persistent TanStack Store under src/stores/, created via the
+              persistedStore helper (data-only state; whole state persisted,
+              no partialize). Consumers render normally (client-only routes;
+              no <ClientOnly> needed).
     └── No  → continue.
 
 Q4. Must it be readable on the server (SSR loaders, server functions)?
@@ -306,7 +325,7 @@ Q6. Does a deep feature subtree need this value without prop drilling,
 Defaults when unsure:
 
 - Server-shaped data → TanStack Query.
-- User selection of server entities → ids-only Zustand + server query.
+- User selection of server entities → ids-only persistent store + server query.
 - Cross-cutting preference visible to SSR → cookie + route context.
 
 ## 8. Acceptance Criteria
@@ -315,7 +334,7 @@ Defaults when unsure:
   When the route renders on the client,
   Then the corresponding component using `useSuspenseQuery(getXOptions)`
   resolves synchronously without a loading boundary trigger.
-- **AC-002:** Given a Zustand store consumer in a client-only route, When
+- **AC-002:** Given a store consumer in a client-only route, When
   the user reloads the page, Then the worker returns the shell (empty
   `<main>`), the persisted value is restored from `localStorage` on the
   client, and there are no hydration warnings in the console.
@@ -338,8 +357,9 @@ Defaults when unsure:
 ## 9. Test Automation Strategy
 
 - **Unit tests (Vitest via `vp test`)**:
-  - Reducers/selectors of Zustand stores: add → list contains id;
-    remove → id removed; reset → empty array; quantity setter overwrites.
+  - Store action functions: add → list contains id; remove → id removed;
+    reset → empty array; quantity setter overwrites. Assert against
+    `store.state` after calling the action.
   - `getTheme()` returns `'light'` when the cookie is missing; toggling
     flips between `'dark'` and `'light'`.
   - `queryKeys.recipeListByIds(ids)` is stable for the same input and
@@ -352,8 +372,8 @@ Defaults when unsure:
 - **SSR smoke**:
   - Verify the worker returns the shell with an empty `<main>` for a
     store-backed route (e.g. `/shopping-list`) and that the build/runtime
-    does not throw (Zustand `persist` tolerates the missing `localStorage`
-    when the store module is evaluated server-side).
+    does not throw (the `persistedStore` helper guards `localStorage`, so it
+    tolerates its absence when the store module is evaluated server-side).
 - **Manual checks before merge**: `vp check` (format, lint, types) and
   `vp test`.
 
@@ -368,14 +388,14 @@ Defaults when unsure:
   navigation.
 - Centralizing query keys in `src/lib/query-keys.ts` makes invalidation
   predictable and lets refactors stay local to one file.
-- Zustand stores are kept narrow and id-shaped (shopping list ids,
-  quantities by id) so server data is never copied into the client
-  store. Server data stays in the query cache where invalidation works.
+- Stores are kept narrow and id-shaped (shopping list ids, quantities by
+  id) so server data is never copied into the client store. Server data
+  stays in the query cache where invalidation works.
 - Client-only render mode (`defaultSsr: false`) eliminates the most common
   SSR hydration mismatch class outright: store-backed page content never
   renders on the server, so no `client-only` directive or `<ClientOnly>`
   boundary is required.
-- Theme is intentionally a cookie rather than a Zustand store because it
+- Theme is intentionally a cookie rather than a persistent store because it
   must be readable during SSR to render `<html className={theme}>`
   without a flash of incorrect theme.
 - Feature-scoped Context is allowed but bounded: cross-feature wiring
@@ -392,8 +412,9 @@ Defaults when unsure:
 - **LIB-003:** `@tanstack/react-start` — isomorphic helpers
   (`createIsomorphicFn`), sessions (`useSession`), and `createStart`
   (`src/start.ts`, `defaultSsr: false`).
-- **LIB-004:** `zustand` and `zustand/middleware` — persistent
-  client-only stores.
+- **LIB-004:** `@tanstack/react-store` (0.11) — `Store` + `useSelector`
+  for persistent client-only stores (via the shared `persistedStore`
+  helper). Already present transitively via TanStack React Form/Router.
 - **LIB-005:** `zod` — schema validation for `validateSearch` and
   request payloads.
 

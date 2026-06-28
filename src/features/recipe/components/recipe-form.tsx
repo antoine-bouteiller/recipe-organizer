@@ -1,5 +1,5 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
-import { useStore } from '@tanstack/react-form'
+import { useSelector } from '@tanstack/react-store'
 import { Suspense } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -40,8 +40,10 @@ export const RecipeForm = withForm({
   render: ({ form, initialImage, initialVideo, id }) => {
     const { AppField, Field } = form
 
-    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
-    const linkedRecipeIds = useStore(form.store, (state) => (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((recipeId) => recipeId > 0))
+    const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
+    const linkedRecipeIds = useSelector(form.store, (state) =>
+      (state.values.linkedRecipes ?? []).map((lr) => lr.id).filter((recipeId) => recipeId > 0)
+    )
     const recipeOptions = useRecipeOptions({ filter: (recipe) => recipe.id !== id })
 
     return (

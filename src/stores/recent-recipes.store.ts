@@ -1,25 +1,12 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { useSelector } from '@tanstack/react-store'
+
+import { persistedStore } from '@/lib/persisted-store'
 
 const MAX_RECENT_RECIPES = 10
 
-interface RecentRecipesState {
-  recentRecipeIds: number[]
-  addRecentRecipe: (recipeId: number) => void
-}
+export const recentRecipesStore = persistedStore<number[]>('recent-recipes', [])
 
-export const useRecentRecipesStore = create<RecentRecipesState>()(
-  persist(
-    (set) => ({
-      addRecentRecipe: (recipeId) =>
-        set(({ recentRecipeIds }) => ({
-          recentRecipeIds: [recipeId, ...recentRecipeIds.filter((id) => id !== recipeId)].slice(0, MAX_RECENT_RECIPES),
-        })),
-      recentRecipeIds: [],
-    }),
-    {
-      name: 'recent-recipes',
-      partialize: (state) => ({ recentRecipeIds: state.recentRecipeIds }),
-    }
-  )
-)
+export const useRecentRecipeIds = () => useSelector(recentRecipesStore)
+
+export const addRecentRecipe = (recipeId: number) =>
+  recentRecipesStore.setState((ids) => [recipeId, ...ids.filter((id) => id !== recipeId)].slice(0, MAX_RECENT_RECIPES))

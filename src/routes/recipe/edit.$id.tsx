@@ -1,6 +1,7 @@
-import { revalidateLogic, useStore } from '@tanstack/react-form'
+import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { useSelector } from '@tanstack/react-store'
 import { z } from 'zod'
 
 import { NotFound } from '@/components/error/not-found'
@@ -77,7 +78,7 @@ const EditRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+  const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
 
   if (isLoading) {
     return (

@@ -17,7 +17,7 @@ const blockUserSchema = z.object({
 
 const blockUser = createServerFn()
   .middleware([authGuard('admin')])
-  .inputValidator(blockUserSchema)
+  .validator(blockUserSchema)
   .handler(
     withServerError(async ({ data }) => {
       const { id } = data

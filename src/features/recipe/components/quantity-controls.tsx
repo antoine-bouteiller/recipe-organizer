@@ -1,7 +1,7 @@
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
-import { useShoppingListStore } from '@/stores/shopping-list.store'
+import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
@@ -22,8 +22,6 @@ const withStopPropagation = (callback: () => void) => (event: React.MouseEvent<H
 export const QuantityControls = ({ recipeId, servings, variant = 'default', className }: QuantityControlsProps) => {
   const isInShoppingList = useIsInShoppingList(recipeId)
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipeId, servings)
-  const addToShoppingList = useShoppingListStore((state) => state.addToShoppingList)
-  const removeFromShoppingList = useShoppingListStore((state) => state.removeFromShoppingList)
 
   const wrap = variant === 'card' ? withStopPropagation : (cb: () => void) => cb
 

@@ -20,7 +20,7 @@ export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 
 const updateIngredient = createServerFn()
   .middleware([authGuard()])
-  .inputValidator(updateIngredientSchema)
+  .validator(updateIngredientSchema)
   .handler(
     withServerError(async ({ data }) => {
       const { id, ...newIngredient } = data

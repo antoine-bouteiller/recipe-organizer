@@ -152,7 +152,7 @@ preferred shopping unit), the CRUD server functions backing the catalogue, the U
 
 ### 3.5 Patterns
 
-- **PAT-001.** Server function = `createServerFn().middleware([authGuard(...)]).inputValidator(zodSchema).handler(...)`.
+- **PAT-001.** Server function = `createServerFn().middleware([authGuard(...)]).validator(zodSchema).handler(...)`.
 - **PAT-002.** Mutation hook = `mutationOptions({ mutationFn, onError: toastError(..), onSuccess: invalidateQueries + toastManager.add })`.
 - **PAT-003.** Form dialog = `getFormDialog(defaults)` + `useAppForm({ validationLogic: revalidateLogic(), validators: { onDynamic: schema } })` + `IngredientForm` body.
 - **PAT-004.** Category metadata fan-out via three keyed records (`Labels`, `Icons`, badge `categoryStyles`) keyed by `IngredientCategory`.

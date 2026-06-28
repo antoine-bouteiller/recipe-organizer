@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vite-plus/test'
 
-import { useRecentRecipesStore } from './recent-recipes.store'
+import { addRecentRecipe, recentRecipesStore } from './recent-recipes.store'
 
-const add = (id: number) => useRecentRecipesStore.getState().addRecentRecipe(id)
-const ids = () => useRecentRecipesStore.getState().recentRecipeIds
+const add = (id: number) => addRecentRecipe(id)
+const ids = () => recentRecipesStore.state
 
-describe('useRecentRecipesStore.addRecentRecipe', () => {
+describe('addRecentRecipe', () => {
   beforeEach(() => {
-    useRecentRecipesStore.setState({ recentRecipeIds: [] })
+    recentRecipesStore.setState(() => [])
   })
 
   it('prepends recipes most-recent-first', () => {

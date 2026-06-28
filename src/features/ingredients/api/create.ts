@@ -25,7 +25,7 @@ export type IngredientFormInput = Partial<IngredientFormValues>
 
 const createIngredient = createServerFn()
   .middleware([authGuard()])
-  .inputValidator(ingredientSchema)
+  .validator(ingredientSchema)
   .handler(
     withServerError(async ({ data }) => {
       await getDb().insert(ingredient).values(data)

@@ -14,7 +14,7 @@ const getUsersList = createServerFn({
   method: 'GET',
 })
   .middleware([authGuard('admin')])
-  .inputValidator(getUsersListSchema)
+  .validator(getUsersListSchema)
   .handler(({ data }) =>
     getDb().query.user.findMany({
       orderBy: {

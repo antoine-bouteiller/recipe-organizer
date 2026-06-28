@@ -11,7 +11,7 @@ const getRecipeInstructionsSchema = z.number()
 const getRecipeInstructions = createServerFn({
   method: 'GET',
 })
-  .inputValidator(getRecipeInstructionsSchema)
+  .validator(getRecipeInstructionsSchema)
   .handler(
     withServerError(async ({ data }) => {
       const result = await getDb().query.recipe.findFirst({

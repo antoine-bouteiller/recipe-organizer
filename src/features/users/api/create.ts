@@ -20,7 +20,7 @@ export type UserFormInput = Partial<UserFormValues>
 
 const createUser = createServerFn()
   .middleware([authGuard('admin')])
-  .inputValidator(userSchema)
+  .validator(userSchema)
   .handler(
     withServerError(async ({ data }) => {
       await getDb()
