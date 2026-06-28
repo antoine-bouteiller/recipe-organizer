@@ -536,5 +536,3 @@ export const DrawerMenuRadioItem = ({
     <span className="col-start-2">{children}</span>
   </RadioPrimitive.Root>
 )
-
-export { DrawerPrimitive }

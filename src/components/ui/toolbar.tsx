@@ -37,5 +37,3 @@ export const ToolbarSeparator = ({ className, ...props }: ToolbarPrimitive.Separ
     {...props}
   />
 )
-
-export { ToolbarPrimitive }

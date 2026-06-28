@@ -214,5 +214,3 @@ export const AutocompleteTrigger = ({ className, children, ...props }: Autocompl
 )
 
 export const useAutocompleteFilter: typeof AutocompletePrimitive.useFilter = AutocompletePrimitive.useFilter
-
-export { AutocompletePrimitive }

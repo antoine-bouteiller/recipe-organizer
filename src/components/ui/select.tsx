@@ -172,4 +172,4 @@ export const SelectGroupLabel = (props: SelectPrimitive.GroupLabel.Props): React
   <SelectPrimitive.GroupLabel className="px-2 py-1.5 text-xs font-medium text-muted-foreground" data-slot="select-group-label" {...props} />
 )
 
-export { SelectPopup as SelectContent, SelectPrimitive }
+export { SelectPopup as SelectContent }

@@ -43,5 +43,3 @@ export const Textarea = ({ className, size = 'default', unstyled = false, ref, .
     />
   </span>
 )
-
-export { FieldPrimitive }

@@ -333,5 +333,3 @@ export const ComboboxChipRemove = (props: ComboboxPrimitive.ChipRemove.Props): R
 )
 
 export const useComboboxFilter: typeof ComboboxPrimitive.useFilter = ComboboxPrimitive.useFilter
-
-export { ComboboxPrimitive }

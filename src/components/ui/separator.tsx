@@ -14,5 +14,3 @@ export const Separator = ({ className, orientation = 'horizontal', ...props }: S
     {...props}
   />
 )
-
-export { SeparatorPrimitive }

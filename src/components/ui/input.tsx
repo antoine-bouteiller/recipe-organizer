@@ -38,5 +38,3 @@ export const Input = ({ className, size = 'default', unstyled = false, nativeInp
     </span>
   )
 }
-
-export { InputPrimitive }
