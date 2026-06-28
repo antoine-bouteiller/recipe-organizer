@@ -7,7 +7,9 @@ export const persistedStore = <TValue>(key: string, initial: TValue): Store<TVal
     const raw = localStorage.getItem(key)
     if (raw != null) {
       try {
-        saved = JSON.parse(raw) as TValue
+        const parsed = JSON.parse(raw) as TValue
+        // Discard stale data whose shape no longer matches (e.g. legacy zustand `{ state, version }` wrappers).
+        saved = Array.isArray(parsed) === Array.isArray(initial) ? parsed : undefined
       } catch {
         saved = undefined
       }
