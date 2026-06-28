@@ -5,7 +5,7 @@ import { Fragment } from 'react/jsx-runtime'
 import { Item } from '@/components/common/item'
 import { ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { type ReducedRecipe } from '@/features/recipe/api/get-all'
-import { useRecentRecipesStore } from '@/stores/recent-recipes.store'
+import { addRecentRecipe } from '@/stores/recent-recipes.store'
 
 interface RecipeListProps {
   recipes: ReducedRecipe[]
@@ -18,7 +18,7 @@ export const RecipeList = ({ recipes }: RecipeListProps) => (
         <Item
           content={recipe.name}
           media={<ArrowRightIcon />}
-          onClick={() => useRecentRecipesStore.getState().addRecentRecipe(recipe.id)}
+          onClick={() => addRecentRecipe(recipe.id)}
           render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition />}
         />
         {index !== recipes.length - 1 && <ItemSeparator />}

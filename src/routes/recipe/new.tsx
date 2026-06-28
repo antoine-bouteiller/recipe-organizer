@@ -1,6 +1,7 @@
-import { revalidateLogic, useStore } from '@tanstack/react-form'
+import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { useSelector } from '@tanstack/react-store'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -32,7 +33,7 @@ const NewRecipePage = () => {
     },
   })
 
-  const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+  const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
 
   return (
     <ScreenLayout title="Nouvelle Recette" withGoBack>

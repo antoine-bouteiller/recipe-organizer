@@ -63,8 +63,8 @@ add the recipe to a shopping list, and edit or delete it.
 | `RecipeTag`                | Union of manual and auto tags. Stored mixed in `recipes.tags` (JSON).                                                                                                                                   |
 | Magimix program            | A Lexical node representing a Magimix Cook Expert program (program, time, rotation speed, optional temperature). Detected via the substring `"type":"magimixProgram"` in the serialized `instructions`. |
 | Subrecipe node             | A Lexical node embedding another recipe's instructions inline, with `hideFirstNodes` / `hideLastNodes` slicing controls.                                                                                |
-| Recipe quantity            | A client-only multiplier of the base `servings`, kept per-recipe in the `recipe-quantities` Zustand store.                                                                                              |
-| Shopping list membership   | Whether a `recipeId` is currently in `shopping-list` Zustand store; toggles the `QuantityControls` UI.                                                                                                  |
+| Recipe quantity            | A client-only multiplier of the base `servings`, kept per-recipe in the `recipe-quantities` store (TanStack Store).                                                                                     |
+| Shopping list membership   | Whether a `recipeId` is currently in the `shopping-list` store (TanStack Store); toggles the `QuantityControls` UI.                                                                                     |
 
 ## 3. Requirements, Constraints & Guidelines
 
@@ -176,13 +176,13 @@ isolated enough to deserve its own spec.
 - **TanStack React Form** for `RecipeForm`, `MagimixProgramDialog`, `SubrecipeDialog`
   (`docs/infrastructure/forms.spec.md`).
 - **Lexical** + `@lexical/react` + `@lexical/utils` for the rich-text editor.
-- **Zustand** stores: `shopping-list.store`, `recipe-quantities.store`
+- **TanStack Store** stores: `shopping-list.store`, `recipe-quantities.store`
   (`docs/infrastructure/client-state.spec.md`).
 - **Auth feature** (`src/features/auth/lib/auth-guard.ts`) for write-side authentication.
 - **Ingredients feature** (`src/features/ingredients/`) for the ingredient picker and `AddIngredient`
   inline dialog.
 - **Shopping list feature** (`src/features/shopping-list/`) consumes recipe ids stored in the
-  shopping-list Zustand store.
+  shopping-list store (TanStack Store).
 
 ## 9. Examples & Edge Cases
 

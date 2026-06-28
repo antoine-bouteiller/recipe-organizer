@@ -1,4 +1,4 @@
-import { useStore } from '@tanstack/react-form'
+import { useSelector } from '@tanstack/react-store'
 
 import { withForm } from '@/hooks/use-app-form'
 
@@ -18,7 +18,7 @@ export const UserForm = withForm({
   defaultValues: userDefaultValues,
   render: ({ form }) => {
     const { AppField } = form
-    const isSubmitting = useStore(form.store, (state) => state.isSubmitting)
+    const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
     return (
       <>

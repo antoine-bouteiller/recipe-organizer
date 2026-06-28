@@ -1,24 +1,13 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { useSelector } from '@tanstack/react-store'
 
-interface ShoppingListState {
-  shoppingList: number[]
-  addToShoppingList: (recipeId: number) => void
-  removeFromShoppingList: (recipeId: number) => void
-  resetShoppingList: () => void
-}
+import { persistedStore } from '@/lib/persisted-store'
 
-export const useShoppingListStore = create<ShoppingListState>()(
-  persist(
-    (set) => ({
-      addToShoppingList: (recipeId) => set(({ shoppingList }) => ({ shoppingList: [...shoppingList, recipeId] })),
-      removeFromShoppingList: (recipeId) => set(({ shoppingList }) => ({ shoppingList: shoppingList.filter((id) => id !== recipeId) })),
-      resetShoppingList: () => set({ shoppingList: [] }),
-      shoppingList: [],
-    }),
-    {
-      name: 'shopping-list',
-      partialize: (state) => ({ shoppingList: state.shoppingList }),
-    }
-  )
-)
+const shoppingListStore = persistedStore<number[]>('shopping-list', [])
+
+export const useShoppingListIds = () => useSelector(shoppingListStore)
+
+export const addToShoppingList = (recipeId: number) => shoppingListStore.setState((list) => [...list, recipeId])
+
+export const removeFromShoppingList = (recipeId: number) => shoppingListStore.setState((list) => list.filter((id) => id !== recipeId))
+
+export const resetShoppingList = () => shoppingListStore.setState(() => [])

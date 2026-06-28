@@ -1,4 +1,4 @@
-import { useStore } from '@tanstack/react-form'
+import { useSelector } from '@tanstack/react-store'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { Dialog } from '@/components/common/dialog'
@@ -20,7 +20,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
     defaultValues,
     props: {} as FormModalProps,
     render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
-      const errors = useStore(form.store, (state) => formatFormErrors(state.errors))
+      const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
 
       return (
         <Dialog

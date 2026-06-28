@@ -13,7 +13,7 @@ This spec covers the read-side of the recipe feature: the home grid, the recipe 
 mobile tabs + swipe and desktop two-column grid), the recipe card, the search bar, the search
 list page, the `QuantityControls` component (with its toggle between "add to shopping list" and
 the increment/decrement controls), and the integration with the shopping-list and recipe-quantities
-Zustand stores.
+TanStack Store stores.
 
 Source files:
 
@@ -49,8 +49,8 @@ headers.
 | `RecipeIngredientGroup`  | One ingredient group as nested in `Recipe`, with `groupName?`, `id`, and `groupIngredients[]`.                  |
 | Detail two-pane          | Desktop layout `grid grid-cols-5`: ingredients (`col-span-2`) + preparation (`col-span-3`).                     |
 | Detail tabs+swipe        | Mobile layout: `Tabs[ingredients                                                                                | preparation]`with`useSwipeTabs`driving a horizontal`motion.div` translation. |
-| Recipe quantity          | Per-recipe multiplier in the `recipe-quantities.store` Zustand store, defaults to `recipe.servings`.            |
-| Shopping-list membership | A `recipeId` present in the `shopping-list` Zustand store.                                                      |
+| Recipe quantity          | Per-recipe multiplier in the `recipe-quantities.store` (TanStack Store), defaults to `recipe.servings`.         |
+| Shopping-list membership | A `recipeId` present in the `shopping-list` store (TanStack Store).                                             |
 
 ## 3. Requirements, Constraints & Guidelines
 
@@ -96,7 +96,7 @@ text-emerald-600`;
     `setRecipesQuantities(recipeId, quantity ± 1)`,
   - or no-ops if `recipeId` is null/undefined.
 - **REQ-009** `useIsInShoppingList(recipeId)` MUST return
-  `useShoppingListStore(state => state.shoppingList).includes(recipeId)`.
+  `useShoppingListIds().includes(recipeId)`.
 - **REQ-010** `RecipeIngredientGroups` (`recipe-section.tsx`) MUST scale each ingredient quantity
   with `(quantity * currentQuantity) / baseServings` and append the unit name from
   `UNITS[unitSlug]?.name` when `unitSlug` is set. Use `formatNumber(...)` from `@/utils/number`.
@@ -131,7 +131,7 @@ text-emerald-600`;
 - **CON-001** The detail page's loader MUST use `ensureQueryData(getRecipeDetailsOptions(id))`. The
   route is client-only (`defaultSsr: false`), so the loader runs on the client before the component
   renders.
-- **CON-002** `<RecipeIngredientGroups />` and `<QuantityControls />` rely on Zustand stores. They
+- **CON-002** `<RecipeIngredientGroups />` and `<QuantityControls />` rely on TanStack Store stores. They
   render directly (no `<ClientOnly />`) because their routes are client-only and never run during
   SSR.
 - **CON-003** In dev (`import.meta.env.DEV`), `getImageUrl(key)` returns
@@ -230,7 +230,7 @@ useIsInShoppingList(recipeId: number): boolean
 
 ## 6. Test Automation Strategy
 
-- **PAT-001** Component tests for `RecipeCard` and `QuantityControls` use RTL with mocked Zustand
+- **PAT-001** Component tests for `RecipeCard` and `QuantityControls` use RTL with mocked TanStack Store
   stores. Verify the variant flip, the `withStopPropagation` behavior on card click, and the
   decrement-disabled state.
 - **PAT-002** `RecipeIngredientGroups` test: feed two groups (one default, one with a
@@ -247,8 +247,8 @@ useIsInShoppingList(recipeId: number): boolean
 - **Why two layouts on the detail page?** Ingredient density vs. instruction reading is very
   different on phone and desktop. On phone, a single column with swipeable tabs keeps the screen
   uncluttered; on desktop, the side-by-side grid lets the cook keep both visible while working.
-- **Why no `<ClientOnly>` for the card footer?** `useShoppingListStore` and
-  `useRecipeQuantitiesStore` read from `localStorage`. Client-only render mode (`defaultSsr: false`)
+- **Why no `<ClientOnly>` for the card footer?** `useShoppingListIds` and
+  `useRecipeQuantitiesState` read from `localStorage`. Client-only render mode (`defaultSsr: false`)
   means these components never render during SSR, so they read the store directly on the client with
   no hydration mismatch — `<ClientOnly>` is unnecessary.
 - **Why merge linked recipes into the displayed ingredient groups?** Cooks expect to see the
@@ -266,7 +266,7 @@ useIsInShoppingList(recipeId: number): boolean
 - **TanStack Router** (`createFileRoute`, `Link`, `redirect`, `notFound`).
 - **TanStack React Query** (`useSuspenseQuery`, `useQuery`, `queryOptions`).
 - **Motion** (`motion.div` for the swipe animation).
-- **Zustand stores** (`shopping-list.store`, `recipe-quantities.store`).
+- **TanStack Store stores** (`shopping-list.store`, `recipe-quantities.store`).
 - **Cloudflare R2** (`env.R2_BUCKET.get/head`) + the shared `CacheManager`
   (`src/lib/cache-manager.ts`).
 - **Lexical** (read-only `<Editor readOnly>` from `@/components/ui/editor`) — the editor's full

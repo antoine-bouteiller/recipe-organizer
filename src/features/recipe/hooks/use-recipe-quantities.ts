@@ -1,9 +1,8 @@
-import { useRecipeQuantitiesStore } from '@/stores/recipe-quantities.store'
+import { setRecipesQuantities, useRecipeQuantitiesState } from '@/stores/recipe-quantities.store'
 import { isNullOrUndefined } from '@/utils/is-null-or-undefined'
 
 export const useRecipeQuantities = (recipeId?: number, defaultValue?: number) => {
-  const recipesQuantities = useRecipeQuantitiesStore((state) => state.recipesQuantities)
-  const setRecipesQuantities = useRecipeQuantitiesStore((state) => state.setRecipesQuantities)
+  const recipesQuantities = useRecipeQuantitiesState()
 
   const quantity = isNullOrUndefined(recipeId) || isNullOrUndefined(recipesQuantities[recipeId]) ? (defaultValue ?? 0) : recipesQuantities[recipeId]
 

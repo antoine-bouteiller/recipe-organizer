@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
 import { type IngredientCartItem } from '@/features/shopping-list/types/ingredient-cart-item'
-import { useRecipeQuantitiesStore } from '@/stores/recipe-quantities.store'
-import { useShoppingListStore } from '@/stores/shopping-list.store'
+import { useRecipeQuantitiesState } from '@/stores/recipe-quantities.store'
+import { useShoppingListIds } from '@/stores/shopping-list.store'
 import { type IngredientCategory } from '@/types/ingredient'
 
 import { aggregateShoppingList } from '../utils/aggregate-shopping-list'
@@ -21,8 +21,8 @@ type UseShoppingListResult =
     }
 
 export const useShoppingList = (): UseShoppingListResult => {
-  const shoppingList = useShoppingListStore((state) => state.shoppingList)
-  const recipesQuantities = useRecipeQuantitiesStore((state) => state.recipesQuantities)
+  const shoppingList = useShoppingListIds()
+  const recipesQuantities = useRecipeQuantitiesState()
 
   const { data: recipes, isLoading } = useQuery(getRecipeByIdsOptions(shoppingList))
 

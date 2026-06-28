@@ -1,5 +1,5 @@
 import { type ReducedRecipe } from '@/features/recipe/api/get-all'
-import { useRecentRecipesStore } from '@/stores/recent-recipes.store'
+import { useRecentRecipeIds } from '@/stores/recent-recipes.store'
 
 import { RecipeList } from './recipe-list'
 
@@ -8,7 +8,7 @@ interface RecentRecipesContentProps {
 }
 
 export const RecentRecipesContent = ({ recipes }: RecentRecipesContentProps) => {
-  const recentRecipeIds = useRecentRecipesStore((state) => state.recentRecipeIds)
+  const recentRecipeIds = useRecentRecipeIds()
 
   const recentRecipes = recentRecipeIds
     .map((id) => recipes.find((recipe) => recipe.id === id))

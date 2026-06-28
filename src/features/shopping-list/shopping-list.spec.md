@@ -13,7 +13,7 @@ This specification defines the **shopping-list** feature of the Recipe Organizer
 collect a set of recipes, override their target servings, and produce a unified, aggregated, category-grouped
 list of ingredients to buy. The list is computed entirely client-side from a server snapshot of the selected
 recipes, with quantity scaling, unit conversion, parent/child rollup, and graceful fallback when units are
-incompatible. Selection state is persisted in `localStorage` via Zustand `persist`. The page is rendered
+incompatible. Selection state is persisted in `localStorage` via TanStack Store (`persistedStore` helper). The page is rendered
 client-only because all of its inputs come from persisted client state.
 
 ## 1. Purpose & Scope
@@ -69,9 +69,9 @@ Provide a deterministic, client-rendered shopping list that:
 
 ### 3.1 Functional Requirements
 
-- **REQ-001**: The selection of recipes MUST be stored in a Zustand store named `shoppingList` (key `shopping-list` in `localStorage`) as `shoppingList: number[]`.
-- **REQ-002**: Per-recipe servings overrides MUST be stored in a Zustand store named `recipe-quantities` as `recipesQuantities: Record<number, number>`.
-- **REQ-003**: Both stores MUST use `zustand/middleware`'s `persist` with `partialize` exposing only `shoppingList` and `recipesQuantities` respectively.
+- **REQ-001**: The selection of recipes MUST be stored in a TanStack Store named `shoppingListStore` (key `shopping-list` in `localStorage`) holding `number[]`.
+- **REQ-002**: Per-recipe servings overrides MUST be stored in a TanStack Store named `recipeQuantitiesStore` (key `recipe-quantities`) holding `Record<number, number>`.
+- **REQ-003**: Both stores MUST persist to `localStorage` via the shared `persistedStore` helper (`src/lib/persisted-store.ts`). Store state holds data only (actions are exported functions), so the whole state is persisted — no `partialize` is needed.
 - **REQ-004**: Both store modules MUST be plain modules with no `'@tanstack/react-start/client-only'` directive. They are never read during SSR because their consuming routes are client-only (`defaultSsr: false`).
 - **REQ-005**: `addToShoppingList(recipeId)` MUST append to `shoppingList`. `removeFromShoppingList(recipeId)` MUST filter by id. `resetShoppingList()` MUST set `shoppingList` to `[]`.
 - **REQ-006**: `setRecipesQuantities(recipeId, quantity)` MUST upsert the value at `recipesQuantities[recipeId]`.
@@ -93,7 +93,7 @@ Provide a deterministic, client-rendered shopping list that:
 - **REQ-022**: `<ShoppingList />` MUST iterate categories with `typedEntriesOf(shoppingListIngredients)`, render `ingredientCategoryIcons[key]` and `ingredientCategoryLabels[key]` inside an `<h2>`, and render one `<CartItem />` per ingredient.
 - **REQ-023**: `<CartItem />` MUST render a `<Checkbox>` controlled by local component state, apply `line-through` styling when checked, render the primary quantity + unit on the first line, and render each fallback entry on its own muted line prefixed with `+ `.
 - **REQ-024**: Quantity formatting MUST use `formatNumber` from `@/utils/number` and unit display MUST use `UNITS[slug].name`. A `null` `unitSlug` MUST render only the quantity (no unit label).
-- **REQ-025**: `<ResetCartButton />` MUST call `useShoppingListStore((store) => store.resetShoppingList)` and clear the shopping list when clicked.
+- **REQ-025**: `<ResetCartButton />` MUST call `resetShoppingList()` and clear the shopping list when clicked.
 
 ### 3.2 Constraints
 
@@ -108,7 +108,7 @@ Provide a deterministic, client-rendered shopping list that:
 
 ### 3.3 Guidelines
 
-- **GUD-001**: Prefer driving "wanted servings" widgets (in recipe detail / card components) through `useRecipeQuantitiesStore` rather than local component state so the override survives navigation.
+- **GUD-001**: Prefer driving "wanted servings" widgets (in recipe detail / card components) through `useRecipeQuantitiesState` / `setRecipesQuantities` rather than local component state so the override survives navigation.
 - **GUD-002**: Adding new aggregation steps SHOULD operate on the `IngredientAccumulator` map before `aggregateLines`, or on the post-aggregation `aggregatesById` map, never inline in JSX.
 - **GUD-003**: When adding a new `IngredientCategory`, extend `ingredientCategoryIcons` and `ingredientCategoryLabels` so the `<ShoppingList />` renders correctly.
 - **GUD-004**: When introducing a new unit, define `parent` + `factor` in `UNITS` (or leave both `null` for an isolated count unit). Cross-dimension conversion still requires `densityGPerMl` or `countWeightG` on the ingredient.
@@ -123,55 +123,34 @@ Provide a deterministic, client-rendered shopping list that:
 
 ## 4. Interfaces & Data Contracts
 
-### 4.1 Zustand Stores
+### 4.1 Stores (TanStack Store)
+
+Each store holds data only and persists to `localStorage` via the shared `persistedStore` helper
+(`src/lib/persisted-store.ts`). Reads use `useSelector`; actions are plain exported functions.
 
 ```ts
 // src/stores/shopping-list.store.ts
-interface ShoppingListState {
-  shoppingList: number[]
-  addToShoppingList: (recipeId: number) => void
-  removeFromShoppingList: (recipeId: number) => void
-  resetShoppingList: () => void
-}
+import { useSelector } from '@tanstack/react-store'
 
-export const useShoppingListStore = create<ShoppingListState>()(
-  persist(
-    (set) => ({
-      addToShoppingList: (recipeId) => set(({ shoppingList }) => ({ shoppingList: [...shoppingList, recipeId] })),
-      removeFromShoppingList: (recipeId) => set(({ shoppingList }) => ({ shoppingList: shoppingList.filter((id) => id !== recipeId) })),
-      resetShoppingList: () => set({ shoppingList: [] }),
-      shoppingList: [],
-    }),
-    {
-      name: 'shopping-list',
-      partialize: (state) => ({ shoppingList: state.shoppingList }),
-    }
-  )
-)
+import { persistedStore } from '@/lib/persisted-store'
+
+export const shoppingListStore = persistedStore<number[]>('shopping-list', [])
+export const useShoppingListIds = () => useSelector(shoppingListStore)
+export const addToShoppingList = (recipeId: number) => shoppingListStore.setState((list) => [...list, recipeId])
+export const removeFromShoppingList = (recipeId: number) => shoppingListStore.setState((list) => list.filter((id) => id !== recipeId))
+export const resetShoppingList = () => shoppingListStore.setState(() => [])
 ```
 
 ```ts
 // src/stores/recipe-quantities.store.ts
-interface RecipeQuantitiesState {
-  recipesQuantities: Record<number, number>
-  setRecipesQuantities: (recipeId: number, quantity: number) => void
-}
+import { useSelector } from '@tanstack/react-store'
 
-export const useRecipeQuantitiesStore = create<RecipeQuantitiesState>()(
-  persist(
-    (set) => ({
-      recipesQuantities: {},
-      setRecipesQuantities: (recipeId, quantity) =>
-        set(({ recipesQuantities }) => ({
-          recipesQuantities: { ...recipesQuantities, [recipeId]: quantity },
-        })),
-    }),
-    {
-      name: 'recipe-quantities',
-      partialize: (state) => ({ recipesQuantities: state.recipesQuantities }),
-    }
-  )
-)
+import { persistedStore } from '@/lib/persisted-store'
+
+export const recipeQuantitiesStore = persistedStore<Record<number, number>>('recipe-quantities', {})
+export const useRecipeQuantitiesState = () => useSelector(recipeQuantitiesStore)
+export const setRecipesQuantities = (recipeId: number, quantity: number) =>
+  recipeQuantitiesStore.setState((quantities) => ({ ...quantities, [recipeId]: quantity }))
 ```
 
 ### 4.2 Server Function
@@ -330,8 +309,8 @@ Conversion-relevant entries (parent/factor):
 
 ## 5. Acceptance Criteria
 
-- **AC-001**: Given a user adds recipe `42` to the cart, When `addToShoppingList(42)` is dispatched, Then `useShoppingListStore.getState().shoppingList` includes `42` and `localStorage['shopping-list']` reflects the new value.
-- **AC-002**: Given a user changes the wanted servings for recipe `7` to `4`, When `setRecipesQuantities(7, 4)` is dispatched, Then `useRecipeQuantitiesStore.getState().recipesQuantities[7] === 4` and `localStorage['recipe-quantities']` reflects the new value.
+- **AC-001**: Given a user adds recipe `42` to the cart, When `addToShoppingList(42)` is dispatched, Then `shoppingListStore.state` includes `42` and `localStorage['shopping-list']` reflects the new value.
+- **AC-002**: Given a user changes the wanted servings for recipe `7` to `4`, When `setRecipesQuantities(7, 4)` is dispatched, Then `recipeQuantitiesStore.state[7] === 4` and `localStorage['recipe-quantities']` reflects the new value.
 - **AC-003**: Given a recipe with `servings = 2` and an ingredient line of `200 g`, When the user sets `wantedQuantity = 4`, Then the scaled line equals `400 g`.
 - **AC-004**: Given two recipes both containing ingredient `id=10` with `100 g` and `0.2 kg` respectively and `preferredUnitSlug = 'g'`, When `useShoppingList` aggregates, Then `primary` is `{ quantity: 300, unitSlug: 'g' }` and `fallback` is empty.
 - **AC-005**: Given an ingredient line in `piece` with no `countWeightG` and a `preferredUnitSlug = 'g'`, When aggregation runs, Then the line is placed in `fallback` keyed by `'piece'` and is not added to `primary`.
@@ -351,7 +330,7 @@ Conversion-relevant entries (parent/factor):
 - **TST-003**: Snapshot/component test `<CartItem>` for the unchecked state, the checked (`line-through`) state, the unitless variant, and the multi-fallback variant.
 - **TST-004**: Component test `<ShoppingList>` rendering one section per category, in the order yielded by `typedEntriesOf`, with the right icon + label.
 - **TST-005**: Integration test the route `/shopping-list`: with empty selection it renders the `Skeleton` fallback; with selection it renders the suspense fallback then the populated list after the query resolves.
-- **TST-006**: Store tests assert `persist` keys (`shopping-list`, `recipe-quantities`), `partialize` output, and the reducer behavior of all actions.
+- **TST-006**: Store tests assert the persisted `localStorage` keys (`shopping-list`, `recipe-quantities`) and the behavior of all actions.
 - **TST-007**: Server-function test of `getRecipesByIds` validates: rejection of non-array inputs by Zod, exclusion of spices via `ingredientGroupSelect`, and linked-recipe scaling math.
 - **TST-008**: Tests run via `vp test` (Vitest) using imports from `vite-plus/test`.
 
@@ -398,7 +377,7 @@ the primary, surfaces the partial information without polluting the primary aggr
 
 | Dependency                                                                                             | Role                                                                     |
 | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `zustand` + `zustand/middleware`                                                                       | Client store + `localStorage` persistence.                               |
+| `@tanstack/react-store`                                                                                | Client store + `localStorage` persistence (via `persistedStore` helper). |
 | `@tanstack/react-start`                                                                                | Server function (`createServerFn`); `createStart` (`defaultSsr: false`). |
 | `@tanstack/react-router`                                                                               | `createFileRoute`.                                                       |
 | `@tanstack/react-query`                                                                                | `queryOptions` + `useSuspenseQuery`.                                     |

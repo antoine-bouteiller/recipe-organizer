@@ -1,7 +1,7 @@
-import { useShoppingListStore } from '@/stores/shopping-list.store'
+import { useShoppingListIds } from '@/stores/shopping-list.store'
 
 export const useIsInShoppingList = (recipeId: number) => {
-  const shoppingList = useShoppingListStore((state) => state.shoppingList)
+  const shoppingList = useShoppingListIds()
 
   return shoppingList.includes(recipeId)
 }

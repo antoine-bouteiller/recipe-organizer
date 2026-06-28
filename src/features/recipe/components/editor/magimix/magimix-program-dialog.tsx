@@ -1,4 +1,5 @@
-import { revalidateLogic, useStore } from '@tanstack/react-form'
+import { revalidateLogic } from '@tanstack/react-form'
+import { useSelector } from '@tanstack/react-store'
 import { useState, type ReactElement } from 'react'
 import { z } from 'zod'
 
@@ -65,7 +66,7 @@ export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title
     },
   })
 
-  const { isSubmitting } = useStore(form.store, (state) => ({
+  const { isSubmitting } = useSelector(form.store, (state) => ({
     isSubmitting: state.isSubmitting,
   }))
 
