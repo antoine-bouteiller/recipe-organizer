@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
@@ -10,7 +10,7 @@ import { getImageUrl } from '@/utils/get-file-url'
 
 import { ingredientGroupSelect } from '../utils/ingredient-group-select'
 
-const getRecipeSchema = z.number()
+const getRecipeSchema = v.number()
 
 const getRecipe = createServerFn({
   method: 'GET',

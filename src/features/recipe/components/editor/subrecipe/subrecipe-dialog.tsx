@@ -1,6 +1,6 @@
 import { revalidateLogic } from '@tanstack/react-form'
 import { useState, type ReactElement } from 'react'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
@@ -8,13 +8,13 @@ import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 import { useAppForm } from '@/hooks/use-app-form'
 import { useRecipeOptions } from '@/hooks/use-options'
 
-const subrecipeSchema = z.object({
-  hideFirstNodes: z.number().min(0),
-  hideLastNodes: z.number().min(0),
-  recipeId: z.number(),
+const subrecipeSchema = v.object({
+  hideFirstNodes: v.pipe(v.number(), v.minValue(0)),
+  hideLastNodes: v.pipe(v.number(), v.minValue(0)),
+  recipeId: v.number(),
 })
 
-type SubrecipeFormInput = z.infer<typeof subrecipeSchema>
+type SubrecipeFormInput = v.InferOutput<typeof subrecipeSchema>
 
 interface SubrecipeDialogProps {
   initialData?: SubrecipeFormInput
@@ -40,7 +40,7 @@ export const SubrecipeDialog = ({ initialData, onSubmit, submitLabel, title, tri
   const form = useAppForm({
     defaultValues: initialData ?? subrecipeDefaultValues,
     onSubmit: async ({ value }) => {
-      const validated = subrecipeSchema.parse(value)
+      const validated = v.parse(subrecipeSchema, value)
 
       onSubmit({
         hideFirstNodes: validated.hideFirstNodes,

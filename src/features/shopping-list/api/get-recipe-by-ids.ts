@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
+import * as v from 'valibot'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
@@ -9,8 +9,8 @@ import { scaleQuantity } from '@/utils/scale-quantity'
 
 import { ingredientGroupSelect } from '../utils/ingredient-group-select'
 
-const getRecipesByIdsSchema = z.object({
-  ids: z.array(z.number()),
+const getRecipesByIdsSchema = v.object({
+  ids: v.array(v.number()),
 })
 
 const getRecipesByIds = createServerFn({

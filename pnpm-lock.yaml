@@ -47,6 +47,9 @@ importers:
       '@tanstack/react-store':
         specifier: 0.11.0
         version: 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@valibot/i18n':
+        specifier: ^1.0.0
+        version: 1.2.0(valibot@1.4.1(typescript@6.0.3))
       '@vidstack/react':
         specifier: 1.15.6
         version: 1.15.6(@types/react@19.2.17)(react@19.2.7)
@@ -58,7 +61,7 @@ importers:
         version: 2.1.1
       drizzle-orm:
         specifier: 1.0.0-beta.22
-        version: 1.0.0-beta.22(zod@4.4.3)
+        version: 1.0.0-beta.22(valibot@1.4.1(typescript@6.0.3))(zod@4.4.3)
       lexical:
         specifier: 0.46.0
         version: 0.46.0(typescript@6.0.3)
@@ -77,9 +80,9 @@ importers:
       tw-animate-css:
         specifier: 1.4.0
         version: 1.4.0
-      zod:
-        specifier: 4.4.3
-        version: 4.4.3
+      valibot:
+        specifier: ^1.2.0
+        version: 1.4.1(typescript@6.0.3)
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: 1.42.3
@@ -2515,6 +2518,11 @@ packages:
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
 
+  '@valibot/i18n@1.2.0':
+    resolution: {integrity: sha512-vpSWlLB/or0GjF8dqQlUn9HIO+sBMWj74tw/w85KpkZAKsrdfdXb97EtXXRlEVgdYK8/AoUqe8GIGuqwmxiu1Q==}
+    peerDependencies:
+      valibot: ^1.4.0
+
   '@vidstack/react@1.15.6':
     resolution: {integrity: sha512-hO7cLld5yfxCdDnDCYqh5aS7JxmHfsmX43PmKBJWzDTwK40P3hh5qAdDQzl3qDtEJLYjuo3Sv+kr6tt/VRtJzQ==}
     engines: {node: '>=18'}
@@ -3759,6 +3767,14 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  valibot@1.4.1:
+    resolution: {integrity: sha512-klCmFTz2jeDluy9RwX+F884TCiogtdBJ/YaxSx1EOBYXa3NXNWj8kR1jjN8rzluwojJVWWaHJ4r1U5LfICnM3g==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   vite-plus@0.2.1:
     resolution: {integrity: sha512-q5q/Y38UkWFsNg1JO+RyRdPUqoewaSqIlMyK2p83GKNUvf4D38Ntb3PToRTDZbTRh7mWt+B+d0DQBv4nCDpMcQ==}
@@ -5862,6 +5878,10 @@ snapshots:
 
   '@types/trusted-types@2.0.7': {}
 
+  '@valibot/i18n@1.2.0(valibot@1.4.1(typescript@6.0.3))':
+    dependencies:
+      valibot: 1.4.1(typescript@6.0.3)
+
   '@vidstack/react@1.15.6(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
       '@floating-ui/dom': 1.7.6
@@ -6139,8 +6159,9 @@ snapshots:
       get-tsconfig: 4.14.0
       jiti: 2.7.0
 
-  drizzle-orm@1.0.0-beta.22(zod@4.4.3):
+  drizzle-orm@1.0.0-beta.22(valibot@1.4.1(typescript@6.0.3))(zod@4.4.3):
     optionalDependencies:
+      valibot: 1.4.1(typescript@6.0.3)
       zod: 4.4.3
 
   electron-to-chromium@1.5.368: {}
@@ -6942,6 +6963,10 @@ snapshots:
       react: 19.2.7
 
   util-deprecate@1.0.2: {}
+
+  valibot@1.4.1(typescript@6.0.3):
+    optionalDependencies:
+      typescript: 6.0.3
 
   vite-plus@0.2.1(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.4)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0))(yaml@2.9.0):
     dependencies:
