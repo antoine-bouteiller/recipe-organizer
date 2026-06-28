@@ -13,7 +13,7 @@ export const SearchInput = ({ autoFocus, search, setSearch }: InputProps) => (
     <InputGroupInput
       autoFocus={autoFocus}
       onChange={(event) => setSearch(event.target.value)}
-      placeholder="Search recipes..."
+      placeholder="Rechercher une recette, un ingrédient…"
       size="lg"
       value={search}
     />

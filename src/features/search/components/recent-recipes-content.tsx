@@ -1,4 +1,4 @@
-import { useRecentRecipeIds } from '@/stores/recent-recipes.store'
+import { clearRecentRecipes, useRecentRecipeIds } from '@/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@/types/recipe'
 
 import { RecipeList } from './recipe-list'
@@ -20,7 +20,12 @@ export const RecentRecipesContent = ({ recipes }: RecentRecipesContentProps) => 
 
   return (
     <div className="flex flex-1 flex-col">
-      <h2 className="px-4 pt-2 pb-1 text-sm font-medium text-muted-foreground">Recherches récentes</h2>
+      <div className="flex items-center justify-between px-4 pt-2 pb-1">
+        <h2 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Recherches récentes</h2>
+        <button onClick={clearRecentRecipes} type="button" className="text-sm font-semibold text-primary">
+          Effacer
+        </button>
+      </div>
       <RecipeList recipes={recentRecipes} />
     </div>
   )

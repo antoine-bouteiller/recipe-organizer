@@ -12,12 +12,13 @@ interface RecipeGroupIngredientsProps {
 
 const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: RecipeGroupIngredientsProps) =>
   groupIngredients.length > 0 && (
-    <ul className="mt-0 mb-0 space-y-2 pr-4 md:pr-2">
+    <ul className="mt-0 mb-0 list-none overflow-hidden rounded-2xl border bg-card px-3.5 pl-3.5">
       {groupIngredients.map((groupIngredient) => (
-        <li key={groupIngredient.id}>
-          <div className="flex items-center justify-between gap-2 text-nowrap text-ellipsis">
-            <div>{groupIngredient.ingredient.name}</div>
-            <div className="font-medium">
+        <li className="mt-0 mb-0 border-b py-3 last:border-b-0" key={groupIngredient.id}>
+          <div className="flex items-center gap-3 text-nowrap text-ellipsis">
+            <span className="size-1.5 shrink-0 rounded-full bg-primary" />
+            <div className="flex-1">{groupIngredient.ingredient.name}</div>
+            <div className="font-semibold text-muted-foreground">
               {formatNumber(scaleQuantity(groupIngredient.quantity, servings, baseServings))}
               {groupIngredient.unitSlug && ` ${UNITS[groupIngredient.unitSlug]?.name ?? ''}`}
             </div>
@@ -37,8 +38,8 @@ export const RecipeIngredientGroups = ({ recipeId, baseServings, ingredientGroup
   const { quantity } = useRecipeQuantities(recipeId, baseServings)
 
   return ingredientGroups.map((group) => (
-    <div key={group.id}>
-      {group.groupName && <div className="font-semibold">{group.groupName}</div>}
+    <div className="mb-4 last:mb-0" key={group.id}>
+      {group.groupName && <div className="mb-2 px-1 font-semibold">{group.groupName}</div>}
 
       <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} servings={quantity} />
     </div>

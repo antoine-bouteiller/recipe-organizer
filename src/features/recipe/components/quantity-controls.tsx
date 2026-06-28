@@ -2,6 +2,7 @@ import { MinusIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
+import { cn } from '@/utils/cn'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
@@ -64,17 +65,30 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
   }
 
   return (
-    <div className={className}>
-      <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon" variant="outline">
-        <MinusIcon />
-      </Button>
-      <span>{quantity}</span>
-      <Button onClick={incrementQuantity} size="icon" variant="outline">
-        <PlusIcon />
-      </Button>
-      <Button onClick={() => (isInShoppingList ? removeFromShoppingList(recipeId) : addToShoppingList(recipeId))} variant="outline">
-        {isInShoppingList ? 'Supprimer de la liste' : 'Ajouter à la liste'}
-      </Button>
+    <div className={cn('flex items-center justify-between gap-3 rounded-2xl border bg-card p-2 pl-4', className)}>
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-bold">Couverts</span>
+        <div className="flex items-center gap-2">
+          <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon-sm" variant="outline">
+            <MinusIcon />
+          </Button>
+          <span className="min-w-5 text-center font-bold">{quantity}</span>
+          <Button onClick={incrementQuantity} size="icon-sm">
+            <PlusIcon />
+          </Button>
+        </div>
+      </div>
+      {isInShoppingList ? (
+        <Button onClick={() => removeFromShoppingList(recipeId)} variant="destructive-outline">
+          <TrashIcon />
+          Retirer
+        </Button>
+      ) : (
+        <Button onClick={() => addToShoppingList(recipeId)} className="bg-accent text-primary hover:bg-accent/70">
+          <PlusIcon weight="bold" />
+          Ajouter
+        </Button>
+      )}
     </div>
   )
 }

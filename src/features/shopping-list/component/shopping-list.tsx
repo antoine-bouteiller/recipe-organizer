@@ -23,14 +23,16 @@ export const ShoppingList = () => {
   }
 
   return typedEntriesOf(shoppingListIngredients).map(([key, ingredients]) => (
-    <div className="space-y-2" key={key}>
-      <h2 className="flex items-center gap-2 font-medium">
+    <div key={key}>
+      <h2 className="mb-2 flex items-center gap-1.5 px-1 text-[11px] font-semibold tracking-wider text-primary uppercase">
         {ingredientCategoryIcons[key]}
         {ingredientCategoryLabels[key]}
       </h2>
-      {ingredients?.map((ingredient) => (
-        <CartItem ingredient={ingredient} key={ingredient.id} />
-      ))}
+      <div className="overflow-hidden rounded-2xl border bg-card px-3.5">
+        {ingredients?.map((ingredient) => (
+          <CartItem ingredient={ingredient} key={ingredient.id} />
+        ))}
+      </div>
     </div>
   ))
 }

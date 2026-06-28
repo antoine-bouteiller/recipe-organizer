@@ -69,11 +69,7 @@ const RecipePage = () => {
       }
     >
       <h1 className="hidden px-4 py-2 font-heading text-3xl md:block">{recipe.name}</h1>
-      <QuantityControls
-        className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start"
-        recipeId={id}
-        servings={recipe.servings}
-      />
+      <QuantityControls className="mx-4 my-2" recipeId={id} servings={recipe.servings} />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 md:hidden">
@@ -98,7 +94,7 @@ const RecipePage = () => {
         </div>
 
         <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
-          <div className="col-span-2 rounded-xl border px-8 pb-8">
+          <div className="col-span-2">
             <h2>Ingrédients</h2>
             <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
           </div>

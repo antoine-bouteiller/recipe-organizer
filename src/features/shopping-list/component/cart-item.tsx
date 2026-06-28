@@ -1,6 +1,6 @@
+import { CheckIcon } from '@phosphor-icons/react'
 import { useState } from 'react'
 
-import { Checkbox } from '@/components/ui/checkbox'
 import { UNITS, type UnitSlug } from '@/lib/db/schema/unit'
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
@@ -18,19 +18,30 @@ export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => 
   const [isChecked, setIsChecked] = useState(false)
 
   return (
-    <div className={cn('flex items-center gap-2 text-nowrap text-ellipsis', isChecked && 'line-through')}>
-      <Checkbox checked={isChecked} id={`ingredient-${ingredient.id}`} onCheckedChange={(checked) => setIsChecked(checked)} />
-      <label className="flex flex-1 justify-between gap-2" htmlFor={`ingredient-${ingredient.id}`}>
+    <button
+      type="button"
+      onClick={() => setIsChecked((checked) => !checked)}
+      className="flex w-full items-center gap-3 border-b py-3 text-left last:border-b-0"
+    >
+      <span
+        className={cn(
+          'flex size-5.5 shrink-0 items-center justify-center rounded-full border-2',
+          isChecked ? 'border-primary bg-primary text-white' : 'border-muted-foreground/40'
+        )}
+      >
+        {isChecked && <CheckIcon weight="bold" className="size-3" />}
+      </span>
+      <span className={cn('flex flex-1 items-center justify-between gap-2', isChecked && 'text-muted-foreground line-through')}>
         <span>{ingredient.name}</span>
-        <span className="flex flex-col items-end">
+        <span className="flex flex-col items-end text-sm font-semibold text-muted-foreground">
           <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>
           {ingredient.fallback.map((line) => (
-            <span className="text-xs text-muted-foreground" key={line.unitSlug ?? 'unitless'}>
+            <span className="text-xs" key={line.unitSlug ?? 'unitless'}>
               + {formatQuantityWithUnit(line.quantity, line.unitSlug)}
             </span>
           ))}
         </span>
-      </label>
-    </div>
+      </span>
+    </button>
   )
 }
