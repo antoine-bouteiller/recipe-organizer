@@ -1,20 +1,17 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start'
 
 import { Card } from '@/components/common/card'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
-import { logout } from '@/features/auth/api/logout'
+import { authClient } from '@/features/auth/lib/auth-client'
 
 const RouteComponent = () => {
   const { authUser } = Route.useRouteContext()
 
   const router = useRouter()
 
-  const signout = useServerFn(logout)
-
   const handleLogout = async () => {
-    await signout()
+    await authClient.signOut()
     await router.invalidate()
   }
 

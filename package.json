@@ -29,6 +29,7 @@
     "@tanstack/react-store": "0.11.0",
     "@valibot/i18n": "^1.0.0",
     "@vidstack/react": "1.15.6",
+    "better-auth": "^1.6.22",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "drizzle-orm": "1.0.0-beta.22",

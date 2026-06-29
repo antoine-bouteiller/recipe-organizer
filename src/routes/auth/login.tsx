@@ -1,15 +1,21 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start'
 import { useEffect } from 'react'
 import * as v from 'valibot'
 
 import { Card } from '@/components/common/card'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
-import { initiateGoogleAuth } from '@/features/auth/api/google-auth'
+import { authClient } from '@/features/auth/lib/auth-client'
 
 const searchSchema = v.object({ error: v.optional(v.string()) })
+
+const signInWithGoogle = () =>
+  authClient.signIn.social({
+    callbackURL: '/',
+    errorCallbackURL: '/auth/login',
+    provider: 'google',
+  })
 
 const getErrorMessage = (error: string) => {
   if (error === 'account_pending') {
@@ -34,8 +40,6 @@ const LoginPage = () => {
     }
   }, [error])
 
-  const login = useServerFn(initiateGoogleAuth)
-
   return (
     <div className="grid flex-1 place-items-center p-4">
       <Card
@@ -51,7 +55,7 @@ const LoginPage = () => {
         panelClassName="flex-1"
         title="Connexion"
       >
-        <Button className="w-full" onClick={() => login()} variant="outline">
+        <Button className="w-full" onClick={() => signInWithGoogle()} variant="outline">
           <img alt="Google" className="h-4" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg" /> Connexion avec Google
         </Button>
       </Card>

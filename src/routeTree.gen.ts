@@ -23,7 +23,7 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as RecipeEditIdRouteImport } from './routes/recipe/edit.$id'
 import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
 import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
-import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const ShoppingListRoute = ShoppingListRouteImport.update({
   id: '/shopping-list',
@@ -95,9 +95,9 @@ const ApiImageIdRoute = ApiImageIdRouteImport.update({
   path: '/api/image/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
-  id: '/api/auth/google/callback',
-  path: '/api/auth/google/callback',
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -113,10 +113,10 @@ export interface FileRoutesByFullPath {
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
-  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -129,10 +129,10 @@ export interface FileRoutesByTo {
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings': typeof SettingsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
-  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -147,10 +147,10 @@ export interface FileRoutesById {
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/image/$id': typeof ApiImageIdRoute
   '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
-  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -166,10 +166,10 @@ export interface FileRouteTypes {
     | '/settings/ingredients'
     | '/settings/users'
     | '/settings/'
+    | '/api/auth/$'
     | '/api/image/$id'
     | '/api/video/$id'
     | '/recipe/edit/$id'
-    | '/api/auth/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -182,10 +182,10 @@ export interface FileRouteTypes {
     | '/settings/ingredients'
     | '/settings/users'
     | '/settings'
+    | '/api/auth/$'
     | '/api/image/$id'
     | '/api/video/$id'
     | '/recipe/edit/$id'
-    | '/api/auth/google/callback'
   id:
     | '__root__'
     | '/'
@@ -199,10 +199,10 @@ export interface FileRouteTypes {
     | '/settings/ingredients'
     | '/settings/users'
     | '/settings/'
+    | '/api/auth/$'
     | '/api/image/$id'
     | '/api/video/$id'
     | '/recipe/edit/$id'
-    | '/api/auth/google/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -213,10 +213,10 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   RecipeIdRoute: typeof RecipeIdRoute
   RecipeNewRoute: typeof RecipeNewRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiImageIdRoute: typeof ApiImageIdRoute
   ApiVideoIdRoute: typeof ApiVideoIdRoute
   RecipeEditIdRoute: typeof RecipeEditIdRoute
-  ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -319,11 +319,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiImageIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/google/callback': {
-      id: '/api/auth/google/callback'
-      path: '/api/auth/google/callback'
-      fullPath: '/api/auth/google/callback'
-      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -355,10 +355,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   RecipeIdRoute: RecipeIdRoute,
   RecipeNewRoute: RecipeNewRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiImageIdRoute: ApiImageIdRoute,
   ApiVideoIdRoute: ApiVideoIdRoute,
   RecipeEditIdRoute: RecipeEditIdRoute,
-  ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

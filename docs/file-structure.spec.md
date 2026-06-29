@@ -160,7 +160,6 @@ recipe-organizer/
 │   │   ├── cache-manager.ts  Cloudflare edge cache wrapper
 │   │   ├── query-keys.ts     TanStack Query key factory
 │   │   ├── r2.ts             R2 upload/delete helpers + Cloudflare Images
-│   │   ├── session.ts        useAppSession / useOAuthSession
 │   │   ├── theme.ts          Theme cookie helpers
 │   │   └── toast-helpers.ts  Toast convenience wrappers
 │   ├── routes/
@@ -180,7 +179,7 @@ recipe-organizer/
 │   │   │   ├── edit.$id.tsx
 │   │   │   └── new.tsx
 │   │   └── api/
-│   │       ├── auth/google/callback.ts
+│   │       ├── auth/$.ts        Better Auth catch-all (getAuth().handler)
 │   │       ├── image/$id.ts
 │   │       └── video/$id.ts
 │   ├── stores/               Persistent TanStack Store stores
