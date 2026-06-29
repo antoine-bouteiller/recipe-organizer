@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 
 import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'
+
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
 
