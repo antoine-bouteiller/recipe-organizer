@@ -27,7 +27,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, subtitle, withGoB
   return (
     <div
       className={cn(
-        'relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-background pt-0 md:overflow-y-auto',
+        'relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-muted pt-0 md:overflow-y-auto',
         pageKey ? 'pb-14' : ''
       )}
     >
@@ -73,7 +73,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, subtitle, withGoB
       )}
       <div
         className={cn(
-          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-background md:mt-0 md:max-w-5xl md:overflow-y-visible',
+          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible',
           isImageHeader && '-mt-10 rounded-t-3xl'
         )}
       >

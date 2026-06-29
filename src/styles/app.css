@@ -48,7 +48,7 @@
 :root {
   --radius: 0.625rem;
 
-  --background: #f3f4f1;
+  --background: var(--color-white);
   --foreground: #18302e;
 
   --card: var(--color-white);
@@ -63,7 +63,7 @@
   --secondary: #eaf2f2;
   --secondary-foreground: #2a4644;
 
-  --muted: #eaeeed;
+  --muted: #f3f4f1;
   --muted-foreground: #6e807e;
 
   --accent: #dcefef;
@@ -105,7 +105,7 @@
   --secondary: --alpha(var(--color-white) / 8%);
   --secondary-foreground: var(--color-zinc-100);
 
-  --muted: --alpha(var(--color-white) / 4%);
+  --muted: #0d1416;
   --muted-foreground: #8aa0a0;
 
   --accent: --alpha(var(--color-white) / 8%);
@@ -151,7 +151,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-muted text-foreground;
   }
 }
 

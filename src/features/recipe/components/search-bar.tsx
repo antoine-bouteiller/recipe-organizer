@@ -73,7 +73,7 @@ export const SearchBar = () => {
             </CommandList>
           </CommandPanel>
           <CommandFooter>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-foreground">
               <Kbd>
                 <ArrowElbowDownLeftIcon />
               </Kbd>

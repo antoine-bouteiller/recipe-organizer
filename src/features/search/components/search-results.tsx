@@ -6,8 +6,7 @@ import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/utils/constants'
 import { addRecentRecipe } from '@/stores/recent-recipes.store'
 import { addToShoppingList } from '@/stores/shopping-list.store'
-import type { ReducedRecipe } from '@/types/recipe'
-
+import { type ReducedRecipe } from '@/types/recipe'
 
 interface SearchResultsProps {
   recipes: ReducedRecipe[]

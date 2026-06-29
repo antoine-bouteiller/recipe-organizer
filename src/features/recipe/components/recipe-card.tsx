@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
+import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'
-
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
 
@@ -16,7 +16,7 @@ const Tag = ({ children }: { readonly children: React.ReactNode }) => (
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
   return (
     <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition>
-      <div className="relative h-60 cursor-pointer overflow-hidden rounded-[28px] bg-[#1b2426] shadow-lg" key={recipe.id}>
+      <Card className="h-60 cursor-pointer overflow-hidden rounded-[28px] border-0 bg-[#1b2426] shadow-lg" key={recipe.id}>
         <img src={recipe.image} alt={recipe.name} className="absolute inset-0 h-full w-full object-cover" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(8,14,14,0.93)_0%,rgba(8,14,14,0.34)_54%,rgba(8,14,14,0)_78%)]" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-4.5">
@@ -39,7 +39,7 @@ export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
             variant="card"
           />
         </div>
-      </div>
+      </Card>
     </Link>
   )
 }

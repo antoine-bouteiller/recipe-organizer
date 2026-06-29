@@ -129,7 +129,7 @@ export const CommandShortcut = ({ className, ...props }: React.ComponentProps<'k
 export const CommandFooter = ({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (
   <div
     className={cn(
-      'flex items-center justify-between gap-2 rounded-b-[calc(var(--radius-2xl)-1px)] border-t px-5 py-3 text-muted-foreground text-xs',
+      'relative flex items-center justify-between gap-2 rounded-b-[calc(var(--radius-2xl)-1px)] border-t px-5 py-3 text-muted-foreground text-xs',
       className
     )}
     data-slot="command-footer"

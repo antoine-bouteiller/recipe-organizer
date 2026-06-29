@@ -8,6 +8,7 @@ import { Editor, EditorContent } from '@/components/common/editor'
 import { Popover } from '@/components/common/popover'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
@@ -99,12 +100,12 @@ const RecipePage = () => {
             <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
           </div>
 
-          <div className="col-span-3 rounded-xl border px-8 pb-8">
+          <Card className="col-span-3 rounded-[28px] border-0 px-8 pb-8 shadow-lg">
             <h2>Préparation</h2>
             <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
               <EditorContent className="pb-4" />
             </Editor>
-          </div>
+          </Card>
         </div>
       </div>
     </ScreenLayout>

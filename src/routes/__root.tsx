@@ -43,10 +43,10 @@ const RootComponent = () => {
         <HeadContent />
       </head>
 
-      <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
+      <body className="fixed top-0 isolate flex h-dvh! w-screen flex-col overflow-hidden">
         <ToastProvider>
           <OfflineBanner />
-          <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
+          <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
             <Navbar search={<SearchBar />} />
           </header>
           <main className="flex min-h-0 flex-1 flex-col md:pb-0">
