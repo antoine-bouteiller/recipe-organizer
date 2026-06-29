@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { ToastProvider } from '@/components/ui/toast'
+import { SearchBar } from '@/features/recipe/components/search-bar'
 import { getAuthUser } from '@/lib/auth/get-auth-user'
 import { getTheme } from '@/lib/theme'
 
@@ -46,7 +47,7 @@ const RootComponent = () => {
         <ToastProvider>
           <OfflineBanner />
           <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
-            <Navbar />
+            <Navbar search={<SearchBar />} />
           </header>
           <main className="flex min-h-0 flex-1 flex-col md:pb-0">
             <Outlet />

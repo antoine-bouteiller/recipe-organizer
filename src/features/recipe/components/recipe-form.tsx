@@ -7,9 +7,10 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/features/recipe/contexts/linked-recipes-context'
+import { useRecipeOptions } from '@/features/recipe/hooks/use-recipe-options'
 import { withForm } from '@/hooks/use-app-form'
 import { type FileMetadata } from '@/hooks/use-file-upload'
-import { useRecipeOptions } from '@/hooks/use-options'
+import { type Option } from '@/hooks/use-options'
 
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '../utils/constants'
 import { recipeDefaultValues } from '../utils/form'
@@ -33,12 +34,13 @@ interface RecipeFormProps extends Record<string, unknown> {
   initialVideo?: FileMetadata
   id?: number
   addNewIngredientOption: (inputValue: string) => ReactNode
+  ingredientOptions: Option<number>[]
 }
 
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
-  render: ({ form, initialImage, initialVideo, id, addNewIngredientOption }) => {
+  render: ({ form, initialImage, initialVideo, id, addNewIngredientOption, ingredientOptions }) => {
     const { AppField, Field } = form
 
     const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
@@ -130,7 +132,12 @@ export const RecipeForm = withForm({
                           </>
                         )}
 
-                        <IngredientGroupField addNewIngredientOption={addNewIngredientOption} form={form} groupIndex={groupIndex} />
+                        <IngredientGroupField
+                          addNewIngredientOption={addNewIngredientOption}
+                          form={form}
+                          groupIndex={groupIndex}
+                          ingredientOptions={ingredientOptions}
+                        />
                         <FieldError />
                       </GroupField>
                     )}

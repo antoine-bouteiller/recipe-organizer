@@ -1,14 +1,11 @@
 import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/react-query'
 
-import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
-import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-
 export interface Option<TValue = number | undefined> {
   label: string
   value: TValue
 }
 
-const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(
+export const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(
   getQueryOptions: () => UseQueryOptions<TQueryOptionData, TError, TData, TQueryKey>,
   mapFn: (item: TData[number]) => Option
 ) => {
@@ -37,13 +34,3 @@ const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQu
 
   return useOptions
 }
-
-export const useIngredientOptions = createOptionsHook(getIngredientListOptions, (item) => ({
-  label: item.name,
-  value: item.id,
-}))
-
-export const useRecipeOptions = createOptionsHook(getRecipeListOptions, (item) => ({
-  label: item.name,
-  value: item.id,
-}))

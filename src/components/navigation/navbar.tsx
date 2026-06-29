@@ -1,14 +1,14 @@
 import { Link, useLocation, useRouter } from '@tanstack/react-router'
+import { type ReactNode } from 'react'
 
 import { Tabs } from '@/components/common/tabs'
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
-import { SearchBar } from '@/features/recipe/components/search-bar'
 import { toggleTheme } from '@/lib/theme'
 
 import { menuItems } from './constants'
 
-export const Navbar = () => {
+export const Navbar = ({ search }: { search: ReactNode }) => {
   const router = useRouter()
 
   const location = useLocation()
@@ -28,7 +28,7 @@ export const Navbar = () => {
         variant="underline"
       />
       <div className="flex flex-1 items-center justify-end gap-2">
-        <SearchBar />
+        {search}
         <Button
           onClick={async () => {
             toggleTheme()

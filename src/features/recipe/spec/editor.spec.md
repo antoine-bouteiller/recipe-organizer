@@ -350,7 +350,7 @@ useLinkedRecipes(): number[]
   `SubrecipeNode`.
 - **Shared editor** (`@/components/common/editor`) — `Editor`, `EditorContent` for the read-only
   embedded subrecipe render.
-- **`@/hooks/use-options`** — `useRecipeOptions({ filter })` for the SubrecipeDialog's combobox.
+- **`@/features/recipe/hooks/use-recipe-options`** — `useRecipeOptions({ filter })` for the SubrecipeDialog's combobox.
 - **`@/components/dialogs/form-dialog`** — `getFormDialog(defaults)` factory.
 
 ## 9. Examples & Edge Cases

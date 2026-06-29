@@ -11,6 +11,7 @@ import { Form } from '@/components/ui/form'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { renderAddIngredientOption } from '@/features/ingredients/components/add-ingredient'
+import { useIngredientOptions } from '@/features/ingredients/hooks/use-ingredient-options'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
@@ -37,6 +38,7 @@ const EditRecipePage = () => {
   const { data: recipe, isLoading } = useSuspenseQuery(getRecipeDetailsOptions(id))
   const { mutateAsync: updateRecipe } = useMutation(updateRecipeOptions())
   const router = useRouter()
+  const ingredientOptions = useIngredientOptions()
 
   const initialValues: UpdateRecipeFormInput = recipe
     ? {
@@ -109,6 +111,7 @@ const EditRecipePage = () => {
           fields={recipeFormFields}
           form={form}
           id={recipe.id}
+          ingredientOptions={ingredientOptions}
           initialImage={{ id: recipe.image, url: recipe.image }}
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
