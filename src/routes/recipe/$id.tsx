@@ -94,13 +94,13 @@ const RecipePage = () => {
           </Tabs>
         </div>
 
-        <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
-          <div className="col-span-2">
+        <div className="hidden grid-cols-5 items-stretch gap-8 p-4 md:grid">
+          <Card className="col-span-2 rounded-3xl border-0 px-8 pb-8 shadow-lg [&_ul]:rounded-none [&_ul]:border-0 [&_ul]:bg-transparent [&_ul]:px-0">
             <h2>Ingrédients</h2>
             <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-          </div>
+          </Card>
 
-          <Card className="col-span-3 rounded-[28px] border-0 px-8 pb-8 shadow-lg">
+          <Card className="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
             <h2>Préparation</h2>
             <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
               <EditorContent className="pb-4" />

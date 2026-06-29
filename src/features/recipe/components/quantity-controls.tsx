@@ -27,7 +27,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
   if (variant === 'card') {
     if (!isInShoppingList) {
       return (
-        <Button onClick={withStopPropagation(() => addToShoppingList(recipeId))} className="h-9 w-full rounded-xl font-bold sm:h-9">
+        <Button onClick={withStopPropagation(() => addToShoppingList(recipeId))}>
           <PlusIcon weight="bold" />
           Ajouter à la liste
         </Button>
@@ -36,30 +36,28 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
 
     return (
       <div className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-white/15 p-1 ring-1 ring-white/20 backdrop-blur-md ring-inset">
-        <button
+        <Button
           onClick={withStopPropagation(decrementQuantity)}
           disabled={quantity === 1}
-          type="button"
-          className="flex h-7 w-9 items-center justify-center rounded-lg bg-white/20 text-white disabled:opacity-40"
+          size="icon-xs"
+          variant="secondary"
+          className="bg-white/12 text-white hover:bg-white/20"
         >
           <MinusIcon weight="bold" />
-        </button>
+        </Button>
         <span className="min-w-18 text-center text-[13px] font-bold text-white">{quantity} couverts</span>
-        <button
-          onClick={withStopPropagation(incrementQuantity)}
-          type="button"
-          className="flex h-7 w-9 items-center justify-center rounded-lg bg-primary text-white"
-        >
+        <Button onClick={withStopPropagation(incrementQuantity)} size="icon-xs">
           <PlusIcon weight="bold" />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={withStopPropagation(() => removeFromShoppingList(recipeId))}
-          type="button"
           aria-label="Retirer de la liste"
-          className="flex h-7 w-9 items-center justify-center rounded-lg bg-white/12 text-white"
+          size="icon-xs"
+          variant="secondary"
+          className="bg-white/12 text-white hover:bg-white/20"
         >
           <TrashIcon />
-        </button>
+        </Button>
       </div>
     )
   }
@@ -84,7 +82,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
           Retirer
         </Button>
       ) : (
-        <Button onClick={() => addToShoppingList(recipeId)} className="bg-accent text-primary hover:bg-accent/70">
+        <Button onClick={() => addToShoppingList(recipeId)} variant="secondary">
           <PlusIcon weight="bold" />
           Ajouter
         </Button>
