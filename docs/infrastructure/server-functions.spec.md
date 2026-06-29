@@ -20,7 +20,7 @@ binary streaming (R2) and the Better Auth catch-all (`/api/auth/$`).
 Authentication is owned by **Better Auth** (`getAuth()`, `authClient`). This document covers only
 the server-function touchpoints — `getAuthUser` and the `authGuard` middleware. The full auth
 contract (sign-in/out flow, session issuance, account lifecycle, schema) lives in
-`src/features/auth/auth.spec.md`.
+`docs/infrastructure/auth.spec.md`.
 
 Audience: contributors adding or modifying server functions, query/mutation factories, or API
 routes. Out of scope: the database schema (see `./data-layer.spec.md`), runtime/platform
@@ -53,7 +53,7 @@ Assumptions:
   `createFileRoute(...)({ server: { handlers: { GET, HEAD, POST } } })`. Used when a server
   function is unsuitable (binary streaming, the Better Auth catch-all).
 - **Auth Guard**: middleware factory `authGuard(role?: 'admin')` from
-  `src/features/auth/lib/auth-guard.ts`.
+  `src/lib/auth/auth-guard.ts`.
 - **withServerError**: handler wrapper from `src/utils/error-handler.ts` that normalises
   thrown errors.
 - **D1 Batch**: `getDb().batch([...])` — sqlite multi-statement transaction primitive.
@@ -234,7 +234,7 @@ Assumptions:
 
 | Name                    | File                                                  | Method | Middleware           | Inputs                                      | Output                                                       | Side effects                                                                                                                             |
 | ----------------------- | ----------------------------------------------------- | ------ | -------------------- | ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `getAuthUser`           | `src/features/auth/api/get-auth-user.ts`              | GET    | none                 | none                                        | `User \| undefined`                                          | Reads Better Auth session via `getAuth().api.getSession(...)`; in DEV returns synthetic admin                                            |
+| `getAuthUser`           | `src/lib/auth/get-auth-user.ts`                       | GET    | none                 | none                                        | `User \| undefined`                                          | Reads Better Auth session via `getAuth().api.getSession(...)`; in DEV returns synthetic admin                                            |
 | `getAllRecipes`         | `src/features/recipe/api/get-all.ts`                  | GET    | none                 | none                                        | `ReducedRecipe[]`                                            | Maps `image` through `getImageUrl`                                                                                                       |
 | `getRecipe`             | `src/features/recipe/api/get-one.ts`                  | GET    | none                 | `z.number()`                                | `Recipe` (with relations)                                    | Throws `notFound()` if missing                                                                                                           |
 | `getRecipeInstructions` | `src/features/recipe/api/get-instructions.ts`         | GET    | none                 | `z.number()`                                | `{ id, instructions, name } \| undefined`                    | none                                                                                                                                     |
@@ -497,7 +497,7 @@ await Promise.all(
   `mutationOptions`.
 - **INF-004 — Better Auth `better-auth`**: owns sign-in/out, the OAuth handshake, session
   issuance, and cookie management. Consumed by `getAuthUser` / `authGuard` via `getAuth()`. See
-  `src/features/auth/auth.spec.md`.
+  `docs/infrastructure/auth.spec.md`.
 
 ### Data dependencies
 
@@ -611,7 +611,7 @@ it to the string `'42'`, not the number 42. Schemas MUST therefore declare numer
   delegate to server functions or `createServerOnlyFn` helpers.
 - **VAL-008**: `vp check` (`fmt` + `lint` + `tsc`) and `vp test` pass on changes to any file
   under `src/features/*/api/` or `src/utils/error-handler.ts`,
-  `src/utils/form-data.ts`, `src/lib/r2.ts`, `src/features/auth/lib/auth-guard.ts`.
+  `src/utils/form-data.ts`, `src/lib/r2.ts`, `src/lib/auth/auth-guard.ts`.
 
 ## 12. Related Specifications / Further Reading
 

@@ -1,10 +1,10 @@
 ---
-title: Auth Feature Specification
-version: 2.0
+title: Auth Specification
+version: 2.1
 date_created: 2026-05-08
-last_updated: 2026-06-28
+last_updated: 2026-06-29
 owner: recipe-organizer
-tags: [feature, auth, oauth, sessions, better-auth]
+tags: [infrastructure, auth, oauth, sessions, better-auth]
 ---
 
 # Introduction
@@ -13,7 +13,7 @@ This document specifies the authentication feature of the recipe-organizer appli
 handled by [Better Auth](https://www.better-auth.com) configured with the Google social provider, the Drizzle
 adapter over Cloudflare D1, and database-backed sessions. The feature retains the application-specific
 admin-approval lifecycle (`pending` -> `active` / `blocked`) and the `user` / `admin` role model layered on top
-of Better Auth via additional user fields and database hooks. It is implemented in `src/features/auth/` and
+of Better Auth via additional user fields and database hooks. It is implemented in `src/lib/auth/` and
 integrated with the data layer (`src/lib/db/schema/`) and the platform layer (Cloudflare Workers `env`).
 
 ## 1. Purpose & Scope
@@ -31,10 +31,10 @@ Define the authoritative behavior, contracts, constraints, and acceptance criter
 
 ### 1.2 In Scope
 
-- Server instance factory: `getAuth()` (`src/features/auth/lib/auth-server.ts`).
-- Browser client: `authClient` (`src/features/auth/lib/auth-client.ts`).
-- Server function: `getAuthUser` (`src/features/auth/api/get-auth-user.ts`).
-- Middleware: `authGuard(role?)` (`src/features/auth/lib/auth-guard.ts`).
+- Server instance factory: `getAuth()` (`src/lib/auth/auth-server.ts`).
+- Browser client: `authClient` (`src/lib/auth/auth-client.ts`).
+- Server function: `getAuthUser` (`src/lib/auth/get-auth-user.ts`).
+- Middleware: `authGuard(role?)` (`src/lib/auth/auth-guard.ts`).
 - Route handler: `/api/auth/$` (GET + POST) mounting `getAuth().handler`.
 - Login page: `/auth/login`.
 - Drizzle schema for Better Auth tables: `user`, `session`, `account`, `verification`.
@@ -113,7 +113,7 @@ Define the authoritative behavior, contracts, constraints, and acceptance criter
 - **SEC-002** Sessions SHALL be signed using `env.SESSION_SECRET` (`secret` option). `SESSION_SECRET` MUST NOT be
   exposed to the client.
 - **SEC-003** `GOOGLE_CLIENT_SECRET` and `SESSION_SECRET` SHALL only be read inside server-only code
-  (`src/features/auth/lib/auth-server.ts` imports `cloudflare:workers`, which the bundler keeps server-side).
+  (`src/lib/auth/auth-server.ts` imports `cloudflare:workers`, which the bundler keeps server-side).
 - **SEC-004** The OAuth `state`/PKCE handshake SHALL be managed entirely by Better Auth (stored in the
   `verification` table); the application SHALL NOT hand-roll CSRF state.
 - **SEC-005** New users SHALL be created with `status: 'pending'` and SHALL NOT receive a session until promoted
@@ -169,12 +169,12 @@ Define the authoritative behavior, contracts, constraints, and acceptance criter
 
 ### 4.1 Auth Surface
 
-| Name          | Kind                | File                                     | Notes                                                  |
-| ------------- | ------------------- | ---------------------------------------- | ------------------------------------------------------ |
-| `getAuth`     | server factory      | `src/features/auth/lib/auth-server.ts`   | Returns a per-request Better Auth instance.            |
-| `authClient`  | browser client      | `src/features/auth/lib/auth-client.ts`   | `createAuthClient` with `baseURL = VITE_PUBLIC_URL`.   |
-| `getAuthUser` | GET server function | `src/features/auth/api/get-auth-user.ts` | `Promise<User \| undefined>` (or DEV synthetic admin). |
-| `authGuard`   | function middleware | `src/features/auth/lib/auth-guard.ts`    | `(role?: 'admin') => Middleware`.                      |
+| Name          | Kind                | File                            | Notes                                                  |
+| ------------- | ------------------- | ------------------------------- | ------------------------------------------------------ |
+| `getAuth`     | server factory      | `src/lib/auth/auth-server.ts`   | Returns a per-request Better Auth instance.            |
+| `authClient`  | browser client      | `src/lib/auth/auth-client.ts`   | `createAuthClient` with `baseURL = VITE_PUBLIC_URL`.   |
+| `getAuthUser` | GET server function | `src/lib/auth/get-auth-user.ts` | `Promise<User \| undefined>` (or DEV synthetic admin). |
+| `authGuard`   | function middleware | `src/lib/auth/auth-guard.ts`    | `(role?: 'admin') => Middleware`.                      |
 
 ### 4.2 Routes
 

@@ -33,6 +33,7 @@ colocated with the code.
 - [Form Patterns](docs/infrastructure/forms.spec.md)
 - [Client State Layering](docs/infrastructure/client-state.spec.md)
 - [Routing & SSR](docs/infrastructure/routing-ssr.spec.md)
+- [Auth (Better Auth)](docs/infrastructure/auth.spec.md)
 - Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 
 <!--VITE PLUS START-->

@@ -20,22 +20,22 @@ This specification defines the canonical file and folder structure of the `recip
 
 ## 2. Definitions
 
-| Term                          | Definition                                                                                                                                                                      |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Feature module**            | A self-contained slice under `src/features/<name>/` exposing API, components, hooks, types, and utils for one bounded domain (auth, recipe, ingredients, shopping-list, users). |
-| **Provider / infrastructure** | Cross-cutting machinery used by every feature (data layer, server-function helpers, forms, client state, routing/SSR, platform). Lives outside `features/`.                     |
-| **Server function**           | A `createServerFn(...)` exported from `src/features/<name>/api/<verb>.ts`.                                                                                                      |
-| **Route file**                | A file under `src/routes/**` that uses `createFileRoute(...)` and is registered in the generated `src/routeTree.gen.ts`.                                                        |
-| **Spec file**                 | A `*.spec.md` file describing requirements for a folder, feature, or infra layer. Specs are authoritative documentation.                                                        |
-| **kebab-case**                | Lowercase ASCII words separated by `-`. The default casing for filenames in this repo (oxlint enforces `filename-case: kebabCase`).                                             |
-| **PascalCase route param**    | TanStack Router file convention `[$id].tsx` for dynamic params; oxlint allows `\\[.+\\]\\.tsx` to bypass kebab-case.                                                            |
+| Term                          | Definition                                                                                                                                                                                                                             |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Feature module**            | A self-contained slice under `src/features/<name>/` exposing API, components, hooks, types, and utils for one bounded domain (recipe, ingredients, shopping-list, users). Auth is infrastructure, not a feature — see `src/lib/auth/`. |
+| **Provider / infrastructure** | Cross-cutting machinery used by every feature (data layer, server-function helpers, forms, client state, routing/SSR, platform). Lives outside `features/`.                                                                            |
+| **Server function**           | A `createServerFn(...)` exported from `src/features/<name>/api/<verb>.ts`.                                                                                                                                                             |
+| **Route file**                | A file under `src/routes/**` that uses `createFileRoute(...)` and is registered in the generated `src/routeTree.gen.ts`.                                                                                                               |
+| **Spec file**                 | A `*.spec.md` file describing requirements for a folder, feature, or infra layer. Specs are authoritative documentation.                                                                                                               |
+| **kebab-case**                | Lowercase ASCII words separated by `-`. The default casing for filenames in this repo (oxlint enforces `filename-case: kebabCase`).                                                                                                    |
+| **PascalCase route param**    | TanStack Router file convention `[$id].tsx` for dynamic params; oxlint allows `\\[.+\\]\\.tsx` to bypass kebab-case.                                                                                                                   |
 
 ## 3. Requirements, Constraints & Guidelines
 
 ### Functional requirements
 
 - **REQ-001**: Every file under `src/**` MUST be either a feature file (`src/features/<name>/...`), a route file (`src/routes/...`), or a shared infrastructure file (`src/components`, `src/hooks`, `src/lib`, `src/stores`, `src/styles`, `src/types`, `src/utils`).
-- **REQ-002**: Each feature folder MUST expose at most these subfolders, and only those that contain code: `api/`, `components/`, `hooks/`, `contexts/`, `types/`, `utils/`, `lib/`, `spec/`.
+- **REQ-002**: Each feature folder MUST expose at most these subfolders, and only those that contain code: `api/`, `components/`, `hooks/`, `contexts/`, `types/`, `utils/`, `spec/`. Feature folders MUST NOT contain a `lib/` — binding/SDK-dependent code that would otherwise live there belongs in `src/lib/<topic>/` (e.g. `src/lib/auth/`).
 - **REQ-003**: Server functions MUST live under `src/features/<name>/api/` with one server function per file, named after the verb: `create.ts`, `update.ts`, `delete.ts`, `get-all.ts`, `get-one.ts`, `get-instructions.ts`, etc.
 - **REQ-004**: Drizzle schema modules MUST live in `src/lib/db/schema/<table>.ts` and be re-exported from `src/lib/db/schema/index.ts`. Relations MUST be defined in `src/lib/db/index.ts` via `defineRelations`.
 - **REQ-005**: Route files MUST be placed under `src/routes/` and reflect the URL hierarchy. Dynamic segments use `$param.tsx`; nested API routes use `src/routes/api/...`.
@@ -119,10 +119,6 @@ recipe-organizer/
 │   │   ├── ui/               Base UI primitives (button, dialog, etc.)
 │   │   └── search-input.tsx  Cross-cutting components live at root
 │   ├── features/
-│   │   ├── auth/
-│   │   │   ├── api/
-│   │   │   ├── lib/          Auth-only middleware (auth-guard.ts)
-│   │   │   └── auth.spec.md
 │   │   ├── ingredients/
 │   │   │   ├── api/
 │   │   │   ├── components/
@@ -154,6 +150,7 @@ recipe-organizer/
 │   │       └── users.spec.md
 │   ├── hooks/                Shared hooks (use-app-form, use-file-upload, ...)
 │   ├── lib/
+│   │   ├── auth/             Better Auth server/client, authGuard, getAuthUser
 │   │   ├── db/
 │   │   │   ├── index.ts      defineRelations + getDb()
 │   │   │   └── schema/       Drizzle table modules (one per table)

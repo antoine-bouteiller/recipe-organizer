@@ -3,7 +3,7 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Card } from '@/components/common/card'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
-import { authClient } from '@/features/auth/lib/auth-client'
+import { authClient } from '@/lib/auth/auth-client'
 
 const RouteComponent = () => {
   const { authUser } = Route.useRouteContext()

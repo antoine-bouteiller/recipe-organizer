@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
 
-import { authGuard } from '@/features/auth/lib/auth-guard'
+import { authGuard } from '@/lib/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 

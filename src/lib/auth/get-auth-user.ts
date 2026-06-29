@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 
-import { getAuth } from '@/features/auth/lib/auth-server'
+import { getAuth } from '@/lib/auth/auth-server'
 import { getDb } from '@/lib/db'
 import { withServerError } from '@/utils/error-handler'
 

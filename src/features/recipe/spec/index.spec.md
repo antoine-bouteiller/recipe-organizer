@@ -44,7 +44,7 @@ add the recipe to a shopping list, and edit or delete it.
 
 ### Out of scope
 
-- Authentication and `authGuard` middleware (see `src/features/auth/`).
+- Authentication and `authGuard` middleware (see `src/lib/auth/auth-guard.ts`).
 - Ingredient catalog management (see `src/features/ingredients/`).
 - Shopping list page UI and aggregation logic (see `src/features/shopping-list/`).
 - The shared Lexical `Editor` component itself (see `src/components/common/editor/`); only the recipe
@@ -178,7 +178,7 @@ isolated enough to deserve its own spec.
 - **Lexical** + `@lexical/react` + `@lexical/utils` for the rich-text editor.
 - **TanStack Store** stores: `shopping-list.store`, `recipe-quantities.store`
   (`docs/infrastructure/client-state.spec.md`).
-- **Auth feature** (`src/features/auth/lib/auth-guard.ts`) for write-side authentication.
+- **Auth feature** (`src/lib/auth/auth-guard.ts`) for write-side authentication.
 - **Ingredients feature** (`src/features/ingredients/`) for the ingredient picker and `AddIngredient`
   inline dialog.
 - **Shopping list feature** (`src/features/shopping-list/`) consumes recipe ids stored in the

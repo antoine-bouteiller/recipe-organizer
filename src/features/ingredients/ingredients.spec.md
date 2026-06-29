@@ -331,7 +331,7 @@ ingredient)` is called, **then** it returns `null`.
 - **Runtime.** Cloudflare Workers via TanStack Start.
 - **Database.** Cloudflare D1 accessed through Drizzle ORM (`@/lib/db`, `getDb()`).
 - **Server functions.** `@tanstack/react-start` (`createServerFn`).
-- **Auth.** `@/features/auth/lib/auth-guard` (`authGuard`, `authGuard('admin')`).
+- **Auth.** `@/lib/auth/auth-guard` (`authGuard`, `authGuard('admin')`).
 - **State.** `@tanstack/react-query` (`queryOptions`, `mutationOptions`, `useMutation`,
   `useSuspenseQuery`).
 - **Forms.** `@tanstack/react-form` (`revalidateLogic`, `useStore`), `useAppForm`/`withForm` from
