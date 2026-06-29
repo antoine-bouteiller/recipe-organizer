@@ -3,12 +3,12 @@ import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
 import * as v from 'valibot'
 
-import { assertOwnerOrAdmin } from '@/features/auth/lib/assert-owner-or-admin'
-import { authGuard } from '@/features/auth/lib/auth-guard'
+import { authGuard } from '@/lib/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'
 import { deleteFile } from '@/lib/r2'
+import { assertOwnerOrAdmin } from '@/utils/assert-owner-or-admin'
 import { withServerError } from '@/utils/error-handler'
 
 const deleteRecipeSchema = v.number()

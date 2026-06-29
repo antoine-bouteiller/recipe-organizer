@@ -41,7 +41,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **REQ-004**: All persistent data MUST live in Cloudflare D1 (relational data) or R2 (binary blobs: images, videos). No external database.
 - **REQ-005**: All cross-cutting concerns (auth, data layer, server functions, forms, client state, routing/SSR, platform) MUST have a corresponding `docs/infrastructure/<topic>.spec.md` and respect the rules therein.
 - **REQ-006**: Every feature MUST be self-contained under `src/features/<name>/` and own its server functions, components, and (when needed) stores/contexts. See [`./file-structure.spec.md`](./file-structure.spec.md).
-- **REQ-007**: The application MUST authenticate users via Google OAuth 2.0 only. New users land in `pending` state and require admin approval. See [`../src/features/auth/auth.spec.md`](../src/features/auth/auth.spec.md).
+- **REQ-007**: The application MUST authenticate users via Google OAuth 2.0 only. New users land in `pending` state and require admin approval. See [`./infrastructure/auth.spec.md`](./infrastructure/auth.spec.md).
 - **REQ-008**: Server functions performing writes MUST be guarded by `authGuard()` (or `authGuard('admin')`), and write handlers that touch user-owned rows MUST additionally check `currentRow.createdBy === user.id || user.role === 'admin'`.
 - **REQ-009**: Image uploads MUST be transformed to WebP (width 1024, quality 80) via Cloudflare Images before being written to R2. Video uploads are stored raw.
 - **REQ-010**: The user-facing language MUST be French (UI strings, validation messages via `z.config(z.locales.fr())` in `src/router.tsx`).
@@ -271,7 +271,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - [Routing & SSR](./infrastructure/routing-ssr.spec.md)
 - [Forms](./infrastructure/forms.spec.md)
 - [Client State Layering](./infrastructure/client-state.spec.md)
-- [Auth Feature](../src/features/auth/auth.spec.md)
+- [Auth](./infrastructure/auth.spec.md)
 - [Ingredients Feature](../src/features/ingredients/ingredients.spec.md)
 - [Recipe Feature (index)](../src/features/recipe/spec/index.spec.md)
 - [Shopping List Feature](../src/features/shopping-list/shopping-list.spec.md)

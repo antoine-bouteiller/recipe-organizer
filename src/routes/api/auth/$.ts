@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { getAuth } from '@/features/auth/lib/auth-server'
+import { getAuth } from '@/lib/auth/auth-server'
 
 // Catch-all handler that mounts Better Auth on `/api/auth/*`
 // (sign-in, OAuth callback, session, sign-out, ...).

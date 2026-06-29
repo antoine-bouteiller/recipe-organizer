@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 import * as v from 'valibot'
 
 import { toastManager } from '@/components/ui/toast'
-import { authGuard } from '@/features/auth/lib/auth-guard'
+import { authGuard } from '@/lib/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { ingredient } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'

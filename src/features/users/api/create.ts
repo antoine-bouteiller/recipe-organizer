@@ -3,7 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import * as v from 'valibot'
 
 import { toastManager } from '@/components/ui/toast'
-import { authGuard } from '@/features/auth/lib/auth-guard'
+import { authGuard } from '@/lib/auth/auth-guard'
 import { getDb } from '@/lib/db'
 import { user } from '@/lib/db/schema'
 import { queryKeys } from '@/lib/query-keys'

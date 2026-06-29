@@ -48,7 +48,7 @@ Provide a single, authoritative server-side write path for recipes that:
 | `recipeSchema`            | Zod schema in `api/create.ts` for the full create input. Re-used by update via `.extend({ id })`.                                      |
 | `parseFormData(formData)` | Helper from `@/utils/form-data` that turns the multipart body into a JS object, preserving `File` instances and JSON-parsing the rest. |
 | `objectToFormData(value)` | Inverse helper used on the client to serialize the form before submitting.                                                             |
-| `authGuard()`             | Middleware from `src/features/auth/lib/auth-guard.ts` that injects `context.user`.                                                     |
+| `authGuard()`             | Middleware from `src/lib/auth/auth-guard.ts` that injects `context.user`.                                                              |
 | `withServerError(fn)`     | Wrapper from `@/utils/error-handler` that translates thrown errors into typed server-fn errors.                                        |
 | Auto-tag                  | Server-computed entry in `recipes.tags`. Two are emitted: `vegetarian` and `magimix`.                                                  |
 | Image key / Video key     | Opaque `randomUUID()` string used as the R2 object key and stored in `recipes.image` / `recipes.video`.                                |

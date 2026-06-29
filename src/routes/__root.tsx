@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { ToastProvider } from '@/components/ui/toast'
-import { getAuthUser } from '@/features/auth/api/get-auth-user'
+import { getAuthUser } from '@/lib/auth/get-auth-user'
 import { getTheme } from '@/lib/theme'
 
 import appCss from '../styles/app.css?url'

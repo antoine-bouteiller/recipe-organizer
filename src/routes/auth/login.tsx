@@ -6,7 +6,7 @@ import * as v from 'valibot'
 import { Card } from '@/components/common/card'
 import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
-import { authClient } from '@/features/auth/lib/auth-client'
+import { authClient } from '@/lib/auth/auth-client'
 
 const searchSchema = v.object({ error: v.optional(v.string()) })
 
