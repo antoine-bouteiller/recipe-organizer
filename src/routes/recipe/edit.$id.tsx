@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
+import { renderAddIngredientOption } from '@/features/ingredients/components/add-ingredient'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
@@ -104,6 +105,7 @@ const EditRecipePage = () => {
         }}
       >
         <RecipeForm
+          addNewIngredientOption={renderAddIngredientOption}
           fields={recipeFormFields}
           form={form}
           id={recipe.id}

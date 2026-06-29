@@ -388,7 +388,7 @@ the primary, surfaces the partial information without polluting the primary aggr
 | Internal: `@/utils/unit-converter`                                                                     | `convert(...)`.                                                          |
 | Internal: `@/utils/error-handler`                                                                      | `withServerError` wrapper.                                               |
 | Internal: `@/lib/query-keys`                                                                           | `queryKeys.recipeListByIds`.                                             |
-| Internal: `@/features/ingredients/utils/constants`                                                     | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                   |
+| Internal: `@/components/ingredient-category`                                                           | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                   |
 | Internal: `@/components/common/checkbox`, `@/components/common/button`, `@/components/common/skeleton` | UI primitives.                                                           |
 | Internal: `@/utils/number`                                                                             | `formatNumber`.                                                          |
 | Internal: `@/utils/object`                                                                             | `typedEntriesOf`.                                                        |

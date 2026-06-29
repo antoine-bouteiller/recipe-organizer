@@ -1,6 +1,6 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useSelector } from '@tanstack/react-store'
-import { Suspense } from 'react'
+import { Suspense, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -32,12 +32,13 @@ interface RecipeFormProps extends Record<string, unknown> {
   initialImage?: FileMetadata
   initialVideo?: FileMetadata
   id?: number
+  addNewIngredientOption: (inputValue: string) => ReactNode
 }
 
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as RecipeFormProps,
-  render: ({ form, initialImage, initialVideo, id }) => {
+  render: ({ form, initialImage, initialVideo, id, addNewIngredientOption }) => {
     const { AppField, Field } = form
 
     const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
@@ -129,7 +130,7 @@ export const RecipeForm = withForm({
                           </>
                         )}
 
-                        <IngredientGroupField form={form} groupIndex={groupIndex} />
+                        <IngredientGroupField addNewIngredientOption={addNewIngredientOption} form={form} groupIndex={groupIndex} />
                         <FieldError />
                       </GroupField>
                     )}

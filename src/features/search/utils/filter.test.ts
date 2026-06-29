@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test'
 
-import { type ReducedRecipe } from '@/features/recipe/api/get-all'
+import { type ReducedRecipe } from '@/types/recipe'
 
 import { EMPTY_FILTERS, filterRecipes, hasActiveFilters, type SearchFilters } from './filter'
 

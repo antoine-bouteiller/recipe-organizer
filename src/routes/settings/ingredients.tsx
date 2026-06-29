@@ -4,6 +4,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
 import { Item } from '@/components/common/item'
+import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
@@ -13,7 +14,6 @@ import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@/features/ingredients/components/delete-ingredient'
 import { EditIngredient } from '@/features/ingredients/components/edit-ingredient'
 import { IngredientBadge } from '@/features/ingredients/components/ingredient-badge'
-import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/features/ingredients/utils/constants'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
