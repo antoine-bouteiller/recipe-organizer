@@ -25,7 +25,7 @@ const createUser = createServerFn()
     withServerError(async ({ data }) => {
       await getDb()
         .insert(user)
-        .values({ ...data, id: crypto.randomUUID() })
+        .values({ ...data, id: crypto.randomUUID(), name: data.email })
     })
   )
 

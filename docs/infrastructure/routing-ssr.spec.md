@@ -163,8 +163,8 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
 - **REQ-019** — API routes MUST be declared as `createFileRoute('/api/<path>')({ server: {
 handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-keyed
   `Request -> Response` handlers. Existing API routes:
-  - `/api/auth/google/callback` — `GET` exchanges the OAuth code/state then `throw redirect({ to:
-'/' })`.
+  - `/api/auth/$` — `GET` and `POST` delegate to `getAuth().handler(request)` (Better Auth catch-all:
+    sign-in, OAuth callback `/api/auth/callback/google`, session, sign-out).
   - `/api/image/$id` — `GET` proxies an R2 object via `createR2GetHandler('image/webp')`.
   - `/api/video/$id` — `GET` and `HEAD` proxy an R2 object via
     `createR2GetHandler('video/mp4')` / `createR2HeadHandler('video/mp4')`.
@@ -213,9 +213,9 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
   phase are unaffected because the hook itself redispatches the event.
 - **CON-008** — Server handler routes (`/api/*`) MUST NOT export a `component`. Mixing the two on
   the same file route is unsupported.
-- **CON-009** — The OAuth callback (`/api/auth/google/callback`) finishes by `throw redirect({ to:
-'/' })`. The `throw` form is required so TanStack Router serializes the redirect; returning a
-  redirect object would render the route component instead.
+- **CON-009** — The Better Auth catch-all (`/api/auth/$`) returns the `Response` produced by
+  `getAuth().handler(request)` directly (including any `Location` redirect and `Set-Cookie` headers).
+  It MUST NOT wrap or rewrite that response.
 - **CON-010** — The worker-rendered shell is per-request and auth-dependent (the root resolves
   `authUser` server-side), so it MUST NOT be served with public cache headers. Edge/CDN caching of
   navigations is not used.
@@ -316,22 +316,13 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
   })
   ```
 
-- **PAT-005** — _OAuth callback: handler that finishes with `throw redirect`._
+- **PAT-005** — _Better Auth catch-all handler._
 
   ```ts
-  export const Route = createFileRoute('/api/auth/google/callback')({
-    server: {
-      handlers: {
-        GET: async ({ request }) => {
-          const url = new URL(request.url)
-          const code = url.searchParams.get('code')
-          const state = url.searchParams.get('state')
-          if (!code || !state) throw new Error('Missing code or state')
-          await handleGoogleCallback(code, state)
-          throw redirect({ to: '/' })
-        },
-      },
-    },
+  const handler = ({ request }: { request: Request }) => getAuth().handler(request)
+
+  export const Route = createFileRoute('/api/auth/$')({
+    server: { handlers: { GET: handler, POST: handler } },
   })
   ```
 
@@ -374,23 +365,23 @@ The following table is exhaustive for routes currently defined under `src/routes
 `beforeLoad` redirects unauthenticated users. "Admin (UI)" = component branches on
 `context.isAdmin` for write actions but does not redirect.
 
-| Path                        | File                                 | Auth                                          | Loader prefetch                                                                       | Search / Params                                       | Cache-Control    |
-| --------------------------- | ------------------------------------ | --------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------- |
-| `/` (index)                 | `routes/index.tsx`                   | Public                                        | `getRecipeListOptions()`                                                              | `searchSchema = { search?: boolean }` (safeParse)     | —                |
-| `/search`                   | `routes/search.tsx`                  | Public                                        | `getRecipeListOptions()`                                                              | —                                                     | —                |
-| `/shopping-list`            | `routes/shopping-list.tsx`           | Public                                        | — (client-only route; store data via Suspense)                                        | —                                                     | —                |
-| `/auth/login`               | `routes/auth/login.tsx`              | Anti-auth (redirects to `/` if signed in)     | —                                                                                     | `searchSchema = { error?: string }` (parse)           | —                |
-| `/recipe/$id`               | `routes/recipe/$id.tsx`              | Public                                        | `getRecipeDetailsOptions(id)`                                                         | `paramsSchema = { id: string -> number }` (in loader) | —                |
-| `/recipe/new`               | `routes/recipe/new.tsx`              | Required                                      | `getIngredientListOptions()`, `getRecipeListOptions()`                                | —                                                     | —                |
-| `/recipe/edit/$id`          | `routes/recipe/edit.$id.tsx`         | Required                                      | `getRecipeDetailsOptions(id)`, `getIngredientListOptions()`, `getRecipeListOptions()` | `paramsSchema = { id: string -> number }` (in loader) | —                |
-| `/settings` (layout)        | `routes/settings.tsx`                | Required                                      | —                                                                                     | —                                                     | —                |
-| `/settings/` (index)        | `routes/settings/index.tsx`          | Inherits                                      | —                                                                                     | —                                                     | —                |
-| `/settings/account`         | `routes/settings/account.tsx`        | Inherits                                      | —                                                                                     | —                                                     | —                |
-| `/settings/ingredients`     | `routes/settings/ingredients.tsx`    | Inherits                                      | `getIngredientListOptions()`                                                          | —                                                     | —                |
-| `/settings/users`           | `routes/settings/users.tsx`          | Admin (own `beforeLoad` redirects non-admins) | `getUserListOptions('active')`, `('blocked')`, `('pending')`                          | —                                                     | —                |
-| `/api/auth/google/callback` | `routes/api/auth/google/callback.ts` | n/a (server)                                  | `GET` — exchanges OAuth code/state then `throw redirect({ to: '/' })`                 | URL search params: `code`, `state` (raw)              | n/a              |
-| `/api/image/$id`            | `routes/api/image/$id.ts`            | n/a (server)                                  | `GET = createR2GetHandler('image/webp')`                                              | Path: `$id`                                           | Set by R2 helper |
-| `/api/video/$id`            | `routes/api/video/$id.ts`            | n/a (server)                                  | `GET = createR2GetHandler('video/mp4')`, `HEAD = createR2HeadHandler('video/mp4')`    | Path: `$id`                                           | Set by R2 helper |
+| Path                    | File                              | Auth                                          | Loader prefetch                                                                       | Search / Params                                       | Cache-Control      |
+| ----------------------- | --------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------ |
+| `/` (index)             | `routes/index.tsx`                | Public                                        | `getRecipeListOptions()`                                                              | `searchSchema = { search?: boolean }` (safeParse)     | —                  |
+| `/search`               | `routes/search.tsx`               | Public                                        | `getRecipeListOptions()`                                                              | —                                                     | —                  |
+| `/shopping-list`        | `routes/shopping-list.tsx`        | Public                                        | — (client-only route; store data via Suspense)                                        | —                                                     | —                  |
+| `/auth/login`           | `routes/auth/login.tsx`           | Anti-auth (redirects to `/` if signed in)     | —                                                                                     | `searchSchema = { error?: string }` (parse)           | —                  |
+| `/recipe/$id`           | `routes/recipe/$id.tsx`           | Public                                        | `getRecipeDetailsOptions(id)`                                                         | `paramsSchema = { id: string -> number }` (in loader) | —                  |
+| `/recipe/new`           | `routes/recipe/new.tsx`           | Required                                      | `getIngredientListOptions()`, `getRecipeListOptions()`                                | —                                                     | —                  |
+| `/recipe/edit/$id`      | `routes/recipe/edit.$id.tsx`      | Required                                      | `getRecipeDetailsOptions(id)`, `getIngredientListOptions()`, `getRecipeListOptions()` | `paramsSchema = { id: string -> number }` (in loader) | —                  |
+| `/settings` (layout)    | `routes/settings.tsx`             | Required                                      | —                                                                                     | —                                                     | —                  |
+| `/settings/` (index)    | `routes/settings/index.tsx`       | Inherits                                      | —                                                                                     | —                                                     | —                  |
+| `/settings/account`     | `routes/settings/account.tsx`     | Inherits                                      | —                                                                                     | —                                                     | —                  |
+| `/settings/ingredients` | `routes/settings/ingredients.tsx` | Inherits                                      | `getIngredientListOptions()`                                                          | —                                                     | —                  |
+| `/settings/users`       | `routes/settings/users.tsx`       | Admin (own `beforeLoad` redirects non-admins) | `getUserListOptions('active')`, `('blocked')`, `('pending')`                          | —                                                     | —                  |
+| `/api/auth/$`           | `routes/api/auth/$.ts`            | n/a (server)                                  | `GET`/`POST` — delegate to `getAuth().handler(request)` (Better Auth)                 | Better Auth endpoint path under `/api/auth/*`         | Set by Better Auth |
+| `/api/image/$id`        | `routes/api/image/$id.ts`         | n/a (server)                                  | `GET = createR2GetHandler('image/webp')`                                              | Path: `$id`                                           | Set by R2 helper   |
+| `/api/video/$id`        | `routes/api/video/$id.ts`         | n/a (server)                                  | `GET = createR2GetHandler('video/mp4')`, `HEAD = createR2HeadHandler('video/mp4')`    | Path: `$id`                                           | Set by R2 helper   |
 
 Notes:
 
@@ -554,8 +545,8 @@ type ResolvedRootContext = RootContext & { isAdmin: boolean }
 - [`./platform.spec.md`](./platform.spec.md) — Worker entry, Cloudflare bindings, SW emission via
   `tanstackSerwistPlugin`, R2 cache headers backing `/api/image/$id` and `/api/video/$id`.
 - [`./server-functions.spec.md`](./server-functions.spec.md) — RPC contract used by mutations in
-  routes (e.g. `useServerFn(initiateGoogleAuth)`, `useServerFn(logout)`) and by query options
-  consumed in loaders.
+  routes and by query options consumed in loaders. Sign-in/sign-out are handled by the Better Auth
+  client (`authClient.signIn.social`, `authClient.signOut`), not server functions.
 - [`./client-state.spec.md`](./client-state.spec.md) — Query options factories
   (`getRecipeListOptions`, `getRecipeDetailsOptions`, etc.) and the SSR-Query integration that
   ties loaders to component-level `useQuery`/`useSuspenseQuery`.

@@ -1,8 +1,8 @@
 ---
 title: Server Functions Specification
-version: 1.0
+version: 1.1
 date_created: 2026-05-08
-last_updated: 2026-05-08
+last_updated: 2026-06-29
 owner: recipe-organizer
 tags: [infrastructure, tanstack-start, server-functions, middleware, validation, zod]
 ---
@@ -15,7 +15,12 @@ middleware pipeline (authentication, authorization, error handling), input valid
 the FormData round-trip used for multipart writes, error normalisation, and the integration with
 TanStack Query (read `queryOptions` factories, write `mutationOptions` factories with toast +
 cache invalidation). It also documents low-level API route handlers (`createFileRoute`) used for
-binary streaming (R2) and OAuth callbacks.
+binary streaming (R2) and the Better Auth catch-all (`/api/auth/$`).
+
+Authentication is owned by **Better Auth** (`getAuth()`, `authClient`). This document covers only
+the server-function touchpoints — `getAuthUser` and the `authGuard` middleware. The full auth
+contract (sign-in/out flow, session issuance, account lifecycle, schema) lives in
+`src/features/auth/auth.spec.md`.
 
 Audience: contributors adding or modifying server functions, query/mutation factories, or API
 routes. Out of scope: the database schema (see `./data-layer.spec.md`), runtime/platform
@@ -25,7 +30,7 @@ file-based routing rules (see `./routing-ssr.spec.md`).
 Assumptions:
 
 - Runtime is Cloudflare Workers; `cloudflare:workers` `env` exposes bindings (D1, R2, IMAGES,
-  GOOGLE_CLIENT_ID/SECRET).
+  GOOGLE_CLIENT_ID/SECRET, SESSION_SECRET).
 - Bundler is Vite+ via `vp`; runtime is TanStack Start with file-based routing.
 
 ## 2. Definitions
@@ -46,7 +51,7 @@ Assumptions:
   function.
 - **API Route Handler**: a low-level handler exported via
   `createFileRoute(...)({ server: { handlers: { GET, HEAD, POST } } })`. Used when a server
-  function is unsuitable (binary streaming, OAuth redirect callbacks).
+  function is unsuitable (binary streaming, the Better Auth catch-all).
 - **Auth Guard**: middleware factory `authGuard(role?: 'admin')` from
   `src/features/auth/lib/auth-guard.ts`.
 - **withServerError**: handler wrapper from `src/utils/error-handler.ts` that normalises
@@ -62,8 +67,7 @@ Assumptions:
   (create, update, delete). The default applies for delete operations as well; deletes MUST
   NOT use HTTP DELETE.
 - **REQ-002**: Server-only helpers (callable solely from server-side contexts such as API route
-  handlers) MUST be declared with `createServerOnlyFn(...)`. Example:
-  `handleGoogleCallback` in `src/features/auth/api/google-auth.ts`.
+  handlers) MUST be declared with `createServerOnlyFn(...)`.
 - **REQ-003**: Middleware MUST be declared with `createMiddleware({ type: 'function' }).server(...)`
   and MUST inject values into the handler via `next({ context: { ... } })`.
 - **REQ-004**: Each feature MUST own an `api/` folder with one server function per file. File
@@ -120,22 +124,25 @@ Assumptions:
   - Otherwise call `next({ context: { user } })`.
 - **REQ-032**: `getAuthUser` MUST return a synthetic admin user (`email: 'admin@test.fr'`,
   `id: 'string'`, `role: 'admin'`, `status: 'active'`) when `import.meta.env.DEV` is true.
-  Production paths MUST read `userId` from `useAppSession()` and look up the user in D1.
+  Production paths MUST read the Better Auth session via
+  `getAuth().api.getSession({ headers: getRequest().headers })` and look up the full user row in
+  D1 (`getDb().query.user.findFirst({ where: { id: session.user.id } })`), returning `undefined`
+  when there is no session or no matching row.
 - **REQ-033**: Per-row ownership checks MUST be performed inside the handler after the guard.
   For recipe `update` and `delete`: after fetching the row, throw
   `new Error('Permission denied')` unless `currentRecipe.createdBy === context.user.id` or
   `context.user.role === 'admin'`.
-- **SEC-001**: User creation through Google OAuth MUST default new users to
-  `status: 'pending'` and `role: 'user'`. Activation requires admin approval via
-  `approveUser`.
-- **SEC-002**: `initiateGoogleAuth` MUST generate a 16-byte random `state` value, persist it
-  in `useOAuthSession()`, and the callback MUST verify it equals the returned state. Mismatch
-  MUST redirect to `/auth/login?error=invalid_state`.
-- **SEC-003**: Google OAuth client credentials MUST be read exclusively from
-  `cloudflare:workers` `env.GOOGLE_CLIENT_ID` / `env.GOOGLE_CLIENT_SECRET`. They MUST NOT be
-  bundled into client code.
-- **SEC-004**: `logout` MUST call `session.clear()` on `useAppSession()`.
-- **SEC-005**: User-supplied input that participates in DB writes MUST be Zod-validated. The
+- **SEC-001**: New users created through the Google flow MUST default to `status: 'pending'`
+  and `role: 'user'`, enforced by Better Auth `databaseHooks` (not in server-function code).
+  Activation requires admin approval via `approveUser`. See `auth.spec.md`.
+- **SEC-002**: OAuth `state`/PKCE/CSRF protection is owned entirely by Better Auth (stored in
+  the `verification` table). Server functions MUST NOT hand-roll OAuth state.
+- **SEC-003**: Google OAuth client credentials and `SESSION_SECRET` MUST be read exclusively
+  from `cloudflare:workers` `env` (inside server-only auth code). They MUST NOT be bundled into
+  client code.
+- **SEC-004**: Sign-out is performed client-side via `authClient.signOut()`; there is no
+  server-function logout. Server functions MUST NOT manage session cookies directly.
+- **SEC-005**: User-supplied input that participates in DB writes MUST be schema-validated. The
   recipe handler relies on Drizzle parameterised queries — ad-hoc string concatenation is
   forbidden (see `./data-layer.spec.md`).
 
@@ -199,11 +206,11 @@ Assumptions:
 
 - **CON-001**: API route handlers (`createFileRoute('/api/...')({ server: { handlers: ... } })`)
   MUST be used only for cases that server functions cannot model: binary streaming from R2,
-  the Google OAuth callback (which must respond to a GET redirect from Google), and HEAD
-  responses for video range support.
+  the Better Auth catch-all (`/api/auth/$`, which delegates GET/POST to `getAuth().handler`),
+  and HEAD responses for video range support.
 - **CON-002**: API route handlers MUST live under `src/routes/api/...` and follow file-based
-  routing. They MUST delegate business logic to server functions or `createServerOnlyFn`
-  helpers; they MUST NOT inline DB or R2 logic.
+  routing. They MUST delegate business logic to server functions, `createServerOnlyFn`
+  helpers, or `getAuth().handler`; they MUST NOT inline DB or R2 logic.
 
 ### 3.9 Coding constraints
 
@@ -225,35 +232,32 @@ Assumptions:
 
 ## 4. Server Function Inventory
 
-| Name                                 | File                                                  | Method | Middleware           | Inputs                                      | Output                                                       | Side effects                                                                                                                             |
-| ------------------------------------ | ----------------------------------------------------- | ------ | -------------------- | ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `getAuthUser`                        | `src/features/auth/api/get-auth-user.ts`              | GET    | none                 | none                                        | `User \| undefined`                                          | Reads `useAppSession`; in DEV returns synthetic admin                                                                                    |
-| `initiateGoogleAuth`                 | `src/features/auth/api/google-auth.ts`                | POST   | none                 | none                                        | never (throws redirect)                                      | Generates `state`, writes `useOAuthSession`, redirects to Google                                                                         |
-| `handleGoogleCallback` (server-only) | `src/features/auth/api/google-auth.ts`                | n/a    | none                 | `(code, state)` args                        | `User`                                                       | Exchanges OAuth code, upserts user (pending), writes `useAppSession`                                                                     |
-| `logout`                             | `src/features/auth/api/logout.ts`                     | POST   | none                 | none                                        | `{ success: true }`                                          | `session.clear()`                                                                                                                        |
-| `getAllRecipes`                      | `src/features/recipe/api/get-all.ts`                  | GET    | none                 | none                                        | `ReducedRecipe[]`                                            | Maps `image` through `getImageUrl`                                                                                                       |
-| `getRecipe`                          | `src/features/recipe/api/get-one.ts`                  | GET    | none                 | `z.number()`                                | `Recipe` (with relations)                                    | Throws `notFound()` if missing                                                                                                           |
-| `getRecipeInstructions`              | `src/features/recipe/api/get-instructions.ts`         | GET    | none                 | `z.number()`                                | `{ id, instructions, name } \| undefined`                    | none                                                                                                                                     |
-| `getRecipesByIds`                    | `src/features/shopping-list/api/get-recipe-by-ids.ts` | GET    | none                 | `{ ids: number[] }`                         | `Recipe[]` flattened with linked ingredients scaled by ratio | none                                                                                                                                     |
-| `createRecipe`                       | `src/features/recipe/api/create.ts`                   | POST   | `authGuard()`        | `FormData` -> `recipeSchema`                | `void`                                                       | R2 upload (image, optional video); D1 inserts (recipe, ingredient groups, group ingredients, linked recipes); auto-tag inference         |
-| `updateRecipe`                       | `src/features/recipe/api/update.ts`                   | POST   | `authGuard()`        | `FormData` -> `recipeSchema.extend({ id })` | `id: number`                                                 | Per-row ownership check; R2 delete+upload (image/video) when replaced; D1 batch (update + cascade delete + reinsert); auto-tag inference |
-| `deleteRecipe`                       | `src/features/recipe/api/delete.ts`                   | POST   | `authGuard()`        | `z.number()`                                | `void`                                                       | Per-row ownership check; D1 batch deletes; `deleteFile(image)`                                                                           |
-| `getIngredientsList`                 | `src/features/ingredients/api/get-all.ts`             | GET    | none                 | none                                        | `Ingredient[]`                                               | none                                                                                                                                     |
-| `createIngredient`                   | `src/features/ingredients/api/create.ts`              | POST   | `authGuard()`        | `ingredientSchema`                          | `void`                                                       | DB insert                                                                                                                                |
-| `updateIngredient`                   | `src/features/ingredients/api/update.ts`              | POST   | `authGuard()`        | `ingredientSchema.extend({ id })`           | `void`                                                       | DB update                                                                                                                                |
-| `deleteIngredient`                   | `src/features/ingredients/api/delete.ts`              | POST   | `authGuard('admin')` | `{ id: number }`                            | `void`                                                       | DB delete                                                                                                                                |
-| `getUsersList`                       | `src/features/users/api/get-all.ts`                   | GET    | `authGuard('admin')` | `{ status }` (default `'active'`)           | `User[]`                                                     | none                                                                                                                                     |
-| `createUser`                         | `src/features/users/api/create.ts`                    | POST   | `authGuard('admin')` | `{ email, role }`                           | `void`                                                       | DB insert with `crypto.randomUUID()`                                                                                                     |
-| `approveUser`                        | `src/features/users/api/approve.ts`                   | POST   | `authGuard('admin')` | `{ id: string }`                            | `void`                                                       | DB update `status = 'active'`                                                                                                            |
-| `blockUser`                          | `src/features/users/api/block.ts`                     | POST   | `authGuard('admin')` | `{ id: string }`                            | `void`                                                       | DB update `status = 'blocked'`                                                                                                           |
+| Name                    | File                                                  | Method | Middleware           | Inputs                                      | Output                                                       | Side effects                                                                                                                             |
+| ----------------------- | ----------------------------------------------------- | ------ | -------------------- | ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `getAuthUser`           | `src/features/auth/api/get-auth-user.ts`              | GET    | none                 | none                                        | `User \| undefined`                                          | Reads Better Auth session via `getAuth().api.getSession(...)`; in DEV returns synthetic admin                                            |
+| `getAllRecipes`         | `src/features/recipe/api/get-all.ts`                  | GET    | none                 | none                                        | `ReducedRecipe[]`                                            | Maps `image` through `getImageUrl`                                                                                                       |
+| `getRecipe`             | `src/features/recipe/api/get-one.ts`                  | GET    | none                 | `z.number()`                                | `Recipe` (with relations)                                    | Throws `notFound()` if missing                                                                                                           |
+| `getRecipeInstructions` | `src/features/recipe/api/get-instructions.ts`         | GET    | none                 | `z.number()`                                | `{ id, instructions, name } \| undefined`                    | none                                                                                                                                     |
+| `getRecipesByIds`       | `src/features/shopping-list/api/get-recipe-by-ids.ts` | GET    | none                 | `{ ids: number[] }`                         | `Recipe[]` flattened with linked ingredients scaled by ratio | none                                                                                                                                     |
+| `createRecipe`          | `src/features/recipe/api/create.ts`                   | POST   | `authGuard()`        | `FormData` -> `recipeSchema`                | `void`                                                       | R2 upload (image, optional video); D1 inserts (recipe, ingredient groups, group ingredients, linked recipes); auto-tag inference         |
+| `updateRecipe`          | `src/features/recipe/api/update.ts`                   | POST   | `authGuard()`        | `FormData` -> `recipeSchema.extend({ id })` | `id: number`                                                 | Per-row ownership check; R2 delete+upload (image/video) when replaced; D1 batch (update + cascade delete + reinsert); auto-tag inference |
+| `deleteRecipe`          | `src/features/recipe/api/delete.ts`                   | POST   | `authGuard()`        | `z.number()`                                | `void`                                                       | Per-row ownership check; D1 batch deletes; `deleteFile(image)`                                                                           |
+| `getIngredientsList`    | `src/features/ingredients/api/get-all.ts`             | GET    | none                 | none                                        | `Ingredient[]`                                               | none                                                                                                                                     |
+| `createIngredient`      | `src/features/ingredients/api/create.ts`              | POST   | `authGuard()`        | `ingredientSchema`                          | `void`                                                       | DB insert                                                                                                                                |
+| `updateIngredient`      | `src/features/ingredients/api/update.ts`              | POST   | `authGuard()`        | `ingredientSchema.extend({ id })`           | `void`                                                       | DB update                                                                                                                                |
+| `deleteIngredient`      | `src/features/ingredients/api/delete.ts`              | POST   | `authGuard('admin')` | `{ id: number }`                            | `void`                                                       | DB delete                                                                                                                                |
+| `getUsersList`          | `src/features/users/api/get-all.ts`                   | GET    | `authGuard('admin')` | `{ status }` (default `'active'`)           | `User[]`                                                     | none                                                                                                                                     |
+| `createUser`            | `src/features/users/api/create.ts`                    | POST   | `authGuard('admin')` | `{ email, role }`                           | `void`                                                       | DB insert with `crypto.randomUUID()`                                                                                                     |
+| `approveUser`           | `src/features/users/api/approve.ts`                   | POST   | `authGuard('admin')` | `{ id: string }`                            | `void`                                                       | DB update `status = 'active'`                                                                                                            |
+| `blockUser`             | `src/features/users/api/block.ts`                     | POST   | `authGuard('admin')` | `{ id: string }`                            | `void`                                                       | DB update `status = 'blocked'`                                                                                                           |
 
 API route handlers (low-level):
 
-| Path                        | File                                     | Methods   | Purpose                                                                      |
-| --------------------------- | ---------------------------------------- | --------- | ---------------------------------------------------------------------------- |
-| `/api/image/$id`            | `src/routes/api/image/$id.ts`            | GET       | Stream R2 image with edge cache                                              |
-| `/api/video/$id`            | `src/routes/api/video/$id.ts`            | GET, HEAD | Stream / probe R2 video with edge cache                                      |
-| `/api/auth/google/callback` | `src/routes/api/auth/google/callback.ts` | GET       | Handle Google OAuth redirect; calls `handleGoogleCallback`; redirects to `/` |
+| Path             | File                          | Methods   | Purpose                                                          |
+| ---------------- | ----------------------------- | --------- | ---------------------------------------------------------------- |
+| `/api/image/$id` | `src/routes/api/image/$id.ts` | GET       | Stream R2 image with edge cache                                  |
+| `/api/video/$id` | `src/routes/api/video/$id.ts` | GET, HEAD | Stream / probe R2 video with edge cache                          |
+| `/api/auth/$`    | `src/routes/api/auth/$.ts`    | GET, POST | Better Auth catch-all; delegates to `getAuth().handler(request)` |
 
 ## 5. Patterns
 
@@ -334,26 +338,24 @@ const resolveKey = async (next: File | { id: string } | undefined, currentKey: s
 }
 ```
 
-### PAT-006 — Server-only helper invoked from API route
+### PAT-006 — Framework-owned API route (Better Auth catch-all)
+
+Some endpoints must be served directly by a framework's own request handler rather than a server
+function. Mount it as an API route that delegates the raw `request` to the handler:
 
 ```ts
-// google-auth.ts
-export const handleGoogleCallback = createServerOnlyFn(async (code: string, state: string) => {
-  /* ... */
-})
-
-// routes/api/auth/google/callback.ts
-export const Route = createFileRoute('/api/auth/google/callback')({
+// routes/api/auth/$.ts
+export const Route = createFileRoute('/api/auth/$')({
   server: {
     handlers: {
-      GET: async ({ request }) => {
-        /* ... */ await handleGoogleCallback(code, state)
-        throw redirect({ to: '/' })
-      },
+      GET: ({ request }) => getAuth().handler(request),
+      POST: ({ request }) => getAuth().handler(request),
     },
   },
 })
 ```
+
+`getAuth()` is instantiated per request (Workers `env` is request-scoped). See `auth.spec.md`.
 
 ### PAT-007 — D1 batch + post-batch dependent inserts
 
@@ -411,9 +413,10 @@ await Promise.all(
 - **AC-009 (REQ-061, REQ-062)**: Given a successful `createRecipe`, when `mutationFn`
   resolves, then `queryClient.invalidateQueries({ queryKey: queryKeys.recipeLists() })` is
   called and a success toast titled `Recette <name> créée` is emitted.
-- **AC-010 (SEC-002)**: Given `/api/auth/google/callback` is hit with a `state` that does not
-  match `useOAuthSession().data.oauthState`, when `handleGoogleCallback` runs, then it
-  redirects to `/auth/login?error=invalid_state` and does not exchange the code.
+- **AC-010 (REQ-031, SEC-001)**: Given a user with `status === 'pending'` calling a server
+  function guarded by `authGuard()`, when the function is invoked, then it throws
+  `redirect({ to: '/auth/login', search: { error: 'account_pending' } })` and never executes
+  the handler body. (OAuth `state` validation is now owned by Better Auth — see `auth.spec.md`.)
 - **AC-011 (CON-001)**: Given a request to `/api/image/<key>` for a non-existent key, when the
   R2 GET handler runs, then `env.R2_BUCKET.get(id)` returns null and the handler throws
   `notFound()`.
@@ -460,18 +463,19 @@ await Promise.all(
 - **D1 batch over per-statement awaits (REQ-050)**: D1 charges per round-trip; batching
   collapses related writes into a single statement set and provides atomicity within the
   batch.
-- **Server-only fn for OAuth callback (REQ-002, PAT-006)**: The callback URL must be a `GET`
-  endpoint reachable by Google. A server function would expose a generic RPC envelope; an
-  API route handler delegating to a server-only helper preserves the redirect semantics
-  while keeping the OAuth logic colocated with `initiateGoogleAuth`.
+- **Better Auth catch-all over a server function (PAT-006)**: The OAuth handshake and session
+  endpoints must be reachable as real HTTP routes (Google redirects to
+  `/api/auth/callback/google`; the browser client posts to `/api/auth/*`). A server function
+  would wrap these in a generic RPC envelope, so the catch-all API route delegates the raw
+  `request` to `getAuth().handler` instead. See `auth.spec.md` for the full flow.
 
 ## 9. Dependencies & External Integrations
 
 ### External systems
 
-- **EXT-001 — Google OAuth 2.0**: Token exchange at
-  `https://oauth2.googleapis.com/token`; user info at
-  `https://www.googleapis.com/oauth2/v2/userinfo`. Scopes: `openid email profile`.
+- **EXT-001 — Google OAuth 2.0**: Authorization-code flow, driven entirely by Better Auth
+  (token exchange, user info, `state`/PKCE). The redirect URI is
+  `${VITE_PUBLIC_URL}/api/auth/callback/google`. See `auth.spec.md`.
 - **EXT-002 — Cloudflare D1**: Accessed via `getDb()` (Drizzle adapter). See
   `./data-layer.spec.md`.
 - **EXT-003 — Cloudflare R2**: Object storage for images and videos. Bound as
@@ -491,13 +495,17 @@ await Promise.all(
   `isRedirect`, `isNotFound`, `createFileRoute`.
 - **INF-003 — TanStack Query `@tanstack/react-query`**: provides `queryOptions`,
   `mutationOptions`.
+- **INF-004 — Better Auth `better-auth`**: owns sign-in/out, the OAuth handshake, session
+  issuance, and cookie management. Consumed by `getAuthUser` / `authGuard` via `getAuth()`. See
+  `src/features/auth/auth.spec.md`.
 
 ### Data dependencies
 
 - **DAT-001 — D1 schema**: tables `user`, `recipe`, `ingredient`, `recipeIngredientGroup`,
-  `groupIngredient`, `recipeLinkedRecipes`. See `./data-layer.spec.md`.
-- **DAT-002 — Sessions**: `useAppSession()` (user session) and `useOAuthSession()`
-  (transient state during OAuth) defined in `src/lib/session.ts`.
+  `groupIngredient`, `recipeLinkedRecipes`, plus the Better Auth tables `session`, `account`,
+  `verification`. See `./data-layer.spec.md` and `auth.spec.md`.
+- **DAT-002 — Sessions**: database-backed Better Auth sessions (`session` table + signed cookie).
+  Read server-side via `getAuth().api.getSession(...)`. See `auth.spec.md`.
 
 ### Technology platform
 
@@ -549,14 +557,15 @@ When the handler runs after `authGuard()` has passed,
 Then `currentRecipe.createdBy !== context.user.id` and the handler throws
 `Error('Permission denied')` before any DB or R2 mutation.
 
-### 10.5 OAuth state mismatch
+### 10.5 Pending account hitting a guarded function
 
-Given a malicious GET to `/api/auth/google/callback?code=...&state=tampered`:
+Given a user whose row has `status === 'pending'` calls a server function guarded by
+`authGuard()`:
 
-When `handleGoogleCallback` runs and `oAuthSession.data.oauthState !== 'tampered'`,
+When the guard runs, `getAuthUser` returns the user,
 
-Then it throws `redirect({ to: '/auth/login', search: { error: 'invalid_state' } })` before
-exchanging the code.
+Then the guard throws `redirect({ to: '/auth/login', search: { error: 'account_pending' } })`
+before the handler body executes. (OAuth `state` is validated upstream by Better Auth.)
 
 ### 10.6 R2 cache miss
 
