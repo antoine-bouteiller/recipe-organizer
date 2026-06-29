@@ -37,7 +37,7 @@ const SearchPage = () => {
 
   return (
     <ScreenLayout title="Rechercher" pageKey="/search">
-      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-background px-4 pt-4 pb-2">
+      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-muted px-4 pt-4 pb-2">
         <Collapsible>
           <div className="flex items-center gap-2">
             <div className="flex-1">
@@ -47,7 +47,7 @@ const SearchPage = () => {
               <FunnelSimpleIcon />
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="flex items-center gap-2 overflow-x-auto pt-2">
+          <CollapsibleContent className="grid grid-cols-2 gap-2.5 pt-2">
             <Select
               items={mealItems}
               multiple
@@ -55,7 +55,7 @@ const SearchPage = () => {
               placeholder="Repas"
               title="Repas"
               value={filters.meals}
-              className="w-34 shrink-0"
+              className="w-full"
             />
             <Select
               items={cuisineItems}
@@ -64,19 +64,30 @@ const SearchPage = () => {
               placeholder="Cuisines"
               title="Cuisines"
               value={filters.cuisineTypes}
-              className="w-34 shrink-0"
+              className="w-full"
             />
             <Toggle
-              className="shrink-0"
+              variant="outline"
+              className="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
               pressed={filters.isVegetarian}
               onPressedChange={(pressed) => setFilters({ ...filters, isVegetarian: pressed })}
             >
               Végétarien
             </Toggle>
-            <Toggle className="shrink-0" pressed={filters.isMagimix} onPressedChange={(pressed) => setFilters({ ...filters, isMagimix: pressed })}>
+            <Toggle
+              variant="outline"
+              className="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              pressed={filters.isMagimix}
+              onPressedChange={(pressed) => setFilters({ ...filters, isMagimix: pressed })}
+            >
               Magimix
             </Toggle>
-            <Toggle className="shrink-0" pressed={filters.isSpice} onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}>
+            <Toggle
+              variant="outline"
+              className="col-span-2 w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              pressed={filters.isSpice}
+              onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}
+            >
               Épices
             </Toggle>
           </CollapsibleContent>

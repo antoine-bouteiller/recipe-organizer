@@ -1,7 +1,8 @@
-import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
+import { MinusIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
+import { cn } from '@/utils/cn'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
@@ -23,28 +24,69 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
   const isInShoppingList = useIsInShoppingList(recipeId)
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipeId, servings)
 
-  const wrap = variant === 'card' ? withStopPropagation : (cb: () => void) => cb
+  if (variant === 'card') {
+    if (!isInShoppingList) {
+      return (
+        <Button onClick={withStopPropagation(() => addToShoppingList(recipeId))}>
+          <PlusIcon weight="bold" />
+          Ajouter à la liste
+        </Button>
+      )
+    }
 
-  if (variant === 'card' && !isInShoppingList) {
     return (
-      <Button onClick={withStopPropagation(() => addToShoppingList(recipeId))} variant="outline" className="w-full">
-        Ajouter à la liste de courses
-      </Button>
+      <div className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-white/15 p-1 ring-1 ring-white/20 backdrop-blur-md ring-inset">
+        <Button
+          onClick={withStopPropagation(decrementQuantity)}
+          disabled={quantity === 1}
+          size="icon-xs"
+          variant="secondary"
+          className="bg-white/12 text-white hover:bg-white/20"
+        >
+          <MinusIcon weight="bold" />
+        </Button>
+        <span className="min-w-18 text-center text-[13px] font-bold text-white">{quantity} couverts</span>
+        <Button onClick={withStopPropagation(incrementQuantity)} size="icon-xs">
+          <PlusIcon weight="bold" />
+        </Button>
+        <Button
+          onClick={withStopPropagation(() => removeFromShoppingList(recipeId))}
+          aria-label="Retirer de la liste"
+          size="icon-xs"
+          variant="secondary"
+          className="bg-white/12 text-white hover:bg-white/20"
+        >
+          <TrashIcon />
+        </Button>
+      </div>
     )
   }
 
   return (
-    <div className={className}>
-      <Button disabled={quantity === 1} onClick={wrap(decrementQuantity)} size="icon" variant="outline">
-        <MinusIcon />
-      </Button>
-      <span className={variant === 'card' ? 'text-white' : undefined}>{quantity}</span>
-      <Button onClick={wrap(incrementQuantity)} size="icon" variant="outline">
-        <PlusIcon />
-      </Button>
-      <Button onClick={wrap(() => (isInShoppingList ? removeFromShoppingList(recipeId) : addToShoppingList(recipeId)))} variant="outline">
-        {isInShoppingList ? 'Supprimer de la liste' : 'Ajouter à la liste'}
-      </Button>
+    <div className={cn('flex items-center justify-between gap-3 rounded-2xl border bg-card p-2 pl-4', className)}>
+      <div className="flex items-center gap-3">
+        <span className="text-sm font-bold">Couverts</span>
+        <div className="flex items-center gap-2">
+          <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon-sm" variant="outline">
+            <MinusIcon />
+          </Button>
+          <span className="min-w-5 text-center font-bold">{quantity}</span>
+          <Button onClick={incrementQuantity} size="icon-sm">
+            <PlusIcon />
+          </Button>
+        </div>
+      </div>
+      {isInShoppingList ? (
+        <Button onClick={() => removeFromShoppingList(recipeId)} variant="destructive-outline">
+          <TrashIcon />
+          Retirer
+        </Button>
+      ) : (
+        <Button onClick={() => addToShoppingList(recipeId)} variant="secondary">
+          <PlusIcon weight="bold" />
+          Ajouter
+        </Button>
+      )}
     </div>
   )
 }

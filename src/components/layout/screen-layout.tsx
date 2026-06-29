@@ -11,46 +11,72 @@ interface ScreenLayoutProps {
   children: React.ReactNode
   headerEndItem?: React.ReactNode
   title: string
+  subtitle?: string
   withGoBack?: boolean
   backgroundImage?: string
   pageKey?: string
 }
 
-export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = false, backgroundImage, pageKey }: ScreenLayoutProps) => {
+export const ScreenLayout = ({ children, headerEndItem, title, subtitle, withGoBack = false, backgroundImage, pageKey }: ScreenLayoutProps) => {
   const router = useRouter()
 
   useBackViewTransition(withGoBack)
 
+  const isImageHeader = Boolean(backgroundImage)
+
   return (
     <div
       className={cn(
-        'relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-background pt-0 md:overflow-y-auto',
+        'relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-muted pt-0 md:overflow-y-auto',
         pageKey ? 'pb-14' : ''
       )}
     >
-      <div className="relative flex w-full shrink-0 items-center gap-2 overflow-hidden bg-linear-to-b from-violet-950 to-primary px-6 pt-safe-4 pb-12 text-primary-foreground md:hidden">
-        {backgroundImage && (
-          <>
-            <img src={backgroundImage} alt="Background Image" className="absolute inset-0 size-full object-cover object-center" />
-            <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-black/10 md:rounded-t-2xl" />
-          </>
+      {isImageHeader ? (
+        <div className="relative flex w-full shrink-0 items-center gap-2 overflow-hidden bg-linear-to-b from-violet-950 to-primary px-6 pt-safe-4 pb-12 text-primary-foreground md:hidden">
+          <img src={backgroundImage} alt="Background Image" className="absolute inset-0 size-full object-cover object-center" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-black/10 md:rounded-t-2xl" />
+          {withGoBack && (
+            <Button
+              onClick={() => {
+                router.history.back()
+              }}
+              variant="ghost"
+              size="icon"
+              className="-ml-4 text-white"
+            >
+              <ArrowLeftIcon />
+            </Button>
+          )}
+          <h1 className="z-10 min-w-0 flex-1 truncate font-heading text-2xl">{title}</h1>
+          {headerEndItem && <div className="z-10">{headerEndItem}</div>}
+        </div>
+      ) : (
+        <div className="flex w-full shrink-0 items-center gap-2 px-6 pt-safe-4 pb-2 text-foreground md:hidden">
+          {withGoBack && (
+            <Button
+              onClick={() => {
+                router.history.back()
+              }}
+              variant="ghost"
+              size="icon"
+              className="-ml-4"
+            >
+              <ArrowLeftIcon />
+            </Button>
+          )}
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate font-heading text-3xl font-normal">{title}</h1>
+            {subtitle && <p className="mt-1 truncate text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
+          {headerEndItem && <div>{headerEndItem}</div>}
+        </div>
+      )}
+      <div
+        className={cn(
+          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible',
+          isImageHeader && '-mt-10 rounded-t-3xl'
         )}
-        {withGoBack && (
-          <Button
-            onClick={() => {
-              router.history.back()
-            }}
-            variant="ghost"
-            size="icon"
-            className="-ml-4 text-white"
-          >
-            <ArrowLeftIcon />
-          </Button>
-        )}
-        <h1 className="z-10 min-w-0 flex-1 truncate font-heading text-2xl">{title}</h1>
-        {headerEndItem && <div className="z-10">{headerEndItem}</div>}
-      </div>
-      <div className="z-10 -mt-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto rounded-t-3xl bg-background md:mt-0 md:max-w-5xl md:overflow-y-visible">
+      >
         {children}
       </div>
       {pageKey && <TabBar activePage={pageKey} />}

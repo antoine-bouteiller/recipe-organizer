@@ -8,6 +8,7 @@ import { Editor, EditorContent } from '@/components/common/editor'
 import { Popover } from '@/components/common/popover'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
@@ -69,11 +70,7 @@ const RecipePage = () => {
       }
     >
       <h1 className="hidden px-4 py-2 font-heading text-3xl md:block">{recipe.name}</h1>
-      <QuantityControls
-        className="flex w-full items-center justify-center gap-2 px-8 py-2 md:justify-start"
-        recipeId={id}
-        servings={recipe.servings}
-      />
+      <QuantityControls className="mx-4 my-2" recipeId={id} servings={recipe.servings} />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 md:hidden">
@@ -97,18 +94,18 @@ const RecipePage = () => {
           </Tabs>
         </div>
 
-        <div className="hidden flex-1 grid-cols-5 gap-8 p-4 md:grid">
-          <div className="col-span-2 rounded-xl border px-8 pb-8">
+        <div className="hidden grid-cols-5 items-stretch gap-8 p-4 md:grid">
+          <Card className="col-span-2 rounded-3xl border-0 px-8 pb-8 shadow-lg [&_ul]:rounded-none [&_ul]:border-0 [&_ul]:bg-transparent [&_ul]:px-0">
             <h2>Ingrédients</h2>
             <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-          </div>
+          </Card>
 
-          <div className="col-span-3 rounded-xl border px-8 pb-8">
+          <Card className="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
             <h2>Préparation</h2>
             <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
               <EditorContent className="pb-4" />
             </Editor>
-          </div>
+          </Card>
         </div>
       </div>
     </ScreenLayout>

@@ -43,10 +43,10 @@ const RootComponent = () => {
         <HeadContent />
       </head>
 
-      <body className="fixed top-0 flex h-dvh! w-screen flex-col overflow-hidden">
+      <body className="fixed top-0 isolate flex h-dvh! w-screen flex-col overflow-hidden">
         <ToastProvider>
           <OfflineBanner />
-          <header className="sticky top-0 z-50 hidden w-full bg-background md:block">
+          <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
             <Navbar search={<SearchBar />} />
           </header>
           <main className="flex min-h-0 flex-1 flex-col md:pb-0">
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{
       { href: '/favicon.ico', rel: 'icon' },
       { href: '/apple-touch-icon.png', rel: 'apple-touch-icon' },
       {
-        href: 'https://fonts.googleapis.com/css2?family=Cal+Sans&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap',
         rel: 'stylesheet',
       },
       {
