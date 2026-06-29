@@ -4,9 +4,9 @@ import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
+import { useRecipeOptions } from '@/features/recipe/hooks/use-recipe-options'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 import { useAppForm } from '@/hooks/use-app-form'
-import { useRecipeOptions } from '@/hooks/use-options'
 
 const subrecipeSchema = v.object({
   hideFirstNodes: v.pipe(v.number(), v.minValue(0)),

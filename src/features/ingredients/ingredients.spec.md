@@ -147,8 +147,9 @@ preferred shopping unit), the CRUD server functions backing the catalogue, the U
   for ingredient mutations.
 - **GUD-003.** Prefer `ingredientCategoryLabels` and `ingredientCategoryIcons` for any UI rendering of a
   category to keep mapping centralised.
-- **GUD-004.** Surface ingredients to other features through `useIngredientOptions` rather than re-reading
-  the query directly when combobox options are needed.
+- **GUD-004.** When another feature needs ingredient combobox options, the route (composition root) calls
+  `useIngredientOptions` and injects the result as a prop — features MUST NOT import this hook from one
+  another. Use `useIngredientOptions` rather than re-reading the query directly.
 
 ### 3.5 Patterns
 

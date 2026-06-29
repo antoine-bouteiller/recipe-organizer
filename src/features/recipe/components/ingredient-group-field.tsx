@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { withForm } from '@/hooks/use-app-form'
-import { useIngredientOptions } from '@/hooks/use-options'
+import { type Option } from '@/hooks/use-options'
 import { unitOptions } from '@/lib/db/schema/unit'
 
 import { recipeDefaultValues } from '../utils/form'
@@ -15,6 +15,7 @@ import { recipeDefaultValues } from '../utils/form'
 interface IngredientFormProps {
   groupIndex: number
   addNewIngredientOption: (inputValue: string) => ReactNode
+  ingredientOptions: Option<number>[]
 }
 
 const unitPickerItems = [{ label: 'Aucune', value: null }, ...unitOptions]
@@ -22,11 +23,9 @@ const unitPickerItems = [{ label: 'Aucune', value: null }, ...unitOptions]
 export const IngredientGroupField = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as IngredientFormProps,
-  render: ({ form, groupIndex, addNewIngredientOption }) => {
+  render: ({ form, groupIndex, addNewIngredientOption, ingredientOptions }) => {
     const { AppField } = form
     const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
-
-    const ingredientsOptions = useIngredientOptions()
 
     return (
       <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
@@ -42,7 +41,7 @@ export const IngredientGroupField = withForm({
                         <ComboboxField
                           addNew={addNewIngredientOption}
                           disabled={isSubmitting}
-                          options={ingredientsOptions}
+                          options={ingredientOptions}
                           placeholder="Sélectionner un ingrédient"
                           searchPlaceholder="Rechercher un ingrédient"
                         />

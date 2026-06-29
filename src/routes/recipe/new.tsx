@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { renderAddIngredientOption } from '@/features/ingredients/components/add-ingredient'
+import { useIngredientOptions } from '@/features/ingredients/hooks/use-ingredient-options'
 import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
@@ -19,6 +20,7 @@ import { formatFormErrors } from '@/utils/format-form-errors'
 const NewRecipePage = () => {
   const router = useRouter()
   const { mutateAsync: createRecipe } = useMutation(createRecipeOptions())
+  const ingredientOptions = useIngredientOptions()
 
   const form = useAppForm({
     defaultValues: recipeDefaultValues,
@@ -47,7 +49,7 @@ const NewRecipePage = () => {
           void form.handleSubmit()
         }}
       >
-        <RecipeForm addNewIngredientOption={renderAddIngredientOption} fields={recipeFormFields} form={form} />
+        <RecipeForm addNewIngredientOption={renderAddIngredientOption} fields={recipeFormFields} form={form} ingredientOptions={ingredientOptions} />
         <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
