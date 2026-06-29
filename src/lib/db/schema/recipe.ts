@@ -1,6 +1,6 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-import { type CuisineType, type Meal } from '@/features/recipe/utils/constants'
+import { type CuisineType, type Meal } from '@/types/recipe'
 
 export const recipe = sqliteTable('recipes', {
   createdBy: text('created_by').notNull().default('1'),

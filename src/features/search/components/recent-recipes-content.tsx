@@ -1,5 +1,5 @@
-import { type ReducedRecipe } from '@/features/recipe/api/get-all'
 import { useRecentRecipeIds } from '@/stores/recent-recipes.store'
+import { type ReducedRecipe } from '@/types/recipe'
 
 import { RecipeList } from './recipe-list'
 

@@ -1,5 +1,5 @@
+import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/features/ingredients/utils/constants'
 import { incrementalArray } from '@/utils/array'
 import { typedEntriesOf } from '@/utils/object'
 

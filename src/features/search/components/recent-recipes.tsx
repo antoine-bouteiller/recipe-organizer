@@ -1,4 +1,4 @@
-import { type ReducedRecipe } from '@/features/recipe/api/get-all'
+import { type ReducedRecipe } from '@/types/recipe'
 
 import { RecentRecipesContent } from './recent-recipes-content'
 

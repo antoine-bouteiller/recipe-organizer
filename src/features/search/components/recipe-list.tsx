@@ -4,8 +4,8 @@ import { Fragment } from 'react/jsx-runtime'
 
 import { Item } from '@/components/common/item'
 import { ItemGroup, ItemSeparator } from '@/components/ui/item'
-import { type ReducedRecipe } from '@/features/recipe/api/get-all'
 import { addRecentRecipe } from '@/stores/recent-recipes.store'
+import { type ReducedRecipe } from '@/types/recipe'
 
 interface RecipeListProps {
   recipes: ReducedRecipe[]

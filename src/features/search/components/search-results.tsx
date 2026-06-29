@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { type ReducedRecipe } from '@/features/recipe/api/get-all'
+import { type ReducedRecipe } from '@/types/recipe'
 
 import { RecipeList } from './recipe-list'
 

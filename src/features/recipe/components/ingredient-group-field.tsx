@@ -1,11 +1,11 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useSelector } from '@tanstack/react-store'
+import { type ReactNode } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { AddIngredient } from '@/features/ingredients/components/add-ingredient'
 import { withForm } from '@/hooks/use-app-form'
 import { useIngredientOptions } from '@/hooks/use-options'
 import { unitOptions } from '@/lib/db/schema/unit'
@@ -14,23 +14,15 @@ import { recipeDefaultValues } from '../utils/form'
 
 interface IngredientFormProps {
   groupIndex: number
+  addNewIngredientOption: (inputValue: string) => ReactNode
 }
 
 const unitPickerItems = [{ label: 'Aucune', value: null }, ...unitOptions]
 
-const addNewIngredient = (inputValue: string) => (
-  <AddIngredient defaultValue={inputValue} key={inputValue}>
-    <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
-      <PlusIcon aria-hidden="true" className="size-4" />
-      Nouvel ingrédient: {inputValue}
-    </Button>
-  </AddIngredient>
-)
-
 export const IngredientGroupField = withForm({
   defaultValues: recipeDefaultValues,
   props: {} as IngredientFormProps,
-  render: ({ form, groupIndex }) => {
+  render: ({ form, groupIndex, addNewIngredientOption }) => {
     const { AppField } = form
     const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
@@ -48,7 +40,7 @@ export const IngredientGroupField = withForm({
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
-                          addNew={addNewIngredient}
+                          addNew={addNewIngredientOption}
                           disabled={isSubmitting}
                           options={ingredientsOptions}
                           placeholder="Sélectionner un ingrédient"

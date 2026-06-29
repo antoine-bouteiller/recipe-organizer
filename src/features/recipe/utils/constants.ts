@@ -1,9 +1,16 @@
-export const CUISINE_TYPES = ['mediterranean', 'chinese', 'japanese', 'indian', 'mexican', 'italian', 'french'] as const
+import { type CuisineType, type Meal } from '@/types/recipe'
 
-export const MEALS = ['breakfast', 'lunch', 'diner', 'dessert'] as const
+export const CUISINE_TYPES = [
+  'mediterranean',
+  'chinese',
+  'japanese',
+  'indian',
+  'mexican',
+  'italian',
+  'french',
+] as const satisfies readonly CuisineType[]
 
-export type CuisineType = (typeof CUISINE_TYPES)[number]
-export type Meal = (typeof MEALS)[number]
+export const MEALS = ['breakfast', 'lunch', 'diner', 'dessert'] as const satisfies readonly Meal[]
 
 export const CUISINE_TYPE_LABELS: Record<CuisineType, string> = {
   chinese: 'Chinois',

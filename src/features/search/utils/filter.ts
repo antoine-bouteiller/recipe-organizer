@@ -1,5 +1,4 @@
-import { type ReducedRecipe } from '@/features/recipe/api/get-all'
-import { type CuisineType, type Meal } from '@/features/recipe/utils/constants'
+import { type CuisineType, type Meal, type ReducedRecipe } from '@/types/recipe'
 
 import { normalize } from './normalize'
 

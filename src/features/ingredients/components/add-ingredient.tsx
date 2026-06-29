@@ -1,9 +1,11 @@
+import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type JSX } from 'react'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { Button } from '@/components/ui/button'
 import { createIngredientOptions, ingredientSchema, type IngredientFormInput } from '@/features/ingredients/api/create'
 import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -49,3 +51,12 @@ export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) =>
     </FormDialog>
   )
 }
+
+export const renderAddIngredientOption = (inputValue: string) => (
+  <AddIngredient defaultValue={inputValue} key={inputValue}>
+    <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
+      <PlusIcon aria-hidden="true" className="size-4" />
+      Nouvel ingrédient: {inputValue}
+    </Button>
+  </AddIngredient>
+)
