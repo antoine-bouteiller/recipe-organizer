@@ -1,5 +1,5 @@
 import { defaultCache } from '@serwist/vite/worker'
-import { Serwist, type PrecacheEntry, type SerwistGlobalConfig } from 'serwist'
+import { Serwist, StaleWhileRevalidate, type PrecacheEntry, type SerwistGlobalConfig } from 'serwist'
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -13,7 +13,13 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   precacheEntries: self.__SW_MANIFEST,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [
+    {
+      handler: new StaleWhileRevalidate({ cacheName: 'server-fn' }),
+      matcher: ({ request, sameOrigin, url }) => sameOrigin && request.method === 'GET' && url.pathname.includes('_serverFn'),
+    },
+    ...defaultCache,
+  ],
   skipWaiting: true,
 })
 
