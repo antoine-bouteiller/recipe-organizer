@@ -21,7 +21,7 @@ import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
 import { type Recipe } from '@/types/recipe'
 
-export const SearchBar = () => {
+const SearchBar = () => {
   const [open, setOpen] = useState(false)
 
   const platform = usePlatform()
@@ -85,3 +85,5 @@ export const SearchBar = () => {
     </CommandDialog>
   )
 }
+
+export default SearchBar

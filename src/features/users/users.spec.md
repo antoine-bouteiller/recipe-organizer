@@ -400,8 +400,8 @@ factory that exposes `email` (TextField) and `role` (SelectField with items
 - **Levels.** Unit-test each server function handler against an in-memory or
   miniflare-bound D1 instance. Component-test `AddUser`, `ApproveUser`,
   `BlockUser`, and the `SwipeToBlock` interaction with React Testing Library
-  and `motion/react` test helpers. Route-level tests cover loader behavior
-  and tab/search rendering.
+  (firing `touchstart`/`touchmove`/`touchend` on the foreground element).
+  Route-level tests cover loader behavior and tab/search rendering.
 - **Frameworks.** Vitest via `vp test`. Mocking via Vitest spies on
   `@/lib/db` and `@tanstack/react-query` mutation results.
 - **RBAC tests.** For each server function, assert two negative paths:
@@ -454,7 +454,7 @@ denied'`). One positive path per function.
 | External | `@tanstack/react-router` (`createFileRoute`, `redirect`)                                       | Route + redirects                       |
 | External | `drizzle-orm` (`eq`) and `drizzle-orm/sqlite-core`                                             | DB query/schema                         |
 | External | `zod`                                                                                          | Input validation                        |
-| External | `motion/react` (`animate`, `motion`, `useMotionValue`, `useTransform`)                         | Mobile swipe gesture                    |
+| Native   | Touch events (`onTouchStart`/`onTouchMove`/`onTouchEnd`) + CSS transition                      | Mobile swipe gesture                    |
 | External | `@phosphor-icons/react` (`CheckIcon`, `PlusIcon`, `ProhibitIcon`)                              | Icons                                   |
 
 ## 9. Examples & Edge Cases

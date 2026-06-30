@@ -211,7 +211,7 @@ This specification describes the high-level architecture of the `recipe-organize
 - **PLT-002**: Drizzle ORM 1.0 beta + Drizzle Kit 1.0 beta (D1 dialect).
 - **PLT-003**: Vite+ 0.1.18 (wrapping Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt).
 - **PLT-004**: TypeScript 6, React 19.2, Tailwind 4.2, TanStack Store (`@tanstack/react-store` 0.11), Zod 4.
-- **PLT-005**: Lexical 0.43 (rich-text editor) + Vidstack 1.12 (video player).
+- **PLT-005**: Lexical 0.46 (rich-text editor).
 
 ### Compliance Dependencies
 

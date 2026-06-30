@@ -1,7 +1,6 @@
 import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { motion } from 'motion/react'
 import * as v from 'valibot'
 
 import { Editor, EditorContent } from '@/components/common/editor'
@@ -22,7 +21,7 @@ const RecipePage = () => {
   const { data: recipe } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
 
-  const { activeTab, containerRef, swipeX, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
+  const { activeTab, containerRef, trackRef, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
     ['ingredients', 'preparation'] as const,
     'ingredients'
   )
@@ -80,7 +79,7 @@ const RecipePage = () => {
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>
             <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
-              <motion.div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} style={{ x: swipeX }}>
+              <div ref={trackRef} className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}>
                 <div className="min-w-full overflow-y-auto px-2">
                   <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
                 </div>
@@ -89,7 +88,7 @@ const RecipePage = () => {
                     <EditorContent />
                   </Editor>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </Tabs>
         </div>

@@ -1,5 +1,4 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
-import { motion } from 'motion/react'
 import type React from 'react'
 
 import { cn } from '@/utils/cn'
@@ -19,9 +18,8 @@ export const TabsList = ({ className, children, ...props }: TabsPrimitive.List.P
   >
     {children}
     <TabsPrimitive.Indicator
-      className="absolute bottom-0 left-0 -z-1 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) rounded-md bg-background shadow-sm dark:bg-accent"
+      className="absolute bottom-0 left-0 -z-1 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) rounded-md bg-background shadow-sm transition-[translate,width,height] duration-300 ease-out dark:bg-accent"
       data-slot="tab-indicator"
-      render={<motion.span layout transition={{ bounce: 0.15, duration: 0.3, type: 'spring' }} />}
     />
   </TabsPrimitive.List>
 )

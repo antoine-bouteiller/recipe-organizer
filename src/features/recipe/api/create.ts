@@ -14,7 +14,7 @@ import { parseFormData } from '@/utils/form-data'
 
 import { CUISINE_TYPES, MEALS } from '../utils/constants'
 import { getTitle } from '../utils/get-recipe-title'
-import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write'
+import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write.server'
 
 const recipeSchema = v.object({
   cuisineTypes: v.array(v.picklist(CUISINE_TYPES)),

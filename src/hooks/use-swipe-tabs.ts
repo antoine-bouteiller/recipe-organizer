@@ -1,47 +1,58 @@
-import { animate, useMotionValue } from 'motion/react'
 import { useCallback, useRef, useState, type TouchEvent } from 'react'
 
 const SWIPE_THRESHOLD = 50
 const VELOCITY_THRESHOLD = 500
 const DIRECTION_LOCK_THRESHOLD = 5
 const ELASTIC_FACTOR = 0.15
-
-const SPRING_CONFIG = { bounce: 0, duration: 0.35, type: 'spring' as const }
+const RELEASE_TRANSITION = 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)'
 
 export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], defaultTab: TTab) => {
   const [activeTab, setActiveTab] = useState(defaultTab)
-  const [containerWidth, setContainerWidth] = useState(0)
+  const widthRef = useRef(0)
+  const trackRef = useRef<HTMLDivElement | null>(null)
+  const offsetRef = useRef(0)
 
   const activeIndex = tabs.indexOf(activeTab)
 
-  const swipeX = useMotionValue(-activeIndex * containerWidth)
-
   const touchState = useRef({
-    baseX: 0,
+    baseOffset: 0,
     direction: null as 'horizontal' | 'vertical' | null,
     startTime: 0,
     startX: 0,
     startY: 0,
   })
 
-  const containerRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      setContainerWidth(node.offsetWidth)
+  const setOffset = useCallback((value: number, animated: boolean) => {
+    offsetRef.current = value
+    const element = trackRef.current
+    if (!element) {
+      return
     }
+    element.style.transition = animated ? RELEASE_TRANSITION : 'none'
+    element.style.transform = `translate3d(${value}px, 0, 0)`
   }, [])
+
+  const containerRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (node) {
+        widthRef.current = node.offsetWidth
+        setOffset(-tabs.indexOf(activeTab) * node.offsetWidth, false)
+      }
+    },
+    [setOffset, tabs, activeTab]
+  )
 
   const goTo = useCallback(
     (tab: TTab) => {
-      const newIndex = tabs.indexOf(tab)
       setActiveTab(tab)
-      animate(swipeX, -newIndex * containerWidth, SPRING_CONFIG)
+      setOffset(-tabs.indexOf(tab) * widthRef.current, true)
     },
-    [tabs, containerWidth, swipeX]
+    [setOffset, tabs]
   )
 
-  const clampX = useCallback(
+  const clampOffset = useCallback(
     (value: number) => {
-      const min = -(tabs.length - 1) * containerWidth
+      const min = -(tabs.length - 1) * widthRef.current
       const max = 0
       if (value > max) {
         return max + (value - max) * ELASTIC_FACTOR
@@ -51,25 +62,22 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
       }
       return value
     },
-    [tabs.length, containerWidth]
+    [tabs.length]
   )
 
-  const onTouchStart = useCallback(
-    (event: TouchEvent) => {
-      const touch = event.touches.item(0)
-      if (!touch) {
-        return
-      }
-      touchState.current = {
-        baseX: swipeX.get(),
-        direction: null,
-        startTime: Date.now(),
-        startX: touch.clientX,
-        startY: touch.clientY,
-      }
-    },
-    [swipeX]
-  )
+  const onTouchStart = useCallback((event: TouchEvent) => {
+    const touch = event.touches.item(0)
+    if (!touch) {
+      return
+    }
+    touchState.current = {
+      baseOffset: offsetRef.current,
+      direction: null,
+      startTime: Date.now(),
+      startX: touch.clientX,
+      startY: touch.clientY,
+    }
+  }, [])
 
   const onTouchMove = useCallback(
     (event: TouchEvent) => {
@@ -90,10 +98,10 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
 
       if (state.direction === 'horizontal') {
         event.preventDefault()
-        swipeX.set(clampX(state.baseX + dx))
+        setOffset(clampOffset(state.baseOffset + dx), false)
       }
     },
-    [swipeX, clampX]
+    [setOffset, clampOffset]
   )
 
   const onTouchEnd = useCallback(
@@ -122,10 +130,10 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
       }
 
       setActiveTab(tabs[newIndex])
-      animate(swipeX, -newIndex * containerWidth, SPRING_CONFIG)
+      setOffset(-newIndex * widthRef.current, true)
     },
-    [activeTab, tabs, containerWidth, swipeX]
+    [activeTab, tabs, setOffset]
   )
 
-  return { activeIndex, activeTab, containerRef, goTo, onTouchEnd, onTouchMove, onTouchStart, swipeX }
+  return { activeIndex, activeTab, containerRef, goTo, onTouchEnd, onTouchMove, onTouchStart, trackRef }
 }

@@ -17,7 +17,7 @@ import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
 import { getTitle } from '../utils/get-recipe-title'
-import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write'
+import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write.server'
 
 const updateRecipeSchema = v.object({ ...recipeSchema.entries, id: v.number() })
 

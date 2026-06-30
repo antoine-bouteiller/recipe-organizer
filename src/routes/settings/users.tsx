@@ -1,8 +1,7 @@
 import { PlusIcon, ProhibitIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { animate, motion, useMotionValue, useTransform } from 'motion/react'
-import React, { useState } from 'react'
+import React, { useRef, useState, type TouchEvent } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
@@ -17,6 +16,10 @@ import { BlockUser } from '@/features/users/components/block-user'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 const SWIPE_THRESHOLD = -100
+const DRAG_MIN = -150
+const ELASTIC_FACTOR = 0.1
+const DIRECTION_LOCK_THRESHOLD = 5
+const RELEASE_TRANSITION = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
 
 const roleLabels: Record<string, string> = {
   admin: 'Admin',
@@ -24,37 +27,83 @@ const roleLabels: Record<string, string> = {
 }
 
 const SwipeToBlock = ({ children, userEmail, userId }: { children: React.ReactNode; userEmail: string; userId: string }) => {
-  const swipeX = useMotionValue(0)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const buttonWidth = useTransform(swipeX, (val) => Math.max(0, -val))
+  const foregroundRef = useRef<HTMLDivElement | null>(null)
+  const revealRef = useRef<HTMLDivElement | null>(null)
+  const drag = useRef({ base: 0, direction: null as 'horizontal' | 'vertical' | null, startX: 0, startY: 0, x: 0 })
 
-  const handleDragEnd = () => {
-    if (swipeX.get() < SWIPE_THRESHOLD) {
-      animate(swipeX, 0, { damping: 30, stiffness: 300, type: 'spring' })
-      setDialogOpen(true)
-    } else {
-      animate(swipeX, 0, { damping: 30, stiffness: 300, type: 'spring' })
+  const setX = (value: number, animated: boolean) => {
+    drag.current.x = value
+    const foreground = foregroundRef.current
+    const reveal = revealRef.current
+    if (foreground) {
+      foreground.style.transition = animated ? RELEASE_TRANSITION : 'none'
+      foreground.style.transform = `translate3d(${value}px, 0, 0)`
     }
+    if (reveal) {
+      reveal.style.width = `${Math.max(0, -value)}px`
+    }
+  }
+
+  const onTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches.item(0)
+    if (!touch) {
+      return
+    }
+    drag.current = { base: drag.current.x, direction: null, startX: touch.clientX, startY: touch.clientY, x: drag.current.x }
+  }
+
+  const onTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches.item(0)
+    if (!touch) {
+      return
+    }
+    const state = drag.current
+    const dx = touch.clientX - state.startX
+    const dy = touch.clientY - state.startY
+
+    if (!state.direction) {
+      if (Math.abs(dx) > DIRECTION_LOCK_THRESHOLD || Math.abs(dy) > DIRECTION_LOCK_THRESHOLD) {
+        state.direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
+      }
+      return
+    }
+
+    if (state.direction !== 'horizontal') {
+      return
+    }
+
+    event.preventDefault()
+    let next = state.base + dx
+    if (next > 0) {
+      next *= ELASTIC_FACTOR
+    } else if (next < DRAG_MIN) {
+      next = DRAG_MIN + (next - DRAG_MIN) * ELASTIC_FACTOR
+    }
+    setX(next, false)
+  }
+
+  const onTouchEnd = () => {
+    if (drag.current.direction !== 'horizontal') {
+      return
+    }
+    if (drag.current.x < SWIPE_THRESHOLD) {
+      setDialogOpen(true)
+    }
+    setX(0, true)
   }
 
   return (
     <div className="relative overflow-hidden">
-      <motion.div
-        className="absolute top-0 right-0 bottom-0 flex items-center justify-center rounded-xl bg-destructive text-destructive-foreground"
-        style={{ width: buttonWidth }}
+      <div
+        ref={revealRef}
+        className="absolute top-0 right-0 bottom-0 flex w-0 items-center justify-center rounded-xl bg-destructive text-destructive-foreground"
       >
         <ProhibitIcon className="size-5 shrink-0" />
-      </motion.div>
-      <motion.div
-        className="relative bg-background"
-        drag="x"
-        dragConstraints={{ left: -150, right: 0 }}
-        dragElastic={0.1}
-        onDragEnd={handleDragEnd}
-        style={{ x: swipeX }}
-      >
+      </div>
+      <div className="relative bg-background" ref={foregroundRef} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}>
         {children}
-      </motion.div>
+      </div>
       <BlockUser onOpenChange={setDialogOpen} open={dialogOpen} userEmail={userEmail} userId={userId} />
     </div>
   )

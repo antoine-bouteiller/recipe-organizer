@@ -4,16 +4,17 @@ import { type QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { ToastProvider } from '@/components/ui/toast'
-import { SearchBar } from '@/features/recipe/components/search-bar'
 import { getAuthUser } from '@/lib/auth/get-auth-user'
 import { getTheme } from '@/lib/theme'
 
 import appCss from '../styles/app.css?url'
+
+const SearchBar = lazy(() => import('@/features/recipe/components/search-bar'))
 
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
@@ -47,7 +48,13 @@ const RootComponent = () => {
         <ToastProvider>
           <OfflineBanner />
           <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
-            <Navbar search={<SearchBar />} />
+            <Navbar
+              search={
+                <Suspense fallback={<div className="h-9 w-56" />}>
+                  <SearchBar />
+                </Suspense>
+              }
+            />
           </header>
           <main className="flex min-h-0 flex-1 flex-col md:pb-0">
             <Outlet />
