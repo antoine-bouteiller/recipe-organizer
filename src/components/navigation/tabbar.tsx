@@ -11,13 +11,9 @@ export const TabBar = ({ activePage }: { activePage: string }) => (
     className="fixed bottom-0 z-10 flex h-14 w-full flex-1 items-center border-t bg-background px-4 transition-transform duration-300 ease-out md:hidden"
     indicatorLayoutId="tabbar-indicator"
     items={items.map((item) => ({
-      children: (
-        <span className="flex flex-col items-center gap-1">
-          <item.icon className="size-6" {...(item.linkProps.to === activePage ? item.iconFilledProps : {})} />
-          <span className="text-[10px] font-semibold">{item.label}</span>
-        </span>
-      ),
-      className: 'h-12 text-muted-foreground data-active:text-primary flex-1',
+      className: 'h-12 text-muted-foreground data-active:text-primary flex-1 flex flex-col items-center gap-1 font-semibold text-xs',
+      icon: item.icon,
+      label: item.label,
       nativeButton: false,
       render: <Link {...item.linkProps} />,
       value: item.linkProps.to,

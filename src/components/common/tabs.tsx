@@ -1,3 +1,4 @@
+import { type Icon, type IconProps } from '@phosphor-icons/react'
 import { type ComponentProps, type ReactElement, type ReactNode } from 'react'
 
 import { TabsList, TabsPanel, Tabs as TabsRoot, TabsTab } from '@/components/ui/tabs'
@@ -8,7 +9,8 @@ type TabsTabProps = ComponentProps<typeof TabsTab>
 interface TabItem {
   value: TabsTabProps['value']
   label?: ReactNode
-  children?: ReactNode
+  icon?: Icon
+  iconProps?: IconProps
   content?: ReactNode
   className?: string
   render?: TabsTabProps['render']
@@ -45,7 +47,8 @@ export const Tabs = ({
     <TabsList className={listClassName} indicatorLayoutId={indicatorLayoutId} variant={variant}>
       {items.map((item) => (
         <TabsTab className={item.className} key={item.value} nativeButton={item.nativeButton} render={item.render} value={item.value}>
-          {item.label ?? item.children}
+          {item.icon && <item.icon className="size-6" {...(item.iconProps ?? {})} />}
+          {item.label}
         </TabsTab>
       ))}
     </TabsList>
