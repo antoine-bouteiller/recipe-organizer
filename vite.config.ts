@@ -4,7 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
-import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite-plus'
 
 import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
@@ -14,7 +13,7 @@ const isAnalyze = Boolean(process.env.ANALYZE)
 
 const viteConfig = defineConfig({
   devtools: {
-    enabled: true,
+    enabled: isAnalyze,
   },
   lint: {
     options: { typeAware: true, typeCheck: true },
@@ -123,14 +122,6 @@ const viteConfig = defineConfig({
       injectSource: { enabled: false },
     }),
     babel({ presets: [reactCompilerPreset()] }),
-    ...(isAnalyze
-      ? [
-          {
-            ...visualizer({ brotliSize: true, filename: 'dist/stats.html', gzipSize: true, template: 'treemap' }),
-            applyToEnvironment: (env) => env.name === 'client',
-          },
-        ]
-      : []),
   ],
   server: {
     port: 3000,
