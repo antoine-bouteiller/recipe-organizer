@@ -110,18 +110,18 @@ This specification describes the high-level architecture of the `recipe-organize
 
 ### Layered overview
 
-| Layer                   | Lives in                                                    | Responsibility                                                                                   |
-| ----------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| **UI primitives**       | `src/components/ui/`                                        | Base UI (Base UI / Shadcn-flavored) — buttons, dialogs, fields. No data dependencies.            |
-| **Form fields**         | `src/components/forms/`                                     | TanStack Form-aware fields built on UI primitives.                                               |
-| **Layout / Navigation** | `src/components/layout/`, `src/components/navigation/`      | Mobile/desktop chrome (`ScreenLayout`, `Navbar`, `TabBar`).                                      |
-| **Feature components**  | `src/features/<name>/components/`                           | Feature-specific UI: forms, dialogs, lists, editors.                                             |
-| **Hooks & contexts**    | `src/hooks/`, `src/features/<name>/{hooks,contexts}/`       | Cross-cutting hooks (forms, file upload, swipe), feature-scoped contexts (e.g. linked recipes).  |
-| **Server functions**    | `src/features/<name>/api/`                                  | Validation + DB/R2 + cache invalidation.                                                         |
-| **Data layer**          | `src/lib/db/`                                               | Drizzle schema, relations, `getDb()`.                                                            |
-| **Platform helpers**    | `src/lib/{r2,session,cache-manager,theme,toast-helpers}.ts` | R2 upload/download + edge cache, session helpers, theme/toast plumbing.                          |
-| **Stores**              | `src/stores/`                                               | Persistent client-only TanStack Store stores (shopping list, recipe quantities, recent recipes). |
-| **Routes**              | `src/routes/`                                               | File-based pages and API handlers; SSR loaders prefetch queries.                                 |
+| Layer                   | Lives in                                                    | Responsibility                                                                                                    |
+| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **UI primitives**       | `src/components/ui/`                                        | Owned design-system components built on Base UI — buttons, dialogs, fields. One file per component, no data deps. |
+| **Form fields**         | `src/components/forms/`                                     | TanStack Form-aware fields built on UI primitives.                                                                |
+| **Layout / Navigation** | `src/components/layout/`, `src/components/navigation/`      | Mobile/desktop chrome (`ScreenLayout`, `Navbar`, `TabBar`).                                                       |
+| **Feature components**  | `src/features/<name>/components/`                           | Feature-specific UI: forms, dialogs, lists, editors.                                                              |
+| **Hooks & contexts**    | `src/hooks/`, `src/features/<name>/{hooks,contexts}/`       | Cross-cutting hooks (forms, file upload, swipe), feature-scoped contexts (e.g. linked recipes).                   |
+| **Server functions**    | `src/features/<name>/api/`                                  | Validation + DB/R2 + cache invalidation.                                                                          |
+| **Data layer**          | `src/lib/db/`                                               | Drizzle schema, relations, `getDb()`.                                                                             |
+| **Platform helpers**    | `src/lib/{r2,session,cache-manager,theme,toast-helpers}.ts` | R2 upload/download + edge cache, session helpers, theme/toast plumbing.                                           |
+| **Stores**              | `src/stores/`                                               | Persistent client-only TanStack Store stores (shopping list, recipe quantities, recent recipes).                  |
+| **Routes**              | `src/routes/`                                               | File-based pages and API handlers; SSR loaders prefetch queries.                                                  |
 
 ### Cross-feature data flow (page render)
 

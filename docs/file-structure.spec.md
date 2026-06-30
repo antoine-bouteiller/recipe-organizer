@@ -39,7 +39,7 @@ This specification defines the canonical file and folder structure of the `recip
 - **REQ-003**: Server functions MUST live under `src/features/<name>/api/` with one server function per file, named after the verb: `create.ts`, `update.ts`, `delete.ts`, `get-all.ts`, `get-one.ts`, `get-instructions.ts`, etc.
 - **REQ-004**: Drizzle schema modules MUST live in `src/lib/db/schema/<table>.ts` and be re-exported from `src/lib/db/schema/index.ts`. Relations MUST be defined in `src/lib/db/index.ts` via `defineRelations`.
 - **REQ-005**: Route files MUST be placed under `src/routes/` and reflect the URL hierarchy. Dynamic segments use `$param.tsx`; nested API routes use `src/routes/api/...`.
-- **REQ-006**: Reusable UI primitives (Base UI / Shadcn-flavored) MUST live in `src/components/ui/`; reusable form fields in `src/components/forms/`; reusable dialogs in `src/components/dialogs/`; reusable layout in `src/components/layout/`; reusable navigation in `src/components/navigation/`; reusable error UI in `src/components/error/`; reusable icons in `src/components/icons/`.
+- **REQ-006**: Reusable UI primitives (owned design-system components built on Base UI; one file per component, no longer re-pulled from a registry) MUST live in `src/components/ui/`; reusable form fields in `src/components/forms/`; reusable dialogs in `src/components/dialogs/`; reusable layout in `src/components/layout/`; reusable navigation in `src/components/navigation/`; reusable error UI in `src/components/error/`; reusable icons in `src/components/icons/`.
 - **REQ-007**: Cross-feature singleton client state MUST live in `src/stores/<topic>.store.ts` (TanStack Store via the shared `persistedStore` helper). Feature-internal stores MUST stay inside the feature folder.
 - **REQ-008**: Pure helper utilities (no React, no DOM, no fetch) MUST live in `src/utils/`. Anything that depends on React, the database, or Cloudflare bindings belongs in `src/lib/` or feature folders.
 - **REQ-009**: Database migrations MUST live under `migrations/` (drizzle-kit `out`). The `migrations_tmp/` directory referenced in `wrangler.jsonc` is owned by Wrangler and MUST NOT be hand-edited.
@@ -189,7 +189,6 @@ recipe-organizer/
 ├── AGENTS.md                 Project instructions for agents (CLAUDE.md is a symlink)
 ├── CLAUDE.md -> AGENTS.md
 ├── README.md
-├── components.json           Shadcn registry config
 ├── database.sql              Latest D1 dump (gitignored in production)
 ├── drizzle.config.ts         drizzle-kit config (D1 HTTP)
 ├── knip.json                 Unused-code detector

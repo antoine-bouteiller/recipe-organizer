@@ -1,24 +1,22 @@
 import { Link } from '@tanstack/react-router'
 
-import { Tabs } from '@/components/common/tabs'
-
 import { menuItems } from './constants'
 
 const items = menuItems.filter((item) => item.display !== 'desktop')
 
-export const TabBar = ({ activePage }: { activePage: string }) => (
-  <Tabs
-    className="fixed bottom-0 z-10 flex h-14 w-full flex-1 items-center border-t bg-background px-4 transition-transform duration-300 ease-out md:hidden"
-    indicatorLayoutId="tabbar-indicator"
-    items={items.map((item) => ({
-      className: 'h-12 text-muted-foreground data-active:text-primary flex-1 flex flex-col items-center gap-1 font-semibold text-xs',
-      icon: item.icon,
-      label: item.label,
-      nativeButton: false,
-      render: <Link {...item.linkProps} />,
-      value: item.linkProps.to,
-    }))}
-    value={activePage}
-    variant="tabbar"
-  />
+export const TabBar = () => (
+  <nav className="fixed bottom-0 z-10 flex h-14 w-full items-center justify-around border-t bg-background px-4 md:hidden">
+    {items.map((item) => (
+      <Link
+        key={item.linkProps.to}
+        {...item.linkProps}
+        activeOptions={item.linkProps.to === '/' ? { exact: true } : undefined}
+        activeProps={{ className: 'text-primary' }}
+        className="flex h-12 flex-1 flex-col items-center justify-center gap-1 text-xs font-semibold text-muted-foreground"
+      >
+        <item.icon className="size-6" />
+        {item.label}
+      </Link>
+    ))}
+  </nav>
 )

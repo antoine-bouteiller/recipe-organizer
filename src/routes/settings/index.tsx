@@ -1,8 +1,8 @@
 import { CaretRightIcon, CookieIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-import { Card } from '@/components/common/card'
 import { ScreenLayout } from '@/components/layout/screen-layout'
+import { Card } from '@/components/ui/card'
 
 interface SettingsSection {
   adminOnly?: boolean

@@ -2,6 +2,5 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
   "entry": ["src/sw.ts", "vite.config.ts", "src/**/*.test.ts"],
-  "ignore": ["src/components/ui/**"],
   "ignoreDependencies": ["cloudflare", "@commitlint/cli", "lefthook"]
 }

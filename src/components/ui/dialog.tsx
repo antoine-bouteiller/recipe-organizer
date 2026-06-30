@@ -2,25 +2,32 @@ import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import { XIcon } from '@phosphor-icons/react'
-import type React from 'react'
+import { type ReactElement, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
+import {
+  DrawerClose,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerPanel,
+  DrawerPopup,
+  Drawer as DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useIsMobile } from '@/hooks/use-is-mobile'
 import { cn } from '@/utils/cn'
 
-export const DialogCreateHandle: typeof DialogPrimitive.createHandle = DialogPrimitive.createHandle
+const DialogRoot = DialogPrimitive.Root
 
-export const Dialog: typeof DialogPrimitive.Root = DialogPrimitive.Root
+const DialogPortal = DialogPrimitive.Portal
 
-export const DialogPortal: typeof DialogPrimitive.Portal = DialogPrimitive.Portal
+const DialogTrigger = (props: DialogPrimitive.Trigger.Props): ReactElement => <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 
-export const DialogTrigger = (props: DialogPrimitive.Trigger.Props): React.ReactElement => (
-  <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
-)
+const DialogClose = (props: DialogPrimitive.Close.Props): ReactElement => <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 
-export const DialogClose = (props: DialogPrimitive.Close.Props): React.ReactElement => <DialogPrimitive.Close data-slot="dialog-close" {...props} />
-
-export const DialogBackdrop = ({ className, ...props }: DialogPrimitive.Backdrop.Props): React.ReactElement => (
+const DialogBackdrop = ({ className, ...props }: DialogPrimitive.Backdrop.Props): ReactElement => (
   <DialogPrimitive.Backdrop
     className={cn(
       'fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
@@ -31,7 +38,7 @@ export const DialogBackdrop = ({ className, ...props }: DialogPrimitive.Backdrop
   />
 )
 
-export const DialogViewport = ({ className, ...props }: DialogPrimitive.Viewport.Props): React.ReactElement => (
+const DialogViewport = ({ className, ...props }: DialogPrimitive.Viewport.Props): ReactElement => (
   <DialogPrimitive.Viewport
     className={cn('fixed inset-0 z-50 grid grid-rows-[1fr_auto_3fr] justify-items-center p-4', className)}
     data-slot="dialog-viewport"
@@ -39,7 +46,7 @@ export const DialogViewport = ({ className, ...props }: DialogPrimitive.Viewport
   />
 )
 
-export const DialogPopup = ({
+const DialogPopup = ({
   className,
   children,
   showCloseButton = true,
@@ -50,7 +57,7 @@ export const DialogPopup = ({
   showCloseButton?: boolean
   bottomStickOnMobile?: boolean
   closeProps?: DialogPrimitive.Close.Props
-}): React.ReactElement => (
+}): ReactElement => (
   <DialogPortal>
     <DialogBackdrop />
     <DialogViewport className={cn(bottomStickOnMobile && 'max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12')}>
@@ -75,7 +82,7 @@ export const DialogPopup = ({
   </DialogPortal>
 )
 
-export const DialogHeader = ({ className, render, ...props }: useRender.ComponentProps<'div'>): React.ReactElement => {
+const DialogHeader = ({ className, render, ...props }: useRender.ComponentProps<'div'>): ReactElement => {
   const defaultProps = {
     className: cn('flex flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4', className),
     'data-slot': 'dialog-header',
@@ -88,14 +95,14 @@ export const DialogHeader = ({ className, render, ...props }: useRender.Componen
   })
 }
 
-export const DialogFooter = ({
+const DialogFooter = ({
   className,
   variant = 'default',
   render,
   ...props
 }: useRender.ComponentProps<'div'> & {
   variant?: 'default' | 'bare'
-}): React.ReactElement => {
+}): ReactElement => {
   const defaultProps = {
     className: cn(
       'flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]',
@@ -113,22 +120,18 @@ export const DialogFooter = ({
   })
 }
 
-export const DialogTitle = ({ className, ...props }: DialogPrimitive.Title.Props): React.ReactElement => (
+const DialogTitle = ({ className, ...props }: DialogPrimitive.Title.Props): ReactElement => (
   <DialogPrimitive.Title className={cn('font-heading font-semibold text-xl leading-none', className)} data-slot="dialog-title" {...props} />
 )
 
-export const DialogDescription = ({ className, ...props }: DialogPrimitive.Description.Props): React.ReactElement => (
-  <DialogPrimitive.Description className={cn('text-muted-foreground text-sm', className)} data-slot="dialog-description" {...props} />
-)
-
-export const DialogPanel = ({
+const DialogPanel = ({
   className,
   scrollFade = true,
   render,
   ...props
 }: useRender.ComponentProps<'div'> & {
   scrollFade?: boolean
-}): React.ReactElement => {
+}): ReactElement => {
   const defaultProps = {
     className: cn(
       'p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-header])]:pt-1 in-[[data-slot=dialog-popup]:has([data-slot=dialog-footer]:not(.border-t))]:pb-1',
@@ -148,4 +151,82 @@ export const DialogPanel = ({
   )
 }
 
-export { DialogPopup as DialogContent, DialogBackdrop as DialogOverlay }
+interface DialogProps {
+  title: string
+  trigger?: ReactElement
+  children: ReactNode
+  cancelLabel?: string
+  cancelDisabled?: boolean
+  footer?: ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  contentRender?: (content: ReactNode) => ReactNode
+  panelClassName?: string
+}
+
+export const Dialog = ({
+  title,
+  trigger,
+  children,
+  cancelLabel,
+  cancelDisabled,
+  footer,
+  open,
+  onOpenChange,
+  contentRender,
+  panelClassName,
+}: DialogProps): ReactElement => {
+  const isMobile = useIsMobile()
+  const hasFooter = cancelLabel !== undefined || footer !== undefined
+  const wrap = (body: ReactNode): ReactNode => (contentRender ? contentRender(body) : body)
+
+  if (isMobile) {
+    return (
+      <DrawerRoot onOpenChange={onOpenChange} open={open}>
+        {trigger !== undefined && <DrawerTrigger render={trigger} />}
+        <DrawerPopup>
+          {wrap(
+            <>
+              <DrawerHeader>
+                <DrawerTitle>{title}</DrawerTitle>
+              </DrawerHeader>
+              <DrawerPanel className={panelClassName}>{children}</DrawerPanel>
+              {hasFooter && (
+                <DrawerFooter>
+                  {cancelLabel !== undefined && (
+                    <DrawerClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DrawerClose>
+                  )}
+                  {footer}
+                </DrawerFooter>
+              )}
+            </>
+          )}
+        </DrawerPopup>
+      </DrawerRoot>
+    )
+  }
+
+  return (
+    <DialogRoot modal="trap-focus" onOpenChange={onOpenChange ? (next) => onOpenChange(next) : undefined} open={open}>
+      {trigger !== undefined && <DialogTrigger render={trigger} />}
+      <DialogPopup>
+        {wrap(
+          <>
+            <DialogHeader>
+              <DialogTitle>{title}</DialogTitle>
+            </DialogHeader>
+            <DialogPanel className={panelClassName}>{children}</DialogPanel>
+            {hasFooter && (
+              <DialogFooter>
+                {cancelLabel !== undefined && (
+                  <DialogClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DialogClose>
+                )}
+                {footer}
+              </DialogFooter>
+            )}
+          </>
+        )}
+      </DialogPopup>
+    </DialogRoot>
+  )
+}

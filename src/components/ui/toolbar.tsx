@@ -15,14 +15,6 @@ export const ToolbarButton = ({ className, ...props }: ToolbarPrimitive.Button.P
   <ToolbarPrimitive.Button className={cn(className)} data-slot="toolbar-button" {...props} />
 )
 
-export const ToolbarLink = ({ className, ...props }: ToolbarPrimitive.Link.Props): React.ReactElement => (
-  <ToolbarPrimitive.Link className={cn(className)} data-slot="toolbar-link" {...props} />
-)
-
-export const ToolbarInput = ({ className, ...props }: ToolbarPrimitive.Input.Props): React.ReactElement => (
-  <ToolbarPrimitive.Input className={cn(className)} data-slot="toolbar-input" {...props} />
-)
-
 export const ToolbarGroup = ({ className, ...props }: ToolbarPrimitive.Group.Props): React.ReactElement => (
   <ToolbarPrimitive.Group className={cn('flex items-center gap-1', className)} data-slot="toolbar-group" {...props} />
 )

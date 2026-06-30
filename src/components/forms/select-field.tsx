@@ -1,5 +1,5 @@
-import { Select } from '@/components/common/select'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Select } from '@/components/ui/select'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface SelectFieldProps {

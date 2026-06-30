@@ -1,5 +1,5 @@
-import { NumberInput } from '@/components/common/number-input'
 import { Field, FieldError } from '@/components/ui/field'
+import { NumberInput } from '@/components/ui/number-input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface NumberFieldProps {

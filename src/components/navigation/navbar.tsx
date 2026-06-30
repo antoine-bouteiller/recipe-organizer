@@ -1,32 +1,34 @@
-import { Link, useLocation, useRouter } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/react-router'
 import { type ReactNode } from 'react'
 
-import { Tabs } from '@/components/common/tabs'
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
 import { toggleTheme } from '@/lib/theme'
 
 import { menuItems } from './constants'
 
+const navItems = menuItems.filter((item) => item.display !== 'mobile')
+
 export const Navbar = ({ search }: { search: ReactNode }) => {
   const router = useRouter()
 
-  const location = useLocation()
-
   return (
     <div className="flex h-14 items-center gap-2 px-6">
-      <Tabs
-        items={menuItems
-          .filter((item) => item.display !== 'mobile')
-          .map((item) => ({
-            label: item.label,
-            nativeButton: false,
-            render: <Link {...item.linkProps} />,
-            value: item.linkProps.to,
-          }))}
-        value={location.href}
-        variant="underline"
-      />
+      <nav className="flex items-center gap-1">
+        {navItems.map((item) => (
+          <Link
+            key={item.linkProps.to}
+            {...item.linkProps}
+            activeOptions={item.linkProps.to === '/' ? { exact: true } : undefined}
+            activeProps={{
+              className: 'text-foreground after:absolute after:inset-x-2.5 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-primary',
+            }}
+            className="relative rounded-md px-2.5 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
       <div className="flex flex-1 items-center justify-end gap-2">
         {search}
         <Button

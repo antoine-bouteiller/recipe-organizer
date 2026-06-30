@@ -1,12 +1,17 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
-import { CaretUpDownIcon, XIcon } from '@phosphor-icons/react'
-import React from 'react'
+import { CaretDownIcon, CaretUpDownIcon, CheckIcon, XIcon } from '@phosphor-icons/react'
+import React, { useMemo, useState, type ReactElement, type ReactNode } from 'react'
 
+import { Button } from '@/components/ui/button'
+import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { useIsMobile } from '@/hooks/use-is-mobile'
+import { type Option } from '@/hooks/use-options'
 import { cn } from '@/utils/cn'
 
-export const ComboboxContext: React.Context<{
+const ComboboxContext: React.Context<{
   chipsRef: React.RefObject<Element | null> | null
   multiple: boolean
 }> = React.createContext<{
@@ -17,7 +22,7 @@ export const ComboboxContext: React.Context<{
   multiple: false,
 })
 
-export const Combobox = <Value, Multiple extends boolean | undefined = false>(
+const ComboboxRoot = <Value, Multiple extends boolean | undefined = false>(
   props: ComboboxPrimitive.Root.Props<Value, Multiple>
 ): React.ReactElement => {
   const chipsRef = React.useRef<Element | null>(null)
@@ -28,32 +33,17 @@ export const Combobox = <Value, Multiple extends boolean | undefined = false>(
   )
 }
 
-export const ComboboxChipsInput = ({
-  className,
-  size,
-  ...props
-}: Omit<ComboboxPrimitive.Input.Props, 'size'> & {
-  size?: 'sm' | 'default' | 'lg' | number
-  ref?: React.Ref<HTMLInputElement>
-}): React.ReactElement => {
-  const sizeValue = size ?? 'default'
+const ComboboxTrigger = ({ className, children, ...props }: ComboboxPrimitive.Trigger.Props): React.ReactElement => (
+  <ComboboxPrimitive.Trigger className={className} data-slot="combobox-trigger" {...props}>
+    {children}
+  </ComboboxPrimitive.Trigger>
+)
 
-  return (
-    <ComboboxPrimitive.Input
-      className={cn(
-        'min-w-12 flex-1 text-base outline-none sm:text-sm [[data-slot=combobox-chip]+&]:ps-0.5',
-        sizeValue === 'sm' ? 'ps-1.5' : 'ps-2',
-        className
-      )}
-      data-size={typeof sizeValue === 'string' ? sizeValue : undefined}
-      data-slot="combobox-chips-input"
-      size={typeof sizeValue === 'number' ? sizeValue : undefined}
-      {...props}
-    />
-  )
-}
+const ComboboxClear = ({ className, ...props }: ComboboxPrimitive.Clear.Props): React.ReactElement => (
+  <ComboboxPrimitive.Clear className={className} data-slot="combobox-clear" {...props} />
+)
 
-export const ComboboxInput = ({
+const ComboboxInput = ({
   className,
   showTrigger = true,
   showClear = false,
@@ -128,13 +118,7 @@ export const ComboboxInput = ({
   )
 }
 
-export const ComboboxTrigger = ({ className, children, ...props }: ComboboxPrimitive.Trigger.Props): React.ReactElement => (
-  <ComboboxPrimitive.Trigger className={className} data-slot="combobox-trigger" {...props}>
-    {children}
-  </ComboboxPrimitive.Trigger>
-)
-
-export const ComboboxPopup = ({
+const ComboboxPopup = ({
   className,
   children,
   side = 'bottom',
@@ -183,7 +167,7 @@ export const ComboboxPopup = ({
   )
 }
 
-export const ComboboxItem = ({ className, children, ...props }: ComboboxPrimitive.Item.Props): React.ReactElement => (
+const ComboboxItem = ({ className, children, ...props }: ComboboxPrimitive.Item.Props): React.ReactElement => (
   <ComboboxPrimitive.Item
     className={cn(
       "grid min-h-8 in-data-[side=none]:min-w-[calc(var(--anchor-width)+1.25rem)] cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-sm py-1 ps-2 pe-4 text-base outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-64 sm:min-h-7 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -212,23 +196,11 @@ export const ComboboxItem = ({ className, children, ...props }: ComboboxPrimitiv
   </ComboboxPrimitive.Item>
 )
 
-export const ComboboxSeparator = ({ className, ...props }: ComboboxPrimitive.Separator.Props): React.ReactElement => (
+const ComboboxSeparator = ({ className, ...props }: ComboboxPrimitive.Separator.Props): React.ReactElement => (
   <ComboboxPrimitive.Separator className={cn('mx-2 my-1 h-px bg-border last:hidden', className)} data-slot="combobox-separator" {...props} />
 )
 
-export const ComboboxGroup = ({ className, ...props }: ComboboxPrimitive.Group.Props): React.ReactElement => (
-  <ComboboxPrimitive.Group className={cn('[[role=group]+&]:mt-1.5', className)} data-slot="combobox-group" {...props} />
-)
-
-export const ComboboxGroupLabel = ({ className, ...props }: ComboboxPrimitive.GroupLabel.Props): React.ReactElement => (
-  <ComboboxPrimitive.GroupLabel
-    className={cn('px-2 py-1.5 font-medium text-muted-foreground text-xs', className)}
-    data-slot="combobox-group-label"
-    {...props}
-  />
-)
-
-export const ComboboxEmpty = ({ className, ...props }: ComboboxPrimitive.Empty.Props): React.ReactElement => (
+const ComboboxEmpty = ({ className, ...props }: ComboboxPrimitive.Empty.Props): React.ReactElement => (
   <ComboboxPrimitive.Empty
     className={cn('not-empty:p-2 text-center text-base text-muted-foreground sm:text-sm', className)}
     data-slot="combobox-empty"
@@ -236,15 +208,7 @@ export const ComboboxEmpty = ({ className, ...props }: ComboboxPrimitive.Empty.P
   />
 )
 
-export const ComboboxRow = ({ className, ...props }: ComboboxPrimitive.Row.Props): React.ReactElement => (
-  <ComboboxPrimitive.Row className={className} data-slot="combobox-row" {...props} />
-)
-
-export const ComboboxValue = ({ ...props }: ComboboxPrimitive.Value.Props): React.ReactElement => (
-  <ComboboxPrimitive.Value data-slot="combobox-value" {...props} />
-)
-
-export const ComboboxList = ({ className, ...props }: ComboboxPrimitive.List.Props): React.ReactElement => (
+const ComboboxList = ({ className, ...props }: ComboboxPrimitive.List.Props): React.ReactElement => (
   <ScrollArea scrollbarGutter scrollFade>
     <ComboboxPrimitive.List
       className={cn('not-empty:scroll-py-1 not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3', className)}
@@ -254,82 +218,202 @@ export const ComboboxList = ({ className, ...props }: ComboboxPrimitive.List.Pro
   </ScrollArea>
 )
 
-export const ComboboxClear = ({ className, ...props }: ComboboxPrimitive.Clear.Props): React.ReactElement => (
-  <ComboboxPrimitive.Clear className={className} data-slot="combobox-clear" {...props} />
-)
+type ValueOptions = number | string | undefined
 
-export const ComboboxStatus = ({ className, ...props }: ComboboxPrimitive.Status.Props): React.ReactElement => (
-  <ComboboxPrimitive.Status
-    className={cn('px-3 py-2 font-medium text-muted-foreground text-xs empty:m-0 empty:p-0', className)}
-    data-slot="combobox-status"
-    {...props}
-  />
-)
+interface ComboboxProps<TValue extends ValueOptions> {
+  addNew?: (inputValue: string) => ReactNode
+  disabled?: boolean
+  isInvalid?: boolean
+  onChange: (option: Option<TValue> | null) => void
+  options: Option<TValue>[]
+  placeholder?: string
+  searchPlaceholder?: string
+  title?: string
+  value: TValue | undefined
+}
 
-export const ComboboxCollection = (props: ComboboxPrimitive.Collection.Props): React.ReactElement => (
-  <ComboboxPrimitive.Collection data-slot="combobox-collection" {...props} />
-)
+const Combobox = <TValue extends ValueOptions>({
+  addNew,
+  disabled,
+  isInvalid = false,
+  onChange,
+  options,
+  placeholder = 'Sélectionner une option',
+  searchPlaceholder = 'Rechercher une option',
+  title,
+  value,
+}: ComboboxProps<TValue>): ReactElement => {
+  const isMobile = useIsMobile()
+  const selectedOption = useMemo(() => options.find((opt) => opt.value === value), [options, value])
 
-export const ComboboxChips = ({
-  className,
-  children,
-  startAddon,
-  ...props
-}: ComboboxPrimitive.Chips.Props & {
-  startAddon?: React.ReactNode
-}): React.ReactElement => {
-  const { chipsRef } = React.useContext(ComboboxContext)
+  if (isMobile) {
+    return (
+      <MobileCombobox
+        addNew={addNew}
+        disabled={disabled}
+        isInvalid={isInvalid}
+        onChange={onChange}
+        options={options}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
+        selectedOption={selectedOption}
+        title={title ?? placeholder}
+      />
+    )
+  }
 
   return (
-    <ComboboxPrimitive.Chips
-      className={cn(
-        'relative inline-flex min-h-9 w-full flex-wrap gap-1 rounded-lg border border-input bg-background not-dark:bg-clip-padding p-[calc(--spacing(1)-1px)] text-base shadow-xs/5 outline-none ring-ring/24 transition-shadow *:min-h-7 before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-within:border-ring focus-within:ring-[3px] has-disabled:pointer-events-none has-data-[size=lg]:min-h-10 has-data-[size=sm]:min-h-8 has-aria-invalid:border-destructive/36 has-autofill:bg-foreground/4 has-disabled:opacity-64 has-[:disabled,:focus-within,[aria-invalid]]:shadow-none focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/16 has-data-[size=lg]:*:min-h-8 has-data-[size=sm]:*:min-h-6 sm:min-h-8 sm:text-sm sm:has-data-[size=lg]:min-h-9 sm:has-data-[size=sm]:min-h-7 sm:*:min-h-6 sm:has-data-[size=lg]:*:min-h-7 sm:has-data-[size=sm]:*:min-h-5 dark:not-has-disabled:bg-input/32 dark:has-autofill:bg-foreground/8 dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-        className
-      )}
-      data-slot="combobox-chips"
-      ref={chipsRef as React.Ref<HTMLDivElement> | null}
-      {...props}
-    >
-      {startAddon && (
-        <div
-          aria-hidden="true"
-          className="flex shrink-0 items-center ps-2 opacity-80 has-[+[data-slot=combobox-chip]]:pe-2 has-[~[data-size=sm]]:ps-1.5 has-[~[data-size=sm]]:has-[+[data-slot=combobox-chip]]:pe-1.5 [&_svg]:pointer-events-none [&_svg]:-ms-0.5 [&_svg]:-me-1.5 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4"
-          data-slot="combobox-start-addon"
-        >
-          {startAddon}
-        </div>
-      )}
-      {children}
-    </ComboboxPrimitive.Chips>
+    <DesktopCombobox
+      addNew={addNew}
+      disabled={disabled}
+      isInvalid={isInvalid}
+      onChange={onChange}
+      options={options}
+      placeholder={placeholder}
+      selectedOption={selectedOption}
+    />
   )
 }
 
-export const ComboboxChip = ({
-  children,
-  removeProps,
-  ...props
-}: ComboboxPrimitive.Chip.Props & {
-  removeProps?: ComboboxPrimitive.ChipRemove.Props
-}): React.ReactElement => (
-  <ComboboxPrimitive.Chip
-    className="flex items-center rounded-[calc(var(--radius-md)-1px)] bg-accent ps-2 text-sm font-medium text-accent-foreground outline-none sm:text-xs/(--text-xs--line-height) [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5"
-    data-slot="combobox-chip"
-    {...props}
-  >
-    {children}
-    <ComboboxChipRemove {...removeProps} />
-  </ComboboxPrimitive.Chip>
-)
+export { Combobox }
 
-export const ComboboxChipRemove = (props: ComboboxPrimitive.ChipRemove.Props): React.ReactElement => (
-  <ComboboxPrimitive.ChipRemove
-    aria-label="Remove"
-    className="h-full shrink-0 cursor-pointer px-1.5 opacity-80 hover:opacity-100 [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5"
-    data-slot="combobox-chip-remove"
-    {...props}
-  >
-    <XIcon />
-  </ComboboxPrimitive.ChipRemove>
-)
+interface DesktopComboboxProps<TValue extends ValueOptions> {
+  addNew?: (inputValue: string) => ReactNode
+  disabled?: boolean
+  isInvalid: boolean
+  onChange: (option: Option<TValue> | null) => void
+  options: Option<TValue>[]
+  placeholder: string
+  selectedOption: Option<TValue> | undefined
+}
 
-export const useComboboxFilter: typeof ComboboxPrimitive.useFilter = ComboboxPrimitive.useFilter
+const DesktopCombobox = <TValue extends ValueOptions>({
+  addNew,
+  disabled,
+  isInvalid,
+  onChange,
+  options,
+  placeholder,
+  selectedOption,
+}: DesktopComboboxProps<TValue>) => {
+  const [inputValue, setInputValue] = useState('')
+
+  return (
+    <ComboboxRoot<Option<TValue>>
+      aria-invalid={isInvalid || undefined}
+      disabled={disabled}
+      items={options}
+      onInputValueChange={setInputValue}
+      onValueChange={(option) => onChange(option)}
+      value={selectedOption ?? null}
+    >
+      <ComboboxInput placeholder={placeholder} showClear={Boolean(selectedOption)} />
+      <ComboboxPopup>
+        <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
+        <ComboboxList>
+          {(item) => (
+            <ComboboxItem key={String(item.value)} value={item}>
+              {item.label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+        {addNew && (
+          <>
+            <ComboboxSeparator />
+            <div className="p-1">{addNew(inputValue)}</div>
+          </>
+        )}
+      </ComboboxPopup>
+    </ComboboxRoot>
+  )
+}
+
+interface MobileComboboxProps<TValue extends ValueOptions> {
+  addNew?: (inputValue: string) => ReactNode
+  disabled?: boolean
+  isInvalid: boolean
+  onChange: (option: Option<TValue> | null) => void
+  options: Option<TValue>[]
+  placeholder: string
+  searchPlaceholder: string
+  selectedOption: Option<TValue> | undefined
+  title: string
+}
+
+const MobileCombobox = <TValue extends ValueOptions>({
+  addNew,
+  disabled,
+  isInvalid,
+  onChange,
+  options,
+  placeholder,
+  searchPlaceholder,
+  selectedOption,
+  title,
+}: MobileComboboxProps<TValue>) => {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+
+  const filteredOptions = useMemo(() => {
+    if (!search) {
+      return options
+    }
+    const lower = search.toLowerCase()
+    return options.filter((opt) => opt.label.toLowerCase().includes(lower))
+  }, [options, search])
+
+  return (
+    <Drawer onOpenChange={setOpen} open={open}>
+      <DrawerTrigger
+        disabled={disabled}
+        render={
+          <Button
+            aria-invalid={isInvalid || undefined}
+            className={cn(
+              'w-full justify-between border-input font-normal text-ellipsis',
+              'not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] aria-invalid:border-destructive/36 focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16'
+            )}
+            variant="outline"
+          />
+        }
+      >
+        <span className="truncate">{selectedOption?.label ?? placeholder}</span>
+        <CaretDownIcon />
+      </DrawerTrigger>
+      <DrawerPopup>
+        <DrawerHeader>
+          <DrawerTitle>{title}</DrawerTitle>
+        </DrawerHeader>
+        <DrawerPanel>
+          <div className="flex flex-col gap-2">
+            <Input onChange={(event) => setSearch(event.target.value)} placeholder={searchPlaceholder} value={search} />
+            <div className="flex max-h-64 flex-col overflow-y-auto">
+              {filteredOptions.length === 0 && <p className="py-4 text-center text-sm text-muted-foreground">Aucun résultat</p>}
+              {filteredOptions.map((option) => (
+                <button
+                  className="flex min-h-10 w-full cursor-default items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-base outline-none active:bg-accent active:text-accent-foreground"
+                  key={String(option.value)}
+                  onClick={() => {
+                    onChange(option)
+                    setOpen(false)
+                    setSearch('')
+                  }}
+                  type="button"
+                >
+                  <span className="truncate">{option.label}</span>
+                  {selectedOption?.value === option.value && <CheckIcon className="size-4 shrink-0" />}
+                </button>
+              ))}
+            </div>
+            {addNew && (
+              <>
+                <Separator />
+                {addNew(search)}
+              </>
+            )}
+          </div>
+        </DrawerPanel>
+      </DrawerPopup>
+    </Drawer>
+  )
+}

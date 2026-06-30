@@ -4,13 +4,12 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { animate, motion, useMotionValue, useTransform } from 'motion/react'
 import React, { useState } from 'react'
 
-import { Item } from '@/components/common/item'
-import { Tabs } from '@/components/common/tabs'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ItemGroup, ItemSeparator } from '@/components/ui/item'
+import { Item, ItemGroup, ItemSeparator } from '@/components/ui/item'
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
 import { getUserListOptions } from '@/features/users/api/get-all'
 import { AddUser } from '@/features/users/components/add-user'
 import { ApproveUser } from '@/features/users/components/approve-user'
@@ -126,39 +125,28 @@ const UsersManagement = () => {
       </div>
 
       <div className="px-4">
-        <Tabs
-          defaultValue="active"
-          items={[
-            {
-              content: (
-                <React.Suspense fallback={null}>
-                  <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
-                </React.Suspense>
-              ),
-              label: 'Actifs',
-              value: 'active',
-            },
-            {
-              content: (
-                <React.Suspense fallback={null}>
-                  <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-                </React.Suspense>
-              ),
-              label: 'En attente',
-              value: 'pending',
-            },
-            {
-              content: (
-                <React.Suspense fallback={null}>
-                  <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-                </React.Suspense>
-              ),
-              label: 'Bloqués',
-              value: 'blocked',
-            },
-          ]}
-          listClassName="w-full"
-        />
+        <Tabs defaultValue="active">
+          <TabsList className="w-full">
+            <TabsTab value="active">Actifs</TabsTab>
+            <TabsTab value="pending">En attente</TabsTab>
+            <TabsTab value="blocked">Bloqués</TabsTab>
+          </TabsList>
+          <TabsPanel value="active">
+            <React.Suspense fallback={null}>
+              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+            </React.Suspense>
+          </TabsPanel>
+          <TabsPanel value="pending">
+            <React.Suspense fallback={null}>
+              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
+            </React.Suspense>
+          </TabsPanel>
+          <TabsPanel value="blocked">
+            <React.Suspense fallback={null}>
+              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+            </React.Suspense>
+          </TabsPanel>
+        </Tabs>
       </div>
     </ScreenLayout>
   )

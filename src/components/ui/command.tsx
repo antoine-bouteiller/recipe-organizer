@@ -1,31 +1,97 @@
+import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomplete'
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import React from 'react'
 
-import {
-  Autocomplete,
-  AutocompleteCollection,
-  AutocompleteEmpty,
-  AutocompleteGroup,
-  AutocompleteGroupLabel,
-  AutocompleteInput,
-  AutocompleteItem,
-  AutocompleteList,
-  AutocompleteSeparator,
-} from '@/components/ui/autocomplete'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/utils/cn'
+
+const Autocomplete: typeof AutocompletePrimitive.Root = AutocompletePrimitive.Root
+
+const AutocompleteInput = ({
+  className,
+  startAddon,
+  size,
+  ...props
+}: Omit<AutocompletePrimitive.Input.Props, 'size'> & {
+  startAddon?: React.ReactNode
+  size?: 'sm' | 'default' | 'lg' | number
+  ref?: React.Ref<HTMLInputElement>
+}): React.ReactElement => {
+  const sizeValue = size ?? 'default'
+
+  return (
+    <AutocompletePrimitive.InputGroup
+      className="relative w-full text-foreground not-has-[>*.w-full]:w-fit has-disabled:opacity-64"
+      data-slot="autocomplete-input-group"
+    >
+      {startAddon && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 start-px z-10 flex items-center ps-[calc(--spacing(3)-1px)] opacity-80 has-[+[data-size=sm]]:ps-[calc(--spacing(2.5)-1px)] [&_svg]:-mx-0.5 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4"
+          data-slot="autocomplete-start-addon"
+        >
+          {startAddon}
+        </div>
+      )}
+      <AutocompletePrimitive.Input
+        className={cn(
+          startAddon &&
+            'data-[size=sm]:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(7.5)-1px)] *:data-[slot=autocomplete-input]:ps-[calc(--spacing(8.5)-1px)] sm:data-[size=sm]:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(7)-1px)] sm:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(8)-1px)]',
+          sizeValue === 'sm'
+            ? 'has-[+[data-slot=autocomplete-trigger],+[data-slot=autocomplete-clear]]:*:data-[slot=autocomplete-input]:pe-6.5'
+            : 'has-[+[data-slot=autocomplete-trigger],+[data-slot=autocomplete-clear]]:*:data-[slot=autocomplete-input]:pe-7',
+          className
+        )}
+        data-slot="autocomplete-input"
+        render={<Input nativeInput size={sizeValue} />}
+        {...props}
+      />
+    </AutocompletePrimitive.InputGroup>
+  )
+}
+
+const AutocompleteItem = ({ className, children, ...props }: AutocompletePrimitive.Item.Props): React.ReactElement => (
+  <AutocompletePrimitive.Item
+    className={cn(
+      'flex min-h-8 cursor-default select-none items-center rounded-sm px-2 py-1 text-base outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-64 sm:min-h-7 sm:text-sm',
+      className
+    )}
+    data-slot="autocomplete-item"
+    {...props}
+  >
+    {children}
+  </AutocompletePrimitive.Item>
+)
+
+const AutocompleteEmpty = ({ className, ...props }: AutocompletePrimitive.Empty.Props): React.ReactElement => (
+  <AutocompletePrimitive.Empty
+    className={cn('not-empty:p-2 text-center text-base text-muted-foreground sm:text-sm', className)}
+    data-slot="autocomplete-empty"
+    {...props}
+  />
+)
+
+const AutocompleteList = ({ className, ...props }: AutocompletePrimitive.List.Props): React.ReactElement => (
+  <ScrollArea scrollbarGutter scrollFade>
+    <AutocompletePrimitive.List
+      className={cn('not-empty:scroll-py-1 not-empty:p-1 in-data-has-overflow-y:pe-3', className)}
+      data-slot="autocomplete-list"
+      {...props}
+    />
+  </ScrollArea>
+)
 
 export const CommandDialog: typeof CommandDialogPrimitive.Root = CommandDialogPrimitive.Root
 
-export const CommandDialogPortal: typeof CommandDialogPrimitive.Portal = CommandDialogPrimitive.Portal
-
-export const CommandCreateHandle: typeof CommandDialogPrimitive.createHandle = CommandDialogPrimitive.createHandle
+const CommandDialogPortal: typeof CommandDialogPrimitive.Portal = CommandDialogPrimitive.Portal
 
 export const CommandDialogTrigger = (props: CommandDialogPrimitive.Trigger.Props): React.ReactElement => (
   <CommandDialogPrimitive.Trigger data-slot="command-dialog-trigger" {...props} />
 )
 
-export const CommandDialogBackdrop = ({ className, ...props }: CommandDialogPrimitive.Backdrop.Props): React.ReactElement => (
+const CommandDialogBackdrop = ({ className, ...props }: CommandDialogPrimitive.Backdrop.Props): React.ReactElement => (
   <CommandDialogPrimitive.Backdrop
     className={cn(
       'fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
@@ -36,7 +102,7 @@ export const CommandDialogBackdrop = ({ className, ...props }: CommandDialogPrim
   />
 )
 
-export const CommandDialogViewport = ({ className, ...props }: CommandDialogPrimitive.Viewport.Props): React.ReactElement => (
+const CommandDialogViewport = ({ className, ...props }: CommandDialogPrimitive.Viewport.Props): React.ReactElement => (
   <CommandDialogPrimitive.Viewport
     className={cn('fixed inset-0 z-50 flex flex-col items-center px-4 py-[max(--spacing(4),4vh)] sm:py-[10vh]', className)}
     data-slot="command-dialog-viewport"
@@ -98,32 +164,8 @@ export const CommandPanel = ({ className: _className, ...props }: React.Componen
   />
 )
 
-export const CommandGroup = ({ className, ...props }: React.ComponentProps<typeof AutocompleteGroup>): React.ReactElement => (
-  <AutocompleteGroup className={className} data-slot="command-group" {...props} />
-)
-
-export const CommandGroupLabel = ({ className, ...props }: React.ComponentProps<typeof AutocompleteGroupLabel>): React.ReactElement => (
-  <AutocompleteGroupLabel className={className} data-slot="command-group-label" {...props} />
-)
-
-export const CommandCollection = ({ ...props }: React.ComponentProps<typeof AutocompleteCollection>): React.ReactElement => (
-  <AutocompleteCollection data-slot="command-collection" {...props} />
-)
-
 export const CommandItem = ({ className, ...props }: React.ComponentProps<typeof AutocompleteItem>): React.ReactElement => (
   <AutocompleteItem className={cn('py-1.5', className)} data-slot="command-item" {...props} />
-)
-
-export const CommandSeparator = ({ className, ...props }: React.ComponentProps<typeof AutocompleteSeparator>): React.ReactElement => (
-  <AutocompleteSeparator className={cn('my-2', className)} data-slot="command-separator" {...props} />
-)
-
-export const CommandShortcut = ({ className, ...props }: React.ComponentProps<'kbd'>): React.ReactElement => (
-  <kbd
-    className={cn('ms-auto font-medium font-sans text-muted-foreground/72 text-xs tracking-widest', className)}
-    data-slot="command-shortcut"
-    {...props}
-  />
 )
 
 export const CommandFooter = ({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (

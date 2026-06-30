@@ -1,15 +1,16 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { type ComponentProps, type ReactElement, type ReactNode } from 'react'
 
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/utils/cn'
 
-const ItemGroup = ({ className, ...props }: React.ComponentProps<'div'>) => (
+export const ItemGroup = ({ className, ...props }: ComponentProps<'div'>) => (
   <div className={cn('group/item-group flex flex-col', className)} data-slot="item-group" role="list" {...props} />
 )
 
-const ItemSeparator = ({ className, ...props }: React.ComponentProps<typeof Separator>) => (
+export const ItemSeparator = ({ className, ...props }: ComponentProps<typeof Separator>) => (
   <Separator className={cn('my-0', className)} data-slot="item-separator" orientation="horizontal" {...props} />
 )
 
@@ -40,13 +41,13 @@ const itemVariants = cva(
   }
 )
 
-const Item = ({
+export const ItemRoot = ({
   className,
   render,
   size = 'default',
   variant = 'default',
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof itemVariants> & { render?: useRender.RenderProp }) =>
+}: ComponentProps<'div'> & VariantProps<typeof itemVariants> & { render?: useRender.RenderProp }) =>
   useRender({
     defaultTagName: 'div',
     props: mergeProps(
@@ -88,19 +89,19 @@ const itemMediaVariants = cva(
   }
 )
 
-const ItemMedia = ({ className, variant = 'default', ...props }: React.ComponentProps<'div'> & VariantProps<typeof itemMediaVariants>) => (
+export const ItemMedia = ({ className, variant = 'default', ...props }: ComponentProps<'div'> & VariantProps<typeof itemMediaVariants>) => (
   <div className={cn(itemMediaVariants({ className, variant }))} data-slot="item-media" data-variant={variant} {...props} />
 )
 
-const ItemContent = ({ className, ...props }: React.ComponentProps<'div'>) => (
+export const ItemContent = ({ className, ...props }: ComponentProps<'div'>) => (
   <div className={cn(`flex flex-1 flex-col gap-1 [&+[data-slot=item-content]]:flex-none`, className)} data-slot="item-content" {...props} />
 )
 
-const ItemTitle = ({ className, ...props }: React.ComponentProps<'div'>) => (
+export const ItemTitle = ({ className, ...props }: ComponentProps<'div'>) => (
   <div className={cn(`flex w-fit items-center gap-2 text-sm leading-snug font-medium`, className)} data-slot="item-title" {...props} />
 )
 
-const ItemDescription = ({ className, ...props }: React.ComponentProps<'p'>) => (
+export const ItemDescription = ({ className, ...props }: ComponentProps<'p'>) => (
   <p
     className={cn(
       `line-clamp-2 text-sm leading-normal font-normal text-balance text-muted-foreground`,
@@ -112,16 +113,39 @@ const ItemDescription = ({ className, ...props }: React.ComponentProps<'p'>) => 
   />
 )
 
-const ItemActions = ({ className, ...props }: React.ComponentProps<'div'>) => (
+const ItemActions = ({ className, ...props }: ComponentProps<'div'>) => (
   <div className={cn('flex items-center gap-2', className)} data-slot="item-actions" {...props} />
 )
 
-const ItemHeader = ({ className, ...props }: React.ComponentProps<'div'>) => (
-  <div className={cn('flex basis-full items-center justify-between gap-2', className)} data-slot="item-header" {...props} />
-)
+type ItemRootProps = ComponentProps<typeof ItemRoot>
 
-const ItemFooter = ({ className, ...props }: React.ComponentProps<'div'>) => (
-  <div className={cn('flex basis-full items-center justify-between gap-2', className)} data-slot="item-footer" {...props} />
-)
+interface ItemProps {
+  media?: ReactNode
+  title?: ReactNode
+  description?: ReactNode
+  content?: ReactNode
+  actions?: ReactNode
+  variant?: ItemRootProps['variant']
+  size?: ItemRootProps['size']
+  className?: string
+  render?: ItemRootProps['render']
+  onClick?: ItemRootProps['onClick']
+}
 
-export { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle }
+export const Item = ({ media, title, description, content, actions, variant, size, className, render, onClick }: ItemProps): ReactElement => {
+  const hasContent = title !== undefined || description !== undefined || content !== undefined
+
+  return (
+    <ItemRoot className={className} onClick={onClick} render={render} size={size} variant={variant}>
+      {media !== undefined && <ItemMedia>{media}</ItemMedia>}
+      {hasContent && (
+        <ItemContent>
+          {title !== undefined && <ItemTitle>{title}</ItemTitle>}
+          {description !== undefined && <ItemDescription>{description}</ItemDescription>}
+          {content}
+        </ItemContent>
+      )}
+      {actions !== undefined && <ItemActions>{actions}</ItemActions>}
+    </ItemRoot>
+  )
+}

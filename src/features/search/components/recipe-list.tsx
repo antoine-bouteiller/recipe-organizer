@@ -2,8 +2,7 @@ import { ArrowRightIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import { Fragment } from 'react/jsx-runtime'
 
-import { Item } from '@/components/common/item'
-import { ItemGroup, ItemSeparator } from '@/components/ui/item'
+import { Item, ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { addRecentRecipe } from '@/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@/types/recipe'
 

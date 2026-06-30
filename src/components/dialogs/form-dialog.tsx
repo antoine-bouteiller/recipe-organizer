@@ -1,7 +1,7 @@
 import { useSelector } from '@tanstack/react-store'
 import { type ReactElement, type ReactNode } from 'react'
 
-import { Dialog } from '@/components/common/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { Form } from '@/components/ui/form'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'

@@ -15,10 +15,6 @@ export const FieldLabel = ({ className, ...props }: FieldPrimitive.Label.Props):
   />
 )
 
-export const FieldItem = ({ className, ...props }: FieldPrimitive.Item.Props): React.ReactElement => (
-  <FieldPrimitive.Item className={cn('flex', className)} data-slot="field-item" {...props} />
-)
-
 export const FieldDescription = ({ className, ...props }: FieldPrimitive.Description.Props): React.ReactElement => (
   <FieldPrimitive.Description className={cn('text-muted-foreground text-xs', className)} data-slot="field-description" {...props} />
 )
@@ -28,4 +24,3 @@ export const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props):
 )
 
 export const FieldControl: typeof FieldPrimitive.Control = FieldPrimitive.Control
-export const FieldValidity: typeof FieldPrimitive.Validity = FieldPrimitive.Validity

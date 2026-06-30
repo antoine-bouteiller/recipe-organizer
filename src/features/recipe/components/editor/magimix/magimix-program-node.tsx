@@ -14,7 +14,7 @@ import {
   type Spread,
 } from 'lexical'
 
-import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '@/components/ui/item'
+import { ItemContent, ItemDescription, ItemMedia, ItemRoot, ItemTitle } from '@/components/ui/item'
 import { magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'
 
@@ -112,15 +112,15 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
         submitLabel="Enregistrer"
         title="Modifier le programme Magimix"
         triggerRender={
-          <Item variant="outline" render={<button />} className="w-full">
+          <ItemRoot variant="outline" render={<button />} className="w-full">
             {content}
-          </Item>
+          </ItemRoot>
         }
       />
     )
   }
 
-  return <Item variant="outline">{content}</Item>
+  return <ItemRoot variant="outline">{content}</ItemRoot>
 }
 
 class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {

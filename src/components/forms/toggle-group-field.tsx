@@ -1,5 +1,5 @@
-import { ToggleGroup } from '@/components/common/toggle-group'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { ToggleGroup } from '@/components/ui/toggle-group'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface ToggleGroupFieldProps {

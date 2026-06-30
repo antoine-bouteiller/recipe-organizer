@@ -1,18 +1,17 @@
 import { type Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui/react/toggle-group'
 import { type VariantProps } from 'class-variance-authority'
-import React from 'react'
+import React, { type ReactElement } from 'react'
 
-import { Separator } from '@/components/ui/separator'
 import { Toggle as ToggleComponent, type toggleVariants } from '@/components/ui/toggle'
 import { cn } from '@/utils/cn'
 
-export const ToggleGroupContext: React.Context<VariantProps<typeof toggleVariants>> = React.createContext<VariantProps<typeof toggleVariants>>({
+const ToggleGroupContext: React.Context<VariantProps<typeof toggleVariants>> = React.createContext<VariantProps<typeof toggleVariants>>({
   size: 'default',
   variant: 'default',
 })
 
-export const ToggleGroup = ({
+const ToggleGroupRoot = ({
   className,
   variant = 'default',
   size = 'default',
@@ -43,7 +42,7 @@ export const ToggleGroup = ({
   </ToggleGroupPrimitive>
 )
 
-export const Toggle = ({
+const Toggle = ({
   className,
   children,
   variant,
@@ -69,16 +68,22 @@ export const Toggle = ({
   )
 }
 
-export const ToggleGroupSeparator = ({
-  className,
-  orientation = 'vertical',
-  ...props
-}: {
+interface ToggleGroupProps {
+  items: { label: string; value: string }[]
+  value: string[]
+  onValueChange: (value: string[]) => void
+  disabled?: boolean
   className?: string
-} & React.ComponentProps<typeof Separator>): React.ReactElement => (
-  <Separator
-    className={cn('pointer-events-none relative bg-input before:absolute before:inset-0 dark:before:bg-input/32', className)}
-    orientation={orientation}
-    {...props}
-  />
+}
+
+export const ToggleGroup = ({ items, value, onValueChange, disabled, className }: ToggleGroupProps): ReactElement => (
+  <div className={cn('max-w-full overflow-x-auto overflow-y-hidden', className)}>
+    <ToggleGroupRoot disabled={disabled} multiple onValueChange={onValueChange} value={value}>
+      {items.map(({ label, value: itemValue }) => (
+        <Toggle className="shrink-0" key={itemValue} value={itemValue}>
+          {label}
+        </Toggle>
+      ))}
+    </ToggleGroupRoot>
+  </div>
 )

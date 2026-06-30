@@ -1,5 +1,4 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
-import { cva, type VariantProps } from 'class-variance-authority'
 import { motion } from 'motion/react'
 import type React from 'react'
 
@@ -9,73 +8,20 @@ export const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props): React.R
   <TabsPrimitive.Root className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)} data-slot="tabs" {...props} />
 )
 
-const tabListVariants = cva(
-  `
-    relative z-0 flex w-fit items-center justify-center gap-x-0.5
-    text-muted-foreground data-[orientation=vertical]:flex-col
-  `,
-  {
-    defaultVariants: {
-      variant: 'default',
-    },
-    variants: {
-      variant: {
-        default: 'rounded-lg bg-muted p-0.5 text-muted-foreground/64',
-        tabbar: 'flex w-full flex-1 items-center justify-around',
-        underline: `
-          data-[orientation=horizontal]:py-1
-          data-[orientation=vertical]:px-1
-          *:data-[slot=tabs-trigger]:hover:bg-accent
-        `,
-      },
-    },
-  }
-)
-
-const tabIndicatorVariants = cva(
-  `
-  absolute bottom-0 left-0 h-(--active-tab-height)
-  w-(--active-tab-width) translate-x-(--active-tab-left)
-  -translate-y-(--active-tab-bottom)
-`,
-  {
-    defaultVariants: {
-      variant: 'default',
-    },
-    variants: {
-      variant: {
-        default: `
-          -z-1 rounded-md bg-background shadow-sm
-          dark:bg-accent
-        `,
-        tabbar: `
-          -z-1 rounded-full bg-primary/7
-        `,
-        underline: `
-          z-10 bg-primary
-          data-[orientation=horizontal]:h-0.5
-          data-[orientation=horizontal]:translate-y-px
-          data-[orientation=vertical]:w-0.5
-          data-[orientation=vertical]:-translate-x-px
-        `,
-      },
-    },
-  }
-)
-
-export const TabsList = ({
-  variant = 'default',
-  className,
-  children,
-  indicatorLayoutId,
-  ...props
-}: TabsPrimitive.List.Props & VariantProps<typeof tabListVariants> & { indicatorLayoutId?: string }): React.ReactElement => (
-  <TabsPrimitive.List className={cn(tabListVariants({ variant }), className)} data-slot="tabs-list" {...props}>
+export const TabsList = ({ className, children, ...props }: TabsPrimitive.List.Props): React.ReactElement => (
+  <TabsPrimitive.List
+    className={cn(
+      `relative z-0 flex w-fit items-center justify-center gap-x-0.5 rounded-lg bg-muted p-0.5 text-muted-foreground/64 data-[orientation=vertical]:flex-col`,
+      className
+    )}
+    data-slot="tabs-list"
+    {...props}
+  >
     {children}
     <TabsPrimitive.Indicator
+      className="absolute bottom-0 left-0 -z-1 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) rounded-md bg-background shadow-sm dark:bg-accent"
       data-slot="tab-indicator"
-      render={<motion.span layoutId={indicatorLayoutId} layout transition={{ bounce: 0.15, duration: 0.3, type: 'spring' }} />}
-      className={cn(tabIndicatorVariants({ variant }))}
+      render={<motion.span layout transition={{ bounce: 0.15, duration: 0.3, type: 'spring' }} />}
     />
   </TabsPrimitive.List>
 )

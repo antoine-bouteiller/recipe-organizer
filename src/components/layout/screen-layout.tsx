@@ -75,7 +75,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
       >
         {children}
       </div>
-      {pageKey && <TabBar activePage={pageKey} />}
+      {pageKey && <TabBar />}
     </div>
   )
 }
