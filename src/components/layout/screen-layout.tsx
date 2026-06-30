@@ -11,13 +11,12 @@ interface ScreenLayoutProps {
   children: React.ReactNode
   headerEndItem?: React.ReactNode
   title: string
-  subtitle?: string
   withGoBack?: boolean
   backgroundImage?: string
   pageKey?: string
 }
 
-export const ScreenLayout = ({ children, headerEndItem, title, subtitle, withGoBack = false, backgroundImage, pageKey }: ScreenLayoutProps) => {
+export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = false, backgroundImage, pageKey }: ScreenLayoutProps) => {
   const router = useRouter()
 
   useBackViewTransition(withGoBack)
@@ -27,7 +26,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, subtitle, withGoB
   return (
     <div
       className={cn(
-        'relative flex min-h-0 w-full flex-1 flex-col items-center gap-2 overflow-hidden bg-muted pt-0 md:overflow-y-auto',
+        'relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-muted pt-0 md:overflow-y-auto',
         pageKey ? 'pb-14' : ''
       )}
     >
@@ -64,16 +63,13 @@ export const ScreenLayout = ({ children, headerEndItem, title, subtitle, withGoB
               <ArrowLeftIcon />
             </Button>
           )}
-          <div className="min-w-0 flex-1">
-            <h1 className="truncate font-heading text-3xl font-normal">{title}</h1>
-            {subtitle && <p className="mt-1 truncate text-sm text-muted-foreground">{subtitle}</p>}
-          </div>
+          <h1 className="flex-1 truncate font-heading text-3xl font-semibold">{title}</h1>
           {headerEndItem && <div>{headerEndItem}</div>}
         </div>
       )}
       <div
         className={cn(
-          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible',
+          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible px-4 pb-4',
           isImageHeader && '-mt-10 rounded-t-3xl'
         )}
       >

@@ -36,7 +36,7 @@ export const menuItems: MenuItem[] = [
     iconFilledProps: {
       weight: 'fill',
     },
-    label: 'Liste de courses',
+    label: 'Courses',
     linkProps: {
       to: '/shopping-list',
     },

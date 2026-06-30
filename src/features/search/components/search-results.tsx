@@ -87,7 +87,7 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-2.5 px-4 pb-4">
+    <div className="flex flex-1 flex-col gap-2.5">
       <div className="text-xs font-semibold text-muted-foreground">
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>

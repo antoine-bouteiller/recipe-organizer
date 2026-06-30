@@ -6,7 +6,7 @@ import { ShoppingList } from '@/features/shopping-list/component/shopping-list'
 
 const ShoppingListPage = () => (
   <ScreenLayout pageKey="/shopping-list" headerEndItem={<ResetCartButton />} title="Liste de courses">
-    <div className="space-y-5 p-4">
+    <div className="space-y-5">
       <ShoppingList />
     </div>
   </ScreenLayout>

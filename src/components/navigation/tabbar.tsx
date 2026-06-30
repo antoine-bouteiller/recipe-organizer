@@ -17,7 +17,7 @@ export const TabBar = ({ activePage }: { activePage: string }) => (
           <span className="text-[10px] font-semibold">{item.label}</span>
         </span>
       ),
-      className: 'h-12 text-muted-foreground data-active:text-primary',
+      className: 'h-12 text-muted-foreground data-active:text-primary flex-1',
       nativeButton: false,
       render: <Link {...item.linkProps} />,
       value: item.linkProps.to,

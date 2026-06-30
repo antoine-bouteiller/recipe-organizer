@@ -37,7 +37,7 @@ const SearchPage = () => {
 
   return (
     <ScreenLayout title="Rechercher" pageKey="/search">
-      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-muted px-4 pt-4 pb-2">
+      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-muted pb-2">
         <Collapsible>
           <div className="flex items-center gap-2">
             <div className="flex-1">

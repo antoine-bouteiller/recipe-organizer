@@ -17,7 +17,7 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Compte" withGoBack>
-      <Card className="m-4 p-6">
+      <Card className="p-6">
         <div className="space-y-6">
           <div>
             <h2 className="mb-4 text-lg font-semibold">Informations du compte</h2>

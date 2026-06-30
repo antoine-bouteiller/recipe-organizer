@@ -28,7 +28,7 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
+      <div className="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
         <SearchInput search={search} setSearch={setSearch} />
         <AddIngredient>
           <Button size="icon-lg" variant="outline">
@@ -37,41 +37,39 @@ const IngredientsManagement = () => {
         </AddIngredient>
       </div>
 
-      <div className="px-4">
-        {filteredIngredients.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">
-            {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
-          </p>
-        ) : (
-          <ItemGroup>
-            {filteredIngredients.map((ingredient, index) => (
-              <React.Fragment key={ingredient.id}>
-                <Item
-                  actions={
-                    isAdmin ? (
-                      <>
-                        <EditIngredient ingredient={ingredient} />
-                        <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
-                      </>
-                    ) : undefined
-                  }
-                  className="flex-nowrap"
-                  title={
+      {filteredIngredients.length === 0 ? (
+        <p className="py-8 text-center text-muted-foreground">
+          {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
+        </p>
+      ) : (
+        <ItemGroup>
+          {filteredIngredients.map((ingredient, index) => (
+            <React.Fragment key={ingredient.id}>
+              <Item
+                actions={
+                  isAdmin ? (
                     <>
-                      <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
-                      <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
-                        {ingredientCategoryIcons[ingredient.category]}
-                        <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
-                      </IngredientBadge>
+                      <EditIngredient ingredient={ingredient} />
+                      <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
                     </>
-                  }
-                />
-                {index !== filteredIngredients.length - 1 && <ItemSeparator />}
-              </React.Fragment>
-            ))}
-          </ItemGroup>
-        )}
-      </div>
+                  ) : undefined
+                }
+                className="flex-nowrap"
+                title={
+                  <>
+                    <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
+                    <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
+                      {ingredientCategoryIcons[ingredient.category]}
+                      <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
+                    </IngredientBadge>
+                  </>
+                }
+              />
+              {index !== filteredIngredients.length - 1 && <ItemSeparator />}
+            </React.Fragment>
+          ))}
+        </ItemGroup>
+      )}
     </ScreenLayout>
   )
 }

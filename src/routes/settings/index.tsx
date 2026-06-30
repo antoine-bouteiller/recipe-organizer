@@ -45,7 +45,7 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Paramètres" pageKey="/settings">
-      <div className="grid gap-4 p-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         {visibleSections.map((section) => {
           const Icon = section.icon
           return (
