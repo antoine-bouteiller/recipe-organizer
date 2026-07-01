@@ -112,6 +112,36 @@ const viteConfig = defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              test: /node_modules\/react/,
+              name: 'react',
+            },
+            {
+              test: /node_modules\/react-dom/,
+              name: 'react-dom',
+            },
+            {
+              test: /node_modules\/@tanstack\/react-query/,
+              name: 'tanstack-query',
+            },
+          ],
+        },
+      },
+      onLog(level, log, defaultHandler) {
+        // Supress Lexical Warning
+        if (log.code === 'INVALID_ANNOTATION') {
+          return
+        }
+        // Handle all other logs normally
+        defaultHandler(level, log)
+      },
+    },
+  },
   plugins: [
     tanstackStart(),
     react(),
