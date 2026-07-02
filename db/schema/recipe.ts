@@ -1,9 +1,13 @@
+import { user } from '@schema'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-import { type CuisineType, type Meal } from '@/types/recipe'
+export type CuisineType = 'mediterranean' | 'chinese' | 'japanese' | 'indian' | 'mexican' | 'italian' | 'french'
+export type Meal = 'breakfast' | 'lunch' | 'diner' | 'dessert'
 
 export const recipe = sqliteTable('recipes', {
-  createdBy: text('created_by').notNull().default('1'),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'restrict' }),
   cuisineTypes: text('cuisine_types', { mode: 'json' }).$type<CuisineType[]>().notNull().default([]),
   id: integer('id').primaryKey(),
   image: text('image', { length: 255 }).notNull(),

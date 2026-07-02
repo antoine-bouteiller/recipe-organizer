@@ -23,7 +23,8 @@
     "noFallthroughCasesInSwitch": true,
 
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@schema": ["./db/schema/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],

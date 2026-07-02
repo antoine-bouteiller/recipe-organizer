@@ -1,4 +1,4 @@
-import { UNITS, type Dimension, type Unit, type UnitSlug } from '@/lib/db/schema/unit'
+import { UNITS, type Dimension, type Unit, type UnitSlug } from '@schema'
 
 interface IngredientConversionMeta {
   readonly densityGPerMl: number | null

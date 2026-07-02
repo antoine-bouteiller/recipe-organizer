@@ -1,4 +1,6 @@
-import { type CuisineType, type Meal, type ReducedRecipe } from '@/types/recipe'
+import { type CuisineType, type Meal } from '@schema'
+
+import { type ReducedRecipe } from '@/types/recipe'
 
 import { normalize } from './normalize'
 

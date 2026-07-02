@@ -1,6 +1,7 @@
+import { UNITS } from '@schema'
+
 import { type Recipe, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { useRecipeQuantities } from '@/features/recipe/hooks/use-recipe-quantities'
-import { UNITS } from '@/lib/db/schema/unit'
 import { formatNumber } from '@/utils/number'
 import { scaleQuantity } from '@/utils/scale-quantity'
 

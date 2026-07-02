@@ -1,4 +1,5 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { unitOptions } from '@schema'
 import { useSelector } from '@tanstack/react-store'
 import { type ReactNode } from 'react'
 import { Fragment } from 'react/jsx-runtime'
@@ -8,7 +9,6 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { withForm } from '@/hooks/use-app-form'
 import { type Option } from '@/hooks/use-options'
-import { unitOptions } from '@/lib/db/schema/unit'
 
 import { recipeDefaultValues } from '../utils/form'
 

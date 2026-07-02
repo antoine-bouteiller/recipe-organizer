@@ -1,8 +1,8 @@
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-import { ingredient } from '@/lib/db/schema/ingredient'
-import { recipe } from '@/lib/db/schema/recipe'
-import { type UnitSlug } from '@/lib/db/schema/unit'
+import { ingredient } from './ingredient'
+import { recipe } from './recipe'
+import { type UnitSlug } from './unit'
 
 export const recipeIngredientGroup = sqliteTable(
   'recipe_ingredient_groups',

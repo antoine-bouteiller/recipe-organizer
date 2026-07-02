@@ -1,4 +1,4 @@
-import { type CuisineType, type Meal } from '@/types/recipe'
+import { type CuisineType, type Meal } from '@schema'
 
 export const CUISINE_TYPES = [
   'mediterranean',

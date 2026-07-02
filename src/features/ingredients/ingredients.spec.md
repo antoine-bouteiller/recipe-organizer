@@ -105,7 +105,7 @@ preferred shopping unit), the CRUD server functions backing the catalogue, the U
 
 ### 3.2 Unit & Conversion Requirements
 
-- **REQ-025.** `UNITS` MUST contain exactly the 16 entries defined in `src/lib/db/schema/unit.ts` with
+- **REQ-025.** `UNITS` MUST contain exactly the 16 entries defined in `db/schema/unit.ts` with
   their declared `dimension`, `parent`, and `factor` values.
 - **REQ-026.** `kg` MUST resolve to `g` via factor `1000`; `l` MUST resolve to `ml` via factor `1000`;
   `tbsp` MUST resolve to `ml` via factor `15`; `tsp` MUST resolve to `ml` via factor `5`. All other units

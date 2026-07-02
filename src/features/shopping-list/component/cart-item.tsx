@@ -1,7 +1,7 @@
 import { CheckIcon } from '@phosphor-icons/react'
+import { UNITS, type UnitSlug } from '@schema'
 import { useState } from 'react'
 
-import { UNITS, type UnitSlug } from '@/lib/db/schema/unit'
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
 

@@ -18,7 +18,7 @@ declaration, relations, client construction, the data-access patterns used by se
 
 In scope:
 
-- Drizzle schema modules under `src/lib/db/schema/*` and the relations graph in `src/lib/db/index.ts`.
+- Drizzle schema modules under `db/schema/*` and the relations graph in `db/schema/index.ts`.
 - The `getDb()` client and the read/write/batch idioms used by feature server functions.
 - Migration generation, local apply, and remote apply workflows.
 - Conventions for query keys and cache invalidation tied to mutations.
@@ -41,7 +41,7 @@ Audience: contributors and AI agents modifying schema, writing queries, or evolv
 - **Relational query API**: `getDb().query.<table>.findMany / findFirst({ columns, with, where, orderBy })` syntax
   driven by the relations object.
 - **Batch**: `getDb().batch([...])` — D1's atomic multi-statement transaction primitive.
-- **`UnitSlug`**: String-literal union of supported measurement units (see `src/lib/db/schema/unit.ts`).
+- **`UnitSlug`**: String-literal union of supported measurement units (see `db/schema/unit.ts`).
 - **`RecipeTag`**: Domain-specific recipe tag enum defined in `src/features/recipe/utils/constants.ts`.
 
 ## 3. Requirements, Constraints & Guidelines
@@ -51,13 +51,13 @@ Audience: contributors and AI agents modifying schema, writing queries, or evolv
 - **REQ-001**: All persistent data MUST be stored in the Cloudflare D1 binding named `DB`
   (`wrangler.jsonc` `d1_databases[].binding = "DB"`).
 - **REQ-002**: All schema tables MUST be declared with `sqliteTable` from `drizzle-orm/sqlite-core` and live under
-  `src/lib/db/schema/`.
-- **REQ-003**: Every schema module MUST be re-exported from `src/lib/db/schema/index.ts` so drizzle-kit picks it up
-  via `drizzle.config.ts` `schema: './src/lib/db/schema/index.ts'`.
+  `db/schema/`.
+- **REQ-003**: Every schema module MUST be re-exported from `db/schema/index.ts` so drizzle-kit picks it up
+  via `drizzle.config.ts` `schema: './db/schema/index.ts'`.
 - **REQ-004**: Application code MUST acquire its Drizzle client through `getDb()` from `src/lib/db/index.ts`. Direct
   imports of `drizzle-orm/d1` outside that module are forbidden.
 - **REQ-005**: Cross-table reads using `with: { ... }` MUST use relations declared in `defineRelations(...)` in
-  `src/lib/db/index.ts`. Adding a new `with` key requires adding the matching relation.
+  `db/schema/index.ts`. Adding a new `with` key requires adding the matching relation.
 - **REQ-006**: Multi-statement writes that must be atomic MUST be issued via `getDb().batch([...])`.
 - **REQ-007**: All foreign keys MUST declare `{ onDelete: 'restrict' }`. Cascading deletes are performed by
   application code (see `src/features/recipe/api/delete.ts`).
@@ -67,7 +67,7 @@ Audience: contributors and AI agents modifying schema, writing queries, or evolv
   `unitSlugSchema` (Zod) at server-function boundaries.
 - **REQ-010**: Mutations exposed as `mutationOptions` MUST invalidate the relevant query keys from
   `src/lib/query-keys.ts` in their `onSuccess`.
-- **REQ-011**: Schema changes MUST be paired with a generated migration committed to `migrations/`.
+- **REQ-011**: Schema changes MUST be paired with a generated migration committed to `db/migrations/`.
 - **REQ-012**: `vp check` MUST pass before committing any schema or data-layer change.
 
 ### 3.2 Constraints
@@ -83,7 +83,7 @@ Audience: contributors and AI agents modifying schema, writing queries, or evolv
   schema can compile in a single module; the relation is wired via `defineRelations` instead. Preserve this pattern
   when extending self-references.
 - **CON-006**: `wrangler.jsonc` `d1_databases[].migrations_dir` is set to `migrations_tmp` for Wrangler's own
-  migration mechanism. The authoritative migration directory for drizzle-kit is `migrations/` (per
+  migration mechanism. The authoritative migration directory for drizzle-kit is `db/migrations/` (per
   `drizzle.config.ts`). Do not conflate the two.
 - **CON-007**: Local migration apply uses a project-specific Bun script invoked via
   `pnpm db:migrate:local`. Remote apply runs `drizzle-kit migrate` in CI (`pnpm db:migrate:remote`).
@@ -121,7 +121,7 @@ export const getDb = () => drizzle(cloudflareEnv.DB, { relations })
 
 ### 4.2 Relations Graph
 
-Defined via `defineRelations(...)` in `src/lib/db/index.ts`:
+Defined via `defineRelations(...)` in `db/schema/index.ts`:
 
 | Owner table             | Relation key       | Cardinality | Target table            | Notes                                                     |
 | ----------------------- | ------------------ | ----------- | ----------------------- | --------------------------------------------------------- |
@@ -194,10 +194,10 @@ export const queryKeys = {
 
 ## 5. Acceptance Criteria
 
-- **AC-001**: Given a new schema module, when re-exported from `src/lib/db/schema/index.ts`, then
-  `vp dlx drizzle-kit generate` produces a migration in `migrations/` with no manual edits to existing files.
+- **AC-001**: Given a new schema module, when re-exported from `db/schema/index.ts`, then
+  `vp dlx drizzle-kit generate` produces a migration in `db/migrations/` with no manual edits to existing files.
 - **AC-002**: Given a `with: { <relationKey>: ... }` clause used by application code, when the relations graph in
-  `src/lib/db/index.ts` is inspected, then `<relationKey>` is declared on the owning table in `defineRelations(...)`.
+  `db/schema/index.ts` is inspected, then `<relationKey>` is declared on the owning table in `defineRelations(...)`.
 - **AC-003**: Given a delete of a parent entity, when the operation runs, then all child rows are removed in the
   same `getDb().batch([...])` call before the parent row is deleted.
 - **AC-004**: Given a successful mutation (`create`/`update`/`delete`), when the `onSuccess` handler runs, then it
@@ -207,7 +207,7 @@ export const queryKeys = {
 - **AC-006**: Given any change under `src/lib/db/`, when CI runs `vp check` and `vp test`, then both succeed before
   merge.
 - **AC-007**: Given a deployed environment, when `pnpm db:migrate:remote` is invoked in CI, then
-  `drizzle-kit migrate` applies pending `migrations/*.sql` files against the configured D1 database.
+  `drizzle-kit migrate` applies pending `db/migrations/*.sql` files against the configured D1 database.
 
 ## 6. Test Automation Strategy
 
@@ -236,7 +236,7 @@ export const queryKeys = {
   recipe row.
 - **PAT-005 (auto-tag computation at write time)**: `vegetarian`/`magimix` flags are derived during create/update
   (`src/features/recipe/api/create.ts`, `update.ts`) so reads remain a single row fetch.
-- **PAT-006 (two migration tools)**: drizzle-kit owns the source-of-truth migrations under `migrations/`. The
+- **PAT-006 (two migration tools)**: drizzle-kit owns the source-of-truth migrations under `db/migrations/`. The
   `migrations_tmp` referenced in `wrangler.jsonc` belongs to Wrangler's separate (and currently unused) migration
   mechanism — kept distinct to avoid Wrangler stomping on drizzle-managed history.
 
@@ -327,14 +327,14 @@ The `--no-schema` flag exports data only; the receiving database must already ha
 - **VAL-001**: `vp check` passes (format + lint + type-aware lint).
 - **VAL-002**: `vp test` passes.
 - **VAL-003**: `vp dlx drizzle-kit generate` produces an empty diff after a clean checkout (no drift between
-  schema files and `migrations/`).
+  schema files and `db/migrations/`).
 - **VAL-004**: Every `with: { ... }` key used in `src/features/**/api/*.ts` corresponds to a key declared in
-  `defineRelations(...)` in `src/lib/db/index.ts`.
+  `defineRelations(...)` in `db/schema/index.ts`.
 - **VAL-005**: Every mutation in `src/features/**/api/{create,update,delete}.ts` invalidates an appropriate key
   from `src/lib/query-keys.ts` in `onSuccess`.
-- **VAL-006**: Every FK in `src/lib/db/schema/*.ts` declares `{ onDelete: 'restrict' }`.
+- **VAL-006**: Every FK in `db/schema/*.ts` declares `{ onDelete: 'restrict' }`.
 - **VAL-007**: After running `pnpm db:migrate:local`, the local D1 schema matches the schema in
-  `src/lib/db/schema/`.
+  `db/schema/`.
 
 ## 11. Data Dictionary
 

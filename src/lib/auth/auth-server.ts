@@ -1,3 +1,4 @@
+import { account, session, user, verification } from '@schema'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'
@@ -5,7 +6,6 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start'
 import { env } from 'cloudflare:workers'
 
 import { getDb } from '@/lib/db'
-import { account, session, user, verification } from '@/lib/db/schema'
 
 // Better Auth must be instantiated per request: the Cloudflare `env` binding and
 // The D1 database are only available inside a request scope on Workers.

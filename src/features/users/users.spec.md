@@ -27,7 +27,7 @@ Start server functions and a single React route under
 
 ### 1.2 In scope
 
-- `user` SQLite table schema (`src/lib/db/schema/user.ts`).
+- `user` SQLite table schema (`db/schema/user.ts`).
 - Server functions in `src/features/users/api/`: `getUsersList`, `createUser`,
   `approveUser`, `blockUser`.
 - React Query options exposed by those modules
@@ -213,7 +213,7 @@ Engineers and LLM coding agents working on the recipe-organizer codebase.
 
 ## 4. Interfaces & Data Contracts
 
-### 4.1 Database schema (`src/lib/db/schema/user.ts`)
+### 4.1 Database schema (`db/schema/user.ts`)
 
 | Column   | Type        | Constraints                                           | Default              |
 | -------- | ----------- | ----------------------------------------------------- | -------------------- |
@@ -441,7 +441,7 @@ denied'`). One positive path per function.
 | -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------- |
 | Internal | `@/lib/auth/auth-guard`                                                                        | RBAC enforcement (`authGuard('admin')`) |
 | Internal | `@/lib/db` (`getDb`)                                                                           | Drizzle D1 client                       |
-| Internal | `@/lib/db/schema` (`user`)                                                                     | Drizzle table definition                |
+| Internal | `@schema` (`user`)                                                                             | Drizzle table definition                |
 | Internal | `@/lib/query-keys` (`queryKeys.allUsers`, `queryKeys.listUsers`)                               | React Query key factory                 |
 | Internal | `@/components/common/toast` (`toastManager`) and `@/lib/toast-helpers` (`toastError`)          | User feedback                           |
 | Internal | `@/components/dialogs/delete-dialog` (`DeleteDialog`)                                          | Confirmation UX for `BlockUser`         |

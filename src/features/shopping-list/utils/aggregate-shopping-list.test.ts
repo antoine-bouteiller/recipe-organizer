@@ -1,6 +1,6 @@
+import { type UnitSlug } from '@schema'
 import { describe, expect, it } from 'vite-plus/test'
 
-import { type UnitSlug } from '@/lib/db/schema/unit'
 import { type IngredientCategory } from '@/types/ingredient'
 
 import { aggregateShoppingList, type ShoppingListIngredient, type ShoppingListRecipe } from './aggregate-shopping-list'

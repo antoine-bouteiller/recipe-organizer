@@ -14,7 +14,7 @@ This specification defines the canonical file and folder structure of the `recip
 ## 1. Purpose & Scope
 
 - **Audience**: contributors and AI agents authoring or moving files in this repository.
-- **Scope**: the entire repository tree, with normative rules for `src/`, `docs/`, `migrations/`, `scripts/`, `public/`, and root-level config.
+- **Scope**: the entire repository tree, with normative rules for `src/`, `docs/`, `db/migrations/`, `scripts/`, `public/`, and root-level config.
 - **Out of scope**: implementation details inside files (covered by infrastructure and feature specs).
 - **Assumption**: project tooling is Vite+ (`vp`) on top of pnpm, oxlint, oxfmt, Vitest, and Wrangler — see `AGENTS.md`/`CLAUDE.md`.
 
@@ -37,12 +37,12 @@ This specification defines the canonical file and folder structure of the `recip
 - **REQ-001**: Every file under `src/**` MUST be either a feature file (`src/features/<name>/...`), a route file (`src/routes/...`), or a shared infrastructure file (`src/components`, `src/hooks`, `src/lib`, `src/stores`, `src/styles`, `src/types`, `src/utils`).
 - **REQ-002**: Each feature folder MUST expose at most these subfolders, and only those that contain code: `api/`, `components/`, `hooks/`, `contexts/`, `types/`, `utils/`, `spec/`. Feature folders MUST NOT contain a `lib/` — binding/SDK-dependent code that would otherwise live there belongs in `src/lib/<topic>/` (e.g. `src/lib/auth/`).
 - **REQ-003**: Server functions MUST live under `src/features/<name>/api/` with one server function per file, named after the verb: `create.ts`, `update.ts`, `delete.ts`, `get-all.ts`, `get-one.ts`, `get-instructions.ts`, etc.
-- **REQ-004**: Drizzle schema modules MUST live in `src/lib/db/schema/<table>.ts` and be re-exported from `src/lib/db/schema/index.ts`. Relations MUST be defined in `src/lib/db/index.ts` via `defineRelations`.
+- **REQ-004**: Drizzle schema modules MUST live in `db/schema/<table>.ts` and be re-exported from `db/schema/index.ts`. Relations MUST be defined in `db/schema/index.ts` via `defineRelations`.
 - **REQ-005**: Route files MUST be placed under `src/routes/` and reflect the URL hierarchy. Dynamic segments use `$param.tsx`; nested API routes use `src/routes/api/...`.
 - **REQ-006**: Reusable UI primitives (owned design-system components built on Base UI; one file per component, no longer re-pulled from a registry) MUST live in `src/components/ui/`; reusable form fields in `src/components/forms/`; reusable dialogs in `src/components/dialogs/`; reusable layout in `src/components/layout/`; reusable navigation in `src/components/navigation/`; reusable error UI in `src/components/error/`; reusable icons in `src/components/icons/`.
 - **REQ-007**: Cross-feature singleton client state MUST live in `src/stores/<topic>.store.ts` (TanStack Store via the shared `persistedStore` helper). Feature-internal stores MUST stay inside the feature folder.
 - **REQ-008**: Pure helper utilities (no React, no DOM, no fetch) MUST live in `src/utils/`. Anything that depends on React, the database, or Cloudflare bindings belongs in `src/lib/` or feature folders.
-- **REQ-009**: Database migrations MUST live under `migrations/` (drizzle-kit `out`). The `migrations_tmp/` directory referenced in `wrangler.jsonc` is owned by Wrangler and MUST NOT be hand-edited.
+- **REQ-009**: Database migrations MUST live under `db/migrations/` (drizzle-kit `out`). The `migrations_tmp/` directory referenced in `wrangler.jsonc` is owned by Wrangler and MUST NOT be hand-edited.
 - **REQ-010**: Specs MUST follow the naming and location rules in §3 _Spec rules_.
 
 ### Spec rules
@@ -92,6 +92,9 @@ recipe-organizer/
 ├── .vite-hooks/              Vite+ hooks state (gitignored)
 ├── .wrangler/                Wrangler local state (gitignored)
 ├── .zed/                     Editor settings (optional)
+├── db/                       Database layer (Void `db/` convention)
+│   ├── schema/               Drizzle tables + `defineRelations` in `index.ts`
+│   └── migrations/           drizzle-kit migrations (canonical)
 ├── docs/
 │   ├── architecture.spec.md          Global architecture
 │   ├── file-structure.spec.md        This file
@@ -102,7 +105,6 @@ recipe-organizer/
 │       ├── platform.spec.md
 │       ├── routing-ssr.spec.md
 │       └── server-functions.spec.md
-├── migrations/               drizzle-kit migrations (canonical)
 ├── migrations_tmp/           wrangler-managed (do NOT edit)
 ├── public/                   Static assets served from /
 ├── scripts/
@@ -248,7 +250,7 @@ Every spec MUST contain sections numbered 1–11 with these exact headings:
 ## 5. Acceptance Criteria
 
 - **AC-001**: Given a new feature `foo`, When the author creates `src/features/foo/api/get-all.ts`, Then it MUST export both the server function and a `getFooListOptions()` factory.
-- **AC-002**: Given a request to add a `bar` Drizzle table, When the schema is added at `src/lib/db/schema/bar.ts`, Then it MUST be re-exported from `src/lib/db/schema/index.ts` and registered in `defineRelations` if it has FKs.
+- **AC-002**: Given a request to add a `bar` Drizzle table, When the schema is added at `db/schema/bar.ts`, Then it MUST be re-exported from `db/schema/index.ts` and registered in `defineRelations` if it has FKs.
 - **AC-003**: Given a route file `src/routes/foo/$id.tsx`, When the dev server is restarted, Then `src/routeTree.gen.ts` MUST contain the new route entry without manual edits.
 - **AC-004**: Given a TanStack Store, When the file is added under `src/stores/`, Then it is a plain
   module (no `'@tanstack/react-start/client-only'` directive); consumers render it within client-only
@@ -293,8 +295,8 @@ Every spec MUST contain sections numbered 1–11 with these exact headings:
 
 ### Example: adding a new entity `mealPlan`
 
-1. Schema → `src/lib/db/schema/meal-plan.ts`; re-export from `schema/index.ts`; register in `defineRelations`.
-2. Migration → `vp dlx drizzle-kit generate` (creates a file in `migrations/`).
+1. Schema → `db/schema/meal-plan.ts`; re-export from `schema/index.ts`; register in `defineRelations`.
+2. Migration → `vp dlx drizzle-kit generate` (creates a file in `db/migrations/`).
 3. API → `src/features/meal-plan/api/{get-all,create,update,delete}.ts`.
 4. Components → `src/features/meal-plan/components/{meal-plan-form,add-meal-plan,...}.tsx`.
 5. Route → `src/routes/meal-plan/index.tsx`. Restart `pnpm dev`.

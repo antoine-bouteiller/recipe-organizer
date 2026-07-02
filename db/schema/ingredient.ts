@@ -1,6 +1,6 @@
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-import { type UnitSlug } from '@/lib/db/schema/unit'
+import { type UnitSlug } from './unit'
 
 export const ingredientCategory = ['meat', 'fish', 'vegetables', 'spices', 'other'] as const
 

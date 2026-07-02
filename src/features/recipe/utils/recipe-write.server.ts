@@ -1,8 +1,7 @@
+import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes, type UnitSlug } from '@schema'
 import { inArray } from 'drizzle-orm'
 
 import { getDb } from '@/lib/db'
-import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/lib/db/schema'
-import { type UnitSlug } from '@/lib/db/schema/unit'
 import { isNotEmpty } from '@/utils/array'
 
 interface IngredientGroupWrite {

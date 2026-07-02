@@ -1,10 +1,20 @@
-import { env as cloudflareEnv } from 'cloudflare:workers'
 import { defineRelations } from 'drizzle-orm'
-import { drizzle } from 'drizzle-orm/d1'
 
-import { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, user } from './schema'
+import { ingredient, ingredientCategory } from './ingredient'
+import { recipe } from './recipe'
+import { groupIngredient, recipeIngredientGroup } from './recipe-ingredients'
+import { recipeLinkedRecipes } from './recipe-linked-recipes'
+import { user } from './user'
 
-const relations = defineRelations(
+export * from './auth'
+export * from './ingredient'
+export * from './recipe'
+export * from './recipe-ingredients'
+export * from './recipe-linked-recipes'
+export * from './unit'
+export * from './user'
+
+export const relations = defineRelations(
   { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, user },
   (relation) => ({
     groupIngredient: {
@@ -64,5 +74,3 @@ const relations = defineRelations(
     },
   })
 )
-
-export const getDb = () => drizzle(cloudflareEnv.DB, { relations })

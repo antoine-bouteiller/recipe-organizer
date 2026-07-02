@@ -38,7 +38,7 @@ add the recipe to a shopping list, and edit or delete it.
 - `src/routes/recipe/{$id,edit.$id,new}.tsx` (recipe routes)
 - `src/routes/index.tsx` (recipe list home page)
 - `src/routes/search.tsx` (recipe search list)
-- `src/lib/db/schema/{recipe,recipe-ingredients,recipe-linked-recipes}.ts` (DB shape)
+- `db/schema/{recipe,recipe-ingredients,recipe-linked-recipes}.ts` (DB shape)
 - The R2 upload contract used by the recipe feature (`src/lib/r2.ts`,
   `src/routes/api/{image,video}/$id.ts`).
 
@@ -201,7 +201,7 @@ isolated enough to deserve its own spec.
 - All four spec files (this one and the three sub-specs) MUST exist and reference each other in
   their §11.
 - The exported types and helpers in §4 MUST match the actual exports in source.
-- The DB schema in §4 MUST match `src/lib/db/schema/{recipe,recipe-ingredients,recipe-linked-recipes}.ts`.
+- The DB schema in §4 MUST match `db/schema/{recipe,recipe-ingredients,recipe-linked-recipes}.ts`.
 - The auto-tag rules MUST be consistent with the implementation in `api/create.ts` and `api/update.ts`.
 
 ## 11. Related Specifications / Further Reading

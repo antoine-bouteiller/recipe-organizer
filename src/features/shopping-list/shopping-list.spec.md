@@ -273,7 +273,7 @@ Returns `null` when no conversion path exists (missing density/count weight, mis
 ### 4.8 Unit Schema
 
 ```ts
-// src/lib/db/schema/unit.ts
+// db/schema/unit.ts
 export type Dimension = 'mass' | 'volume' | 'count' | 'length'
 export type UnitSlug =
   | 'g'
@@ -384,7 +384,7 @@ the primary, surfaces the partial information without polluting the primary aggr
 | `zod`                                                                                                  | Input validation for `getRecipesByIds`.                                  |
 | `drizzle-orm` (via `getDb`)                                                                            | Relational query for recipes + ingredient groups + linked recipes.       |
 | `@phosphor-icons/react`                                                                                | `ArrowCounterClockwiseIcon` in `ResetCartButton`.                        |
-| Internal: `@/lib/db/schema/unit`                                                                       | `UNITS`, `UnitSlug`, `Dimension`.                                        |
+| Internal: `@schema`                                                                                    | `UNITS`, `UnitSlug`, `Dimension`.                                        |
 | Internal: `@/utils/unit-converter`                                                                     | `convert(...)`.                                                          |
 | Internal: `@/utils/error-handler`                                                                      | `withServerError` wrapper.                                               |
 | Internal: `@/lib/query-keys`                                                                           | `queryKeys.recipeListByIds`.                                             |

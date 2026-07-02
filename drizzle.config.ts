@@ -8,8 +8,8 @@ const drizzleConfig = defineConfig({
   },
   dialect: 'sqlite',
   driver: 'd1-http',
-  out: './migrations',
-  schema: './src/lib/db/schema/index.ts',
+  out: './db/migrations',
+  schema: './db/schema/index.ts',
 })
 
 export default drizzleConfig

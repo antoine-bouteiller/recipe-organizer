@@ -14,7 +14,7 @@ handled by [Better Auth](https://www.better-auth.com) configured with the Google
 adapter over Cloudflare D1, and database-backed sessions. The feature retains the application-specific
 admin-approval lifecycle (`pending` -> `active` / `blocked`) and the `user` / `admin` role model layered on top
 of Better Auth via additional user fields and database hooks. It is implemented in `src/lib/auth/` and
-integrated with the data layer (`src/lib/db/schema/`) and the platform layer (Cloudflare Workers `env`).
+integrated with the data layer (`db/schema/`) and the platform layer (Cloudflare Workers `env`).
 
 ## 1. Purpose & Scope
 
@@ -195,7 +195,7 @@ Application-emitted codes (from the session hook):
 Any other code (Better Auth's own OAuth error codes, e.g. `unable_to_get_user_info`) falls back to the generic
 "Une erreur est survenue" message via `getErrorMessage`.
 
-### 4.4 Better Auth Schema (`src/lib/db/schema/`)
+### 4.4 Better Auth Schema (`db/schema/`)
 
 `user.ts` — Better Auth core user fields plus `role` / `status`:
 
@@ -278,7 +278,7 @@ context: {
 ### 8.1 Internal
 
 - `@/lib/db` (Drizzle + D1) for the adapter and `user` lookups.
-- `@/lib/db/schema` for `user`, `session`, `account`, `verification`.
+- `@schema` for `user`, `session`, `account`, `verification`.
 - `@/utils/error-handler` for `withServerError`.
 - `@/components/ui/*` for the login page UI.
 - Root route for injecting `authUser` / `isAdmin`.
@@ -297,7 +297,7 @@ context: {
   `src/features/auth/api/logout.ts`, `src/features/auth/api/constants.ts`, `src/lib/session.ts`, and the route
   `src/routes/api/auth/google/callback.ts`.
 - The `user` table is recreated with the Better Auth shape (migration
-  `migrations/20260628202100_better_auth`). Existing user rows are dropped — user migration is explicitly out of
+  `db/migrations/20260628202100_better_auth`). Existing user rows are dropped — user migration is explicitly out of
   scope. The `recipes.created_by` column is unconstrained text and is unaffected by the recreate.
 - Operators MUST update the Google OAuth client's authorized redirect URI to
   `${VITE_PUBLIC_URL}/api/auth/callback/google`.
