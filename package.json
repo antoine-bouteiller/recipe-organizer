@@ -41,7 +41,7 @@
     "valibot": "^1.2.0"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.42.4",
+    "@cloudflare/vite-plugin": "1.43.0",
     "@commitlint/cli": "21.2.0",
     "@commitlint/config-conventional": "21.2.0",
     "@rolldown/plugin-babel": "0.2.3",
@@ -67,7 +67,7 @@
     "tailwindcss": "4.3.2",
     "typescript": "6.0.3",
     "vite-plus": "0.2.1",
-    "wrangler": "4.106.0"
+    "wrangler": "4.107.0"
   },
   "commitlint": {
     "extends": [
