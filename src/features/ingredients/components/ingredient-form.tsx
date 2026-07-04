@@ -7,18 +7,18 @@ import { withForm } from '@/hooks/use-app-form'
 
 import { type IngredientFormInput } from '../api/create'
 
-export const ingredientDefaultValues: IngredientFormInput = {
+export const getIngredientDefaultValues = (defaultName?: string): IngredientFormInput => ({
   category: undefined,
   countWeightG: null,
   densityGPerMl: null,
-  name: '',
+  name: defaultName ?? '',
   preferredUnitSlug: null,
-}
+})
 
 const preferredUnitOptions = [{ label: 'Aucune', value: '' }, ...unitOptions]
 
 export const IngredientForm = withForm({
-  defaultValues: ingredientDefaultValues,
+  defaultValues: getIngredientDefaultValues(),
   render: ({ form }) => {
     const { AppField } = form
     const ingredientOptions = useIngredientOptions({ allowEmpty: true })

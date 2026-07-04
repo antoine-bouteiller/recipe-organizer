@@ -1,7 +1,4 @@
-import { type UnitSlug } from '@schema'
 import { describe, expect, it } from 'vite-plus/test'
-
-import { type IngredientCategory } from '@/types/ingredient'
 
 import { aggregateShoppingList, type ShoppingListIngredient, type ShoppingListRecipe } from './aggregate-shopping-list'
 
@@ -13,7 +10,7 @@ const makeIngredient = (overrides: Partial<ShoppingListIngredient> & Pick<Shoppi
   parentId: null,
   preferredUnitSlug: null,
   quantity: 0,
-  unitSlug: 'g' as UnitSlug,
+  unitSlug: 'g',
   ...overrides,
 })
 
@@ -108,10 +105,7 @@ describe('aggregateShoppingList', () => {
   it('groups results by category', () => {
     const recipe = makeRecipe({
       id: 1,
-      ingredients: [
-        makeIngredient({ category: 'meat', id: 10, quantity: 100 }),
-        makeIngredient({ category: 'vegetables' as IngredientCategory, id: 20, quantity: 100 }),
-      ],
+      ingredients: [makeIngredient({ category: 'meat', id: 10, quantity: 100 }), makeIngredient({ category: 'vegetables', id: 20, quantity: 100 })],
       servings: 4,
     })
 

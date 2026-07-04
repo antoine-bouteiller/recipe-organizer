@@ -8,7 +8,7 @@ import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
 import { ingredientSchema } from '@/features/ingredients/api/create'
 import { updateIngredientOptions, updateIngredientSchema, type UpdateIngredientFormInput } from '@/features/ingredients/api/update'
-import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
+import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { type Ingredient } from '@/types/ingredient'
 
@@ -16,7 +16,7 @@ interface EditIngredientProps {
   ingredient: Ingredient
 }
 
-const FormDialog = getFormDialog(ingredientDefaultValues)
+const FormDialog = getFormDialog(getIngredientDefaultValues())
 
 export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const updateMutation = useMutation(updateIngredientOptions())

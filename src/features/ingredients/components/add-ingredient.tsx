@@ -6,8 +6,8 @@ import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
-import { createIngredientOptions, ingredientSchema, type IngredientFormInput } from '@/features/ingredients/api/create'
-import { ingredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
+import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/create'
+import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddIngredientProps {
@@ -15,17 +15,14 @@ interface AddIngredientProps {
   defaultValue?: string
 }
 
-const FormDialog = getFormDialog(ingredientDefaultValues)
+const FormDialog = getFormDialog(getIngredientDefaultValues())
 
 export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) => {
   const createMutation = useMutation(createIngredientOptions())
   const [open, setOpen] = useState(false)
 
   const form = useAppForm({
-    defaultValues: {
-      ...ingredientDefaultValues,
-      name: defaultValue ?? ingredientDefaultValues.name,
-    } as IngredientFormInput,
+    defaultValues: getIngredientDefaultValues(defaultValue),
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
