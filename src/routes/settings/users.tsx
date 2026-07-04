@@ -101,7 +101,7 @@ const SwipeToBlock = ({ children, userEmail, userId }: { children: React.ReactNo
       >
         <ProhibitIcon className="size-5 shrink-0" />
       </div>
-      <div className="relative bg-background" ref={foregroundRef} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}>
+      <div className="relative bg-muted" ref={foregroundRef} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}>
         {children}
       </div>
       <BlockUser onOpenChange={setDialogOpen} open={dialogOpen} userEmail={userEmail} userId={userId} />

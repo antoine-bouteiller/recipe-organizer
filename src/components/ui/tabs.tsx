@@ -74,7 +74,7 @@ export const SwipeTabsPanels = ({ className, children }: { className?: string; c
     <div ref={containerRef} className={cn('min-h-0 flex-1 overflow-hidden', className)} data-slot="swipe-tabs-panels">
       <div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={trackRef}>
         {Children.map(children, (child) =>
-          isValidElement<{ className?: string }>(child) ? cloneElement(child, { className: cn('min-w-full shrink-0', child.props.className) }) : child
+          isValidElement<{ className?: string }>(child) ? cloneElement(child, { className: cn('w-full shrink-0', child.props.className) }) : child
         )}
       </div>
     </div>

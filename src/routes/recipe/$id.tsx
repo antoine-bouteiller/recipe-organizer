@@ -65,7 +65,7 @@ const RecipePage = () => {
       <h1 className="hidden px-4 py-2 font-heading text-3xl md:block">{recipe.name}</h1>
       <QuantityControls className="my-2" recipeId={id} servings={recipe.servings} />
 
-      <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
+      <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground dark:prose-invert">
         <div className="flex min-h-0 flex-1 flex-col md:hidden">
           <SwipeTabs className="flex min-h-0 flex-1 flex-col" defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
             <TabsList className="w-full">
