@@ -8,23 +8,17 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Popover } from '@/components/ui/popover'
-import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
+import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
-import { useSwipeTabs } from '@/hooks/use-swipe-tabs'
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
   const { data: recipe } = useQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
-
-  const { activeTab, containerRef, trackRef, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(
-    ['ingredients', 'preparation'] as const,
-    'ingredients'
-  )
 
   if (!recipe) {
     return null
@@ -73,24 +67,22 @@ const RecipePage = () => {
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground">
         <div className="flex min-h-0 flex-1 flex-col md:hidden">
-          <Tabs className="flex min-h-0 flex-1 flex-col" onValueChange={(value) => goTo(value as 'ingredients' | 'preparation')} value={activeTab}>
+          <SwipeTabs className="flex min-h-0 flex-1 flex-col" defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
             <TabsList className="w-full">
               <TabsTab value="ingredients">Ingrédients</TabsTab>
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>
-            <div ref={containerRef} className="min-h-0 flex-1 overflow-hidden">
-              <div ref={trackRef} className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}>
-                <div className="min-w-full overflow-y-auto px-2">
-                  <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-                </div>
-                <div className="min-w-full overflow-y-auto p-2">
-                  <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                    <EditorContent />
-                  </Editor>
-                </div>
+            <SwipeTabsPanels>
+              <div className="overflow-y-auto px-2">
+                <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
               </div>
-            </div>
-          </Tabs>
+              <div className="overflow-y-auto p-2">
+                <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                  <EditorContent />
+                </Editor>
+              </div>
+            </SwipeTabsPanels>
+          </SwipeTabs>
         </div>
 
         <div className="hidden grid-cols-5 items-stretch gap-8 pt-4 md:grid">

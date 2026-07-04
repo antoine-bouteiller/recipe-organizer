@@ -36,12 +36,13 @@ export const useBackViewTransition = (isEnabled: boolean) => {
 
       document.documentElement.classList.add('back-transition')
 
-      const transition = document.startViewTransition(async () => {
+      const transition = document.startViewTransition(() => {
+        const resolved = waitForRouterResolved(router)
         isRedispatching = true
         redispatchPopstate(event.state)
         isRedispatching = false
 
-        await waitForRouterResolved(router)
+        return resolved
       })
 
       void transition.finished.then(() => {

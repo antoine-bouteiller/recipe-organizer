@@ -164,7 +164,7 @@ const UsersManagement = () => {
 
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
-      <div className="sticky top-0 z-10 flex items-center gap-4 bg-background px-4 pt-4 pb-2">
+      <div className="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
         <SearchInput search={search} setSearch={setSearch} />
         <AddUser>
           <Button size="icon-lg" variant="outline">
@@ -173,30 +173,28 @@ const UsersManagement = () => {
         </AddUser>
       </div>
 
-      <div className="px-4">
-        <Tabs defaultValue="active">
-          <TabsList className="w-full">
-            <TabsTab value="active">Actifs</TabsTab>
-            <TabsTab value="pending">En attente</TabsTab>
-            <TabsTab value="blocked">Bloqués</TabsTab>
-          </TabsList>
-          <TabsPanel value="active">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
-            </React.Suspense>
-          </TabsPanel>
-          <TabsPanel value="pending">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-            </React.Suspense>
-          </TabsPanel>
-          <TabsPanel value="blocked">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-            </React.Suspense>
-          </TabsPanel>
-        </Tabs>
-      </div>
+      <Tabs defaultValue="active">
+        <TabsList className="w-full">
+          <TabsTab value="active">Actifs</TabsTab>
+          <TabsTab value="pending">En attente</TabsTab>
+          <TabsTab value="blocked">Bloqués</TabsTab>
+        </TabsList>
+        <TabsPanel value="active">
+          <React.Suspense fallback={null}>
+            <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+          </React.Suspense>
+        </TabsPanel>
+        <TabsPanel value="pending">
+          <React.Suspense fallback={null}>
+            <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
+          </React.Suspense>
+        </TabsPanel>
+        <TabsPanel value="blocked">
+          <React.Suspense fallback={null}>
+            <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+          </React.Suspense>
+        </TabsPanel>
+      </Tabs>
     </ScreenLayout>
   )
 }

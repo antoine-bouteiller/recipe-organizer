@@ -50,7 +50,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
           {headerEndItem && <div className="z-10">{headerEndItem}</div>}
         </div>
       ) : (
-        <div className="flex w-full shrink-0 items-center gap-2 px-6 pt-safe-4 pb-2 text-foreground md:hidden">
+        <div className="flex w-full shrink-0 items-center gap-2 px-6 pt-safe-4 pb-1 text-foreground md:hidden">
           {withGoBack && (
             <Button
               onClick={() => {
@@ -69,7 +69,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
       )}
       <div
         className={cn(
-          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible px-4 pb-4',
+          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible px-4 pb-4 pt-1',
           isImageHeader && '-mt-10 rounded-t-3xl'
         )}
       >

@@ -11,7 +11,7 @@ interface RecipeListProps {
 }
 
 export const RecipeList = ({ recipes }: RecipeListProps) => (
-  <ItemGroup className="flex-1 px-4">
+  <ItemGroup className="flex-1">
     {recipes.map((recipe, index) => (
       <Fragment key={recipe.id}>
         <Item
