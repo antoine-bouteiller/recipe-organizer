@@ -39,6 +39,14 @@ export const getRouter = () => {
     defaultErrorComponent: DefaultErrorComponent,
     defaultNotFoundComponent: NotFound,
     defaultPreload: 'intent',
+    defaultViewTransition: {
+      types: ({ fromLocation, toLocation }) => {
+        const fromIndex = fromLocation?.state.__TSR_index ?? 0
+        const toIndex = toLocation.state.__TSR_index ?? 0
+
+        return toIndex < fromIndex ? ['back'] : false
+      },
+    },
     notFoundMode: 'root',
     routeTree,
   })

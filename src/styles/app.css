@@ -215,12 +215,12 @@
   }
 
   /* Back navigation */
-  .back-transition::view-transition-old(root) {
+  :active-view-transition-type(back)::view-transition-old(root) {
     animation: slide-out-to-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
     z-index: 1;
   }
 
-  .back-transition::view-transition-new(root) {
+  :active-view-transition-type(back)::view-transition-new(root) {
     animation: scale-up-from-back 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
     z-index: 0;
   }

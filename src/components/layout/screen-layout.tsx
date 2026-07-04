@@ -2,7 +2,6 @@ import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { useRouter } from '@tanstack/react-router'
 
 import { Button } from '@/components/ui/button'
-import { useBackViewTransition } from '@/hooks/use-back-view-transition'
 import { cn } from '@/utils/cn'
 
 import { TabBar } from '../navigation/tabbar'
@@ -18,8 +17,6 @@ interface ScreenLayoutProps {
 
 export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = false, backgroundImage, pageKey }: ScreenLayoutProps) => {
   const router = useRouter()
-
-  useBackViewTransition(withGoBack)
 
   const isImageHeader = Boolean(backgroundImage)
 
