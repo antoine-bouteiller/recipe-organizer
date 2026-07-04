@@ -10,7 +10,6 @@ import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { getAuthUser } from '@/lib/auth/get-auth-user'
-import { queryKeys } from '@/lib/query-keys'
 import { getTheme } from '@/lib/theme'
 
 import appCss from '../styles/app.css?url'
@@ -86,12 +85,8 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   theme: Theme
 }>()({
-  beforeLoad: async ({ context }) => {
-    const authUser = await context.queryClient.ensureQueryData({
-      queryFn: getAuthUser,
-      queryKey: queryKeys.authUser,
-      revalidateIfStale: true,
-    })
+  beforeLoad: async () => {
+    const authUser = await getAuthUser()
     const theme = getTheme()
 
     return { authUser, isAdmin: authUser?.role === 'admin', theme }

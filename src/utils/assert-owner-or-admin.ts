@@ -4,7 +4,7 @@ interface OwnableRow {
 
 interface OwnershipUser {
   readonly id: string
-  readonly role: string
+  readonly role: string | null | undefined
 }
 
 export const assertOwnerOrAdmin = (user: OwnershipUser, row: OwnableRow): void => {

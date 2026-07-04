@@ -1,8 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
+import { getRequestHeaders } from '@tanstack/react-start/server'
 
 import { getAuth } from '@/lib/auth/auth-server'
-import { getDb } from '@/lib/db'
 import { withServerError } from '@/utils/error-handler'
 
 export const getAuthUser = createServerFn({ method: 'GET' }).handler(
@@ -16,16 +15,12 @@ export const getAuthUser = createServerFn({ method: 'GET' }).handler(
       }
     }
 
-    const authSession = await getAuth().api.getSession({ headers: getRequest().headers })
+    const authSession = await getAuth().api.getSession({ headers: getRequestHeaders() })
 
-    if (!authSession?.user?.id) {
+    if (authSession === null) {
       return undefined
     }
 
-    const authUser = await getDb().query.user.findFirst({
-      where: { id: authSession.user.id },
-    })
-
-    return authUser
+    return { id: authSession.user.id, role: authSession.user.role, status: authSession.user.status }
   })
 )

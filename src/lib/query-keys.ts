@@ -2,7 +2,6 @@ export const queryKeys = {
   allIngredients: ['ingredients'] as const,
   allRecipes: ['recipes'] as const,
   allUsers: ['users'] as const,
-  authUser: ['auth-user'] as const,
   detailIngredient: (id: string) => [...queryKeys.allIngredients, id] as const,
   listIngredients: () => [...queryKeys.allIngredients, 'list'] as const,
   listUsers: (status?: string) => [...queryKeys.allUsers, 'list', status ?? 'active'] as const,
