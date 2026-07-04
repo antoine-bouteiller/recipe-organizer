@@ -125,13 +125,7 @@ const SelectBase = <TValue extends string>(props: SelectProps<TValue>): ReactEle
 
   if (props.multiple) {
     return (
-      <SelectRoot
-        disabled={disabled}
-        items={items}
-        multiple
-        onValueChange={props.onValueChange as (value: (string | null)[]) => void}
-        value={props.value}
-      >
+      <SelectRoot disabled={disabled} items={items} multiple onValueChange={props.onValueChange} value={props.value}>
         {trigger}
         {popup}
       </SelectRoot>

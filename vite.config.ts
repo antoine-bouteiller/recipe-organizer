@@ -96,6 +96,7 @@ const viteConfig = defineConfig({
       'consistent-type-specifier-style': ['error', 'prefer-inline'],
       'exports-last': 'off',
       'no-underscore-dangle': 'off',
+      'max-nested-calls': 'off',
     },
   },
   fmt: {
