@@ -4,7 +4,9 @@ type Theme = 'dark' | 'light'
 
 const storageKey = 'ui-theme'
 
-export const getTheme = () => (getCookie(storageKey) || 'light') as Theme
+const systemTheme = (): Theme => (globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+
+export const getTheme = () => (getCookie(storageKey) as Theme) || systemTheme()
 
 export const toggleTheme = () => {
   const currentTheme = getTheme()
