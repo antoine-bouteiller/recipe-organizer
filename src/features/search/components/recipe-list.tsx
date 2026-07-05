@@ -15,7 +15,7 @@ export const RecipeList = ({ recipes }: RecipeListProps) => (
     {recipes.map((recipe, index) => (
       <Fragment key={recipe.id}>
         <Item
-          content={recipe.name}
+          title={recipe.name}
           media={<ArrowRightIcon />}
           onClick={() => addRecentRecipe(recipe.id)}
           render={<Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition />}

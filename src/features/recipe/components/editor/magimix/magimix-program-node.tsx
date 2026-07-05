@@ -14,7 +14,7 @@ import {
   type Spread,
 } from 'lexical'
 
-import { ItemContent, ItemDescription, ItemMedia, ItemRoot, ItemTitle } from '@/components/ui/item'
+import { Item } from '@/components/ui/item'
 import { magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'
 
@@ -59,9 +59,26 @@ interface MagimixProgramComponentProps {
   time: number
 }
 
+const MagimixItem = ({ isEditable, program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'nodeKey'>) => (
+  <Item
+    variant="outline"
+    render={isEditable ? <button /> : undefined}
+    className="w-full"
+    media={<img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />}
+    title={magimixProgramLabels[program as keyof typeof magimixProgramLabels]}
+  >
+    <TimerIcon className="size-4" />
+    <span>{formatTime(time)}</span>/
+    <SpinnerGapIcon className="size-4" />
+    <span>{capitalize(rotationSpeed)}</span>
+    /
+    <ThermometerIcon className="size-4" />
+    <span>{temperature ?? '__'}°C</span>
+  </Item>
+)
+
 const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, temperature, time }: MagimixProgramComponentProps) => {
   const [editor] = useLexicalComposerContext()
-  const label = magimixProgramLabels[program as keyof typeof magimixProgramLabels]
 
   const formInitialValues: MagimixProgramFormInput = {
     program: program as MagimixProgramFormInput['program'],
@@ -84,26 +101,6 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
     })
   }
 
-  const content = (
-    <>
-      <ItemMedia>
-        <img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />
-      </ItemMedia>
-      <ItemContent>
-        <ItemTitle>{label}</ItemTitle>
-        <ItemDescription className="not-prose my-0 flex items-center gap-1">
-          <TimerIcon className="size-4" />
-          <span>{formatTime(time)}</span>/
-          <SpinnerGapIcon className="size-4" />
-          <span>{capitalize(rotationSpeed)}</span>
-          /
-          <ThermometerIcon className="size-4" />
-          <span>{temperature ?? '__'}°C</span>
-        </ItemDescription>
-      </ItemContent>
-    </>
-  )
-
   if (isEditable) {
     return (
       <MagimixProgramDialog
@@ -111,16 +108,12 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
         onSubmit={updateAttributes}
         submitLabel="Enregistrer"
         title="Modifier le programme Magimix"
-        triggerRender={
-          <ItemRoot variant="outline" render={<button />} className="w-full">
-            {content}
-          </ItemRoot>
-        }
+        triggerRender={<MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />}
       />
     )
   }
 
-  return <ItemRoot variant="outline">{content}</ItemRoot>
+  return <MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
 }
 
 class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {

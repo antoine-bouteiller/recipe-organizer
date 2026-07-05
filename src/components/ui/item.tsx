@@ -41,7 +41,7 @@ const itemVariants = cva(
   }
 )
 
-export const ItemRoot = ({
+const ItemRoot = ({
   className,
   render,
   size = 'default',
@@ -65,8 +65,8 @@ export const ItemRoot = ({
 const itemMediaVariants = cva(
   `
     flex shrink-0 items-center justify-center gap-2
-    group-has-[[data-slot=item-description]]/item:translate-y-0.5
-    group-has-[[data-slot=item-description]]/item:self-start
+    group-has-data-[slot=item-description]/item:translate-y-0.5
+    group-has-data-[slot=item-description]/item:self-start
     [&_svg]:pointer-events-none
   `,
   {
@@ -89,22 +89,22 @@ const itemMediaVariants = cva(
   }
 )
 
-export const ItemMedia = ({ className, variant = 'default', ...props }: ComponentProps<'div'> & VariantProps<typeof itemMediaVariants>) => (
+const ItemMedia = ({ className, variant = 'default', ...props }: ComponentProps<'div'> & VariantProps<typeof itemMediaVariants>) => (
   <div className={cn(itemMediaVariants({ className, variant }))} data-slot="item-media" data-variant={variant} {...props} />
 )
 
-export const ItemContent = ({ className, ...props }: ComponentProps<'div'>) => (
+const ItemContent = ({ className, ...props }: ComponentProps<'div'>) => (
   <div className={cn(`flex flex-1 flex-col gap-1 [&+[data-slot=item-content]]:flex-none`, className)} data-slot="item-content" {...props} />
 )
 
-export const ItemTitle = ({ className, ...props }: ComponentProps<'div'>) => (
+const ItemTitle = ({ className, ...props }: ComponentProps<'div'>) => (
   <div className={cn(`flex w-fit items-center gap-2 text-sm leading-snug font-medium`, className)} data-slot="item-title" {...props} />
 )
 
-export const ItemDescription = ({ className, ...props }: ComponentProps<'p'>) => (
+const ItemDescription = ({ className, ...props }: ComponentProps<'p'>) => (
   <p
     className={cn(
-      `line-clamp-2 text-sm leading-normal font-normal text-balance text-muted-foreground`,
+      `not-prose flex items-center gap-1 text-sm leading-normal font-normal text-balance text-muted-foreground`,
       `[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary`,
       className
     )}
@@ -122,8 +122,7 @@ type ItemRootProps = ComponentProps<typeof ItemRoot>
 interface ItemProps {
   media?: ReactNode
   title?: ReactNode
-  description?: ReactNode
-  content?: ReactNode
+  children?: ReactNode
   actions?: ReactNode
   variant?: ItemRootProps['variant']
   size?: ItemRootProps['size']
@@ -132,8 +131,8 @@ interface ItemProps {
   onClick?: ItemRootProps['onClick']
 }
 
-export const Item = ({ media, title, description, content, actions, variant, size, className, render, onClick }: ItemProps): ReactElement => {
-  const hasContent = title !== undefined || description !== undefined || content !== undefined
+export const Item = ({ media, title, children, actions, variant, size, className, render, onClick }: ItemProps): ReactElement => {
+  const hasContent = title !== undefined || children !== undefined
 
   return (
     <ItemRoot className={className} onClick={onClick} render={render} size={size} variant={variant}>
@@ -141,8 +140,7 @@ export const Item = ({ media, title, description, content, actions, variant, siz
       {hasContent && (
         <ItemContent>
           {title !== undefined && <ItemTitle>{title}</ItemTitle>}
-          {description !== undefined && <ItemDescription>{description}</ItemDescription>}
-          {content}
+          {children !== undefined && <ItemDescription>{children}</ItemDescription>}
         </ItemContent>
       )}
       {actions !== undefined && <ItemActions>{actions}</ItemActions>}
