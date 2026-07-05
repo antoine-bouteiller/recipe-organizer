@@ -1,5 +1,5 @@
 import { defaultCache } from '@serwist/vite/worker'
-import { Serwist, StaleWhileRevalidate, type PrecacheEntry, type SerwistGlobalConfig } from 'serwist'
+import { NetworkFirst, Serwist, type PrecacheEntry, type SerwistGlobalConfig } from 'serwist'
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -15,7 +15,8 @@ const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   runtimeCaching: [
     {
-      handler: new StaleWhileRevalidate({ cacheName: 'server-fn' }),
+      // NetworkFirst, not SWR: post-invalidation refetches must see fresh data; cache is offline fallback only.
+      handler: new NetworkFirst({ cacheName: 'server-fn' }),
       matcher: ({ request, sameOrigin, url }) => sameOrigin && request.method === 'GET' && url.pathname.includes('_serverFn'),
     },
     ...defaultCache,
