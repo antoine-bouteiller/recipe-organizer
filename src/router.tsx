@@ -49,6 +49,7 @@ export const getRouter = () => {
     },
     notFoundMode: 'root',
     routeTree,
+    scrollRestoration: true,
   })
 
   setupRouterSsrQueryIntegration({
