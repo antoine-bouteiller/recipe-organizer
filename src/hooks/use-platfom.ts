@@ -1,14 +1,9 @@
 import { createIsomorphicFn } from '@tanstack/solid-start'
 import { getRequestHeader } from '@tanstack/solid-start/server'
-import { useEffect, useState } from 'react'
 
 type Platform = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Windows'
 
-const getPlatform = createIsomorphicFn()
-  .server(() => getPlatformFromUserAgent(getRequestHeader('user-agent')))
-  .client(() => getPlatformFromUserAgent(navigator.userAgent))
-
-const getPlatformFromUserAgent = (userAgent: string | undefined) => {
+const getPlatformFromUserAgent = (userAgent: string | undefined): Platform => {
   if (!userAgent) {
     return 'Unknown'
   }
@@ -27,12 +22,8 @@ const getPlatformFromUserAgent = (userAgent: string | undefined) => {
   return 'Unknown'
 }
 
-export const usePlatform = () => {
-  const [platform, setPlatform] = useState<Platform>(getPlatform())
+const getPlatform = createIsomorphicFn()
+  .server(() => getPlatformFromUserAgent(getRequestHeader('user-agent')))
+  .client(() => getPlatformFromUserAgent(navigator.userAgent))
 
-  useEffect(() => {
-    setPlatform(getPlatform())
-  }, [])
-
-  return platform
-}
+export const usePlatform = (): Platform => getPlatform()

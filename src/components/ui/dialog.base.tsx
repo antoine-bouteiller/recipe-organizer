@@ -1,183 +1,103 @@
-import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
-import { XIcon } from '@phosphor-icons/react'
-import { type ReactElement, type ReactNode } from 'react'
+import { Dialog as DialogPrimitive } from '@kobalte/core/dialog'
+import { X } from 'phosphor-solid'
+import { type ComponentProps, type JSX, Show, splitProps } from 'solid-js'
 
 import { Button } from '@/components/ui/button'
 import { type DialogProps } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/utils/cn'
 
-const DialogRoot = DialogPrimitive.Root
-
-const DialogPortal = DialogPrimitive.Portal
-
-const DialogTrigger = (props: DialogPrimitive.Trigger.Props): ReactElement => <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
-
-const DialogClose = (props: DialogPrimitive.Close.Props): ReactElement => <DialogPrimitive.Close data-slot="dialog-close" {...props} />
-
-const DialogBackdrop = ({ className, ...props }: DialogPrimitive.Backdrop.Props): ReactElement => (
-  <DialogPrimitive.Backdrop
-    className={cn(
-      'fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
-      className
-    )}
-    data-slot="dialog-backdrop"
-    {...props}
-  />
-)
-
-const DialogViewport = ({ className, ...props }: DialogPrimitive.Viewport.Props): ReactElement => (
-  <DialogPrimitive.Viewport
-    className={cn('fixed inset-0 z-50 grid grid-rows-[1fr_auto_3fr] justify-items-center p-4', className)}
-    data-slot="dialog-viewport"
-    {...props}
-  />
-)
-
-const DialogPopup = ({
-  className,
-  children,
-  showCloseButton = true,
-  bottomStickOnMobile = true,
-  closeProps,
-  ...props
-}: DialogPrimitive.Popup.Props & {
-  showCloseButton?: boolean
-  bottomStickOnMobile?: boolean
-  closeProps?: DialogPrimitive.Close.Props
-}): ReactElement => (
-  <DialogPortal>
-    <DialogBackdrop />
-    <DialogViewport className={cn(bottomStickOnMobile && 'max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12')}>
-      <DialogPrimitive.Popup
-        className={cn(
-          'relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 max-w-lg origin-center flex-col rounded-2xl border bg-popover not-dark:bg-clip-padding text-popover-foreground opacity-[calc(1-var(--nested-dialogs))] shadow-lg/5 outline-none transition-[scale,opacity,translate] duration-200 ease-in-out will-change-transform before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] data-ending-style:opacity-0 data-starting-style:opacity-0 sm:scale-[calc(1-0.1*var(--nested-dialogs))] sm:data-ending-style:scale-98 sm:data-starting-style:scale-98 dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-          bottomStickOnMobile &&
-            'max-sm:max-w-none max-sm:origin-bottom max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0 max-sm:data-ending-style:translate-y-4 max-sm:data-starting-style:translate-y-4 max-sm:before:hidden max-sm:before:rounded-none',
-          className
-        )}
-        data-slot="dialog-popup"
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close aria-label="Close" className="absolute end-2 top-2" render={<Button size="icon" variant="ghost" />} {...closeProps}>
-            <XIcon />
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Popup>
-    </DialogViewport>
-  </DialogPortal>
-)
-
-const DialogHeader = ({ className, render, ...props }: useRender.ComponentProps<'div'>): ReactElement => {
-  const defaultProps = {
-    className: cn('flex flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4', className),
-    'data-slot': 'dialog-header',
-  }
-
-  return useRender({
-    defaultTagName: 'div',
-    props: mergeProps<'div'>(defaultProps, props),
-    render,
-  })
-}
-
-const DialogFooter = ({
-  className,
-  variant = 'default',
-  render,
-  ...props
-}: useRender.ComponentProps<'div'> & {
-  variant?: 'default' | 'bare'
-}): ReactElement => {
-  const defaultProps = {
-    className: cn(
-      'flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]',
-      variant === 'default' && 'border-t bg-muted/72 py-4',
-      variant === 'bare' && 'in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6',
-      className
-    ),
-    'data-slot': 'dialog-footer',
-  }
-
-  return useRender({
-    defaultTagName: 'div',
-    props: mergeProps<'div'>(defaultProps, props),
-    render,
-  })
-}
-
-const DialogTitle = ({ className, ...props }: DialogPrimitive.Title.Props): ReactElement => (
-  <DialogPrimitive.Title className={cn('font-heading font-semibold text-xl leading-none', className)} data-slot="dialog-title" {...props} />
-)
-
-const DialogPanel = ({
-  className,
-  scrollFade = true,
-  render,
-  ...props
-}: useRender.ComponentProps<'div'> & {
-  scrollFade?: boolean
-}): ReactElement => {
-  const defaultProps = {
-    className: cn(
-      'p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-header])]:pt-1 in-[[data-slot=dialog-popup]:has([data-slot=dialog-footer]:not(.border-t))]:pb-1',
-      className
-    ),
-    'data-slot': 'dialog-panel',
-  }
-
+const DialogHeader = (props: ComponentProps<'div'>) => {
+  const [local, rest] = splitProps(props, ['class'])
   return (
-    <ScrollArea scrollFade={scrollFade}>
-      {useRender({
-        defaultTagName: 'div',
-        props: mergeProps<'div'>(defaultProps, props),
-        render,
-      })}
-    </ScrollArea>
+    <div
+      class={cn('flex flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4', local.class)}
+      data-slot="dialog-header"
+      {...rest}
+    />
   )
 }
 
-const DialogBase = ({
-  title,
-  trigger,
-  children,
-  cancelLabel,
-  cancelDisabled,
-  footer,
-  open,
-  onOpenChange,
-  contentRender,
-  panelClassName,
-}: DialogProps): ReactElement => {
-  const hasFooter = cancelLabel !== undefined || footer !== undefined
-  const wrap = (body: ReactNode): ReactNode => (contentRender ? contentRender(body) : body)
+const DialogFooter = (props: ComponentProps<'div'> & { variant?: 'default' | 'bare' }) => {
+  const [local, rest] = splitProps(props, ['class', 'variant'])
+  const variant = () => local.variant ?? 'default'
+  return (
+    <div
+      class={cn(
+        'flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]',
+        variant() === 'default' && 'border-t bg-muted/72 py-4',
+        variant() === 'bare' && 'in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6',
+        local.class
+      )}
+      data-slot="dialog-footer"
+      {...rest}
+    />
+  )
+}
+
+const DialogTitle = (props: ComponentProps<typeof DialogPrimitive.Title>) => {
+  const [local, rest] = splitProps(props, ['class'])
+  return <DialogPrimitive.Title class={cn('font-heading font-semibold text-xl leading-none', local.class)} data-slot="dialog-title" {...rest} />
+}
+
+const DialogPanel = (props: { class?: string; scrollFade?: boolean; children: JSX.Element }) => (
+  <ScrollArea scrollFade={props.scrollFade ?? true}>
+    <div
+      class={cn(
+        'p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-header])]:pt-1 in-[[data-slot=dialog-popup]:has([data-slot=dialog-footer]:not(.border-t))]:pb-1',
+        props.class
+      )}
+      data-slot="dialog-panel"
+    >
+      {props.children}
+    </div>
+  </ScrollArea>
+)
+
+const DialogBase = (props: DialogProps) => {
+  const hasFooter = () => props.cancelLabel !== undefined || props.footer !== undefined
+  const wrap = (body: JSX.Element): JSX.Element => (props.contentRender ? props.contentRender(body) : body)
 
   return (
-    <DialogRoot modal="trap-focus" onOpenChange={onOpenChange ? (next) => onOpenChange(next) : undefined} open={open}>
-      {trigger !== undefined && <DialogTrigger render={trigger} />}
-      <DialogPopup>
-        {wrap(
-          <>
-            <DialogHeader>
-              <DialogTitle>{title}</DialogTitle>
-            </DialogHeader>
-            <DialogPanel className={panelClassName}>{children}</DialogPanel>
-            {hasFooter && (
-              <DialogFooter>
-                {cancelLabel !== undefined && (
-                  <DialogClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DialogClose>
-                )}
-                {footer}
-              </DialogFooter>
+    <DialogPrimitive modal onOpenChange={props.onOpenChange} open={props.open}>
+      <Show when={props.trigger}>
+        <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props.trigger} />
+      </Show>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay
+          class="fixed inset-0 z-50 bg-black/32 backdrop-blur-sm data-expanded:animate-in data-expanded:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+          data-slot="dialog-backdrop"
+        />
+        <div class="fixed inset-0 z-50 grid grid-rows-[1fr_auto_3fr] justify-items-center p-4 max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12" data-slot="dialog-viewport">
+          <DialogPrimitive.Content
+            class="relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 max-w-lg flex-col rounded-2xl border bg-popover not-dark:bg-clip-padding text-popover-foreground shadow-lg/5 outline-none data-expanded:animate-in data-expanded:fade-in-0 data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-sm:max-w-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0"
+            data-slot="dialog-popup"
+          >
+            {wrap(
+              <>
+                <DialogHeader>
+                  <DialogTitle>{props.title}</DialogTitle>
+                </DialogHeader>
+                <DialogPanel class={props.panelClassName}>{props.children}</DialogPanel>
+                <Show when={hasFooter()}>
+                  <DialogFooter>
+                    <Show when={props.cancelLabel !== undefined}>
+                      <DialogPrimitive.CloseButton as={Button} disabled={props.cancelDisabled} variant="outline">
+                        {props.cancelLabel}
+                      </DialogPrimitive.CloseButton>
+                    </Show>
+                    {props.footer}
+                  </DialogFooter>
+                </Show>
+              </>
             )}
-          </>
-        )}
-      </DialogPopup>
-    </DialogRoot>
+            <DialogPrimitive.CloseButton aria-label="Close" as={Button} class="absolute end-2 top-2" size="icon" variant="ghost">
+              <X />
+            </DialogPrimitive.CloseButton>
+          </DialogPrimitive.Content>
+        </div>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive>
   )
 }
 

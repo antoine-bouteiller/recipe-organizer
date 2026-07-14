@@ -1,22 +1,24 @@
-import { lazy, Suspense, type ReactElement, type ReactNode } from 'react'
+import { type JSX, lazy, Show, Suspense } from 'solid-js'
 
+import { type TriggerConfig } from '@/components/ui/dialog'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 export interface PopoverProps {
-  trigger: ReactElement
-  children: ReactNode
+  trigger: TriggerConfig
+  children: JSX.Element
 }
 
 const PopoverBase = lazy(() => import('@/components/ui/popover.base'))
 const PopoverDrawer = lazy(() => import('@/components/ui/popover.drawer'))
 
-export const Popover = (props: PopoverProps): ReactElement => {
+export const Popover = (props: PopoverProps) => {
   const isMobile = useIsMobile()
-  const Impl = isMobile ? PopoverDrawer : PopoverBase
 
   return (
-    <Suspense fallback={props.trigger}>
-      <Impl {...props} />
+    <Suspense>
+      <Show when={isMobile()} fallback={<PopoverBase {...props} />}>
+        <PopoverDrawer {...props} />
+      </Show>
     </Suspense>
   )
 }
