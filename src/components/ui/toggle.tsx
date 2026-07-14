@@ -1,6 +1,7 @@
-import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
+import { type PolymorphicProps } from '@kobalte/core/polymorphic'
+import { ToggleButton, type ToggleButtonRootProps } from '@kobalte/core/toggle-button'
 import { cva, type VariantProps } from 'class-variance-authority'
-import React from 'react'
+import { splitProps, type ValidComponent } from 'solid-js'
 
 import { cn } from '@/utils/cn'
 
@@ -26,6 +27,9 @@ export const toggleVariants = cva(
   }
 )
 
-export const Toggle = ({ className, variant, size, ...props }: TogglePrimitive.Props & VariantProps<typeof toggleVariants>): React.ReactElement => (
-  <TogglePrimitive className={cn(toggleVariants({ className, size, variant }))} data-slot="toggle" {...props} />
-)
+export type ToggleProps<T extends ValidComponent = 'button'> = PolymorphicProps<T, ToggleButtonRootProps<T>> & VariantProps<typeof toggleVariants> & { class?: string }
+
+export const Toggle = <T extends ValidComponent = 'button'>(props: ToggleProps<T>) => {
+  const [local, rest] = splitProps(props as ToggleProps, ['class', 'variant', 'size'])
+  return <ToggleButton class={cn(toggleVariants({ size: local.size, variant: local.variant }), local.class)} data-slot="toggle" {...rest} />
+}
