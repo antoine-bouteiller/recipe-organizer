@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/solid-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/solid-router'
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'

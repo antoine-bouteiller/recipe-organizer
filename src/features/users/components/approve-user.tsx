@@ -1,5 +1,5 @@
 import { CheckIcon } from '@phosphor-icons/react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/solid-query'
 import { useTransition } from 'react'
 
 import { Button } from '@/components/ui/button'

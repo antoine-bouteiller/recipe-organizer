@@ -1,6 +1,6 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { unitOptions } from '@schema'
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 import { type ReactNode } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 

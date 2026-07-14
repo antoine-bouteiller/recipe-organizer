@@ -1,4 +1,4 @@
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { Dialog } from '@/components/ui/dialog'

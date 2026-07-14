@@ -1,4 +1,4 @@
-import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/solid-query'
 
 export interface Option<TValue = number | undefined> {
   label: string

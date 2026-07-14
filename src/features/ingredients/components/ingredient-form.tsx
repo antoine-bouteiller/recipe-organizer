@@ -1,5 +1,5 @@
 import { unitOptions } from '@schema'
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 
 import { ingredientsCategoryOptions } from '@/components/ingredient-category'
 import { useIngredientOptions } from '@/features/ingredients/hooks/use-ingredient-options'

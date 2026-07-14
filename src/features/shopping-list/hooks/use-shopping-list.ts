@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/solid-query'
 
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
 import { type IngredientCartItem } from '@/features/shopping-list/types/ingredient-cart-item'

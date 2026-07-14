@@ -1,5 +1,5 @@
 import { revalidateLogic } from '@tanstack/react-form'
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 import { useState, type ReactElement } from 'react'
 import * as v from 'valibot'
 

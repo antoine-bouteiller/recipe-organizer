@@ -1,5 +1,5 @@
 import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/solid-query'
 import { useNavigate } from '@tanstack/solid-router'
 import { useEffect, useState } from 'react'
 

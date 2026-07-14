@@ -1,5 +1,5 @@
 import { ProhibitIcon } from '@phosphor-icons/react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/solid-query'
 
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
 import { Button } from '@/components/ui/button'

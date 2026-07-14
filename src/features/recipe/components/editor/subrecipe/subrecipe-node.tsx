@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/solid-query'
 import {
   $getNodeByKey,
   DecoratorNode,

@@ -1,4 +1,4 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/solid-query'
 import { createServerFn } from '@tanstack/solid-start'
 import * as v from 'valibot'
 

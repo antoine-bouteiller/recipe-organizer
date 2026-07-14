@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
 import { FunnelSimpleIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import { useMemo, useState } from 'react'
 

@@ -1,4 +1,4 @@
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 
 import { withForm } from '@/hooks/use-app-form'
 

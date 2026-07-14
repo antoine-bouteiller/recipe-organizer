@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/solid-router'
 import { PlusIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
 import React, { useState } from 'react'
 

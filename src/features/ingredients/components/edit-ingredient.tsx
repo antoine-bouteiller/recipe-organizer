@@ -1,6 +1,6 @@
 import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/solid-query'
 import { useState } from 'react'
 import * as v from 'valibot'
 

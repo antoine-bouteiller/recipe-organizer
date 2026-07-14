@@ -1,5 +1,5 @@
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@schema'
-import { mutationOptions } from '@tanstack/react-query'
+import { mutationOptions } from '@tanstack/solid-query'
 import { createServerFn } from '@tanstack/solid-start'
 import { eq, inArray } from 'drizzle-orm'
 import * as v from 'valibot'

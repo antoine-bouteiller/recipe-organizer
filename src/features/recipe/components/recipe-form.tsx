@@ -1,5 +1,5 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
-import { useSelector } from '@tanstack/react-store'
+import { useSelector } from '@tanstack/solid-store'
 import { Suspense, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
