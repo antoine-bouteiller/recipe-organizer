@@ -26,7 +26,7 @@ import {
   type TextFormatType,
   UNDO_COMMAND,
 } from 'lexical'
-import { createContext, createSignal, For, type JSX, onCleanup, onMount, useContext } from 'solid-js'
+import { createContext, createSignal, For, type JSX, onCleanup, onMount, Show, useContext } from 'solid-js'
 import { Portal } from 'solid-js/web'
 
 import { Toggle } from '@/components/ui/toggle'
@@ -189,15 +189,22 @@ const Editor = (props: EditorProps) => {
   }
   onCleanup(mergeRegister(...registrations))
 
+  // Lexical mutates the DOM imperatively via setRootElement (onMount), so the editor cannot hydrate
+  // SSR markup. Gate rendering on mount: server and first client render match (empty), editor attaches after.
+  const [mounted, setMounted] = createSignal(false)
+  onMount(() => setMounted(true))
+
   return (
     <EditorContext.Provider value={editor}>
-      {props.children}
-      <For each={Object.keys(decorators())}>
-        {(key) => {
-          const element = editor.getElementByKey(key)
-          return element ? <Portal mount={element}>{decorators()[key]}</Portal> : null
-        }}
-      </For>
+      <Show when={mounted()}>
+        {props.children}
+        <For each={Object.keys(decorators())}>
+          {(key) => {
+            const element = editor.getElementByKey(key)
+            return element ? <Portal mount={element}>{decorators()[key]}</Portal> : null
+          }}
+        </For>
+      </Show>
     </EditorContext.Provider>
   )
 }

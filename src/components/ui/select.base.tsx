@@ -26,10 +26,24 @@ const SelectItemRenderer = (itemProps: SelectRootItemComponentProps<SelectOption
   </SelectPrimitive.Item>
 )
 
+const selectContent = () => (
+  <SelectPrimitive.Portal>
+    <SelectPrimitive.Content
+      class="z-50 origin-[var(--kb-select-content-transform-origin)] select-none data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-expanded:animate-in data-expanded:fade-in-0 data-expanded:zoom-in-95"
+      data-slot="select-popup"
+    >
+      <div class="relative min-w-(--kb-popper-anchor-width) rounded-lg border bg-popover shadow-lg/5 not-dark:bg-clip-padding before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]">
+        <SelectPrimitive.Listbox class="max-h-(--kb-popper-content-available-height) overflow-y-auto p-1" data-slot="select-list" />
+      </div>
+    </SelectPrimitive.Content>
+  </SelectPrimitive.Portal>
+)
+
 const SelectBase = <TValue extends string>(props: SelectProps<TValue>) => {
   const display = () => getSelectDisplay(props)
 
-  const trigger = (
+  // Thunks, not consts: an eager `const x = <Root.Trigger/>` runs outside the Root, so useFormControlContext throws
+  const trigger = () => (
     <SelectPrimitive.Trigger
       class={cn(selectTriggerVariants({ size: props.size }), props.class)}
       data-slot="select-trigger"
@@ -40,19 +54,6 @@ const SelectBase = <TValue extends string>(props: SelectProps<TValue>) => {
         <CaretDown class={selectTriggerIconClassName} />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
-  )
-
-  const content = (
-    <SelectPrimitive.Portal>
-      <SelectPrimitive.Content
-        class="z-50 origin-[var(--kb-select-content-transform-origin)] select-none data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-expanded:animate-in data-expanded:fade-in-0 data-expanded:zoom-in-95"
-        data-slot="select-popup"
-      >
-        <div class="relative min-w-(--kb-popper-anchor-width) rounded-lg border bg-popover shadow-lg/5 not-dark:bg-clip-padding before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]">
-          <SelectPrimitive.Listbox class="max-h-(--kb-popper-content-available-height) overflow-y-auto p-1" data-slot="select-list" />
-        </div>
-      </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
   )
 
   const shared = {
@@ -71,8 +72,8 @@ const SelectBase = <TValue extends string>(props: SelectProps<TValue>) => {
         onChange={(options) => props.onValueChange(options.map((option) => option.value as TValue))}
         value={props.items.filter((item) => props.value.includes(item.value as TValue))}
       >
-        {trigger}
-        {content}
+        {trigger()}
+        {selectContent()}
       </SelectPrimitive>
     )
   }
@@ -83,8 +84,8 @@ const SelectBase = <TValue extends string>(props: SelectProps<TValue>) => {
       onChange={(option) => props.onValueChange((option?.value ?? null) as TValue | null)}
       value={props.items.find((item) => item.value === (props.value ?? null)) ?? null}
     >
-      {trigger}
-      {content}
+      {trigger()}
+      {selectContent()}
     </SelectPrimitive>
   )
 }
