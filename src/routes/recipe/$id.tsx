@@ -5,6 +5,7 @@ import * as v from 'valibot'
 import DotsThreeVertical from '~icons/ph/dots-three-vertical-bold'
 import PencilSimple from '~icons/ph/pencil-simple'
 
+import { Editor, EditorContent } from '@/components/common/editor'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -12,12 +13,15 @@ import { Popover } from '@/components/ui/popover'
 import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
+import { recipeNodes } from '@/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
 import { cn } from '@/utils/cn'
 
-const InstructionsPlaceholder = () => (
-  <div class="p-2 text-sm text-muted-foreground">Les instructions seront disponibles après la migration de l&apos;éditeur.</div>
+const Instructions = (props: { instructions: string }) => (
+  <Editor content={props.instructions} nodes={recipeNodes} readOnly>
+    <EditorContent />
+  </Editor>
 )
 
 const RecipePage = () => {
@@ -83,7 +87,7 @@ const RecipePage = () => {
                       <RecipeIngredientGroups baseServings={recipe().servings} ingredientGroups={ingredientGroups()} recipeId={recipe().id} />
                     </div>
                     <div class="overflow-y-auto p-2">
-                      <InstructionsPlaceholder />
+                      <Instructions instructions={recipe().instructions} />
                     </div>
                   </SwipeTabsPanels>
                 </SwipeTabs>
@@ -97,7 +101,7 @@ const RecipePage = () => {
 
                 <Card class="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
                   <h2>Préparation</h2>
-                  <InstructionsPlaceholder />
+                  <Instructions instructions={recipe().instructions} />
                 </Card>
               </div>
             </div>

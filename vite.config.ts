@@ -145,6 +145,11 @@ const viteConfig = defineConfig({
   },
   test: {
     include: ['src/**/*.test.ts'],
+    server: {
+      deps: {
+        inline: [/@tanstack\/solid-/, /@kobalte/, /@corvu/],
+      },
+    },
   },
 })
 

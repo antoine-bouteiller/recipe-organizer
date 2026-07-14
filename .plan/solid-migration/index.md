@@ -1,6 +1,6 @@
 # SolidJS v1 Migration
 
-**Status:** in-progress — §01/§02/§04/§05/§06/§07 done + all feature components & routes migrated (usable-app milestone). Only §08 (Lexical editor + `ui/toolbar` + editor-owned feature files) and §09 (final gate/cutover) remain. On branch `feat/migrate-to-solid` (11 commits). `tsc` clean and `vp test` green (42 tests) with the §08 editor files excluded; zero `react`/`@base-ui`/`@tanstack/react-form` imports outside §08.
+**Status:** in-progress — §01/§02/§04/§05/§06/§07/§08 done + all feature components & routes migrated. Only §09 (final gate/cutover: spec-doc rewrites, `wrangler deploy --dry-run`, VAL-001..005 manual pass) remains. On branch `feat/migrate-to-solid`. `tsc` clean, `vp lint`/`vp fmt` clean, `vp test` green (43 tests incl. the Lexical round-trip), `vp build` succeeds; **zero** `react`/`react-dom`/`@base-ui`/`@lexical/react`/`@tanstack/react-*`/`@phosphor-icons/react` imports anywhere in `src`.
 **Goal:** Migrate `recipe-organizer` from React 19 + TanStack Start (React) to SolidJS v1 (stable), replace the
 Base UI design system with Kobalte, and rebuild the drawer on corvu. Infra (Cloudflare Workers,
 D1/Drizzle, R2, Better Auth, Serwist, Tailwind, Vite+) is untouched — only the UI framework and its
@@ -69,11 +69,37 @@ VAL-001..005 pass on the Solid build, and zero `react` / `@base-ui` / `@lexical/
 - [x] Rebuild the drawer + `*.drawer.tsx` variants on corvu; all dismiss paths animate fully (memory 7640 guard) — see `05-drawer-corvu.md` _(drawer + dialog.drawer + popover.drawer + select.drawer + combobox.drawer done)_
 - [x] Port forms to `@tanstack/solid-form` (accessor field API `field().state…`); text/file/select/combobox forms submit end-to-end (editor field stubbed) — see `06-forms.md`
 - [x] Migrate feature components + routes to consume the rebuilt UI _(all ~40 `.tsx` except editor-owned §08 files; `Icon` suffix stripped, `render`→`as`/`TriggerConfig` triggers, `useSelector`/`useQuery` accessor call-sites, `useMutation(() => opts())`, `use-options`/`use-shopping-list` made reactive; delete-dialog trigger→TriggerConfig)_
-- [ ] Build the custom Lexical Solid binding (composer, decorator nodes, toolbar); round-trip + leak test pass, zero data migration — see `08-editor-lexical.md`
+- [x] Build the custom Lexical Solid binding (composer, decorator nodes, toolbar); round-trip test passes, zero data migration — see `08-editor-lexical.md`
 - [ ] Testing, dead-code/grep gates, doc updates, and branch-and-flip cutover; final validation checklist green — see `09-testing-cutover.md`
 
 ## Log
 
+- 2026-07-14 §08 editor session (Lexical core + hand-rolled Solid binding):
+  - **Binding** (`common/editor/index.tsx`): `createEditor` in the component body; `EditorContext` +
+    `useEditor()` replace `useLexicalComposerContext`. Registrations (`registerRichText`/`registerList`/
+    `registerCheckList` + `registerHistory` from the newly-added **`@lexical/history@0.46.0`** — core
+    does _not_ expose it, contrary to the §08 note) run synchronously via `mergeRegister`+`onCleanup`;
+    `EditorContent` owns the contentEditable `<div>` and calls `setRootElement` in `onMount`.
+  - **Decorator mounting** — replaced the plan's manual `render()`+WeakMap disposer with
+    `registerDecoratorListener` → signal → `<For>`+`<Portal mount={getElementByKey(key)}>`. Portals
+    preserve Solid context (QueryClient/LinkedRecipes/EditorContext) — a bare `render()` root would
+    not — and dispose automatically when For drops a key, so **no bespoke disposer and no leak test
+    needed** (the plan's leak test existed only to cover the hand-rolled disposer). Accepted: Portal
+    adds one wrapper `<div>` inside the `display:contents` host (block-in-block, visually equivalent).
+  - **Nodes**: `subrecipe-node`/`magimix-program-node` → `DecoratorNode<JSX.Element>`, `decorate()`
+    returns Solid JSX; `importJSON`/`exportJSON`/`exportDOM`/`importDOM`/`getType`/`clone` copied
+    **byte-identical** (round-trip test asserts the `"type":"magimixProgram"` marker + parse→export
+    stability). `MagimixItem` is now always a plain div `Item`; editable wraps it in a `TriggerConfig`
+    (`as:'button'`/`as:'div'`) instead of Base UI's `render` merge.
+  - **Dialogs/buttons** → `@tanstack/solid-form` (`useAppForm(() => …)`, `createSignal` open,
+    `useSelector` isSubmitting), `triggerRender`→`trigger: TriggerConfig`, `useEditor()`, unplugin-icons.
+  - **Toolbar** (`ui/toolbar.tsx`): plain `role="toolbar"` div + ~30-line roving-tabindex
+    (`querySelectorAll('button:not([disabled])')`, Arrow/Home/End, focusin retab). Dropped `ToolbarButton`
+    (unused → knip). `editor-field` un-stubbed; `recipe-form` re-wired `nodes`+`extraToolbar`;
+    `recipe/$id` read-only `<Editor>` replaces the placeholder.
+  - Test infra: added `test.server.deps.inline` for `@tanstack/solid-*`/`@kobalte`/`@corvu` so the
+    node-env round-trip test can pull the graph (solid-router ships untransformed `.jsx`); **no jsdom /
+    testing-library** added — still within the "no component-test infra" rule.
 - 2026-07-14 Usable-app session (3 commits: §04 remainder, §06 forms, §C features/routes):
   - **§04** select/combobox/command/field/form on Kobalte. Bridges: select/combobox map the app's primitive-value API to Kobalte's option-object model via an `optionValue` getter + a string sentinel for the `null`/`undefined` option. `field.tsx`+`form.tsx` are framework-plain — reproduced Base UI's `<Form errors>`→childless `<FieldError>` distribution with a `FormErrorsContext` + per-field context. `command.tsx` rebuilt on Kobalte `Dialog` + a tiny Solid registry (query signal, roving active index, item registration) — Kobalte's Combobox/Search are popover-only, no inline-in-dialog fit.
   - **§06** forms → `@tanstack/solid-form`: `useFieldContext()` returns an `Accessor`, so all field reads are `field().state.value` etc.; `useAppForm(() => ({…}))` takes an accessor; `form.Subscribe` children receive an accessor. `use-file-upload` ported to `createStore`+`produce`+`onMount/onCleanup`. `editor-field` stubbed (disabled textarea) pending §08.

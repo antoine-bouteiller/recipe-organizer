@@ -6,6 +6,7 @@ import Trash from '~icons/ph/trash'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { LinkedRecipesProvider } from '@/features/recipe/contexts/linked-recipes-context'
 import { useRecipeOptions } from '@/features/recipe/hooks/use-recipe-options'
 import { withForm } from '@/hooks/use-app-form'
@@ -14,6 +15,9 @@ import { type Option } from '@/hooks/use-options'
 
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '../utils/constants'
 import { recipeDefaultValues } from '../utils/form'
+import { recipeNodes } from './editor/extensions'
+import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
+import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
 import { IngredientGroupField } from './ingredient-group-field'
 
 const cuisineTypeItems = CUISINE_TYPES.map((cuisineType) => ({
@@ -173,7 +177,20 @@ export const RecipeForm = withForm({
           <AppField name="instructions">
             {({ EditorField }) => (
               <Suspense fallback={<Skeleton class="h-64 w-full" />}>
-                <EditorField disabled={isSubmitting()} label="Instructions" />
+                <EditorField
+                  disabled={isSubmitting()}
+                  extraToolbar={
+                    <>
+                      <ToolbarSeparator />
+                      <ToolbarGroup>
+                        <MagimixProgramButton />
+                        <SubrecipeButton />
+                      </ToolbarGroup>
+                    </>
+                  }
+                  label="Instructions"
+                  nodes={recipeNodes}
+                />
               </Suspense>
             )}
           </AppField>

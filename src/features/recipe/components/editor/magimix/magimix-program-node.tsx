@@ -1,5 +1,3 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import {
   $getNodeByKey,
   DecoratorNode,
@@ -13,7 +11,12 @@ import {
   type SerializedLexicalNode,
   type Spread,
 } from 'lexical'
+import { type JSX, Show } from 'solid-js'
+import SpinnerGap from '~icons/ph/spinner-gap'
+import Thermometer from '~icons/ph/thermometer'
+import Timer from '~icons/ph/timer'
 
+import { useEditor } from '@/components/common/editor'
 import { Item } from '@/components/ui/item'
 import { magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'
@@ -50,6 +53,30 @@ const formatTime = (time: number): string => {
   return `${minutes}min ${seconds}s`
 }
 
+interface MagimixItemProps {
+  program: string
+  rotationSpeed: string
+  temperature?: number
+  time: number
+}
+
+const MagimixItem = (props: MagimixItemProps) => (
+  <Item
+    class="w-full"
+    media={<img alt="Magimix Program Icon" class="not-prose size-10" src={`/magimix/${props.program}.png`} />}
+    title={magimixProgramLabels[props.program as keyof typeof magimixProgramLabels]}
+    variant="outline"
+  >
+    <Timer class="size-4" />
+    <span>{formatTime(props.time)}</span>/
+    <SpinnerGap class="size-4" />
+    <span>{capitalize(props.rotationSpeed)}</span>
+    /
+    <Thermometer class="size-4" />
+    <span>{props.temperature ?? '__'}°C</span>
+  </Item>
+)
+
 interface MagimixProgramComponentProps {
   isEditable: boolean
   nodeKey: NodeKey
@@ -59,38 +86,20 @@ interface MagimixProgramComponentProps {
   time: number
 }
 
-const MagimixItem = ({ isEditable, program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'nodeKey'>) => (
-  <Item
-    variant="outline"
-    render={isEditable ? <button /> : undefined}
-    className="w-full"
-    media={<img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />}
-    title={magimixProgramLabels[program as keyof typeof magimixProgramLabels]}
-  >
-    <TimerIcon className="size-4" />
-    <span>{formatTime(time)}</span>/
-    <SpinnerGapIcon className="size-4" />
-    <span>{capitalize(rotationSpeed)}</span>
-    /
-    <ThermometerIcon className="size-4" />
-    <span>{temperature ?? '__'}°C</span>
-  </Item>
-)
+const MagimixProgramComponent = (props: MagimixProgramComponentProps) => {
+  const editor = useEditor()
 
-const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, temperature, time }: MagimixProgramComponentProps) => {
-  const [editor] = useLexicalComposerContext()
-
-  const formInitialValues: MagimixProgramFormInput = {
-    program: program as MagimixProgramFormInput['program'],
-    rotationSpeed: rotationSpeed as MagimixProgramFormInput['rotationSpeed'],
-    temperature: temperature ?? undefined,
-    timeMinutes: Math.floor(time / 60),
-    timeSeconds: time % 60,
-  }
+  const formInitialValues = (): MagimixProgramFormInput => ({
+    program: props.program as MagimixProgramFormInput['program'],
+    rotationSpeed: props.rotationSpeed as MagimixProgramFormInput['rotationSpeed'],
+    temperature: props.temperature ?? undefined,
+    timeMinutes: Math.floor(props.time / 60),
+    timeSeconds: props.time % 60,
+  })
 
   const updateAttributes = (data: MagimixProgramData) => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey)
+      const node = $getNodeByKey(props.nodeKey)
       if ($isMagimixProgramNode(node)) {
         const writable = node.getWritable()
         writable.__program = data.program
@@ -101,22 +110,22 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
     })
   }
 
-  if (isEditable) {
-    return (
+  const item = <MagimixItem program={props.program} rotationSpeed={props.rotationSpeed} temperature={props.temperature} time={props.time} />
+
+  return (
+    <Show fallback={item} when={props.isEditable}>
       <MagimixProgramDialog
-        initialData={formInitialValues}
+        initialData={formInitialValues()}
         onSubmit={updateAttributes}
         submitLabel="Enregistrer"
         title="Modifier le programme Magimix"
-        triggerRender={<MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />}
+        trigger={{ as: 'button', children: item, class: 'w-full', type: 'button' }}
       />
-    )
-  }
-
-  return <MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
+    </Show>
+  )
 }
 
-class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {
+class MagimixProgramNodeType extends DecoratorNode<JSX.Element> {
   __program: string
   __rotationSpeed: string
   __temperature?: number
@@ -203,7 +212,7 @@ class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {
     return false
   }
 
-  decorate(editor: LexicalEditor): React.ReactElement {
+  decorate(editor: LexicalEditor): JSX.Element {
     return (
       <MagimixProgramComponent
         isEditable={editor.isEditable()}
