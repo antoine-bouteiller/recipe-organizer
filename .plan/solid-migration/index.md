@@ -65,7 +65,7 @@ VAL-001..005 pass on the Solid build, and zero `react` / `@base-ui` / `@lexical/
   - [x] **combobox** cluster (Kobalte Combobox; clear/addNew/empty preserved)
   - [x] **command** — rebuilt on Kobalte `Dialog` + a small Solid registry/keyboard context (Kobalte has no inline command/listbox-in-dialog)
   - [x] **field / form** — framework-plain; `Form errors`→`FieldError` distribution reproduced with a Solid context
-  - [ ] toolbar — deferred to §08 (its only consumer is the editor)
+  - [x] toolbar — built in §08 (plain `role="toolbar"` div + roving-tabindex; only consumer is the editor)
 - [x] Rebuild the drawer + `*.drawer.tsx` variants on corvu; all dismiss paths animate fully (memory 7640 guard) — see `05-drawer-corvu.md` _(drawer + dialog.drawer + popover.drawer + select.drawer + combobox.drawer done)_
 - [x] Port forms to `@tanstack/solid-form` (accessor field API `field().state…`); text/file/select/combobox forms submit end-to-end (editor field stubbed) — see `06-forms.md`
 - [x] Migrate feature components + routes to consume the rebuilt UI _(all ~40 `.tsx` except editor-owned §08 files; `Icon` suffix stripped, `render`→`as`/`TriggerConfig` triggers, `useSelector`/`useQuery` accessor call-sites, `useMutation(() => opts())`, `use-options`/`use-shopping-list` made reactive; delete-dialog trigger→TriggerConfig)_
