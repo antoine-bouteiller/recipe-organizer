@@ -6,7 +6,7 @@ import { Form } from '@/components/ui/form'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
 
-type FormModalProps = {
+interface FormModalProps extends Record<string, unknown> {
   children: JSX.Element
   open: boolean
   setOpen: (open: boolean) => void

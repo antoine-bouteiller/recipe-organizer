@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/solid-router'
-import { BookIcon, PlusIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/solid-query'
+import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, Link } from '@tanstack/solid-router'
+import { Book, Plus } from 'phosphor-solid'
+import { For, Show } from 'solid-js'
 import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -14,26 +14,22 @@ const searchSchema = v.object({
 })
 
 const RecipeList = () => {
-  const { authUser } = Route.useRouteContext()
-  const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
+  const context = Route.useRouteContext()
+  const recipesQuery = useQuery(() => getRecipeListOptions())
 
   return (
-    <ScreenLayout title="Recettes" pageKey="/">
-      <div className="flex flex-col gap-8 sm:grid-cols-2 md:grid lg:grid-cols-3">
-        {recipes
-          .filter((recipe) => !recipe.isSpice)
-          .map((recipe) => (
-            <RecipeCard recipe={recipe} key={recipe.id} />
-          ))}
+    <ScreenLayout pageKey="/" title="Recettes">
+      <div class="flex flex-col gap-8 sm:grid-cols-2 md:grid lg:grid-cols-3">
+        <For each={(recipesQuery.data ?? []).filter((recipe) => !recipe.isSpice)}>{(recipe) => <RecipeCard recipe={recipe} />}</For>
       </div>
-      {authUser && (
-        <Button className="fixed right-2 bottom-16 md:hidden" render={<Link to="/recipe/new" viewTransition />} size="icon-xl">
-          <BookIcon className="size-5" />
-          <div className="absolute right-1.75 bottom-1.75 rounded-full border border-primary-foreground bg-primary p-0.5">
-            <PlusIcon className="size-1.5" />
+      <Show when={context().authUser}>
+        <Button as={Link} class="fixed right-2 bottom-16 md:hidden" size="icon-xl" to="/recipe/new" viewTransition>
+          <Book class="size-5" />
+          <div class="absolute right-1.75 bottom-1.75 rounded-full border border-primary-foreground bg-primary p-0.5">
+            <Plus class="size-1.5" />
           </div>
         </Button>
-      )}
+      </Show>
     </ScreenLayout>
   )
 }

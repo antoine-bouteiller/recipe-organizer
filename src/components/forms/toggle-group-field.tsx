@@ -23,7 +23,12 @@ export const ToggleGroupField = (props: ToggleGroupFieldProps) => {
       touched={field().state.meta.isTouched}
     >
       <Show when={props.label}>{(label) => <FieldLabel>{label()}</FieldLabel>}</Show>
-      <ToggleGroup disabled={props.disabled} items={props.items} onValueChange={(value) => field().handleChange(value)} value={field().state.value ?? []} />
+      <ToggleGroup
+        disabled={props.disabled}
+        items={props.items}
+        onValueChange={(value) => field().handleChange(value)}
+        value={field().state.value ?? []}
+      />
       <FieldError />
     </Field>
   )

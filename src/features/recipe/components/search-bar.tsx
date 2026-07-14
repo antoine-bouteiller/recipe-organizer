@@ -1,7 +1,7 @@
-import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/solid-query'
 import { useNavigate } from '@tanstack/solid-router'
-import { useEffect, useState } from 'react'
+import { ArrowElbowDownLeft } from 'phosphor-solid'
+import { createSignal, onCleanup, onMount } from 'solid-js'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -19,17 +19,17 @@ import {
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { usePlatform } from '@/hooks/use-platfom'
-import { type Recipe } from '@/types/recipe'
+import { type ReducedRecipe } from '@/types/recipe'
 
 const SearchBar = () => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = createSignal(false)
 
   const platform = usePlatform()
   const navigate = useNavigate()
 
-  const { data: recipes } = useQuery(getRecipeListOptions())
+  const query = useQuery(() => getRecipeListOptions())
 
-  useEffect(() => {
+  onMount(() => {
     const down = (event: KeyboardEvent) => {
       if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault()
@@ -37,27 +37,26 @@ const SearchBar = () => {
       }
     }
     document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [])
+    onCleanup(() => document.removeEventListener('keydown', down))
+  })
 
   return (
-    <CommandDialog onOpenChange={setOpen} open={open}>
-      <CommandDialogTrigger className="w-56 justify-start pl-2.5 font-normal shadow-none" render={<Button variant="outline" />}>
+    <CommandDialog onOpenChange={setOpen} open={open()}>
+      <CommandDialogTrigger as={Button} class="w-56 justify-start pl-2.5 font-normal shadow-none" variant="outline">
         Recherche une recette...
-        <KbdGroup className="absolute top-1.5 right-1.5 gap-1">
+        <KbdGroup class="absolute top-1.5 right-1.5 gap-1">
           <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-          <Kbd className="aspect-square">K</Kbd>
+          <Kbd class="aspect-square">K</Kbd>
         </KbdGroup>
       </CommandDialogTrigger>
       <CommandDialogPopup>
-        <Command items={recipes}>
+        <Command>
           <CommandInput placeholder="Rechercher une recette" />
           <CommandPanel>
             <CommandEmpty>Aucun résultats trouvé.</CommandEmpty>
-            <CommandList>
-              {(recipe: Recipe) => (
+            <CommandList items={query.data}>
+              {(recipe: ReducedRecipe) => (
                 <CommandItem
-                  key={recipe.id}
                   onClick={() => {
                     setOpen(false)
                     void navigate({
@@ -73,9 +72,9 @@ const SearchBar = () => {
             </CommandList>
           </CommandPanel>
           <CommandFooter>
-            <div className="flex items-center gap-2 text-foreground">
+            <div class="flex items-center gap-2 text-foreground">
               <Kbd>
-                <ArrowElbowDownLeftIcon />
+                <ArrowElbowDownLeft />
               </Kbd>
               <span>Open</span>
             </div>

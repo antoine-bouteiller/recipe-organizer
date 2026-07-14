@@ -1,8 +1,7 @@
-import { createFileRoute } from '@tanstack/solid-router'
-import { PlusIcon, ProhibitIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/solid-query'
+import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, redirect } from '@tanstack/solid-router'
-import React, { useRef, useState, type TouchEvent } from 'react'
+import { Plus, Prohibit } from 'phosphor-solid'
+import { createMemo, createSignal, For, type JSX, Show, Suspense } from 'solid-js'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
@@ -22,60 +21,62 @@ const ELASTIC_FACTOR = 0.1
 const DIRECTION_LOCK_THRESHOLD = 5
 const RELEASE_TRANSITION = 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)'
 
+type UserStatus = 'active' | 'blocked' | 'pending'
+
 const roleLabels: Record<string, string> = {
   admin: 'Admin',
   user: 'Utilisateur',
 }
 
-const SwipeToBlock = ({ children, userEmail, userId }: { children: React.ReactNode; userEmail: string; userId: string }) => {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const foregroundRef = useRef<HTMLDivElement | null>(null)
-  const revealRef = useRef<HTMLDivElement | null>(null)
-  const drag = useRef({ base: 0, direction: null as 'horizontal' | 'vertical' | null, startX: 0, startY: 0, x: 0 })
+const SwipeToBlock = (props: { children: JSX.Element; userEmail: string; userId: string }) => {
+  const [dialogOpen, setDialogOpen] = createSignal(false)
+  let foregroundRef: HTMLDivElement | undefined = undefined
+  let revealRef: HTMLDivElement | undefined = undefined
+  const drag = { base: 0, direction: null as 'horizontal' | 'vertical' | null, startX: 0, startY: 0, x: 0 }
 
   const setX = (value: number, animated: boolean) => {
-    drag.current.x = value
-    const foreground = foregroundRef.current
-    const reveal = revealRef.current
-    if (foreground) {
-      foreground.style.transition = animated ? RELEASE_TRANSITION : 'none'
-      foreground.style.transform = `translate3d(${value}px, 0, 0)`
+    drag.x = value
+    if (foregroundRef) {
+      foregroundRef.style.transition = animated ? RELEASE_TRANSITION : 'none'
+      foregroundRef.style.transform = `translate3d(${value}px, 0, 0)`
     }
-    if (reveal) {
-      reveal.style.width = `${Math.max(0, -value)}px`
+    if (revealRef) {
+      revealRef.style.width = `${Math.max(0, -value)}px`
     }
   }
 
-  const onTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+  const onTouchStart = (event: TouchEvent) => {
     const touch = event.touches.item(0)
     if (!touch) {
       return
     }
-    drag.current = { base: drag.current.x, direction: null, startX: touch.clientX, startY: touch.clientY, x: drag.current.x }
+    drag.base = drag.x
+    drag.direction = null
+    drag.startX = touch.clientX
+    drag.startY = touch.clientY
   }
 
-  const onTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+  const onTouchMove = (event: TouchEvent) => {
     const touch = event.touches.item(0)
     if (!touch) {
       return
     }
-    const state = drag.current
-    const dx = touch.clientX - state.startX
-    const dy = touch.clientY - state.startY
+    const dx = touch.clientX - drag.startX
+    const dy = touch.clientY - drag.startY
 
-    if (!state.direction) {
+    if (!drag.direction) {
       if (Math.abs(dx) > DIRECTION_LOCK_THRESHOLD || Math.abs(dy) > DIRECTION_LOCK_THRESHOLD) {
-        state.direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
+        drag.direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
       }
       return
     }
 
-    if (state.direction !== 'horizontal') {
+    if (drag.direction !== 'horizontal') {
       return
     }
 
     event.preventDefault()
-    let next = state.base + dx
+    let next = drag.base + dx
     if (next > 0) {
       next *= ELASTIC_FACTOR
     } else if (next < DRAG_MIN) {
@@ -85,115 +86,126 @@ const SwipeToBlock = ({ children, userEmail, userId }: { children: React.ReactNo
   }
 
   const onTouchEnd = () => {
-    if (drag.current.direction !== 'horizontal') {
+    if (drag.direction !== 'horizontal') {
       return
     }
-    if (drag.current.x < SWIPE_THRESHOLD) {
+    if (drag.x < SWIPE_THRESHOLD) {
       setDialogOpen(true)
     }
     setX(0, true)
   }
 
   return (
-    <div className="relative overflow-hidden">
+    <div class="relative overflow-hidden">
       <div
-        ref={revealRef}
-        className="absolute top-0 right-0 bottom-0 flex w-0 items-center justify-center rounded-xl bg-destructive text-destructive-foreground"
+        class="absolute top-0 right-0 bottom-0 flex w-0 items-center justify-center rounded-xl bg-destructive text-destructive-foreground"
+        ref={(el) => (revealRef = el)}
       >
-        <ProhibitIcon className="size-5 shrink-0" />
+        <Prohibit class="size-5 shrink-0" />
       </div>
-      <div className="relative bg-muted" ref={foregroundRef} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart}>
-        {children}
+      <div class="relative bg-muted" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={(el) => (foregroundRef = el)}>
+        {props.children}
       </div>
-      <BlockUser onOpenChange={setDialogOpen} open={dialogOpen} userEmail={userEmail} userId={userId} />
+      <BlockUser onOpenChange={setDialogOpen} open={dialogOpen()} userEmail={props.userEmail} userId={props.userId} />
     </div>
   )
 }
 
-const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: string; status: 'active' | 'pending' | 'blocked' }) => {
-  const { data: users } = useSuspenseQuery(getUserListOptions(status))
+const UserRow = (props: { isMobile: boolean; status: UserStatus; userEmail: string; userId: string; userRole: string }) => (
+  <Item
+    actions={
+      <>
+        <Show when={props.status === 'blocked' || props.status === 'pending'}>
+          <ApproveUser userId={props.userId} />
+        </Show>
+        <Show when={!props.isMobile && (props.status === 'active' || props.status === 'pending')}>
+          <BlockUser userEmail={props.userEmail} userId={props.userId} />
+        </Show>
+      </>
+    }
+    class="flex-nowrap"
+    title={
+      <>
+        <span class="text-nowrap text-ellipsis">{props.userEmail}</span>
+        <Badge variant={props.userRole === 'admin' ? 'default' : 'secondary'}>{roleLabels[props.userRole]}</Badge>
+      </>
+    }
+  />
+)
+
+const UserList = (props: { emptyLabel: string; search: string; status: UserStatus }) => {
+  const usersQuery = useQuery(() => getUserListOptions(props.status))
   const isMobile = useIsMobile()
-  const query = search.trim().toLowerCase()
-  const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
 
-  if (filteredUsers.length === 0) {
-    return <p className="py-8 text-center text-muted-foreground">{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
-  }
+  const filteredUsers = createMemo(() => {
+    const query = props.search.trim().toLowerCase()
+    return (usersQuery.data ?? []).filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
+  })
 
-  const showBlockButton = status === 'active' || status === 'pending'
+  const showBlockButton = () => props.status === 'active' || props.status === 'pending'
 
   return (
-    <ItemGroup>
-      {filteredUsers.map((userItem, index) => {
-        const item = (
-          <Item
-            actions={
-              <>
-                {(status === 'blocked' || status === 'pending') && <ApproveUser userId={userItem.id} />}
-                {!isMobile && showBlockButton && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
-              </>
-            }
-            className="flex-nowrap"
-            title={
-              <>
-                <span className="text-nowrap text-ellipsis">{userItem.email}</span>
-                <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[userItem.role]}</Badge>
-              </>
-            }
-          />
-        )
-
-        return (
-          <React.Fragment key={userItem.id}>
-            {isMobile && showBlockButton ? (
-              <SwipeToBlock userEmail={userItem.email} userId={userItem.id}>
-                {item}
-              </SwipeToBlock>
-            ) : (
-              item
-            )}
-            {index !== filteredUsers.length - 1 && <ItemSeparator />}
-          </React.Fragment>
-        )
-      })}
-    </ItemGroup>
+    <Show
+      when={filteredUsers().length > 0}
+      fallback={
+        <p class="py-8 text-center text-muted-foreground">{props.search ? 'Aucun utilisateur trouvé pour cette recherche.' : props.emptyLabel}</p>
+      }
+    >
+      <ItemGroup>
+        <For each={filteredUsers()}>
+          {(userItem, index) => (
+            <>
+              <Show
+                when={isMobile() && showBlockButton()}
+                fallback={
+                  <UserRow isMobile={isMobile()} status={props.status} userEmail={userItem.email} userId={userItem.id} userRole={userItem.role} />
+                }
+              >
+                <SwipeToBlock userEmail={userItem.email} userId={userItem.id}>
+                  <UserRow isMobile={isMobile()} status={props.status} userEmail={userItem.email} userId={userItem.id} userRole={userItem.role} />
+                </SwipeToBlock>
+              </Show>
+              <Show when={index() !== filteredUsers().length - 1}>
+                <ItemSeparator />
+              </Show>
+            </>
+          )}
+        </For>
+      </ItemGroup>
+    </Show>
   )
 }
 
 const UsersManagement = () => {
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = createSignal('')
 
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
-      <div className="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
-        <SearchInput search={search} setSearch={setSearch} />
-        <AddUser>
-          <Button size="icon-lg" variant="outline">
-            <PlusIcon />
-          </Button>
-        </AddUser>
+      <div class="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
+        <SearchInput search={search()} setSearch={setSearch} />
+        <AddUser trigger={{ as: Button, children: <Plus />, size: 'icon-lg', variant: 'outline' }} />
       </div>
 
       <Tabs defaultValue="active">
-        <TabsList className="w-full">
+        <TabsList class="w-full">
           <TabsTab value="active">Actifs</TabsTab>
           <TabsTab value="pending">En attente</TabsTab>
           <TabsTab value="blocked">Bloqués</TabsTab>
         </TabsList>
         <TabsPanel value="active">
-          <React.Suspense fallback={null}>
-            <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
-          </React.Suspense>
+          <Suspense fallback={null}>
+            <UserList emptyLabel="Aucun utilisateur actif." search={search()} status="active" />
+          </Suspense>
         </TabsPanel>
         <TabsPanel value="pending">
-          <React.Suspense fallback={null}>
-            <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-          </React.Suspense>
+          <Suspense fallback={null}>
+            <UserList emptyLabel="Aucun utilisateur en attente." search={search()} status="pending" />
+          </Suspense>
         </TabsPanel>
         <TabsPanel value="blocked">
-          <React.Suspense fallback={null}>
-            <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-          </React.Suspense>
+          <Suspense fallback={null}>
+            <UserList emptyLabel="Aucun utilisateur bloqué." search={search()} status="blocked" />
+          </Suspense>
         </TabsPanel>
       </Tabs>
     </ScreenLayout>

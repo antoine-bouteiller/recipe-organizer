@@ -1,5 +1,5 @@
-import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@phosphor-icons/react'
-import { type ReactNode } from 'react'
+import { Fire, Fish, ForkKnife, Leaf, Package } from 'phosphor-solid'
+import { type JSX } from 'solid-js'
 
 import { type IngredientCategory } from '@/types/ingredient'
 
@@ -11,12 +11,12 @@ export const ingredientCategoryLabels: Record<IngredientCategory, string> = {
   vegetables: 'Légumes',
 }
 
-export const ingredientCategoryIcons: Record<IngredientCategory, ReactNode> = {
-  fish: <FishIcon />,
-  meat: <CowIcon />,
-  other: <PackageIcon />,
-  spices: <PepperIcon />,
-  vegetables: <CarrotIcon />,
+export const ingredientCategoryIcons: Record<IngredientCategory, JSX.Element> = {
+  fish: <Fish />,
+  meat: <ForkKnife />,
+  other: <Package />,
+  spices: <Fire />,
+  vegetables: <Leaf />,
 }
 
 export const ingredientsCategoryOptions = Object.entries(ingredientCategoryLabels).map(([key, value]) => ({

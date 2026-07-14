@@ -37,7 +37,7 @@ const ToastIcon = (props: { type?: ToastType }) => (
 
 const ToastItem = (props: { toastId: number } & AddToastOptions) => (
   <Toast
-    class="relative flex w-full select-none items-center justify-between gap-1.5 rounded-lg border bg-popover px-3.5 py-3 not-dark:bg-clip-padding text-popover-foreground text-sm shadow-lg/5 data-opened:animate-in data-opened:fade-in-0 data-opened:slide-in-from-right-full data-closed:animate-out data-closed:fade-out-0"
+    class="relative flex w-full items-center justify-between gap-1.5 rounded-lg border bg-popover px-3.5 py-3 text-sm text-popover-foreground shadow-lg/5 select-none not-dark:bg-clip-padding data-closed:animate-out data-closed:fade-out-0 data-opened:animate-in data-opened:fade-in-0 data-opened:slide-in-from-right-full"
     data-type={props.type}
     toastId={props.toastId}
   >

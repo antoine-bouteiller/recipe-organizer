@@ -1,6 +1,6 @@
-import { CheckIcon } from '@phosphor-icons/react'
 import { useMutation } from '@tanstack/solid-query'
-import { useTransition } from 'react'
+import { Check } from 'phosphor-solid'
+import { createSignal } from 'solid-js'
 
 import { Button } from '@/components/ui/button'
 import { approveUserOptions } from '@/features/users/api/approve'
@@ -9,19 +9,22 @@ interface ApproveUserProps {
   userId: string
 }
 
-export const ApproveUser = ({ userId }: ApproveUserProps) => {
-  const approveMutation = useMutation(approveUserOptions())
-  const [isPending, startTransition] = useTransition()
+export const ApproveUser = (props: ApproveUserProps) => {
+  const approveMutation = useMutation(() => approveUserOptions())
+  const [isPending, setIsPending] = createSignal(false)
 
-  const handleApprove = () => {
-    startTransition(async () => {
-      await approveMutation.mutateAsync({ data: { id: userId } })
-    })
+  const handleApprove = async () => {
+    setIsPending(true)
+    try {
+      await approveMutation.mutateAsync({ data: { id: props.userId } })
+    } finally {
+      setIsPending(false)
+    }
   }
 
   return (
-    <Button disabled={isPending} onClick={handleApprove} size="icon" variant="default">
-      <CheckIcon />
+    <Button disabled={isPending()} onClick={handleApprove} size="icon" variant="default">
+      <Check />
     </Button>
   )
 }

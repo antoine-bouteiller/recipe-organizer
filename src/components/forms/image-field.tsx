@@ -60,7 +60,7 @@ export const ImageField = (props: ImageFieldProps) => {
           <div class="absolute top-4 right-4">
             <button
               aria-label="Remove image"
-              class="z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white outline-none transition-[color,box-shadow] hover:bg-black/80 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              class="z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()

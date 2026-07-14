@@ -8,14 +8,14 @@ interface DeleteIngredientProps {
   ingredientName: string
 }
 
-export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredientProps) => {
-  const deleteMutation = useMutation(deleteIngredientOptions())
+export const DeleteIngredient = (props: DeleteIngredientProps) => {
+  const deleteMutation = useMutation(() => deleteIngredientOptions())
 
-  const handleDelete = () => deleteMutation.mutate({ data: { id: ingredientId } })
+  const handleDelete = () => deleteMutation.mutate({ data: { id: props.ingredientId } })
 
   return (
     <DeleteDialog
-      description={`Êtes-vous sûr de vouloir supprimer l'ingrédient ${ingredientName} ?`}
+      description={`Êtes-vous sûr de vouloir supprimer l'ingrédient ${props.ingredientName} ?`}
       onDelete={handleDelete}
       title="Supprimer l'ingrédient"
     />

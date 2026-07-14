@@ -22,9 +22,11 @@ export const UserForm = withForm({
 
     return (
       <>
-        <AppField name="email">{({ TextField }) => <TextField disabled={isSubmitting} label="Email" placeholder="Ex: user@example.com" />}</AppField>
+        <AppField name="email">
+          {({ TextField }) => <TextField disabled={isSubmitting()} label="Email" placeholder="Ex: user@example.com" />}
+        </AppField>
 
-        <AppField name="role">{({ SelectField }) => <SelectField disabled={isSubmitting} items={roleOptions} label="Rôle" />}</AppField>
+        <AppField name="role">{({ SelectField }) => <SelectField disabled={isSubmitting()} items={roleOptions} label="Rôle" />}</AppField>
       </>
     )
   },

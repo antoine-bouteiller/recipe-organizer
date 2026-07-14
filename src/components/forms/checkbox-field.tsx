@@ -8,7 +8,7 @@ const Checkbox = (props: { checked?: boolean; disabled?: boolean; onChange?: (ch
   <CheckboxPrimitive checked={props.checked} class="inline-flex" disabled={props.disabled} onChange={props.onChange}>
     <CheckboxPrimitive.Input class="peer" />
     <CheckboxPrimitive.Control
-      class="relative inline-flex size-4.5 shrink-0 items-center justify-center rounded-[.25rem] border border-input bg-background not-dark:bg-clip-padding text-primary-foreground shadow-xs/5 outline-none transition-shadow data-checked:border-primary data-checked:bg-primary data-disabled:opacity-64 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-background sm:size-4 dark:not-data-checked:bg-input/32"
+      class="relative inline-flex size-4.5 shrink-0 items-center justify-center rounded-[.25rem] border border-input bg-background text-primary-foreground shadow-xs/5 transition-shadow outline-none not-dark:bg-clip-padding peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-background data-checked:border-primary data-checked:bg-primary data-disabled:opacity-64 sm:size-4 dark:not-data-checked:bg-input/32"
       data-slot="checkbox"
     >
       <CheckboxPrimitive.Indicator>

@@ -11,17 +11,18 @@ interface DeleteRecipeProps {
   recipeName: string
 }
 
-export default function DeleteRecipe({ recipeId, recipeName }: Readonly<DeleteRecipeProps>) {
-  const { mutateAsync: deleteRecipe } = useMutation(deleteRecipeOptions())
+export default function DeleteRecipe(props: Readonly<DeleteRecipeProps>) {
+  const mutation = useMutation(() => deleteRecipeOptions())
   const router = useRouter()
 
-  const handleDelete = () =>
-    deleteRecipe(
-      { data: recipeId },
+  const handleDelete = async () => {
+    await mutation.mutateAsync(
+      { data: props.recipeId },
       {
         onError: () =>
           toastManager.add({
             description: 'Une erreur est survenue lors de la suppression de la recette',
+            title: 'Erreur',
             type: 'error',
           }),
         onSuccess: () => {
@@ -33,14 +34,15 @@ export default function DeleteRecipe({ recipeId, recipeName }: Readonly<DeleteRe
         },
       }
     )
+  }
 
   return (
     <DeleteDialog
       deleteButtonLabel="Supprimer la recette"
-      description={`Êtes-vous sûr de vouloir supprimer la recette ${recipeName}?`}
+      description={`Êtes-vous sûr de vouloir supprimer la recette ${props.recipeName}?`}
       onDelete={handleDelete}
       title="Supprimer la recette"
-      trigger={<Button className="text-destructive hover:text-destructive" variant="ghost" />}
+      trigger={{ as: Button, class: 'text-destructive hover:text-destructive', variant: 'ghost' }}
     />
   )
 }

@@ -35,30 +35,30 @@ export const NumberInput = (props: NumberInputProps) => (
     step={props.step}
   >
     <Show when={props.label}>
-      <NumberFieldPrimitive.Label class="inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4">
+      <NumberFieldPrimitive.Label class="inline-flex items-center gap-2 text-base/4.5 font-medium text-foreground sm:text-sm/4">
         {props.label}
       </NumberFieldPrimitive.Label>
     </Show>
     <div
-      class="relative flex w-full justify-between rounded-lg border border-input bg-background not-dark:bg-clip-padding text-base text-foreground shadow-xs/5 transition-shadow focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/24 sm:text-sm dark:bg-input/32 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0"
+      class="relative flex w-full justify-between rounded-lg border border-input bg-background text-base text-foreground shadow-xs/5 transition-shadow not-dark:bg-clip-padding focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/24 sm:text-sm dark:bg-input/32 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4"
       data-slot="number-field-group"
     >
       <NumberFieldPrimitive.DecrementTrigger
         aria-label="Décrémenter"
-        class="relative flex shrink-0 cursor-pointer items-center justify-center rounded-s-[calc(var(--radius-lg)-1px)] px-[calc(--spacing(3)-1px)] in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] transition-colors hover:bg-accent"
+        class="relative flex shrink-0 cursor-pointer items-center justify-center rounded-s-[calc(var(--radius-lg)-1px)] px-[calc(--spacing(3)-1px)] transition-colors hover:bg-accent in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)]"
         data-slot="number-field-decrement"
       >
         <Minus />
       </NumberFieldPrimitive.DecrementTrigger>
       <NumberFieldPrimitive.Input
-        class="h-8.5 in-data-[size=lg]:h-9.5 in-data-[size=sm]:h-7.5 w-full min-w-0 grow bg-transparent px-[calc(--spacing(3)-1px)] in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] text-center leading-8.5 tabular-nums outline-none sm:h-7.5"
+        class="h-8.5 w-full min-w-0 grow bg-transparent px-[calc(--spacing(3)-1px)] text-center leading-8.5 tabular-nums outline-none in-data-[size=lg]:h-9.5 in-data-[size=sm]:h-7.5 in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] sm:h-7.5"
         data-slot="number-field-input"
         onBlur={props.onBlur}
         placeholder={props.placeholder}
       />
       <NumberFieldPrimitive.IncrementTrigger
         aria-label="Incrémenter"
-        class="relative flex shrink-0 cursor-pointer items-center justify-center rounded-e-[calc(var(--radius-lg)-1px)] px-[calc(--spacing(3)-1px)] in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)] transition-colors hover:bg-accent"
+        class="relative flex shrink-0 cursor-pointer items-center justify-center rounded-e-[calc(var(--radius-lg)-1px)] px-[calc(--spacing(3)-1px)] transition-colors hover:bg-accent in-data-[size=sm]:px-[calc(--spacing(2.5)-1px)]"
         data-slot="number-field-increment"
       >
         <Plus />

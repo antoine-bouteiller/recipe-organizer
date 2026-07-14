@@ -29,7 +29,11 @@ const SelectBase = <TValue extends string>(props: SelectProps<TValue>) => {
   const display = () => getSelectDisplay(props)
 
   const trigger = (
-    <SelectPrimitive.Trigger class={cn(selectTriggerVariants({ size: props.size }), props.class)} data-slot="select-trigger" disabled={props.disabled}>
+    <SelectPrimitive.Trigger
+      class={cn(selectTriggerVariants({ size: props.size }), props.class)}
+      data-slot="select-trigger"
+      disabled={props.disabled}
+    >
       <span class={cn('flex-1 truncate text-left', display().isEmpty && 'text-muted-foreground')}>{display().displayLabel}</span>
       <SelectPrimitive.Icon data-slot="select-icon">
         <CaretDown class={selectTriggerIconClassName} />

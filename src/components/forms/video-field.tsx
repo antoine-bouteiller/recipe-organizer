@@ -68,7 +68,7 @@ export const VideoField = (props: VideoFieldProps) => {
               </div>
               <button
                 aria-label="Remove video"
-                class="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-destructive/10 text-destructive outline-none transition-colors hover:bg-destructive/20 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                class="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-destructive/10 text-destructive transition-colors outline-none hover:bg-destructive/20 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 onClick={(event) => {
                   event.preventDefault()
                   event.stopPropagation()

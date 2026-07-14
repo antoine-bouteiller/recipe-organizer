@@ -1,40 +1,20 @@
 import { useQuery } from '@tanstack/solid-query'
 
 import { getRecipeByIdsOptions } from '@/features/shopping-list/api/get-recipe-by-ids'
-import { type IngredientCartItem } from '@/features/shopping-list/types/ingredient-cart-item'
 import { useRecipeQuantitiesState } from '@/stores/recipe-quantities.store'
 import { useShoppingListIds } from '@/stores/shopping-list.store'
-import { type IngredientCategory } from '@/types/ingredient'
 
 import { aggregateShoppingList } from '../utils/aggregate-shopping-list'
 
-type UseShoppingListResult =
-  | {
-      isLoading: true
-      recipesQuantities?: never
-      shoppingListIngredients?: never
-    }
-  | {
-      isLoading: false
-      recipesQuantities: Record<number, number>
-      shoppingListIngredients: Partial<Record<IngredientCategory, IngredientCartItem[]>>
-    }
-
-export const useShoppingList = (): UseShoppingListResult => {
-  const shoppingList = useShoppingListIds()
+export const useShoppingList = () => {
+  const shoppingListIds = useShoppingListIds()
   const recipesQuantities = useRecipeQuantitiesState()
 
-  const { data: recipes, isLoading } = useQuery(getRecipeByIdsOptions(shoppingList))
-
-  if (isLoading) {
-    return {
-      isLoading,
-    }
-  }
+  const query = useQuery(() => getRecipeByIdsOptions(shoppingListIds()))
 
   return {
-    isLoading,
+    isLoading: () => query.isLoading,
     recipesQuantities,
-    shoppingListIngredients: aggregateShoppingList(recipes ?? [], recipesQuantities),
+    shoppingListIngredients: () => aggregateShoppingList(query.data ?? [], recipesQuantities()),
   }
 }

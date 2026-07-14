@@ -1,28 +1,25 @@
-import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/solid-query'
+import { type QueryKey, useQuery } from '@tanstack/solid-query'
 
 export interface Option<TValue = number | undefined> {
   label: string
   value: TValue
 }
 
-export const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(
-  getQueryOptions: () => UseQueryOptions<TQueryOptionData, TError, TData, TQueryKey>,
-  mapFn: (item: TData[number]) => Option
-) => {
-  function useOptions(props?: { allowEmpty?: false; filter?: (item: TData[number]) => boolean }): Option<number>[]
+export const createOptionsHook = <TItem>(getQueryOptions: () => { queryFn?: unknown; queryKey: QueryKey }, mapFn: (item: TItem) => Option) => {
+  function useOptions(props?: { allowEmpty?: false; filter?: (item: TItem) => boolean }): Option<number>[]
 
-  function useOptions(props: { allowEmpty: true; filter?: (item: TData[number]) => boolean }): Option[]
+  function useOptions(props: { allowEmpty: true; filter?: (item: TItem) => boolean }): Option[]
 
   function useOptions({
     allowEmpty,
     filter = () => true,
   }: {
     allowEmpty?: boolean
-    filter?: (item: TData[number]) => boolean
+    filter?: (item: TItem) => boolean
   } = {}): Option[] {
-    const { data } = useQuery(getQueryOptions())
+    const query = useQuery(getQueryOptions as never)
 
-    const items = data ?? []
+    const items = (query.data ?? []) as TItem[]
     const options: Option[] = items.filter(filter).map(mapFn)
 
     if (allowEmpty) {

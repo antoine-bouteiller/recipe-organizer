@@ -44,7 +44,7 @@ const useCommand = () => {
   return context
 }
 
-export const Command = <TItem,>(props: { items?: TItem[]; children: (item: TItem) => JSX.Element }) => {
+export const Command = (props: { children: JSX.Element }) => {
   const [query, setQuery] = createSignal('')
   const [entries, setEntries] = createSignal<CommandItemEntry[]>([])
   const [activeIndex, setActiveIndex] = createSignal(0)
@@ -70,11 +70,7 @@ export const Command = <TItem,>(props: { items?: TItem[]; children: (item: TItem
     visibleCount: () => visible().length,
   }
 
-  return (
-    <CommandContext.Provider value={context}>
-      <For each={props.items}>{(item) => props.children(item)}</For>
-    </CommandContext.Provider>
-  )
+  return <CommandContext.Provider value={context}>{props.children}</CommandContext.Provider>
 }
 
 export const CommandInput = (props: { placeholder?: string; class?: string }) => {
@@ -107,9 +103,9 @@ export const CommandInput = (props: { placeholder?: string; class?: string }) =>
   )
 }
 
-export const CommandList = (props: { class?: string; children: JSX.Element }) => (
+export const CommandList = <TItem,>(props: { class?: string; items?: TItem[]; children: (item: TItem) => JSX.Element }) => (
   <div class={cn('min-h-0 flex-1 overflow-y-auto scroll-py-2 p-2', props.class)} data-slot="command-list">
-    {props.children}
+    <For each={props.items}>{(item) => props.children(item)}</For>
   </div>
 )
 

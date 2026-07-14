@@ -65,12 +65,15 @@ const DialogBase = (props: DialogProps) => {
       </Show>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
-          class="fixed inset-0 z-50 bg-black/32 backdrop-blur-sm data-expanded:animate-in data-expanded:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+          class="fixed inset-0 z-50 bg-black/32 backdrop-blur-sm data-closed:animate-out data-closed:fade-out-0 data-expanded:animate-in data-expanded:fade-in-0"
           data-slot="dialog-backdrop"
         />
-        <div class="fixed inset-0 z-50 grid grid-rows-[1fr_auto_3fr] justify-items-center p-4 max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12" data-slot="dialog-viewport">
+        <div
+          class="fixed inset-0 z-50 grid grid-rows-[1fr_auto_3fr] justify-items-center p-4 max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12"
+          data-slot="dialog-viewport"
+        >
           <DialogPrimitive.Content
-            class="relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 max-w-lg flex-col rounded-2xl border bg-popover not-dark:bg-clip-padding text-popover-foreground shadow-lg/5 outline-none data-expanded:animate-in data-expanded:fade-in-0 data-expanded:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-sm:max-w-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0"
+            class="relative row-start-2 flex max-h-full min-h-0 w-full max-w-lg min-w-0 flex-col rounded-2xl border bg-popover text-popover-foreground shadow-lg/5 outline-none not-dark:bg-clip-padding data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-expanded:animate-in data-expanded:fade-in-0 data-expanded:zoom-in-95 max-sm:max-w-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0"
             data-slot="dialog-popup"
           >
             {wrap(

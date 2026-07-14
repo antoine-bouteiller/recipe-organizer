@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/solid-router'
-import { createFileRoute } from '@tanstack/solid-router'
 
 import { createR2GetHandler, createR2HeadHandler } from '@/lib/r2'
 

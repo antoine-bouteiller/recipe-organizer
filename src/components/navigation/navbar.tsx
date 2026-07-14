@@ -1,5 +1,5 @@
 import { Link, useRouter } from '@tanstack/solid-router'
-import { type ReactNode } from 'react'
+import { For, type JSX } from 'solid-js'
 
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
@@ -9,28 +9,29 @@ import { menuItems } from './constants'
 
 const navItems = menuItems.filter((item) => item.display !== 'mobile')
 
-export const Navbar = ({ search }: { search: ReactNode }) => {
+export const Navbar = (props: { search: JSX.Element }) => {
   const router = useRouter()
 
   return (
-    <div className="flex h-14 items-center gap-2 px-6">
-      <nav className="flex items-center gap-1">
-        {navItems.map((item) => (
-          <Link
-            key={item.linkProps.to}
-            {...item.linkProps}
-            activeOptions={item.linkProps.to === '/' ? { exact: true } : undefined}
-            activeProps={{
-              className: 'text-foreground after:absolute after:inset-x-2.5 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-primary',
-            }}
-            className="relative rounded-md px-2.5 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            {item.label}
-          </Link>
-        ))}
+    <div class="flex h-14 items-center gap-2 px-6">
+      <nav class="flex items-center gap-1">
+        <For each={navItems}>
+          {(item) => (
+            <Link
+              {...item.linkProps}
+              activeOptions={item.linkProps.to === '/' ? { exact: true } : undefined}
+              activeProps={{
+                class: 'text-foreground after:absolute after:inset-x-2.5 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-primary',
+              }}
+              class="relative rounded-md px-2.5 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          )}
+        </For>
       </nav>
-      <div className="flex flex-1 items-center justify-end gap-2">
-        {search}
+      <div class="flex flex-1 items-center justify-end gap-2">
+        {props.search}
         <Button
           onClick={async () => {
             toggleTheme()
@@ -39,7 +40,7 @@ export const Navbar = ({ search }: { search: ReactNode }) => {
           size="icon"
           variant="ghost"
         >
-          <ThemeIcon className="size-6" />
+          <ThemeIcon class="size-6" />
         </Button>
       </div>
     </div>

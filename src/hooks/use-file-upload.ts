@@ -95,7 +95,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     isDragging: false,
   })
 
-  let inputRef: HTMLInputElement | undefined
+  let inputRef: HTMLInputElement | undefined = undefined
 
   const validateFile = (file: File): string | null => {
     if (file.size > maxSize) {
@@ -137,10 +137,12 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
       inputRef.value = ''
     }
 
-    setState(produce((draft) => {
-      draft.errors = []
-      draft.files = []
-    }))
+    setState(
+      produce((draft) => {
+        draft.errors = []
+        draft.files = []
+      })
+    )
 
     onFilesChange?.([])
   }
@@ -188,10 +190,12 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     if (validFiles.length > 0) {
       onFilesAdded?.(validFiles)
       const updatedFiles = multiple ? [...state.files, ...validFiles] : validFiles
-      setState(produce((draft) => {
-        draft.errors = errors
-        draft.files = updatedFiles
-      }))
+      setState(
+        produce((draft) => {
+          draft.errors = errors
+          draft.files = updatedFiles
+        })
+      )
       onFilesChange?.(updatedFiles)
     } else if (errors.length > 0) {
       setState('errors', errors)
@@ -209,10 +213,12 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     }
 
     const newFiles = state.files.filter((file) => file.id !== id)
-    setState(produce((draft) => {
-      draft.errors = []
-      draft.files = newFiles
-    }))
+    setState(
+      produce((draft) => {
+        draft.errors = []
+        draft.files = newFiles
+      })
+    )
     onFilesChange?.(newFiles)
   }
 

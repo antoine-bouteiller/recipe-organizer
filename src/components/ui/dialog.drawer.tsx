@@ -2,7 +2,16 @@ import { type JSX, Show } from 'solid-js'
 
 import { Button } from '@/components/ui/button'
 import { type DialogProps } from '@/components/ui/dialog'
-import { DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, Drawer as DrawerRoot, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
+import {
+  DrawerClose,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerPanel,
+  DrawerPopup,
+  Drawer as DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 
 const DialogDrawer = (props: DialogProps) => {
   const hasFooter = () => props.cancelLabel !== undefined || props.footer !== undefined
