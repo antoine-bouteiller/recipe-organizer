@@ -1,37 +1,37 @@
-import { type ReactElement, type ReactNode } from 'react'
+import { type JSX, Show } from 'solid-js'
 
 import { cn } from '@/utils/cn'
 
 interface CardProps {
-  title?: ReactNode
-  description?: ReactNode
-  className?: string
-  children?: ReactNode
+  title?: JSX.Element
+  description?: JSX.Element
+  class?: string
+  children?: JSX.Element
 }
 
-export const Card = ({ title, description, className, children }: CardProps): ReactElement => {
-  const hasHeader = title !== undefined || description !== undefined
+export const Card = (props: CardProps) => {
+  const hasHeader = () => props.title !== undefined || props.description !== undefined
 
   return (
     <div
-      className={cn(`relative flex flex-col rounded-2xl border bg-card text-card-foreground shadow-xs/5 not-dark:bg-clip-padding`, className)}
+      class={cn('relative flex flex-col rounded-2xl border bg-card text-card-foreground shadow-xs/5 not-dark:bg-clip-padding', props.class)}
       data-slot="card"
     >
-      {hasHeader && (
-        <div className="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6" data-slot="card-header">
-          {title !== undefined && (
-            <div className="text-lg leading-none font-semibold" data-slot="card-title">
-              {title}
+      <Show when={hasHeader()}>
+        <div class="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6" data-slot="card-header">
+          <Show when={props.title !== undefined}>
+            <div class="text-lg leading-none font-semibold" data-slot="card-title">
+              {props.title}
             </div>
-          )}
-          {description !== undefined && (
-            <div className="text-sm text-muted-foreground" data-slot="card-description">
-              {description}
+          </Show>
+          <Show when={props.description !== undefined}>
+            <div class="text-sm text-muted-foreground" data-slot="card-description">
+              {props.description}
             </div>
-          )}
+          </Show>
         </div>
-      )}
-      {children}
+      </Show>
+      {props.children}
     </div>
   )
 }

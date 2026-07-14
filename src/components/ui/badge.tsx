@@ -1,7 +1,6 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
+import { Polymorphic, type PolymorphicProps } from '@kobalte/core/polymorphic'
 import { cva, type VariantProps } from 'class-variance-authority'
-import type React from 'react'
+import { splitProps, type ValidComponent } from 'solid-js'
 
 import { cn } from '@/utils/cn'
 
@@ -32,20 +31,23 @@ const badgeVariants = cva(
   }
 )
 
-export interface BadgeProps extends useRender.ComponentProps<'span'> {
+export interface BadgeOptions {
   variant?: VariantProps<typeof badgeVariants>['variant']
   size?: VariantProps<typeof badgeVariants>['size']
+  class?: string
 }
 
-export const Badge = ({ className, variant, size, render, ...props }: BadgeProps): React.ReactElement => {
-  const defaultProps = {
-    className: cn(badgeVariants({ className, size, variant })),
-    'data-slot': 'badge',
-  }
+export type BadgeProps<T extends ValidComponent = 'span'> = PolymorphicProps<T, BadgeOptions>
 
-  return useRender({
-    defaultTagName: 'span',
-    props: mergeProps<'span'>(defaultProps, props),
-    render,
-  })
+export const Badge = <T extends ValidComponent = 'span'>(props: BadgeProps<T>) => {
+  const [local, rest] = splitProps(props as BadgeProps, ['variant', 'size', 'class', 'as'])
+
+  return (
+    <Polymorphic
+      as={(local.as ?? 'span') as ValidComponent}
+      class={cn(badgeVariants({ size: local.size, variant: local.variant }), local.class)}
+      data-slot="badge"
+      {...rest}
+    />
+  )
 }

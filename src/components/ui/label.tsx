@@ -1,18 +1,18 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
-import type React from 'react'
+import { Polymorphic, type PolymorphicProps } from '@kobalte/core/polymorphic'
+import { splitProps, type ValidComponent } from 'solid-js'
 
 import { cn } from '@/utils/cn'
 
-export const Label = ({ className, render, ...props }: useRender.ComponentProps<'label'>): React.ReactElement => {
-  const defaultProps = {
-    className: cn('inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4', className),
-    'data-slot': 'label',
-  }
+export type LabelProps<T extends ValidComponent = 'label'> = PolymorphicProps<T, { class?: string }>
 
-  return useRender({
-    defaultTagName: 'label',
-    props: mergeProps<'label'>(defaultProps, props),
-    render,
-  })
+export const Label = <T extends ValidComponent = 'label'>(props: LabelProps<T>) => {
+  const [local, rest] = splitProps(props as LabelProps, ['class', 'as'])
+  return (
+    <Polymorphic
+      as={(local.as ?? 'label') as ValidComponent}
+      class={cn('inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4', local.class)}
+      data-slot="label"
+      {...rest}
+    />
+  )
 }

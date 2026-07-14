@@ -1,6 +1,6 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
+import { Polymorphic, type PolymorphicProps } from '@kobalte/core/polymorphic'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { splitProps, type ValidComponent } from 'solid-js'
 
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/utils/cn'
@@ -44,43 +44,33 @@ export const buttonVariants = cva(
   }
 )
 
-export interface ButtonProps extends useRender.ComponentProps<'button'> {
+export interface ButtonOptions {
   variant?: VariantProps<typeof buttonVariants>['variant']
   size?: VariantProps<typeof buttonVariants>['size']
   loading?: boolean
+  class?: string
+  disabled?: boolean
 }
 
-export const Button = ({
-  className,
-  variant,
-  size,
-  render,
-  children,
-  loading = false,
-  disabled: disabledProp,
-  ...props
-}: ButtonProps): React.ReactElement => {
-  const isDisabled = Boolean(loading || disabledProp)
-  const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
+export type ButtonProps<T extends ValidComponent = 'button'> = PolymorphicProps<T, ButtonOptions>
 
-  const defaultProps = {
-    'aria-disabled': loading || undefined,
-    children: (
-      <>
-        {children}
-        {loading && <Spinner className="pointer-events-none absolute" data-slot="button-loading-indicator" />}
-      </>
-    ),
-    className: cn(buttonVariants({ className, size, variant })),
-    'data-loading': loading ? '' : undefined,
-    'data-slot': 'button',
-    disabled: isDisabled,
-    type: typeValue,
-  }
+export const Button = <T extends ValidComponent = 'button'>(props: ButtonProps<T>) => {
+  const [local, rest] = splitProps(props as ButtonProps, ['variant', 'size', 'loading', 'class', 'children', 'disabled', 'as'])
+  const isDisabled = () => Boolean(local.loading || local.disabled)
 
-  return useRender({
-    defaultTagName: 'button',
-    props: mergeProps<'button'>(defaultProps, props),
-    render,
-  })
+  return (
+    <Polymorphic
+      as={(local.as ?? 'button') as ValidComponent}
+      aria-disabled={local.loading || undefined}
+      class={cn(buttonVariants({ size: local.size, variant: local.variant }), local.class)}
+      data-loading={local.loading ? '' : undefined}
+      data-slot="button"
+      disabled={isDisabled()}
+      type={local.as ? undefined : 'button'}
+      {...rest}
+    >
+      {local.children}
+      {local.loading ? <Spinner class="pointer-events-none absolute" data-slot="button-loading-indicator" /> : null}
+    </Polymorphic>
+  )
 }
