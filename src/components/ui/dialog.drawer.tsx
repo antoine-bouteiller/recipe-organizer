@@ -1,51 +1,35 @@
-import { type ReactElement, type ReactNode } from 'react'
+import { type JSX, Show } from 'solid-js'
 
 import { Button } from '@/components/ui/button'
 import { type DialogProps } from '@/components/ui/dialog'
-import {
-  DrawerClose,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerPanel,
-  DrawerPopup,
-  Drawer as DrawerRoot,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer'
+import { DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, Drawer as DrawerRoot, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 
-const DialogDrawer = ({
-  title,
-  trigger,
-  children,
-  cancelLabel,
-  cancelDisabled,
-  footer,
-  open,
-  onOpenChange,
-  contentRender,
-  panelClassName,
-}: DialogProps): ReactElement => {
-  const hasFooter = cancelLabel !== undefined || footer !== undefined
-  const wrap = (body: ReactNode): ReactNode => (contentRender ? contentRender(body) : body)
+const DialogDrawer = (props: DialogProps) => {
+  const hasFooter = () => props.cancelLabel !== undefined || props.footer !== undefined
+  const wrap = (body: JSX.Element): JSX.Element => (props.contentRender ? props.contentRender(body) : body)
 
   return (
-    <DrawerRoot onOpenChange={onOpenChange} open={open}>
-      {trigger !== undefined && <DrawerTrigger render={trigger} />}
+    <DrawerRoot onOpenChange={props.onOpenChange} open={props.open}>
+      <Show when={props.trigger}>
+        <DrawerTrigger data-slot="drawer-trigger" {...props.trigger} />
+      </Show>
       <DrawerPopup>
         {wrap(
           <>
             <DrawerHeader>
-              <DrawerTitle>{title}</DrawerTitle>
+              <DrawerTitle>{props.title}</DrawerTitle>
             </DrawerHeader>
-            <DrawerPanel className={panelClassName}>{children}</DrawerPanel>
-            {hasFooter && (
+            <DrawerPanel class={props.panelClassName}>{props.children}</DrawerPanel>
+            <Show when={hasFooter()}>
               <DrawerFooter>
-                {cancelLabel !== undefined && (
-                  <DrawerClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DrawerClose>
-                )}
-                {footer}
+                <Show when={props.cancelLabel !== undefined}>
+                  <DrawerClose as={Button} disabled={props.cancelDisabled} variant="outline">
+                    {props.cancelLabel}
+                  </DrawerClose>
+                </Show>
+                {props.footer}
               </DrawerFooter>
-            )}
+            </Show>
           </>
         )}
       </DrawerPopup>
