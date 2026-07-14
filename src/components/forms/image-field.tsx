@@ -1,5 +1,6 @@
-import { Image, X } from 'phosphor-solid'
 import { Show } from 'solid-js'
+import Image from '~icons/ph/image'
+import X from '~icons/ph/x'
 
 import { Field, FieldControl, FieldError, FieldLabel } from '@/components/ui/field'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'

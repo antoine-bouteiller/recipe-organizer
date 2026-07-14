@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/solid-query'
 import { useNavigate } from '@tanstack/solid-router'
-import { ArrowElbowDownLeft } from 'phosphor-solid'
 import { createSignal, onCleanup, onMount } from 'solid-js'
+import ArrowElbowDownLeft from '~icons/ph/arrow-elbow-down-left'
 
 import { Button } from '@/components/ui/button'
 import {

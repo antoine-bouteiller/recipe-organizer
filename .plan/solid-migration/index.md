@@ -53,9 +53,9 @@ VAL-001..005 pass on the Solid build, and zero `react` / `@base-ui` / `@lexical/
 ## Steps
 
 - [x] Swap the Vite plugin, deps, tsconfig JSX and lint config so `vp dev` boots a Solid app — see `01-tooling-build.md`
-- [x] Port router + start + `__root` shell to `@tanstack/solid-*`; app routes and SSRs an empty shell (fresh load 200) — see `02-tanstack-start-solid.md` *(entry + server-fn import renames done; per-route component bodies migrate with feature phase)*
-- [x] Establish the React→Solid translation rulebook (signals, effects, `splitProps`, control flow) used by all later phases — see `03-component-translation.md` *(conventions locked & applied: `splitProps` forwarding, Kobalte `Polymorphic`/`as`, `<Compound>`-is-root for Kobalte+corvu, phosphor-solid bare names)*
-- [x] Port state/query/auth to solid-query / solid-store / better-auth/solid; store + query + auth round-trips pass — see `07-state-query-auth.md` *(data-layer import renames + auth client done; accessor call-sites in components land with feature phase)*
+- [x] Port router + start + `__root` shell to `@tanstack/solid-*`; app routes and SSRs an empty shell (fresh load 200) — see `02-tanstack-start-solid.md` _(entry + server-fn import renames done; per-route component bodies migrate with feature phase)_
+- [x] Establish the React→Solid translation rulebook (signals, effects, `splitProps`, control flow) used by all later phases — see `03-component-translation.md` _(conventions locked & applied: `splitProps` forwarding, Kobalte `Polymorphic`/`as`, `<Compound>`-is-root for Kobalte+corvu, phosphor-solid bare names)_
+- [x] Port state/query/auth to solid-query / solid-store / better-auth/solid; store + query + auth round-trips pass — see `07-state-query-auth.md` _(data-layer import renames + auth client done; accessor call-sites in components land with feature phase)_
 - [x] Rebuild `src/components/ui/*` on Kobalte bottom-up (primitives → composites); knip clean, keyboard/focus parity — see `04-ui-kobalte.md`
   - [x] Tier 1 (button, badge, input, card, kbd, skeleton, spinner, label, item)
   - [x] Tier 2 direct (tabs, toggle, toggle-group, separator, dialog(+base), popover(+base), number-input, toast)
@@ -66,9 +66,9 @@ VAL-001..005 pass on the Solid build, and zero `react` / `@base-ui` / `@lexical/
   - [x] **command** — rebuilt on Kobalte `Dialog` + a small Solid registry/keyboard context (Kobalte has no inline command/listbox-in-dialog)
   - [x] **field / form** — framework-plain; `Form errors`→`FieldError` distribution reproduced with a Solid context
   - [ ] toolbar — deferred to §08 (its only consumer is the editor)
-- [x] Rebuild the drawer + `*.drawer.tsx` variants on corvu; all dismiss paths animate fully (memory 7640 guard) — see `05-drawer-corvu.md` *(drawer + dialog.drawer + popover.drawer + select.drawer + combobox.drawer done)*
+- [x] Rebuild the drawer + `*.drawer.tsx` variants on corvu; all dismiss paths animate fully (memory 7640 guard) — see `05-drawer-corvu.md` _(drawer + dialog.drawer + popover.drawer + select.drawer + combobox.drawer done)_
 - [x] Port forms to `@tanstack/solid-form` (accessor field API `field().state…`); text/file/select/combobox forms submit end-to-end (editor field stubbed) — see `06-forms.md`
-- [x] Migrate feature components + routes to consume the rebuilt UI *(all ~40 `.tsx` except editor-owned §08 files; `Icon` suffix stripped, `render`→`as`/`TriggerConfig` triggers, `useSelector`/`useQuery` accessor call-sites, `useMutation(() => opts())`, `use-options`/`use-shopping-list` made reactive; delete-dialog trigger→TriggerConfig)*
+- [x] Migrate feature components + routes to consume the rebuilt UI _(all ~40 `.tsx` except editor-owned §08 files; `Icon` suffix stripped, `render`→`as`/`TriggerConfig` triggers, `useSelector`/`useQuery` accessor call-sites, `useMutation(() => opts())`, `use-options`/`use-shopping-list` made reactive; delete-dialog trigger→TriggerConfig)_
 - [ ] Build the custom Lexical Solid binding (composer, decorator nodes, toolbar); round-trip + leak test pass, zero data migration — see `08-editor-lexical.md`
 - [ ] Testing, dead-code/grep gates, doc updates, and branch-and-flip cutover; final validation checklist green — see `09-testing-cutover.md`
 

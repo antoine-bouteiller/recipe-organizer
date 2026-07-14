@@ -1,6 +1,10 @@
 import { Toast, toaster } from '@kobalte/core/toast'
-import { CheckCircle, Info, SpinnerGap, Warning, WarningCircle } from 'phosphor-solid'
 import { type JSX, Show } from 'solid-js'
+import CheckCircle from '~icons/ph/check-circle'
+import Info from '~icons/ph/info'
+import SpinnerGap from '~icons/ph/spinner-gap'
+import Warning from '~icons/ph/warning'
+import WarningCircle from '~icons/ph/warning-circle'
 
 type ToastType = 'error' | 'info' | 'loading' | 'success' | 'warning'
 

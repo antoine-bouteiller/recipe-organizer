@@ -1,5 +1,5 @@
-import { Check } from 'phosphor-solid'
 import { createSignal, For } from 'solid-js'
+import Check from '~icons/ph/check'
 
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { type SelectProps } from '@/components/ui/select'

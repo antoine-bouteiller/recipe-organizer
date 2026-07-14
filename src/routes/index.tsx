@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, Link } from '@tanstack/solid-router'
-import { Book, Plus } from 'phosphor-solid'
 import { For, Show } from 'solid-js'
 import * as v from 'valibot'
+import Book from '~icons/ph/book'
+import Plus from '~icons/ph/plus'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'

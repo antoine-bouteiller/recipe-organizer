@@ -11,7 +11,7 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
 
   let width = 0
   let offset = 0
-  let trackEl: HTMLDivElement | undefined
+  let trackEl: HTMLDivElement | undefined = undefined
 
   const touchState = {
     baseOffset: 0,

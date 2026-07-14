@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import { MagnifyingGlass } from 'phosphor-solid'
 import { type ComponentProps, splitProps } from 'solid-js'
+import MagnifyingGlass from '~icons/ph/magnifying-glass'
 
 import { Input, type InputProps as InputControlProps } from '@/components/ui/input'
 import { cn } from '@/utils/cn'

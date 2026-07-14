@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/solid-router'
-import { For, type ValidComponent } from 'solid-js'
+import { For } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 
 import { menuItems } from './constants'
@@ -16,7 +16,7 @@ export const TabBar = () => (
           activeProps={{ class: 'text-primary' }}
           class="flex h-12 flex-1 flex-col items-center justify-center gap-1 text-xs font-semibold text-muted-foreground"
         >
-          <Dynamic class="size-6" component={item.icon as unknown as ValidComponent} />
+          <Dynamic class="size-6" component={item.icon} />
           {item.label}
         </Link>
       )}

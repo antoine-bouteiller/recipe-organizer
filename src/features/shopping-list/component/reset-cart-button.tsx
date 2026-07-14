@@ -1,4 +1,4 @@
-import { ArrowCounterClockwise } from 'phosphor-solid'
+import ArrowCounterClockwise from '~icons/ph/arrow-counter-clockwise'
 
 import { Button } from '@/components/ui/button'
 import { resetShoppingList } from '@/stores/shopping-list.store'

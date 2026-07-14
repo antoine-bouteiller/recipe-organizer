@@ -1,5 +1,9 @@
-import { Minus, Plus, Trash } from 'phosphor-solid'
 import { Show } from 'solid-js'
+import Minus from '~icons/ph/minus'
+import MinusBold from '~icons/ph/minus-bold'
+import Plus from '~icons/ph/plus'
+import PlusBold from '~icons/ph/plus-bold'
+import Trash from '~icons/ph/trash'
 
 import { Button } from '@/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
@@ -46,7 +50,7 @@ export const QuantityControls = (props: QuantityControlsProps) => {
             when={isInShoppingList()}
             fallback={
               <Button onClick={() => addToShoppingList(props.recipeId)} variant="secondary">
-                <Plus weight="bold" />
+                <PlusBold />
                 Ajouter
               </Button>
             }
@@ -63,7 +67,7 @@ export const QuantityControls = (props: QuantityControlsProps) => {
         when={isInShoppingList()}
         fallback={
           <Button onClick={withStopPropagation(() => addToShoppingList(props.recipeId))}>
-            <Plus weight="bold" />
+            <PlusBold />
             Ajouter à la liste
           </Button>
         }
@@ -76,11 +80,11 @@ export const QuantityControls = (props: QuantityControlsProps) => {
             size="icon-xs"
             variant="secondary"
           >
-            <Minus weight="bold" />
+            <MinusBold />
           </Button>
           <span class="min-w-18 text-center text-[13px] font-bold text-white">{quantity()} couverts</span>
           <Button onClick={withStopPropagation(incrementQuantity)} size="icon-xs">
-            <Plus weight="bold" />
+            <PlusBold />
           </Button>
           <Button
             aria-label="Retirer de la liste"

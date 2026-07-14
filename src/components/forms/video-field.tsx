@@ -1,5 +1,6 @@
-import { VideoCamera, X } from 'phosphor-solid'
 import { Show } from 'solid-js'
+import VideoCamera from '~icons/ph/video-camera'
+import X from '~icons/ph/x'
 
 import { Field, FieldControl, FieldError, FieldLabel } from '@/components/ui/field'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'

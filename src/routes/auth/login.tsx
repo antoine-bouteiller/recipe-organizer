@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect } from '@tanstack/solid-router'
-import { ArrowLeft } from 'phosphor-solid'
 import { createEffect } from 'solid-js'
 import * as v from 'valibot'
+import ArrowLeft from '~icons/ph/arrow-left'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'

@@ -2,8 +2,9 @@ import { cloudflare } from '@cloudflare/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
-import { defineConfig } from 'vite-plus'
+import Icons from 'unplugin-icons/vite'
 import solid from 'vite-plugin-solid'
+import { defineConfig } from 'vite-plus'
 
 import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
 
@@ -72,7 +73,7 @@ const viteConfig = defineConfig({
       'no-magic-numbers': 'off',
       'sort-imports': 'off',
       'no-namespace': 'off',
-      'id-length': ['error', { exceptions: ['v', 'x', '$'] }],
+      'id-length': ['error', { exceptions: ['v', 'x', '$', 'T', 'X'] }],
       'no-ternary': 'off',
       'max-params': 'off',
       'jsx-max-depth': 'off',
@@ -129,6 +130,7 @@ const viteConfig = defineConfig({
     },
   },
   plugins: [
+    Icons({ compiler: 'solid' }),
     tanstackStart(),
     solid({ ssr: true }),
     ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),

@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/solid-router'
-import { Check, Plus } from 'phosphor-solid'
 import { For, Show } from 'solid-js'
+import Check from '~icons/ph/check-bold'
+import Plus from '~icons/ph/plus-bold'
 
 import { Button } from '@/components/ui/button'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
@@ -30,12 +31,12 @@ const ResultAddButton = (props: { recipeId: number }) => {
           }}
           size="icon"
         >
-          <Plus weight="bold" />
+          <Plus />
         </Button>
       }
     >
       <span aria-label="Déjà dans la liste" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-primary">
-        <Check weight="bold" />
+        <Check />
       </span>
     </Show>
   )

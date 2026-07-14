@@ -1,5 +1,4 @@
 import { Dialog as DialogPrimitive } from '@kobalte/core/dialog'
-import { MagnifyingGlass } from 'phosphor-solid'
 import {
   type ComponentProps,
   createContext,
@@ -14,6 +13,7 @@ import {
   splitProps,
   useContext,
 } from 'solid-js'
+import MagnifyingGlass from '~icons/ph/magnifying-glass'
 
 import { Input } from '@/components/ui/input'
 import { cn } from '@/utils/cn'

@@ -1,6 +1,6 @@
 import { UNITS, type UnitSlug } from '@schema'
-import { Check } from 'phosphor-solid'
 import { createSignal, For, Show } from 'solid-js'
+import Check from '~icons/ph/check-bold'
 
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
@@ -30,7 +30,7 @@ export const CartItem = (props: { ingredient: IngredientCartItem }) => {
         )}
       >
         <Show when={isChecked()}>
-          <Check class="size-3" weight="bold" />
+          <Check class="size-3" />
         </Show>
       </span>
       <span class={cn('flex flex-1 items-center justify-between gap-2', isChecked() && 'text-muted-foreground line-through')}>

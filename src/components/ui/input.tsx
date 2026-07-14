@@ -33,7 +33,7 @@ export const Input = (props: InputProps) => {
       data-size={size()}
       data-slot="input-control"
     >
-      <input class={inputClass()} data-slot="input" size={typeof size() === 'number' ? (size() as number) : undefined} type={local.type} {...rest} />
+      <input class={inputClass()} data-slot="input" size={typeof size() === 'number' ? size() : undefined} type={local.type} {...rest} />
     </span>
   )
 }

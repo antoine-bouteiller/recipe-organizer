@@ -1,5 +1,6 @@
 import { Select as SelectPrimitive, type SelectRootItemComponentProps } from '@kobalte/core/select'
-import { CaretDown, Check } from 'phosphor-solid'
+import CaretDown from '~icons/ph/caret-down'
+import Check from '~icons/ph/check'
 
 import { type SelectProps } from '@/components/ui/select'
 import { getSelectDisplay, selectTriggerIconClassName, selectTriggerVariants } from '@/components/ui/select.shared'

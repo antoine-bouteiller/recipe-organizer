@@ -1,6 +1,6 @@
 import { useRouter } from '@tanstack/solid-router'
-import { ArrowLeft } from 'phosphor-solid'
 import { type JSX, Show } from 'solid-js'
+import ArrowLeft from '~icons/ph/arrow-left'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'

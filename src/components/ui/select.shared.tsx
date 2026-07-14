@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import { CaretDown } from 'phosphor-solid'
 import { type ComponentProps, splitProps } from 'solid-js'
+import CaretDown from '~icons/ph/caret-down'
 
 import { type SelectProps } from '@/components/ui/select'
 import { cn } from '@/utils/cn'

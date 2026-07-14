@@ -1,5 +1,9 @@
-import { Fire, Fish, ForkKnife, Leaf, Package } from 'phosphor-solid'
 import { type JSX } from 'solid-js'
+import Fire from '~icons/ph/fire'
+import Fish from '~icons/ph/fish'
+import ForkKnife from '~icons/ph/fork-knife'
+import Leaf from '~icons/ph/leaf'
+import Package from '~icons/ph/package'
 
 import { type IngredientCategory } from '@/types/ingredient'
 

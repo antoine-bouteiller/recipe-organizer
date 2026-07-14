@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useRouter } from '@tanstack/solid-router'
-import { CaretRight, Cookie, type IconProps, User, Users } from 'phosphor-solid'
-import { type Component, For } from 'solid-js'
+import { For } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
+import CaretRight from '~icons/ph/caret-right'
+import Cookie from '~icons/ph/cookie'
+import User from '~icons/ph/user'
+import Users from '~icons/ph/users'
 
 import { ThemeIcon } from '@/components/icons/theme'
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -68,7 +71,7 @@ const RouteComponent = () => {
                 <div class="flex items-start justify-between">
                   <div class="flex flex-1 items-start gap-3">
                     <div class="rounded-lg bg-primary/10 p-2">
-                      <Dynamic class="h-5 w-5 text-primary" component={section.icon as Component<IconProps>} />
+                      <Dynamic class="h-5 w-5 text-primary" component={section.icon} />
                     </div>
                     <div class="flex-1">
                       <h3 class="font-semibold">{section.title}</h3>

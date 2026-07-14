@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/solid-query'
-import { Prohibit } from 'phosphor-solid'
+import Prohibit from '~icons/ph/prohibit'
 
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
 import { Button } from '@/components/ui/button'

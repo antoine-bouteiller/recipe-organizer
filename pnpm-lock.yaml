@@ -18,45 +18,14 @@ importers:
         specifier: 0.13.12
         version: 0.13.12(solid-js@1.9.14)
       '@lexical/list':
-<<<<<<< HEAD
         specifier: 0.47.0
         version: 0.47.0(typescript@7.0.2)
-      '@lexical/react':
-        specifier: 0.47.0
-        version: 0.47.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@7.0.2)(yjs@13.6.31)
-=======
-        specifier: 0.46.0
-        version: 0.46.0(typescript@6.0.3)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       '@lexical/rich-text':
         specifier: 0.47.0
         version: 0.47.0(typescript@7.0.2)
       '@lexical/utils':
-<<<<<<< HEAD
         specifier: 0.47.0
         version: 0.47.0(typescript@7.0.2)
-      '@phosphor-icons/react':
-        specifier: 2.1.10
-        version: 2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-form':
-        specifier: 1.33.2
-        version: 1.33.2(@tanstack/react-start@1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-query':
-        specifier: 5.101.2
-        version: 5.101.2(react@19.2.7)
-      '@tanstack/react-router':
-        specifier: 1.170.18
-        version: 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-router-ssr-query':
-        specifier: 1.167.1
-        version: 1.167.1(@tanstack/query-core@5.101.2)(@tanstack/react-query@5.101.2(react@19.2.7))(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@tanstack/router-core@1.171.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-start':
-        specifier: 1.168.28
-        version: 1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16)
-      '@tanstack/react-store':
-=======
-        specifier: 0.46.0
-        version: 0.46.0(typescript@6.0.3)
       '@solid-primitives/media':
         specifier: 2.3.6
         version: 2.3.6(solid-js@1.9.14)
@@ -74,9 +43,8 @@ importers:
         version: 1.167.1(@tanstack/query-core@5.101.2)(@tanstack/router-core@1.171.15)(@tanstack/solid-query@5.101.2(solid-js@1.9.14))(@tanstack/solid-router@1.170.18(solid-js@1.9.14))(solid-js@1.9.14)
       '@tanstack/solid-start':
         specifier: 1.168.28
-        version: 1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
+        version: 1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
       '@tanstack/solid-store':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
         specifier: 0.11.0
         version: 0.11.0(solid-js@1.9.14)
       '@valibot/i18n':
@@ -84,11 +52,7 @@ importers:
         version: 1.2.0(valibot@1.4.2(typescript@7.0.2))
       better-auth:
         specifier: ^1.6.22
-<<<<<<< HEAD
-        version: 1.6.23(@tanstack/react-start@1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16))(drizzle-kit@1.0.0-beta.22)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.13)(vitest@4.1.10)(vue@3.5.39(typescript@7.0.2))
-=======
-        version: 1.6.23(@tanstack/react-start@1.168.27(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(@tanstack/solid-start@1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(drizzle-kit@1.0.0-beta.22)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@6.0.3))(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.14)(vitest@4.1.9)(vue@3.5.39(typescript@6.0.3))
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+        version: 1.6.23(@tanstack/react-start@1.168.27(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(@tanstack/solid-start@1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(drizzle-kit@1.0.0-beta.22)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.14)(vitest@4.1.10)(vue@3.5.39(typescript@7.0.2))
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -99,25 +63,11 @@ importers:
         specifier: 1.0.0-beta.22
         version: 1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3)
       lexical:
-<<<<<<< HEAD
         specifier: 0.47.0
         version: 0.47.0(typescript@7.0.2)
-      react:
-        specifier: 19.2.7
-        version: 19.2.7
-      react-dom:
-        specifier: 19.2.7
-        version: 19.2.7(react@19.2.7)
-=======
-        specifier: 0.46.0
-        version: 0.46.0(typescript@6.0.3)
-      phosphor-solid:
-        specifier: 1.1.5
-        version: 1.1.5(react@19.2.7)
       solid-js:
         specifier: 1.9.14
         version: 1.9.14
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       tailwind-merge:
         specifier: 3.6.0
         version: 3.6.0
@@ -137,6 +87,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: 21.2.0
         version: 21.2.0
+      '@iconify-json/ph':
+        specifier: 1.2.2
+        version: 1.2.2
       '@serwist/build':
         specifier: 9.5.11
         version: 9.5.11(browserslist@4.28.4)(typescript@7.0.2)
@@ -163,35 +116,13 @@ importers:
         version: 5.101.2(@tanstack/solid-query@5.101.2(solid-js@1.9.14))(solid-js@1.9.14)
       '@tanstack/solid-router-devtools':
         specifier: 1.167.0
-<<<<<<< HEAD
-        version: 1.167.0(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@tanstack/router-core@1.171.15)(csstype@3.2.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 1.167.0(@tanstack/router-core@1.171.15)(@tanstack/solid-router@1.170.18(solid-js@1.9.14))(csstype@3.2.3)(solid-js@1.9.14)
       '@types/node':
         specifier: 25.9.5
         version: 25.9.5
-      '@types/react':
-        specifier: 19.2.17
-        version: 19.2.17
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.17)
       '@vitejs/devtools':
         specifier: 0.4.1
         version: 0.4.1(crossws@0.4.10(srvx@0.11.17))(srvx@0.11.17)(typescript@7.0.2)(valibot@1.4.2(typescript@7.0.2))(vite@8.0.16)
-      '@vitejs/plugin-react':
-        specifier: 6.0.3
-        version: 6.0.3(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.1.0)(vite@8.0.16))(babel-plugin-react-compiler@1.0.0)(vite@8.0.16)
-      babel-plugin-react-compiler:
-        specifier: 1.0.0
-        version: 1.0.0
-=======
-        version: 1.167.0(@tanstack/router-core@1.171.15)(@tanstack/solid-router@1.170.18(solid-js@1.9.14))(csstype@3.2.3)(solid-js@1.9.14)
-      '@types/node':
-        specifier: 25.9.4
-        version: 25.9.4
-      '@vitejs/devtools':
-        specifier: 0.3.4
-        version: 0.3.4(typescript@6.0.3)(vite@8.0.16)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       drizzle-kit:
         specifier: 1.0.0-beta.22
         version: 1.0.0-beta.22
@@ -208,16 +139,14 @@ importers:
         specifier: 4.3.2
         version: 4.3.2
       typescript:
-<<<<<<< HEAD
         specifier: 7.0.2
         version: 7.0.2
-=======
-        specifier: 6.0.3
-        version: 6.0.3
+      unplugin-icons:
+        specifier: 23.0.1
+        version: 23.0.1(@vue/compiler-sfc@3.5.39)
       vite-plugin-solid:
         specifier: 2.11.12
         version: 2.11.12(solid-js@1.9.14)(vite@8.0.16)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       vite-plus:
         specifier: 0.2.4
         version: 0.2.4(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@7.0.2)(vite@8.0.16)(yaml@2.9.0)
@@ -226,6 +155,9 @@ importers:
         version: 4.111.0
 
 packages:
+
+  '@antfu/install-pkg@1.1.0':
+    resolution: {integrity: sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -557,37 +489,37 @@ packages:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
 
-  '@devframes/hub@0.6.0':
-    resolution: {integrity: sha512-TIL5uYkrm20+nxmJzl7Z13O9N22nNiwW8EZ8AjcX/iowDzFgDXuridYdsf70OPaaHS2kRk4VeibuGpAERDxxqA==}
+  '@devframes/hub@0.6.2':
+    resolution: {integrity: sha512-UAlfCYRP2LYmv3D/eiltJGUMiZIRtimNHUfBnx9CRL3FqEGbPUyA9yDaXdnFu9isg5kXkWoE3pQ78xYEW8Mu5Q==}
     peerDependencies:
-      devframe: 0.6.0
+      devframe: 0.6.2
 
-  '@devframes/plugin-inspect@0.6.0':
-    resolution: {integrity: sha512-FAQu7XAihGevQh1h2yEB7Eb9FeZpbIES9TruskG2uRN0lub3wSiGxUj7YQsXhkecL0m6kFPv52KB4Sg9IGV4Vg==}
+  '@devframes/plugin-inspect@0.6.2':
+    resolution: {integrity: sha512-sXPWu/FII13lBx9zQFVXD9w9sey57ii7LN23YiD/1neF3tVG9bZ/ZHmGjST+1qvCcszGAGKmMROBK6RlfGYWog==}
     hasBin: true
     peerDependencies:
-      devframe: 0.6.0
+      devframe: 0.6.2
       vite: ^7.0.0 || ^8.0.0
     peerDependenciesMeta:
       vite:
         optional: true
 
-  '@devframes/plugin-messages@0.6.0':
-    resolution: {integrity: sha512-ItKt3aSosekhVeCXB5ScOGJExB3g92CFa9GmDmjyeOjDmcIjjug9kASagrkBs5XVwOgY3wAEotuHDiLmeeTUUQ==}
+  '@devframes/plugin-messages@0.6.2':
+    resolution: {integrity: sha512-y3M4do5cLzCRujSLDBU0ypjgeywev0IxDc31Z4aW+xy56zAFmmVxXwM2+W8ZHMoTd/xDmo1UUc/aJmcofhBtEA==}
     hasBin: true
     peerDependencies:
-      '@devframes/hub': 0.6.0
-      devframe: 0.6.0
+      '@devframes/hub': 0.6.2
+      devframe: 0.6.2
       vite: ^7.0.0 || ^8.0.0
     peerDependenciesMeta:
       vite:
         optional: true
 
-  '@devframes/plugin-terminals@0.6.0':
-    resolution: {integrity: sha512-XPb/BnQ4dm0LbxqQQvRpNdinli0/+rzWfWs9y5ohyejGWHDe2q+SYbjPARZq26yVxK2V/Dv40xtNWxkETlmuKw==}
+  '@devframes/plugin-terminals@0.6.2':
+    resolution: {integrity: sha512-IgbXBJmgU7zCOE5+qKYtp/P1uZCbV7WJXYNSpJVL2oT0dWZP5Ob+x2RlxfV67+9UOLlZMGtXVVZ5lU1beRWeoQ==}
     hasBin: true
     peerDependencies:
-      devframe: 0.6.0
+      devframe: 0.6.2
       vite: ^8.0.0
     peerDependenciesMeta:
       vite:
@@ -941,6 +873,15 @@ packages:
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
+  '@iconify-json/ph@1.2.2':
+    resolution: {integrity: sha512-PgkEZNtqa8hBGjHXQa4pMwZa93hmfu8FUSjs/nv4oUU6yLsgv+gh9nu28Kqi8Fz9CCVu4hj1MZs9/60J57IzFw==}
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
+
+  '@iconify/utils@3.1.4':
+    resolution: {integrity: sha512-b1S7B1k9ohZ+iNTi2ATxbRYG9fTrJmUT0rc46bvVnNxqNRGW7dyo/vRREwyniI5IRN2RSJHDcm+s3BjWrSAjHw==}
+
   '@img/colour@1.1.0':
     resolution: {integrity: sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==}
     engines: {node: '>=18'}
@@ -1120,10 +1061,6 @@ packages:
     resolution: {integrity: sha512-hloP58zRVCRSpgDxmqCWJNlizAlUgJFqG2ypq79DCvyv9tHjRYMDOcPFjzfl/A1/YxDvRCZz8wvZvmapQnKwFQ==}
     engines: {node: '>=12'}
 
-<<<<<<< HEAD
-  '@lexical/a11y@0.47.0':
-    resolution: {integrity: sha512-MlAL25PxThTYQuFn2aOwyfY9+/wKloAd8fbf4a1GeFATVgvirC8xACBmERpqpf4A06OdLIoIZ5J/qtgJXsdn1g==}
-=======
   '@kobalte/core@0.13.12':
     resolution: {integrity: sha512-aumsbsPe99/z2igcX2+p+Mdhzw89uuZx8ZdgfEqSlVuuWeTvkoBtCId5sl/Y7sWvllIOFwPoMzE3u0rAzDNkvg==}
     peerDependencies:
@@ -1134,41 +1071,9 @@ packages:
     peerDependencies:
       solid-js: ^1.8.8
 
-  '@lexical/clipboard@0.46.0':
-    resolution: {integrity: sha512-c7lQeORx5+2tfc9+xnHDPBT097t9KdWW3a/kg/ThliokHOkaYz6OeM2z53uID/OOpRGao8FRO5vw9rz5ZAhg+w==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-<<<<<<< HEAD
   '@lexical/clipboard@0.47.0':
     resolution: {integrity: sha512-OIB+NxHjfpRJJoTtU/mqeb7vPVMks5l97QgwoZthQLR/GIc5zrOtvoLftxl5hKAG5lwOe9BzhashKgVcsSPB3g==}
     peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/code-core@0.47.0':
-    resolution: {integrity: sha512-L0hg+57yzQDhYRV5NFyTwSz2+N3O/iLBgRuMNccE3ieltPPSq7lCBTKOuXF3G0ot3NVudu8//ewHjw7OCMqI5g==}
-=======
-  '@lexical/dragon@0.46.0':
-    resolution: {integrity: sha512-/PIjscXlD0jp3Bj5MWJ+y1WZsVxagsqnnzOkqdDStM3033soj/2cI7tysMU/7XAEJtMBk1bTJdDvmDHM/bn/rg==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/devtools-core@0.47.0':
-    resolution: {integrity: sha512-u/+WHfs9p6Jiz83OdWzM2W7xc/BXUqN/RN/o97qFP+H7XX/D5fD3Sn0q/0ymyDgacN7sI4HNxQttkrKXKn1PCA==}
-    peerDependencies:
-      react: '>=18.x'
-      react-dom: '>=18.x'
       typescript: '>=5.2'
     peerDependenciesMeta:
       typescript:
@@ -1182,29 +1087,8 @@ packages:
       typescript:
         optional: true
 
-<<<<<<< HEAD
   '@lexical/extension@0.47.0':
     resolution: {integrity: sha512-F9WyXB0eDsCbeSuShzgjBS3ugxNnTvHQa+P+VZiVSWilbDNGjJyysco2JCwn5ruLmEP4MXCQn5IKeW7A9FG8KQ==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/hashtag@0.47.0':
-    resolution: {integrity: sha512-i5ML0v5d52h8hen4cdS/tnqfiteWbvpwihJgZR9hLIk9w6vQJISXUWzg4jRPQIezWwU1xikbBLkT5rD+Qth7tw==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/history@0.47.0':
-    resolution: {integrity: sha512-CqAR6G4x6WewKS2uDgf2N1/rszIlXiDCW4dwu0IiQV9oVbhOklvAmPBJX6319myJxB+ArtjuuMgDU3gi/iTqXA==}
-=======
-  '@lexical/html@0.46.0':
-    resolution: {integrity: sha512-Rvke8FvQkjd+hFBCe39YdQxPQZZ/7W95xilY3qFxmSZaW0zakcA8pItaf7HfueG8Ja6jDu/TOMH4LUeyQPT3HQ==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     peerDependencies:
       typescript: '>=5.2'
     peerDependenciesMeta:
@@ -1219,7 +1103,6 @@ packages:
       typescript:
         optional: true
 
-<<<<<<< HEAD
   '@lexical/internal@0.47.0':
     resolution: {integrity: sha512-VKDTHajXvjCkjYHwWra4Qjz8AI6PWeNPW7l6Q9AIlAwUiolAXrlkyfrBAFzdAP360IyDbC2gO9fwTb9ZvZM85Q==}
     peerDependencies:
@@ -1228,19 +1111,6 @@ packages:
       typescript:
         optional: true
 
-  '@lexical/link@0.47.0':
-    resolution: {integrity: sha512-lDAbTyJwufKs3yUn1D4AY0IoBU9O4JXzTDqSRa8qVCK7LC3+cF0u+rR5o9RJfxtHUzmALk+s2I0IqlxGCyIocg==}
-=======
-  '@lexical/list@0.46.0':
-    resolution: {integrity: sha512-nIX3k05MFAhWZvVXZBZB7LTS1DhsCF2iCFH2WDYebwJfADTnAqhE/ZCAJax84RRMjYla67JU31br9r+P6KR+hA==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-<<<<<<< HEAD
   '@lexical/list@0.47.0':
     resolution: {integrity: sha512-g8AApVZNqqcCDXfJtgxEfAv7ylK0HmblRaJYMxB0OI7nlLipUjutIUy8cRX5GKI0woa+oGPYi68cZcMQnBysGw==}
     peerDependencies:
@@ -1249,57 +1119,8 @@ packages:
       typescript:
         optional: true
 
-  '@lexical/mark@0.47.0':
-    resolution: {integrity: sha512-/9ZS9NSjrqJ/sTZ7l2KFiBxZbbXEmPp/JxtN5sTlM+F4a/hTRreROWlcXgTLyf9g8GTnRyZScvBqFYKWd6HR1g==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/markdown@0.47.0':
-    resolution: {integrity: sha512-mtfcomzk/ZT2wtImEzYeFB6VLsOYM6RqBmwnvEMp5alvJISXFhIHDKAT4BkUMMtWGM6AnrlytZyMNPb4QwnZIA==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/overflow@0.47.0':
-    resolution: {integrity: sha512-XR+F2mni27TgjmE2/PsFYXkAq0AIMV8JJh5VSeHiSg0mccKSfEqsfTxYlwV+um2eGT+6XggtpwFMDy6ZjC+uMw==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/plain-text@0.47.0':
-    resolution: {integrity: sha512-MyRjCpEnDJuEeoT/ndYI/i2605QM2bAgFEi6sX/NObYDJSuupC2iY6tOEbCFZ1s0Y1SX6arNrrAPhwygcemz7g==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/react@0.47.0':
-    resolution: {integrity: sha512-4y2iEKghKcYcJ8+GoO8pqyvwjJFVDWR71Ezm37lLQGmSTFKY50miTJmgKI12GeL4hLWQjePpB3eVdmSQHG1b7g==}
-    peerDependencies:
-      react: '>=18.x'
-      react-dom: '>=18.x'
-      typescript: '>=5.2'
-      yjs: '>=13.5.22'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      yjs:
-        optional: true
-
   '@lexical/rich-text@0.47.0':
     resolution: {integrity: sha512-GtRH7KNW7fVJzd3Xftdr/EPXaMqHt2xCIO/eJtf17Yrs7vlVOljM0xMcDoj4QOY2Gp4p3CheLlwBbcO96YYV0A==}
-=======
-  '@lexical/rich-text@0.46.0':
-    resolution: {integrity: sha512-YwERYF7bOGZOmulxzyHID+gUkxCbTbn73pqow8GyasAdwlbTiiyqKSUp3fXC3prcMftQX8eg+SJNwkijvZk9yA==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     peerDependencies:
       typescript: '>=5.2'
     peerDependenciesMeta:
@@ -1314,47 +1135,14 @@ packages:
       typescript:
         optional: true
 
-<<<<<<< HEAD
-  '@lexical/table@0.47.0':
-    resolution: {integrity: sha512-T0sOB1i0I05f2U+tTVXDitYq4ACtFob42gULwwqqKfQ/SEPq26Kfd5CljI1rSS4+N+vQz/VTDYF/BN7ZMgHpjA==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@lexical/text@0.47.0':
-    resolution: {integrity: sha512-Rj1xa/MMhgOckjOJ+ifDUO8BUyi7o+a/vpYcsftMTCpiKmeteO+qSAKoyhvZke496nLh/WFCWKw/iD43bst/Ig==}
-    peerDependencies:
-      typescript: '>=5.2'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@lexical/utils@0.47.0':
     resolution: {integrity: sha512-uVAqNr5qiE4t9GSj+L4rv06WaIGADzblxEKCn134sPzvsVouDv0VTT0pBKjQYUgshT4z9iW5cFtO11+iPacBYg==}
-=======
-  '@lexical/utils@0.46.0':
-    resolution: {integrity: sha512-s8XQDoBr1wyPKGqy3qyDeHvi+vMgOiszzcRdHvTd6AqWpXxw2MsDQzMdF3Nr56QHahcOYxMOcv+r7r2nnCcgCA==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     peerDependencies:
       typescript: '>=5.2'
     peerDependenciesMeta:
       typescript:
         optional: true
 
-<<<<<<< HEAD
-  '@lexical/yjs@0.47.0':
-    resolution: {integrity: sha512-EKw1df2cmUTQrfSp1EnXqsHtNjwgxS973CRor0W4GWmIQJyKdmf6cmA7cct3flkyH5tE/xDnpr8sy38U4R2hlQ==}
-    peerDependencies:
-      typescript: '>=5.2'
-      yjs: '>=13.5.22'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-=======
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
   '@napi-rs/wasm-runtime@1.1.5':
     resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
     peerDependencies:
@@ -2160,19 +1948,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-<<<<<<< HEAD
-  '@rolldown/binding-win32-x64-msvc@1.1.0':
-    resolution: {integrity: sha512-Ogji1TQNqH3ACLnYr+1Ns1nyrJ0CO2P585u9Hsh02pXvtFiFpgtgT2b3P4PnCOU86VVCvqtAeCN4OftMT8KU4w==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [win32]
-
-  '@rolldown/debug@1.1.5':
-    resolution: {integrity: sha512-GJDtRyJkktO4fcFe8cjnUf99ylufh+GWjE9RevRw8Y/aIt0xQkBc27/Pmu1EoUZFfwyz5LjEJGh+XSTqsuXG8g==}
-=======
-  '@rolldown/debug@1.1.3':
-    resolution: {integrity: sha512-1OMsP69fnm1Ky82qFODn6ekpmKetcIZ5Zk+wRR4apdJhhMs4DztmK6Bxnr70Lg6BRjWcesEnpU1cjHD2O74oYg==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  '@rolldown/debug@1.2.0':
+    resolution: {integrity: sha512-jcMmtPtfY9GZU+QqzrNhSr7eq6+ggARiyzMEgYsZMgQSKs9fyRTLbF0HBW6p6WbtuZOEXQGHlhtVNfVJ7CC/fg==}
 
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
@@ -2485,78 +2262,22 @@ packages:
   '@tanstack/query-devtools@5.101.2':
     resolution: {integrity: sha512-o+wHcqgN7Pp0s8v1i0UGq/ZrrEKrxdIiMQmKRdYb2w7NPtylYSJ4+wg/tIn71m9DLstwUwdEGAvROdly6HXP6w==}
 
-<<<<<<< HEAD
-  '@tanstack/react-devtools@0.10.8':
-    resolution: {integrity: sha512-YJV6YttQf9lhhPbPBLULgy1eScEvJUMsCS26mjg9hfBKgAJQA5sF9zvzorDzW9Ob6o/asoXikO81JnRUVuFX0Q==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@types/react': '>=16.8'
-      '@types/react-dom': '>=16.8'
-      react: '>=16.8'
-      react-dom: '>=16.8'
-
-  '@tanstack/react-form@1.33.2':
-    resolution: {integrity: sha512-nEfayOu+27q5cZ5E0G5dmnddqLcLjdFCatbL/LCs/iLD469a1o1yYJlr8RISV3GfnqsBpm0hf+8kM4okh5fPCw==}
-    peerDependencies:
-      '@tanstack/react-start': '*'
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      '@tanstack/react-start':
-        optional: true
-
-  '@tanstack/react-query-devtools@5.101.2':
-    resolution: {integrity: sha512-eU7HctdA9gDjqoERoEdzLbw9DiqnBDfh5+Hu0u26gjqoHJezOpQAuiesDL2VvkU+2cPV76zgv0tMZsOrI4LjnQ==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.101.2
-      react: ^18 || ^19
-
-  '@tanstack/react-query@5.101.2':
-    resolution: {integrity: sha512-seDkr6kzGzX1okaaTtZPtgA688CDPlXUz1C6xSg0ESqn04Vuc8tlrYms1s3de+znBqhPVxFRfpAfUf+6XvfPWg==}
-    peerDependencies:
-      react: ^18 || ^19
-
-  '@tanstack/react-router-devtools@1.167.0':
-    resolution: {integrity: sha512-nGw095EG7IHx0h5NtlEmzf6vcCTaFNPWdTSuDKazajhN0ct/v/TkekJ9J6KYUCeV1a8/2ZmToc58M+0rrOyn7w==}
-    engines: {node: '>=20.19'}
-    peerDependencies:
-      '@tanstack/react-router': ^1.170.0
-      '@tanstack/router-core': ^1.170.0
-      react: '>=18.0.0 || >=19.0.0'
-      react-dom: '>=18.0.0 || >=19.0.0'
-    peerDependenciesMeta:
-      '@tanstack/router-core':
-        optional: true
-
-  '@tanstack/react-router-ssr-query@1.167.1':
-    resolution: {integrity: sha512-W9j5JPnBikyafvuUfykFfHIWod58OAbAAa5leNkXBcoDoocghMmu6w9uZOmUZvAWT7CSvgj5tBUtF7CM2OoHXQ==}
-    engines: {node: '>=20.19'}
-    peerDependencies:
-      '@tanstack/query-core': '>=5.90.0'
-      '@tanstack/react-query': '>=5.90.0'
-      '@tanstack/react-router': '>=1.127.0'
-      react: '>=18.0.0 || >=19.0.0'
-      react-dom: '>=18.0.0 || >=19.0.0'
-
-  '@tanstack/react-router@1.170.18':
-    resolution: {integrity: sha512-wpbGYZEp/fmz1q4bn7BD8VZ+/VZ7GBqSJv5V969pU+chP8y7dquWDmKTFMohvUegb9lg12m1uPVvD6kB2wORvQ==}
-=======
   '@tanstack/react-router@1.170.17':
     resolution: {integrity: sha512-ppLkjCfSMaeug9rmFRYzOd4TIqWV+yTE7tzIny7alJsSnM7w4lzEZm6eqCehG0SPetpZ0R3K+UnanSmBgOAVcQ==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     engines: {node: '>=20.19'}
     peerDependencies:
       react: '>=18.0.0 || >=19.0.0'
       react-dom: '>=18.0.0 || >=19.0.0'
 
-  '@tanstack/react-start-client@1.168.16':
-    resolution: {integrity: sha512-1OfHgy0wpHwe2tlB3FxMeA+IMX6Il/QAMf+8UdXuimReIc2Lz3BkMLBL38k4GIxBguX9sI8EMLO5jlTZ4e1olw==}
+  '@tanstack/react-start-client@1.168.15':
+    resolution: {integrity: sha512-pW50PHvadgi50iNCw6deUOvqc9rzs30SstyFZY2tcS9z1XlqTlELSvGowjxdu2m0ymtqm1emj1jau1iP7+3+PQ==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       react: '>=18.0.0 || >=19.0.0'
       react-dom: '>=18.0.0 || >=19.0.0'
 
-  '@tanstack/react-start-rsc@0.1.27':
-    resolution: {integrity: sha512-4Gt8+XHRhcYJjfw1rTlkW5ZxRWcp6AmvPoBf1p7ysOSVlnfVitQBqgAAFNGy+d745vWfoz1/JWqyFBP8IVVYYg==}
+  '@tanstack/react-start-rsc@0.1.26':
+    resolution: {integrity: sha512-+FMm3qtT1gWsl0i5sG/Q70mh1k7tzZUsPBaqbg4v34zVJZ+XGn1mJb34x2w7z1M0/e7co6GkZfV8BRpczrs8UA==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       '@rspack/core': '>=2.0.0-0'
@@ -2572,15 +2293,15 @@ packages:
       react-server-dom-rspack:
         optional: true
 
-  '@tanstack/react-start-server@1.167.22':
-    resolution: {integrity: sha512-eH2PeHuLfL3R5YzE9+y2FfcE4Ld1LNV2ZfrCNVPJMMJFt+9nXDaRHg9BsEmc+JkTAGzz3FKLyQEoWwpbG6Ehqg==}
+  '@tanstack/react-start-server@1.167.21':
+    resolution: {integrity: sha512-puJ7eFxaLuDzeM/tiLDJaXCA4uK+PZnEOoIC73zipsFqx865MGzrRS/GSZxeVxjavC5iHU+ZwC+rgI0qYSol1A==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       react: '>=18.0.0 || >=19.0.0'
       react-dom: '>=18.0.0 || >=19.0.0'
 
-  '@tanstack/react-start@1.168.28':
-    resolution: {integrity: sha512-UyJ/OYBw7x8MQclyXKlbg72qzSTK6Do4AugHcx0LoagHNg6tQgvF0l2HZqll2CrxKAlv2Ar8+0gEkHnFYxxI5Q==}
+  '@tanstack/react-start@1.168.27':
+    resolution: {integrity: sha512-rdGFDqfCW71gyofyAxaYxhelNKmeVjpmbpm0uFYbNHORCa///4aBxi7B7ecShibKv9O4GfJ66MPX5F0ozbm+ig==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       '@rsbuild/core': ^2.0.0
@@ -2602,8 +2323,8 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tanstack/router-core@1.171.15':
-    resolution: {integrity: sha512-IILCDcLaItMZQ2jEmCABHY1Nhjjn5XUvwpQp3e4Nmu+vfg0BgYFuu/QASz2SwE2ZNbVMrvt8X/wxa+Gg5aErxA==}
+  '@tanstack/router-core@1.171.14':
+    resolution: {integrity: sha512-Mo3hwx0qB0cJsVYGDjG0+Ouf7VV74h/vsoDMGztdlyzDanp4gBA2s7IVvm6hFrmQM6GpD9F0Z7SqD7OldfLE7g==}
     engines: {node: '>=20.19'}
 
   '@tanstack/router-core@1.171.15':
@@ -2620,25 +2341,20 @@ packages:
       csstype:
         optional: true
 
-  '@tanstack/router-generator@1.167.19':
-    resolution: {integrity: sha512-db3AQGLinf8ZQ8AKMyxLVWwHIFZxtx+zLktvPXv/nFH/B793/Z7lKLl4dUWM3JpAluynDSVVKaTWQVTAgTYmVA==}
+  '@tanstack/router-generator@1.167.18':
+    resolution: {integrity: sha512-kFvM4caRds9Q3EXg64bZubJ6rbDxyV0YDSBSGvOGzmKspQPdz5Xrh0uj5T1Ov8avUUg+c761u04VQAaEzSBXRw==}
     engines: {node: '>=20.19'}
 
-<<<<<<< HEAD
-  '@tanstack/router-plugin@1.168.20':
-    resolution: {integrity: sha512-G5S63xDr2AxADtWP+0tQtJsduijT/Mk85hDh3Od4ct8UV0PHr2f/H1CGl72lYWLgcWRMn6bKJoQhz27QFIgLRQ==}
-=======
   '@tanstack/router-generator@1.167.19':
     resolution: {integrity: sha512-db3AQGLinf8ZQ8AKMyxLVWwHIFZxtx+zLktvPXv/nFH/B793/Z7lKLl4dUWM3JpAluynDSVVKaTWQVTAgTYmVA==}
     engines: {node: '>=20.19'}
 
   '@tanstack/router-plugin@1.168.19':
     resolution: {integrity: sha512-aFglwLc+bbPTgZlkXn3PvOwpjJAfgUyPGSuql4MP3XrqTTh6WkBiy2RYb6oaG5h0s7EKwivEuq85K3Y4V0Mt1g==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     engines: {node: '>=20.19'}
     peerDependencies:
       '@rsbuild/core': '>=1.0.2 || ^2.0.0'
-      '@tanstack/react-router': ^1.170.18
+      '@tanstack/react-router': ^1.170.17
       vite: '>=5.0.0 || >=6.0.0 || >=7.0.0 || >=8.0.0'
       vite-plugin-solid: ^2.11.10 || ^3.0.0-0
       webpack: '>=5.92.0'
@@ -2686,10 +2402,6 @@ packages:
     resolution: {integrity: sha512-hTWqJtqIFFdvuCl8WXNyrodp2L9zo2G37xKRrcVmVRWpAB2h+U1LuRAfS4tsFTiWOIoE/B+WDVFB8JpoEdw6jQ==}
     engines: {node: '>=20.19'}
 
-<<<<<<< HEAD
-  '@tanstack/start-client-core@1.170.14':
-    resolution: {integrity: sha512-yasBgEIFSWysL4EiFIGwp638nCoXXKiTqkc48EP2oty4OyNsZPTC1yfJ82zjq2KGkTAYtIaeMl7otqqRl1n85Q==}
-=======
   '@tanstack/solid-devtools@0.8.8':
     resolution: {integrity: sha512-iewpcpiuOA6MZwJUt2RwqS+AVzS2mqf+819N/OqjxlovI5Lvpl5DkxGr7DrlLVe+LQsED6HyZVViIAMF3R7L8A==}
     engines: {node: '>=18'}
@@ -2770,7 +2482,6 @@ packages:
 
   '@tanstack/start-client-core@1.170.13':
     resolution: {integrity: sha512-o37M3msIK5ec87kPrIYJWXb1XPnjIe5/jrkGLXiXpFuVL99z7mhoBCzftKtVPtzqI8EElnRE/VGFYT9BHNnWcw==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     engines: {node: '>=22.12.0'}
 
   '@tanstack/start-client-core@1.170.14':
@@ -2781,8 +2492,8 @@ packages:
     resolution: {integrity: sha512-QWfUZ3Yo923tdQn38LyKMU8rcTw69zc+T4dAvgTWV4O56SqFRsGfS0lSWIMhJRwXIx/bvdi7nTUBDdZtTHtpTQ==}
     engines: {node: '>=22.12.0'}
 
-  '@tanstack/start-plugin-core@1.171.20':
-    resolution: {integrity: sha512-s2n82ykGXGkDSoJwGZP85vC9Dv5vAN6fya5TCSm/cvUn+r/g30iDR1x+Ptizas3fIvcracSOOvRnma4RJ8Orww==}
+  '@tanstack/start-plugin-core@1.171.19':
+    resolution: {integrity: sha512-+fpW3Z/2vPT8HDV1c5p2WC6/g2k/AV/ujdJVDcn/VFd+gXRtzSX1D/LfozlaDbhDoEsqOnAk/mGwjg60JkUA2Q==}
     engines: {node: '>=22.12.0'}
     peerDependencies:
       '@rsbuild/core': ^2.0.0
@@ -2793,14 +2504,6 @@ packages:
       vite:
         optional: true
 
-<<<<<<< HEAD
-  '@tanstack/start-server-core@1.169.17':
-    resolution: {integrity: sha512-u0N+PHJhMHnzfnlXYI9F+A/qweDe3E2X0mfkORPGIEkNQgvS548RA9fjwvixR2en5b848CfpEqUzwFhm/tQ40Q==}
-    engines: {node: '>=22.12.0'}
-
-  '@tanstack/start-storage-context@1.167.17':
-    resolution: {integrity: sha512-ntkDyGx0PE0opIlWNAMpkMb8qkjR4uyCUOfC0CiT0STM25+EcwPuwYNfDXXeVObMrTAPgsQ4yOj3xdY0Xr4ptw==}
-=======
   '@tanstack/start-plugin-core@1.171.20':
     resolution: {integrity: sha512-s2n82ykGXGkDSoJwGZP85vC9Dv5vAN6fya5TCSm/cvUn+r/g30iDR1x+Ptizas3fIvcracSOOvRnma4RJ8Orww==}
     engines: {node: '>=22.12.0'}
@@ -2823,7 +2526,6 @@ packages:
 
   '@tanstack/start-storage-context@1.167.16':
     resolution: {integrity: sha512-zTegxlij4BC1DbCrC6rsVlMOQVMzOuG5IllacZEkrUdhiFwMIMYpk0VWGH+d0ucx5RBkmv8e8GNX3AOVBWclfg==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     engines: {node: '>=22.12.0'}
 
   '@tanstack/start-storage-context@1.167.17':
@@ -3030,26 +2732,8 @@ packages:
     peerDependencies:
       vite: '*'
 
-<<<<<<< HEAD
-  '@vitejs/plugin-react@6.0.3':
-    resolution: {integrity: sha512-vmFvco5/QuC2f9Oj+wTk0+9XeDFkHxSamwZKYc7MxYwKICfvUvlMhqKI0VuICPltGqh1neqBKDvO4kes1ya8vg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    peerDependencies:
-      '@rolldown/plugin-babel': ^0.1.7 || ^0.2.0
-      babel-plugin-react-compiler: ^1.0.0
-      vite: ^8.0.0
-    peerDependenciesMeta:
-      '@rolldown/plugin-babel':
-        optional: true
-      babel-plugin-react-compiler:
-        optional: true
-
   '@vitest/browser-preview@4.1.10':
     resolution: {integrity: sha512-14MJrL59ZFkqXLjwfSk6RzTDy5Czf9UG4+8q8L6Gxjs2aPjEce/cVNYV14bXAc2BvMjUNu904+ZEZA1Xc1wtvQ==}
-=======
-  '@vitest/browser-preview@4.1.9':
-    resolution: {integrity: sha512-a4/OrkMDb/WUnE4OOB/4FJbK3rYVO7YykqtUgcTKG4p2a0R3XcjPVu7SLRHFBs2+NIYhv5yxp1Lz3dbdGBjIow==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     peerDependencies:
       vitest: 4.1.10
 
@@ -3421,6 +3105,9 @@ packages:
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
 
+  confbox@0.2.4:
+    resolution: {integrity: sha512-ysOGlgTFbN2/Y6Cg3Iye8YKulHw+R2fNXHrgSmXISQdMnomY6eNDprVdW9R5xBguEqI954+S6709UyiO7B+6OQ==}
+
   conventional-changelog-angular@9.2.0:
     resolution: {integrity: sha512-2EihZvM1KmbBGwuUow8lNXLe+ECRFsyOcV8X0197/WI7Rvvgfi55Oicfw0wxJTXGGIVXSfj+xBoNj+cxLlIiVw==}
     engines: {node: '>=22'}
@@ -3511,8 +3198,8 @@ packages:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
 
-  devframe@0.6.0:
-    resolution: {integrity: sha512-Pb8qMgoDmKYrVjw8TItmVI3o5PbffTxime5STp8JpWtb9SJiSbIupj96Ejly53/56uuljgyFjaRrV+t3kdA7dA==}
+  devframe@0.6.2:
+    resolution: {integrity: sha512-/P2MPHZzCRyuzEqPOThTDbiCsvbT7OkL1lj9/p6yiUycmC5xfRx5lOhjURYggSyTzEpOSUuWtlicr53ohEFZ5Q==}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.0.0
     peerDependenciesMeta:
@@ -3806,6 +3493,9 @@ packages:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
 
+  import-meta-resolve@4.2.0:
+    resolution: {integrity: sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg==}
+
   ini@6.0.0:
     resolution: {integrity: sha512-IBTdIkzZNOpqm7q3dRqJvMaldXjDHWkEDfrwGEQTs5eaQMWV+djAhR+wahyNNMAa+qpbDUhBMVt4ZKNwpPm7xQ==}
     engines: {node: ^20.17.0 || >=22.9.0}
@@ -4020,6 +3710,10 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
+  local-pkg@1.2.1:
+    resolution: {integrity: sha512-++gUqRDEvcnN6Zhqrr+y/CkVEHhlrR96vZn3nZZPYzMcBUyBtTKzB9NadClFIsIVSsu+3i9tfk/erqy9kAmt7Q==}
+    engines: {node: '>=14'}
+
   lodash.sortby@4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
 
@@ -4041,17 +3735,12 @@ packages:
     resolution: {integrity: sha512-EDYo6VlmtnumlcBCbh1gLJ//9jvM/ndXHfVXIFrZVr6fGcwTUyCTFNTLCKuY3ffbK8L/+3Mzqnd58RojiZqHVw==}
     engines: {node: '>=20'}
 
-<<<<<<< HEAD
-  miniflare@4.20260710.0:
-    resolution: {integrity: sha512-x1LLRkU6o1p7hiKrB0TRnL0MJn6xFOT+/vrlEQINz5cRDKLP8ru4hBqWTIvXAetzr1acKAnmAaG84pQ4W/K14g==}
-=======
   merge-anything@5.1.7:
     resolution: {integrity: sha512-eRtbOb1N5iyH0tkQDAoQ4Ipsp/5qSR79Dzrz8hEPxRX10RWWR/iQXdoKmBSRCThY1Fh5EhISDtpSc93fpxUniQ==}
     engines: {node: '>=12.13'}
 
-  miniflare@4.20260701.0:
-    resolution: {integrity: sha512-L6eAAi6IKtyb/7J6L+YsH2vb1yBrJWKRXI293JYDiMl70+6nncdAgigex58w6WBd+CwvdMsqOyNyGs95Op5gWQ==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  miniflare@4.20260710.0:
+    resolution: {integrity: sha512-x1LLRkU6o1p7hiKrB0TRnL0MJn6xFOT+/vrlEQINz5cRDKLP8ru4hBqWTIvXAetzr1acKAnmAaG84pQ4W/K14g==}
     engines: {node: '>=22.0.0'}
     hasBin: true
 
@@ -4165,12 +3854,6 @@ packages:
   perfect-debounce@2.1.0:
     resolution: {integrity: sha512-LjgdTytVFXeUgtHZr9WYViYSM/g8MkcTPYDlPa3cDqMirHjKiSZPYd6DoL7pK8AJQr+uWkQvCjHNdiMqsrJs+g==}
 
-  phosphor-solid@1.1.5:
-    resolution: {integrity: sha512-FNvvkJytLTYrsvzafgkv/jUhsWOuiXAUcJevX/BD+bs0vATVoO1JCpEToFkVnYY8gkIWrT8Mojwzqb1mFTFQgw==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>=16'
-
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -4180,6 +3863,9 @@ packages:
 
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
+
+  pkg-types@2.3.1:
+    resolution: {integrity: sha512-y+ichcgc2LrADuhLNAx8DFjVfgz91pRxfZdI3UDhxHvcVEZsenLO+7XaU5vOp0u/7V/wZ+plyuQxtrDlZJ+yeg==}
 
   pngjs@7.0.0:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
@@ -4214,6 +3900,9 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  quansync@0.2.11:
+    resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
   react-dom@19.2.7:
     resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
@@ -4322,9 +4011,6 @@ packages:
     resolution: {integrity: sha512-LTyNki6GUJPRLXV5uMWPkYClB07SUMubbr2EkAddiR0CJCF/I283txilMU9RURSr/P8EewMfXWu2o3aWrK7A5A==}
     peerDependencies:
       solid-js: ^1.8
-
-  solid-js@1.9.13:
-    resolution: {integrity: sha512-6hJeJMOcEX8ktqjpDoJZEmld3ijvcvWBDtiXBm7f4332SiFN66QeAQI1REQshvyUoISsSeJ4PHDauKYbwao9JQ==}
 
   solid-js@1.9.14:
     resolution: {integrity: sha512-sAEXC0Kk0S1EDg+8ysEWJDbYhA3RRoEjwuySUGlKIemeo0I5YZfOyumNjNs9Sv3y2nmhD+0rW66ag2HsMuQiGQ==}
@@ -4466,6 +4152,27 @@ packages:
   unenv@2.0.0-rc.24:
     resolution: {integrity: sha512-i7qRCmY42zmCwnYlh9H2SvLEypEFGye5iRmEMKjcGi7zk9UquigRjFtTLz0TYqr0ZGLZhaMHl/foy1bZR+Cwlw==}
 
+  unplugin-icons@23.0.1:
+    resolution: {integrity: sha512-rv0XEJepajKzDLvRUWASM8K+8+/CCfZn2jtogXqg6RIp7kpatRc/aFrVJn8ANQA09e++lPEEv9yX8cC9enc+QQ==}
+    peerDependencies:
+      '@svgr/core': '>=7.0.0'
+      '@svgx/core': ^1.0.1
+      '@vue/compiler-sfc': ^3.0.2
+      svelte: ^3.0.0 || ^4.0.0 || ^5.0.0
+    peerDependenciesMeta:
+      '@svgr/core':
+        optional: true
+      '@svgx/core':
+        optional: true
+      '@vue/compiler-sfc':
+        optional: true
+      svelte:
+        optional: true
+
+  unplugin@2.3.11:
+    resolution: {integrity: sha512-5uKD0nqiYVzlmCRs01Fhs2BdkEgBS3SAVP6ndrBsuK42iC2+JHyxM05Rm9G8+5mkmRtzMZGY8Ct5+mliZxU/Ww==}
+    engines: {node: '>=18.12.0'}
+
   unplugin@3.0.0:
     resolution: {integrity: sha512-0Mqk3AT2TZCXWKdcoaufeXNukv2mTrEZExeXlHIOZXdqYoHHr4n51pymnwV8x2BOVxwXbK2HLlI7usrqMpycdg==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -4492,10 +4199,6 @@ packages:
       typescript:
         optional: true
 
-<<<<<<< HEAD
-  vite-plus@0.2.4:
-    resolution: {integrity: sha512-gaBBjOXIq9lLRU44oAYdIr99p+JBLX1kxs+l/6LqGgSXwcVKAdDa1boSrOTELqYCkQQ0fpppXUGWi9o6JDT5zw==}
-=======
   vite-plugin-solid@2.11.12:
     resolution: {integrity: sha512-FgjPcx2OwX9h6f28jli7A4bG7PP3te8uyakE5iqsmpq3Jqi1TWLgSroC9N6cMfGRU2zXsl4Q6ISvTr2VL0QHpA==}
     peerDependencies:
@@ -4506,9 +4209,8 @@ packages:
       '@testing-library/jest-dom':
         optional: true
 
-  vite-plus@0.2.2:
-    resolution: {integrity: sha512-bXO3O0F2/uxtvX9Ck0o67stTErH/Zh0GEcCMd9pAh22tTHABCNTDPrRMWVo733e7Ux3h0Y7HanJ7neOV/nid4g==}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  vite-plus@0.2.4:
+    resolution: {integrity: sha512-gaBBjOXIq9lLRU44oAYdIr99p+JBLX1kxs+l/6LqGgSXwcVKAdDa1boSrOTELqYCkQQ0fpppXUGWi9o6JDT5zw==}
     engines: {node: ^20.19.0 || ^22.18.0 || >=24.11.0}
     hasBin: true
     peerDependencies:
@@ -4698,16 +4400,6 @@ packages:
     resolution: {integrity: sha512-4UEqdc2RYGHZc7Doyqkrqiln3p9X2DZVxaGbwhn2pi7MrRagKaOcIKe8L3OxYcbhXLgLFUS3zAYuQjKBQgmuNg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=23}
 
-<<<<<<< HEAD
-  yjs@13.6.31:
-    resolution: {integrity: sha512-Eq+5BRfbeGyqGVrTJL3bEcr8gKkxPuyuoHmAwpk52fDb8kOVMrfVSTRPd6yiGgX5Fskb96qCRjzjbRjrL4YEnw==}
-    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
-=======
-  yocto-queue@1.2.2:
-    resolution: {integrity: sha512-4LCcse/U2MHZ63HAJVE+v71o7yOdIe4cZ70Wpf8D/IyjDKYQLV5GD46B+hSTjJsvV5PztjvHoU580EftxjDZFQ==}
-    engines: {node: '>=12.20'}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
-
   youch-core@0.3.3:
     resolution: {integrity: sha512-ho7XuGjLaJ2hWHoK8yFnsUGy2Y5uDpqSTq1FkHLK4/oqKtyUU1AFbOOxY4IpC9f0fTLjwYbslUz0Po5BpD1wrA==}
 
@@ -4724,6 +4416,11 @@ packages:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
+
+  '@antfu/install-pkg@1.1.0':
+    dependencies:
+      package-manager-detector: 1.6.0
+      tinyexec: 1.2.4
 
   '@babel/code-frame@7.27.1':
     dependencies:
@@ -5083,40 +4780,40 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
-  '@devframes/hub@0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))':
+  '@devframes/hub@0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))':
     dependencies:
       birpc: 4.0.0
       destr: 2.0.5
-      devframe: 0.6.0(srvx@0.11.17)(typescript@7.0.2)
+      devframe: 0.6.2(srvx@0.11.17)(typescript@7.0.2)
       nostics: 1.1.4
       pathe: 2.0.3
       perfect-debounce: 2.1.0
       tinyexec: 1.2.4
       zigpty: 0.2.1
 
-  '@devframes/plugin-inspect@0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))(valibot@1.4.2(typescript@7.0.2))(vite@8.0.16)':
+  '@devframes/plugin-inspect@0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))(valibot@1.4.2(typescript@7.0.2))(vite@8.0.16)':
     dependencies:
       '@valibot/to-json-schema': 1.7.1(valibot@1.4.2(typescript@7.0.2))
-      devframe: 0.6.0(srvx@0.11.17)(typescript@7.0.2)
+      devframe: 0.6.2(srvx@0.11.17)(typescript@7.0.2)
       nostics: 1.1.4
     optionalDependencies:
       vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - valibot
 
-  '@devframes/plugin-messages@0.6.0(@devframes/hub@0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2)))(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))(vite@8.0.16)':
+  '@devframes/plugin-messages@0.6.2(@devframes/hub@0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2)))(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))(vite@8.0.16)':
     dependencies:
-      '@devframes/hub': 0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))
-      devframe: 0.6.0(srvx@0.11.17)(typescript@7.0.2)
+      '@devframes/hub': 0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))
+      devframe: 0.6.2(srvx@0.11.17)(typescript@7.0.2)
       nostics: 1.1.4
     optionalDependencies:
       vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
 
-  '@devframes/plugin-terminals@0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))(typescript@7.0.2)(vite@8.0.16)':
+  '@devframes/plugin-terminals@0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))(typescript@7.0.2)(vite@8.0.16)':
     dependencies:
       '@xterm/addon-fit': 0.11.0
       '@xterm/xterm': 6.0.0
-      devframe: 0.6.0(srvx@0.11.17)(typescript@7.0.2)
+      devframe: 0.6.2(srvx@0.11.17)(typescript@7.0.2)
       nostics: 1.1.4
       pathe: 2.0.3
       valibot: 1.4.2(typescript@7.0.2)
@@ -5338,6 +5035,18 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
+  '@iconify-json/ph@1.2.2':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify/types@2.0.0': {}
+
+  '@iconify/utils@3.1.4':
+    dependencies:
+      '@antfu/install-pkg': 1.1.0
+      '@iconify/types': 2.0.0
+      import-meta-resolve: 4.2.0
+
   '@img/colour@1.1.0': {}
 
   '@img/sharp-darwin-arm64@0.34.5':
@@ -5466,9 +5175,6 @@ snapshots:
     dependencies:
       jsbi: 4.3.2
 
-<<<<<<< HEAD
-  '@lexical/a11y@0.47.0(typescript@7.0.2)':
-=======
   '@kobalte/core@0.13.12(solid-js@1.9.14)':
     dependencies:
       '@floating-ui/dom': 1.7.6
@@ -5491,15 +5197,6 @@ snapshots:
       '@solid-primitives/utils': 6.4.0(solid-js@1.9.14)
       solid-js: 1.9.14
 
-  '@lexical/clipboard@0.46.0(typescript@6.0.3)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
-    dependencies:
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
   '@lexical/clipboard@0.47.0(typescript@7.0.2)':
     dependencies:
       '@lexical/extension': 0.47.0(typescript@7.0.2)
@@ -5513,34 +5210,7 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-<<<<<<< HEAD
-  '@lexical/code-core@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/html': 0.47.0(typescript@7.0.2)
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/devtools-core@0.47.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@7.0.2)':
-    dependencies:
-      '@lexical/html': 0.47.0(typescript@7.0.2)
-      '@lexical/link': 0.47.0(typescript@7.0.2)
-      '@lexical/mark': 0.47.0(typescript@7.0.2)
-      '@lexical/table': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    optionalDependencies:
-      typescript: 7.0.2
-
   '@lexical/dragon@0.47.0(typescript@7.0.2)':
-=======
-  '@lexical/dragon@0.46.0(typescript@6.0.3)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@lexical/extension': 0.47.0(typescript@7.0.2)
       lexical: 0.47.0(typescript@7.0.2)
@@ -5556,27 +5226,7 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-<<<<<<< HEAD
-  '@lexical/hashtag@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/text': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/history@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
   '@lexical/html@0.47.0(typescript@7.0.2)':
-=======
-  '@lexical/html@0.46.0(typescript@6.0.3)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@lexical/extension': 0.47.0(typescript@7.0.2)
       '@lexical/internal': 0.47.0(typescript@7.0.2)
@@ -5590,21 +5240,7 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-<<<<<<< HEAD
-  '@lexical/link@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/html': 0.47.0(typescript@7.0.2)
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
   '@lexical/list@0.47.0(typescript@7.0.2)':
-=======
-  '@lexical/list@0.46.0(typescript@6.0.3)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@lexical/extension': 0.47.0(typescript@7.0.2)
       '@lexical/html': 0.47.0(typescript@7.0.2)
@@ -5613,78 +5249,8 @@ snapshots:
       lexical: 0.47.0(typescript@7.0.2)
     optionalDependencies:
       typescript: 7.0.2
-
-<<<<<<< HEAD
-  '@lexical/mark@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/markdown@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/code-core': 0.47.0(typescript@7.0.2)
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      '@lexical/link': 0.47.0(typescript@7.0.2)
-      '@lexical/list': 0.47.0(typescript@7.0.2)
-      '@lexical/rich-text': 0.47.0(typescript@7.0.2)
-      '@lexical/selection': 0.47.0(typescript@7.0.2)
-      '@lexical/text': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/overflow@0.47.0(typescript@7.0.2)':
-    dependencies:
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/plain-text@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/clipboard': 0.47.0(typescript@7.0.2)
-      '@lexical/dragon': 0.47.0(typescript@7.0.2)
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/selection': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/react@0.47.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@7.0.2)(yjs@13.6.31)':
-    dependencies:
-      '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@lexical/a11y': 0.47.0(typescript@7.0.2)
-      '@lexical/devtools-core': 0.47.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@7.0.2)
-      '@lexical/dragon': 0.47.0(typescript@7.0.2)
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/hashtag': 0.47.0(typescript@7.0.2)
-      '@lexical/history': 0.47.0(typescript@7.0.2)
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      '@lexical/link': 0.47.0(typescript@7.0.2)
-      '@lexical/list': 0.47.0(typescript@7.0.2)
-      '@lexical/mark': 0.47.0(typescript@7.0.2)
-      '@lexical/markdown': 0.47.0(typescript@7.0.2)
-      '@lexical/overflow': 0.47.0(typescript@7.0.2)
-      '@lexical/plain-text': 0.47.0(typescript@7.0.2)
-      '@lexical/rich-text': 0.47.0(typescript@7.0.2)
-      '@lexical/table': 0.47.0(typescript@7.0.2)
-      '@lexical/text': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      '@lexical/yjs': 0.47.0(typescript@7.0.2)(yjs@13.6.31)
-      lexical: 0.47.0(typescript@7.0.2)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    optionalDependencies:
-      typescript: 7.0.2
-      yjs: 13.6.31
 
   '@lexical/rich-text@0.47.0(typescript@7.0.2)':
-=======
-  '@lexical/rich-text@0.46.0(typescript@6.0.3)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@lexical/clipboard': 0.47.0(typescript@7.0.2)
       '@lexical/dragon': 0.47.0(typescript@7.0.2)
@@ -5703,29 +5269,7 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-<<<<<<< HEAD
-  '@lexical/table@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/clipboard': 0.47.0(typescript@7.0.2)
-      '@lexical/extension': 0.47.0(typescript@7.0.2)
-      '@lexical/html': 0.47.0(typescript@7.0.2)
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      '@lexical/utils': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
-  '@lexical/text@0.47.0(typescript@7.0.2)':
-    dependencies:
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-    optionalDependencies:
-      typescript: 7.0.2
-
   '@lexical/utils@0.47.0(typescript@7.0.2)':
-=======
-  '@lexical/utils@0.46.0(typescript@6.0.3)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@lexical/internal': 0.47.0(typescript@7.0.2)
       '@lexical/selection': 0.47.0(typescript@7.0.2)
@@ -5733,18 +5277,6 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-<<<<<<< HEAD
-  '@lexical/yjs@0.47.0(typescript@7.0.2)(yjs@13.6.31)':
-    dependencies:
-      '@lexical/internal': 0.47.0(typescript@7.0.2)
-      '@lexical/selection': 0.47.0(typescript@7.0.2)
-      lexical: 0.47.0(typescript@7.0.2)
-      yjs: 13.6.31
-    optionalDependencies:
-      typescript: 7.0.2
-
-=======
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
   '@napi-rs/wasm-runtime@1.1.5(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
     dependencies:
       '@emnapi/core': 1.11.1
@@ -6200,25 +5732,8 @@ snapshots:
   '@rolldown/binding-win32-x64-msvc@1.0.3':
     optional: true
 
-<<<<<<< HEAD
-  '@rolldown/binding-win32-x64-msvc@1.1.0':
-    optional: true
+  '@rolldown/debug@1.2.0': {}
 
-  '@rolldown/debug@1.1.5': {}
-
-  '@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.1.0)(vite@8.0.16)':
-    dependencies:
-      '@babel/core': 7.29.7
-      picomatch: 4.0.4
-      rolldown: 1.1.0
-    optionalDependencies:
-      '@babel/runtime': 7.29.7
-      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
-
-=======
-  '@rolldown/debug@1.1.3': {}
-
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
   '@rolldown/pluginutils@1.0.1': {}
 
   '@serwist/build@9.5.11(browserslist@4.28.4)(typescript@7.0.2)':
@@ -6520,105 +6035,35 @@ snapshots:
 
   '@tanstack/query-devtools@5.101.2': {}
 
-<<<<<<< HEAD
-  '@tanstack/react-devtools@0.10.8(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(csstype@3.2.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.13)':
-    dependencies:
-      '@tanstack/devtools': 0.12.5(csstype@3.2.3)(solid-js@1.9.13)
-      '@types/react': 19.2.17
-      '@types/react-dom': 19.2.3(@types/react@19.2.17)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    transitivePeerDependencies:
-      - bufferutil
-      - csstype
-      - solid-js
-      - utf-8-validate
-
-  '@tanstack/react-form@1.33.2(@tanstack/react-start@1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@tanstack/form-core': 1.33.2
-      '@tanstack/react-store': 0.11.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
-    optionalDependencies:
-      '@tanstack/react-start': 1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16)
-    transitivePeerDependencies:
-      - react-dom
-
-  '@tanstack/react-query-devtools@5.101.2(@tanstack/react-query@5.101.2(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@tanstack/query-devtools': 5.101.2
-      '@tanstack/react-query': 5.101.2(react@19.2.7)
-      react: 19.2.7
-
-  '@tanstack/react-query@5.101.2(react@19.2.7)':
-    dependencies:
-      '@tanstack/query-core': 5.101.2
-      react: 19.2.7
-
-  '@tanstack/react-router-devtools@1.167.0(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@tanstack/router-core@1.171.15)(csstype@3.2.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-devtools-core': 1.168.0(@tanstack/router-core@1.171.15)(csstype@3.2.3)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    optionalDependencies:
-      '@tanstack/router-core': 1.171.15
-    transitivePeerDependencies:
-      - csstype
-
-  '@tanstack/react-router-ssr-query@1.167.1(@tanstack/query-core@5.101.2)(@tanstack/react-query@5.101.2(react@19.2.7))(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@tanstack/router-core@1.171.15)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@tanstack/query-core': 5.101.2
-      '@tanstack/react-query': 5.101.2(react@19.2.7)
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-ssr-query-core': 1.169.1(@tanstack/query-core@5.101.2)(@tanstack/router-core@1.171.15)
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-    transitivePeerDependencies:
-      - '@tanstack/router-core'
-
-  '@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-=======
   '@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@tanstack/history': 1.162.0
       '@tanstack/react-store': 0.9.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-core': 1.171.15
+      '@tanstack/router-core': 1.171.14
       isbot: 5.1.41
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optional: true
 
-  '@tanstack/react-start-client@1.168.16(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@tanstack/react-start-client@1.168.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-core': 1.171.15
-      '@tanstack/start-client-core': 1.170.14
+      '@tanstack/react-router': 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/router-core': 1.171.14
+      '@tanstack/start-client-core': 1.170.13
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optional: true
 
-<<<<<<< HEAD
-  '@tanstack/react-start-rsc@0.1.27(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16)':
-=======
-  '@tanstack/react-start-rsc@0.1.26(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  '@tanstack/react-start-rsc@0.1.26(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
     dependencies:
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-core': 1.171.15
+      '@tanstack/react-router': 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/router-core': 1.171.14
       '@tanstack/router-utils': 1.162.2
-      '@tanstack/start-client-core': 1.170.14
+      '@tanstack/start-client-core': 1.170.13
       '@tanstack/start-fn-stubs': 1.162.0
-<<<<<<< HEAD
-      '@tanstack/start-plugin-core': 1.171.20(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite@8.0.16)
-      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
-      '@tanstack/start-storage-context': 1.167.17
-=======
-      '@tanstack/start-plugin-core': 1.171.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
-      '@tanstack/start-server-core': 1.169.16
+      '@tanstack/start-plugin-core': 1.171.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
+      '@tanstack/start-server-core': 1.169.16(crossws@0.4.10(srvx@0.11.17))
       '@tanstack/start-storage-context': 1.167.16
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       pathe: 2.0.3
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
@@ -6631,40 +6076,27 @@ snapshots:
       - webpack
     optional: true
 
-  '@tanstack/react-start-server@1.167.22(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@tanstack/react-start-server@1.167.21(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-core': 1.171.15
-      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
+      '@tanstack/react-router': 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/router-core': 1.171.14
+      '@tanstack/start-server-core': 1.169.16(crossws@0.4.10(srvx@0.11.17))
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     transitivePeerDependencies:
       - crossws
     optional: true
 
-<<<<<<< HEAD
-  '@tanstack/react-start@1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16)':
-    dependencies:
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-start-client': 1.168.16(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-start-rsc': 0.1.27(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16)
-      '@tanstack/react-start-server': 1.167.22(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/router-utils': 1.162.2
-      '@tanstack/start-client-core': 1.170.14
-      '@tanstack/start-plugin-core': 1.171.20(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite@8.0.16)
-      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
-=======
-  '@tanstack/react-start@1.168.27(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
+  '@tanstack/react-start@1.168.27(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
     dependencies:
       '@tanstack/react-router': 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/react-start-client': 1.168.15(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@tanstack/react-start-rsc': 0.1.26(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
-      '@tanstack/react-start-server': 1.167.21(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@tanstack/react-start-rsc': 0.1.26(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
+      '@tanstack/react-start-server': 1.167.21(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/router-utils': 1.162.2
       '@tanstack/start-client-core': 1.170.13
-      '@tanstack/start-plugin-core': 1.171.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
-      '@tanstack/start-server-core': 1.169.16
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+      '@tanstack/start-plugin-core': 1.171.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
+      '@tanstack/start-server-core': 1.169.16(crossws@0.4.10(srvx@0.11.17))
       pathe: 2.0.3
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
@@ -6687,7 +6119,7 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.7)
     optional: true
 
-  '@tanstack/router-core@1.171.15':
+  '@tanstack/router-core@1.171.14':
     dependencies:
       '@tanstack/history': 1.162.0
       cookie-es: 3.1.1
@@ -6695,10 +6127,6 @@ snapshots:
       seroval-plugins: 1.5.4(seroval@1.5.4)
     optional: true
 
-<<<<<<< HEAD
-  '@tanstack/router-devtools-core@1.168.0(@tanstack/router-core@1.171.15)(csstype@3.2.3)':
-    dependencies:
-=======
   '@tanstack/router-core@1.171.15':
     dependencies:
       '@tanstack/history': 1.162.0
@@ -6708,17 +6136,16 @@ snapshots:
 
   '@tanstack/router-devtools-core@1.168.0(@tanstack/router-core@1.171.15)(csstype@3.2.3)':
     dependencies:
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       '@tanstack/router-core': 1.171.15
       clsx: 2.1.1
       goober: 2.1.19(csstype@3.2.3)
     optionalDependencies:
       csstype: 3.2.3
 
-  '@tanstack/router-generator@1.167.19':
+  '@tanstack/router-generator@1.167.18':
     dependencies:
       '@babel/types': 7.29.7
-      '@tanstack/router-core': 1.171.15
+      '@tanstack/router-core': 1.171.14
       '@tanstack/router-utils': 1.162.2
       '@tanstack/virtual-file-routes': 1.162.0
       jiti: 2.7.0
@@ -6729,9 +6156,6 @@ snapshots:
       - supports-color
     optional: true
 
-<<<<<<< HEAD
-  '@tanstack/router-plugin@1.168.20(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@8.0.16)':
-=======
   '@tanstack/router-generator@1.167.19':
     dependencies:
       '@babel/types': 7.29.7
@@ -6746,24 +6170,19 @@ snapshots:
       - supports-color
 
   '@tanstack/router-plugin@1.168.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@babel/core': 7.29.7
       '@babel/template': 7.29.7
       '@babel/types': 7.29.7
-      '@tanstack/router-core': 1.171.15
-      '@tanstack/router-generator': 1.167.19
+      '@tanstack/router-core': 1.171.14
+      '@tanstack/router-generator': 1.167.18
       '@tanstack/router-utils': 1.162.2
       chokidar: 5.0.0
       unplugin: 3.0.0
       zod: 4.4.3
     optionalDependencies:
-<<<<<<< HEAD
-      '@tanstack/react-router': 1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
-=======
       '@tanstack/react-router': 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      vite: 8.0.16(@types/node@25.9.4)(@vitejs/devtools@0.3.4)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
       vite-plugin-solid: 2.11.12(solid-js@1.9.14)(vite@8.0.16)
     transitivePeerDependencies:
       - supports-color
@@ -6782,9 +6201,8 @@ snapshots:
       zod: 4.4.3
     optionalDependencies:
       '@tanstack/react-router': 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      vite: 8.0.16(@types/node@25.9.4)(@vitejs/devtools@0.3.4)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
       vite-plugin-solid: 2.11.12(solid-js@1.9.14)(vite@8.0.16)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     transitivePeerDependencies:
       - supports-color
 
@@ -6806,9 +6224,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-<<<<<<< HEAD
-  '@tanstack/start-client-core@1.170.14':
-=======
   '@tanstack/solid-devtools@0.8.8(csstype@3.2.3)(solid-js@1.9.14)':
     dependencies:
       '@tanstack/devtools': 0.12.5(csstype@3.2.3)(solid-js@1.9.14)
@@ -6871,27 +6286,27 @@ snapshots:
       '@tanstack/start-client-core': 1.170.14
       solid-js: 1.9.14
 
-  '@tanstack/solid-start-server@1.167.22(solid-js@1.9.14)':
+  '@tanstack/solid-start-server@1.167.22(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)':
     dependencies:
       '@tanstack/router-core': 1.171.15
       '@tanstack/solid-router': 1.170.18(solid-js@1.9.14)
-      '@tanstack/start-server-core': 1.169.17
+      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
       solid-js: 1.9.14
     transitivePeerDependencies:
       - crossws
 
-  '@tanstack/solid-start@1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
+  '@tanstack/solid-start@1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
     dependencies:
       '@tanstack/solid-router': 1.170.18(solid-js@1.9.14)
       '@tanstack/solid-start-client': 1.168.16(solid-js@1.9.14)
-      '@tanstack/solid-start-server': 1.167.22(solid-js@1.9.14)
+      '@tanstack/solid-start-server': 1.167.22(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)
       '@tanstack/start-client-core': 1.170.14
-      '@tanstack/start-plugin-core': 1.171.20(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
-      '@tanstack/start-server-core': 1.169.17
+      '@tanstack/start-plugin-core': 1.171.20(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
+      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
       pathe: 2.0.3
       solid-js: 1.9.14
     optionalDependencies:
-      vite: 8.0.16(@types/node@25.9.4)(@vitejs/devtools@0.3.4)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@tanstack/react-router'
       - crossws
@@ -6905,11 +6320,10 @@ snapshots:
       solid-js: 1.9.14
 
   '@tanstack/start-client-core@1.170.13':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
-      '@tanstack/router-core': 1.171.15
+      '@tanstack/router-core': 1.171.14
       '@tanstack/start-fn-stubs': 1.162.0
-      '@tanstack/start-storage-context': 1.167.17
+      '@tanstack/start-storage-context': 1.167.16
       seroval: 1.5.4
     optional: true
 
@@ -6922,26 +6336,16 @@ snapshots:
 
   '@tanstack/start-fn-stubs@1.162.0': {}
 
-<<<<<<< HEAD
-  '@tanstack/start-plugin-core@1.171.20(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite@8.0.16)':
-=======
-  '@tanstack/start-plugin-core@1.171.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  '@tanstack/start-plugin-core@1.171.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/core': 7.29.7
       '@babel/types': 7.29.7
-<<<<<<< HEAD
-      '@tanstack/router-core': 1.171.15
-      '@tanstack/router-generator': 1.167.19
-      '@tanstack/router-plugin': 1.168.20(@tanstack/react-router@1.170.18(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite@8.0.16)
-=======
       '@tanstack/router-core': 1.171.14
       '@tanstack/router-generator': 1.167.18
       '@tanstack/router-plugin': 1.168.19(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       '@tanstack/router-utils': 1.162.2
-      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
+      '@tanstack/start-server-core': 1.169.16(crossws@0.4.10(srvx@0.11.17))
       exsolve: 1.0.8
       lightningcss: 1.32.0
       pathe: 2.0.3
@@ -6964,7 +6368,7 @@ snapshots:
       - webpack
     optional: true
 
-  '@tanstack/start-plugin-core@1.171.20(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
+  '@tanstack/start-plugin-core@1.171.20(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/core': 7.29.7
@@ -6973,7 +6377,7 @@ snapshots:
       '@tanstack/router-generator': 1.167.19
       '@tanstack/router-plugin': 1.168.20(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
       '@tanstack/router-utils': 1.162.2
-      '@tanstack/start-server-core': 1.169.17
+      '@tanstack/start-server-core': 1.169.17(crossws@0.4.10(srvx@0.11.17))
       exsolve: 1.0.8
       lightningcss: 1.32.0
       pathe: 2.0.3
@@ -6987,13 +6391,26 @@ snapshots:
       xmlbuilder2: 4.0.3
       zod: 4.4.3
     optionalDependencies:
-      vite: 8.0.16(@types/node@25.9.4)(@vitejs/devtools@0.3.4)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@tanstack/react-router'
       - crossws
       - supports-color
       - vite-plugin-solid
       - webpack
+
+  '@tanstack/start-server-core@1.169.16(crossws@0.4.10(srvx@0.11.17))':
+    dependencies:
+      '@tanstack/history': 1.162.0
+      '@tanstack/router-core': 1.171.14
+      '@tanstack/start-client-core': 1.170.13
+      '@tanstack/start-storage-context': 1.167.16
+      fetchdts: 0.1.7
+      h3-v2: h3@2.0.1-rc.20(crossws@0.4.10(srvx@0.11.17))
+      seroval: 1.5.4
+    transitivePeerDependencies:
+      - crossws
+    optional: true
 
   '@tanstack/start-server-core@1.169.17(crossws@0.4.10(srvx@0.11.17))':
     dependencies:
@@ -7006,30 +6423,14 @@ snapshots:
       seroval: 1.5.4
     transitivePeerDependencies:
       - crossws
-    optional: true
 
-  '@tanstack/start-server-core@1.169.17':
+  '@tanstack/start-storage-context@1.167.16':
     dependencies:
-      '@tanstack/history': 1.162.0
-      '@tanstack/router-core': 1.171.15
-      '@tanstack/start-client-core': 1.170.14
-      '@tanstack/start-storage-context': 1.167.17
-      fetchdts: 0.1.7
-      h3-v2: h3@2.0.1-rc.20
-      seroval: 1.5.4
-    transitivePeerDependencies:
-      - crossws
-
-  '@tanstack/start-storage-context@1.167.17':
-    dependencies:
-<<<<<<< HEAD
-=======
       '@tanstack/router-core': 1.171.14
     optional: true
 
   '@tanstack/start-storage-context@1.167.17':
     dependencies:
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
       '@tanstack/router-core': 1.171.15
 
   '@tanstack/store@0.11.0': {}
@@ -7172,8 +6573,8 @@ snapshots:
 
   '@vitejs/devtools-kit@0.4.1(srvx@0.11.17)(typescript@7.0.2)(vite@8.0.16)':
     dependencies:
-      '@devframes/hub': 0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))
-      devframe: 0.6.0(srvx@0.11.17)(typescript@7.0.2)
+      '@devframes/hub': 0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))
+      devframe: 0.6.2(srvx@0.11.17)(typescript@7.0.2)
       mlly: 1.8.2
       nostics: 1.1.4
       vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
@@ -7185,7 +6586,7 @@ snapshots:
   '@vitejs/devtools-rolldown@0.4.1(srvx@0.11.17)(typescript@7.0.2)(vite@8.0.16)(vue@3.5.39(typescript@7.0.2))':
     dependencies:
       '@floating-ui/dom': 1.7.6
-      '@rolldown/debug': 1.1.5
+      '@rolldown/debug': 1.2.0
       '@vitejs/devtools-kit': 0.4.1(srvx@0.11.17)(typescript@7.0.2)(vite@8.0.16)
       d3-shape: 3.2.0
       diff: 9.0.0
@@ -7201,15 +6602,15 @@ snapshots:
 
   '@vitejs/devtools@0.4.1(crossws@0.4.10(srvx@0.11.17))(srvx@0.11.17)(typescript@7.0.2)(valibot@1.4.2(typescript@7.0.2))(vite@8.0.16)':
     dependencies:
-      '@devframes/hub': 0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))
-      '@devframes/plugin-inspect': 0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))(valibot@1.4.2(typescript@7.0.2))(vite@8.0.16)
-      '@devframes/plugin-messages': 0.6.0(@devframes/hub@0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2)))(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))(vite@8.0.16)
-      '@devframes/plugin-terminals': 0.6.0(devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2))(typescript@7.0.2)(vite@8.0.16)
+      '@devframes/hub': 0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))
+      '@devframes/plugin-inspect': 0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))(valibot@1.4.2(typescript@7.0.2))(vite@8.0.16)
+      '@devframes/plugin-messages': 0.6.2(@devframes/hub@0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2)))(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))(vite@8.0.16)
+      '@devframes/plugin-terminals': 0.6.2(devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2))(typescript@7.0.2)(vite@8.0.16)
       '@vitejs/devtools-kit': 0.4.1(srvx@0.11.17)(typescript@7.0.2)(vite@8.0.16)
       '@vitejs/devtools-rolldown': 0.4.1(srvx@0.11.17)(typescript@7.0.2)(vite@8.0.16)(vue@3.5.39(typescript@7.0.2))
       birpc: 4.0.0
       cac: 7.0.0
-      devframe: 0.6.0(srvx@0.11.17)(typescript@7.0.2)
+      devframe: 0.6.2(srvx@0.11.17)(typescript@7.0.2)
       h3: 2.0.1-rc.22(crossws@0.4.10(srvx@0.11.17))
       mlly: 1.8.2
       nostics: 1.1.4
@@ -7224,19 +6625,7 @@ snapshots:
       - typescript
       - valibot
 
-<<<<<<< HEAD
-  '@vitejs/plugin-react@6.0.3(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.1.0)(vite@8.0.16))(babel-plugin-react-compiler@1.0.0)(vite@8.0.16)':
-    dependencies:
-      '@rolldown/pluginutils': 1.0.1
-      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
-    optionalDependencies:
-      '@rolldown/plugin-babel': 0.2.3(@babel/core@7.29.7)(@babel/runtime@7.29.7)(rolldown@1.1.0)(vite@8.0.16)
-      babel-plugin-react-compiler: 1.0.0
-
   '@vitest/browser-preview@4.1.10(vite@8.0.16)(vitest@4.1.10)':
-=======
-  '@vitest/browser-preview@4.1.9(vite@8.0.16)(vitest@4.1.9)':
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     dependencies:
       '@testing-library/dom': 10.4.1
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.1)
@@ -7460,11 +6849,7 @@ snapshots:
 
   baseline-browser-mapping@2.10.40: {}
 
-<<<<<<< HEAD
-  better-auth@1.6.23(@tanstack/react-start@1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16))(drizzle-kit@1.0.0-beta.22)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.13)(vitest@4.1.10)(vue@3.5.39(typescript@7.0.2)):
-=======
-  better-auth@1.6.23(@tanstack/react-start@1.168.27(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(@tanstack/solid-start@1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(drizzle-kit@1.0.0-beta.22)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@6.0.3))(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.14)(vitest@4.1.9)(vue@3.5.39(typescript@6.0.3)):
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  better-auth@1.6.23(@tanstack/react-start@1.168.27(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(@tanstack/solid-start@1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16))(drizzle-kit@1.0.0-beta.22)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(solid-js@1.9.14)(vitest@4.1.10)(vue@3.5.39(typescript@7.0.2)):
     dependencies:
       '@better-auth/core': 1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.2)(nanostores@1.4.0)
       '@better-auth/drizzle-adapter': 1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.2)(nanostores@1.4.0))(@better-auth/utils@0.4.2)(drizzle-orm@1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3))
@@ -7484,25 +6869,15 @@ snapshots:
       nanostores: 1.4.0
       zod: 4.4.3
     optionalDependencies:
-<<<<<<< HEAD
-      '@tanstack/react-start': 1.168.28(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite@8.0.16)
-=======
-      '@tanstack/react-start': 1.168.27(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
-      '@tanstack/solid-start': 1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+      '@tanstack/react-start': 1.168.27(crossws@0.4.10(srvx@0.11.17))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
+      '@tanstack/solid-start': 1.168.28(@tanstack/react-router@1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(crossws@0.4.10(srvx@0.11.17))(solid-js@1.9.14)(vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16))(vite@8.0.16)
       drizzle-kit: 1.0.0-beta.22
       drizzle-orm: 1.0.0-beta.22(valibot@1.4.2(typescript@7.0.2))(zod@4.4.3)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
-<<<<<<< HEAD
-      solid-js: 1.9.13
+      solid-js: 1.9.14
       vitest: 4.1.10(@types/node@25.9.5)(@vitest/browser-preview@4.1.10)(vite@8.0.16)
       vue: 3.5.39(typescript@7.0.2)
-=======
-      solid-js: 1.9.14
-      vitest: 4.1.9(@types/node@25.9.4)(@vitest/browser-preview@4.1.9)(vite@8.0.16)
-      vue: 3.5.39(typescript@6.0.3)
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
     transitivePeerDependencies:
       - '@cloudflare/workers-types'
       - '@opentelemetry/api'
@@ -7561,6 +6936,8 @@ snapshots:
   common-tags@1.8.2: {}
 
   confbox@0.1.8: {}
+
+  confbox@0.2.4: {}
 
   conventional-changelog-angular@9.2.0:
     dependencies:
@@ -7625,7 +7002,7 @@ snapshots:
 
   detect-libc@2.1.2: {}
 
-  devframe@0.6.0(srvx@0.11.17)(typescript@7.0.2):
+  devframe@0.6.2(srvx@0.11.17)(typescript@7.0.2):
     dependencies:
       '@valibot/to-json-schema': 1.7.1(valibot@1.4.2(typescript@7.0.2))
       birpc: 4.0.0
@@ -7826,6 +7203,8 @@ snapshots:
       parent-module: 1.0.1
       resolve-from: 4.0.0
 
+  import-meta-resolve@4.2.0: {}
+
   ini@6.0.0: {}
 
   is-arrayish@0.2.1: {}
@@ -7985,6 +7364,12 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
+  local-pkg@1.2.1:
+    dependencies:
+      mlly: 1.8.2
+      pkg-types: 2.3.1
+      quansync: 0.2.11
+
   lodash.sortby@4.7.0: {}
 
   lru-cache@11.5.1: {}
@@ -8001,15 +7386,11 @@ snapshots:
 
   meow@14.1.0: {}
 
-<<<<<<< HEAD
-  miniflare@4.20260710.0:
-=======
   merge-anything@5.1.7:
     dependencies:
       is-what: 4.1.16
 
-  miniflare@4.20260701.0:
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  miniflare@4.20260710.0:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       sharp: 0.34.5
@@ -8184,8 +7565,7 @@ snapshots:
       oxlint-tsgolint: 0.24.0
       vite-plus: 0.2.4(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@7.0.2)(vite@8.0.16)(yaml@2.9.0)
 
-  package-manager-detector@1.6.0:
-    optional: true
+  package-manager-detector@1.6.0: {}
 
   parent-module@1.0.1:
     dependencies:
@@ -8213,11 +7593,6 @@ snapshots:
 
   perfect-debounce@2.1.0: {}
 
-  phosphor-solid@1.1.5(react@19.2.7):
-    dependencies:
-      react: 19.2.7
-      solid-js: 1.9.13
-
   picocolors@1.1.1: {}
 
   picomatch@4.0.4: {}
@@ -8226,6 +7601,12 @@ snapshots:
     dependencies:
       confbox: 0.1.8
       mlly: 1.8.2
+      pathe: 2.0.3
+
+  pkg-types@2.3.1:
+    dependencies:
+      confbox: 0.2.4
+      exsolve: 1.0.8
       pathe: 2.0.3
 
   pngjs@7.0.0: {}
@@ -8261,6 +7642,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  quansync@0.2.11: {}
+
   react-dom@19.2.7(react@19.2.7):
     dependencies:
       react: 19.2.7
@@ -8269,7 +7652,8 @@ snapshots:
 
   react-is@17.0.2: {}
 
-  react@19.2.7: {}
+  react@19.2.7:
+    optional: true
 
   readdirp@5.0.0: {}
 
@@ -8387,12 +7771,6 @@ snapshots:
     dependencies:
       '@corvu/utils': 0.4.2(solid-js@1.9.14)
       solid-js: 1.9.14
-
-  solid-js@1.9.13:
-    dependencies:
-      csstype: 3.2.3
-      seroval: 1.5.4
-      seroval-plugins: 1.5.4(seroval@1.5.4)
 
   solid-js@1.9.14:
     dependencies:
@@ -8527,6 +7905,23 @@ snapshots:
     dependencies:
       pathe: 2.0.3
 
+  unplugin-icons@23.0.1(@vue/compiler-sfc@3.5.39):
+    dependencies:
+      '@antfu/install-pkg': 1.1.0
+      '@iconify/utils': 3.1.4
+      local-pkg: 1.2.1
+      obug: 2.1.3
+      unplugin: 2.3.11
+    optionalDependencies:
+      '@vue/compiler-sfc': 3.5.39
+
+  unplugin@2.3.11:
+    dependencies:
+      '@jridgewell/remapping': 2.3.5
+      acorn: 8.17.0
+      picomatch: 4.0.4
+      webpack-virtual-modules: 0.6.2
+
   unplugin@3.0.0:
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -8550,9 +7945,6 @@ snapshots:
     optionalDependencies:
       typescript: 7.0.2
 
-<<<<<<< HEAD
-  vite-plus@0.2.4(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@7.0.2)(vite@8.0.16)(yaml@2.9.0):
-=======
   vite-plugin-solid@2.11.12(solid-js@1.9.14)(vite@8.0.16):
     dependencies:
       '@babel/core': 7.29.7
@@ -8561,13 +7953,12 @@ snapshots:
       merge-anything: 5.1.7
       solid-js: 1.9.14
       solid-refresh: 0.6.3(solid-js@1.9.14)
-      vite: 8.0.16(@types/node@25.9.4)(@vitejs/devtools@0.3.4)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(yaml@2.9.0)
       vitefu: 1.1.3(vite@8.0.16)
     transitivePeerDependencies:
       - supports-color
 
-  vite-plus@0.2.2(@types/node@25.9.4)(@vitejs/devtools@0.3.4)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@6.0.3)(vite@8.0.16)(yaml@2.9.0):
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
+  vite-plus@0.2.4(@types/node@25.9.5)(@vitejs/devtools@0.4.1)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@7.0.2)(vite@8.0.16)(yaml@2.9.0):
     dependencies:
       '@oxc-project/types': 0.138.0
       '@oxlint/plugins': 1.68.0
@@ -8758,14 +8149,6 @@ snapshots:
       string-width: 7.2.0
       y18n: 5.0.8
       yargs-parser: 22.0.0
-
-<<<<<<< HEAD
-  yjs@13.6.31:
-    dependencies:
-      lib0: 0.2.117
-=======
-  yocto-queue@1.2.2: {}
->>>>>>> 489b3e0 (refactor(solid): §01 swap toolchain to SolidJS)
 
   youch-core@0.3.3:
     dependencies:

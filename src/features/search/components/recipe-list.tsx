@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/solid-router'
-import { ArrowRight } from 'phosphor-solid'
 import { For, Show } from 'solid-js'
+import ArrowRight from '~icons/ph/arrow-right'
 
 import { Item, ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { addRecentRecipe } from '@/stores/recent-recipes.store'

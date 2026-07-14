@@ -1,6 +1,6 @@
 import { Dialog as DialogPrimitive } from '@kobalte/core/dialog'
-import { X } from 'phosphor-solid'
 import { type ComponentProps, type JSX, Show, splitProps } from 'solid-js'
+import X from '~icons/ph/x'
 
 import { Button } from '@/components/ui/button'
 import { type DialogProps } from '@/components/ui/dialog'

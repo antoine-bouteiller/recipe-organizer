@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
-import { Plus } from 'phosphor-solid'
 import { createMemo, createSignal, For, Show } from 'solid-js'
+import Plus from '~icons/ph/plus'
 
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { ScreenLayout } from '@/components/layout/screen-layout'

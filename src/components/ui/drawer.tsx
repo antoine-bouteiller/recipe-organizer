@@ -6,9 +6,7 @@ import { cn } from '@/utils/cn'
 
 export const Drawer = (props: ComponentProps<typeof CorvuDrawer>) => <CorvuDrawer side="bottom" {...props} />
 
-export const DrawerTrigger = CorvuDrawer.Trigger
-
-export const DrawerClose = CorvuDrawer.Close
+export { Close as DrawerClose, Trigger as DrawerTrigger } from '@corvu/drawer'
 
 export const DrawerPopup = (props: { class?: string; children: JSX.Element }) => {
   const [local, rest] = splitProps(props, ['class', 'children'])

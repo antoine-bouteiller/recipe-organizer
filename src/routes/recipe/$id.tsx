@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, Link } from '@tanstack/solid-router'
-import { DotsThreeVertical, PencilSimple } from 'phosphor-solid'
 import { Show } from 'solid-js'
 import * as v from 'valibot'
+import DotsThreeVertical from '~icons/ph/dots-three-vertical-bold'
+import PencilSimple from '~icons/ph/pencil-simple'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -44,7 +45,7 @@ const RecipePage = () => {
                 <Popover
                   trigger={{
                     as: Button,
-                    children: <DotsThreeVertical class="text-primary" weight="bold" />,
+                    children: <DotsThreeVertical class="text-primary" />,
                     size: 'icon',
                     variant: 'outline',
                   }}

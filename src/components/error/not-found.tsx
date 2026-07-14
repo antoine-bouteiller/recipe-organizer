@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/solid-router'
-import { CaretLeft } from 'phosphor-solid'
+import CaretLeft from '~icons/ph/caret-left'
 
 import { Button } from '@/components/ui/button'
 

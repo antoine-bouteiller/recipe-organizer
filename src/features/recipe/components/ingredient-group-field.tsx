@@ -1,7 +1,8 @@
 import { unitOptions } from '@schema'
 import { useSelector } from '@tanstack/solid-store'
-import { Plus, Trash } from 'phosphor-solid'
 import { For, type JSX } from 'solid-js'
+import Plus from '~icons/ph/plus'
+import Trash from '~icons/ph/trash'
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/solid-query'
-import { Check } from 'phosphor-solid'
 import { createSignal } from 'solid-js'
+import Check from '~icons/ph/check'
 
 import { Button } from '@/components/ui/button'
 import { approveUserOptions } from '@/features/users/api/approve'

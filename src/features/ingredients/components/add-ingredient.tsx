@@ -1,8 +1,8 @@
 import { revalidateLogic } from '@tanstack/solid-form'
 import { useMutation } from '@tanstack/solid-query'
-import { Plus } from 'phosphor-solid'
 import { createSignal } from 'solid-js'
 import * as v from 'valibot'
+import Plus from '~icons/ph/plus'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'

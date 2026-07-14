@@ -1,5 +1,5 @@
-import { Trash } from 'phosphor-solid'
 import { createSignal, Show } from 'solid-js'
+import Trash from '~icons/ph/trash'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, type TriggerConfig } from '@/components/ui/dialog'

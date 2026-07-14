@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute, redirect } from '@tanstack/solid-router'
-import { Plus, Prohibit } from 'phosphor-solid'
 import { createMemo, createSignal, For, type JSX, Show, Suspense } from 'solid-js'
+import Plus from '~icons/ph/plus'
+import Prohibit from '~icons/ph/prohibit'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'

@@ -1,5 +1,6 @@
-import { CaretDown, Check } from 'phosphor-solid'
 import { createMemo, createSignal, For, Show } from 'solid-js'
+import CaretDown from '~icons/ph/caret-down'
+import Check from '~icons/ph/check'
 
 import { Button } from '@/components/ui/button'
 import { type ComboboxImplProps, type ValueOptions } from '@/components/ui/combobox'

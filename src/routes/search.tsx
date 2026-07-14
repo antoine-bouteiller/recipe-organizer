@@ -1,8 +1,8 @@
 import { Collapsible } from '@kobalte/core/collapsible'
 import { useQuery } from '@tanstack/solid-query'
 import { createFileRoute } from '@tanstack/solid-router'
-import { FunnelSimple } from 'phosphor-solid'
 import { createMemo, createSignal, Show } from 'solid-js'
+import FunnelSimple from '~icons/ph/funnel-simple'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'

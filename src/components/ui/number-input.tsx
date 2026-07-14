@@ -1,6 +1,7 @@
 import { NumberField as NumberFieldPrimitive } from '@kobalte/core/number-field'
-import { Minus, Plus } from 'phosphor-solid'
 import { Show } from 'solid-js'
+import Minus from '~icons/ph/minus'
+import Plus from '~icons/ph/plus'
 
 import { cn } from '@/utils/cn'
 

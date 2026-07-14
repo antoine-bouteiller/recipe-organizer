@@ -2,7 +2,7 @@ import { account, session, user, verification } from '@schema'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { APIError } from 'better-auth/api'
-import { tanstackStartCookies } from 'better-auth/tanstack-start'
+import { tanstackStartCookies } from 'better-auth/tanstack-start/solid'
 import { env } from 'cloudflare:workers'
 
 import { getDb } from '@/lib/db'

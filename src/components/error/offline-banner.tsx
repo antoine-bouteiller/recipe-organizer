@@ -1,5 +1,5 @@
-import { WifiSlash } from 'phosphor-solid'
 import { createSignal, onCleanup, onMount, Show } from 'solid-js'
+import WifiSlash from '~icons/ph/wifi-slash-fill'
 
 export default function OfflineBanner() {
   const [isOnline, setIsOnline] = createSignal(true)
@@ -30,7 +30,7 @@ export default function OfflineBanner() {
     <Show when={isMounted() && !isOnline()}>
       <div class="fixed top-0 right-0 left-0 z-40 w-full bg-yellow-500 px-4 py-3 text-sm font-medium text-yellow-900 shadow-md">
         <div class="mx-auto flex max-w-7xl items-center gap-3">
-          <WifiSlash class="h-5 w-5 shrink-0" weight="fill" />
+          <WifiSlash class="h-5 w-5 shrink-0" />
           <span>Vous êtes hors ligne. Certaines fonctionnalités peuvent être indisponibles.</span>
         </div>
       </div>

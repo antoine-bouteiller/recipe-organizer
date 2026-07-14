@@ -2,6 +2,7 @@ import { Serwist } from '@serwist/window'
 import { type QueryClient } from '@tanstack/solid-query'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/solid-router'
 import { lazy, onMount, Suspense } from 'solid-js'
+import { HydrationScript } from 'solid-js/web'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
@@ -16,28 +17,29 @@ const SearchBar = lazy(() => import('@/features/recipe/components/search-bar'))
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
 
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
+      await serwist.register()
+    } catch {
+      // App still works without SW - silent failure is OK
+      // Service worker provides offline support, not critical functionality
+    }
+  }
+}
+
 const RootComponent = () => {
   const context = Route.useRouteContext()
 
   onMount(() => {
-    const registerServiceWorker = async () => {
-      if ('serviceWorker' in navigator) {
-        try {
-          const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
-          await serwist.register()
-        } catch {
-          // App still works without SW - silent failure is OK
-          // Service worker provides offline support, not critical functionality
-        }
-      }
-    }
-
     void registerServiceWorker()
   })
 
   return (
     <html class={context().theme} lang="fr">
       <head>
+        <HydrationScript />
         <HeadContent />
       </head>
 
