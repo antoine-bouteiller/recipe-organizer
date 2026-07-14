@@ -66,16 +66,25 @@ config are untouched, so infra needs no coordinated change at flip time.
 
 ## Final validation checklist
 
-- [ ] `vp check` green (fmt + lint + types)
-- [ ] `vp test` green (6 logic tests unchanged + Lexical round-trip/leak harness passes)
-- [ ] `knip` clean; grep gates all zero
-- [ ] `wrangler deploy --dry-run` succeeds with DB/R2/IMAGES bindings (AC-005)
-- [ ] Fresh-cache SSR load returns 200 with prefetched data (AC-001, S1705 guard)
+**Automated gates (done):**
+
+- [x] `vp check` green (fmt + lint + types) — 194 files, 0 errors
+- [x] `vp test` green (43 tests: logic + Lexical round-trip harness)
+- [x] `knip` clean (exit 0); grep gates all zero (`react`/`@base-ui`/`@lexical/react` = 0 in `src`, `className=` = 0)
+- [x] `wrangler deploy --dry-run` succeeds with DB/R2/IMAGES bindings (AC-005)
+- [x] Fresh-cache SSR load returns 200 with hydration script (`window._$HY`) present (AC-001, S1705 guard) — verified via dev-server curl
+- [x] Docs + `CLAUDE.md` (→ `AGENTS.md` symlink) updated to Solid/Kobalte/corvu
+- [x] Browser hydration smoke (agent-browser on dev): app renders, hydrates, nav + interaction work, no uncaught errors
+
+**Human-only — require a preview Worker deploy + real auth/data (do at flip):**
+
 - [ ] Auth guard + admin guard behave (AC-002/003)
 - [ ] Recipe create → invalidate + toast (AC-004); image stored as WebP (AC-007)
 - [ ] Drawer open/close animates fully in all dismiss paths (memory 7640 guard)
 - [ ] PWA still installs; SW registration failure stays silent (AC-006)
-- [ ] Docs + CLAUDE.md updated to Solid/Kobalte/corvu
+- [ ] Flip production (branch-and-flip step 7)
+
+**Known warning to eyeball (non-blocking):** `computations created outside a createRoot or render` fires ~10× on `/shopping-list` (empty list → not per-item; traced in §08 to the DevTools `installHook.js` hook, mitigated via root `HydrationScript`). Confirm it's absent without the browser DevTools extension during human QA.
 
 ## ponytail notes
 

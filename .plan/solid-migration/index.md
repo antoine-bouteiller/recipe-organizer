@@ -1,6 +1,6 @@
 # SolidJS v1 Migration
 
-**Status:** in-progress — §01/§02/§04/§05/§06/§07/§08 done + all feature components & routes migrated. Only §09 (final gate/cutover: spec-doc rewrites, `wrangler deploy --dry-run`, VAL-001..005 manual pass) remains. On branch `feat/migrate-to-solid`. `tsc` clean, `vp lint`/`vp fmt` clean, `vp test` green (43 tests incl. the Lexical round-trip), `vp build` succeeds; **zero** `react`/`react-dom`/`@base-ui`/`@lexical/react`/`@tanstack/react-*`/`@phosphor-icons/react` imports anywhere in `src`.
+**Status:** code-complete — §01–§08 done + all features/routes migrated + §09 automated gates green. On branch `feat/migrate-to-solid`. `vp check` clean (194 files), `vp test` green (43 incl. Lexical round-trip), `vp build` succeeds, `knip` clean, `wrangler deploy --dry-run` succeeds with DB/R2/IMAGES bindings, fresh SSR load 200 with hydration script (S1705 guard), docs/AGENTS.md updated to Solid/Kobalte/corvu, Solid devtools re-wired dev-only (tree-shaken from prod). **Zero** `react`/`react-dom`/`@base-ui`/`@lexical/react`/`@tanstack/react-*`/`@phosphor-icons/react` imports in `src`. **Remaining = human-only:** preview-Worker QA (auth/admin guards, recipe-create→toast, WebP, drawer animation, PWA install) + production flip.
 **Goal:** Migrate `recipe-organizer` from React 19 + TanStack Start (React) to SolidJS v1 (stable), replace the
 Base UI design system with Kobalte, and rebuild the drawer on corvu. Infra (Cloudflare Workers,
 D1/Drizzle, R2, Better Auth, Serwist, Tailwind, Vite+) is untouched — only the UI framework and its
@@ -70,10 +70,33 @@ VAL-001..005 pass on the Solid build, and zero `react` / `@base-ui` / `@lexical/
 - [x] Port forms to `@tanstack/solid-form` (accessor field API `field().state…`); text/file/select/combobox forms submit end-to-end (editor field stubbed) — see `06-forms.md`
 - [x] Migrate feature components + routes to consume the rebuilt UI _(all ~40 `.tsx` except editor-owned §08 files; `Icon` suffix stripped, `render`→`as`/`TriggerConfig` triggers, `useSelector`/`useQuery` accessor call-sites, `useMutation(() => opts())`, `use-options`/`use-shopping-list` made reactive; delete-dialog trigger→TriggerConfig)_
 - [x] Build the custom Lexical Solid binding (composer, decorator nodes, toolbar); round-trip test passes, zero data migration — see `08-editor-lexical.md`
-- [ ] Testing, dead-code/grep gates, doc updates, and branch-and-flip cutover; final validation checklist green — see `09-testing-cutover.md`
+- [x] Testing, dead-code/grep gates, doc updates; automated validation gates green (§09). _Remaining: human-only preview-Worker QA (auth/admin guards, recipe-create→toast, WebP, drawer anim, PWA install) + production flip._ — see `09-testing-cutover.md`
 
 ## Log
 
+- 2026-07-14 §09 gate/cutover session (automated portion):
+  - **Gates green:** `vp check` (194 files, 0 err), `vp test` (43), `knip` (exit 0), `vp build`, `wrangler
+deploy --dry-run` (DB/R2/IMAGES bindings present), fresh-no-cache SSR `GET /` → 200 with `window._$HY`
+    hydration script. Grep gates zero: no `react`/`react-dom`/`@base-ui`/`@lexical/react` imports in `src`,
+    no `className=` in `.tsx`.
+  - **knip fixes:** dropped migration-dead exports `recipeFormFields`/`createFieldMap` (solid-form uses
+    `useAppForm`, not field-maps) and un-exported now-in-file-only `Recipe`/`BadgeOptions`/`ButtonOptions`;
+    knip config: `ignoreUnresolved: ["^~icons/"]` (unplugin-icons virtual modules) + `@iconify-json/ph` to
+    `ignoreDependencies` (build-time icon data).
+  - **Docs:** framework-name swaps across `architecture`/`platform`/`file-structure`/`forms`/`auth`/
+    `server-functions`/`routing-ssr`/`data-layer`/`client-state` specs + `AGENTS.md` (React→Solid adapters,
+    Base UI→Kobalte, `@lexical/react`→hand-rolled Solid binding, `@phosphor-icons/react`→unplugin-icons).
+    Factual corrections beyond names: Form/Field are now framework-plain Solid (`FormErrorsContext`), not
+    Base UI wrappers; `EditorField` is a direct Solid import, not `React.lazy`.
+  - **Devtools:** re-wired the three `@tanstack/solid-*-devtools` (dropped in §02) via a dev-only
+    `src/components/dev-tools.tsx` lazy-loaded behind `import.meta.env.DEV` in `__root` — confirmed
+    tree-shaken from the prod client bundle (a plain `<Show when={DEV}>` leaked ~150KB, the ternary-`lazy`
+    does not).
+  - **Browser smoke** (agent-browser on dev): app renders full UI, hydrates, nav + interaction work, no
+    uncaught errors. Noted the `computations created outside createRoot` warning on `/shopping-list`
+    (empty list → not per-item; §08-traced to DevTools `installHook.js`, not app code) for human QA.
+  - **Remaining = human-only:** preview-Worker deploy + AC-002/003/004/006/007 QA + drawer-animation
+    eyeball + production flip.
 - 2026-07-14 §08 editor session (Lexical core + hand-rolled Solid binding):
   - **Binding** (`common/editor/index.tsx`): `createEditor` in the component body; `EditorContext` +
     `useEditor()` replace `useLexicalComposerContext`. Registrations (`registerRichText`/`registerList`/

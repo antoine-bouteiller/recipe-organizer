@@ -9,7 +9,7 @@ tags: [architecture, overview, tanstack-start, cloudflare, edge]
 
 # Introduction
 
-This specification describes the high-level architecture of the `recipe-organizer` application — an isomorphic React app built on **TanStack Start** that runs as a single **Cloudflare Worker**. It is the entry point for understanding how the pieces fit together; every other spec under `docs/`, `docs/infrastructure/`, and `src/features/<name>/` zooms into one slice of this picture.
+This specification describes the high-level architecture of the `recipe-organizer` application — an isomorphic SolidJS app built on **TanStack Start** that runs as a single **Cloudflare Worker**. It is the entry point for understanding how the pieces fit together; every other spec under `docs/`, `docs/infrastructure/`, and `src/features/<name>/` zooms into one slice of this picture.
 
 ## 1. Purpose & Scope
 
@@ -21,8 +21,8 @@ This specification describes the high-level architecture of the `recipe-organize
 
 | Term                  | Definition                                                                                                                                                                     |
 | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **TanStack Start**    | Full-stack React meta-framework providing SSR, file-based routing, server functions, and isomorphic helpers, built on TanStack Router + Vite.                                  |
-| **Server function**   | A callable defined with `createServerFn(...)` from `@tanstack/react-start`. Runs only on the worker; can be invoked from the client (RPC) or from a route loader (in-process). |
+| **TanStack Start**    | Full-stack SolidJS meta-framework providing SSR, file-based routing, server functions, and isomorphic helpers, built on TanStack Router + Vite.                                |
+| **Server function**   | A callable defined with `createServerFn(...)` from `@tanstack/solid-start`. Runs only on the worker; can be invoked from the client (RPC) or from a route loader (in-process). |
 | **Worker**            | A Cloudflare Workers V8 isolate executing the SSR + API code on the edge, on demand, with no persistent process.                                                               |
 | **D1**                | Cloudflare's serverless SQLite, accessed through the `DB` binding via `drizzle-orm/d1`.                                                                                        |
 | **R2**                | Cloudflare's S3-compatible object store, accessed through the `R2_BUCKET` binding for image and video blobs.                                                                   |
@@ -35,7 +35,7 @@ This specification describes the high-level architecture of the `recipe-organize
 
 ### Architectural requirements
 
-- **REQ-001**: The application MUST run as a single Cloudflare Worker. The worker entry point is `@tanstack/react-start/server-entry`, configured in `wrangler.jsonc`.
+- **REQ-001**: The application MUST run as a single Cloudflare Worker. The worker entry point is `@tanstack/solid-start/server-entry`, configured in `wrangler.jsonc`.
 - **REQ-002**: The app runs in client-only render mode: `src/start.ts` sets `defaultSsr: false` and the root route opts into `ssr: true`. The worker renders only the document shell (and resolves auth in the root `beforeLoad`) per request; all page-route content renders on the client. Loaders prefetch data via `context.queryClient.ensureQueryData(...)` (on the client for client-only routes).
 - **REQ-003**: The application MUST be a Progressive Web App: a `manifest.json` is linked from the root route, and a Serwist service worker provides offline shell + asset caching.
 - **REQ-004**: All persistent data MUST live in Cloudflare D1 (relational data) or R2 (binary blobs: images, videos). No external database.
@@ -112,7 +112,7 @@ This specification describes the high-level architecture of the `recipe-organize
 
 | Layer                   | Lives in                                                    | Responsibility                                                                                                    |
 | ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **UI primitives**       | `src/components/ui/`                                        | Owned design-system components built on Base UI — buttons, dialogs, fields. One file per component, no data deps. |
+| **UI primitives**       | `src/components/ui/`                                        | Owned design-system components built on Kobalte — buttons, dialogs, fields. One file per component, no data deps. |
 | **Form fields**         | `src/components/forms/`                                     | TanStack Form-aware fields built on UI primitives.                                                                |
 | **Layout / Navigation** | `src/components/layout/`, `src/components/navigation/`      | Mobile/desktop chrome (`ScreenLayout`, `Navbar`, `TabBar`).                                                       |
 | **Feature components**  | `src/features/<name>/components/`                           | Feature-specific UI: forms, dialogs, lists, editors.                                                              |
@@ -130,7 +130,7 @@ This specification describes the high-level architecture of the `recipe-organize
 3. Router resolves `recipe/$id.tsx`:
    - `loader` calls `context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))`.
    - That option is backed by `getRecipe` (a `createServerFn`) which queries D1 via Drizzle and returns a serialized recipe.
-4. Worker renders the React tree to HTML and ships it back along with the query cache as a serialized payload.
+4. Worker renders the Solid tree to HTML and ships it back along with the query cache as a serialized payload.
 5. Client hydrates and runs the (client-only) route loader/component: `useQuery(getRecipeDetailsOptions(id))` and `useShoppingListIds()` (TanStack Store) are read directly on the client — no `<ClientOnly>` needed, since the route never rendered on the server.
 6. User actions (add to shopping list, update quantity) call store action functions (e.g. `addToShoppingList(id)`) that run `store.setState(...)`; `localStorage` persists the change.
 
@@ -160,7 +160,7 @@ This specification describes the high-level architecture of the `recipe-organize
 ## 6. Test Automation Strategy
 
 - **Test Levels**: lint (`vp lint`), format (`vp fmt`), type-check (`vp check`), unit/integration via Vitest (`vp test`), manual smoke (browser).
-- **Frameworks**: Oxlint (with TS + React + Unicorn + Import plugins), Oxfmt, Vitest (`vite-plus/test`), Wrangler `dev` for local Worker emulation.
+- **Frameworks**: Oxlint (with TS + Unicorn + Import plugins), Oxfmt, Vitest (`vite-plus/test`), Wrangler `dev` for local Worker emulation.
 - **Test Data Management**: D1 dump/restore via `pnpm db:dump` / `pnpm db:import` (`wrangler d1 export/execute`).
 - **CI/CD Integration**: GitHub Actions with `voidzero-dev/setup-vp@v1`, `vp install`, `vp check`, `vp test`. Migrations applied to remote D1 during deploy (`pnpm db:migrate:remote` → `drizzle-kit migrate`).
 - **Coverage Requirements**: not enforced; cover unit-converter, shopping list aggregation, auth guard.
@@ -170,9 +170,9 @@ This specification describes the high-level architecture of the `recipe-organize
 
 - **Why TanStack Start + Cloudflare Workers**: same TS code on edge SSR and client; no separate API service. Loaders + Query make optimistic SSR cheap. D1/R2/Images keep all infra in one provider.
 - **Why D1 + Drizzle**: SQLite at the edge avoids cold-start connections. Drizzle gives type-safe relational queries with `defineRelations`. `batch([...])` provides multi-statement atomicity.
-- **Why TanStack Store for selected client state**: we need persisted UI state (shopping list, per-recipe servings). React Query is for server state, not for "this user picked these recipes". The two never overlap (PAT-005 in client-state spec). `@tanstack/react-store` is already in the tree (TanStack React Form/Router depend on it), so it adds no new dependency.
+- **Why TanStack Store for selected client state**: we need persisted UI state (shopping list, per-recipe servings). Solid Query is for server state, not for "this user picked these recipes". The two never overlap (PAT-005 in client-state spec). `@tanstack/solid-store` is already in the tree (TanStack Solid Form/Router depend on it), so it adds no new dependency.
 - **Why Cloudflare Images for uploads**: zero-effort WebP conversion + resize at the edge. Avoids storing huge JPEGs in R2 and serves the optimization tax once at upload time.
-- **Why Lexical for instructions**: rich-text editor with first-class custom-node support, used to embed Magimix programs and subrecipes inside instructions.
+- **Why Lexical for instructions**: rich-text editor with first-class custom-node support, used to embed Magimix programs and subrecipes inside instructions. The editor now uses a hand-rolled SolidJS binding over Lexical core (`@lexical/history|list|rich-text|utils` 0.46), replacing `@lexical/react`.
 - **Why French-only UI**: the app targets French-speaking users (Pelico domain context). All copy and validation messages are localized.
 - **Why no separate API service**: every server-side concern (RPC, OAuth callback, image streaming) is reachable through TanStack Router's `server.handlers` or `createServerFn`. The Worker is the API.
 
@@ -207,10 +207,10 @@ This specification describes the high-level architecture of the `recipe-organize
 
 ### Technology Platform Dependencies
 
-- **PLT-001**: TanStack Start + Router (1.16x) + React Query (5.99) + React 19.
+- **PLT-001**: TanStack Start + Router (1.17x) + Solid Query (5.101) + SolidJS 1.9.
 - **PLT-002**: Drizzle ORM 1.0 beta + Drizzle Kit 1.0 beta (D1 dialect).
 - **PLT-003**: Vite+ 0.1.18 (wrapping Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt).
-- **PLT-004**: TypeScript 6, React 19.2, Tailwind 4.2, TanStack Store (`@tanstack/react-store` 0.11), Zod 4.
+- **PLT-004**: TypeScript 6, SolidJS 1.9.14, Tailwind 4.2, TanStack Store (`@tanstack/solid-store` 0.11), Zod 4.
 - **PLT-005**: Lexical 0.46 (rich-text editor).
 
 ### Compliance Dependencies

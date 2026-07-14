@@ -44,7 +44,7 @@ export const buttonVariants = cva(
   }
 )
 
-export interface ButtonOptions {
+interface ButtonOptions {
   variant?: VariantProps<typeof buttonVariants>['variant']
   size?: VariantProps<typeof buttonVariants>['size']
   loading?: boolean

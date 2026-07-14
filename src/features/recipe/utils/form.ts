@@ -1,5 +1,3 @@
-import { createFieldMap } from '@tanstack/solid-form'
-
 import { type RecipeFormInput } from '../api/create'
 
 export const recipeDefaultValues: Partial<RecipeFormInput> = {
@@ -24,5 +22,3 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
   servings: 4,
   video: undefined,
 }
-
-export const recipeFormFields = createFieldMap(recipeDefaultValues)

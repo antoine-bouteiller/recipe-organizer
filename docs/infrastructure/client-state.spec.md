@@ -27,7 +27,7 @@ encrypted server sessions, and shared form context. This document specifies:
   of server data.
 
 In scope: client-side state organization, TanStack Query usage, TanStack
-Store stores, URL search state, theme cookie, and feature-scoped React context.
+Store stores, URL search state, theme cookie, and feature-scoped Solid context.
 
 Out of scope: encrypted server sessions (see `./server-functions.spec.md`),
 form state internals (see `./forms.spec.md`), and the routing/SSR mechanics
@@ -47,7 +47,7 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 - **Cookie state** — Isomorphic key/value pairs readable on both server and
   client. Used for theme; encrypted variants used for sessions.
 - **Component-local state** — `useState`/`useReducer` for ephemeral UI.
-- **Feature context** — React Context scoped to a single feature subtree
+- **Feature context** — Solid context scoped to a single feature subtree
   (e.g., propagating a form's linked-recipe ids to descendant editors).
 - **Query key** — A tuple identifying a server resource. All keys are
   produced by helpers in `src/lib/query-keys.ts`.
@@ -58,7 +58,7 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   the root route opts back in with `ssr: true`. The worker renders only the
   document shell; all child-route content renders on the client. This removes
   the need for `<ClientOnly>` boundaries and the
-  `'@tanstack/react-start/client-only'` directive. See `./routing-ssr.spec.md`.
+  `'@tanstack/solid-start/client-only'` directive. See `./routing-ssr.spec.md`.
 - **`createIsomorphicFn`** — TanStack Start helper exposing a function
   with separate server and client implementations (`utils/cookie.ts`).
 
@@ -78,7 +78,7 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 - **REQ-005:** Persistent client-only state MUST live in `src/stores/*` as
   TanStack Store instances created via the shared `persistedStore` helper
   (`src/lib/persisted-store.ts`). Store files MUST NOT carry the
-  `'@tanstack/react-start/client-only'` directive — under client-only render
+  `'@tanstack/solid-start/client-only'` directive — under client-only render
   mode they are never rendered server-side, and `persistedStore` guards every
   `localStorage` access with `typeof localStorage !== 'undefined'`, so it
   tolerates the absence of `localStorage` during server module evaluation.
@@ -95,8 +95,8 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   `beforeLoad` and surfaced through route context.
 - **REQ-009:** Server-encrypted session state MUST go through
   `useAppSession`/`useOAuthSession` (TanStack Start `useSession`). It MUST
-  NOT be mirrored into a TanStack Store or React Context.
-- **REQ-010:** Feature-scoped React Context (e.g., `LinkedRecipesProvider`
+  NOT be mirrored into a TanStack Store or Solid context.
+- **REQ-010:** Feature-scoped Solid context (e.g., `LinkedRecipesProvider`
   in `src/features/recipe/contexts/linked-recipes-context.tsx`) MUST be
   used only for values that need to be threaded through a deep subtree
   within a single feature. Cross-feature contexts are prohibited.
@@ -119,7 +119,7 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
 - **CON-003:** Stores MUST hold only user-controlled data — never derived
   values, server data, or ephemeral UI state. Keep the store state shape
   minimal; everything in it is persisted (no `partialize`).
-- **CON-004:** New global React Contexts are prohibited. Prefer route
+- **CON-004:** New global Solid contexts are prohibited. Prefer route
   context (TanStack Router) for app-wide values, and feature-scoped
   Context for local subtree wiring.
 - **CON-005:** Default `QueryClient` options MUST NOT be overridden
@@ -163,7 +163,7 @@ Audience: contributors and AI agents adding or modifying stateful behavior.
   functions, and client code.
 - **PAT-005:** _Route-context propagation._ Resolve cross-cutting values
   (`authUser`, `theme`) in `beforeLoad` and consume them via
-  `Route.useRouteContext()` rather than React Context.
+  `Route.useRouteContext()` rather than Solid context.
 
 ## 4. Architecture: The Three Layers
 
@@ -177,7 +177,7 @@ bottom and stop at the first match):
 4. **Cookies** — Isomorphic for shareable preferences (theme); encrypted
    for sessions.
 5. **Component-local state** — `useState`/`useReducer`.
-6. **React Context** — feature-scoped only.
+6. **Solid context** — feature-scoped only.
 
 ### 4.1 Server state — TanStack Query
 
@@ -238,7 +238,7 @@ and survives back/forward navigation.
 input values, swipe drag state, hover, etc. Do not promote any of this
 to a global store.
 
-### 4.6 React Context (feature-scoped)
+### 4.6 Solid context (feature-scoped)
 
 Used only when a value must be threaded through a deep feature subtree.
 Current example: `LinkedRecipesProvider`
@@ -317,7 +317,7 @@ Q5. Is the value ephemeral UI (open/closed, hover, draft input)?
 
 Q6. Does a deep feature subtree need this value without prop drilling,
     AND it doesn't fit any layer above?
-    └── Yes → Feature-scoped React Context, colocated under
+    └── Yes → Feature-scoped Solid context, colocated under
               src/features/<feature>/contexts/.
     └── No  → reconsider; you probably don't need new state.
 ```
@@ -405,16 +405,16 @@ Defaults when unsure:
 
 ### Libraries
 
-- **LIB-001:** `@tanstack/react-query` — server-state cache.
-- **LIB-002:** `@tanstack/react-router` and
-  `@tanstack/react-router-ssr-query` — routing, route context, and the
+- **LIB-001:** `@tanstack/solid-query` — server-state cache.
+- **LIB-002:** `@tanstack/solid-router` and
+  `@tanstack/solid-router-ssr-query` — routing, route context, and the
   SSR/Query bridge (`setupRouterSsrQueryIntegration`).
-- **LIB-003:** `@tanstack/react-start` — isomorphic helpers
+- **LIB-003:** `@tanstack/solid-start` — isomorphic helpers
   (`createIsomorphicFn`), sessions (`useSession`), and `createStart`
   (`src/start.ts`, `defaultSsr: false`).
-- **LIB-004:** `@tanstack/react-store` (0.11) — `Store` + `useSelector`
+- **LIB-004:** `@tanstack/solid-store` (0.11) — `Store` + `useSelector`
   for persistent client-only stores (via the shared `persistedStore`
-  helper). Already present transitively via TanStack React Form/Router.
+  helper). Already present transitively via TanStack Solid Form/Router.
 - **LIB-005:** `zod` — schema validation for `validateSearch` and
   request payloads.
 

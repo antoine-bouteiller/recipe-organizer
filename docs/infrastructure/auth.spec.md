@@ -56,7 +56,7 @@ Define the authoritative behavior, contracts, constraints, and acceptance criter
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | Better Auth        | The authentication framework (`better-auth`) that owns sign-in, the OAuth handshake, session issuance, and cookie management. |
 | `getAuth()`        | Per-request factory returning a configured Better Auth instance. Created per request because Workers `env` is request-scoped. |
-| `authClient`       | Browser-side Better Auth client (`better-auth/react`) exposing `signIn.social`, `signOut`, etc.                               |
+| `authClient`       | Browser-side Better Auth client (`better-auth/solid`) exposing `signIn.social`, `signOut`, etc.                               |
 | Social sign-in     | `authClient.signIn.social({ provider: 'google', ... })` — initiates the Google authorization-code flow via Better Auth.       |
 | Drizzle adapter    | `better-auth/adapters/drizzle` bridge so Better Auth reads/writes the app's Drizzle (D1/SQLite) tables.                       |
 | `session` cookie   | Better Auth session cookie referencing a row in the `session` table. `httpOnly`, `sameSite=lax`, `secure` in production.      |
@@ -285,9 +285,9 @@ context: {
 
 ### 8.2 External
 
-- `better-auth` (core, `better-auth/react`, `better-auth/adapters/drizzle`, `better-auth/api`,
-  `better-auth/tanstack-start`).
-- `@tanstack/react-router`, `@tanstack/react-start` (+ `/server` for `getRequest`).
+- `better-auth` (core, `better-auth/solid`, `better-auth/adapters/drizzle`, `better-auth/api`,
+  `better-auth/tanstack-start/solid`).
+- `@tanstack/solid-router`, `@tanstack/solid-start` (+ `/server` for `getRequest`).
 - `cloudflare:workers` (`env`).
 - Google OAuth 2.0 (authorization, token, and userinfo endpoints, driven by Better Auth).
 

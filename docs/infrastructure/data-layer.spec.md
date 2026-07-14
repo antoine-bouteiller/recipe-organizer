@@ -247,8 +247,8 @@ export const queryKeys = {
 - **DEP-001**: `drizzle-orm` — query builder and relational query API (`drizzle-orm`, `drizzle-orm/d1`,
   `drizzle-orm/sqlite-core`).
 - **DEP-002**: `cloudflare:workers` — provides the runtime `env` with the `DB` binding.
-- **DEP-003**: `@tanstack/react-query` — `mutationOptions`/`queryOptions` and cache invalidation.
-- **DEP-004**: `@tanstack/react-router` — loader-driven preloading via `context.queryClient.ensureQueryData(...)`.
+- **DEP-003**: `@tanstack/solid-query` — `mutationOptions`/`queryOptions` and cache invalidation.
+- **DEP-004**: `@tanstack/solid-router` — loader-driven preloading via `context.queryClient.ensureQueryData(...)`.
 - **DEP-005**: `zod` — input validation at server-function boundaries (e.g. `unitSlugSchema`, `recipeSchema`).
 
 ### 8.2 Tooling Dependencies

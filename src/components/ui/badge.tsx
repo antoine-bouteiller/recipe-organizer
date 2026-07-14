@@ -31,7 +31,7 @@ const badgeVariants = cva(
   }
 )
 
-export interface BadgeOptions {
+interface BadgeOptions {
   variant?: VariantProps<typeof badgeVariants>['variant']
   size?: VariantProps<typeof badgeVariants>['size']
   class?: string
