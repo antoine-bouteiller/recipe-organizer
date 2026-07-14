@@ -1,5 +1,5 @@
 import { ArrowRightIcon } from '@phosphor-icons/react'
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/solid-router'
 import { Fragment } from 'react/jsx-runtime'
 
 import { Item, ItemGroup, ItemSeparator } from '@/components/ui/item'

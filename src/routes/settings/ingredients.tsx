@@ -1,6 +1,7 @@
+import { createFileRoute } from '@tanstack/solid-router'
 import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/solid-router'
 import React, { useState } from 'react'
 
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'

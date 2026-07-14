@@ -1,5 +1,6 @@
+import { createFileRoute } from '@tanstack/solid-router'
 import { ArrowLeftIcon } from '@phosphor-icons/react'
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/solid-router'
 import { useEffect } from 'react'
 import * as v from 'valibot'
 

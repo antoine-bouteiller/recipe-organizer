@@ -1,4 +1,4 @@
-import { Link, type ErrorComponentProps } from '@tanstack/react-router'
+import { Link, type ErrorComponentProps } from '@tanstack/solid-router'
 
 import { Button } from '@/components/ui/button'
 

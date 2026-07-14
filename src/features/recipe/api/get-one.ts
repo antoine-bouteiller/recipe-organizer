@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
-import { notFound } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
+import { notFound } from '@tanstack/solid-router'
+import { createServerFn } from '@tanstack/solid-start'
 import * as v from 'valibot'
 
 import { getDb } from '@/lib/db'

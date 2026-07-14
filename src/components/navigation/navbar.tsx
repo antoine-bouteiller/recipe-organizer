@@ -1,4 +1,4 @@
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link, useRouter } from '@tanstack/solid-router'
 import { type ReactNode } from 'react'
 
 import { ThemeIcon } from '@/components/icons/theme'

@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/solid-router'
 
 import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'

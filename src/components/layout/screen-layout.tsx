@@ -1,5 +1,5 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/solid-router'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'

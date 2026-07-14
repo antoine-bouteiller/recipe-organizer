@@ -1,4 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/solid-router'
+import { createFileRoute } from '@tanstack/solid-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { ResetCartButton } from '@/features/shopping-list/component/reset-cart-button'

@@ -1,6 +1,7 @@
+import { createFileRoute } from '@tanstack/solid-router'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/solid-router'
 import { useSelector } from '@tanstack/react-store'
 import * as v from 'valibot'
 

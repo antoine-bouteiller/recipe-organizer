@@ -1,5 +1,5 @@
 import { CaretLeftIcon } from '@phosphor-icons/react/dist/ssr'
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/solid-router'
 
 import { Button } from '@/components/ui/button'
 

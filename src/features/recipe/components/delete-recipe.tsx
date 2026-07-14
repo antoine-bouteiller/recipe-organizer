@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/solid-router'
 
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
 import { Button } from '@/components/ui/button'

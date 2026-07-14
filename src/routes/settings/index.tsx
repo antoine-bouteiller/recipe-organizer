@@ -1,5 +1,6 @@
+import { createFileRoute } from '@tanstack/solid-router'
 import { CaretRightIcon, CookieIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Link, useRouter } from '@tanstack/solid-router'
 
 import { ThemeIcon } from '@/components/icons/theme'
 import { ScreenLayout } from '@/components/layout/screen-layout'

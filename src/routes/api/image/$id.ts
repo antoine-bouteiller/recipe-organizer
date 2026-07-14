@@ -1,4 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/solid-router'
+import { createFileRoute } from '@tanstack/solid-router'
 
 import { createR2GetHandler } from '@/lib/r2'
 

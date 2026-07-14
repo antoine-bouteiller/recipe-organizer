@@ -1,5 +1,5 @@
 import { CheckIcon, PlusIcon } from '@phosphor-icons/react'
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/solid-router'
 
 import { Button } from '@/components/ui/button'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'

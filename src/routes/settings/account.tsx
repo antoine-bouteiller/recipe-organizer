@@ -1,4 +1,5 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/solid-router'
+import { createFileRoute, useRouter } from '@tanstack/solid-router'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'

@@ -1,5 +1,5 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
+import { createIsomorphicFn } from '@tanstack/solid-start'
+import { getRequestHeaders } from '@tanstack/solid-start/server'
 import { useState } from 'react'
 
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'

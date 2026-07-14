@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-import { notFound } from '@tanstack/react-router'
+import { notFound } from '@tanstack/solid-router'
 import { env } from 'cloudflare:workers'
 import * as v from 'valibot'
 

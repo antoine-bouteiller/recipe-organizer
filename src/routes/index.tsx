@@ -1,6 +1,7 @@
+import { createFileRoute } from '@tanstack/solid-router'
 import { BookIcon, PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/solid-router'
 import * as v from 'valibot'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'

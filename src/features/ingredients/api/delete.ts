@@ -1,6 +1,6 @@
 import { ingredient } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
+import { createServerFn } from '@tanstack/solid-start'
 import { eq } from 'drizzle-orm'
 import * as v from 'valibot'
 

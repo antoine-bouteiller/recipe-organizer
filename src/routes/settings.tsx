@@ -1,4 +1,5 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/solid-router'
+import { createFileRoute, redirect } from '@tanstack/solid-router'
 
 export const Route = createFileRoute('/settings')({
   beforeLoad: ({ context }) => {

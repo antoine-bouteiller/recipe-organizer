@@ -1,6 +1,6 @@
-import { QueryClient } from '@tanstack/react-query'
-import { createRouter } from '@tanstack/react-router'
-import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { QueryClient } from '@tanstack/solid-query'
+import { createRouter } from '@tanstack/solid-router'
+import { setupRouterSsrQueryIntegration } from '@tanstack/solid-router-ssr-query'
 import * as v from 'valibot'
 
 import { DefaultErrorComponent } from '@/components/error/default-error-component'
@@ -10,7 +10,7 @@ import '@valibot/i18n/fr'
 
 import { routeTree } from './routeTree.gen'
 
-declare module '@tanstack/react-router' {
+declare module '@tanstack/solid-router' {
   interface Register {
     router: ReturnType<typeof getRouter>
   }

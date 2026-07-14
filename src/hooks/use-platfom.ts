@@ -1,5 +1,5 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
-import { getRequestHeader } from '@tanstack/react-start/server'
+import { createIsomorphicFn } from '@tanstack/solid-start'
+import { getRequestHeader } from '@tanstack/solid-start/server'
 import { useEffect, useState } from 'react'
 
 type Platform = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Windows'

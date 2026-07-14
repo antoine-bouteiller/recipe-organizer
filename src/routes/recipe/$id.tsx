@@ -1,6 +1,7 @@
+import { createFileRoute } from '@tanstack/solid-router'
 import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/solid-router'
 import * as v from 'valibot'
 
 import { Editor, EditorContent } from '@/components/common/editor'
