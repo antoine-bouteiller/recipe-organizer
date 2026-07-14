@@ -1,8 +1,6 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
-import { CaretUpDownIcon } from '@phosphor-icons/react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { type ButtonHTMLAttributes, type ReactElement } from 'react'
+import { CaretDown } from 'phosphor-solid'
+import { type ComponentProps, splitProps } from 'solid-js'
 
 import { type SelectProps } from '@/components/ui/select'
 import { cn } from '@/utils/cn'
@@ -25,30 +23,19 @@ export const selectTriggerVariants = cva(
 
 export const selectTriggerIconClassName = '-me-1 size-4.5 opacity-80 sm:size-4'
 
-export interface SelectButtonProps extends useRender.ComponentProps<'button'> {
+export interface SelectButtonProps extends ComponentProps<'button'> {
   size?: VariantProps<typeof selectTriggerVariants>['size']
 }
 
-export const SelectButton = ({ className, size, render, children, ...props }: SelectButtonProps): ReactElement => {
-  const typeValue: ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
+export const SelectButton = (props: SelectButtonProps) => {
+  const [local, rest] = splitProps(props, ['class', 'size', 'children'])
 
-  const defaultProps = {
-    children: (
-      <>
-        <span className="flex-1 truncate in-data-placeholder:text-muted-foreground/72">{children}</span>
-        <CaretUpDownIcon className={selectTriggerIconClassName} />
-      </>
-    ),
-    className: cn(selectTriggerVariants({ size }), 'min-w-0', className),
-    'data-slot': 'select-button',
-    type: typeValue,
-  }
-
-  return useRender({
-    defaultTagName: 'button',
-    props: mergeProps<'button'>(defaultProps, props),
-    render,
-  })
+  return (
+    <button class={cn(selectTriggerVariants({ size: local.size }), 'min-w-0', local.class)} data-slot="select-button" type="button" {...rest}>
+      <span class="flex-1 truncate in-data-placeholder:text-muted-foreground/72">{local.children}</span>
+      <CaretDown class={selectTriggerIconClassName} />
+    </button>
+  )
 }
 
 export const getSelectDisplay = <TValue extends string>(

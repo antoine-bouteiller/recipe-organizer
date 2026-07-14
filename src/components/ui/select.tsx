@@ -1,8 +1,7 @@
-import { lazy, Suspense, type ReactElement } from 'react'
+import { lazy, Show, Suspense } from 'solid-js'
 
-import { getSelectDisplay, SelectButton, type SelectButtonProps } from '@/components/ui/select.shared'
+import { type SelectButtonProps } from '@/components/ui/select.shared'
 import { useIsMobile } from '@/hooks/use-is-mobile'
-import { cn } from '@/utils/cn'
 
 interface SelectOption<TValue extends string> {
   label: string
@@ -14,7 +13,7 @@ interface SelectBaseProps<TValue extends string> {
   placeholder?: string
   title?: string
   disabled?: boolean
-  className?: string
+  class?: string
   size?: SelectButtonProps['size']
 }
 
@@ -27,20 +26,14 @@ export type SelectProps<TValue extends string> = SelectBaseProps<TValue> &
 const SelectBase = lazy(() => import('@/components/ui/select.base'))
 const SelectDrawer = lazy(() => import('@/components/ui/select.drawer'))
 
-export const Select = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
+export const Select = <TValue extends string>(props: SelectProps<TValue>) => {
   const isMobile = useIsMobile()
-  const { displayLabel, isEmpty } = getSelectDisplay(props)
-  const Impl = (isMobile ? SelectDrawer : SelectBase) as unknown as (props: SelectProps<TValue>) => ReactElement
 
   return (
-    <Suspense
-      fallback={
-        <SelectButton className={props.className} disabled={props.disabled} size={props.size}>
-          <span className={cn(isEmpty && 'text-muted-foreground')}>{displayLabel}</span>
-        </SelectButton>
-      }
-    >
-      <Impl {...props} />
+    <Suspense>
+      <Show when={isMobile()} fallback={<SelectBase {...props} />}>
+        <SelectDrawer {...props} />
+      </Show>
     </Suspense>
   )
 }

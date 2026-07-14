@@ -1,15 +1,14 @@
-import { CheckIcon } from '@phosphor-icons/react'
-import { useState, type ReactElement } from 'react'
+import { Check } from 'phosphor-solid'
+import { createSignal, For } from 'solid-js'
 
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { type SelectProps } from '@/components/ui/select'
 import { getSelectDisplay, SelectButton } from '@/components/ui/select.shared'
 import { cn } from '@/utils/cn'
 
-const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
-  const { items, placeholder = 'Sélectionner', title, disabled, className } = props
-  const [open, setOpen] = useState(false)
-  const { displayLabel, isEmpty, isSelected } = getSelectDisplay(props)
+const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>) => {
+  const [open, setOpen] = createSignal(false)
+  const display = () => getSelectDisplay(props)
 
   const handleSelect = (value: TValue | null) => {
     if (props.multiple) {
@@ -21,32 +20,28 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactE
   }
 
   return (
-    <Drawer onOpenChange={setOpen} open={open}>
-      <DrawerTrigger
-        disabled={disabled}
-        render={
-          <SelectButton className={className} size={props.size}>
-            <span className={cn(isEmpty && 'text-muted-foreground')}>{displayLabel}</span>
-          </SelectButton>
-        }
-      />
+    <Drawer onOpenChange={setOpen} open={open()}>
+      <DrawerTrigger as={SelectButton} class={props.class} data-slot="drawer-trigger" disabled={props.disabled} size={props.size}>
+        <span class={cn(display().isEmpty && 'text-muted-foreground')}>{display().displayLabel}</span>
+      </DrawerTrigger>
       <DrawerPopup>
         <DrawerHeader>
-          <DrawerTitle>{title ?? placeholder}</DrawerTitle>
+          <DrawerTitle>{props.title ?? props.placeholder ?? 'Sélectionner'}</DrawerTitle>
         </DrawerHeader>
         <DrawerPanel>
-          <div className="flex flex-col">
-            {items.map((item) => (
-              <button
-                className="flex min-h-11 w-full items-center justify-between gap-2 rounded-sm px-2 text-base outline-none hover:bg-accent hover:text-accent-foreground"
-                key={item.value ?? 'none'}
-                onClick={() => handleSelect(item.value)}
-                type="button"
-              >
-                <span className="truncate">{item.label}</span>
-                {isSelected(item.value) && <CheckIcon className="size-4 shrink-0" />}
-              </button>
-            ))}
+          <div class="flex flex-col">
+            <For each={props.items}>
+              {(item) => (
+                <button
+                  class="flex min-h-11 w-full items-center justify-between gap-2 rounded-sm px-2 text-base outline-none hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => handleSelect(item.value)}
+                  type="button"
+                >
+                  <span class="truncate">{item.label}</span>
+                  {display().isSelected(item.value) && <Check class="size-4 shrink-0" />}
+                </button>
+              )}
+            </For>
           </div>
         </DrawerPanel>
       </DrawerPopup>
