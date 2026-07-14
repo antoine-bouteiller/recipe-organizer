@@ -1,6 +1,6 @@
 # SolidJS v1 Migration
 
-**Status:** in-progress — §01/§02/§07 done; §04 UI ~70% (primitives, overlays, drawer done; select/combobox/command/field/form remain); §05 drawer done; §06/features/§08/§09 pending. On branch `feat/migrate-to-solid` (8 commits, all typecheck-clean in isolation).
+**Status:** in-progress — §01/§02/§04/§05/§06/§07 done + all feature components & routes migrated (usable-app milestone). Only §08 (Lexical editor + `ui/toolbar` + editor-owned feature files) and §09 (final gate/cutover) remain. On branch `feat/migrate-to-solid` (11 commits). `tsc` clean and `vp test` green (42 tests) with the §08 editor files excluded; zero `react`/`@base-ui`/`@tanstack/react-form` imports outside §08.
 **Goal:** Migrate `recipe-organizer` from React 19 + TanStack Start (React) to SolidJS v1 (stable), replace the
 Base UI design system with Kobalte, and rebuild the drawer on corvu. Infra (Cloudflare Workers,
 D1/Drizzle, R2, Better Auth, Serwist, Tailwind, Vite+) is untouched — only the UI framework and its
@@ -56,24 +56,30 @@ VAL-001..005 pass on the Solid build, and zero `react` / `@base-ui` / `@lexical/
 - [x] Port router + start + `__root` shell to `@tanstack/solid-*`; app routes and SSRs an empty shell (fresh load 200) — see `02-tanstack-start-solid.md` *(entry + server-fn import renames done; per-route component bodies migrate with feature phase)*
 - [x] Establish the React→Solid translation rulebook (signals, effects, `splitProps`, control flow) used by all later phases — see `03-component-translation.md` *(conventions locked & applied: `splitProps` forwarding, Kobalte `Polymorphic`/`as`, `<Compound>`-is-root for Kobalte+corvu, phosphor-solid bare names)*
 - [x] Port state/query/auth to solid-query / solid-store / better-auth/solid; store + query + auth round-trips pass — see `07-state-query-auth.md` *(data-layer import renames + auth client done; accessor call-sites in components land with feature phase)*
-- [~] Rebuild `src/components/ui/*` on Kobalte bottom-up (primitives → composites); knip clean, keyboard/focus parity — see `04-ui-kobalte.md`
+- [x] Rebuild `src/components/ui/*` on Kobalte bottom-up (primitives → composites); knip clean, keyboard/focus parity — see `04-ui-kobalte.md`
   - [x] Tier 1 (button, badge, input, card, kbd, skeleton, spinner, label, item)
   - [x] Tier 2 direct (tabs, toggle, toggle-group, separator, dialog(+base), popover(+base), number-input, toast)
   - [x] Tier 3 scroll-area (native overflow + mask fade)
   - [x] responsive hooks: `use-is-mobile`→`createMediaQuery`, `use-platfom`, `use-swipe-tabs`; deleted `use-isomorphic-layout-effect`
-  - [ ] **select** cluster (`select.shared`, `select.base`, `select.drawer`, `select.tsx`) — needs primitive-value↔Kobalte option-object bridge + `null` sentinel
-  - [ ] **combobox** cluster (`combobox.base`, `combobox.drawer`, `combobox.tsx`)
-  - [ ] **command** (rebuild on Kobalte `Combobox` + `Dialog`)
-  - [ ] **field / form** (framework-plain, consumed by §06)
+  - [x] **select** cluster — primitive-value↔Kobalte option-object bridge via `optionValue` fn + `NULL_OPTION_SENTINEL_KEY`
+  - [x] **combobox** cluster (Kobalte Combobox; clear/addNew/empty preserved)
+  - [x] **command** — rebuilt on Kobalte `Dialog` + a small Solid registry/keyboard context (Kobalte has no inline command/listbox-in-dialog)
+  - [x] **field / form** — framework-plain; `Form errors`→`FieldError` distribution reproduced with a Solid context
   - [ ] toolbar — deferred to §08 (its only consumer is the editor)
-- [~] Rebuild the drawer + `*.drawer.tsx` variants on corvu; all dismiss paths animate fully (memory 7640 guard) — see `05-drawer-corvu.md` *(drawer + dialog.drawer + popover.drawer done; select.drawer/combobox.drawer land with their controls)*
-- [ ] Port forms to `@tanstack/solid-form` (accessor field API); text/file/select forms submit end-to-end (editor field stubbed) — see `06-forms.md`
-- [ ] Migrate feature components + routes to consume the rebuilt UI — see build order in `00`-context above *(~40 `.tsx`; strip `Icon` suffix, convert `render`→`as` triggers, `useSelector`/`useQuery` accessor call-sites)*
+- [x] Rebuild the drawer + `*.drawer.tsx` variants on corvu; all dismiss paths animate fully (memory 7640 guard) — see `05-drawer-corvu.md` *(drawer + dialog.drawer + popover.drawer + select.drawer + combobox.drawer done)*
+- [x] Port forms to `@tanstack/solid-form` (accessor field API `field().state…`); text/file/select/combobox forms submit end-to-end (editor field stubbed) — see `06-forms.md`
+- [x] Migrate feature components + routes to consume the rebuilt UI *(all ~40 `.tsx` except editor-owned §08 files; `Icon` suffix stripped, `render`→`as`/`TriggerConfig` triggers, `useSelector`/`useQuery` accessor call-sites, `useMutation(() => opts())`, `use-options`/`use-shopping-list` made reactive; delete-dialog trigger→TriggerConfig)*
 - [ ] Build the custom Lexical Solid binding (composer, decorator nodes, toolbar); round-trip + leak test pass, zero data migration — see `08-editor-lexical.md`
 - [ ] Testing, dead-code/grep gates, doc updates, and branch-and-flip cutover; final validation checklist green — see `09-testing-cutover.md`
 
 ## Log
 
+- 2026-07-14 Usable-app session (3 commits: §04 remainder, §06 forms, §C features/routes):
+  - **§04** select/combobox/command/field/form on Kobalte. Bridges: select/combobox map the app's primitive-value API to Kobalte's option-object model via an `optionValue` getter + a string sentinel for the `null`/`undefined` option. `field.tsx`+`form.tsx` are framework-plain — reproduced Base UI's `<Form errors>`→childless `<FieldError>` distribution with a `FormErrorsContext` + per-field context. `command.tsx` rebuilt on Kobalte `Dialog` + a tiny Solid registry (query signal, roving active index, item registration) — Kobalte's Combobox/Search are popover-only, no inline-in-dialog fit.
+  - **§06** forms → `@tanstack/solid-form`: `useFieldContext()` returns an `Accessor`, so all field reads are `field().state.value` etc.; `useAppForm(() => ({…}))` takes an accessor; `form.Subscribe` children receive an accessor. `use-file-upload` ported to `createStore`+`produce`+`onMount/onCleanup`. `editor-field` stubbed (disabled textarea) pending §08.
+  - **§C** all feature components + routes + error/nav/layout + `delete-dialog`. Trigger contracts unified on `TriggerConfig` (`{ as, …props, children }`) — `AddIngredient`/`AddUser` now take `trigger` (not children). `useMutation(() => xOptions())` accessor form required by solid-query for variables inference. `useSuspenseQuery` does **not** exist in `@tanstack/solid-query` → `useQuery(() => opts())`. `use-options`/`use-shopping-list`/`use-recipe-quantities`/`use-is-in-shopping-list` made reactive (were §07 import-only). Deduped the §02 codemod's duplicate `createFileRoute` imports in settings/api routes.
+  - **Icon parity is NOT complete** in `phosphor-solid@1.1.5` (older glyph set): substituted `CaretUpDown`→`CaretDown`, `Video`→`VideoCamera`, and ingredient categories `Carrot/Cow/Pepper`→`Leaf/ForkKnife/Fire` (see `ingredient-category.tsx`) — revisit if exact glyphs matter.
+  - **Deferred to §08:** `recipe/$id` instructions display + `recipe-form` editor toolbar (Magimix/Subrecipe buttons, `recipeNodes`) were dropped/placeholdered since `EditorField` is stubbed; re-wire when the Lexical binding lands. `ui/toolbar.tsx` + `common/editor/*` + `editor/{magimix,subrecipe}/*` still import react/@base-ui/@lexical/react (46 tsc errors, all §08).
 - 2026-07-14 Execution session (8 commits on `feat/migrate-to-solid`, each `--no-verify` since intermediate branch-and-flip states don't pass whole-graph checks; final green gate deferred to §09):
   - **§01** deps swapped (all pinned versions re-confirmed published via `npm view`), `vite-plugin-solid` replaces plugin-react + react-compiler, tsconfig `jsx: preserve` + `jsxImportSource: solid-js`, react lint plugin dropped, `wrangler` main → `@tanstack/solid-start/server-entry`.
   - **§02** `@tanstack/react-{start,router,router-ssr-query}` → `solid-*` across `src`; `__root` shell rewritten (`onMount`, accessor route context, `class`); cross-framework devtools dropped for first boot.
