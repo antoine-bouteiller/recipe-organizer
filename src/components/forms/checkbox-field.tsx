@@ -1,83 +1,57 @@
-import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox'
-import type React from 'react'
+import { Checkbox as CheckboxPrimitive } from '@kobalte/core/checkbox'
+import { Show } from 'solid-js'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
-import { cn } from '@/utils/cn'
 
-const Checkbox = ({ className, ...props }: CheckboxPrimitive.Root.Props): React.ReactElement => (
-  <CheckboxPrimitive.Root
-    className={cn(
-      'relative inline-flex size-4.5 shrink-0 items-center justify-center rounded-[.25rem] border border-input bg-background not-dark:bg-clip-padding shadow-xs/5 outline-none ring-ring transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[3px] not-data-disabled:not-data-checked:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-background aria-invalid:border-destructive/36 focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/48 data-disabled:opacity-64 sm:size-4 dark:not-data-checked:bg-input/32 dark:aria-invalid:ring-destructive/24 dark:not-data-disabled:not-data-checked:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)] [[data-disabled],[data-checked],[aria-invalid]]:shadow-none',
-      className
-    )}
-    data-slot="checkbox"
-    {...props}
-  >
-    <CheckboxPrimitive.Indicator
-      className="absolute -inset-px flex items-center justify-center rounded-[.25rem] text-primary-foreground data-checked:bg-primary data-indeterminate:text-foreground data-unchecked:hidden"
-      data-slot="checkbox-indicator"
-      render={(indicatorProps: React.ComponentProps<'span'>, state: CheckboxPrimitive.Indicator.State) => (
-        <span {...indicatorProps}>
-          {state.indeterminate ? (
-            <svg
-              aria-hidden="true"
-              className="size-3.5 sm:size-3"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="3"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M5.252 12h13.496" />
-            </svg>
-          ) : (
-            <svg
-              aria-hidden="true"
-              className="size-3.5 sm:size-3"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="3"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
-            </svg>
-          )}
-        </span>
-      )}
-    />
-  </CheckboxPrimitive.Root>
+const Checkbox = (props: { checked?: boolean; disabled?: boolean; onChange?: (checked: boolean) => void }) => (
+  <CheckboxPrimitive checked={props.checked} class="inline-flex" disabled={props.disabled} onChange={props.onChange}>
+    <CheckboxPrimitive.Input class="peer" />
+    <CheckboxPrimitive.Control
+      class="relative inline-flex size-4.5 shrink-0 items-center justify-center rounded-[.25rem] border border-input bg-background not-dark:bg-clip-padding text-primary-foreground shadow-xs/5 outline-none transition-shadow data-checked:border-primary data-checked:bg-primary data-disabled:opacity-64 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-1 peer-focus-visible:ring-offset-background sm:size-4 dark:not-data-checked:bg-input/32"
+      data-slot="checkbox"
+    >
+      <CheckboxPrimitive.Indicator>
+        <svg
+          aria-hidden="true"
+          class="size-3.5 sm:size-3"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="3"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
+        </svg>
+      </CheckboxPrimitive.Indicator>
+    </CheckboxPrimitive.Control>
+  </CheckboxPrimitive>
 )
 
 interface CheckboxFieldProps {
-  className?: string
+  class?: string
   disabled?: boolean
   label?: string
 }
 
-export const CheckboxField = ({ className, disabled, label }: CheckboxFieldProps) => {
+export const CheckboxField = (props: CheckboxFieldProps) => {
   const field = useFieldContext<boolean>()
 
   return (
     <Field
-      className={className}
-      dirty={field.state.meta.isDirty}
-      invalid={!field.state.meta.isValid}
-      name={field.name}
-      touched={field.state.meta.isTouched}
+      class={props.class}
+      dirty={field().state.meta.isDirty}
+      invalid={!field().state.meta.isValid}
+      name={field().name}
+      touched={field().state.meta.isTouched}
     >
-      <div className="flex items-center gap-2">
-        <Checkbox checked={field.state.value ?? false} disabled={disabled} onCheckedChange={(checked) => field.handleChange(checked)} />
-        {label && <FieldLabel className="cursor-pointer">{label}</FieldLabel>}
+      <div class="flex items-center gap-2">
+        <Checkbox checked={field().state.value ?? false} disabled={props.disabled} onChange={(checked) => field().handleChange(checked)} />
+        <Show when={props.label}>{(label) => <FieldLabel class="cursor-pointer">{label()}</FieldLabel>}</Show>
       </div>
       <FieldError />
     </Field>

@@ -3,35 +3,33 @@ import { NumberInput } from '@/components/ui/number-input'
 import { useFieldContext } from '@/hooks/use-form-context'
 
 interface NumberFieldProps {
+  class?: string
   disabled?: boolean
   label?: string
   max?: number
   min?: number
   placeholder?: string
-  className?: string
 }
 
-export const NumberField = ({ disabled, label, max, min, placeholder, className }: NumberFieldProps) => {
+export const NumberField = (props: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
 
   return (
     <Field
-      dirty={field.state.meta.isDirty}
-      invalid={!field.state.meta.isValid}
-      name={field.name}
-      touched={field.state.meta.isTouched}
-      className={className}
+      class={props.class}
+      dirty={field().state.meta.isDirty}
+      invalid={!field().state.meta.isValid}
+      name={field().name}
+      touched={field().state.meta.isTouched}
     >
       <NumberInput
-        defaultValue={field.state.value}
-        disabled={disabled}
-        label={label}
-        max={max}
-        min={min}
-        step="any"
-        onValueChange={(value) => field.handleChange(value ?? undefined)}
-        placeholder={placeholder}
-        value={field.state.value}
+        disabled={props.disabled}
+        label={props.label}
+        max={props.max}
+        min={props.min}
+        onChange={(value) => field().handleChange(Number.isNaN(value) ? undefined : value)}
+        placeholder={props.placeholder}
+        value={field().state.value}
       />
       <FieldError />
     </Field>

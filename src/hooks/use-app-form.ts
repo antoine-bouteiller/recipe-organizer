@@ -1,5 +1,5 @@
-import { createFormHook } from '@tanstack/react-form'
-import { lazy } from 'react'
+import { createFormHook } from '@tanstack/solid-form'
+import { lazy } from 'solid-js'
 
 import { CheckboxField } from '@/components/forms/checkbox-field'
 import { ComboboxField } from '@/components/forms/combobox-field'

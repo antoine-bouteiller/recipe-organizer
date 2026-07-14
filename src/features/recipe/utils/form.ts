@@ -1,4 +1,4 @@
-import { createFieldMap } from '@tanstack/react-form'
+import { createFieldMap } from '@tanstack/solid-form'
 
 import { type RecipeFormInput } from '../api/create'
 

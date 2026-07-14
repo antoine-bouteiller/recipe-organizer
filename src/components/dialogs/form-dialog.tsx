@@ -1,35 +1,37 @@
 import { useSelector } from '@tanstack/solid-store'
-import { type ReactElement, type ReactNode } from 'react'
+import { type JSX } from 'solid-js'
 
-import { Dialog } from '@/components/ui/dialog'
+import { Dialog, type TriggerConfig } from '@/components/ui/dialog'
 import { Form } from '@/components/ui/form'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
 
-interface FormModalProps {
-  children: ReactNode
+type FormModalProps = {
+  children: JSX.Element
   open: boolean
   setOpen: (open: boolean) => void
   submitLabel: string
   title: string
-  trigger?: ReactElement
+  trigger?: TriggerConfig
 }
 
 export const getFormDialog = <TValues,>(defaultValues: TValues) =>
   withForm({
     defaultValues,
     props: {} as FormModalProps,
-    render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
+    render: (props) => {
+      const { form } = props
       const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
+      const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
       return (
         <Dialog
-          cancelDisabled={form.state.isSubmitting}
+          cancelDisabled={isSubmitting()}
           cancelLabel="Annuler"
           contentRender={(content) => (
             <Form
-              className="contents"
-              errors={errors}
+              class="contents"
+              errors={errors()}
               onSubmit={async (event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -41,16 +43,16 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
           )}
           footer={
             <form.AppForm>
-              <form.FormSubmit label={submitLabel} />
+              <form.FormSubmit label={props.submitLabel} />
             </form.AppForm>
           }
-          onOpenChange={setOpen}
-          open={open}
+          onOpenChange={props.setOpen}
+          open={props.open}
           panelClassName="flex flex-col gap-4"
-          title={title}
-          trigger={trigger}
+          title={props.title}
+          trigger={props.trigger}
         >
-          {children}
+          {props.children}
         </Dialog>
       )
     },
