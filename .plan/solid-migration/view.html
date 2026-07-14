@@ -1,0 +1,113 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>SolidJS v1 Migration — plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  body {
+    margin: 0;
+    font:
+      15px/1.6 system-ui,
+      sans-serif;
+    display: flex;
+  }
+  nav {
+    flex: 0 0 240px;
+    padding: 1rem;
+    border-right: 1px solid #8884;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+  }
+  nav a {
+    display: block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: inherit;
+  }
+  nav a:hover,
+  nav a.active {
+    background: #8882;
+  }
+  main {
+    flex: 1;
+    padding: 1rem 2rem;
+    max-width: 860px;
+    overflow: auto;
+  }
+  pre {
+    background: #8881;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow: auto;
+  }
+  code {
+    background: #8882;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+  }
+  h1,
+  h2 {
+    border-bottom: 1px solid #8884;
+    padding-bottom: 0.3em;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  td,
+  th {
+    border: 1px solid #8884;
+    padding: 4px 8px;
+  }
+</style>
+<nav id="nav"></nav>
+<main id="main">Loading…</main>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  const files = [
+    ['index.md', 'Overview'],
+    ['01-tooling-build.md', '01 · Tooling & build'],
+    ['02-tanstack-start-solid.md', '02 · TanStack Start/Solid'],
+    ['03-component-translation.md', '03 · Component translation'],
+    ['07-state-query-auth.md', '07 · State / query / auth'],
+    ['04-ui-kobalte.md', '04 · UI (Kobalte)'],
+    ['05-drawer-corvu.md', '05 · Drawer (corvu)'],
+    ['06-forms.md', '06 · Forms'],
+    ['08-editor-lexical.md', '08 · Editor (Lexical)'],
+    ['09-testing-cutover.md', '09 · Testing & cutover'],
+  ]
+  const nav = document.getElementById('nav')
+  const main = document.getElementById('main')
+  async function load(file, link) {
+    document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('active', a === link))
+    location.hash = file
+    try {
+      const md = await (await fetch(file)).text()
+      main.innerHTML = marked.parse(md)
+    } catch (e) {
+      main.innerHTML = "<p>Can't read <code>" + file + '</code>. Serve this folder over http (see console).</p>'
+      console.info('Open via: python3 -m http.server, then browse to view.html')
+    }
+  }
+  files.forEach(([file, label]) => {
+    const a = document.createElement('a')
+    a.textContent = label
+    a.href = '#' + file
+    a.onclick = (e) => {
+      e.preventDefault()
+      load(file, a)
+    }
+    nav.appendChild(a)
+  })
+  const start = location.hash.slice(1) || 'index.md'
+  const startLink = [...nav.children].find((a) => a.hash === '#' + start) || nav.firstChild
+  load(startLink.hash.slice(1), startLink)
+</script>
