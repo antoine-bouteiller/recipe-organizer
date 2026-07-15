@@ -14,7 +14,7 @@ import appCss from '../styles/app.css?url'
 
 const SearchBar = lazy(() => import('@/features/recipe/components/search-bar'))
 
-const DevTools = import.meta.env.DEV ? lazy(() => import('@/components/dev-tools')) : () => null
+const DevTools = import.meta.env.DEV ? lazy(() => import('@/components/dev-tools')) : (_props: { client: QueryClient }) => null
 
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
@@ -62,7 +62,7 @@ const RootComponent = () => {
           </main>
         </ToastProvider>
         <Scripts />
-        <DevTools />
+        <DevTools client={context().queryClient} />
       </body>
     </html>
   )

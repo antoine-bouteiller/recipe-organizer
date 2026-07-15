@@ -175,14 +175,14 @@ const Editor = (props: EditorProps) => {
     editor.setEditorState(editor.parseEditorState(props.content))
   }
 
-  const [decorators, setDecorators] = createSignal<Record<string, JSX.Element>>({})
+  const [decorators, setDecorators] = createSignal<Record<string, () => JSX.Element>>({})
 
   const registrations = [
     registerRichText(editor),
     registerList(editor),
     registerCheckList(editor),
     registerHistory(editor, createEmptyHistoryState(), 300),
-    editor.registerDecoratorListener<JSX.Element>((next) => setDecorators({ ...next })),
+    editor.registerDecoratorListener<() => JSX.Element>((next) => setDecorators({ ...next })),
   ]
   if (props.onChange) {
     registrations.push(editor.registerUpdateListener(({ editorState }) => props.onChange?.(JSON.stringify(editorState.toJSON()))))
@@ -201,7 +201,7 @@ const Editor = (props: EditorProps) => {
         <For each={Object.keys(decorators())}>
           {(key) => {
             const element = editor.getElementByKey(key)
-            return element ? <Portal mount={element}>{decorators()[key]}</Portal> : null
+            return element ? <Portal mount={element}>{decorators()[key]?.()}</Portal> : null
           }}
         </For>
       </Show>

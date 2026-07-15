@@ -125,7 +125,7 @@ const MagimixProgramComponent = (props: MagimixProgramComponentProps) => {
   )
 }
 
-class MagimixProgramNodeType extends DecoratorNode<JSX.Element> {
+class MagimixProgramNodeType extends DecoratorNode<() => JSX.Element> {
   __program: string
   __rotationSpeed: string
   __temperature?: number
@@ -212,8 +212,8 @@ class MagimixProgramNodeType extends DecoratorNode<JSX.Element> {
     return false
   }
 
-  decorate(editor: LexicalEditor): JSX.Element {
-    return (
+  decorate(editor: LexicalEditor): () => JSX.Element {
+    return () => (
       <MagimixProgramComponent
         isEditable={editor.isEditable()}
         nodeKey={this.__key}

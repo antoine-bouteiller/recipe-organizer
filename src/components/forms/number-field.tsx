@@ -27,7 +27,13 @@ export const NumberField = (props: NumberFieldProps) => {
         label={props.label}
         max={props.max}
         min={props.min}
-        onChange={(value) => field().handleChange(Number.isNaN(value) ? undefined : value)}
+        onChange={(value) => {
+          // Kobalte's rawValue effect re-emits onChange; skip no-op updates or it loops forever on undefined values
+          const next = Number.isNaN(value) ? undefined : value
+          if (next !== field().state.value) {
+            field().handleChange(next)
+          }
+        }}
         placeholder={props.placeholder}
         value={field().state.value}
       />

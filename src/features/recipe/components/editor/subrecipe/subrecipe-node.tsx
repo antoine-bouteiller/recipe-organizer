@@ -128,7 +128,7 @@ const SubrecipeComponent = (props: SubrecipeComponentProps) => {
   )
 }
 
-class SubrecipeNodeType extends DecoratorNode<JSX.Element> {
+class SubrecipeNodeType extends DecoratorNode<() => JSX.Element> {
   __recipeId: number
   __hideFirstNodes: number
   __hideLastNodes: number
@@ -209,8 +209,8 @@ class SubrecipeNodeType extends DecoratorNode<JSX.Element> {
     return false
   }
 
-  decorate(editor: LexicalEditor): JSX.Element {
-    return (
+  decorate(editor: LexicalEditor): () => JSX.Element {
+    return () => (
       <SubrecipeComponent
         hideFirstNodes={this.__hideFirstNodes}
         hideLastNodes={this.__hideLastNodes}
