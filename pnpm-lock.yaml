@@ -17,6 +17,9 @@ importers:
       '@kobalte/core':
         specifier: 0.13.12
         version: 0.13.12(solid-js@1.9.14)
+      '@lexical/history':
+        specifier: 0.47.0
+        version: 0.47.0(typescript@7.0.2)
       '@lexical/list':
         specifier: 0.47.0
         version: 0.47.0(typescript@7.0.2)
@@ -1089,6 +1092,14 @@ packages:
 
   '@lexical/extension@0.47.0':
     resolution: {integrity: sha512-F9WyXB0eDsCbeSuShzgjBS3ugxNnTvHQa+P+VZiVSWilbDNGjJyysco2JCwn5ruLmEP4MXCQn5IKeW7A9FG8KQ==}
+    peerDependencies:
+      typescript: '>=5.2'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@lexical/history@0.47.0':
+    resolution: {integrity: sha512-CqAR6G4x6WewKS2uDgf2N1/rszIlXiDCW4dwu0IiQV9oVbhOklvAmPBJX6319myJxB+ArtjuuMgDU3gi/iTqXA==}
     peerDependencies:
       typescript: '>=5.2'
     peerDependenciesMeta:
@@ -5222,6 +5233,14 @@ snapshots:
       '@lexical/internal': 0.47.0(typescript@7.0.2)
       '@lexical/utils': 0.47.0(typescript@7.0.2)
       '@preact/signals-core': 1.14.2
+      lexical: 0.47.0(typescript@7.0.2)
+    optionalDependencies:
+      typescript: 7.0.2
+
+  '@lexical/history@0.47.0(typescript@7.0.2)':
+    dependencies:
+      '@lexical/extension': 0.47.0(typescript@7.0.2)
+      '@lexical/utils': 0.47.0(typescript@7.0.2)
       lexical: 0.47.0(typescript@7.0.2)
     optionalDependencies:
       typescript: 7.0.2
