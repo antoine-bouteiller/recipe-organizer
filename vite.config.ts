@@ -103,32 +103,6 @@ const viteConfig = defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  build: {
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          groups: [
-            {
-              test: /node_modules\/solid-js/,
-              name: 'solid',
-            },
-            {
-              test: /node_modules\/@tanstack\/solid-query/,
-              name: 'tanstack-query',
-            },
-          ],
-        },
-      },
-      onLog(level, log, defaultHandler) {
-        // Supress Lexical Warning
-        if (log.code === 'INVALID_ANNOTATION') {
-          return
-        }
-        // Handle all other logs normally
-        defaultHandler(level, log)
-      },
-    },
-  },
   plugins: [
     Icons({ compiler: 'solid' }),
     tanstackStart(),
