@@ -1,78 +1,76 @@
-import { TrashIcon } from '@phosphor-icons/react'
-import { cloneElement, useState, useTransition, type ElementType, type ReactElement } from 'react'
+import { type VariantProps } from 'class-variance-authority'
+import { createSignal, Show } from 'solid-js'
+import Trash from '~icons/ph/trash'
 
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
+import { Button, type buttonVariants } from '@/components/ui/button'
+import { Dialog, type TriggerRender } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
+
+type ButtonVariants = VariantProps<typeof buttonVariants>
 
 interface DeleteDialogProps {
   actionLabel?: string
   deleteButtonLabel?: string
   description: string
-  icon?: ElementType
+  icon?: typeof Trash
   onDelete: () => Promise<void> | void
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title: string
-  trigger?: ReactElement
+  trigger?: { class?: string; variant?: ButtonVariants['variant']; size?: ButtonVariants['size'] }
 }
 
-const DefaultTrigger = <Button size="icon" variant="destructive" />
+export const DeleteDialog = (props: DeleteDialogProps) => {
+  const [internalOpen, setInternalOpen] = createSignal(false)
+  const [isLoading, setIsLoading] = createSignal(false)
+  const TriggerIcon = props.icon ?? Trash
 
-export const DeleteDialog = ({
-  actionLabel = 'Supprimer',
-  deleteButtonLabel,
-  description,
-  icon,
-  onDelete,
-  onOpenChange: onOpenChangeProp,
-  open: openProp,
-  title,
-  trigger = DefaultTrigger,
-}: DeleteDialogProps) => {
-  const TriggerIcon = icon ?? TrashIcon
-  const [internalOpen, setInternalOpen] = useState(false)
-  const isControlled = openProp !== undefined
-  const isOpen = isControlled ? openProp : internalOpen
+  const isControlled = () => props.open !== undefined
+  const isOpen = () => (isControlled() ? props.open : internalOpen())
+
   const setIsOpen = (value: boolean) => {
-    if (!isControlled) {
+    if (!isControlled()) {
       setInternalOpen(value)
     }
-    onOpenChangeProp?.(value)
+    props.onOpenChange?.(value)
   }
-  const [isLoading, startTransition] = useTransition()
 
-  const handleDelete = () => {
-    startTransition(async () => {
-      await onDelete()
+  const handleDelete = async () => {
+    setIsLoading(true)
+    try {
+      await props.onDelete()
       setIsOpen(false)
-    })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const triggerNode = isControlled
-    ? undefined
-    : cloneElement(
-        trigger,
-        undefined,
-        <>
-          <TriggerIcon /> {deleteButtonLabel}
-        </>
-      )
+  const triggerRender = (): TriggerRender | undefined =>
+    isControlled()
+      ? undefined
+      : (Trigger) => (
+          <Trigger as={Button} size="icon" variant="destructive" {...props.trigger}>
+            <TriggerIcon /> {props.deleteButtonLabel}
+          </Trigger>
+        )
 
   return (
     <Dialog
       cancelLabel="Annuler"
       footer={
-        <Button disabled={isLoading} onClick={handleDelete} variant="destructive">
-          {isLoading && <Spinner />} {actionLabel}
+        <Button disabled={isLoading()} onClick={handleDelete} variant="destructive">
+          <Show when={isLoading()}>
+            <Spinner />
+          </Show>{' '}
+          {props.actionLabel ?? 'Supprimer'}
         </Button>
       }
       onOpenChange={setIsOpen}
-      open={isOpen}
-      title={title}
-      trigger={triggerNode}
+      open={isOpen()}
+      title={props.title}
+      trigger={triggerRender()}
     >
-      {description}
+      {props.description}
     </Dialog>
   )
 }

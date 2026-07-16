@@ -1,10 +1,8 @@
 import { Serwist } from '@serwist/window'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { type QueryClient } from '@tanstack/react-query'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { lazy, Suspense, useEffect } from 'react'
+import { type QueryClient } from '@tanstack/solid-query'
+import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/solid-router'
+import { lazy, onMount, Suspense } from 'solid-js'
+import { HydrationScript } from 'solid-js/web'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
@@ -16,65 +14,55 @@ import appCss from '../styles/app.css?url'
 
 const SearchBar = lazy(() => import('@/features/recipe/components/search-bar'))
 
+const DevTools = import.meta.env.DEV ? lazy(() => import('@/components/dev-tools')) : (_props: { client: QueryClient }) => null
+
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
 
-const RootComponent = () => {
-  const { theme } = Route.useRouteContext()
-
-  useEffect(() => {
-    const registerServiceWorker = async () => {
-      if ('serviceWorker' in navigator) {
-        try {
-          const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
-          await serwist.register()
-        } catch {
-          // App still works without SW - silent failure is OK
-          // Service worker provides offline support, not critical functionality
-        }
-      }
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
+      await serwist.register()
+    } catch {
+      // App still works without SW - silent failure is OK
+      // Service worker provides offline support, not critical functionality
     }
+  }
+}
 
+const RootComponent = () => {
+  const context = Route.useRouteContext()
+
+  onMount(() => {
     void registerServiceWorker()
-  }, [])
+  })
 
   return (
-    <html className={theme} lang="fr">
+    <html class={context().theme} lang="fr">
       <head>
+        <HydrationScript />
         <HeadContent />
       </head>
 
-      <body className="fixed top-0 isolate flex h-dvh! w-screen flex-col overflow-hidden">
+      <body class="fixed top-0 isolate flex h-dvh! w-screen flex-col overflow-hidden">
         <ToastProvider>
           <OfflineBanner />
-          <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
+          <header class="sticky top-0 z-50 hidden w-full bg-muted md:block">
             <Navbar
               search={
-                <Suspense fallback={<div className="h-9 w-56" />}>
+                <Suspense fallback={<div class="h-9 w-56" />}>
                   <SearchBar />
                 </Suspense>
               }
             />
           </header>
-          <main className="flex min-h-0 flex-1 flex-col md:pb-0">
+          <main class="flex min-h-0 flex-1 flex-col md:pb-0">
             <Outlet />
           </main>
         </ToastProvider>
         <Scripts />
-        <TanStackDevtools
-          plugins={[
-            {
-              defaultOpen: true,
-              name: 'TanStack Query',
-              render: <ReactQueryDevtoolsPanel />,
-            },
-            {
-              defaultOpen: false,
-              name: 'TanStack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        <DevTools client={context().queryClient} />
       </body>
     </html>
   )

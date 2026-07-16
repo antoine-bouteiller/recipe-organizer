@@ -1,7 +1,7 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { CookingPotIcon } from '@phosphor-icons/react'
+import CookingPot from '~icons/ph/cooking-pot'
 
+import { useEditor } from '@/components/common/editor'
 import { Toggle } from '@/components/ui/toggle'
 import { type MagimixProgramData } from '@/features/recipe/types/magimix'
 
@@ -9,7 +9,7 @@ import { MagimixProgramDialog } from './magimix-program-dialog'
 import { $createMagimixProgramNode } from './magimix-program-node'
 
 export const MagimixProgramButton = () => {
-  const [editor] = useLexicalComposerContext()
+  const editor = useEditor()
 
   const handleInsert = (data: MagimixProgramData) => {
     editor.update(() => {
@@ -24,11 +24,11 @@ export const MagimixProgramButton = () => {
       onSubmit={handleInsert}
       submitLabel="Insérer"
       title="Ajouter un programme Magimix"
-      triggerRender={
-        <Toggle data-pressed={undefined}>
-          <CookingPotIcon className="size-4" />
-        </Toggle>
-      }
+      trigger={(Trigger) => (
+        <Trigger as={Toggle}>
+          <CookingPot class="size-4" />
+        </Trigger>
+      )}
     />
   )
 }

@@ -1,4 +1,4 @@
-import { Store } from '@tanstack/react-store'
+import { Store } from '@tanstack/solid-store'
 
 export const persistedStore = <TValue>(key: string, initial: TValue): Store<TValue> => {
   const hasStorage = typeof localStorage !== 'undefined'

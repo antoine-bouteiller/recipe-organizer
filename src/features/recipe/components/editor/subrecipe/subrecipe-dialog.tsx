@@ -1,8 +1,9 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useState, type ReactElement } from 'react'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { createSignal } from 'solid-js'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
 import { useRecipeOptions } from '@/features/recipe/hooks/use-recipe-options'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
@@ -21,7 +22,7 @@ interface SubrecipeDialogProps {
   onSubmit: (data: SubrecipeNodeData) => void
   submitLabel: string
   title: string
-  triggerRender?: ReactElement
+  trigger?: TriggerRender
 }
 
 const subrecipeDefaultValues: SubrecipeFormInput = {
@@ -32,17 +33,17 @@ const subrecipeDefaultValues: SubrecipeFormInput = {
 
 const FormDialog = getFormDialog(subrecipeDefaultValues)
 
-export const SubrecipeDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: SubrecipeDialogProps) => {
-  const [open, setOpen] = useState(false)
+export const SubrecipeDialog = (props: SubrecipeDialogProps) => {
+  const [open, setOpen] = createSignal(false)
   const linkedRecipeIds = useLinkedRecipes()
-  const recipesOptions = useRecipeOptions({ filter: (recipe) => linkedRecipeIds.includes(recipe.id) })
+  const recipesOptions = useRecipeOptions({ filter: (recipe) => linkedRecipeIds().includes(recipe.id) })
 
-  const form = useAppForm({
-    defaultValues: initialData ?? subrecipeDefaultValues,
+  const form = useAppForm(() => ({
+    defaultValues: props.initialData ?? subrecipeDefaultValues,
     onSubmit: async ({ value }) => {
       const validated = v.parse(subrecipeSchema, value)
 
-      onSubmit({
+      props.onSubmit({
         hideFirstNodes: validated.hideFirstNodes,
         hideLastNodes: validated.hideLastNodes,
         recipeId: validated.recipeId,
@@ -54,12 +55,12 @@ export const SubrecipeDialog = ({ initialData, onSubmit, submitLabel, title, tri
     validators: {
       onDynamic: subrecipeSchema,
     },
-  })
+  }))
 
   return (
-    <FormDialog form={form} trigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
-      <form.AppField name="recipeId">{({ ComboboxField }) => <ComboboxField label="Recette" options={recipesOptions} />}</form.AppField>
-      <div className="grid grid-cols-2 gap-4">
+    <FormDialog form={form} open={open()} setOpen={setOpen} submitLabel={props.submitLabel} title={props.title} trigger={props.trigger}>
+      <form.AppField name="recipeId">{({ ComboboxField }) => <ComboboxField label="Recette" options={recipesOptions()} />}</form.AppField>
+      <div class="grid grid-cols-2 gap-4">
         <form.AppField name="hideFirstNodes">{({ NumberField }) => <NumberField label="Masquer les N premières étapes" min={0} />}</form.AppField>
         <form.AppField name="hideLastNodes">{({ NumberField }) => <NumberField label="Masquer les N dernières étapes" min={0} />}</form.AppField>
       </div>

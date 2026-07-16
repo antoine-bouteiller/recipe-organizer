@@ -1,6 +1,6 @@
-import { CheckIcon } from '@phosphor-icons/react'
 import { UNITS, type UnitSlug } from '@schema'
-import { useState } from 'react'
+import { createSignal, For, Show } from 'solid-js'
+import Check from '~icons/ph/check-bold'
 
 import { cn } from '@/utils/cn'
 import { formatNumber } from '@/utils/number'
@@ -14,32 +14,32 @@ const formatQuantityWithUnit = (quantity: number, unitSlug: UnitSlug | null) => 
   return label ? `${formatNumber(quantity)} ${label}` : formatNumber(quantity)
 }
 
-export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => {
-  const [isChecked, setIsChecked] = useState(false)
+export const CartItem = (props: { ingredient: IngredientCartItem }) => {
+  const [isChecked, setIsChecked] = createSignal(false)
 
   return (
     <button
-      type="button"
+      class="flex w-full items-center gap-3 border-b py-3 text-left last:border-b-0"
       onClick={() => setIsChecked((checked) => !checked)}
-      className="flex w-full items-center gap-3 border-b py-3 text-left last:border-b-0"
+      type="button"
     >
       <span
-        className={cn(
+        class={cn(
           'flex size-5.5 shrink-0 items-center justify-center rounded-full border-2',
-          isChecked ? 'border-primary bg-primary text-white' : 'border-muted-foreground/40'
+          isChecked() ? 'border-primary bg-primary text-white' : 'border-muted-foreground/40'
         )}
       >
-        {isChecked && <CheckIcon weight="bold" className="size-3" />}
+        <Show when={isChecked()}>
+          <Check class="size-3" />
+        </Show>
       </span>
-      <span className={cn('flex flex-1 items-center justify-between gap-2', isChecked && 'text-muted-foreground line-through')}>
-        <span>{ingredient.name}</span>
-        <span className="flex flex-col items-end text-sm font-semibold text-muted-foreground">
-          <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>
-          {ingredient.fallback.map((line) => (
-            <span className="text-xs" key={line.unitSlug ?? 'unitless'}>
-              + {formatQuantityWithUnit(line.quantity, line.unitSlug)}
-            </span>
-          ))}
+      <span class={cn('flex flex-1 items-center justify-between gap-2', isChecked() && 'text-muted-foreground line-through')}>
+        <span>{props.ingredient.name}</span>
+        <span class="flex flex-col items-end text-sm font-semibold text-muted-foreground">
+          <span>{formatQuantityWithUnit(props.ingredient.primary.quantity, props.ingredient.primary.unitSlug)}</span>
+          <For each={props.ingredient.fallback}>
+            {(line) => <span class="text-xs">+ {formatQuantityWithUnit(line.quantity, line.unitSlug)}</span>}
+          </For>
         </span>
       </span>
     </button>

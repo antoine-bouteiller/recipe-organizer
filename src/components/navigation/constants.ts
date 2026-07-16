@@ -1,20 +1,19 @@
-import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon, type Icon, type IconProps } from '@phosphor-icons/react'
-import { type LinkProps } from '@tanstack/react-router'
+import { type LinkProps } from '@tanstack/solid-router'
+import Gear from '~icons/ph/gear'
+import House from '~icons/ph/house'
+import MagnifyingGlass from '~icons/ph/magnifying-glass'
+import ShoppingCartSimple from '~icons/ph/shopping-cart-simple'
 
 interface MenuItem {
   display?: 'desktop' | 'mobile'
-  icon: Icon
-  iconFilledProps?: IconProps
+  icon: typeof House
   label: string
   linkProps: LinkProps
 }
 
 export const menuItems: MenuItem[] = [
   {
-    icon: HouseIcon,
-    iconFilledProps: {
-      weight: 'fill',
-    },
+    icon: House,
     label: 'Accueil',
     linkProps: {
       to: '/',
@@ -22,30 +21,21 @@ export const menuItems: MenuItem[] = [
   },
   {
     display: 'mobile',
-    icon: MagnifyingGlassIcon,
-    iconFilledProps: {
-      weight: 'bold',
-    },
+    icon: MagnifyingGlass,
     label: 'Rechercher',
     linkProps: {
       to: '/search',
     },
   },
   {
-    icon: ShoppingCartSimpleIcon,
-    iconFilledProps: {
-      weight: 'fill',
-    },
+    icon: ShoppingCartSimple,
     label: 'Courses',
     linkProps: {
       to: '/shopping-list',
     },
   },
   {
-    icon: GearIcon,
-    iconFilledProps: {
-      weight: 'fill',
-    },
+    icon: Gear,
     label: 'Paramètres',
     linkProps: {
       to: '/settings',

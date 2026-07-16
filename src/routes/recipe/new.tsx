@@ -1,7 +1,7 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { useSelector } from '@tanstack/react-store'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { useMutation } from '@tanstack/solid-query'
+import { createFileRoute, redirect, useRouter } from '@tanstack/solid-router'
+import { useSelector } from '@tanstack/solid-store'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
@@ -12,45 +12,45 @@ import { useIngredientOptions } from '@/features/ingredients/hooks/use-ingredien
 import { createRecipeOptions, recipeSchema } from '@/features/recipe/api/create'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
-import { recipeDefaultValues, recipeFormFields } from '@/features/recipe/utils/form'
+import { recipeDefaultValues } from '@/features/recipe/utils/form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
 
 const NewRecipePage = () => {
   const router = useRouter()
-  const { mutateAsync: createRecipe } = useMutation(createRecipeOptions())
+  const createMutation = useMutation(() => createRecipeOptions())
   const ingredientOptions = useIngredientOptions()
 
-  const form = useAppForm({
+  const form = useAppForm(() => ({
     defaultValues: recipeDefaultValues,
     onSubmit: async ({ value }) => {
       const formData = objectToFormData(value)
-      await createRecipe({ data: formData })
-
+      await createMutation.mutateAsync({ data: formData })
       await router.navigate({ to: '/' })
     },
     validationLogic: revalidateLogic(),
     validators: {
       onDynamic: recipeSchema,
     },
-  })
+  }))
 
   const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
+  const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
   return (
     <ScreenLayout title="Nouvelle Recette" withGoBack>
       <Form
-        errors={errors}
+        errors={errors()}
         noValidate
         onSubmit={(event) => {
           event.preventDefault()
           void form.handleSubmit()
         }}
       >
-        <RecipeForm addNewIngredientOption={renderAddIngredientOption} fields={recipeFormFields} form={form} ingredientOptions={ingredientOptions} />
-        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
-          <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
+        <RecipeForm addNewIngredientOption={renderAddIngredientOption} form={form} ingredientOptions={ingredientOptions()} />
+        <div class="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+          <Button disabled={isSubmitting()} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>
           <form.AppForm>

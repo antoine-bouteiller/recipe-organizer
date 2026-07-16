@@ -18,7 +18,7 @@ See the Vite+ section below for the full command reference.
 
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
-- **UI components are owned:** `src/components/ui/*` are our design system (one file per component, built on Base UI) — edit them directly, don't re-pull from a registry. `knip` enforces no dead exports there.
+- **UI components are owned:** `src/components/ui/*` are our design system (one file per component, built on Kobalte (+ corvu drawer)) — edit them directly, don't re-pull from a registry. `knip` enforces no dead exports there.
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
 ## Guidelines

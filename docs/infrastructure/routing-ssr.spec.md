@@ -53,7 +53,7 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
 - TanStack Router file-based routing is enabled via `@tanstack/router-plugin/vite` with the route
   tree generated at `src/routeTree.gen.ts`.
 - TanStack Start owns the SSR runtime; the Cloudflare Worker entrypoint is
-  `@tanstack/react-start/server-entry` (see `wrangler.jsonc`).
+  `@tanstack/solid-start/server-entry` (see `wrangler.jsonc`).
 - The QueryClient/Router SSR hydration is performed by `setupRouterSsrQueryIntegration`.
 - The app runs in **client-only render mode**: `src/start.ts` sets `defaultSsr: false`, and the root
   route opts back into SSR (`ssr: true`). The worker therefore renders only the document shell (root)
@@ -90,7 +90,7 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
 ### Functional requirements
 
 - **REQ-001** — The router MUST be created by `getRouter()` (`src/router.tsx`) using
-  `createRouter` from `@tanstack/react-router` with the generated `routeTree`, `defaultPreload:
+  `createRouter` from `@tanstack/solid-router` with the generated `routeTree`, `defaultPreload:
 'intent'`, `notFoundMode: 'root'`, `defaultErrorComponent: DefaultErrorComponent`, and
   `defaultNotFoundComponent: NotFound`.
 - **REQ-002** — The router context MUST be initialized to
@@ -109,7 +109,7 @@ modifying the SSR shell, or wiring view transitions and layout chrome.
   `createStart(() => ({ defaultSsr: false }))`. This makes every route client-only by default; only
   the root (REQ-004) renders server-side. Consequently child-route components, including ones that
   read persisted (`localStorage`-backed) TanStack Store stores, render exclusively on the client — no
-  `<ClientOnly>` boundary or `'@tanstack/react-start/client-only'` directive is required.
+  `<ClientOnly>` boundary or `'@tanstack/solid-start/client-only'` directive is required.
 - **REQ-005** — The root `beforeLoad` MUST resolve `getAuthUser()` and `getTheme()` and return
   `{ authUser, isAdmin: authUser?.role === 'admin', theme }` so child routes can gate on
   `context.authUser` and `context.isAdmin`.
@@ -245,7 +245,7 @@ handlers: { GET, HEAD, ... } } })` with no `component`. They are HTTP-method-key
 - **GUD-004** — Use `useSuspenseQuery` when the loader has guaranteed prefetch and the consuming
   component is happy to suspend (most pages). Use `useQuery` when nullable rendering is desired
   (e.g. recipe detail's `if (!recipe) return null`).
-- **GUD-005** — Do NOT use `<ClientOnly>` or the `'@tanstack/react-start/client-only'` directive for
+- **GUD-005** — Do NOT use `<ClientOnly>` or the `'@tanstack/solid-start/client-only'` directive for
   components depending on client-only state (`localStorage`, motion, swipe gestures). Client-only
   rendering (REQ-004a) already guarantees these never run server-side. The exception is anything that
   must render inside the root shell itself (e.g. `OfflineBanner`), which guards on client mount
@@ -417,7 +417,7 @@ type ResolvedRootContext = RootContext & { isAdmin: boolean }
 
 ### 5.2 SSR pipeline (client-only render mode)
 
-1. **Cloudflare Worker** invokes `@tanstack/react-start/server-entry` (the package main, see
+1. **Cloudflare Worker** invokes `@tanstack/solid-start/server-entry` (the package main, see
    `wrangler.jsonc`).
 2. **TanStack Start** calls `getRouter()` per request → fresh `QueryClient` + `Router` with the
    generated tree.
@@ -533,7 +533,7 @@ type ResolvedRootContext = RootContext & { isAdmin: boolean }
   `authUser`/`isAdmin` UI checks.
 - **Client-only render mode.** `defaultSsr: false` (with the root opted into SSR) renders all page
   content on the client. This removes the whole class of SSR hydration mismatches around
-  `localStorage`-backed stores — so `<ClientOnly>` boundaries and `'@tanstack/react-start/client-only'`
+  `localStorage`-backed stores — so `<ClientOnly>` boundaries and `'@tanstack/solid-start/client-only'`
   directives are no longer needed — while the worker still produces a real per-request shell that
   resolves auth server-side. The trade-off (no edge-cacheable HTML, worker runs per navigation) is
   acceptable for a personal app with no SEO requirement.

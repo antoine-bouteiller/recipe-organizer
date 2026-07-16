@@ -1,10 +1,10 @@
-import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
+import ArrowCounterClockwise from '~icons/ph/arrow-counter-clockwise'
 
 import { Button } from '@/components/ui/button'
 import { resetShoppingList } from '@/stores/shopping-list.store'
 
 export const ResetCartButton = () => (
   <Button onClick={resetShoppingList} size="icon" variant="outline">
-    <ArrowCounterClockwiseIcon className="size-4 text-primary" />
+    <ArrowCounterClockwise class="size-4 text-primary" />
   </Button>
 )

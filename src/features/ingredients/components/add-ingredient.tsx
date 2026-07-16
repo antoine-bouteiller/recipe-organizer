@@ -1,33 +1,32 @@
-import { PlusIcon } from '@phosphor-icons/react'
-import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
-import { useState, type JSX } from 'react'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { useMutation } from '@tanstack/solid-query'
+import { createSignal } from 'solid-js'
 import * as v from 'valibot'
+import Plus from '~icons/ph/plus'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/create'
 import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddIngredientProps {
-  children: JSX.Element
   defaultValue?: string
+  trigger: TriggerRender
 }
 
 const FormDialog = getFormDialog(getIngredientDefaultValues())
 
-export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) => {
-  const createMutation = useMutation(createIngredientOptions())
-  const [open, setOpen] = useState(false)
+export const AddIngredient = (props: AddIngredientProps) => {
+  const createMutation = useMutation(() => createIngredientOptions())
+  const [open, setOpen] = createSignal(false)
 
-  const form = useAppForm({
-    defaultValues: getIngredientDefaultValues(defaultValue),
+  const form = useAppForm(() => ({
+    defaultValues: getIngredientDefaultValues(props.defaultValue),
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
-        {
-          data: v.parse(ingredientSchema, value),
-        },
+        { data: v.parse(ingredientSchema, value) },
         {
           onSuccess: () => {
             form.reset()
@@ -40,20 +39,23 @@ export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) =>
     validators: {
       onDynamic: ingredientSchema,
     },
-  })
+  }))
 
   return (
-    <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un ingrédient" trigger={children}>
+    <FormDialog form={form} open={open()} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un ingrédient" trigger={props.trigger}>
       <IngredientForm form={form} />
     </FormDialog>
   )
 }
 
 export const renderAddIngredientOption = (inputValue: string) => (
-  <AddIngredient defaultValue={inputValue} key={inputValue}>
-    <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
-      <PlusIcon aria-hidden="true" className="size-4" />
-      Nouvel ingrédient: {inputValue}
-    </Button>
-  </AddIngredient>
+  <AddIngredient
+    defaultValue={inputValue}
+    trigger={(Trigger) => (
+      <Trigger as={Button} class="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
+        <Plus aria-hidden="true" class="size-4" />
+        Nouvel ingrédient: {inputValue}
+      </Trigger>
+    )}
+  />
 )

@@ -1,18 +1,14 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
-import type React from 'react'
+import { type ComponentProps, splitProps } from 'solid-js'
 
 import { cn } from '@/utils/cn'
 
-export const Label = ({ className, render, ...props }: useRender.ComponentProps<'label'>): React.ReactElement => {
-  const defaultProps = {
-    className: cn('inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4', className),
-    'data-slot': 'label',
-  }
-
-  return useRender({
-    defaultTagName: 'label',
-    props: mergeProps<'label'>(defaultProps, props),
-    render,
-  })
+export const Label = (props: ComponentProps<'label'>) => {
+  const [local, rest] = splitProps(props, ['class'])
+  return (
+    <label
+      class={cn('inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4', local.class)}
+      data-slot="label"
+      {...rest}
+    />
+  )
 }

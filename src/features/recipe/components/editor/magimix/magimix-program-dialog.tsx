@@ -1,9 +1,10 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useSelector } from '@tanstack/react-store'
-import { useState, type ReactElement } from 'react'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { useSelector } from '@tanstack/solid-store'
+import { createSignal } from 'solid-js'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
@@ -13,7 +14,7 @@ interface MagimixProgramDialogProps {
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
-  triggerRender?: ReactElement
+  trigger?: TriggerRender
 }
 
 const magimixProgramSchema = v.object({
@@ -41,17 +42,17 @@ const programItems = Object.entries(magimixProgramLabels).map(([value, label]) =
 
 const FormDialog = getFormDialog(magimixProgramDefaultValues)
 
-export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: MagimixProgramDialogProps) => {
-  const [open, setOpen] = useState(false)
+export const MagimixProgramDialog = (props: MagimixProgramDialogProps) => {
+  const [open, setOpen] = createSignal(false)
 
-  const form = useAppForm({
-    defaultValues: initialData ?? magimixProgramDefaultValues,
+  const form = useAppForm(() => ({
+    defaultValues: props.initialData ?? magimixProgramDefaultValues,
     onSubmit: async ({ value }) => {
       const validated = v.parse(magimixProgramSchema, value)
 
       const time = validated.timeMinutes * 60 + validated.timeSeconds
 
-      onSubmit({
+      props.onSubmit({
         program: validated.program,
         rotationSpeed: validated.rotationSpeed,
         temperature: validated.temperature,
@@ -64,25 +65,23 @@ export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title
     validators: {
       onDynamic: magimixProgramSchema,
     },
-  })
-
-  const { isSubmitting } = useSelector(form.store, (state) => ({
-    isSubmitting: state.isSubmitting,
   }))
 
+  const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
+
   return (
-    <FormDialog form={form} trigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
+    <FormDialog form={form} open={open()} setOpen={setOpen} submitLabel={props.submitLabel} title={props.title} trigger={props.trigger}>
       <form.AppField name="program">
-        {({ SelectField }) => <SelectField disabled={isSubmitting} items={programItems} label="Programme" />}
+        {({ SelectField }) => <SelectField disabled={isSubmitting()} items={programItems} label="Programme" />}
       </form.AppField>
-      <form.AppField name="timeMinutes">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Minutes*" min={0} />}</form.AppField>
+      <form.AppField name="timeMinutes">{({ NumberField }) => <NumberField disabled={isSubmitting()} label="Minutes*" min={0} />}</form.AppField>
       <form.AppField name="timeSeconds">
-        {({ NumberField }) => <NumberField disabled={isSubmitting} label="Secondes*" max={59} min={0} />}
+        {({ NumberField }) => <NumberField disabled={isSubmitting()} label="Secondes*" max={59} min={0} />}
       </form.AppField>
       <form.AppField name="rotationSpeed">
         {({ SelectField }) => (
           <SelectField
-            disabled={isSubmitting}
+            disabled={isSubmitting()}
             items={allowedRotationSpeed.map((speed) => ({
               label: capitalize(speed),
               value: speed,
@@ -92,7 +91,7 @@ export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title
         )}
       </form.AppField>
       <form.AppField name="temperature">
-        {({ NumberField }) => <NumberField disabled={isSubmitting} label="Température (°C) - Optionnel" max={200} min={0} placeholder="Ex: 100" />}
+        {({ NumberField }) => <NumberField disabled={isSubmitting()} label="Température (°C) - Optionnel" max={200} min={0} placeholder="Ex: 100" />}
       </form.AppField>
     </FormDialog>
   )

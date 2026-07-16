@@ -1,7 +1,7 @@
-import { PlusIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import React, { useState } from 'react'
+import { useQuery } from '@tanstack/solid-query'
+import { createFileRoute } from '@tanstack/solid-router'
+import { createMemo, createSignal, For, Show } from 'solid-js'
+import Plus from '~icons/ph/plus'
 
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -15,60 +15,71 @@ import { EditIngredient } from '@/features/ingredients/components/edit-ingredien
 import { IngredientBadge } from '@/features/ingredients/components/ingredient-badge'
 
 const IngredientsManagement = () => {
-  const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
-  const [search, setSearch] = useState('')
+  const ingredientsQuery = useQuery(() => getIngredientListOptions())
+  const [search, setSearch] = createSignal('')
 
-  const { isAdmin } = Route.useRouteContext()
+  const context = Route.useRouteContext()
 
-  const query = search.trim().toLowerCase()
-  const filteredIngredients = ingredients.filter(
-    (ingredient) => ingredient.name.toLowerCase().includes(query) || ingredient.category.toLowerCase().includes(query)
-  )
+  const filteredIngredients = createMemo(() => {
+    const query = search().trim().toLowerCase()
+    return (ingredientsQuery.data ?? []).filter(
+      (ingredient) => ingredient.name.toLowerCase().includes(query) || ingredient.category.toLowerCase().includes(query)
+    )
+  })
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
-        <SearchInput search={search} setSearch={setSearch} />
-        <AddIngredient>
-          <Button size="icon-lg" variant="outline">
-            <PlusIcon />
-          </Button>
-        </AddIngredient>
+      <div class="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
+        <SearchInput search={search()} setSearch={setSearch} />
+        <AddIngredient
+          trigger={(Trigger) => (
+            <Trigger as={Button} size="icon-lg" variant="outline">
+              <Plus />
+            </Trigger>
+          )}
+        />
       </div>
 
-      {filteredIngredients.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">
-          {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
-        </p>
-      ) : (
+      <Show
+        when={filteredIngredients().length > 0}
+        fallback={
+          <p class="py-8 text-center text-muted-foreground">
+            {search() ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
+          </p>
+        }
+      >
         <ItemGroup>
-          {filteredIngredients.map((ingredient, index) => (
-            <React.Fragment key={ingredient.id}>
-              <Item
-                actions={
-                  isAdmin ? (
+          <For each={filteredIngredients()}>
+            {(ingredient, index) => (
+              <>
+                <Item
+                  actions={
+                    context().isAdmin ? (
+                      <>
+                        <EditIngredient ingredient={ingredient} />
+                        <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
+                      </>
+                    ) : undefined
+                  }
+                  class="flex-nowrap"
+                  title={
                     <>
-                      <EditIngredient ingredient={ingredient} />
-                      <DeleteIngredient ingredientId={ingredient.id} ingredientName={ingredient.name} />
+                      <span class="text-nowrap text-ellipsis">{ingredient.name}</span>
+                      <IngredientBadge category={ingredient.category} class="aspect-square md:aspect-auto">
+                        {ingredientCategoryIcons[ingredient.category]}
+                        <span class="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
+                      </IngredientBadge>
                     </>
-                  ) : undefined
-                }
-                className="flex-nowrap"
-                title={
-                  <>
-                    <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
-                    <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
-                      {ingredientCategoryIcons[ingredient.category]}
-                      <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
-                    </IngredientBadge>
-                  </>
-                }
-              />
-              {index !== filteredIngredients.length - 1 && <ItemSeparator />}
-            </React.Fragment>
-          ))}
+                  }
+                />
+                <Show when={index() !== filteredIngredients().length - 1}>
+                  <ItemSeparator />
+                </Show>
+              </>
+            )}
+          </For>
         </ItemGroup>
-      )}
+      </Show>
     </ScreenLayout>
   )
 }

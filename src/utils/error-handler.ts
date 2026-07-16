@@ -1,4 +1,4 @@
-import { isNotFound, isRedirect } from '@tanstack/react-router'
+import { isNotFound, isRedirect } from '@tanstack/solid-router'
 import { ValiError } from 'valibot'
 
 export const withServerError =

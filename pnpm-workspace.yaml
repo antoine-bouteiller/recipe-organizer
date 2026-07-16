@@ -4,5 +4,18 @@ allowBuilds:
   sharp: false
   workerd: false
 
+minimumReleaseAgeExclude:
+  - '@tanstack/router-core@1.171.15'
+  - '@tanstack/router-generator@1.167.19'
+  - '@tanstack/router-plugin@1.168.20'
+  - '@tanstack/solid-router@1.170.18'
+  - '@tanstack/solid-start-client@1.168.16'
+  - '@tanstack/solid-start-server@1.167.22'
+  - '@tanstack/solid-start@1.168.28'
+  - '@tanstack/start-client-core@1.170.14'
+  - '@tanstack/start-plugin-core@1.171.20'
+  - '@tanstack/start-server-core@1.169.17'
+  - '@tanstack/start-storage-context@1.167.17'
+
 overrides:
   vite: 'npm:@voidzero-dev/vite-plus-core@latest'

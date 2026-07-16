@@ -1,31 +1,84 @@
-import { Toolbar as ToolbarPrimitive } from '@base-ui/react/toolbar'
-import type React from 'react'
+import { type ComponentProps, onMount, splitProps } from 'solid-js'
 
 import { cn } from '@/utils/cn'
 
-export const Toolbar = ({ className, ...props }: ToolbarPrimitive.Root.Props): React.ReactElement => (
-  <ToolbarPrimitive.Root
-    className={cn('relative flex gap-2 rounded-xl border bg-card not-dark:bg-clip-padding p-1 text-card-foreground w-full overflow-auto', className)}
-    data-slot="toolbar"
-    {...props}
-  />
-)
+const focusableButtons = (root: HTMLElement): HTMLElement[] => [...root.querySelectorAll<HTMLElement>('button:not([disabled])')]
 
-export const ToolbarButton = ({ className, ...props }: ToolbarPrimitive.Button.Props): React.ReactElement => (
-  <ToolbarPrimitive.Button className={cn(className)} data-slot="toolbar-button" {...props} />
-)
+export const Toolbar = (props: ComponentProps<'div'>) => {
+  const [local, rest] = splitProps(props, ['class'])
+  let ref: HTMLDivElement | undefined = undefined
 
-export const ToolbarGroup = ({ className, ...props }: ToolbarPrimitive.Group.Props): React.ReactElement => (
-  <ToolbarPrimitive.Group className={cn('flex items-center gap-1', className)} data-slot="toolbar-group" {...props} />
-)
+  onMount(() => {
+    if (!ref) {
+      return
+    }
+    const buttons = focusableButtons(ref)
+    for (const [index, button] of buttons.entries()) {
+      button.tabIndex = index === 0 ? 0 : -1
+    }
+  })
 
-export const ToolbarSeparator = ({ className, ...props }: ToolbarPrimitive.Separator.Props): React.ReactElement => (
-  <ToolbarPrimitive.Separator
-    className={cn(
-      "shrink-0 bg-border data-[orientation=horizontal]:my-0.5 data-[orientation=vertical]:my-1.5 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:not-[[class^='h-']]:not-[[class*='_h-']]:self-stretch",
-      className
-    )}
-    data-slot="toolbar-separator"
-    {...props}
-  />
-)
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!ref) {
+      return
+    }
+    const steps: Record<string, number> = { ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1 }
+    const buttons = focusableButtons(ref)
+    if (buttons.length === 0) {
+      return
+    }
+    const step = steps[event.key]
+    const current = buttons.indexOf(document.activeElement as HTMLElement)
+    let next = current
+    if (step !== undefined) {
+      next = (current + step + buttons.length) % buttons.length
+    } else if (event.key === 'Home') {
+      next = 0
+    } else if (event.key === 'End') {
+      next = buttons.length - 1
+    } else {
+      return
+    }
+    event.preventDefault()
+    buttons[next]?.focus()
+  }
+
+  const handleFocusIn = (event: FocusEvent) => {
+    if (!ref) {
+      return
+    }
+    for (const button of focusableButtons(ref)) {
+      button.tabIndex = button === event.target ? 0 : -1
+    }
+  }
+
+  return (
+    <div
+      class={cn('relative flex w-full gap-2 overflow-auto rounded-xl border bg-card p-1 text-card-foreground not-dark:bg-clip-padding', local.class)}
+      data-slot="toolbar"
+      onFocusIn={handleFocusIn}
+      onKeyDown={handleKeyDown}
+      ref={(el) => (ref = el)}
+      role="toolbar"
+      {...rest}
+    />
+  )
+}
+
+export const ToolbarGroup = (props: ComponentProps<'div'>) => {
+  const [local, rest] = splitProps(props, ['class'])
+  return <div class={cn('flex items-center gap-1', local.class)} data-slot="toolbar-group" role="group" {...rest} />
+}
+
+export const ToolbarSeparator = (props: ComponentProps<'div'>) => {
+  const [local, rest] = splitProps(props, ['class'])
+  return (
+    <div
+      aria-orientation="vertical"
+      class={cn('my-1.5 w-px shrink-0 self-stretch bg-border', local.class)}
+      data-slot="toolbar-separator"
+      role="separator"
+      {...rest}
+    />
+  )
+}

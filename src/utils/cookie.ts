@@ -1,5 +1,5 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
-import { getCookie as getCookieServer, setCookie as setCookieServer } from '@tanstack/react-start/server'
+import { createIsomorphicFn } from '@tanstack/solid-start'
+import { getCookie as getCookieServer, setCookie as setCookieServer } from '@tanstack/solid-start/server'
 
 export const getCookie = createIsomorphicFn()
   .server(getCookieServer)

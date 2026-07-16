@@ -1,8 +1,8 @@
-import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
-import { FunnelSimpleIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
+import { Collapsible } from '@kobalte/core/collapsible'
+import { useQuery } from '@tanstack/solid-query'
+import { createFileRoute } from '@tanstack/solid-router'
+import { createMemo, createSignal, Show } from 'solid-js'
+import FunnelSimple from '~icons/ph/funnel-simple'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
@@ -26,74 +26,76 @@ const mealItems = MEALS.map((meal) => ({
 }))
 
 const SearchPage = () => {
-  const [filters, setFilters] = useState<SearchFiltersValue>(EMPTY_FILTERS)
+  const [filters, setFilters] = createSignal<SearchFiltersValue>(EMPTY_FILTERS)
 
-  const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
+  const recipesQuery = useQuery(() => getRecipeListOptions())
 
-  const filtered = useMemo(() => filterRecipes(recipes, filters), [recipes, filters])
-  const nonSpiceRecipes = useMemo(() => recipes.filter((recipe) => !recipe.isSpice), [recipes])
+  const filtered = createMemo(() => filterRecipes(recipesQuery.data ?? [], filters()))
+  const nonSpiceRecipes = createMemo(() => (recipesQuery.data ?? []).filter((recipe) => !recipe.isSpice))
 
   const clearFilters = () => setFilters(EMPTY_FILTERS)
 
   return (
-    <ScreenLayout title="Rechercher" pageKey="/search">
-      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-muted pb-2">
-        <CollapsiblePrimitive.Root>
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <SearchInput autoFocus search={filters.query} setSearch={(query) => setFilters({ ...filters, query })} />
+    <ScreenLayout pageKey="/search" title="Rechercher">
+      <div class="sticky top-0 z-10 flex flex-col gap-2 bg-muted pb-2">
+        <Collapsible>
+          <div class="flex items-center gap-2">
+            <div class="flex-1">
+              <SearchInput autofocus search={filters().query} setSearch={(query) => setFilters({ ...filters(), query })} />
             </div>
-            <CollapsiblePrimitive.Trigger render={<Button aria-label="Filtrer par catégorie" size="icon-lg" variant="outline" />}>
-              <FunnelSimpleIcon />
-            </CollapsiblePrimitive.Trigger>
+            <Collapsible.Trigger aria-label="Filtrer par catégorie" as={Button} size="icon-lg" variant="outline">
+              <FunnelSimple />
+            </Collapsible.Trigger>
           </div>
-          <CollapsiblePrimitive.Panel className="grid h-(--collapsible-panel-height) grid-cols-2 gap-2.5 overflow-hidden pt-2 transition-[height] duration-200 data-ending-style:h-0 data-starting-style:h-0">
+          <Collapsible.Content class="grid grid-cols-2 gap-2.5 overflow-hidden pt-2 transition-[height] duration-200 data-closed:h-0 data-expanded:h-[var(--kb-collapsible-content-height)]">
             <Select
+              class="w-full"
               items={mealItems}
               multiple
-              onValueChange={(meals) => setFilters({ ...filters, meals })}
+              onValueChange={(meals) => setFilters({ ...filters(), meals })}
               placeholder="Repas"
               title="Repas"
-              value={filters.meals}
-              className="w-full"
+              value={filters().meals}
             />
             <Select
+              class="w-full"
               items={cuisineItems}
               multiple
-              onValueChange={(cuisineTypes) => setFilters({ ...filters, cuisineTypes })}
+              onValueChange={(cuisineTypes) => setFilters({ ...filters(), cuisineTypes })}
               placeholder="Cuisines"
               title="Cuisines"
-              value={filters.cuisineTypes}
-              className="w-full"
+              value={filters().cuisineTypes}
             />
             <Toggle
+              class="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              onChange={(pressed) => setFilters({ ...filters(), isVegetarian: pressed })}
+              pressed={filters().isVegetarian}
               variant="outline"
-              className="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
-              pressed={filters.isVegetarian}
-              onPressedChange={(pressed) => setFilters({ ...filters, isVegetarian: pressed })}
             >
               Végétarien
             </Toggle>
             <Toggle
+              class="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              onChange={(pressed) => setFilters({ ...filters(), isMagimix: pressed })}
+              pressed={filters().isMagimix}
               variant="outline"
-              className="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
-              pressed={filters.isMagimix}
-              onPressedChange={(pressed) => setFilters({ ...filters, isMagimix: pressed })}
             >
               Magimix
             </Toggle>
             <Toggle
+              class="col-span-2 w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              onChange={(pressed) => setFilters({ ...filters(), isSpice: pressed })}
+              pressed={filters().isSpice}
               variant="outline"
-              className="col-span-2 w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
-              pressed={filters.isSpice}
-              onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}
             >
               Épices
             </Toggle>
-          </CollapsiblePrimitive.Panel>
-        </CollapsiblePrimitive.Root>
+          </Collapsible.Content>
+        </Collapsible>
       </div>
-      {hasActiveFilters(filters) ? <SearchResults onClearFilters={clearFilters} recipes={filtered} /> : <RecentRecipes recipes={nonSpiceRecipes} />}
+      <Show when={hasActiveFilters(filters())} fallback={<RecentRecipes recipes={nonSpiceRecipes()} />}>
+        <SearchResults onClearFilters={clearFilters} recipes={filtered()} />
+      </Show>
     </ScreenLayout>
   )
 }

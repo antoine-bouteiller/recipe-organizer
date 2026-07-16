@@ -1,22 +1,21 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
-import { useSelector } from '@tanstack/react-store'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { useMutation, useQuery } from '@tanstack/solid-query'
+import { createFileRoute, redirect, useRouter } from '@tanstack/solid-router'
+import { useSelector } from '@tanstack/solid-store'
+import { Show } from 'solid-js'
 import * as v from 'valibot'
 
 import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
-import { Spinner } from '@/components/ui/spinner'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
 import { renderAddIngredientOption } from '@/features/ingredients/components/add-ingredient'
 import { useIngredientOptions } from '@/features/ingredients/hooks/use-ingredient-options'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
-import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
+import { getRecipeDetailsOptions, type Recipe as RecipeDetail, type RecipeIngredientGroup } from '@/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@/features/recipe/api/update'
 import { RecipeForm } from '@/features/recipe/components/recipe-form'
-import { recipeFormFields } from '@/features/recipe/utils/form'
 import { useAppForm } from '@/hooks/use-app-form'
 import { objectToFormData } from '@/utils/form-data'
 import { formatFormErrors } from '@/utils/format-form-errors'
@@ -33,14 +32,8 @@ const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   })),
 })
 
-const EditRecipePage = () => {
-  const { id } = Route.useLoaderData()
-  const { data: recipe, isLoading } = useSuspenseQuery(getRecipeDetailsOptions(id))
-  const { mutateAsync: updateRecipe } = useMutation(updateRecipeOptions())
-  const router = useRouter()
-  const ingredientOptions = useIngredientOptions()
-
-  const initialValues: UpdateRecipeFormInput = recipe
+const buildInitialValues = (recipe: RecipeDetail | undefined): UpdateRecipeFormInput | Record<string, never> =>
+  recipe
     ? {
         cuisineTypes: recipe.cuisineTypes,
         id: recipe.id,
@@ -66,63 +59,64 @@ const EditRecipePage = () => {
       }
     : {}
 
-  const form = useAppForm({
-    defaultValues: initialValues,
+const EditRecipePage = () => {
+  const loaderData = Route.useLoaderData()
+  const query = useQuery(() => getRecipeDetailsOptions(loaderData().id))
+  const updateMutation = useMutation(() => updateRecipeOptions())
+  const router = useRouter()
+  const ingredientOptions = useIngredientOptions()
+
+  const form = useAppForm(() => ({
+    defaultValues: buildInitialValues(query.data),
     onSubmit: async ({ value }) => {
       const formData = objectToFormData(value)
-
-      await updateRecipe({ data: formData })
-
+      await updateMutation.mutateAsync({ data: formData })
       router.history.back()
     },
     validationLogic: revalidateLogic(),
     validators: {
       onDynamic: updateRecipeSchema,
     },
-  })
+  }))
 
   const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Spinner />
-      </div>
-    )
-  }
-
-  if (!recipe) {
-    return <NotFound />
-  }
+  const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
 
   return (
     <ScreenLayout title="Modifier la recette" withGoBack>
-      <Form
-        errors={errors}
-        noValidate
-        onSubmit={(event) => {
-          event.preventDefault()
-          void form.handleSubmit()
+      <Show when={query.data} fallback={<NotFound />}>
+        {(recipe) => {
+          const data = recipe()
+
+          return (
+            <Form
+              errors={errors()}
+              noValidate
+              onSubmit={(event) => {
+                event.preventDefault()
+                void form.handleSubmit()
+              }}
+            >
+              <RecipeForm
+                addNewIngredientOption={renderAddIngredientOption}
+                form={form}
+                id={data.id}
+                ingredientOptions={ingredientOptions()}
+                initialImage={data.image ? { id: data.image, url: data.image } : undefined}
+                initialVideo={data.video ? { id: data.video, url: getVideoUrl(data.video) } : undefined}
+              />
+              <div class="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+                <Button disabled={isSubmitting()} onClick={() => router.history.back()} type="button" variant="outline">
+                  Annuler
+                </Button>
+                <form.AppForm>
+                  <form.FormSubmit label="Modifier la recette" />
+                </form.AppForm>
+              </div>
+            </Form>
+          )
         }}
-      >
-        <RecipeForm
-          addNewIngredientOption={renderAddIngredientOption}
-          fields={recipeFormFields}
-          form={form}
-          id={recipe.id}
-          ingredientOptions={ingredientOptions}
-          initialImage={{ id: recipe.image, url: recipe.image }}
-          initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
-        />
-        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
-          <Button disabled={isLoading} onClick={() => router.history.back()} type="button" variant="outline">
-            Annuler
-          </Button>
-          <form.AppForm>
-            <form.FormSubmit label="Modifier la recette" />
-          </form.AppForm>
-        </div>
-      </Form>
+      </Show>
     </ScreenLayout>
   )
 }

@@ -1,9 +1,9 @@
 import { cloudflare } from '@cloudflare/vite-plugin'
-import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import { tanstackStart } from '@tanstack/solid-start/plugin/vite'
+import Icons from 'unplugin-icons/vite'
+import solid from 'vite-plugin-solid'
 import { defineConfig } from 'vite-plus'
 
 import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
@@ -17,7 +17,7 @@ const viteConfig = defineConfig({
   },
   lint: {
     options: { typeAware: true, typeCheck: true },
-    plugins: ['typescript', 'react', 'unicorn', 'import'],
+    plugins: ['typescript', 'unicorn', 'import'],
     categories: {
       correctness: 'error',
       suspicious: 'error',
@@ -32,14 +32,6 @@ const viteConfig = defineConfig({
       'shared-node-browser': true,
     },
     ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
-    overrides: [
-      {
-        files: ['**/use-file-upload.ts'],
-        rules: {
-          'react-hooks/exhaustive-deps': 'off',
-        },
-      },
-    ],
     rules: {
       // Restriction
       'default-case': 'error',
@@ -56,11 +48,9 @@ const viteConfig = defineConfig({
       complexity: ['error', 15],
 
       // Suspicious
-      'react-in-jsx-scope': 'off',
       'no-unneeded-ternary': 'off',
       'style-prop-object': 'off',
       'no-unsafe-type-assertion': 'off',
-      'react/jsx-no-constructed-context-values': 'off',
 
       // Pedantic
       'no-deprecated': 'error',
@@ -83,7 +73,7 @@ const viteConfig = defineConfig({
       'no-magic-numbers': 'off',
       'sort-imports': 'off',
       'no-namespace': 'off',
-      'id-length': ['error', { exceptions: ['v', 'x', '$'] }],
+      'id-length': ['error', { exceptions: ['v', 'x', '$', 'T', 'X'] }],
       'no-ternary': 'off',
       'max-params': 'off',
       'jsx-max-depth': 'off',
@@ -113,52 +103,27 @@ const viteConfig = defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  build: {
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          groups: [
-            {
-              test: /node_modules\/react/,
-              name: 'react',
-            },
-            {
-              test: /node_modules\/react-dom/,
-              name: 'react-dom',
-            },
-            {
-              test: /node_modules\/@tanstack\/react-query/,
-              name: 'tanstack-query',
-            },
-          ],
-        },
-      },
-      onLog(level, log, defaultHandler) {
-        // Supress Lexical Warning
-        if (log.code === 'INVALID_ANNOTATION') {
-          return
-        }
-        // Handle all other logs normally
-        defaultHandler(level, log)
-      },
-    },
-  },
   plugins: [
+    Icons({ compiler: 'solid' }),
     tanstackStart(),
-    react(),
+    solid({ ssr: true }),
     ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),
     tailwindcss(),
     tanstackSerwistPlugin(),
     devtools({
       injectSource: { enabled: false },
     }),
-    babel({ presets: [reactCompilerPreset()] }),
   ],
   server: {
     port: 3000,
   },
   test: {
     include: ['src/**/*.test.ts'],
+    server: {
+      deps: {
+        inline: [/@tanstack\/solid-/, /@kobalte/, /@corvu/],
+      },
+    },
   },
 })
 

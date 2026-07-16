@@ -1,21 +1,21 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { type Accessor, createContext, type JSX, useContext } from 'solid-js'
 
 interface LinkedRecipesContextValue {
-  linkedRecipeIds: number[]
+  linkedRecipeIds: Accessor<number[]>
 }
 
-const LinkedRecipesContext = createContext<LinkedRecipesContextValue | undefined>(undefined)
+const LinkedRecipesContext = createContext<LinkedRecipesContextValue>()
 
 interface LinkedRecipesProviderProps {
-  children: ReactNode
+  children: JSX.Element
   linkedRecipeIds: number[]
 }
 
-export const LinkedRecipesProvider = ({ children, linkedRecipeIds }: LinkedRecipesProviderProps) => (
-  <LinkedRecipesContext.Provider value={{ linkedRecipeIds }}>{children}</LinkedRecipesContext.Provider>
+export const LinkedRecipesProvider = (props: LinkedRecipesProviderProps) => (
+  <LinkedRecipesContext.Provider value={{ linkedRecipeIds: () => props.linkedRecipeIds }}>{props.children}</LinkedRecipesContext.Provider>
 )
 
-export const useLinkedRecipes = () => {
+export const useLinkedRecipes = (): Accessor<number[]> => {
   const context = useContext(LinkedRecipesContext)
-  return context?.linkedRecipeIds ?? []
+  return () => context?.linkedRecipeIds() ?? []
 }

@@ -1,7 +1,7 @@
-import { type ReactElement, type ReactNode } from 'react'
+import { Show } from 'solid-js'
 
 import { Button } from '@/components/ui/button'
-import { type DialogProps } from '@/components/ui/dialog'
+import { type DialogProps, dialogHasFooter, dialogWrap } from '@/components/ui/dialog'
 import {
   DrawerClose,
   DrawerFooter,
@@ -13,44 +13,31 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 
-const DialogDrawer = ({
-  title,
-  trigger,
-  children,
-  cancelLabel,
-  cancelDisabled,
-  footer,
-  open,
-  onOpenChange,
-  contentRender,
-  panelClassName,
-}: DialogProps): ReactElement => {
-  const hasFooter = cancelLabel !== undefined || footer !== undefined
-  const wrap = (body: ReactNode): ReactNode => (contentRender ? contentRender(body) : body)
-
-  return (
-    <DrawerRoot onOpenChange={onOpenChange} open={open}>
-      {trigger !== undefined && <DrawerTrigger render={trigger} />}
-      <DrawerPopup>
-        {wrap(
-          <>
-            <DrawerHeader>
-              <DrawerTitle>{title}</DrawerTitle>
-            </DrawerHeader>
-            <DrawerPanel className={panelClassName}>{children}</DrawerPanel>
-            {hasFooter && (
-              <DrawerFooter>
-                {cancelLabel !== undefined && (
-                  <DrawerClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DrawerClose>
-                )}
-                {footer}
-              </DrawerFooter>
-            )}
-          </>
-        )}
-      </DrawerPopup>
-    </DrawerRoot>
-  )
-}
+const DialogDrawer = (props: DialogProps) => (
+  <DrawerRoot onOpenChange={props.onOpenChange} open={props.open}>
+    <Show when={props.trigger}>{(trigger) => trigger()((triggerProps) => <DrawerTrigger data-slot="drawer-trigger" {...triggerProps} />)}</Show>
+    <DrawerPopup>
+      {dialogWrap(
+        props,
+        <>
+          <DrawerHeader>
+            <DrawerTitle>{props.title}</DrawerTitle>
+          </DrawerHeader>
+          <DrawerPanel class={props.panelClassName}>{props.children}</DrawerPanel>
+          <Show when={dialogHasFooter(props)}>
+            <DrawerFooter>
+              <Show when={props.cancelLabel !== undefined}>
+                <DrawerClose as={Button} disabled={props.cancelDisabled} variant="outline">
+                  {props.cancelLabel}
+                </DrawerClose>
+              </Show>
+              {props.footer}
+            </DrawerFooter>
+          </Show>
+        </>
+      )}
+    </DrawerPopup>
+  </DrawerRoot>
+)
 
 export default DialogDrawer

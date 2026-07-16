@@ -1,60 +1,50 @@
-import { type ReactNode } from 'react'
+import { type JSX, Show } from 'solid-js'
 
-import { Combobox } from '@/components/ui/combobox'
+import { Combobox, type ValueOptions } from '@/components/ui/combobox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
 import { type Option } from '@/hooks/use-options'
 
-type ValueOptions = number | string | undefined
-
 interface ComboboxFieldProps<TValue extends ValueOptions> {
-  addNew?: (inputValue: string) => ReactNode
+  addNew?: (inputValue: string) => JSX.Element
+  class?: string
   disabled?: boolean
-  className?: string
   label?: string
   options: Option<TValue>[]
   placeholder?: string
   searchPlaceholder?: string
 }
 
-const ComboboxField = <TValue extends ValueOptions>({
-  addNew,
-  disabled,
-  className,
-  label,
-  options,
-  placeholder = 'Sélectionner une option',
-  searchPlaceholder = 'Rechercher une option',
-}: ComboboxFieldProps<TValue>) => {
+const ComboboxField = <TValue extends ValueOptions>(props: ComboboxFieldProps<TValue>) => {
   const field = useFieldContext<TValue | undefined>()
 
   const handleSelect = (option: Option<TValue> | null) => {
-    if (option === null || option.value === field.store.state.value || option.value === undefined) {
-      field.setValue(undefined)
+    if (option === null || option.value === field().state.value || option.value === undefined) {
+      field().setValue(undefined)
     } else {
-      field.setValue(option.value)
+      field().setValue(option.value)
     }
   }
 
   return (
     <Field
-      className={className}
-      dirty={field.state.meta.isDirty}
-      invalid={!field.state.meta.isValid}
-      name={field.name}
-      touched={field.state.meta.isTouched}
+      class={props.class}
+      dirty={field().state.meta.isDirty}
+      invalid={!field().state.meta.isValid}
+      name={field().name}
+      touched={field().state.meta.isTouched}
     >
-      {label && <FieldLabel>{label}</FieldLabel>}
+      <Show when={props.label}>{(label) => <FieldLabel>{label()}</FieldLabel>}</Show>
       <Combobox
-        addNew={addNew}
-        disabled={disabled}
-        isInvalid={field.state.meta.isTouched && !field.state.meta.isValid}
+        addNew={props.addNew}
+        disabled={props.disabled}
+        isInvalid={field().state.meta.isTouched && !field().state.meta.isValid}
         onChange={handleSelect}
-        options={options}
-        placeholder={placeholder}
-        searchPlaceholder={searchPlaceholder}
-        title={label ?? placeholder}
-        value={field.store.state.value}
+        options={props.options}
+        placeholder={props.placeholder}
+        searchPlaceholder={props.searchPlaceholder}
+        title={props.label ?? props.placeholder}
+        value={field().state.value}
       />
       <FieldError />
     </Field>

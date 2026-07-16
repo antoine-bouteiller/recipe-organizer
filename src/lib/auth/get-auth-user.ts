@@ -1,5 +1,5 @@
-import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
+import { createServerFn } from '@tanstack/solid-start'
+import { getRequestHeaders } from '@tanstack/solid-start/server'
 
 import { getAuth } from '@/lib/auth/auth-server'
 import { withServerError } from '@/utils/error-handler'

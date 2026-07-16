@@ -1,30 +1,29 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
-import { useState, type JSX } from 'react'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { useMutation } from '@tanstack/solid-query'
+import { createSignal } from 'solid-js'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { createUserOptions, userSchema } from '@/features/users/api/create'
 import { userDefaultValues, UserForm } from '@/features/users/components/user-form'
 import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddUserProps {
-  children: JSX.Element
+  trigger: TriggerRender
 }
 
 const FormDialog = getFormDialog(userDefaultValues)
 
-export const AddUser = ({ children }: AddUserProps) => {
-  const createMutation = useMutation(createUserOptions())
-  const [open, setOpen] = useState(false)
+export const AddUser = (props: AddUserProps) => {
+  const createMutation = useMutation(() => createUserOptions())
+  const [open, setOpen] = createSignal(false)
 
-  const form = useAppForm({
+  const form = useAppForm(() => ({
     defaultValues: userDefaultValues,
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
-        {
-          data: v.parse(userSchema, value),
-        },
+        { data: v.parse(userSchema, value) },
         {
           onSuccess: () => {
             form.reset()
@@ -37,10 +36,10 @@ export const AddUser = ({ children }: AddUserProps) => {
     validators: {
       onDynamic: userSchema,
     },
-  })
+  }))
 
   return (
-    <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un utilisateur" trigger={children}>
+    <FormDialog form={form} open={open()} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un utilisateur" trigger={props.trigger}>
       <UserForm form={form} />
     </FormDialog>
   )

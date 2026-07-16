@@ -36,7 +36,7 @@ Assumptions:
 ## 2. Definitions
 
 - **Server Function**: a function declared with `createServerFn({ method })` from
-  `@tanstack/react-start`. Callable from client and server; serialised over HTTP.
+  `@tanstack/solid-start`. Callable from client and server; serialised over HTTP.
 - **Server-only Function**: a function declared with `createServerOnlyFn(...)`. Invocable only
   from server contexts (e.g. inside a route `server.handlers.GET`).
 - **Middleware**: a function-type middleware created with
@@ -63,7 +63,7 @@ Assumptions:
 ### 3.1 Declaration & file layout
 
 - **REQ-001**: Server functions MUST be declared with `createServerFn({ method })` imported
-  from `@tanstack/react-start`. `method` MUST be `'GET'` for reads and `'POST'` for any write
+  from `@tanstack/solid-start`. `method` MUST be `'GET'` for reads and `'POST'` for any write
   (create, update, delete). The default applies for delete operations as well; deletes MUST
   NOT use HTTP DELETE.
 - **REQ-002**: Server-only helpers (callable solely from server-side contexts such as API route
@@ -103,7 +103,7 @@ Assumptions:
   `src/utils/error-handler.ts`. The wrapper is cheap and yields uniform error semantics across
   the codebase (rethrow Router control flow, translate `ZodError`, normalise everything else).
 - **REQ-021**: `withServerError` MUST rethrow `notFound()` and `redirect()` from
-  `@tanstack/react-router` unchanged so that TanStack Router can interpret them.
+  `@tanstack/solid-router` unchanged so that TanStack Router can interpret them.
 - **REQ-022**: `withServerError` MUST translate `ZodError` to
   `new Error('Invalid Schema; <message>', { cause: error })`.
 - **REQ-023**: Any other thrown error MUST be `console.error`-logged with the prefix
@@ -214,7 +214,7 @@ Assumptions:
 
 ### 3.9 Coding constraints
 
-- **CON-010**: Imports MUST come from `@tanstack/react-start` and `@tanstack/react-router`.
+- **CON-010**: Imports MUST come from `@tanstack/solid-start` and `@tanstack/solid-router`.
   Vite+ wraps `vite`/`vitest` — see `CLAUDE.md`. Test utility imports come from
   `vite-plus/test`.
 - **CON-011**: D1 access MUST go through the singleton `getDb()` from `src/lib/db.ts`. Direct
@@ -489,11 +489,11 @@ await Promise.all(
 
 ### Infrastructure dependencies
 
-- **INF-001 — TanStack Start `@tanstack/react-start`**: provides `createServerFn`,
+- **INF-001 — TanStack Start `@tanstack/solid-start`**: provides `createServerFn`,
   `createServerOnlyFn`, `createMiddleware`.
-- **INF-002 — TanStack Router `@tanstack/react-router`**: provides `redirect`, `notFound`,
+- **INF-002 — TanStack Router `@tanstack/solid-router`**: provides `redirect`, `notFound`,
   `isRedirect`, `isNotFound`, `createFileRoute`.
-- **INF-003 — TanStack Query `@tanstack/react-query`**: provides `queryOptions`,
+- **INF-003 — TanStack Query `@tanstack/solid-query`**: provides `queryOptions`,
   `mutationOptions`.
 - **INF-004 — Better Auth `better-auth`**: owns sign-in/out, the OAuth handshake, session
   issuance, and cookie management. Consumed by `getAuthUser` / `authGuard` via `getAuth()`. See

@@ -54,8 +54,8 @@ commands must be reflected in this document.
 - **D1** — Cloudflare's serverless SQLite. Bound as `DB`.
 - **R2** — Cloudflare's S3-compatible object store. Bound as `R2_BUCKET`.
 - **Cloudflare Images** — Image transformation API exposed via the `IMAGES` binding.
-- **TanStack Start** — Full-stack React framework providing the SSR runtime; entry resolved via the
-  package export `@tanstack/react-start/server-entry`.
+- **TanStack Start** — Full-stack SolidJS meta-framework providing the SSR runtime; entry resolved via the
+  package export `@tanstack/solid-start/server-entry`.
 - **Vite+** — Unified toolchain (`vp` CLI) wrapping pnpm + Vite + Vitest + Oxlint + Oxfmt + tsdown.
 - **Serwist** — Service-worker library used to generate the offline-capable client SW.
 - **`compatibility_date`** — Pins the Worker runtime feature set; here `2026-01-28`.
@@ -93,7 +93,7 @@ commands must be reflected in this document.
 
 ### Constraints
 
-- **CON-001** — The Worker entry is fixed to `@tanstack/react-start/server-entry`
+- **CON-001** — The Worker entry is fixed to `@tanstack/solid-start/server-entry`
   (`wrangler.jsonc#main`). Build output MUST remain compatible with this resolver — i.e. produced by
   `vp build` running the TanStack Start Vite plugin.
 - **CON-002** — R2 PUT operations require known-length bodies. The image pipeline MUST materialize the
@@ -177,24 +177,23 @@ Production secrets are managed via `wrangler secret put`. `VITE_PUBLIC_URL` is c
 | `oauth-session` | true       | lax        | true            | (session)           |
 
 Both cookies are encrypted with `SESSION_SECRET` via `useSession` from
-`@tanstack/react-start/server`.
+`@tanstack/solid-start/server`.
 
 ### 4.5 Vite plugin chain (`vite.config.ts`)
 
 Order matters; the chain is:
 
 1. `tanstackStart()` — TanStack Start SSR/route plumbing.
-2. `react()` — `@vitejs/plugin-react` v6.
+2. `solid()` — `vite-plugin-solid` (v2.11.12).
 3. `cloudflare({ viteEnvironment: { name: 'ssr' } })` — `@cloudflare/vite-plugin`, binds the Cloudflare
    environment to the `ssr` Vite environment.
 4. `tailwindcss()` — `@tailwindcss/vite` v4.
 5. `tanstackSerwistPlugin()` — custom plugin in `scripts/generate-sw.ts` that emits `dist/client/sw.js`
    on `closeBundle` and runs `injectManifest` only in production.
 6. `devtools({ injectSource: { enabled: false } })` — TanStack Devtools, source injection disabled.
-7. `babel({ presets: [reactCompilerPreset()] })` — runs `babel-plugin-react-compiler`.
 
 Dev server listens on port `3000`. Lint config is Oxlint with `typeAware: true` and the
-`['typescript', 'react', 'unicorn', 'import']` plugins. Format config is Oxfmt
+`['typescript', 'unicorn', 'import']` plugins. Format config is Oxfmt
 (`semi: false`, `singleQuote: true`, `printWidth: 150`, `trailingComma: 'es5'`,
 `experimentalSortImports`, `experimentalTailwindcss` against `src/styles/app.css`).
 
@@ -299,8 +298,8 @@ Dev server listens on port `3000`. Lint config is Oxlint with `typeAware: true` 
 
 - **PLT-001 — Cloudflare Workers runtime.** `compatibility_date: 2026-01-28`,
   `compatibility_flags: ['nodejs_compat']`, observability logs enabled, traces disabled.
-- **PLT-002 — TanStack Start.** SSR React framework; provides the Worker `main` entry
-  `@tanstack/react-start/server-entry` and `useSession` server primitive.
+- **PLT-002 — TanStack Start.** SSR SolidJS meta-framework; provides the Worker `main` entry
+  `@tanstack/solid-start/server-entry` and `useSession` server primitive.
 - **PLT-003 — Vite+ (`vp`).** Unified toolchain wrapping Vite, Rolldown, Vitest, tsdown, Oxlint,
   Oxfmt; entry point for all dev/build/lint/format/test commands.
 - **PLT-004 — Serwist 9.5.7.** Service-worker library; uses `defaultCache`, `clientsClaim`,

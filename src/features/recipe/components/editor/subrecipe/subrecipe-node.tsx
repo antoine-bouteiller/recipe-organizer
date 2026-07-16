@@ -1,5 +1,4 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/solid-query'
 import {
   $getNodeByKey,
   DecoratorNode,
@@ -14,8 +13,9 @@ import {
   type SerializedLexicalNode,
   type Spread,
 } from 'lexical'
+import { type JSX, Show } from 'solid-js'
 
-import { Editor, EditorContent } from '@/components/common/editor'
+import { Editor, EditorContent, useEditor } from '@/components/common/editor'
 import { Spinner } from '@/components/ui/spinner'
 import { getRecipeInstructionsOptions } from '@/features/recipe/api/get-instructions'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
@@ -53,23 +53,11 @@ const filterNodes = (state: string, hideFirstNodes: number, hideLastNodes: numbe
   return JSON.stringify({ root: { ...parsedState.root, children: children.slice(startIndex, endIndex) } })
 }
 
-const SubrecipeInstructionsContent = ({
-  hideFirstNodes,
-  hideLastNodes,
-  instructions,
-}: {
-  hideFirstNodes: number
-  hideLastNodes: number
-  instructions: string
-}) => {
-  const filteredInstructions = filterNodes(instructions, hideFirstNodes, hideLastNodes)
-
-  return (
-    <Editor content={filteredInstructions} nodes={recipeNodes} readOnly>
-      <EditorContent className="pl-4" />
-    </Editor>
-  )
-}
+const SubrecipeInstructionsContent = (props: { hideFirstNodes: number; hideLastNodes: number; instructions: string }) => (
+  <Editor content={filterNodes(props.instructions, props.hideFirstNodes, props.hideLastNodes)} nodes={recipeNodes} readOnly>
+    <EditorContent class="pl-4" />
+  </Editor>
+)
 
 interface SubrecipeComponentProps {
   hideFirstNodes: number
@@ -79,19 +67,13 @@ interface SubrecipeComponentProps {
   recipeId: number
 }
 
-const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey, recipeId }: SubrecipeComponentProps) => {
-  const [editor] = useLexicalComposerContext()
-  const { data: recipe, isLoading } = useQuery(getRecipeInstructionsOptions(recipeId))
-
-  const formInitialValues: SubrecipeNodeData = {
-    hideFirstNodes,
-    hideLastNodes,
-    recipeId,
-  }
+const SubrecipeComponent = (props: SubrecipeComponentProps) => {
+  const editor = useEditor()
+  const query = useQuery(() => getRecipeInstructionsOptions(props.recipeId))
 
   const updateAttributes = (data: SubrecipeNodeData) => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey)
+      const node = $getNodeByKey(props.nodeKey)
       if ($isSubrecipeNode(node)) {
         const writable = node.getWritable()
         writable.__recipeId = data.recipeId
@@ -101,45 +83,55 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
     })
   }
 
-  if (!recipe) {
-    return null
-  }
+  return (
+    <Show when={query.data} keyed>
+      {(recipe) => {
+        const preview = (
+          <>
+            <p>
+              <strong>{recipe.name}</strong>
+            </p>
+            <Show
+              fallback={
+                <div class="flex items-center justify-center py-4">
+                  <Spinner />
+                </div>
+              }
+              when={!query.isLoading}
+            >
+              <SubrecipeInstructionsContent
+                hideFirstNodes={props.hideFirstNodes}
+                hideLastNodes={props.hideLastNodes}
+                instructions={recipe.instructions}
+              />
+            </Show>
+          </>
+        )
 
-  const content = (
-    <>
-      <p>
-        <strong>{recipe.name}</strong>
-      </p>
-      {isLoading ? (
-        <div className="flex items-center justify-center py-4">
-          <Spinner />
-        </div>
-      ) : (
-        <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe.instructions} />
-      )}
-    </>
+        return (
+          <Show fallback={preview} when={props.isEditable}>
+            <SubrecipeDialog
+              initialData={{ hideFirstNodes: props.hideFirstNodes, hideLastNodes: props.hideLastNodes, recipeId: props.recipeId }}
+              onSubmit={updateAttributes}
+              submitLabel="Enregistrer"
+              title="Modifier la sous-recette"
+              trigger={(Trigger) => (
+                <Trigger
+                  as="div"
+                  class="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start"
+                >
+                  {preview}
+                </Trigger>
+              )}
+            />
+          </Show>
+        )
+      }}
+    </Show>
   )
-
-  if (isEditable) {
-    return (
-      <SubrecipeDialog
-        initialData={formInitialValues}
-        onSubmit={updateAttributes}
-        submitLabel="Enregistrer"
-        title="Modifier la sous-recette"
-        triggerRender={
-          <div className="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start">
-            {content}
-          </div>
-        }
-      />
-    )
-  }
-
-  return content
 }
 
-class SubrecipeNodeType extends DecoratorNode<React.ReactElement> {
+class SubrecipeNodeType extends DecoratorNode<() => JSX.Element> {
   __recipeId: number
   __hideFirstNodes: number
   __hideLastNodes: number
@@ -220,8 +212,8 @@ class SubrecipeNodeType extends DecoratorNode<React.ReactElement> {
     return false
   }
 
-  decorate(editor: LexicalEditor): React.ReactElement {
-    return (
+  decorate(editor: LexicalEditor): () => JSX.Element {
+    return () => (
       <SubrecipeComponent
         hideFirstNodes={this.__hideFirstNodes}
         hideLastNodes={this.__hideLastNodes}

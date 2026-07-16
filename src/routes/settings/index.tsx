@@ -1,5 +1,10 @@
-import { CaretRightIcon, CookieIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Link, useRouter } from '@tanstack/solid-router'
+import { For } from 'solid-js'
+import { Dynamic } from 'solid-js/web'
+import CaretRight from '~icons/ph/caret-right'
+import Cookie from '~icons/ph/cookie'
+import User from '~icons/ph/user'
+import Users from '~icons/ph/users'
 
 import { ThemeIcon } from '@/components/icons/theme'
 import { ScreenLayout } from '@/components/layout/screen-layout'
@@ -10,7 +15,7 @@ import { toggleTheme } from '@/lib/theme'
 interface SettingsSection {
   adminOnly?: boolean
   description: string
-  icon: React.ComponentType<IconProps>
+  icon: typeof User
   id: string
   path: string
   title: string
@@ -19,14 +24,14 @@ interface SettingsSection {
 const settingsSections: SettingsSection[] = [
   {
     description: 'Gérer vos informations de compte et vous déconnecter',
-    icon: UserIcon,
+    icon: User,
     id: 'account',
     path: '/settings/account',
     title: 'Compte',
   },
   {
     description: 'Gérer la liste des ingrédients disponibles',
-    icon: CookieIcon,
+    icon: Cookie,
     id: 'ingredients',
     path: '/settings/ingredients',
     title: 'Ingrédients',
@@ -34,7 +39,7 @@ const settingsSections: SettingsSection[] = [
   {
     adminOnly: true,
     description: 'Gérer les utilisateurs et leurs rôles',
-    icon: UsersIcon,
+    icon: Users,
     id: 'users',
     path: '/settings/users',
     title: 'Utilisateurs',
@@ -42,46 +47,43 @@ const settingsSections: SettingsSection[] = [
 ]
 
 const RouteComponent = () => {
-  const { isAdmin } = Route.useRouteContext()
+  const context = Route.useRouteContext()
   const router = useRouter()
 
-  const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
-
   return (
-    <ScreenLayout title="Paramètres" pageKey="/settings">
+    <ScreenLayout pageKey="/settings" title="Paramètres">
       <Button
-        className="mb-4 w-full justify-start gap-3 md:hidden"
+        class="mb-4 w-full justify-start gap-3 md:hidden"
         onClick={async () => {
           toggleTheme()
           await router.invalidate()
         }}
         variant="outline"
       >
-        <ThemeIcon className="size-5" />
+        <ThemeIcon class="size-5" />
         Changer le thème
       </Button>
-      <div className="grid gap-4 md:grid-cols-2">
-        {visibleSections.map((section) => {
-          const Icon = section.icon
-          return (
-            <Link key={section.id} to={section.path} viewTransition>
-              <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
-                <div className="flex items-start justify-between">
-                  <div className="flex flex-1 items-start gap-3">
-                    <div className="rounded-lg bg-primary/10 p-2">
-                      <Icon className="h-5 w-5 text-primary" />
+      <div class="grid gap-4 md:grid-cols-2">
+        <For each={settingsSections.filter((section) => !section.adminOnly || context().isAdmin)}>
+          {(section) => (
+            <Link to={section.path} viewTransition>
+              <Card class="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
+                <div class="flex items-start justify-between">
+                  <div class="flex flex-1 items-start gap-3">
+                    <div class="rounded-lg bg-primary/10 p-2">
+                      <Dynamic class="h-5 w-5 text-primary" component={section.icon} />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{section.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
+                    <div class="flex-1">
+                      <h3 class="font-semibold">{section.title}</h3>
+                      <p class="mt-1 text-sm text-muted-foreground">{section.description}</p>
                     </div>
                   </div>
-                  <CaretRightIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <CaretRight class="h-5 w-5 shrink-0 text-muted-foreground" />
                 </div>
               </Card>
             </Link>
-          )
-        })}
+          )}
+        </For>
       </div>
     </ScreenLayout>
   )

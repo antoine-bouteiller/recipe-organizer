@@ -1,5 +1,5 @@
-import { queryOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
+import { queryOptions } from '@tanstack/solid-query'
+import { createServerFn } from '@tanstack/solid-start'
 
 import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'

@@ -1,5 +1,5 @@
-import { redirect } from '@tanstack/react-router'
-import { createMiddleware } from '@tanstack/react-start'
+import { redirect } from '@tanstack/solid-router'
+import { createMiddleware } from '@tanstack/solid-start'
 
 import { getAuthUser } from '@/lib/auth/get-auth-user'
 

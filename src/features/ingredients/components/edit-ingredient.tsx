@@ -1,12 +1,11 @@
-import { PencilSimpleIcon } from '@phosphor-icons/react'
-import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { revalidateLogic } from '@tanstack/solid-form'
+import { useMutation } from '@tanstack/solid-query'
+import { createSignal } from 'solid-js'
 import * as v from 'valibot'
+import PencilSimple from '~icons/ph/pencil-simple'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
-import { ingredientSchema } from '@/features/ingredients/api/create'
 import { updateIngredientOptions, updateIngredientSchema, type UpdateIngredientFormInput } from '@/features/ingredients/api/update'
 import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
@@ -16,55 +15,55 @@ interface EditIngredientProps {
   ingredient: Ingredient
 }
 
-const FormDialog = getFormDialog(getIngredientDefaultValues())
+const FormDialog = getFormDialog<UpdateIngredientFormInput>(getIngredientDefaultValues())
 
-export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
-  const updateMutation = useMutation(updateIngredientOptions())
-  const [open, setOpen] = useState(false)
+export const EditIngredient = (props: EditIngredientProps) => {
+  const updateMutation = useMutation(() => updateIngredientOptions())
+  const [open, setOpen] = createSignal(false)
 
-  const initialValues: UpdateIngredientFormInput = {
-    category: ingredient.category,
-    countWeightG: ingredient.countWeightG,
-    densityGPerMl: ingredient.densityGPerMl,
-    id: ingredient.id,
-    name: ingredient.name,
-    parentId: ingredient.parentId ?? undefined,
-    preferredUnitSlug: ingredient.preferredUnitSlug,
-  }
+  const form = useAppForm(() => {
+    const initialValues: UpdateIngredientFormInput = {
+      category: props.ingredient.category,
+      countWeightG: props.ingredient.countWeightG,
+      densityGPerMl: props.ingredient.densityGPerMl,
+      id: props.ingredient.id,
+      name: props.ingredient.name,
+      parentId: props.ingredient.parentId ?? undefined,
+      preferredUnitSlug: props.ingredient.preferredUnitSlug,
+    }
 
-  const form = useAppForm({
-    defaultValues: initialValues,
-    onSubmit: async (data) => {
-      await updateMutation.mutateAsync(
-        {
-          data: v.parse(updateIngredientSchema, data.value),
-        },
-        {
-          onSuccess: () => {
-            form.reset()
-            setOpen(false)
-          },
-        }
-      )
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: ingredientSchema,
-    },
+    return {
+      defaultValues: initialValues,
+      onSubmit: async (data) => {
+        await updateMutation.mutateAsync(
+          { data: v.parse(updateIngredientSchema, data.value) },
+          {
+            onSuccess: () => {
+              form.reset()
+              setOpen(false)
+            },
+          }
+        )
+      },
+      validationLogic: revalidateLogic(),
+      validators: {
+        onDynamic: updateIngredientSchema,
+      },
+    }
   })
 
   return (
     <FormDialog
       form={form}
-      open={open}
+      open={open()}
       setOpen={setOpen}
       submitLabel="Mettre à jour"
       title="Modifier l'ingrédient"
-      trigger={
-        <Button size="icon" variant="outline">
-          <PencilSimpleIcon />
-        </Button>
-      }
+      trigger={(Trigger) => (
+        <Trigger as={Button} size="icon" variant="outline">
+          <PencilSimple />
+        </Trigger>
+      )}
     >
       <IngredientForm form={form} />
     </FormDialog>
