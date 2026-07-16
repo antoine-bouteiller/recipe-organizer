@@ -101,7 +101,7 @@ const EditRecipePage = () => {
                 addNewIngredientOption={renderAddIngredientOption}
                 form={form}
                 id={data.id}
-                ingredientOptions={ingredientOptions}
+                ingredientOptions={ingredientOptions()}
                 initialImage={data.image ? { id: data.image, url: data.image } : undefined}
                 initialVideo={data.video ? { id: data.video, url: getVideoUrl(data.video) } : undefined}
               />

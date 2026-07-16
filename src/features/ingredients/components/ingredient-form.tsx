@@ -35,7 +35,7 @@ export const IngredientForm = withForm({
           {({ SelectField }) => <SelectField disabled={isSubmitting()} items={ingredientsCategoryOptions} label="Catégorie" />}
         </AppField>
         <AppField name="parentId">
-          {({ ComboboxField }) => <ComboboxField disabled={isSubmitting()} label="Ingrédient parent" options={ingredientOptions} />}
+          {({ ComboboxField }) => <ComboboxField disabled={isSubmitting()} label="Ingrédient parent" options={ingredientOptions()} />}
         </AppField>
         <AppField name="densityGPerMl">
           {({ NumberField }) => <NumberField disabled={isSubmitting()} label="Densité (g/ml)" min={0} placeholder="Ex: 0.55" />}

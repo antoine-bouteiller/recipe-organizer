@@ -1,4 +1,5 @@
 import { type QueryKey, useQuery } from '@tanstack/solid-query'
+import { type Accessor, createMemo } from 'solid-js'
 
 export interface Option<TValue = number | undefined> {
   label: string
@@ -6,9 +7,9 @@ export interface Option<TValue = number | undefined> {
 }
 
 export const createOptionsHook = <TItem>(getQueryOptions: () => { queryFn?: unknown; queryKey: QueryKey }, mapFn: (item: TItem) => Option) => {
-  function useOptions(props?: { allowEmpty?: false; filter?: (item: TItem) => boolean }): Option<number>[]
+  function useOptions(props?: { allowEmpty?: false; filter?: (item: TItem) => boolean }): Accessor<Option<number>[]>
 
-  function useOptions(props: { allowEmpty: true; filter?: (item: TItem) => boolean }): Option[]
+  function useOptions(props: { allowEmpty: true; filter?: (item: TItem) => boolean }): Accessor<Option[]>
 
   function useOptions({
     allowEmpty,
@@ -16,17 +17,19 @@ export const createOptionsHook = <TItem>(getQueryOptions: () => { queryFn?: unkn
   }: {
     allowEmpty?: boolean
     filter?: (item: TItem) => boolean
-  } = {}): Option[] {
+  } = {}): Accessor<Option[]> {
     const query = useQuery(getQueryOptions as never)
 
-    const items = (query.data ?? []) as TItem[]
-    const options: Option[] = items.filter(filter).map(mapFn)
+    return createMemo(() => {
+      const items = (query.data ?? []) as TItem[]
+      const options: Option[] = items.filter(filter).map(mapFn)
 
-    if (allowEmpty) {
-      options.unshift({ label: 'Aucune', value: undefined })
-    }
+      if (allowEmpty) {
+        options.unshift({ label: 'Aucune', value: undefined })
+      }
 
-    return options
+      return options
+    })
   }
 
   return useOptions

@@ -36,7 +36,7 @@ const FormDialog = getFormDialog(subrecipeDefaultValues)
 export const SubrecipeDialog = (props: SubrecipeDialogProps) => {
   const [open, setOpen] = createSignal(false)
   const linkedRecipeIds = useLinkedRecipes()
-  const recipesOptions = useRecipeOptions({ filter: (recipe) => linkedRecipeIds.includes(recipe.id) })
+  const recipesOptions = useRecipeOptions({ filter: (recipe) => linkedRecipeIds().includes(recipe.id) })
 
   const form = useAppForm(() => ({
     defaultValues: props.initialData ?? subrecipeDefaultValues,
@@ -59,7 +59,7 @@ export const SubrecipeDialog = (props: SubrecipeDialogProps) => {
 
   return (
     <FormDialog form={form} open={open()} setOpen={setOpen} submitLabel={props.submitLabel} title={props.title} trigger={props.trigger}>
-      <form.AppField name="recipeId">{({ ComboboxField }) => <ComboboxField label="Recette" options={recipesOptions} />}</form.AppField>
+      <form.AppField name="recipeId">{({ ComboboxField }) => <ComboboxField label="Recette" options={recipesOptions()} />}</form.AppField>
       <div class="grid grid-cols-2 gap-4">
         <form.AppField name="hideFirstNodes">{({ NumberField }) => <NumberField label="Masquer les N premières étapes" min={0} />}</form.AppField>
         <form.AppField name="hideLastNodes">{({ NumberField }) => <NumberField label="Masquer les N dernières étapes" min={0} />}</form.AppField>

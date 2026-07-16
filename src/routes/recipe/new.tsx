@@ -48,7 +48,7 @@ const NewRecipePage = () => {
           void form.handleSubmit()
         }}
       >
-        <RecipeForm addNewIngredientOption={renderAddIngredientOption} form={form} ingredientOptions={ingredientOptions} />
+        <RecipeForm addNewIngredientOption={renderAddIngredientOption} form={form} ingredientOptions={ingredientOptions()} />
         <div class="flex flex-col justify-end gap-4 pt-6 md:flex-row">
           <Button disabled={isSubmitting()} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler

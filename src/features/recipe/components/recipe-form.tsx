@@ -77,7 +77,7 @@ export const RecipeForm = withForm({
                             <ComboboxField
                               class="flex-1 overflow-hidden"
                               disabled={isSubmitting()}
-                              options={recipeOptions}
+                              options={recipeOptions()}
                               placeholder="Sélectionner une sous-recette"
                               searchPlaceholder="Rechercher une sous-recette"
                             />
