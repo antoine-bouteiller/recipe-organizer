@@ -115,11 +115,14 @@ const SubrecipeComponent = (props: SubrecipeComponentProps) => {
               onSubmit={updateAttributes}
               submitLabel="Enregistrer"
               title="Modifier la sous-recette"
-              trigger={{
-                as: 'div',
-                children: preview,
-                class: 'w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start',
-              }}
+              trigger={(Trigger) => (
+                <Trigger
+                  as="div"
+                  class="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start"
+                >
+                  {preview}
+                </Trigger>
+              )}
             />
           </Show>
         )

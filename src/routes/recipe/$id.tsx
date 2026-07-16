@@ -47,12 +47,11 @@ const RecipePage = () => {
             headerEndItem={
               context().authUser ? (
                 <Popover
-                  trigger={{
-                    as: Button,
-                    children: <DotsThreeVertical class="text-primary" />,
-                    size: 'icon',
-                    variant: 'outline',
-                  }}
+                  trigger={(Trigger) => (
+                    <Trigger as={Button} size="icon" variant="outline">
+                      <DotsThreeVertical class="text-primary" />
+                    </Trigger>
+                  )}
                 >
                   <div class="flex flex-col items-start gap-2 p-4 md:p-0">
                     <Link

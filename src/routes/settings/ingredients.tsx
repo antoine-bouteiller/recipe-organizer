@@ -31,7 +31,13 @@ const IngredientsManagement = () => {
     <ScreenLayout title="Ingrédients" withGoBack>
       <div class="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
         <SearchInput search={search()} setSearch={setSearch} />
-        <AddIngredient trigger={{ as: Button, children: <Plus />, size: 'icon-lg', variant: 'outline' }} />
+        <AddIngredient
+          trigger={(Trigger) => (
+            <Trigger as={Button} size="icon-lg" variant="outline">
+              <Plus />
+            </Trigger>
+          )}
+        />
       </div>
 
       <Show

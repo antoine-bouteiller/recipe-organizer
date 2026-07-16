@@ -1,9 +1,10 @@
 import { Select as SelectPrimitive, type SelectRootItemComponentProps } from '@kobalte/core/select'
+import { createMemo } from 'solid-js'
 import CaretDown from '~icons/ph/caret-down'
 import Check from '~icons/ph/check'
 
 import { type SelectProps } from '@/components/ui/select'
-import { getSelectDisplay, selectTriggerIconClassName, selectTriggerVariants } from '@/components/ui/select.shared'
+import { getSelectDisplay, selectTriggerClassName, selectTriggerIconClassName } from '@/components/ui/select.shared'
 import { cn } from '@/utils/cn'
 
 const NULL_OPTION_SENTINEL_KEY = 'none'
@@ -40,15 +41,11 @@ const selectContent = () => (
 )
 
 const SelectBase = <TValue extends string>(props: SelectProps<TValue>) => {
-  const display = () => getSelectDisplay(props)
+  const display = createMemo(() => getSelectDisplay(props))
 
   // Thunks, not consts: an eager `const x = <Root.Trigger/>` runs outside the Root, so useFormControlContext throws
   const trigger = () => (
-    <SelectPrimitive.Trigger
-      class={cn(selectTriggerVariants({ size: props.size }), props.class)}
-      data-slot="select-trigger"
-      disabled={props.disabled}
-    >
+    <SelectPrimitive.Trigger class={cn(selectTriggerClassName, props.class)} data-slot="select-trigger" disabled={props.disabled}>
       <span class={cn('flex-1 truncate text-left', display().isEmpty && 'text-muted-foreground')}>{display().displayLabel}</span>
       <SelectPrimitive.Icon data-slot="select-icon">
         <CaretDown class={selectTriggerIconClassName} />

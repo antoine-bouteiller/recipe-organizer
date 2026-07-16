@@ -1,10 +1,10 @@
 import { type JSX, lazy, Show, Suspense } from 'solid-js'
 
-import { type TriggerConfig } from '@/components/ui/dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 export interface PopoverProps {
-  trigger: TriggerConfig
+  trigger: TriggerRender
   children: JSX.Element
 }
 

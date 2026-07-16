@@ -1,7 +1,7 @@
 import { useSelector } from '@tanstack/solid-store'
 import { type JSX } from 'solid-js'
 
-import { Dialog, type TriggerConfig } from '@/components/ui/dialog'
+import { Dialog, type TriggerRender } from '@/components/ui/dialog'
 import { Form } from '@/components/ui/form'
 import { withForm } from '@/hooks/use-app-form'
 import { formatFormErrors } from '@/utils/format-form-errors'
@@ -12,7 +12,7 @@ interface FormModalProps extends Record<string, unknown> {
   setOpen: (open: boolean) => void
   submitLabel: string
   title: string
-  trigger?: TriggerConfig
+  trigger?: TriggerRender
 }
 
 export const getFormDialog = <TValues,>(defaultValues: TValues) =>

@@ -119,7 +119,11 @@ const MagimixProgramComponent = (props: MagimixProgramComponentProps) => {
         onSubmit={updateAttributes}
         submitLabel="Enregistrer"
         title="Modifier le programme Magimix"
-        trigger={{ as: 'button', children: item, class: 'w-full', type: 'button' }}
+        trigger={(Trigger) => (
+          <Trigger as="button" class="w-full" type="button">
+            {item}
+          </Trigger>
+        )}
       />
     </Show>
   )

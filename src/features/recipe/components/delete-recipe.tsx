@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/solid-query'
 import { useRouter } from '@tanstack/solid-router'
 
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
-import { Button } from '@/components/ui/button'
 import { toastManager } from '@/components/ui/toast'
 import { deleteRecipeOptions } from '@/features/recipe/api/delete'
 
@@ -42,7 +41,7 @@ export default function DeleteRecipe(props: Readonly<DeleteRecipeProps>) {
       description={`Êtes-vous sûr de vouloir supprimer la recette ${props.recipeName}?`}
       onDelete={handleDelete}
       title="Supprimer la recette"
-      trigger={{ as: Button, class: 'text-destructive hover:text-destructive', variant: 'ghost' }}
+      trigger={{ class: 'text-destructive hover:text-destructive', variant: 'ghost' }}
     />
   )
 }

@@ -8,10 +8,7 @@ export const Separator = <T extends ValidComponent = 'hr'>(props: PolymorphicPro
   const [local, rest] = splitProps(props as PolymorphicProps<'hr', SeparatorRootProps>, ['class', 'orientation'])
   return (
     <SeparatorPrimitive
-      class={cn(
-        "shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:not-[[class^='h-']]:not-[[class*='_h-']]:self-stretch",
-        local.class
-      )}
+      class={cn('h-px w-full shrink-0 bg-border', local.class)}
       data-slot="separator"
       orientation={local.orientation ?? 'horizontal'}
       {...rest}

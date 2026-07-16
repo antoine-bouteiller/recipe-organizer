@@ -59,7 +59,11 @@ export const EditIngredient = (props: EditIngredientProps) => {
       setOpen={setOpen}
       submitLabel="Mettre à jour"
       title="Modifier l'ingrédient"
-      trigger={{ as: Button, children: <PencilSimple />, size: 'icon', variant: 'outline' }}
+      trigger={(Trigger) => (
+        <Trigger as={Button} size="icon" variant="outline">
+          <PencilSimple />
+        </Trigger>
+      )}
     >
       <IngredientForm form={form} />
     </FormDialog>

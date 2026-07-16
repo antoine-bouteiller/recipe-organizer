@@ -1,4 +1,4 @@
-import { createSignal, For } from 'solid-js'
+import { createMemo, createSignal, For } from 'solid-js'
 import Check from '~icons/ph/check'
 
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
@@ -8,7 +8,7 @@ import { cn } from '@/utils/cn'
 
 const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>) => {
   const [open, setOpen] = createSignal(false)
-  const display = () => getSelectDisplay(props)
+  const display = createMemo(() => getSelectDisplay(props))
 
   const handleSelect = (value: TValue | null) => {
     if (props.multiple) {
@@ -21,7 +21,7 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>) => {
 
   return (
     <Drawer onOpenChange={setOpen} open={open()}>
-      <DrawerTrigger as={SelectButton} class={props.class} data-slot="drawer-trigger" disabled={props.disabled} size={props.size}>
+      <DrawerTrigger as={SelectButton} class={props.class} data-slot="drawer-trigger" disabled={props.disabled}>
         <span class={cn(display().isEmpty && 'text-muted-foreground')}>{display().displayLabel}</span>
       </DrawerTrigger>
       <DrawerPopup>

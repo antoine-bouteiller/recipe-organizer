@@ -3,7 +3,7 @@ import { createSignal } from 'solid-js'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { type TriggerConfig } from '@/components/ui/dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { useLinkedRecipes } from '@/features/recipe/contexts/linked-recipes-context'
 import { useRecipeOptions } from '@/features/recipe/hooks/use-recipe-options'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
@@ -22,7 +22,7 @@ interface SubrecipeDialogProps {
   onSubmit: (data: SubrecipeNodeData) => void
   submitLabel: string
   title: string
-  trigger?: TriggerConfig
+  trigger?: TriggerRender
 }
 
 const subrecipeDefaultValues: SubrecipeFormInput = {

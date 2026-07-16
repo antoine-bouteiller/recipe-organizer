@@ -4,13 +4,13 @@ import { createSignal } from 'solid-js'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { type TriggerConfig } from '@/components/ui/dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { createUserOptions, userSchema } from '@/features/users/api/create'
 import { userDefaultValues, UserForm } from '@/features/users/components/user-form'
 import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddUserProps {
-  trigger: TriggerConfig
+  trigger: TriggerRender
 }
 
 const FormDialog = getFormDialog(userDefaultValues)

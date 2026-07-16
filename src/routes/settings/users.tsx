@@ -184,7 +184,13 @@ const UsersManagement = () => {
     <ScreenLayout title="Utilisateurs" withGoBack>
       <div class="sticky top-0 z-10 flex items-center gap-4 bg-muted pb-2">
         <SearchInput search={search()} setSearch={setSearch} />
-        <AddUser trigger={{ as: Button, children: <Plus />, size: 'icon-lg', variant: 'outline' }} />
+        <AddUser
+          trigger={(Trigger) => (
+            <Trigger as={Button} size="icon-lg" variant="outline">
+              <Plus />
+            </Trigger>
+          )}
+        />
       </div>
 
       <Tabs defaultValue="active">

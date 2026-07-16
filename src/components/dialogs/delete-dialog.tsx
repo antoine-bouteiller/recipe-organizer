@@ -1,9 +1,12 @@
+import { type VariantProps } from 'class-variance-authority'
 import { createSignal, Show } from 'solid-js'
 import Trash from '~icons/ph/trash'
 
-import { Button } from '@/components/ui/button'
-import { Dialog, type TriggerConfig } from '@/components/ui/dialog'
+import { Button, type buttonVariants } from '@/components/ui/button'
+import { Dialog, type TriggerRender } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
+
+type ButtonVariants = VariantProps<typeof buttonVariants>
 
 interface DeleteDialogProps {
   actionLabel?: string
@@ -14,7 +17,7 @@ interface DeleteDialogProps {
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title: string
-  trigger?: TriggerConfig
+  trigger?: { class?: string; variant?: ButtonVariants['variant']; size?: ButtonVariants['size'] }
 }
 
 export const DeleteDialog = (props: DeleteDialogProps) => {
@@ -42,20 +45,14 @@ export const DeleteDialog = (props: DeleteDialogProps) => {
     }
   }
 
-  const triggerConfig = (): TriggerConfig | undefined =>
+  const triggerRender = (): TriggerRender | undefined =>
     isControlled()
       ? undefined
-      : {
-          as: Button,
-          size: 'icon',
-          variant: 'destructive',
-          ...props.trigger,
-          children: (
-            <>
-              <TriggerIcon /> {props.deleteButtonLabel}
-            </>
-          ),
-        }
+      : (Trigger) => (
+          <Trigger as={Button} size="icon" variant="destructive" {...props.trigger}>
+            <TriggerIcon /> {props.deleteButtonLabel}
+          </Trigger>
+        )
 
   return (
     <Dialog
@@ -71,7 +68,7 @@ export const DeleteDialog = (props: DeleteDialogProps) => {
       onOpenChange={setIsOpen}
       open={isOpen()}
       title={props.title}
-      trigger={triggerConfig()}
+      trigger={triggerRender()}
     >
       {props.description}
     </Dialog>

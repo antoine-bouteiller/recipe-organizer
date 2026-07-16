@@ -9,16 +9,13 @@ interface ToggleGroupProps {
   value: string[]
   onValueChange: (value: string[]) => void
   disabled?: boolean
-  class?: string
 }
 
 export const ToggleGroup = (props: ToggleGroupProps) => (
-  <div class={cn('max-w-full overflow-x-auto overflow-y-hidden', props.class)}>
+  <div class="max-w-full overflow-x-auto overflow-y-hidden">
     <ToggleGroupPrimitive
       class="flex w-fit gap-0.5 *:focus-visible:z-10 *:pointer-coarse:after:min-w-auto dark:*:[[data-slot=separator]:has(+[data-slot=toggle]:hover)]:before:bg-input/64 dark:*:[[data-slot=separator]:has(+[data-slot=toggle][data-pressed])]:before:bg-input dark:*:[[data-slot=toggle]:hover+[data-slot=separator]]:before:bg-input/64 dark:*:[[data-slot=toggle][data-pressed]+[data-slot=separator]]:before:bg-input"
-      data-size="default"
       data-slot="toggle-group"
-      data-variant="default"
       disabled={props.disabled}
       multiple
       onChange={props.onValueChange}

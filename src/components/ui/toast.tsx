@@ -1,12 +1,10 @@
 import { Toast, toaster } from '@kobalte/core/toast'
 import { type JSX, Show } from 'solid-js'
+import { Dynamic } from 'solid-js/web'
 import CheckCircle from '~icons/ph/check-circle'
-import Info from '~icons/ph/info'
-import SpinnerGap from '~icons/ph/spinner-gap'
-import Warning from '~icons/ph/warning'
 import WarningCircle from '~icons/ph/warning-circle'
 
-type ToastType = 'error' | 'info' | 'loading' | 'success' | 'warning'
+type ToastType = 'error' | 'success'
 
 interface AddToastOptions {
   title: string
@@ -14,28 +12,17 @@ interface AddToastOptions {
   type?: ToastType
 }
 
-const ICON_CLASS =
-  'in-data-[type=error]:text-destructive in-data-[type=info]:text-info in-data-[type=loading]:animate-spin in-data-[type=loading]:opacity-80 in-data-[type=success]:text-success in-data-[type=warning]:text-warning'
+const ICON_CLASS = 'in-data-[type=error]:text-destructive in-data-[type=success]:text-success'
+
+const ICONS = { error: WarningCircle, success: CheckCircle }
 
 const ToastIcon = (props: { type?: ToastType }) => (
   <Show when={props.type}>
-    <div class="[&>svg]:h-lh [&>svg]:w-4" data-slot="toast-icon">
-      <Show when={props.type === 'error'}>
-        <WarningCircle class={ICON_CLASS} />
-      </Show>
-      <Show when={props.type === 'info'}>
-        <Info class={ICON_CLASS} />
-      </Show>
-      <Show when={props.type === 'loading'}>
-        <SpinnerGap class={ICON_CLASS} />
-      </Show>
-      <Show when={props.type === 'success'}>
-        <CheckCircle class={ICON_CLASS} />
-      </Show>
-      <Show when={props.type === 'warning'}>
-        <Warning class={ICON_CLASS} />
-      </Show>
-    </div>
+    {(type) => (
+      <div class="[&>svg]:h-lh [&>svg]:w-4" data-slot="toast-icon">
+        <Dynamic component={ICONS[type()]} class={ICON_CLASS} />
+      </div>
+    )}
   </Show>
 )
 

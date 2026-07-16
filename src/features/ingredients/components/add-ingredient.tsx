@@ -6,14 +6,14 @@ import Plus from '~icons/ph/plus'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
-import { type TriggerConfig } from '@/components/ui/dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/create'
 import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'
 import { useAppForm } from '@/hooks/use-app-form'
 
 interface AddIngredientProps {
   defaultValue?: string
-  trigger: TriggerConfig
+  trigger: TriggerRender
 }
 
 const FormDialog = getFormDialog(getIngredientDefaultValues())
@@ -51,17 +51,11 @@ export const AddIngredient = (props: AddIngredientProps) => {
 export const renderAddIngredientOption = (inputValue: string) => (
   <AddIngredient
     defaultValue={inputValue}
-    trigger={{
-      as: Button,
-      children: (
-        <>
-          <Plus aria-hidden="true" class="size-4" />
-          Nouvel ingrédient: {inputValue}
-        </>
-      ),
-      class: 'w-full justify-start px-1.5 font-normal',
-      size: 'sm',
-      variant: 'ghost',
-    }}
+    trigger={(Trigger) => (
+      <Trigger as={Button} class="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
+        <Plus aria-hidden="true" class="size-4" />
+        Nouvel ingrédient: {inputValue}
+      </Trigger>
+    )}
   />
 )

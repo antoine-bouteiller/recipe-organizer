@@ -3,7 +3,7 @@ import { type ComponentProps, splitProps } from 'solid-js'
 import { cn } from '@/utils/cn'
 
 export type InputProps = Omit<ComponentProps<'input'>, 'size' | 'style'> & {
-  size?: 'sm' | 'default' | 'lg' | number
+  size?: 'default' | 'lg'
   unstyled?: boolean
 }
 
@@ -14,7 +14,6 @@ export const Input = (props: InputProps) => {
   const inputClass = () =>
     cn(
       'h-8.5 w-full min-w-0 rounded-[inherit] px-[calc(--spacing(3)-1px)] leading-8.5 outline-none [transition:background-color_5000000s_ease-in-out_0s] placeholder:text-muted-foreground/72 sm:h-7.5 sm:leading-7.5',
-      size() === 'sm' && 'h-7.5 px-[calc(--spacing(2.5)-1px)] leading-7.5 sm:h-6.5 sm:leading-6.5',
       size() === 'lg' && 'h-9.5 leading-9.5 sm:h-8.5 sm:leading-8.5',
       local.type === 'search' &&
         '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none',
@@ -33,7 +32,7 @@ export const Input = (props: InputProps) => {
       data-size={size()}
       data-slot="input-control"
     >
-      <input class={inputClass()} data-slot="input" size={typeof size() === 'number' ? size() : undefined} type={local.type} {...rest} />
+      <input class={inputClass()} data-slot="input" type={local.type} {...rest} />
     </span>
   )
 }

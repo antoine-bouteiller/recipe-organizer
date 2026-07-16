@@ -24,7 +24,11 @@ export const SubrecipeButton = () => {
       onSubmit={handleInsert}
       submitLabel="Insérer"
       title="Ajouter une sous-recette"
-      trigger={{ as: Toggle, children: <BookOpen class="size-4" /> }}
+      trigger={(Trigger) => (
+        <Trigger as={Toggle}>
+          <BookOpen class="size-4" />
+        </Trigger>
+      )}
     />
   )
 }

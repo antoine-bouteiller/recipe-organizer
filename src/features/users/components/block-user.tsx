@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/solid-query'
 import Prohibit from '~icons/ph/prohibit'
 
 import { DeleteDialog } from '@/components/dialogs/delete-dialog'
-import { Button } from '@/components/ui/button'
 import { blockUserOptions } from '@/features/users/api/block'
 
 interface BlockUserProps {
@@ -26,7 +25,7 @@ export const BlockUser = (props: BlockUserProps) => {
       onOpenChange={props.onOpenChange}
       open={props.open}
       title="Bloquer l'utilisateur"
-      trigger={{ as: Button, size: 'icon', variant: 'destructive-outline' }}
+      trigger={{ size: 'icon', variant: 'destructive-outline' }}
     />
   )
 }

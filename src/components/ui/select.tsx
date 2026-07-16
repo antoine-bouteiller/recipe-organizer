@@ -1,6 +1,5 @@
 import { lazy, Show, Suspense } from 'solid-js'
 
-import { type SelectButtonProps } from '@/components/ui/select.shared'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 interface SelectOption<TValue extends string> {
@@ -14,7 +13,6 @@ interface SelectBaseProps<TValue extends string> {
   title?: string
   disabled?: boolean
   class?: string
-  size?: SelectButtonProps['size']
 }
 
 export type SelectProps<TValue extends string> = SelectBaseProps<TValue> &

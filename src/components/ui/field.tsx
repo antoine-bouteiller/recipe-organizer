@@ -20,9 +20,15 @@ const FieldContext = createContext<FieldState>({
 const useFieldState = () => useContext(FieldContext)
 
 const stateDataAttrs = (state: FieldState) => ({
-  'data-dirty': state.dirty() || undefined,
-  'data-invalid': state.invalid() || undefined,
-  'data-touched': state.touched() || undefined,
+  get 'data-dirty'() {
+    return state.dirty() || undefined
+  },
+  get 'data-invalid'() {
+    return state.invalid() || undefined
+  },
+  get 'data-touched'() {
+    return state.touched() || undefined
+  },
 })
 
 export const Field = (props: ComponentProps<'div'> & { name?: string; invalid?: boolean; dirty?: boolean; touched?: boolean }) => {
@@ -59,11 +65,6 @@ export const FieldLabel = (props: ComponentProps<'label'>) => {
   )
 }
 
-export const FieldDescription = (props: ComponentProps<'p'>) => {
-  const [local, rest] = splitProps(props, ['class'])
-  return <p class={cn('text-muted-foreground text-xs', local.class)} data-slot="field-description" {...rest} />
-}
-
 export const FieldError = (props: ComponentProps<'div'>) => {
   const [local, rest] = splitProps(props, ['class', 'children'])
   const state = useFieldState()
@@ -80,8 +81,7 @@ export const FieldError = (props: ComponentProps<'div'>) => {
 }
 
 export const FieldControl = (props: ComponentProps<'input'>) => {
-  const [local, rest] = splitProps(props, ['class'])
   const state = useFieldState()
 
-  return <input aria-invalid={state.invalid() || undefined} class={local.class} data-slot="field-control" {...stateDataAttrs(state)} {...rest} />
+  return <input aria-invalid={state.invalid() || undefined} data-slot="field-control" {...stateDataAttrs(state)} {...props} />
 }

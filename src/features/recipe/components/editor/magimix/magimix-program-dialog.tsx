@@ -4,7 +4,7 @@ import { createSignal } from 'solid-js'
 import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
-import { type TriggerConfig } from '@/components/ui/dialog'
+import { type TriggerRender } from '@/components/ui/dialog'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
@@ -14,7 +14,7 @@ interface MagimixProgramDialogProps {
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
-  trigger?: TriggerConfig
+  trigger?: TriggerRender
 }
 
 const magimixProgramSchema = v.object({

@@ -61,7 +61,7 @@ export const DrawerFooter = (props: ComponentProps<'div'>) => {
 }
 
 export const DrawerTitle = (props: ComponentProps<typeof CorvuDrawer.Label>) => {
-  const [local, rest] = splitProps(props as { class?: string }, ['class'])
+  const [local, rest] = splitProps(props, ['class'])
   return <CorvuDrawer.Label class={cn('font-heading font-semibold text-xl leading-none', local.class)} data-slot="drawer-title" {...rest} />
 }
 

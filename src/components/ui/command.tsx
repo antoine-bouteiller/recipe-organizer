@@ -26,6 +26,7 @@ interface CommandItemEntry {
 
 interface CommandContextValue {
   activeValue: () => string | undefined
+  isVisible: (value: string) => boolean
   moveActive: (delta: number) => void
   query: () => string
   register: (entry: CommandItemEntry) => void
@@ -59,6 +60,7 @@ export const Command = (props: { children: JSX.Element }) => {
 
   const context: CommandContextValue = {
     activeValue: () => visible()[activeIndex()]?.value,
+    isVisible: matches,
     moveActive: (delta) => setActiveIndex((index) => Math.max(0, Math.min(visible().length - 1, index + delta))),
     query,
     register: (entry) => {
@@ -128,10 +130,9 @@ export const CommandItem = (props: { value: string; onClick?: () => void; childr
   command.register({ id, select: () => props.onClick?.(), value: props.value })
 
   const isActive = () => command.activeValue() === props.value
-  const isVisible = () => props.value.toLowerCase().includes(command.query().toLowerCase())
 
   return (
-    <Show when={isVisible()}>
+    <Show when={command.isVisible(props.value)}>
       <button
         class={cn(
           'flex min-h-8 w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-base outline-none sm:min-h-7 sm:text-sm',
@@ -148,10 +149,13 @@ export const CommandItem = (props: { value: string; onClick?: () => void; childr
 }
 
 export const CommandPanel = (props: ComponentProps<'div'>) => {
-  const [, rest] = splitProps(props, ['class'])
+  const [local, rest] = splitProps(props, ['class'])
   return (
     <div
-      class="relative -mx-px flex min-h-0 flex-col rounded-t-xl border border-b-0 bg-popover bg-clip-padding shadow-xs/5 not-has-[+[data-slot=command-footer]]:-mb-px not-has-[+[data-slot=command-footer]]:rounded-b-2xl"
+      class={cn(
+        'relative -mx-px flex min-h-0 flex-col rounded-t-xl border border-b-0 bg-popover bg-clip-padding shadow-xs/5 not-has-[+[data-slot=command-footer]]:-mb-px not-has-[+[data-slot=command-footer]]:rounded-b-2xl',
+        local.class
+      )}
       {...rest}
     />
   )
@@ -168,7 +172,7 @@ export const CommandFooter = (props: ComponentProps<'div'>) => {
   )
 }
 
-export const CommandDialog = (props: ComponentProps<typeof DialogPrimitive>) => <DialogPrimitive {...props} />
+export { Dialog as CommandDialog } from '@kobalte/core/dialog'
 
 export const CommandDialogTrigger = (props: ComponentProps<typeof DialogPrimitive.Trigger>) => (
   <DialogPrimitive.Trigger data-slot="command-dialog-trigger" {...props} />
