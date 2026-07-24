@@ -19,7 +19,7 @@ const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: Re
           <div className="flex items-center gap-3 text-nowrap text-ellipsis">
             <span className="size-1.5 shrink-0 rounded-full bg-primary" />
             <div className="flex-1">{groupIngredient.ingredient.name}</div>
-            <div className="font-semibold text-muted-foreground">
+            <div className="font-semibold text-muted-foreground tabular-nums">
               {formatNumber(scaleQuantity(groupIngredient.quantity, servings, baseServings))}
               {groupIngredient.unitSlug && ` ${UNITS[groupIngredient.unitSlug]?.name ?? ''}`}
             </div>

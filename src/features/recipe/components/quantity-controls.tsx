@@ -45,7 +45,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
         >
           <MinusIcon weight="bold" />
         </Button>
-        <span className="min-w-18 text-center text-[13px] font-bold text-white">{quantity} couverts</span>
+        <span className="min-w-18 text-center text-[13px] font-bold text-white tabular-nums">{quantity} couverts</span>
         <Button onClick={withStopPropagation(incrementQuantity)} size="icon-xs">
           <PlusIcon weight="bold" />
         </Button>
@@ -70,7 +70,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
           <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon-sm" variant="outline">
             <MinusIcon />
           </Button>
-          <span className="min-w-5 text-center font-bold">{quantity}</span>
+          <span className="min-w-5 text-center font-bold tabular-nums">{quantity}</span>
           <Button onClick={incrementQuantity} size="icon-sm">
             <PlusIcon />
           </Button>

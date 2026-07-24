@@ -45,15 +45,15 @@ const RecipeList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {visibleRecipes.map((recipe) => (
-            <RecipeCard recipe={recipe} key={recipe.id} />
+          {visibleRecipes.map((recipe, index) => (
+            <RecipeCard recipe={recipe} index={index} key={recipe.id} />
           ))}
         </div>
       )}
       {authUser && (
         <Button
           aria-label="Ajouter une recette"
-          className="fixed right-2 bottom-16 md:hidden"
+          className="fixed right-2 bottom-16 transition-transform duration-200 ease-out-snappy hover:-translate-y-0.5 active:scale-95 md:hidden"
           render={<Link to="/recipe/new" viewTransition />}
           size="icon-xl"
         >

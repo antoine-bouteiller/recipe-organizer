@@ -9,6 +9,7 @@ import { QuantityControls } from './quantity-controls'
 
 interface RecipeCardProps {
   readonly recipe: ReducedRecipe
+  readonly index?: number
 }
 
 const Tag = ({ children }: { readonly children: React.ReactNode }) => (
@@ -17,10 +18,19 @@ const Tag = ({ children }: { readonly children: React.ReactNode }) => (
   </Badge>
 )
 
-export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {
+export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardProps>) {
   return (
-    <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition>
-      <Card className="h-60 cursor-pointer overflow-hidden rounded-[28px] border-0 bg-[#1b2426] shadow-lg" key={recipe.id}>
+    <Link
+      params={{ id: recipe.id.toString() }}
+      to="/recipe/$id"
+      viewTransition
+      style={{ '--stagger': Math.min(index, 10) } as React.CSSProperties}
+      className="block animate-in rounded-[30px] bg-white/5 p-[3px] shadow-lg ring-1 shadow-primary/10 ring-black/5 transition-transform duration-200 ease-out-snappy animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*45ms)] fade-in slide-in-from-bottom-2 hover:-translate-y-0.5 active:scale-[0.99] dark:ring-white/10"
+    >
+      <Card
+        className="h-60 cursor-pointer overflow-hidden rounded-[27px] border-0 bg-[#1b2426] shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]"
+        key={recipe.id}
+      >
         <img src={recipe.image} alt={recipe.name} className="absolute inset-0 h-full w-full object-cover" />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(8,14,14,0.93)_0%,rgba(8,14,14,0.34)_54%,rgba(8,14,14,0)_78%)]" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-4.5">

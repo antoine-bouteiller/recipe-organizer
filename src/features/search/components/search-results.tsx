@@ -46,8 +46,8 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
       <div className="text-xs font-semibold text-muted-foreground">
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>
-      {recipes.map((recipe) => (
-        <RecipeSearchCard key={recipe.id} action={<ResultAddButton recipeId={recipe.id} />} recipe={recipe} />
+      {recipes.map((recipe, index) => (
+        <RecipeSearchCard key={recipe.id} index={index} action={<ResultAddButton recipeId={recipe.id} />} recipe={recipe} />
       ))}
     </div>
   )

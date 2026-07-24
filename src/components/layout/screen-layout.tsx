@@ -21,12 +21,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
   const isImageHeader = Boolean(backgroundImage)
 
   return (
-    <div
-      className={cn(
-        'relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-muted pt-0 md:overflow-y-auto',
-        pageKey ? 'pb-14' : ''
-      )}
-    >
+    <div className={cn('relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-muted pt-0 md:overflow-y-auto')}>
       {isImageHeader ? (
         <div className="relative flex w-full shrink-0 items-center gap-2 overflow-hidden bg-linear-to-b from-[#0d3b42] to-primary px-6 pt-safe-4 pb-12 text-primary-foreground md:hidden">
           <img src={backgroundImage} alt="" className="absolute inset-0 size-full object-cover object-center" />
@@ -44,7 +39,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
               <ArrowLeftIcon />
             </Button>
           )}
-          <h1 className="z-10 min-w-0 flex-1 truncate font-heading text-2xl">{title}</h1>
+          <h1 className="z-10 min-w-0 flex-1 truncate font-heading text-2xl font-bold tracking-tight">{title}</h1>
           {headerEndItem && <div className="z-10">{headerEndItem}</div>}
         </div>
       ) : (
@@ -62,13 +57,14 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
               <ArrowLeftIcon />
             </Button>
           )}
-          <h1 className="flex-1 truncate font-heading text-3xl font-semibold">{title}</h1>
+          <h1 className="flex-1 truncate font-heading text-3xl font-bold tracking-tight">{title}</h1>
           {headerEndItem && <div>{headerEndItem}</div>}
         </div>
       )}
       <div
         className={cn(
-          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible px-4 pb-4 pt-1',
+          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted md:mt-0 md:max-w-5xl md:overflow-y-visible px-4 pt-1',
+          pageKey ? 'pb-safe-16' : 'pb-4',
           isImageHeader && '-mt-10 rounded-t-3xl'
         )}
       >

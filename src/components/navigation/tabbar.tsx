@@ -5,7 +5,7 @@ import { menuItems } from './constants'
 const items = menuItems.filter((item) => item.display !== 'desktop')
 
 export const TabBar = () => (
-  <nav className="fixed bottom-0 z-10 flex h-14 w-full items-center justify-around border-t bg-background px-4 md:hidden">
+  <nav className="fixed bottom-0 z-10 flex h-14 w-full items-center justify-around border-t border-border/60 bg-background/80 px-4 backdrop-blur-xl md:hidden">
     {items.map((item) => (
       <Link
         key={item.linkProps.to}

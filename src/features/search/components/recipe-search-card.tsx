@@ -10,10 +10,14 @@ import { cn } from '@/utils/cn'
 interface RecipeSearchCardProps {
   recipe: ReducedRecipe
   action?: ReactNode
+  index?: number
 }
 
-export const RecipeSearchCard = ({ recipe, action }: RecipeSearchCardProps) => (
-  <div className="relative">
+export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
+  <div
+    className="relative animate-in animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*45ms)] fade-in slide-in-from-bottom-2"
+    style={{ '--stagger': Math.min(index, 10) } as React.CSSProperties}
+  >
     <Link
       className={cn('flex items-center gap-3 rounded-2xl border bg-card p-2.5', action && 'pr-14')}
       onClick={() => addRecentRecipe(recipe.id)}

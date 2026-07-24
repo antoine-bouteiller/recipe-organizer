@@ -33,7 +33,7 @@ export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => 
       </span>
       <span className={cn('flex flex-1 items-center justify-between gap-2', isChecked && 'text-muted-foreground line-through')}>
         <span>{ingredient.name}</span>
-        <span className="flex flex-col items-end text-sm font-semibold text-muted-foreground">
+        <span className="flex flex-col items-end text-sm font-semibold text-muted-foreground tabular-nums">
           <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>
           {ingredient.fallback.map((line) => (
             <span className="text-xs" key={line.unitSlug ?? 'unitless'}>

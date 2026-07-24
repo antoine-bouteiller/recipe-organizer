@@ -72,7 +72,7 @@ const RecipePage = () => {
         )
       }
     >
-      <h1 className="hidden px-4 py-2 font-heading text-3xl md:block">{recipe.name}</h1>
+      <h1 className="hidden px-4 py-2 font-heading text-3xl font-bold tracking-tight text-balance md:block">{recipe.name}</h1>
       <QuantityControls className="my-2" recipeId={id} servings={recipe.servings} />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground dark:prose-invert">
@@ -88,7 +88,7 @@ const RecipePage = () => {
               </div>
               <div className="overflow-y-auto p-2">
                 <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                  <EditorContent />
+                  <EditorContent className="max-w-[65ch]" />
                 </Editor>
               </div>
             </SwipeTabsPanels>
@@ -104,7 +104,7 @@ const RecipePage = () => {
           <Card className="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
             <h2>Préparation</h2>
             <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-              <EditorContent className="pb-4" />
+              <EditorContent className="max-w-[65ch] pb-4" />
             </Editor>
           </Card>
         </div>
