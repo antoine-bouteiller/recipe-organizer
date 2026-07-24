@@ -1,10 +1,18 @@
-import { RecipeList } from '@/features/search/components/recipe-list'
+import { RecipeSearchCard } from '@/features/search/components/recipe-search-card'
 import { clearRecentRecipes, useRecentRecipeIds } from '@/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@/types/recipe'
 
 interface RecentRecipesProps {
   recipes: ReducedRecipe[]
 }
+
+const RecipeCardList = ({ recipes }: RecentRecipesProps) => (
+  <div className="flex flex-1 flex-col gap-2.5">
+    {recipes.map((recipe) => (
+      <RecipeSearchCard key={recipe.id} recipe={recipe} />
+    ))}
+  </div>
+)
 
 export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
   const recentRecipeIds = useRecentRecipeIds()
@@ -14,7 +22,7 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
     .filter((recipe): recipe is ReducedRecipe => recipe !== undefined)
 
   if (recentRecipes.length === 0) {
-    return <RecipeList recipes={recipes} />
+    return <RecipeCardList recipes={recipes} />
   }
 
   return (
@@ -25,7 +33,7 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
           Effacer
         </button>
       </div>
-      <RecipeList recipes={recentRecipes} />
+      <RecipeCardList recipes={recentRecipes} />
     </div>
   )
 }

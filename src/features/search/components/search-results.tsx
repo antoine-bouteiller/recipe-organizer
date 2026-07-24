@@ -1,11 +1,8 @@
 import { CheckIcon, PlusIcon } from '@phosphor-icons/react'
-import { Link } from '@tanstack/react-router'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
-import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/utils/constants'
-import { addRecentRecipe } from '@/stores/recent-recipes.store'
+import { RecipeSearchCard } from '@/features/search/components/recipe-search-card'
 import { addToShoppingList } from '@/stores/shopping-list.store'
 import { type ReducedRecipe } from '@/types/recipe'
 
@@ -26,62 +23,11 @@ const ResultAddButton = ({ recipeId }: { recipeId: number }) => {
   }
 
   return (
-    <Button
-      onClick={(event) => {
-        event.preventDefault()
-        addToShoppingList(recipeId)
-      }}
-      size="icon"
-      className="size-9 shrink-0 rounded-full"
-      aria-label="Ajouter à la liste"
-    >
+    <Button onClick={() => addToShoppingList(recipeId)} size="icon" className="size-9 shrink-0 rounded-full" aria-label="Ajouter à la liste">
       <PlusIcon weight="bold" />
     </Button>
   )
 }
-
-const SearchResultCard = ({ recipe }: { recipe: ReducedRecipe }) => (
-  <Link
-    className="flex items-center gap-3 rounded-2xl border bg-card p-2.5"
-    onClick={() => addRecentRecipe(recipe.id)}
-    params={{ id: recipe.id.toString() }}
-    to="/recipe/$id"
-    viewTransition
-  >
-    <img src={recipe.image} alt={recipe.name} className="size-15 shrink-0 rounded-xl object-cover" />
-    <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-      <span className="truncate font-bold text-foreground">{recipe.name}</span>
-      <div className="flex flex-wrap gap-1.5">
-        {recipe.isVegetarian && (
-          <Badge size="sm" variant="accent">
-            {VEGETARIAN_LABEL}
-          </Badge>
-        )}
-        {recipe.isMagimix && (
-          <Badge size="sm" variant="accent">
-            {MAGIMIX_LABEL}
-          </Badge>
-        )}
-        {recipe.isSpice && (
-          <Badge size="sm" variant="accent">
-            {SPICE_LABEL}
-          </Badge>
-        )}
-        {recipe.meals.map((meal) => (
-          <Badge key={meal} size="sm" variant="accent">
-            {MEAL_LABELS[meal]}
-          </Badge>
-        ))}
-        {recipe.cuisineTypes.map((cuisineType) => (
-          <Badge key={cuisineType} size="sm" variant="accent">
-            {CUISINE_TYPE_LABELS[cuisineType]}
-          </Badge>
-        ))}
-      </div>
-    </div>
-    <ResultAddButton recipeId={recipe.id} />
-  </Link>
-)
 
 export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) => {
   if (recipes.length === 0) {
@@ -101,7 +47,7 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>
       {recipes.map((recipe) => (
-        <SearchResultCard key={recipe.id} recipe={recipe} />
+        <RecipeSearchCard key={recipe.id} action={<ResultAddButton recipeId={recipe.id} />} recipe={recipe} />
       ))}
     </div>
   )

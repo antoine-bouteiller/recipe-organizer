@@ -274,7 +274,7 @@ src/features/search/
     search-results.tsx        // filtered results or empty state (clear-all action)
     recent-recipes.tsx        // thin wrapper rendering recent-recipes-content
     recent-recipes-content.tsx// reads store, resolves recents, fallback to catalogue
-    recipe-list.tsx           // ItemGroup of per-row Links (records recent on activate)
+    recipe-search-card.tsx    // shared result/recent card (image + name + tags; optional action slot)
   utils/
     filter.ts                 // matchesQuery / matchesTags / filterRecipes
     normalize.ts              // normalize()
@@ -285,7 +285,7 @@ src/stores/
 ```
 
 > Client-only rendering: the `/search` route is client-only (`defaultSsr: false`), so modules that read the persisted
-> store (`recipe-list.tsx`, `recent-recipes-content.tsx`) run only on the client. No `client-only` directive or
+> store (`recipe-search-card.tsx`, `recent-recipes.tsx`) run only on the client. No `client-only` directive or
 > `<ClientOnly>` boundary is needed — both branches (results and recents) render directly.
 
 > Note: per file-structure REQ-013 this single-file feature spec lives at `src/features/search/search.spec.md`. If the
