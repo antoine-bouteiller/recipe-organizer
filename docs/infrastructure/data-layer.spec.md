@@ -154,12 +154,7 @@ const recipeRow = await getDb().query.recipe.findFirst({
 ### 4.4 Write Pattern
 
 ```ts
-const [created] = await getDb()
-  .insert(recipe)
-  .values({
-    /* ... */
-  })
-  .returning({ id: recipe.id })
+const [created] = await getDb().insert(recipe).values({/* ... */}).returning({ id: recipe.id })
 ```
 
 ### 4.5 Atomic Multi-Statement Pattern
