@@ -69,12 +69,7 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
             <h2 className="overflow-hidden font-heading text-xl leading-tight font-normal text-nowrap text-ellipsis text-white">{recipe.name}</h2>
           </Link>
           <div className="flex flex-col px-4.5 pt-2 pb-4.5">
-            <QuantityControls
-              className="flex w-full items-center justify-center gap-2.5"
-              recipeId={recipe.id}
-              servings={recipe.servings}
-              variant="card"
-            />
+            <QuantityControls recipeId={recipe.id} servings={recipe.servings} variant="card" />
           </div>
         </div>
       </Card>

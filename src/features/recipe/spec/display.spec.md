@@ -234,8 +234,8 @@ useIsInShoppingList(recipeId: number): boolean
 ## 6. Test Automation Strategy
 
 - **PAT-001** Component tests for `RecipeCard` and `QuantityControls` use RTL with mocked TanStack Store
-  stores. Verify the variant flip, the `withStopPropagation` behavior on card click, and the
-  decrement-disabled state.
+  stores. Verify the variant flip, that the card action buttons are not `<Link>` descendants, and
+  the decrement-disabled state.
 - **PAT-002** `RecipeIngredientGroups` test: feed two groups (one default, one with a
   `groupName`) and verify the scaled quantities for `quantity = baseServings * 2`.
 - **PAT-003** Server-fn tests for `getAllRecipes` and `getRecipe(id)` mock `getDb()` and assert

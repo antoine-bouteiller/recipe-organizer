@@ -33,6 +33,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
         <Button
           onClick={decrementQuantity}
           disabled={quantity === 1}
+          aria-label="Retirer un couvert"
           size="icon-xs"
           variant="secondary"
           className="bg-white/12 text-white hover:bg-white/20"
@@ -40,7 +41,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
           <MinusIcon weight="bold" />
         </Button>
         <span className="min-w-18 text-center text-[13px] font-bold text-white tabular-nums">{quantity} couverts</span>
-        <Button onClick={incrementQuantity} size="icon-xs">
+        <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs">
           <PlusIcon weight="bold" />
         </Button>
         <Button
@@ -61,11 +62,11 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
       <div className="flex items-center gap-3">
         <span className="text-sm font-bold">Couverts</span>
         <div className="flex items-center gap-2">
-          <Button disabled={quantity === 1} onClick={decrementQuantity} size="icon-sm" variant="outline">
+          <Button disabled={quantity === 1} onClick={decrementQuantity} aria-label="Retirer un couvert" size="icon-sm" variant="outline">
             <MinusIcon />
           </Button>
           <span className="min-w-5 text-center font-bold tabular-nums">{quantity}</span>
-          <Button onClick={incrementQuantity} size="icon-sm">
+          <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-sm">
             <PlusIcon />
           </Button>
         </div>
