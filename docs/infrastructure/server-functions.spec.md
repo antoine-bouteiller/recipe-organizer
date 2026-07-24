@@ -316,9 +316,7 @@ if (context.user.role !== 'admin' && row.createdBy !== context.user.id) {
 
 ```ts
 // create.ts
-export const xSchema = z.object({
-  /* ... */
-})
+export const xSchema = z.object({/* ... */})
 
 // update.ts
 import { xSchema } from './create'
@@ -364,12 +362,7 @@ inserts that need a returned id:
 
 ```ts
 await getDb().batch([
-  getDb()
-    .update(recipe)
-    .set({
-      /* ... */
-    })
-    .where(eq(recipe.id, id)),
+  getDb().update(recipe).set({/* ... */}).where(eq(recipe.id, id)),
   getDb().delete(groupIngredient).where(/* ... */),
   getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
 ])

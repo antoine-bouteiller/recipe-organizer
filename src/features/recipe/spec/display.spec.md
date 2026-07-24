@@ -42,15 +42,15 @@ headers.
 
 ## 2. Definitions
 
-| Term                     | Meaning                                                                                                         |
+| Term | Meaning |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `ReducedRecipe`          | Lightweight recipe shape returned by `getAllRecipes`: `{ id, image, name, servings, tags }`.                    |
-| `Recipe`                 | Full recipe shape returned by `getRecipe` (`api/get-one.ts`), including `ingredientGroups` and `linkedRecipes`. |
-| `RecipeIngredientGroup`  | One ingredient group as nested in `Recipe`, with `groupName?`, `id`, and `groupIngredients[]`.                  |
-| Detail two-pane          | Desktop layout `grid grid-cols-5`: ingredients (`col-span-2`) + preparation (`col-span-3`).                     |
-| Detail tabs+swipe        | Mobile layout: `Tabs[ingredients                                                                                | preparation]`with`useSwipeTabs`driving a horizontal`motion.div` translation. |
-| Recipe quantity          | Per-recipe multiplier in the `recipe-quantities.store` (TanStack Store), defaults to `recipe.servings`.         |
-| Shopping-list membership | A `recipeId` present in the `shopping-list` store (TanStack Store).                                             |
+| `ReducedRecipe` | Lightweight recipe shape returned by `getAllRecipes`: `{ id, image, name, servings, tags }`. |
+| `Recipe` | Full recipe shape returned by `getRecipe` (`api/get-one.ts`), including `ingredientGroups` and `linkedRecipes`. |
+| `RecipeIngredientGroup` | One ingredient group as nested in `Recipe`, with `groupName?`, `id`, and `groupIngredients[]`. |
+| Detail two-pane | Desktop layout `grid grid-cols-5`: ingredients (`col-span-2`) + preparation (`col-span-3`). |
+| Detail tabs+swipe | Mobile layout: `Tabs[ingredients                                                                                | preparation]`with`useSwipeTabs`driving a horizontal`motion.div` translation. |
+| Recipe quantity | Per-recipe multiplier in the `recipe-quantities.store` (TanStack Store), defaults to `recipe.servings`. |
+| Shopping-list membership | A `recipeId` present in the `shopping-list` store (TanStack Store). |
 
 ## 3. Requirements, Constraints & Guidelines
 

@@ -26,7 +26,7 @@ export const tanstackSerwistPlugin = (): Plugin => {
           },
           minify: isProduction,
           outDir,
-          rollupOptions: {
+          rolldownOptions: {
             output: {
               entryFileNames: 'sw.js',
             },

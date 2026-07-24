@@ -97,6 +97,7 @@ const viteConfig = defineConfig({
       'exports-last': 'off',
       'no-underscore-dangle': 'off',
       'max-nested-calls': 'off',
+      'function-component-definition': 'off', // conflict with func-style
     },
   },
   fmt: {

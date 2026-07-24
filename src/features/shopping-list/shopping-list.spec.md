@@ -48,22 +48,22 @@ Provide a deterministic, client-rendered shopping list that:
 
 ## 2. Definitions
 
-| Term                        | Definition                                                                                                                                                                 |
+| Term | Definition |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----- | ------------------------------------------------------------------------------------------------------------------ |
-| **Recipe**                  | A row in the `recipe` table with a `servings` integer column.                                                                                                              |
-| **IngredientGroup**         | A logical grouping (`recipeIngredientGroup`) of ingredient lines for a recipe.                                                                                             |
-| **GroupIngredient**         | A row joining a `recipeIngredientGroup` to an `ingredient` with `quantity` + `unitSlug`.                                                                                   |
-| **LinkedRecipe**            | A reference from one recipe to another with a `ratio`. The linked recipe's ingredients are flattened into the parent recipe and scaled by `ratio / linkedRecipe.servings`. |
-| **Spice**                   | Any ingredient with `category === 'spices'`. Excluded from the shopping list at the SQL layer.                                                                             |
-| **Wanted Quantity**         | The user's chosen target servings for a recipe: `recipesQuantities[id] ?? recipe.servings`.                                                                                |
-| **Scaled Quantity**         | A line's quantity multiplied by `wantedQuantity / recipe.servings`.                                                                                                        |
-| **Primary Quantity**        | The aggregated quantity in the ingredient's preferred unit (the "main" line shown in the cart).                                                                            |
-| **Fallback Line**           | A residual quantity in a unit that could not be converted to the primary unit, shown muted under the primary.                                                              |
-| **Parent/Child Ingredient** | An ingredient with a non-null `parentId`. Children are removed from the final list and their primary quantity is rolled into the parent via `Math.max`.                    |
-| **IngredientCategory**      | The enum used to group items in the cart. Drives the `<h2>` icon + label per group.                                                                                        |
-| **UnitSlug**                | One of: `g`, `kg`, `ml`, `l`, `tbsp`, `tsp`, `piece`, `pinch`, `cube`, `bottle`, `sheet`, `box`, `can`, `handful`, `packet`, `cm`.                                         |
-| **Dimension**               | One of `mass                                                                                                                                                               | volume | count | length`. Conversion across dimensions requires `densityGPerMl`(volume <-> mass) or`countWeightG` (count <-> mass). |
-| **Client-only render mode** | `src/start.ts` sets `defaultSsr: false`; all route content (including this feature) renders on the client. No `<ClientOnly>` boundary or `client-only` directive is used.  |
+| **Recipe** | A row in the `recipe` table with a `servings` integer column. |
+| **IngredientGroup** | A logical grouping (`recipeIngredientGroup`) of ingredient lines for a recipe. |
+| **GroupIngredient** | A row joining a `recipeIngredientGroup` to an `ingredient` with `quantity` + `unitSlug`. |
+| **LinkedRecipe** | A reference from one recipe to another with a `ratio`. The linked recipe's ingredients are flattened into the parent recipe and scaled by `ratio / linkedRecipe.servings`. |
+| **Spice** | Any ingredient with `category === 'spices'`. Excluded from the shopping list at the SQL layer. |
+| **Wanted Quantity** | The user's chosen target servings for a recipe: `recipesQuantities[id] ?? recipe.servings`. |
+| **Scaled Quantity** | A line's quantity multiplied by `wantedQuantity / recipe.servings`. |
+| **Primary Quantity** | The aggregated quantity in the ingredient's preferred unit (the "main" line shown in the cart). |
+| **Fallback Line** | A residual quantity in a unit that could not be converted to the primary unit, shown muted under the primary. |
+| **Parent/Child Ingredient** | An ingredient with a non-null `parentId`. Children are removed from the final list and their primary quantity is rolled into the parent via `Math.max`. |
+| **IngredientCategory** | The enum used to group items in the cart. Drives the `<h2>` icon + label per group. |
+| **UnitSlug** | One of: `g`, `kg`, `ml`, `l`, `tbsp`, `tsp`, `piece`, `pinch`, `cube`, `bottle`, `sheet`, `box`, `can`, `handful`, `packet`, `cm`. |
+| **Dimension** | One of `mass                                                                                                                                                               | volume | count | length`. Conversion across dimensions requires `densityGPerMl`(volume <-> mass) or`countWeightG` (count <-> mass). |
+| **Client-only render mode** | `src/start.ts` sets `defaultSsr: false`; all route content (including this feature) renders on the client. No `<ClientOnly>` boundary or `client-only` directive is used. |
 
 ## 3. Requirements, Constraints & Guidelines
 
@@ -276,22 +276,7 @@ Returns `null` when no conversion path exists (missing density/count weight, mis
 // db/schema/unit.ts
 export type Dimension = 'mass' | 'volume' | 'count' | 'length'
 export type UnitSlug =
-  | 'g'
-  | 'kg'
-  | 'ml'
-  | 'l'
-  | 'tbsp'
-  | 'tsp'
-  | 'piece'
-  | 'pinch'
-  | 'cube'
-  | 'bottle'
-  | 'sheet'
-  | 'box'
-  | 'can'
-  | 'handful'
-  | 'packet'
-  | 'cm'
+  'g' | 'kg' | 'ml' | 'l' | 'tbsp' | 'tsp' | 'piece' | 'pinch' | 'cube' | 'bottle' | 'sheet' | 'box' | 'can' | 'handful' | 'packet' | 'cm'
 ```
 
 Conversion-relevant entries (parent/factor):
