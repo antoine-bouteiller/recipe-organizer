@@ -9,30 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ShoppingListRouteImport } from './routes/shopping-list'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SearchRouteImport } from './routes/search'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SettingsIndexRouteImport } from './routes/settings/index'
-import { Route as SettingsUsersRouteImport } from './routes/settings/users'
-import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
-import { Route as SettingsAccountRouteImport } from './routes/settings/account'
-import { Route as RecipeNewRouteImport } from './routes/recipe/new'
-import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ShoppingListRouteImport } from './routes/shopping-list'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as RecipeEditIdRouteImport } from './routes/recipe/edit.$id'
-import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
-import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
+import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
+import { Route as RecipeNewRouteImport } from './routes/recipe/new'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as SettingsAccountRouteImport } from './routes/settings/account'
+import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
+import { Route as SettingsUsersRouteImport } from './routes/settings/users'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
+import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
+import { Route as RecipeEditIdRouteImport } from './routes/recipe/edit.$id'
 
-const ShoppingListRoute = ShoppingListRouteImport.update({
-  id: '/shopping-list',
-  path: '/shopping-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -40,39 +35,14 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsUsersRoute = SettingsUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsIngredientsRoute = SettingsIngredientsRouteImport.update({
-  id: '/ingredients',
-  path: '/ingredients',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsAccountRoute = SettingsAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const RecipeNewRoute = RecipeNewRouteImport.update({
-  id: '/recipe/new',
-  path: '/recipe/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecipeIdRoute = RecipeIdRouteImport.update({
-  id: '/recipe/$id',
-  path: '/recipe/$id',
+const ShoppingListRoute = ShoppingListRouteImport.update({
+  id: '/shopping-list',
+  path: '/shopping-list',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -80,14 +50,39 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/auth/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RecipeEditIdRoute = RecipeEditIdRouteImport.update({
-  id: '/recipe/edit/$id',
-  path: '/recipe/edit/$id',
+const RecipeIdRoute = RecipeIdRouteImport.update({
+  id: '/recipe/$id',
+  path: '/recipe/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiVideoIdRoute = ApiVideoIdRouteImport.update({
-  id: '/api/video/$id',
-  path: '/api/video/$id',
+const RecipeNewRoute = RecipeNewRouteImport.update({
+  id: '/recipe/new',
+  path: '/recipe/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsAccountRoute = SettingsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsIngredientsRoute = SettingsIngredientsRouteImport.update({
+  id: '/ingredients',
+  path: '/ingredients',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsUsersRoute = SettingsUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiImageIdRoute = ApiImageIdRouteImport.update({
@@ -95,9 +90,14 @@ const ApiImageIdRoute = ApiImageIdRouteImport.update({
   path: '/api/image/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
+const ApiVideoIdRoute = ApiVideoIdRouteImport.update({
+  id: '/api/video/$id',
+  path: '/api/video/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipeEditIdRoute = RecipeEditIdRouteImport.update({
+  id: '/recipe/edit/$id',
+  path: '/recipe/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -221,18 +221,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/shopping-list': {
-      id: '/shopping-list'
-      path: '/shopping-list'
-      fullPath: '/shopping-list'
-      preLoaderRoute: typeof ShoppingListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -242,53 +235,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings/': {
-      id: '/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/users': {
-      id: '/settings/users'
-      path: '/users'
-      fullPath: '/settings/users'
-      preLoaderRoute: typeof SettingsUsersRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/ingredients': {
-      id: '/settings/ingredients'
-      path: '/ingredients'
-      fullPath: '/settings/ingredients'
-      preLoaderRoute: typeof SettingsIngredientsRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/account': {
-      id: '/settings/account'
-      path: '/account'
-      fullPath: '/settings/account'
-      preLoaderRoute: typeof SettingsAccountRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/recipe/new': {
-      id: '/recipe/new'
-      path: '/recipe/new'
-      fullPath: '/recipe/new'
-      preLoaderRoute: typeof RecipeNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recipe/$id': {
-      id: '/recipe/$id'
-      path: '/recipe/$id'
-      fullPath: '/recipe/$id'
-      preLoaderRoute: typeof RecipeIdRouteImport
+    '/shopping-list': {
+      id: '/shopping-list'
+      path: '/shopping-list'
+      fullPath: '/shopping-list'
+      preLoaderRoute: typeof ShoppingListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/login': {
@@ -298,18 +256,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/recipe/edit/$id': {
-      id: '/recipe/edit/$id'
-      path: '/recipe/edit/$id'
-      fullPath: '/recipe/edit/$id'
-      preLoaderRoute: typeof RecipeEditIdRouteImport
+    '/recipe/$id': {
+      id: '/recipe/$id'
+      path: '/recipe/$id'
+      fullPath: '/recipe/$id'
+      preLoaderRoute: typeof RecipeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/video/$id': {
-      id: '/api/video/$id'
-      path: '/api/video/$id'
-      fullPath: '/api/video/$id'
-      preLoaderRoute: typeof ApiVideoIdRouteImport
+    '/recipe/new': {
+      id: '/recipe/new'
+      path: '/recipe/new'
+      fullPath: '/recipe/new'
+      preLoaderRoute: typeof RecipeNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/account': {
+      id: '/settings/account'
+      path: '/account'
+      fullPath: '/settings/account'
+      preLoaderRoute: typeof SettingsAccountRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/ingredients': {
+      id: '/settings/ingredients'
+      path: '/ingredients'
+      fullPath: '/settings/ingredients'
+      preLoaderRoute: typeof SettingsIngredientsRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/users': {
+      id: '/settings/users'
+      path: '/users'
+      fullPath: '/settings/users'
+      preLoaderRoute: typeof SettingsUsersRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/image/$id': {
@@ -319,11 +312,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiImageIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
+    '/api/video/$id': {
+      id: '/api/video/$id'
+      path: '/api/video/$id'
+      fullPath: '/api/video/$id'
+      preLoaderRoute: typeof ApiVideoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipe/edit/$id': {
+      id: '/recipe/edit/$id'
+      path: '/recipe/edit/$id'
+      fullPath: '/recipe/edit/$id'
+      preLoaderRoute: typeof RecipeEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

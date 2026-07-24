@@ -1,6 +1,7 @@
 import { recipe, unitSlugSchema } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
+import { eq } from 'drizzle-orm'
 import * as v from 'valibot'
 
 import { toastManager } from '@/components/ui/toast'
@@ -9,6 +10,7 @@ import { getDb } from '@/lib/db'
 import { queryKeys } from '@/lib/query-keys'
 import { uploadFile, uploadVideo } from '@/lib/r2'
 import { toastError } from '@/lib/toast-helpers'
+import { withServerError } from '@/utils/error-handler'
 import { parseFormData } from '@/utils/form-data'
 
 import { CUISINE_TYPES, MEALS } from '../utils/constants'
@@ -56,35 +58,43 @@ const createRecipe = createServerFn({
 })
   .middleware([authGuard()])
   .validator((formData: FormData) => v.parse(recipeSchema, parseFormData(formData)))
-  .handler(async ({ data, context }) => {
-    const { cuisineTypes, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data
-    const imageKey = image instanceof File ? await uploadFile(image) : image.id
-    const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
+  .handler(
+    withServerError(async ({ data, context }) => {
+      const { cuisineTypes, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data
+      const imageKey = image instanceof File ? await uploadFile(image) : image.id
+      const videoKey = video instanceof File ? await uploadVideo(video) : video?.id
 
-    const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
-    const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
+      const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
+      const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
 
-    const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags({ allIngredientIds, instructions, linkedRecipeIds, meals })
+      const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags({ allIngredientIds, instructions, linkedRecipeIds, meals })
 
-    const [createdRecipe] = await getDb()
-      .insert(recipe)
-      .values({
-        createdBy: context.user.id,
-        cuisineTypes,
-        image: imageKey,
-        instructions,
-        isMagimix,
-        isSpice,
-        isVegetarian,
-        meals,
-        name,
-        servings,
-        video: videoKey,
-      })
-      .returning({ id: recipe.id })
+      const [createdRecipe] = await getDb()
+        .insert(recipe)
+        .values({
+          createdBy: context.user.id,
+          cuisineTypes,
+          image: imageKey,
+          instructions,
+          isMagimix,
+          isSpice,
+          isVegetarian,
+          meals,
+          name,
+          servings,
+          video: videoKey,
+        })
+        .returning({ id: recipe.id })
 
-    await writeRecipeIngredientGraph(createdRecipe.id, ingredientGroups, linkedRecipes)
-  })
+      try {
+        await writeRecipeIngredientGraph(createdRecipe.id, ingredientGroups, linkedRecipes)
+      } catch (error) {
+        // Best-effort compensation: remove the orphaned recipe row so the UI never shows a half-written recipe.
+        await getDb().delete(recipe).where(eq(recipe.id, createdRecipe.id))
+        throw error
+      }
+    })
+  )
 
 const createRecipeOptions = () =>
   mutationOptions({

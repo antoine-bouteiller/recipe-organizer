@@ -24,27 +24,27 @@ const updateRecipeSchema = v.object({ ...recipeSchema.entries, id: v.number() })
 type UpdateRecipeFormValues = v.InferOutput<typeof updateRecipeSchema>
 type UpdateRecipeFormInput = Partial<UpdateRecipeFormValues>
 
-const resolveImageKey = async (image: UpdateRecipeFormValues['image'], currentKey: string | null): Promise<string> => {
+const resolveImageKey = async (
+  image: UpdateRecipeFormValues['image'],
+  currentKey: string | null
+): Promise<{ key: string; staleKey: string | null }> => {
   if (image instanceof File) {
-    if (currentKey) {
-      await deleteFile(currentKey)
-    }
-    return uploadFile(image)
+    return { key: await uploadFile(image), staleKey: currentKey }
   }
-  return currentKey ?? ''
+  return { key: currentKey ?? '', staleKey: null }
 }
 
-const resolveVideoKey = async (video: UpdateRecipeFormValues['video'], currentKey: string | null | undefined): Promise<string | null | undefined> => {
+const resolveVideoKey = async (
+  video: UpdateRecipeFormValues['video'],
+  currentKey: string | null | undefined
+): Promise<{ key: string | null | undefined; staleKey: string | null }> => {
   if (video instanceof File) {
-    if (currentKey) {
-      await deleteFile(currentKey)
-    }
-    return uploadVideo(video)
+    return { key: await uploadVideo(video), staleKey: currentKey ?? null }
   }
   if (video === undefined) {
-    return currentKey
+    return { key: currentKey, staleKey: null }
   }
-  return video?.id
+  return { key: video?.id, staleKey: null }
 }
 
 const updateRecipe = createServerFn({
@@ -73,8 +73,8 @@ const updateRecipe = createServerFn({
 
       assertOwnerOrAdmin(context.user, currentRecipe)
 
-      const imageKey = await resolveImageKey(image, currentRecipe.image)
-      const videoKey = await resolveVideoKey(video, currentRecipe.video)
+      const { key: imageKey, staleKey: imageStale } = await resolveImageKey(image, currentRecipe.image)
+      const { key: videoKey, staleKey: videoStale } = await resolveVideoKey(video, currentRecipe.video)
 
       const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((ingredientItem) => ingredientItem.id))
       const linkedRecipeIds = linkedRecipes?.map((lr) => lr.id) ?? []
@@ -111,6 +111,9 @@ const updateRecipe = createServerFn({
       ])
 
       await writeRecipeIngredientGraph(currentRecipe.id, ingredientGroups, linkedRecipes)
+
+      // Best-effort: an undeleted stale blob is preferable to failing a successful update.
+      await Promise.allSettled([imageStale, videoStale].filter((key): key is string => Boolean(key)).map((key) => deleteFile(key)))
 
       return id
     })
