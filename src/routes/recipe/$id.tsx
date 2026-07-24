@@ -6,6 +6,7 @@ import * as v from 'valibot'
 import { Editor, EditorContent } from '@/components/common/editor'
 import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Popover } from '@/components/ui/popover'
@@ -16,6 +17,7 @@ import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
+import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@/features/recipe/utils/constants'
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
@@ -42,6 +44,13 @@ const RecipePage = () => {
       isDefault: false,
     })),
   ]
+
+  const metaTags = [
+    recipe.isVegetarian && VEGETARIAN_LABEL,
+    recipe.isMagimix && MAGIMIX_LABEL,
+    ...recipe.meals.map((meal) => MEAL_LABELS[meal]),
+    ...recipe.cuisineTypes.map((cuisineType) => CUISINE_TYPE_LABELS[cuisineType]),
+  ].filter(Boolean) as string[]
 
   return (
     <ScreenLayout
@@ -73,6 +82,15 @@ const RecipePage = () => {
       }
     >
       <h1 className="hidden px-4 py-2 font-heading text-3xl font-bold tracking-tight text-balance md:block">{recipe.name}</h1>
+      {metaTags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 px-1 pt-1">
+          {metaTags.map((label) => (
+            <Badge key={label} size="sm" variant="eyebrow">
+              {label}
+            </Badge>
+          ))}
+        </div>
+      )}
       <QuantityControls className="my-2" recipeId={id} servings={recipe.servings} />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground dark:prose-invert">

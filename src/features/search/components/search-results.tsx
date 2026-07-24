@@ -1,4 +1,4 @@
-import { CheckIcon, PlusIcon } from '@phosphor-icons/react'
+import { CheckIcon, MagnifyingGlassIcon, PlusIcon } from '@phosphor-icons/react'
 
 import { Button } from '@/components/ui/button'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
@@ -33,7 +33,10 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   if (recipes.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-        <p className="text-muted-foreground">Aucune recette ne correspond à votre recherche.</p>
+        <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
+          <MagnifyingGlassIcon className="size-7" />
+        </div>
+        <p className="text-balance text-muted-foreground">Aucune recette ne correspond à votre recherche.</p>
         <Button onClick={onClearFilters} variant="outline">
           Effacer les filtres
         </Button>

@@ -34,8 +34,10 @@ const RecipeList = () => {
     <ScreenLayout title="Recettes" pageKey="/">
       {visibleRecipes.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-          <BookIcon className="size-12 text-muted-foreground" />
-          <p className="text-muted-foreground">Aucune recette</p>
+          <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
+            <BookIcon className="size-7" />
+          </div>
+          <p className="text-balance text-muted-foreground">Aucune recette</p>
           {authUser && (
             <Button render={<Link to="/recipe/new" viewTransition />}>
               <PlusIcon className="size-4" />

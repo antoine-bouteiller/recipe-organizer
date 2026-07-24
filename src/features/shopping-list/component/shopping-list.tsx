@@ -1,3 +1,5 @@
+import { BasketIcon } from '@phosphor-icons/react'
+
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { Skeleton } from '@/components/ui/skeleton'
 import { incrementalArray } from '@/utils/array'
@@ -26,9 +28,12 @@ export const ShoppingList = () => {
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-        <p className="text-muted-foreground">Votre liste de courses est vide</p>
-        <p className="text-sm text-muted-foreground">Ajoutez des recettes depuis la recherche</p>
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+        <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
+          <BasketIcon className="size-7" />
+        </div>
+        <p className="font-medium text-balance">Votre liste de courses est vide</p>
+        <p className="text-sm text-balance text-muted-foreground">Ajoutez des recettes depuis la recherche</p>
       </div>
     )
   }
