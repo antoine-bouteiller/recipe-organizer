@@ -38,6 +38,7 @@ export const getRouter = () => {
     },
     defaultErrorComponent: DefaultErrorComponent,
     defaultNotFoundComponent: NotFound,
+    defaultPendingMs: 100,
     defaultPreload: 'intent',
     defaultViewTransition: {
       types: ({ fromLocation, toLocation }) => {

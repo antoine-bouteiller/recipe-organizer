@@ -1,8 +1,10 @@
 import { Link } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'
+import { cn } from '@/utils/cn'
 
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
@@ -18,14 +20,33 @@ const Tag = ({ children }: { readonly children: React.ReactNode }) => (
   </Badge>
 )
 
+// Module flag — the staggered entrance plays once per app load, not on every navigation back to the list
+let entrancePlayed = false
+
+const useEntranceAnimation = () => {
+  const animate = useRef(!entrancePlayed)
+
+  useEffect(() => {
+    entrancePlayed = true
+  }, [])
+
+  return animate.current
+}
+
 export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardProps>) {
+  const animate = useEntranceAnimation()
+
   return (
     <Link
       params={{ id: recipe.id.toString() }}
       to="/recipe/$id"
       viewTransition
-      style={{ '--stagger': Math.min(index, 10) } as React.CSSProperties}
-      className="block animate-in rounded-[30px] bg-white/5 p-[3px] shadow-lg ring-1 shadow-primary/10 ring-black/5 transition-transform duration-200 ease-out-snappy animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*45ms)] fade-in slide-in-from-bottom-2 hover:-translate-y-0.5 active:scale-[0.99] dark:ring-white/10"
+      style={animate ? ({ '--stagger': Math.min(index, 6) } as React.CSSProperties) : undefined}
+      className={cn(
+        'block rounded-[30px] bg-white/5 p-[3px] shadow-lg ring-1 shadow-primary/10 ring-black/5 transition-transform duration-200 ease-out-snappy hover:-translate-y-0.5 active:scale-[0.99] dark:ring-white/10',
+        animate &&
+          'animate-in animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*35ms)] fade-in slide-in-from-bottom-2'
+      )}
     >
       <Card
         className="h-60 cursor-pointer overflow-hidden rounded-[27px] border-0 bg-[#1b2426] shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]"

@@ -1,5 +1,5 @@
 import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as v from 'valibot'
 
@@ -10,14 +10,34 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Popover } from '@/components/ui/popover'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@/components/ui/tabs'
+import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-section'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@/features/recipe/utils/constants'
+import { incrementalArray } from '@/utils/array'
+
+const RecipeDetailsSkeleton = () => {
+  const { id } = Route.useParams()
+  const recipes = useQueryClient().getQueryData(getRecipeListOptions().queryKey)
+  const recipe = recipes?.find((item) => item.id === Number(id))
+
+  return (
+    <ScreenLayout title={recipe?.name ?? ''} withGoBack backgroundImage={recipe?.image}>
+      <Skeleton className="mt-3 h-10 w-full rounded-lg" />
+      <div className="flex flex-col gap-3 pt-5">
+        {incrementalArray({ length: 6 }).map((index) => (
+          <Skeleton className="h-5 w-full" key={index} />
+        ))}
+      </div>
+    </ScreenLayout>
+  )
+}
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
@@ -151,5 +171,6 @@ export const Route = createFileRoute('/recipe/$id')({
 
     return { id }
   },
+  pendingComponent: RecipeDetailsSkeleton,
   ssr: 'data-only',
 })
