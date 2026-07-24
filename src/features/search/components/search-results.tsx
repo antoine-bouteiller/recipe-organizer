@@ -1,6 +1,7 @@
 import { CheckIcon, PlusIcon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/utils/constants'
@@ -52,21 +53,29 @@ const SearchResultCard = ({ recipe }: { recipe: ReducedRecipe }) => (
       <span className="truncate font-bold text-foreground">{recipe.name}</span>
       <div className="flex flex-wrap gap-1.5">
         {recipe.isVegetarian && (
-          <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">{VEGETARIAN_LABEL}</span>
+          <Badge size="sm" variant="accent">
+            {VEGETARIAN_LABEL}
+          </Badge>
         )}
         {recipe.isMagimix && (
-          <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">{MAGIMIX_LABEL}</span>
+          <Badge size="sm" variant="accent">
+            {MAGIMIX_LABEL}
+          </Badge>
         )}
-        {recipe.isSpice && <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">{SPICE_LABEL}</span>}
+        {recipe.isSpice && (
+          <Badge size="sm" variant="accent">
+            {SPICE_LABEL}
+          </Badge>
+        )}
         {recipe.meals.map((meal) => (
-          <span key={meal} className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">
+          <Badge key={meal} size="sm" variant="accent">
             {MEAL_LABELS[meal]}
-          </span>
+          </Badge>
         ))}
         {recipe.cuisineTypes.map((cuisineType) => (
-          <span key={cuisineType} className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">
+          <Badge key={cuisineType} size="sm" variant="accent">
             {CUISINE_TYPE_LABELS[cuisineType]}
-          </span>
+          </Badge>
         ))}
       </div>
     </div>

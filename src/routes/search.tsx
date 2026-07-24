@@ -8,12 +8,14 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Toggle } from '@/components/ui/toggle'
 import { getRecipeListOptions } from '@/features/recipe/api/get-all'
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@/features/recipe/utils/constants'
 import { RecentRecipes } from '@/features/search/components/recent-recipes'
 import { SearchResults } from '@/features/search/components/search-results'
 import { EMPTY_FILTERS, filterRecipes, hasActiveFilters, type SearchFilters as SearchFiltersValue } from '@/features/search/utils/filter'
+import { incrementalArray } from '@/utils/array'
 
 const cuisineItems = CUISINE_TYPES.map((cuisineType) => ({
   label: CUISINE_TYPE_LABELS[cuisineType],
@@ -24,6 +26,8 @@ const mealItems = MEALS.map((meal) => ({
   label: MEAL_LABELS[meal],
   value: meal,
 }))
+
+const toggleClassName = 'w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-primary-foreground'
 
 const SearchPage = () => {
   const [filters, setFilters] = useState<SearchFiltersValue>(EMPTY_FILTERS)
@@ -68,7 +72,7 @@ const SearchPage = () => {
             />
             <Toggle
               variant="outline"
-              className="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              className={toggleClassName}
               pressed={filters.isVegetarian}
               onPressedChange={(pressed) => setFilters({ ...filters, isVegetarian: pressed })}
             >
@@ -76,7 +80,7 @@ const SearchPage = () => {
             </Toggle>
             <Toggle
               variant="outline"
-              className="w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              className={toggleClassName}
               pressed={filters.isMagimix}
               onPressedChange={(pressed) => setFilters({ ...filters, isMagimix: pressed })}
             >
@@ -84,7 +88,7 @@ const SearchPage = () => {
             </Toggle>
             <Toggle
               variant="outline"
-              className="col-span-2 w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-white"
+              className={`col-span-2 ${toggleClassName}`}
               pressed={filters.isSpice}
               onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}
             >
@@ -98,10 +102,22 @@ const SearchPage = () => {
   )
 }
 
+const SearchSkeleton = () => (
+  <ScreenLayout title="Rechercher" pageKey="/search">
+    <Skeleton className="h-11 w-full rounded-xl" />
+    <div className="flex flex-1 flex-col gap-2.5 pt-2">
+      {incrementalArray({ length: 5 }).map((index) => (
+        <Skeleton className="h-20 w-full rounded-2xl" key={index} />
+      ))}
+    </div>
+  </ScreenLayout>
+)
+
 export const Route = createFileRoute('/search')({
   component: SearchPage,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(getRecipeListOptions())
   },
+  pendingComponent: SearchSkeleton,
   ssr: 'data-only',
 })

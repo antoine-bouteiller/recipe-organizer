@@ -1,11 +1,11 @@
 import { CaretRightIcon, CookieIcon, UserIcon, UsersIcon, type IconProps } from '@phosphor-icons/react'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { ThemeIcon } from '@/components/icons/theme'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { toggleTheme } from '@/lib/theme'
+import { useToggleTheme } from '@/hooks/use-toggle-theme'
 
 interface SettingsSection {
   adminOnly?: boolean
@@ -43,20 +43,13 @@ const settingsSections: SettingsSection[] = [
 
 const RouteComponent = () => {
   const { isAdmin } = Route.useRouteContext()
-  const router = useRouter()
+  const toggleTheme = useToggleTheme()
 
   const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
 
   return (
     <ScreenLayout title="Paramètres" pageKey="/settings">
-      <Button
-        className="mb-4 w-full justify-start gap-3 md:hidden"
-        onClick={async () => {
-          toggleTheme()
-          await router.invalidate()
-        }}
-        variant="outline"
-      >
+      <Button className="mb-4 w-full justify-start gap-3 md:hidden" onClick={toggleTheme} variant="outline">
         <ThemeIcon className="size-5" />
         Changer le thème
       </Button>

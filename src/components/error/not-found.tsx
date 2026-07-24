@@ -23,11 +23,11 @@ export const NotFound = () => (
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-2xl font-semibold text-foreground">Page not found</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Page introuvable</h1>
 
         <Button render={<Link to="/" />} size="lg">
           <CaretLeftIcon />
-          Back to hompeage
+          Retour à l&apos;accueil
         </Button>
       </div>
     </div>

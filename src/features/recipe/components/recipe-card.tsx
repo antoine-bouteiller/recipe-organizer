@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
+import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'
 
@@ -11,7 +12,9 @@ interface RecipeCardProps {
 }
 
 const Tag = ({ children }: { readonly children: React.ReactNode }) => (
-  <span className="rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">{children}</span>
+  <Badge size="sm" variant="overlay">
+    {children}
+  </Badge>
 )
 
 export default function RecipeCard({ recipe }: Readonly<RecipeCardProps>) {

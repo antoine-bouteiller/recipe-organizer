@@ -36,7 +36,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
       >
         {previewUrl ? (
           <div className="absolute inset-0">
-            <img alt="Preview" className="size-full object-cover" src={previewUrl} />
+            <img alt="Aperçu" className="size-full object-cover" src={previewUrl} />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
@@ -53,7 +53,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
         {previewUrl && (
           <div className="absolute top-4 right-4">
             <button
-              aria-label="Remove image"
+              aria-label="Supprimer l'image"
               className="z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               onClick={(event) => {
                 event.preventDefault()

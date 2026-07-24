@@ -123,7 +123,7 @@ export const Route = createRootRouteWithContext<{
         title: 'Recipe Organizer',
       },
       {
-        content: '#2f0d68',
+        content: '#0e6e7e',
         name: 'theme-color',
       },
     ],

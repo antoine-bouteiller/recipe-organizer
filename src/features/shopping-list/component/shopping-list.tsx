@@ -22,7 +22,18 @@ export const ShoppingList = () => {
     ))
   }
 
-  return typedEntriesOf(shoppingListIngredients).map(([key, ingredients]) => (
+  const groups = typedEntriesOf(shoppingListIngredients)
+
+  if (groups.length === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+        <p className="text-muted-foreground">Votre liste de courses est vide</p>
+        <p className="text-sm text-muted-foreground">Ajoutez des recettes depuis la recherche</p>
+      </div>
+    )
+  }
+
+  return groups.map(([key, ingredients]) => (
     <div key={key}>
       <h2 className="mb-2 flex items-center gap-1.5 px-1 text-[11px] font-semibold tracking-wider text-primary uppercase">
         {ingredientCategoryIcons[key]}

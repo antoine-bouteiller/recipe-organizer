@@ -42,11 +42,10 @@ const LoginPage = () => {
 
   return (
     <div className="grid flex-1 place-items-center p-4">
-      <Card className="w-full max-w-sm" description="Connectez-vous pour accéder au portail administrateur" title="Connexion">
+      <Card className="w-full max-w-sm" description="Connectez-vous pour accéder à vos recettes" title="Connexion">
         <div className="px-6 pb-6">
           <Button className="w-full" onClick={() => signInWithGoogle()} variant="outline">
-            <img alt="Google" className="h-4" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg" /> Connexion avec
-            Google
+            <img alt="Google" className="h-4" src="/google.svg" /> Connexion avec Google
           </Button>
         </div>
         <div className="flex items-center justify-center px-6 pb-6">

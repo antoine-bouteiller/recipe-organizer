@@ -1,16 +1,16 @@
-import { Link, useRouter } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { type ReactNode } from 'react'
 
 import { ThemeIcon } from '@/components/icons/theme'
 import { Button } from '@/components/ui/button'
-import { toggleTheme } from '@/lib/theme'
+import { useToggleTheme } from '@/hooks/use-toggle-theme'
 
 import { menuItems } from './constants'
 
 const navItems = menuItems.filter((item) => item.display !== 'mobile')
 
 export const Navbar = ({ search }: { search: ReactNode }) => {
-  const router = useRouter()
+  const toggleTheme = useToggleTheme()
 
   return (
     <div className="flex h-14 items-center gap-2 px-6">
@@ -31,14 +31,7 @@ export const Navbar = ({ search }: { search: ReactNode }) => {
       </nav>
       <div className="flex flex-1 items-center justify-end gap-2">
         {search}
-        <Button
-          onClick={async () => {
-            toggleTheme()
-            await router.invalidate()
-          }}
-          size="icon"
-          variant="ghost"
-        >
+        <Button onClick={toggleTheme} size="icon" variant="ghost">
           <ThemeIcon className="size-6" />
         </Button>
       </div>

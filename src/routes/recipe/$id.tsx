@@ -1,13 +1,15 @@
 import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as v from 'valibot'
 
 import { Editor, EditorContent } from '@/components/common/editor'
+import { NotFound } from '@/components/error/not-found'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Popover } from '@/components/ui/popover'
+import { Spinner } from '@/components/ui/spinner'
 import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@/components/ui/tabs'
 import { getRecipeDetailsOptions } from '@/features/recipe/api/get-one'
 import DeleteRecipe from '@/features/recipe/components/delete-recipe'
@@ -17,11 +19,19 @@ import { RecipeIngredientGroups } from '@/features/recipe/components/recipe-sect
 
 const RecipePage = () => {
   const { id } = Route.useLoaderData()
-  const { data: recipe } = useQuery(getRecipeDetailsOptions(id))
+  const { data: recipe, isLoading } = useSuspenseQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    )
+  }
+
   if (!recipe) {
-    return null
+    return <NotFound />
   }
 
   const ingredientGroups = [
