@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'
 import { authClient } from '@/lib/auth/auth-client'
+import { loadAuthUser, resetAuthUserCache } from '@/lib/auth/get-auth-user'
 
 const searchSchema = v.object({ error: v.optional(v.string()) })
 
@@ -31,8 +32,7 @@ const getErrorMessage = (error: string) => {
 }
 
 const LoginPage = () => {
-  const searchParams = Route.useSearch()
-  const { error } = searchParams as { error?: string }
+  const { error } = Route.useSearch()
 
   useEffect(() => {
     if (error) {
@@ -60,8 +60,11 @@ const LoginPage = () => {
 }
 
 export const Route = createFileRoute('/auth/login')({
-  beforeLoad: ({ context }) => {
-    if (context.authUser) {
+  // Re-checks uncached: a stale cached session would bounce a logged-out user off the login page forever.
+  beforeLoad: async () => {
+    resetAuthUserCache()
+
+    if (await loadAuthUser()) {
       throw redirect({ to: '/' })
     }
   },

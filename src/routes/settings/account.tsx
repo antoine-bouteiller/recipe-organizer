@@ -4,6 +4,7 @@ import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth/auth-client'
+import { resetAuthUserCache } from '@/lib/auth/get-auth-user'
 
 const RouteComponent = () => {
   const { authUser } = Route.useRouteContext()
@@ -12,6 +13,7 @@ const RouteComponent = () => {
 
   const handleLogout = async () => {
     await authClient.signOut()
+    resetAuthUserCache()
     await router.invalidate()
   }
 

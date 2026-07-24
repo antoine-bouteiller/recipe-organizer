@@ -9,7 +9,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { ToastProvider } from '@/components/ui/toast'
-import { getAuthUser } from '@/lib/auth/get-auth-user'
+import { loadAuthUser, type getAuthUser } from '@/lib/auth/get-auth-user'
 import { getTheme } from '@/lib/theme'
 
 import appCss from '../styles/app.css?url'
@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{
   theme: Theme
 }>()({
   beforeLoad: async () => {
-    const authUser = await getAuthUser()
+    const authUser = await loadAuthUser()
     const theme = getTheme()
 
     return { authUser, isAdmin: authUser?.role === 'admin', theme }
