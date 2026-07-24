@@ -74,7 +74,12 @@ headers.
 - **REQ-005** The video route MUST also implement `HEAD` via `createR2HeadHandler('video/mp4')`,
   returning `Accept-Ranges: bytes` and `Content-Length`.
 - **REQ-006** `RecipeCard`:
-  - wraps the whole card in `<Link to="/recipe/$id" viewTransition>`;
+  - stacks a `<Link to="/recipe/$id" viewTransition>` (tags + title, `flex-1` so it covers the whole
+    card above the controls) and the `QuantityControls` row as flex-column SIBLINGS over the image —
+    the buttons MUST NOT be nested inside the `<Link>` (invalid HTML, `nested-interactive` a11y
+    violation);
+  - applies the hover/press transform on the outer wrapper via `has-[a:hover]` / `has-[a:active]` so
+    it does not fire when interacting with the controls;
   - renders `recipe.image` as a covering background `<img>` plus a gradient overlay (`bg-white/30
 mask-[linear-gradient(...)] backdrop-blur-sm`) for legibility;
   - lists `recipe.tags` as `Badge`s with `vegetarian` highlighted in `bg-emerald-100
@@ -87,9 +92,7 @@ text-emerald-600`;
   - otherwise renders `[− <span>{quantity}</span> + <toggle-button>]`;
   - decrement button is disabled when `quantity === 1`;
   - the toggle button label flips between `'Ajouter à la liste'` and `'Supprimer de la liste'`
-    based on `useIsInShoppingList(recipeId)`;
-  - in `variant === 'card'` ALL click handlers run through `withStopPropagation` to keep the
-    `<Link>` inert on button clicks.
+    based on `useIsInShoppingList(recipeId)`.
 - **REQ-008** `useRecipeQuantities(recipeId, defaultValue)` MUST return:
   - `quantity = recipesQuantities[recipeId] ?? defaultValue ?? 0`,
   - `incrementQuantity()` and `decrementQuantity()` that call

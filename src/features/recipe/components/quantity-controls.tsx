@@ -14,12 +14,6 @@ interface QuantityControlsProps {
   readonly className?: string
 }
 
-const withStopPropagation = (callback: () => void) => (event: React.MouseEvent<HTMLButtonElement>) => {
-  event.preventDefault()
-  event.stopPropagation()
-  callback()
-}
-
 export const QuantityControls = ({ recipeId, servings, variant = 'default', className }: QuantityControlsProps) => {
   const isInShoppingList = useIsInShoppingList(recipeId)
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipeId, servings)
@@ -27,7 +21,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
   if (variant === 'card') {
     if (!isInShoppingList) {
       return (
-        <Button onClick={withStopPropagation(() => addToShoppingList(recipeId))}>
+        <Button onClick={() => addToShoppingList(recipeId)}>
           <PlusIcon weight="bold" />
           Ajouter à la liste
         </Button>
@@ -37,7 +31,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
     return (
       <div className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-white/15 p-1 ring-1 ring-white/20 backdrop-blur-md ring-inset">
         <Button
-          onClick={withStopPropagation(decrementQuantity)}
+          onClick={decrementQuantity}
           disabled={quantity === 1}
           size="icon-xs"
           variant="secondary"
@@ -46,11 +40,11 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
           <MinusIcon weight="bold" />
         </Button>
         <span className="min-w-18 text-center text-[13px] font-bold text-white tabular-nums">{quantity} couverts</span>
-        <Button onClick={withStopPropagation(incrementQuantity)} size="icon-xs">
+        <Button onClick={incrementQuantity} size="icon-xs">
           <PlusIcon weight="bold" />
         </Button>
         <Button
-          onClick={withStopPropagation(() => removeFromShoppingList(recipeId))}
+          onClick={() => removeFromShoppingList(recipeId)}
           aria-label="Retirer de la liste"
           size="icon-xs"
           variant="secondary"
