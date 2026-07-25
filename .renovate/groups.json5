@@ -7,7 +7,12 @@
       matchPackageNames: ['wrangler', '@cloudflare/vite-plugin'],
     },
     {
+      // Pinned to 1.0.0-rc.3: rc.4 broke `drizzle-kit migrate` on the d1-http driver.
+      // sqlite-proxy's `values` executor sends method "all" (hitting D1's /query, which
+      // returns keyed rows) while the migrations-table code reads rows positionally, so
+      // every applied migration looks unmatched. Re-enable once upstream ships a fix.
       description: 'Drizzle Group',
+      enabled: false,
       groupName: 'drizzle',
       matchPackageNames: ['drizzle-orm', 'drizzle-kit'],
       versioning: 'docker',
