@@ -37,10 +37,18 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
 
   const containerRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (node) {
+      if (!node) {
+        return undefined
+      }
+      const syncWidth = () => {
         widthRef.current = node.offsetWidth
         setOffset(-activeIndexRef.current * node.offsetWidth, false)
       }
+      syncWidth()
+      // A resize changes panel width without remounting, so a cached width would leave every panel past the first misaligned.
+      const observer = new ResizeObserver(syncWidth)
+      observer.observe(node)
+      return () => observer.disconnect()
     },
     [setOffset]
   )

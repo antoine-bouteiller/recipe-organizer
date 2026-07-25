@@ -36,7 +36,10 @@ export const TabsTab = ({ className, ...props }: TabsPrimitive.Tab.Props): React
   />
 )
 
-type SwipeTabsContextValue = Pick<ReturnType<typeof useSwipeTabs>, 'containerRef' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart' | 'trackRef'>
+type SwipeTabsContextValue = Pick<
+  ReturnType<typeof useSwipeTabs>,
+  'activeIndex' | 'containerRef' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart' | 'trackRef'
+>
 
 const SwipeTabsContext = createContext<SwipeTabsContextValue | null>(null)
 
@@ -48,10 +51,10 @@ interface SwipeTabsProps<TTab extends string> {
 }
 
 export const SwipeTabs = <TTab extends string>({ tabs, defaultTab, className, children }: SwipeTabsProps<TTab>): React.ReactElement => {
-  const { activeTab, containerRef, trackRef, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(tabs, defaultTab)
+  const { activeIndex, activeTab, containerRef, trackRef, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(tabs, defaultTab)
 
   return (
-    <SwipeTabsContext.Provider value={{ containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
+    <SwipeTabsContext.Provider value={{ activeIndex, containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
       <Tabs className={className} onValueChange={(value) => goTo(value as TTab)} value={activeTab}>
         {children}
       </Tabs>
@@ -64,13 +67,16 @@ export const SwipeTabsPanels = ({ className, children }: { className?: string; c
   if (!context) {
     throw new Error('SwipeTabsPanels must be rendered inside SwipeTabs')
   }
-  const { containerRef, trackRef, onTouchStart, onTouchMove, onTouchEnd } = context
+  const { activeIndex, containerRef, trackRef, onTouchStart, onTouchMove, onTouchEnd } = context
 
   return (
     <div ref={containerRef} className={cn('min-h-0 flex-1 overflow-hidden', className)} data-slot="swipe-tabs-panels">
       <div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={trackRef}>
-        {Children.map(children, (child) =>
-          isValidElement<{ className?: string }>(child) ? cloneElement(child, { className: cn('w-full shrink-0', child.props.className) }) : child
+        {Children.map(children, (child, index) =>
+          // Without inert, off-screen panels keep their tab order and focusing one scrolls this overflow-hidden box out of sync with the track transform, unrecoverably.
+          isValidElement<{ className?: string; inert?: boolean }>(child)
+            ? cloneElement(child, { className: cn('w-full shrink-0', child.props.className), inert: index !== activeIndex })
+            : child
         )}
       </div>
     </div>
