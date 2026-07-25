@@ -61,13 +61,14 @@ const ScreenHeader = ({ backgroundImage, headerEndItem, scrolled, title, withGoB
 
   return (
     // Height is fixed so the collapse never reflows the content below: a sticky box that actually shrinks slides the page up mid-scroll.
-    <div className="pointer-events-none sticky top-0 z-20 -mx-4 flex h-(--screen-header-height) w-auto shrink-0 items-center gap-2 px-2 pt-safe-2 text-foreground md:hidden">
+    <div className="pointer-events-none sticky top-0 z-20 -mx-4 flex h-(--screen-header-height) w-auto shrink-0 items-center gap-2 px-2 pt-safe-1 text-foreground md:hidden">
       {withGoBack && (
         <GlassPill on={scrolled}>
           <GoBackButton />
         </GlassPill>
       )}
-      <GlassPill className="min-w-0 px-4" on={scrolled}>
+      {/* Vertical padding + the collapsed text-base line-height adds up to the go-back button's size-9 pill. */}
+      <GlassPill className="min-w-0 px-4 py-1.5" on={scrolled}>
         <h1
           className={cn(
             'truncate font-heading font-bold tracking-tight transition-[font-size,line-height] duration-200 ease-out-snappy',
