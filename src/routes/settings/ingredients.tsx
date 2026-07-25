@@ -27,7 +27,7 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky -top-1 z-10 -mt-1 flex shrink-0 items-center gap-4 bg-muted pt-1 pb-2">
+      <div className="sticky top-(--screen-header-height) z-10 flex shrink-0 items-center gap-4 pb-2 md:top-0 md:bg-muted">
         <SearchInput search={search} setSearch={setSearch} />
         <AddIngredient>
           <Button size="icon-lg" variant="outline">

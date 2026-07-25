@@ -75,7 +75,7 @@ interface InputProps {
 }
 
 export const SearchInput = ({ autoFocus, search, setSearch }: InputProps) => (
-  <InputGroup>
+  <InputGroup className="bg-background/72 backdrop-blur-xl dark:bg-input/48">
     <InputGroupInput
       autoFocus={autoFocus}
       onChange={(event) => setSearch(event.target.value)}
