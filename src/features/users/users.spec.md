@@ -64,7 +64,7 @@ Engineers and LLM coding agents working on the recipe-organizer codebase.
 | **Server function**               | TanStack Start `createServerFn(...)` callable that runs only on the server.                                                                                                                                                         |
 | **`queryKeys.allUsers`**          | Root React Query key for user lists. Invalidated after every mutation.                                                                                                                                                              |
 | **`queryKeys.listUsers(status)`** | Per-status React Query key produced by `getUserListOptions`.                                                                                                                                                                        |
-| **`SWIPE_THRESHOLD`**             | Constant `-100` (px) in `src/routes/settings/users.tsx` that triggers the mobile block confirmation when the row is dragged left past it.                                                                                           |
+| **`SwipeTabs`**                   | Shared component in `src/components/ui/tabs.tsx` (backed by `src/hooks/use-swipe-tabs.ts`) that makes a tab set navigable by horizontal drag and mounts every panel simultaneously.                                                 |
 | **`DeleteDialog`**                | Generic confirm dialog component reused by `BlockUser` with a custom action label and icon.                                                                                                                                         |
 
 ## 3. Requirements, Constraints & Guidelines
@@ -113,14 +113,15 @@ Engineers and LLM coding agents working on the recipe-organizer codebase.
   (blocked). Default selected tab is `active`.
 - **REQ-012** The route MUST provide a search input that filters the
   visible list by case-insensitive substring match on `email` OR `role`.
-- **REQ-013** When viewport is mobile (`useIsMobile()` returns `true`) AND
-  the current tab is `active` or `pending`, each row MUST be wrapped in
-  `SwipeToBlock`. Dragging a row left past `SWIPE_THRESHOLD = -100`
-  releases the drag, animates the row back to `x = 0`, and opens the
-  `BlockUser` confirm dialog.
-- **REQ-014** When viewport is desktop AND the current tab is `active` or
-  `pending`, each row MUST display an explicit `BlockUser` button
-  (`variant="destructive-outline"`).
+- **REQ-013** The three tabs MUST be swipeable via `SwipeTabs` /
+  `SwipeTabsPanels`. All three panels are mounted simultaneously, and a
+  horizontal drag released past `SWIPE_THRESHOLD = 50` (px) or
+  `VELOCITY_THRESHOLD = 500` (px/s) MUST commit a tab change. Each panel
+  scrolls vertically on its own; the direction lock in `use-swipe-tabs.ts`
+  MUST leave vertical scrolling to the browser.
+- **REQ-014** When the current tab is `active` or `pending`, each row MUST
+  display an explicit `BlockUser` button (`variant="destructive-outline"`)
+  on every viewport.
 - **REQ-015** When the current tab is `blocked` or `pending`, each row
   MUST display an `ApproveUser` button.
 - **REQ-016** The "Add user" `AddUser` dialog MUST validate input
@@ -207,9 +208,9 @@ Engineers and LLM coding agents working on the recipe-organizer codebase.
   })
   ```
 
-- **PAT-004** Mobile destructive action via `SwipeToBlock`: `motion.div`
-  with `drag="x"`, `dragConstraints={{ left: -150, right: 0 }}`,
-  `dragElastic={0.1}`, threshold `-100`.
+- **PAT-004** Swipeable tab set via `SwipeTabs` + `SwipeTabsPanels`: native
+  touch events with a direction lock, an elastic clamp at either end
+  (`ELASTIC_FACTOR = 0.15`), and commit on distance or velocity threshold.
 
 ## 4. Interfaces & Data Contracts
 
@@ -352,18 +353,19 @@ factory that exposes `email` (TextField) and `role` (SelectField with items
     `'blocked'`, `queryKeys.allUsers` is invalidated, and the
     `Utilisateur bloqué` toast displays.
 
-- **AC-009** Block on mobile via swipe
-  - **Given** mobile viewport and an active user row
-  - **When** the admin drags the row left past `SWIPE_THRESHOLD = -100`
-    and releases
-  - **Then** the row animates back to `x = 0` and the `BlockUser` confirm
-    dialog opens; confirming triggers AC-008.
+- **AC-009** Swipe between tabs
+  - **Given** the `Actifs` tab is selected on a mobile viewport
+  - **When** the admin drags the panel area left past
+    `SWIPE_THRESHOLD = 50` and releases
+  - **Then** the `En attente` panel becomes active and the `TabsList`
+    indicator moves to it.
 
-- **AC-010** Swipe canceled
+- **AC-010** Block on mobile
   - **Given** mobile viewport and an active user row
-  - **When** the admin drags left to `x = -50` and releases (above the
-    threshold)
-  - **Then** the row animates back to `x = 0` and the dialog does NOT open.
+  - **When** the admin taps the row's destructive-outline `BlockUser`
+    button
+  - **Then** the `BlockUser` confirm dialog opens; confirming triggers
+    AC-008.
 
 - **AC-011** Search filtering
   - **Given** a list with users `alice@x.io (user)` and
@@ -381,12 +383,11 @@ factory that exposes `email` (TextField) and `role` (SelectField with items
 
 - **AC-013** Tab visibility of buttons
   - **Given** the active tab is `Actifs`
-  - **Then** rows show no `ApproveUser` and (on desktop) show `BlockUser`.
+  - **Then** rows show no `ApproveUser` and show `BlockUser`.
   - **Given** the active tab is `Bloqués`
-  - **Then** rows show `ApproveUser` and no `BlockUser` (desktop or mobile).
+  - **Then** rows show `ApproveUser` and no `BlockUser`.
   - **Given** the active tab is `En attente`
-  - **Then** rows show `ApproveUser` AND `BlockUser` (desktop) /
-    swipe-to-block (mobile).
+  - **Then** rows show `ApproveUser` AND `BlockUser`.
 
 - **AC-014** OAuth approval flow
   - **Given** a Google sign-in by an unknown email creates a user with
@@ -399,8 +400,8 @@ factory that exposes `email` (TextField) and `role` (SelectField with items
 
 - **Levels.** Unit-test each server function handler against an in-memory or
   miniflare-bound D1 instance. Component-test `AddUser`, `ApproveUser`,
-  `BlockUser`, and the `SwipeToBlock` interaction with React Testing Library
-  (firing `touchstart`/`touchmove`/`touchend` on the foreground element).
+  `BlockUser`, and the `SwipeTabs` interaction with React Testing Library
+  (firing `touchstart`/`touchmove`/`touchend` on the panel track).
   Route-level tests cover loader behavior and tab/search rendering.
 - **Frameworks.** Vitest via `vp test`. Mocking via Vitest spies on
   `@/lib/db` and `@tanstack/react-query` mutation results.
@@ -431,9 +432,12 @@ denied'`). One positive path per function.
 - **Single root invalidation key (`queryKeys.allUsers`).** Avoids stale
   per-status caches when a user changes status (e.g. pending -> active
   must update both lists).
-- **Mobile swipe destructive action.** Matches platform conventions
-  (iOS-style swipe-to-delete) on small screens where icon buttons are
-  cramped; desktop keeps an explicit visible button.
+- **Explicit block button on every viewport.** The former mobile
+  swipe-to-block gesture was removed because it competed with the tab pan
+  for the same pixels: both started as a horizontal drag on a row, so the
+  row swallowed gestures meant for tab navigation. Tabs won — swiping
+  between the three lists is the more frequent action — and blocking falls
+  back to the same explicit button desktop already used.
 
 ## 8. Dependencies & External Integrations
 
@@ -447,14 +451,14 @@ denied'`). One positive path per function.
 | Internal | `@/components/dialogs/delete-dialog` (`DeleteDialog`)                                          | Confirmation UX for `BlockUser`         |
 | Internal | `@/components/dialogs/form-dialog` (`getFormDialog`)                                           | Form host for `AddUser`                 |
 | Internal | `@/hooks/use-app-form` (`useAppForm`, `withForm`)                                              | TanStack Form integration               |
-| Internal | `@/hooks/use-is-mobile`                                                                        | Toggle desktop vs swipe UX              |
+| Internal | `@/components/ui/tabs` (`SwipeTabs`, `SwipeTabsPanels`) + `@/hooks/use-swipe-tabs`             | Swipeable tab navigation                |
 | External | `@tanstack/react-start` (`createServerFn`, `createMiddleware`)                                 | Server-function runtime                 |
 | External | `@tanstack/react-query` (`queryOptions`, `mutationOptions`, `useMutation`, `useSuspenseQuery`) | Cache + mutations                       |
 | External | `@tanstack/react-form` (`revalidateLogic`, `useStore`)                                         | Form state                              |
 | External | `@tanstack/react-router` (`createFileRoute`, `redirect`)                                       | Route + redirects                       |
 | External | `drizzle-orm` (`eq`) and `drizzle-orm/sqlite-core`                                             | DB query/schema                         |
 | External | `zod`                                                                                          | Input validation                        |
-| Native   | Touch events (`onTouchStart`/`onTouchMove`/`onTouchEnd`) + CSS transition                      | Mobile swipe gesture                    |
+| Native   | Touch events (`onTouchStart`/`onTouchMove`/`onTouchEnd`) + CSS transition                      | Tab swipe gesture (`use-swipe-tabs`)    |
 | External | `@phosphor-icons/react` (`CheckIcon`, `PlusIcon`, `ProhibitIcon`)                              | Icons                                   |
 
 ## 9. Examples & Edge Cases
@@ -492,8 +496,10 @@ is `true`, so an empty search shows all rows.
 
 ### 9.6 Swipe drag clamping
 
-`dragConstraints={{ left: -150, right: 0 }}` caps the drag at -150px;
-`dragElastic={0.1}` allows a small overshoot before snapping back.
+`clampOffset` in `use-swipe-tabs.ts` caps the track between `0` and
+`-(tabs.length - 1) * width`; past either end the excess is scaled by
+`ELASTIC_FACTOR = 0.15`, so over-swiping on `Actifs` or `Bloqués` gives a
+small elastic overshoot before snapping back.
 
 ### 9.7 Pending tab on desktop
 
@@ -519,7 +525,8 @@ overwrite.
   (used by both `AddUser` and `createUser`).
 - **VAL-005** The route loader in `src/routes/settings/users.tsx`
   preloads `getUserListOptions('active' | 'pending' | 'blocked')`.
-- **VAL-006** `SWIPE_THRESHOLD === -100` in `src/routes/settings/users.tsx`.
+- **VAL-006** `src/routes/settings/users.tsx` renders `SwipeTabs` with
+  `tabs={USER_TABS}` and three `SwipeTabsPanels` children.
 - **VAL-007** `BlockUser` passes `actionLabel="Bloquer"` and
   `icon={ProhibitIcon}` to `DeleteDialog`.
 - **VAL-008** Each mutation factory invalidates either

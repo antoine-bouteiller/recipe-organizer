@@ -15,7 +15,7 @@ const searchSchema = v.object({
 })
 
 const RecipeListSkeleton = () => (
-  <ScreenLayout title="Recettes" pageKey="/">
+  <ScreenLayout title="Recettes" pageKey="/" scrollTitle>
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
       {incrementalArray({ length: 6 }).map((index) => (
         <Skeleton className="h-60 rounded-[28px]" key={index} />
@@ -31,7 +31,7 @@ const RecipeList = () => {
   const visibleRecipes = recipes.filter((recipe) => !recipe.isSpice)
 
   return (
-    <ScreenLayout title="Recettes" pageKey="/">
+    <ScreenLayout title="Recettes" pageKey="/" scrollTitle>
       {visibleRecipes.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
           <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">

@@ -114,17 +114,17 @@ const RecipePage = () => {
       <QuantityControls className="my-2" recipeId={id} servings={recipe.servings} />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground dark:prose-invert">
-        <div className="flex min-h-0 flex-1 flex-col md:hidden">
+        <div className="-mb-4 flex min-h-0 flex-1 flex-col md:hidden">
           <SwipeTabs className="flex min-h-0 flex-1 flex-col" defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
             <TabsList className="w-full">
               <TabsTab value="ingredients">Ingrédients</TabsTab>
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>
             <SwipeTabsPanels>
-              <div className="overflow-y-auto px-2">
+              <div className="overflow-y-auto px-2 pb-4">
                 <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
               </div>
-              <div className="overflow-y-auto p-2">
+              <div className="overflow-y-auto p-2 pb-4">
                 <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
                   <EditorContent className="max-w-[65ch]" />
                 </Editor>

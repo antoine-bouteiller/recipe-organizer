@@ -4,7 +4,7 @@ import React, { Children, cloneElement, createContext, isValidElement, useContex
 import { useSwipeTabs } from '@/hooks/use-swipe-tabs'
 import { cn } from '@/utils/cn'
 
-export const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props): React.ReactElement => (
+const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props): React.ReactElement => (
   <TabsPrimitive.Root className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)} data-slot="tabs" {...props} />
 )
 
@@ -34,10 +34,6 @@ export const TabsTab = ({ className, ...props }: TabsPrimitive.Tab.Props): React
     data-slot="tabs-tab"
     {...props}
   />
-)
-
-export const TabsPanel = ({ className, ...props }: TabsPrimitive.Panel.Props): React.ReactElement => (
-  <TabsPrimitive.Panel className={cn('flex-1 outline-none', className)} data-slot="tabs-content" {...props} />
 )
 
 type SwipeTabsContextValue = Pick<ReturnType<typeof useSwipeTabs>, 'containerRef' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart' | 'trackRef'>
