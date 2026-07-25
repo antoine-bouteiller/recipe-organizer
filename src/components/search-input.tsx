@@ -74,8 +74,11 @@ interface InputProps {
   setSearch: (value: string) => void
 }
 
+// Also used by the buttons next to a SearchInput: --input is white/8% in dark, so the outline variant's dark:bg-input/32 lands at ~2.5% white and reads as no background over a transparent sticky band.
+export const glassSurface = 'bg-background/72 backdrop-blur-xl dark:bg-input/48'
+
 export const SearchInput = ({ autoFocus, search, setSearch }: InputProps) => (
-  <InputGroup className="bg-background/72 backdrop-blur-xl dark:bg-input/48">
+  <InputGroup className={glassSurface}>
     <InputGroupInput
       autoFocus={autoFocus}
       onChange={(event) => setSearch(event.target.value)}

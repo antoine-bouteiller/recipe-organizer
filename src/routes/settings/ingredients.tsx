@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { ScreenLayout } from '@/components/layout/screen-layout'
-import { SearchInput } from '@/components/search-input'
+import { glassSurface, SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { Item, ItemGroup, ItemSeparator } from '@/components/ui/item'
 import { getIngredientListOptions } from '@/features/ingredients/api/get-all'
@@ -30,7 +30,7 @@ const IngredientsManagement = () => {
       <div className="sticky top-(--screen-header-height) z-10 flex shrink-0 items-center gap-4 pb-2 md:top-0 md:bg-muted">
         <SearchInput search={search} setSearch={setSearch} />
         <AddIngredient>
-          <Button size="icon-lg" variant="outline">
+          <Button className={glassSurface} size="icon-lg" variant="outline">
             <PlusIcon />
           </Button>
         </AddIngredient>

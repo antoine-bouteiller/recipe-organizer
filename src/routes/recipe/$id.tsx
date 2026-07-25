@@ -81,8 +81,12 @@ const RecipePage = () => {
         authUser && (
           <Popover
             trigger={
-              <Button size="icon" variant="outline">
-                <DotsThreeVerticalIcon className="text-primary" weight="bold" />
+              <Button
+                className="border-white/20 bg-white/15 text-white backdrop-blur-md hover:bg-white/25 data-pressed:bg-white/25 dark:bg-white/15 dark:hover:bg-white/25 dark:data-pressed:bg-white/25"
+                size="icon"
+                variant="outline"
+              >
+                <DotsThreeVerticalIcon weight="bold" />
               </Button>
             }
           >

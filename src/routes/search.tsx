@@ -5,7 +5,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
-import { SearchInput } from '@/components/search-input'
+import { glassSurface, SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -47,7 +47,9 @@ const SearchPage = () => {
             <div className="flex-1">
               <SearchInput autoFocus search={filters.query} setSearch={(query) => setFilters({ ...filters, query })} />
             </div>
-            <CollapsiblePrimitive.Trigger render={<Button aria-label="Filtrer par catégorie" size="icon-lg" variant="outline" />}>
+            <CollapsiblePrimitive.Trigger
+              render={<Button aria-label="Filtrer par catégorie" className={glassSurface} size="icon-lg" variant="outline" />}
+            >
               <FunnelSimpleIcon />
             </CollapsiblePrimitive.Trigger>
           </div>

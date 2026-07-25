@@ -4,7 +4,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
 import { ScreenLayout } from '@/components/layout/screen-layout'
-import { SearchInput } from '@/components/search-input'
+import { glassSurface, SearchInput } from '@/components/search-input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Item, ItemGroup, ItemSeparator } from '@/components/ui/item'
@@ -66,7 +66,7 @@ const UsersManagement = () => {
       <div className="flex shrink-0 items-center gap-4 bg-muted pb-2">
         <SearchInput search={search} setSearch={setSearch} />
         <AddUser>
-          <Button size="icon-lg" variant="outline">
+          <Button className={glassSurface} size="icon-lg" variant="outline">
             <PlusIcon />
           </Button>
         </AddUser>
