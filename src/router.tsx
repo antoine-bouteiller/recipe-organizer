@@ -51,6 +51,7 @@ export const getRouter = () => {
     notFoundMode: 'root',
     routeTree,
     scrollRestoration: true,
+    scrollToTopSelectors: ['[data-scroll-restoration-id="screen-outer"]', '[data-scroll-restoration-id="screen-inner"]'],
   })
 
   setupRouterSsrQueryIntegration({

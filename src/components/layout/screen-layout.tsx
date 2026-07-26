@@ -100,7 +100,11 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
   )
 
   return (
-    <div className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-muted pt-0 md:overflow-y-auto">
+    // Both ids are listed in the router's scrollToTopSelectors; without them the router copies the previous page's scrollTop onto these divs.
+    <div
+      className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-muted pt-0 md:overflow-y-auto"
+      data-scroll-restoration-id="screen-outer"
+    >
       {backgroundImage && header}
       <div
         className={cn(
@@ -109,6 +113,7 @@ export const ScreenLayout = ({ children, headerEndItem, title, withGoBack = fals
           pageKey ? 'pb-safe-16' : 'pb-4',
           backgroundImage && '-mt-10 rounded-t-3xl'
         )}
+        data-scroll-restoration-id="screen-inner"
         onScroll={(event) => {
           const offset = event.currentTarget.scrollTop
           // Asymmetric thresholds: a single one flickers when a finger rests right on it.
