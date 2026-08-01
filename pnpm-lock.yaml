@@ -82,8 +82,8 @@ importers:
         version: 1.4.2(typescript@7.0.2)
     devDependencies:
       '@cloudflare/vite-plugin':
-        specifier: 1.49.0
-        version: 1.49.0(@voidzero-dev/vite-plus-core@0.2.7)(wrangler@4.116.0)
+        specifier: 1.50.0
+        version: 1.50.0(@voidzero-dev/vite-plus-core@0.2.7)(wrangler@4.118.0)
       '@commitlint/cli':
         specifier: 21.2.1
         version: 21.2.1(@types/node@25.9.5)(typescript@7.0.2)
@@ -160,8 +160,8 @@ importers:
         specifier: 0.2.7
         version: 0.2.7(@types/node@25.9.5)(@vitejs/devtools@0.4.10)(@voidzero-dev/vite-plus-core@0.2.7)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@7.0.2)(yaml@2.9.0)
       wrangler:
-        specifier: 4.116.0
-        version: 4.116.0
+        specifier: 4.118.0
+        version: 4.118.0
 
 packages:
 
@@ -362,12 +362,12 @@ packages:
       workerd:
         optional: true
 
-  '@cloudflare/vite-plugin@1.49.0':
-    resolution: {integrity: sha512-r8w3fwkLPfiwG1ksvDqa82fcT//skvNWXe3nMcZqLsShexrecTkJs1ZK41YmKQP+DH2J1ggASoizmBTb1f7hQg==}
+  '@cloudflare/vite-plugin@1.50.0':
+    resolution: {integrity: sha512-zIhZim7Kr7OC22rlOkU81BLj0oRlUOqPRX+E6RU3hyRYg4xU1MbA3yiMIwFONr+jc/uV7Fxs20NlXrB89Fqjqg==}
     hasBin: true
     peerDependencies:
       vite: ^6.1.0 || ^7.0.0 || ^8.0.0
-      wrangler: ^4.116.0
+      wrangler: ^4.118.0
 
   '@cloudflare/workerd-darwin-64@1.20260730.1':
     resolution: {integrity: sha512-+MBHmPaiTe2KajryW0T24rZvWFxb41hD3d8anNzQqHzft6vSEb18+sp0znSwxgij7ApPhSM1+vhkNg4f3YMguA==}
@@ -3926,10 +3926,9 @@ packages:
     resolution: {integrity: sha512-EDYo6VlmtnumlcBCbh1gLJ//9jvM/ndXHfVXIFrZVr6fGcwTUyCTFNTLCKuY3ffbK8L/+3Mzqnd58RojiZqHVw==}
     engines: {node: '>=20'}
 
-  miniflare@4.20260730.0:
-    resolution: {integrity: sha512-1Z9SB9r/o//80UA02Re3QhtcecSHAyAjf5EcKBfQVlQrCg7Miy79hl2PvtkwFLIaJ5rcrOPdDcRr577okwZPsg==}
+  miniflare@5.20260730.0-alpha:
+    resolution: {integrity: sha512-8/dspSXDshP6nSkCpjKO7BYc2qZoYSXm7iM+QxY7qJyJpAB3onnQSaiu0cvKJlfuMGwULl55hG69FJCcCMXU1Q==}
     engines: {node: '>=22.0.0'}
-    hasBin: true
 
   minimatch@10.2.5:
     resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
@@ -4434,8 +4433,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@4.116.0:
-    resolution: {integrity: sha512-wP1PXxH5KJajfGEjty0NNqyxAirTFvMZpGyB5CRqEIiY0fL/SiCKtIYAJB9HXq0MP0sMXB/i/YSls+WObahAhw==}
+  wrangler@4.118.0:
+    resolution: {integrity: sha512-9pkBw/b8zWqGx2S+oLhgHMR1M/4VOE8SynUFABnGWiSFGlcOQ4xiI/B71Xf66RYP2xzngU37IQFPtUruij3lYw==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -4702,14 +4701,14 @@ snapshots:
     optionalDependencies:
       workerd: 1.20260730.1
 
-  '@cloudflare/vite-plugin@1.49.0(@voidzero-dev/vite-plus-core@0.2.7)(wrangler@4.116.0)':
+  '@cloudflare/vite-plugin@1.50.0(@voidzero-dev/vite-plus-core@0.2.7)(wrangler@4.118.0)':
     dependencies:
       '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260730.1)
-      miniflare: 4.20260730.0
+      miniflare: 5.20260730.0-alpha
       unenv: 2.0.0-rc.24
       vite: '@voidzero-dev/vite-plus-core@0.2.7(@types/node@25.9.5)(@vitejs/devtools@0.4.10)(esbuild@0.28.1)(jiti@2.7.0)(publint@0.3.21)(typescript@7.0.2)(yaml@2.9.0)'
       workerd: 1.20260730.1
-      wrangler: 4.116.0
+      wrangler: 4.118.0
       ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
@@ -7481,7 +7480,7 @@ snapshots:
 
   meow@14.1.0: {}
 
-  miniflare@4.20260730.0:
+  miniflare@5.20260730.0-alpha:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       sharp: 0.35.2
@@ -8102,13 +8101,13 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260730.1
       '@cloudflare/workerd-windows-64': 1.20260730.1
 
-  wrangler@4.116.0:
+  wrangler@4.118.0:
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260730.1)
       blake3-wasm: 2.1.5
       esbuild: 0.28.1
-      miniflare: 4.20260730.0
+      miniflare: 5.20260730.0-alpha
       path-to-regexp: 6.3.0
       unenv: 2.0.0-rc.24
       workerd: 1.20260730.1
