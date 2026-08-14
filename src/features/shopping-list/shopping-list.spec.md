@@ -1,450 +1,152 @@
 ---
-title: Shopping List Feature Specification
-version: 1.0
-date_created: 2026-05-08
-last_updated: 2026-05-08
-owner: recipe-organizer
-tags: [feature, shopping-list, aggregation, units]
+title: Shopping List
+status: implemented
+author: Antoine Bouteiller
+date: 2026-08-14
+related: [docs/architecture.spec.md]
 ---
 
-# Introduction
+## 2. Problem Statement
 
-This specification defines the **shopping-list** feature of the Recipe Organizer app. The feature lets a user
-collect a set of recipes, override their target servings, and produce a unified, aggregated, category-grouped
-list of ingredients to buy. The list is computed entirely client-side from a server snapshot of the selected
-recipes, with quantity scaling, unit conversion, parent/child rollup, and graceful fallback when units are
-incompatible. Selection state is persisted in `localStorage` via TanStack Store (`persistedStore` helper). The page is rendered
-client-only because all of its inputs come from persisted client state.
+Home cooks need one purchase list for several recipes, even when each recipe uses different servings,
+units, linked recipes, or ingredient variants. The shopping list preserves the cook's local recipe
+selection and serving intent, then derives a category-grouped list from an authoritative recipe
+projection. This fulfils architecture [G-4] and refines its client-state boundary [KD-7].
 
-## 1. Purpose & Scope
+- `[G-1]` Produce a complete, scaled shopping list from a device-local selection of recipes.
+- `[G-2]` Aggregate compatible ingredient quantities without hiding quantities that cannot convert.
+- `[G-3]` Keep purchase-list interaction fast and durable without persisting recipe records in browser storage.
 
-### 1.1 Purpose
+## 3. Key Design Decisions
 
-Provide a deterministic, client-rendered shopping list that:
+| Decision                      | Choice                                                                                                             | Rationale                                                                                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Durable intent       | Two persisted stores hold selected recipe IDs and serving overrides separately.                                    | Selection and quantity intent have independent lifetimes: removing a recipe does not discard its chosen serving count.                     |
+| `[KD-2]` Recipe projection    | A GET server function returns selected recipes with direct and linked ingredient lines.                            | The Worker supplies relationally consistent source data while the browser retains the user-specific serving choice.                        |
+| `[KD-3]` Aggregation location | The browser scales, converts, rolls up, and groups the projection in a pure derivation.                            | Serving overrides live on the device, and a pure computation makes each rendered list correspond directly to its selection and quantities. |
+| `[KD-4]` Unit result          | Each ingredient has one preferred primary unit plus residual fallback lines.                                       | Conversion failures remain visible to the shopper instead of being silently dropped or inaccurately summed.                                |
+| `[KD-5]` Ingredient hierarchy | Child ingredients disappear from the displayed list and contribute their largest primary quantity to their parent. | A parent purchase can satisfy a child variant, while selecting the largest child quantity avoids double-counting variants.                 |
 
-- Tracks which recipes the user wants to cook (`shoppingList: number[]`).
-- Tracks the user's desired servings per recipe (`recipesQuantities: Record<number, number>`).
-- Pulls those recipes (with linked sub-recipes) from the server.
-- Scales each ingredient line by the user's wanted servings.
-- Aggregates identical ingredients across recipes, converting units when possible.
-- Rolls child ingredients up into their parent.
-- Groups the final list by ingredient category.
+## 4. Principles & Intents
 
-### 1.2 In Scope
+- `[PI-1]` **Persist intent, query records** — refine architecture [PI-4]; stores hold recipe IDs and
+  serving values, while TanStack Query owns recipe data.
+- `[PI-2]` **No lost quantity** — an incompatible or unitless conversion remains a separately labelled
+  fallback amount.
+- `[PI-3]` **Server projection, client presentation** — the feature API owns relational traversal and
+  the hook owns deterministic purchase-list derivation.
+- `[PI-4]` **Categories remain semantic** — the ingredient category selects both grouping and its
+  French display label and icon.
 
-- Client persistence of recipe selection and per-recipe servings overrides.
-- Server-side projection of recipes + ingredient groups + linked recipes (no auth).
-- Unit-aware aggregation, conversion, and fallback handling.
-- Rendering and interactive checkbox UX of the list at `/shopping-list`.
-- Reset of selection via `ResetCartButton`.
+## 5. Non-Goals
 
-### 1.3 Out of Scope
+- `[NG-1]` Per-user server persistence, sharing, or synchronization of a shopping list.
+- `[NG-2]` Editing recipes or ingredients from the shopping-list screen.
+- `[NG-3]` Durable completion state for individual purchase items.
+- `[NG-4]` Shopping-list entries for ingredients in the `spices` category.
+- `[NG-5]` Inventing a conversion where ingredient density or count weight does not support one.
 
-- Persistence of which items have been "checked" in the UI (purely local component state).
-- Per-user server persistence of the shopping list.
-- Editing ingredients from the shopping list page.
-- Spices (excluded server-side from `groupIngredients`).
-- Any unit dimension other than `mass | volume | count | length` as defined by `UNITS`.
+## 6. Caveats
 
-## 2. Definitions
+- `[C-1]` The query key contains the selected ID array, so each distinct compact selection has a
+  separate cache entry, refining architecture [C-5].
+- `[C-2]` A missing selected recipe produces no projection row and therefore no shopping-list lines.
+- `[C-3]` `convert` returns `null` for incompatible dimensions or absent conversion metadata; those
+  amounts remain fallback lines (`src/features/shopping-list/utils/aggregate-shopping-list.ts:38-49`).
+- `[C-4]` A child ingredient contributes only its greatest primary amount among siblings, not a sum
+  (`src/features/shopping-list/utils/aggregate-shopping-list.ts:101-120`).
+- `[C-5]` Checkmarks are component-local state and reset when their `CartItem` unmounts
+  (`src/features/shopping-list/component/cart-item.tsx:17-39`).
 
-| Term | Definition |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----- | ------------------------------------------------------------------------------------------------------------------ |
-| **Recipe** | A row in the `recipe` table with a `servings` integer column. |
-| **IngredientGroup** | A logical grouping (`recipeIngredientGroup`) of ingredient lines for a recipe. |
-| **GroupIngredient** | A row joining a `recipeIngredientGroup` to an `ingredient` with `quantity` + `unitSlug`. |
-| **LinkedRecipe** | A reference from one recipe to another with a `ratio`. The linked recipe's ingredients are flattened into the parent recipe and scaled by `ratio / linkedRecipe.servings`. |
-| **Spice** | Any ingredient with `category === 'spices'`. Excluded from the shopping list at the SQL layer. |
-| **Wanted Quantity** | The user's chosen target servings for a recipe: `recipesQuantities[id] ?? recipe.servings`. |
-| **Scaled Quantity** | A line's quantity multiplied by `wantedQuantity / recipe.servings`. |
-| **Primary Quantity** | The aggregated quantity in the ingredient's preferred unit (the "main" line shown in the cart). |
-| **Fallback Line** | A residual quantity in a unit that could not be converted to the primary unit, shown muted under the primary. |
-| **Parent/Child Ingredient** | An ingredient with a non-null `parentId`. Children are removed from the final list and their primary quantity is rolled into the parent via `Math.max`. |
-| **IngredientCategory** | The enum used to group items in the cart. Drives the `<h2>` icon + label per group. |
-| **UnitSlug** | One of: `g`, `kg`, `ml`, `l`, `tbsp`, `tsp`, `piece`, `pinch`, `cube`, `bottle`, `sheet`, `box`, `can`, `handful`, `packet`, `cm`. |
-| **Dimension** | One of `mass                                                                                                                                                               | volume | count | length`. Conversion across dimensions requires `densityGPerMl`(volume <-> mass) or`countWeightG` (count <-> mass). |
-| **Client-only render mode** | `src/start.ts` sets `defaultSsr: false`; all route content (including this feature) renders on the client. No `<ClientOnly>` boundary or `client-only` directive is used. |
+## 7. High-Level Components
 
-## 3. Requirements, Constraints & Guidelines
-
-### 3.1 Functional Requirements
-
-- **REQ-001**: The selection of recipes MUST be stored in a TanStack Store named `shoppingListStore` (key `shopping-list` in `localStorage`) holding `number[]`.
-- **REQ-002**: Per-recipe servings overrides MUST be stored in a TanStack Store named `recipeQuantitiesStore` (key `recipe-quantities`) holding `Record<number, number>`.
-- **REQ-003**: Both stores MUST persist to `localStorage` via the shared `persistedStore` helper (`src/lib/persisted-store.ts`). Store state holds data only (actions are exported functions), so the whole state is persisted — no `partialize` is needed.
-- **REQ-004**: Both store modules MUST be plain modules with no `'@tanstack/react-start/client-only'` directive. They are never read during SSR because their consuming routes are client-only (`defaultSsr: false`).
-- **REQ-005**: `addToShoppingList(recipeId)` MUST append to `shoppingList`. `removeFromShoppingList(recipeId)` MUST filter by id. `resetShoppingList()` MUST set `shoppingList` to `[]`.
-- **REQ-006**: `setRecipesQuantities(recipeId, quantity)` MUST upsert the value at `recipesQuantities[recipeId]`.
-- **REQ-007**: A server function `getRecipesByIds` MUST exist (`createServerFn({ method: 'GET' })`) accepting `{ ids: number[] }` validated by Zod (`z.object({ ids: z.array(z.number()) })`). It MUST NOT require authentication.
-- **REQ-008**: `getRecipesByIds` MUST query `recipe.findMany` with the recipe's `ingredientGroups` AND `linkedRecipes.linkedRecipe.ingredientGroups`, both via the shared `ingredientGroupSelect`.
-- **REQ-009**: `ingredientGroupSelect` MUST exclude ingredients where `ingredient.category === 'spices'` via `where: { ingredient: { category: { NOT: 'spices' } } }`.
-- **REQ-010**: For each linked recipe, every ingredient quantity MUST be transformed to `(groupIngredient.quantity * ratio) / linkedRecipe.servings` before being merged into the parent recipe's flattened ingredient list.
-- **REQ-011**: The TanStack Query options factory `getRecipeByIdsOptions(ids)` MUST use `queryKeys.recipeListByIds(ids)` (the array of ids is part of the cache key).
-- **REQ-012**: `useShoppingList` MUST consume the query via `useSuspenseQuery`.
-- **REQ-013**: For every selected recipe, `wantedQuantity` MUST be computed as `isNullOrUndefined(recipesQuantities[recipe.id]) ? recipe.servings : recipesQuantities[recipe.id]`.
-- **REQ-014**: Each ingredient line MUST be scaled by `(line.quantity * wantedQuantity) / recipe.servings` before aggregation.
-- **REQ-015**: Lines sharing the same `ingredient.id` MUST be aggregated into a single `IngredientAccumulator` keyed by ingredient id; each scaled line is appended to `lines: RawLine[]`.
-- **REQ-016**: Aggregation MUST pick a `targetSlug = ingredient.preferredUnitSlug ?? lines[0]?.unitSlug ?? null`.
-- **REQ-017**: For each line, the system MUST attempt `tryConvert(line, targetSlug, ingredient)` using `convert(...)` from `src/utils/unit-converter.ts`, supplying `countWeightG` and `densityGPerMl`.
-- **REQ-018**: If `tryConvert` returns `null`, the line MUST be added to a `fallbackMap` keyed by its original `unitSlug`. Otherwise the converted value MUST be added to `primaryQuantity`.
-- **REQ-019**: After aggregation, child ingredients (`parentId !== null`) MUST be excluded from the final list, and the parent's `primary.quantity` MUST be increased by `Math.max(currentMax, childPrimary)` across all of that parent's children (i.e. parent receives the largest single child's primary quantity, not their sum).
-- **REQ-020**: The final list MUST be reduced to `Partial<Record<IngredientCategory, IngredientCartItem[]>>` keyed by `ingredient.category`.
-- **REQ-021**: The route file `src/routes/shopping-list.tsx` MUST wrap `<ShoppingList />` in `<Suspense fallback={<ShoppingListPending />}>` to defer the suspended query. No `<ClientOnly>` is used — the whole route is client-only via `defaultSsr: false`. `<ResetCartButton />` renders directly.
-- **REQ-022**: `<ShoppingList />` MUST iterate categories with `typedEntriesOf(shoppingListIngredients)`, render `ingredientCategoryIcons[key]` and `ingredientCategoryLabels[key]` inside an `<h2>`, and render one `<CartItem />` per ingredient.
-- **REQ-023**: `<CartItem />` MUST render a `<Checkbox>` controlled by local component state, apply `line-through` styling when checked, render the primary quantity + unit on the first line, and render each fallback entry on its own muted line prefixed with `+ `.
-- **REQ-024**: Quantity formatting MUST use `formatNumber` from `@/utils/number` and unit display MUST use `UNITS[slug].name`. A `null` `unitSlug` MUST render only the quantity (no unit label).
-- **REQ-025**: `<ResetCartButton />` MUST call `resetShoppingList()` and clear the shopping list when clicked.
-
-### 3.2 Constraints
-
-- **CON-001**: Both stores are read only on the client. This is guaranteed by client-only render mode (`defaultSsr: false`), not by a `client-only` import directive. Do not render a store consumer inside the SSR'd root shell.
-- **CON-002**: The shopping-list cache key embeds the full ids array. Adding/removing a recipe creates a new cache entry; consumers MUST be aware of cache growth implications.
-- **CON-003**: `convert(...)` may return `null` when no conversion path exists (e.g. count -> mass with no `countWeightG`, volume -> mass with no `densityGPerMl`, or two unrelated dimensionless count units). Fallback handling is the only acceptable behavior; the system MUST NOT throw.
-- **CON-004**: `tryConvert` short-circuits to `null` when either side is a `null` unit. A line with `unitSlug === null` is only considered convertible when the target is also `null` (in which case quantities sum directly).
-- **CON-005**: Aggregation runs synchronously on every render of `useShoppingList`. The function MUST remain pure and side-effect free.
-- **CON-006**: Spices MUST never appear in the shopping list; this is enforced at the SQL layer, not the client.
-- **CON-007**: The server function does not paginate or limit results. Consumers MUST keep `ids.length` reasonable (typical user shopping list size).
-- **CON-008**: Parent rollup uses `Math.max` (not sum). Adding multiple children of the same parent does NOT add their quantities together; only the largest single-child primary is added to the parent.
-
-### 3.3 Guidelines
-
-- **GUD-001**: Prefer driving "wanted servings" widgets (in recipe detail / card components) through `useRecipeQuantitiesState` / `setRecipesQuantities` rather than local component state so the override survives navigation.
-- **GUD-002**: Adding new aggregation steps SHOULD operate on the `IngredientAccumulator` map before `aggregateLines`, or on the post-aggregation `aggregatesById` map, never inline in JSX.
-- **GUD-003**: When adding a new `IngredientCategory`, extend `ingredientCategoryIcons` and `ingredientCategoryLabels` so the `<ShoppingList />` renders correctly.
-- **GUD-004**: When introducing a new unit, define `parent` + `factor` in `UNITS` (or leave both `null` for an isolated count unit). Cross-dimension conversion still requires `densityGPerMl` or `countWeightG` on the ingredient.
-- **GUD-005**: Keep `getRecipesByIds` projection lean; only add columns that are actually consumed by `useShoppingList`.
-
-### 3.4 Patterns
-
-- **PAT-001**: Two-store separation — selection (`shoppingList`) and per-recipe servings (`recipesQuantities`) are two independent stores so quantity overrides survive removing/re-adding a recipe.
-- **PAT-002**: Server projects, client aggregates — the server returns flat per-recipe ingredient arrays; the client owns scaling, conversion, rollup, and grouping.
-- **PAT-003**: Suspense for the suspended query — the route is client-only, so persisted state is read directly on the client; `<Suspense fallback={<ShoppingListPending />}>` defers rendering until `useSuspenseQuery` resolves.
-- **PAT-004**: Primary + fallback aggregation — every aggregated ingredient has exactly one `primary` line and zero or more `fallback` lines for unconvertible residuals.
-
-## 4. Interfaces & Data Contracts
-
-### 4.1 Stores (TanStack Store)
-
-Each store holds data only and persists to `localStorage` via the shared `persistedStore` helper
-(`src/lib/persisted-store.ts`). Reads use `useSelector`; actions are plain exported functions.
-
-```ts
-// src/stores/shopping-list.store.ts
-import { useSelector } from '@tanstack/react-store'
-
-import { persistedStore } from '@/lib/persisted-store'
-
-export const shoppingListStore = persistedStore<number[]>('shopping-list', [])
-export const useShoppingListIds = () => useSelector(shoppingListStore)
-export const addToShoppingList = (recipeId: number) => shoppingListStore.setState((list) => [...list, recipeId])
-export const removeFromShoppingList = (recipeId: number) => shoppingListStore.setState((list) => list.filter((id) => id !== recipeId))
-export const resetShoppingList = () => shoppingListStore.setState(() => [])
+```text
+persisted recipe IDs ─┐
+                       ├─> query options ─> recipe projection ─┐
+persisted servings ───┘                                         │
+                                                                  v
+                                                         aggregateShoppingList
+                                                         scale → convert → roll up → group
+                                                                  │
+                                                                  v
+                                                       category sections and cart items
 ```
 
-```ts
-// src/stores/recipe-quantities.store.ts
-import { useSelector } from '@tanstack/react-store'
+| Component          | Module type              | Responsibility                                           | Public API surface                                 |
+| ------------------ | ------------------------ | -------------------------------------------------------- | -------------------------------------------------- |
+| Selection store    | Persisted TanStack Store | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
+| Quantity store     | Persisted TanStack Store | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
+| Recipe projection  | Feature GET API          | Read selected recipes and flattened linked-recipe lines  | `getRecipeByIdsOptions(ids)`                       |
+| Aggregator         | Pure feature utility     | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
+| Shopping-list hook | Feature hook             | Join stores, query result, and derived output            | `useShoppingList()`                                |
+| List screen        | Route and components     | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
 
-import { persistedStore } from '@/lib/persisted-store'
+## 8. Detailed Design
 
-export const recipeQuantitiesStore = persistedStore<Record<number, number>>('recipe-quantities', {})
-export const useRecipeQuantitiesState = () => useSelector(recipeQuantitiesStore)
-export const setRecipesQuantities = (recipeId: number, quantity: number) =>
-  recipeQuantitiesStore.setState((quantities) => ({ ...quantities, [recipeId]: quantity }))
+### 8.1 Durable selection and serving intent
+
+`shopping-list` holds `number[]` recipe identifiers; `recipe-quantities` holds
+`Record<number, number>` overrides. Both are data-only persisted stores with selector hooks and
+exported mutation functions (`src/stores/shopping-list.store.ts:1-12`,
+`src/stores/recipe-quantities.store.ts:1-10`). A serving override defaults to the recipe's declared
+`servings` only when its map entry is nullish. This refines the client-state specification's
+[persisted selection contract](../../../docs/infrastructure/client/client-state.spec.md).
+
+### 8.2 Projection contract
+
+`getRecipeByIdsOptions(ids)` addresses `queryKeys.recipeListByIds(ids)` and disables its read for
+an empty selection (`src/features/shopping-list/api/get-recipe-by-ids.ts:75-81`). Its server function
+returns this serializable shape:
+
+| Field                          | Meaning                                                                    |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `RecipeForCart.id`, `servings` | Recipe identity and baseline serving count                                 |
+| `ingredients[]`                | Direct ingredient lines followed by linked-recipe lines                    |
+| ingredient metadata            | `id`, category, name, parent ID, preferred unit, density, and count weight |
+| ingredient quantity and unit   | Amount at the recipe's baseline serving scale                              |
+
+Linked-recipe lines use `line.quantity × ratio ÷ linkedRecipe.servings`
+(`src/features/shopping-list/api/get-recipe-by-ids.ts:55-70`). The shared ingredient-group projection
+excludes `spices` in the database read (`src/features/shopping-list/utils/ingredient-group-select.ts:14-31`).
+
+### 8.3 Aggregation contract
+
+For each recipe, the aggregator calculates `line.quantity × wantedServings ÷ recipe.servings`,
+then accumulates raw lines by ingredient ID (`src/features/shopping-list/utils/aggregate-shopping-list.ts:68-99`).
+The accumulator chooses `preferredUnitSlug`, or its first line's unit, as the primary target. Lines
+with that unit or a successful conversion add to the primary total; every other line totals under its
+original unit in `fallback`.
+
+```text
+for each selected recipe and ingredient line
+  scale line by wanted servings / recipe servings
+  collect line under ingredient ID
+for each ingredient
+  convert each line to its preferred (or first) unit
+  retain failed conversions as fallback amounts
+remove children and add each parent's greatest child primary amount
+place surviving ingredients under their category
 ```
 
-### 4.2 Server Function
+The resulting item shape is `{ id, name, category, primary, fallback }`, where `primary` and every
+fallback entry contain `quantity` and `unitSlug`
+(`src/features/shopping-list/types/ingredient-cart-item.ts:5-20`).
 
-```ts
-// src/features/shopping-list/api/get-recipe-by-ids.ts
-const getRecipesByIdsSchema = z.object({
-  ids: z.array(z.number()),
-})
+### 8.4 List interaction
 
-const getRecipesByIds = createServerFn({ method: 'GET' })
-  .validator(getRecipesByIdsSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      /* ... */
-    })
-  )
+The `/shopping-list` route supplies the screen layout and reset control
+(`src/routes/shopping-list.tsx:8-16`). `ShoppingList` renders skeleton sections while the query is
+loading, an empty French message for no groups, then a category heading and item list per category
+(`src/features/shopping-list/component/shopping-list.tsx:11-56`). `CartItem` formats primary and
+fallback values with the unit schema, applies a local checked style, and leaves fallback values
+visible (`src/features/shopping-list/component/cart-item.tsx:10-39`). Reset clears only the selected
+recipe IDs; serving overrides remain available for a later selection
+(`src/features/shopping-list/component/reset-cart-button.tsx:6-10`).
 
-const getRecipeByIdsOptions = (ids: number[]) =>
-  queryOptions({
-    queryFn: () => getRecipesByIds({ data: { ids } }),
-    queryKey: queryKeys.recipeListByIds(ids),
-  })
-```
+The screen derives its content from selection, serving intent, and the query response on each render.
+It retains no separate persisted copy of recipe or aggregate data, so reset and query invalidation
+always converge on their respective owners.
 
-### 4.3 Drizzle Selection
+## 9. Open Questions
 
-```ts
-// src/features/shopping-list/utils/ingredient-group-select.ts
-export const ingredientGroupSelect = {
-  columns: { groupName: true, id: true },
-  orderBy: { isDefault: 'desc' },
-  with: {
-    groupIngredients: {
-      columns: { id: true, quantity: true, unitSlug: true },
-      where: { ingredient: { category: { NOT: 'spices' } } },
-      with: {
-        ingredient: {
-          columns: {
-            category: true,
-            countWeightG: true,
-            densityGPerMl: true,
-            id: true,
-            name: true,
-            parentId: true,
-            preferredUnitSlug: true,
-          },
-        },
-      },
-    },
-  },
-} satisfies Parameters<ReturnType<typeof getDb>['query']['recipeIngredientGroup']['findMany']>[0]
-```
-
-### 4.4 Server Response Shape
-
-```ts
-type RecipeForCart = {
-  id: number
-  servings: number
-  ingredients: ReadonlyArray<{
-    category: IngredientCategory
-    countWeightG: number | null
-    densityGPerMl: number | null
-    id: number
-    name: string
-    parentId: number | null
-    preferredUnitSlug: UnitSlug | null
-    quantity: number // for linked recipes: (quantity * ratio) / linkedRecipe.servings
-    unitSlug: UnitSlug | null
-  }>
-}
-```
-
-### 4.5 Aggregated Output
-
-```ts
-// src/features/shopping-list/types/ingredient-cart-item.ts
-export interface AggregatedIngredient {
-  readonly category: IngredientCategory
-  readonly id: number
-  readonly name: string
-  readonly primary: {
-    readonly quantity: number
-    readonly unitSlug: UnitSlug | null
-  }
-  readonly fallback: readonly {
-    readonly quantity: number
-    readonly unitSlug: UnitSlug | null
-  }[]
-}
-
-export type IngredientCartItem = AggregatedIngredient
-```
-
-### 4.6 Hook Contract
-
-```ts
-// src/features/shopping-list/hooks/use-shopping-list.ts
-export const useShoppingList = (): {
-  recipesQuantities: Record<number, number>
-  shoppingListIngredients: Partial<Record<IngredientCategory, IngredientCartItem[]>>
-}
-```
-
-### 4.7 Unit Conversion Contract
-
-```ts
-// src/utils/unit-converter.ts
-export const convert = (
-  quantity: number,
-  fromSlug: UnitSlug,
-  toSlug: UnitSlug,
-  ingredient: { densityGPerMl: number | null; countWeightG: number | null }
-): number | null
-```
-
-Returns `null` when no conversion path exists (missing density/count weight, mismatched dimensions, infinite quantities, or unknown slugs).
-
-### 4.8 Unit Schema
-
-```ts
-// db/schema/unit.ts
-export type Dimension = 'mass' | 'volume' | 'count' | 'length'
-export type UnitSlug =
-  'g' | 'kg' | 'ml' | 'l' | 'tbsp' | 'tsp' | 'piece' | 'pinch' | 'cube' | 'bottle' | 'sheet' | 'box' | 'can' | 'handful' | 'packet' | 'cm'
-```
-
-Conversion-relevant entries (parent/factor):
-
-| Slug                                                                           | Dimension | Parent | Factor |
-| ------------------------------------------------------------------------------ | --------- | ------ | ------ |
-| `g`                                                                            | mass      | null   | null   |
-| `kg`                                                                           | mass      | `g`    | 1000   |
-| `ml`                                                                           | volume    | null   | null   |
-| `l`                                                                            | volume    | `ml`   | 1000   |
-| `tbsp`                                                                         | volume    | `ml`   | 15     |
-| `tsp`                                                                          | volume    | `ml`   | 5      |
-| `cm`                                                                           | length    | null   | null   |
-| `piece`, `pinch`, `cube`, `bottle`, `sheet`, `box`, `can`, `handful`, `packet` | count     | null   | null   |
-
-## 5. Acceptance Criteria
-
-- **AC-001**: Given a user adds recipe `42` to the cart, When `addToShoppingList(42)` is dispatched, Then `shoppingListStore.state` includes `42` and `localStorage['shopping-list']` reflects the new value.
-- **AC-002**: Given a user changes the wanted servings for recipe `7` to `4`, When `setRecipesQuantities(7, 4)` is dispatched, Then `recipeQuantitiesStore.state[7] === 4` and `localStorage['recipe-quantities']` reflects the new value.
-- **AC-003**: Given a recipe with `servings = 2` and an ingredient line of `200 g`, When the user sets `wantedQuantity = 4`, Then the scaled line equals `400 g`.
-- **AC-004**: Given two recipes both containing ingredient `id=10` with `100 g` and `0.2 kg` respectively and `preferredUnitSlug = 'g'`, When `useShoppingList` aggregates, Then `primary` is `{ quantity: 300, unitSlug: 'g' }` and `fallback` is empty.
-- **AC-005**: Given an ingredient line in `piece` with no `countWeightG` and a `preferredUnitSlug = 'g'`, When aggregation runs, Then the line is placed in `fallback` keyed by `'piece'` and is not added to `primary`.
-- **AC-006**: Given two child ingredients of parent `P` with primary quantities `100` and `250`, When parent rollup runs, Then `P.primary.quantity` is increased by `250` (the max), the children are removed from the final list, and any pre-existing parent quantity is preserved.
-- **AC-007**: Given a recipe with a `linkedRecipe` whose `servings = 4` and `ratio = 2` and a linked ingredient `300 g`, When projected by `getRecipesByIds`, Then the parent's flattened line for that ingredient has `quantity = (300 * 2) / 4 = 150 g`.
-- **AC-008**: Given the page loads at `/shopping-list`, When the worker renders the document, Then it returns the root shell with an empty `<main>` (the route is client-only); the content — `<ShoppingListPending />` then the populated list — renders on the client.
-- **AC-009**: Given the cart has at least one ingredient, When `<CartItem>`'s checkbox is checked, Then the row text receives `line-through` styling and the primary + fallback lines remain visible.
-- **AC-010**: Given the user clicks `<ResetCartButton />`, When the click is handled, Then `shoppingList` becomes `[]` and the rendered groups are cleared (subject to query refetch on the new key `[]`).
-- **AC-011**: Given an ingredient where `preferredUnitSlug` is `null`, When aggregation picks `targetSlug`, Then it falls back to the first line's `unitSlug` (which may itself be `null`).
-- **AC-012**: Given an ingredient row has `category === 'spices'`, When `getRecipesByIds` runs, Then that row is excluded from `groupIngredients` at the SQL layer and never appears in `useShoppingList` output.
-- **AC-013**: Given the shopping list contains ingredients across multiple categories, When `<ShoppingList />` renders, Then there is exactly one `<h2>` per category with the matching icon and label, and each `<CartItem>` appears under its category.
-
-## 6. Test Automation Strategy
-
-- **TST-001**: Unit-test `convert()` for: same-slug pass-through, scaled within-dimension chains (`kg <-> g`, `l <-> ml <-> tbsp <-> tsp`), cross-dimension via `densityGPerMl` (volume <-> mass) and `countWeightG` (count <-> mass), and `null` returns for missing meta or unrelated count units.
-- **TST-002**: Unit-test the aggregation pipeline in `useShoppingList` (extract pure helpers if needed) covering: scaling, primary+fallback split, parent/child rollup with `Math.max`, multi-recipe accumulation, and `wantedQuantity` defaulting to `recipe.servings`.
-- **TST-003**: Snapshot/component test `<CartItem>` for the unchecked state, the checked (`line-through`) state, the unitless variant, and the multi-fallback variant.
-- **TST-004**: Component test `<ShoppingList>` rendering one section per category, in the order yielded by `typedEntriesOf`, with the right icon + label.
-- **TST-005**: Integration test the route `/shopping-list`: with empty selection it renders the `Skeleton` fallback; with selection it renders the suspense fallback then the populated list after the query resolves.
-- **TST-006**: Store tests assert the persisted `localStorage` keys (`shopping-list`, `recipe-quantities`) and the behavior of all actions.
-- **TST-007**: Server-function test of `getRecipesByIds` validates: rejection of non-array inputs by Zod, exclusion of spices via `ingredientGroupSelect`, and linked-recipe scaling math.
-- **TST-008**: Tests run via `vp test` (Vitest) using imports from `vite-plus/test`.
-
-## 7. Rationale & Context
-
-### 7.1 Why two stores
-
-Selection (`shoppingList: number[]`) and serving overrides (`recipesQuantities`) are intentionally decoupled.
-A user can remove a recipe from the cart without losing their custom servings preference for next time, and
-the `recipe-quantities` store can be read from non-cart UIs (recipe detail, recipe card) without coupling to
-cart membership.
-
-### 7.2 Why client-only
-
-Both stores rely on `localStorage`, which is unavailable on the server. Client-only render mode
-(`defaultSsr: false` in `src/start.ts`) means the `/shopping-list` route never renders server-side, so
-the stores are only ever read on the client — no `client-only` directive or `<ClientOnly>` boundary is
-needed. The route still wraps its content in `<Suspense fallback={<ShoppingListPending />}>` so the
-client-side `useSuspenseQuery` can suspend cleanly until the projection resolves.
-
-### 7.3 Why server projects, client aggregates
-
-Aggregation depends on user-side data (`recipesQuantities`) that the server does not see. Doing the join +
-projection on the server keeps the wire payload small and authoritative; doing the scaling, conversion,
-rollup, and grouping on the client keeps the server function cacheable per `ids` set.
-
-### 7.4 Why `Math.max` for child rollup
-
-When a recipe asks for both a parent ingredient (e.g. "tomato") and a child variant (e.g. "cherry tomato"),
-buying the larger of the two quantities is enough to satisfy both. Summing would over-buy.
-
-### 7.5 Why the cache key includes the full ids array
-
-`queryKeys.recipeListByIds(ids)` embeds the array, which means each unique selection is its own cache entry.
-This trades cache growth for simplicity and cache-hit predictability when a user toggles items repeatedly.
-
-### 7.6 Why fallback lines
-
-When unit conversion is impossible (e.g. `piece` with no `countWeightG` while target is `g`), silently
-dropping the line would mislead the shopper. Showing the residual quantity in its original unit, muted under
-the primary, surfaces the partial information without polluting the primary aggregate.
-
-## 8. Dependencies & External Integrations
-
-| Dependency                                                                                             | Role                                                                     |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `@tanstack/react-store`                                                                                | Client store + `localStorage` persistence (via `persistedStore` helper). |
-| `@tanstack/react-start`                                                                                | Server function (`createServerFn`); `createStart` (`defaultSsr: false`). |
-| `@tanstack/react-router`                                                                               | `createFileRoute`.                                                       |
-| `@tanstack/react-query`                                                                                | `queryOptions` + `useSuspenseQuery`.                                     |
-| `zod`                                                                                                  | Input validation for `getRecipesByIds`.                                  |
-| `drizzle-orm` (via `getDb`)                                                                            | Relational query for recipes + ingredient groups + linked recipes.       |
-| `@phosphor-icons/react`                                                                                | `ArrowCounterClockwiseIcon` in `ResetCartButton`.                        |
-| Internal: `@schema`                                                                                    | `UNITS`, `UnitSlug`, `Dimension`.                                        |
-| Internal: `@/utils/unit-converter`                                                                     | `convert(...)`.                                                          |
-| Internal: `@/utils/error-handler`                                                                      | `withServerError` wrapper.                                               |
-| Internal: `@/lib/query-keys`                                                                           | `queryKeys.recipeListByIds`.                                             |
-| Internal: `@/components/ingredient-category`                                                           | `ingredientCategoryIcons`, `ingredientCategoryLabels`.                   |
-| Internal: `@/components/common/checkbox`, `@/components/common/button`, `@/components/common/skeleton` | UI primitives.                                                           |
-| Internal: `@/utils/number`                                                                             | `formatNumber`.                                                          |
-| Internal: `@/utils/object`                                                                             | `typedEntriesOf`.                                                        |
-
-## 9. Examples & Edge Cases
-
-### 9.1 Scaling
-
-```
-recipe.servings = 2
-wantedQuantity = recipesQuantities[recipe.id] ?? 2 = 5
-ingredient.quantity = 200, unitSlug = 'g'
-scaledQty = (200 * 5) / 2 = 500
-```
-
-### 9.2 Multi-recipe aggregation with conversion
-
-```
-Ingredient id=10, preferredUnitSlug='g', densityGPerMl=null, countWeightG=null
-Recipe A line: 100 g
-Recipe B line: 0.2 kg  -> convert(0.2, 'kg', 'g', { ... }) = 200 g
-primary = { quantity: 300, unitSlug: 'g' }
-fallback = []
-```
-
-### 9.3 Fallback when unit cannot convert
-
-```
-Ingredient id=11, preferredUnitSlug='g', countWeightG=null
-Recipe A line: 50 g
-Recipe B line: 2 piece   -> tryConvert -> null (missing countWeightG)
-primary = { quantity: 50, unitSlug: 'g' }
-fallback = [{ quantity: 2, unitSlug: 'piece' }]
-```
-
-### 9.4 Parent/child rollup
-
-```
-Ingredient parent P (primary = 100 g), child C1 (primary = 80 g), child C2 (primary = 250 g)
-Children removed; P.primary.quantity = 100 + max(80, 250) = 350 g
-```
-
-### 9.5 Linked-recipe flattening
-
-```
-Parent recipe pulls linkedRecipe with servings=4, ratio=2.
-Linked ingredient line: 300 g
-Flattened into parent: (300 * 2) / 4 = 150 g
-```
-
-### 9.6 Edge cases
-
-- Empty `shoppingList`: `useShoppingList` calls `getRecipeByIdsOptions([])`, yielding an empty array; `shoppingListIngredients` is `{}`; the page renders no groups.
-- A recipe id present in `shoppingList` but missing in the DB (deleted): the server returns no row for it; aggregation simply ignores it.
-- `recipesQuantities[id]` set to `0`: `wantedQuantity = 0`, all scaled quantities are `0`. The list still groups by category but every quantity is zero.
-- All lines for an ingredient have `unitSlug = null` and `preferredUnitSlug = null`: `targetSlug = null`, `tryConvert` returns the quantity unchanged (`line.unitSlug === targetSlug`), and `primary` sums them with `unitSlug: null` (no unit label rendered).
-- Mixed convertible and unconvertible lines: the convertible ones go into `primary`, the rest into `fallback` keyed by their original `unitSlug`.
-
-## 10. Validation Criteria
-
-- **VAL-001**: `vp check` passes (format + lint + types) for all files in `src/features/shopping-list/**`, `src/stores/{shopping-list,recipe-quantities}.store.ts`, `src/utils/unit-converter.ts`, and `src/routes/shopping-list.tsx`.
-- **VAL-002**: `vp test` passes the suites described in section 6.
-- **VAL-003**: Manual smoke: navigate to a recipe detail, change wanted servings via the quantity control (writes `recipesQuantities`), click "add to list" (writes `shoppingList`), navigate to `/shopping-list`. The list reflects the chosen servings, groups by category, and the reset button empties the list.
-- **VAL-004**: SSR sanity: the first server response for `/shopping-list` MUST be the root shell with an empty `<main>` — no `<CartItem>` and no route content is server-rendered (the route is client-only).
-- **VAL-005**: Persistence: after a hard reload, `shoppingList` and `recipesQuantities` are restored from `localStorage` keys `shopping-list` and `recipe-quantities`.
-- **VAL-006**: Spices invariant: a recipe containing only `spices`-category ingredients results in zero entries in the cart for that recipe (linked recipes included).
-
-## 11. Related Specifications / Further Reading
-
-- [Architecture overview](../../docs/architecture.spec.md)
-- [Client State Layering](../../docs/infrastructure/client-state.spec.md)
-- [Data Layer (Drizzle + D1)](../../docs/infrastructure/data-layer.spec.md)
-- [Recipe feature spec](../recipe/spec/index.spec.md)
-- [Ingredients feature spec](../ingredients/ingredients.spec.md)
+N/A

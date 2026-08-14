@@ -1,281 +1,175 @@
 ---
-title: Recipe Organizer Architecture Specification
-version: 1.0
-date_created: 2026-05-08
-last_updated: 2026-05-08
-owner: recipe-organizer
-tags: [architecture, overview, tanstack-start, cloudflare, edge]
+title: Recipe Organizer Architecture
+kind: umbrella
+status: implemented
+author: Antoine Bouteiller
+date: 2026-08-14
+related:
+  [
+    src/features/recipe/spec/index.spec.md,
+    src/features/ingredients/ingredients.spec.md,
+    src/features/search/search.spec.md,
+    src/features/shopping-list/shopping-list.spec.md,
+    src/features/users/users.spec.md,
+  ]
 ---
 
-# Introduction
+## 2. Problem Statement
 
-This specification describes the high-level architecture of the `recipe-organizer` application — an isomorphic React app built on **TanStack Start** that runs as a single **Cloudflare Worker**. It is the entry point for understanding how the pieces fit together; every other spec under `docs/`, `docs/infrastructure/`, and `src/features/<name>/` zooms into one slice of this picture.
+A small, closed group of French-speaking home cooks needs one place to write, find, scale and shop
+their recipes, including rich instructions that embed Magimix programs and reusable sub-recipes.
+Off-the-shelf recipe apps neither model those instructions nor allow a private, invitation-controlled
+membership. Recipe Organizer is a single isomorphic React application served from one Cloudflare
+Worker, with all state — relational data, blobs, sessions — kept inside one provider so there is no
+second service to operate.
 
-## 1. Purpose & Scope
+- `[G-1]` Serve the whole product — pages, RPC, OAuth callback, media streaming — from a single
+  Cloudflare Worker with no separate API tier.
+- `[G-2]` Keep every persistent byte on Cloudflare: relational rows in D1, blobs in R2.
+- `[G-3]` Admit users only through Google OAuth plus explicit admin approval, and enforce ownership
+  on every write.
+- `[G-4]` Give each product domain a self-contained feature module that owns its server functions,
+  UI and client state.
+- `[G-5]` Work offline as an installable PWA for browsing already-visited content.
+- `[G-6]` Present a French-only interface, including validation messages.
 
-- **Audience**: contributors and AI agents who need a holistic view before touching code.
-- **Scope**: runtime architecture, data flow, deployment topology, security boundaries, technology choices. Not implementation details (those are in the dedicated specs).
-- **Assumption**: reader has read [`./file-structure.spec.md`](./file-structure.spec.md) or is comfortable navigating the repository tree.
+## 3. Key Design Decisions
 
-## 2. Definitions
+| Decision                          | Choice                                                             | Rationale                                                                                                                                                                                                                   |
+| --------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Runtime                  | TanStack Start on one Cloudflare Worker                            | One TypeScript codebase covers document rendering, RPC and HTTP handlers; the Worker is the API, so there is no second deployment target to keep in sync.                                                                   |
+| `[KD-2]` Render mode              | Client-only routes, SSR limited to the root shell                  | Every page is personalised and auth-dependent, so server-rendered page HTML is never shareable; rendering only the shell removes hydration mismatch as a class of bug and lets `localStorage`-backed state render directly. |
+| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                                                                                      |
+| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                     | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                                                                                     |
+| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                   | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                                                                           |
+| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                | The product is private by intent, and OAuth alone would let any Google account in.                                                                                                                                          |
+| `[KD-7]` Server-state vs UI-state | TanStack Query owns server data; TanStack Store owns UI selections | The two have different lifetimes and invalidation rules; keeping them disjoint stops persisted UI state from going stale against the database.                                                                              |
+| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 1024/q80 before the R2 write   | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                                                                       |
+| `[KD-9]` Rich instructions        | Lexical with custom nodes                                          | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.                                                                       |
+| `[KD-10]` Module boundary         | One directory per feature owning `api/`, `components/`, state      | Feature-local ownership keeps a change to one domain inside one directory and makes the spec tree mirror the code tree.                                                                                                     |
+| `[KD-11]` Offline                 | Serwist service worker for shell and asset caching                 | The kitchen is a poor-connectivity environment; caching the shell and already-fetched assets keeps a consulted recipe readable without network.                                                                             |
 
-| Term                  | Definition                                                                                                                                                                     |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **TanStack Start**    | Full-stack React meta-framework providing SSR, file-based routing, server functions, and isomorphic helpers, built on TanStack Router + Vite.                                  |
-| **Server function**   | A callable defined with `createServerFn(...)` from `@tanstack/react-start`. Runs only on the worker; can be invoked from the client (RPC) or from a route loader (in-process). |
-| **Worker**            | A Cloudflare Workers V8 isolate executing the SSR + API code on the edge, on demand, with no persistent process.                                                               |
-| **D1**                | Cloudflare's serverless SQLite, accessed through the `DB` binding via `drizzle-orm/d1`.                                                                                        |
-| **R2**                | Cloudflare's S3-compatible object store, accessed through the `R2_BUCKET` binding for image and video blobs.                                                                   |
-| **Cloudflare Images** | Bound as `IMAGES`; used in this app to transform/encode uploads (WebP, width 1024, quality 80) before they hit R2.                                                             |
-| **Service Worker**    | A Serwist-generated `/sw.js` providing offline support and runtime caching. Distinct from a Cloudflare Worker.                                                                 |
-| **Route context**     | The `{ authUser, queryClient, theme, isAdmin }` object hung off every TanStack Router route after the root `beforeLoad`.                                                       |
-| **Edge cache**        | `caches.default` inside the worker; used to cache R2-served responses.                                                                                                         |
+## 4. Principles & Intents
 
-## 3. Requirements, Constraints & Guidelines
+- `[PI-1]` **The Worker is the API** — any server-side concern is reachable as a server function or a
+  route handler; no separate service is introduced.
+- `[PI-2]` **Thin server functions** — validate, touch the database or bucket, return; substantial
+  logic moves to `src/lib/`.
+- `[PI-3]` **Validate at the trust boundary** — every write parses its input with Zod inside the
+  server function, never relying on client-side validation.
+- `[PI-4]` **Never duplicate server data in a store** — stores hold identifiers and selections; the
+  data behind them is refetched by query.
+- `[PI-5]` **Features are self-contained** — cross-feature use goes through a feature's public API,
+  not into its internals.
+- `[PI-6]` **Design system is owned** — UI primitives live in the repository and are edited in place
+  rather than re-pulled from a registry.
 
-### Architectural requirements
+## 5. Non-Goals
 
-- **REQ-001**: The application MUST run as a single Cloudflare Worker. The worker entry point is `@tanstack/react-start/server-entry`, configured in `wrangler.jsonc`.
-- **REQ-002**: The app runs in client-only render mode: `src/start.ts` sets `defaultSsr: false` and the root route opts into `ssr: true`. The worker renders only the document shell (and resolves auth in the root `beforeLoad`) per request; all page-route content renders on the client. Loaders prefetch data via `context.queryClient.ensureQueryData(...)` (on the client for client-only routes).
-- **REQ-003**: The application MUST be a Progressive Web App: a `manifest.json` is linked from the root route, and a Serwist service worker provides offline shell + asset caching.
-- **REQ-004**: All persistent data MUST live in Cloudflare D1 (relational data) or R2 (binary blobs: images, videos). No external database.
-- **REQ-005**: All cross-cutting concerns (auth, data layer, server functions, forms, client state, routing/SSR, platform) MUST have a corresponding `docs/infrastructure/<topic>.spec.md` and respect the rules therein.
-- **REQ-006**: Every feature MUST be self-contained under `src/features/<name>/` and own its server functions, components, and (when needed) stores/contexts. See [`./file-structure.spec.md`](./file-structure.spec.md).
-- **REQ-007**: The application MUST authenticate users via Google OAuth 2.0 only. New users land in `pending` state and require admin approval. See [`./infrastructure/auth.spec.md`](./infrastructure/auth.spec.md).
-- **REQ-008**: Server functions performing writes MUST be guarded by `authGuard()` (or `authGuard('admin')`), and write handlers that touch user-owned rows MUST additionally check `currentRow.createdBy === user.id || user.role === 'admin'`.
-- **REQ-009**: Image uploads MUST be transformed to WebP (width 1024, quality 80) via Cloudflare Images before being written to R2. Video uploads are stored raw.
-- **REQ-010**: The user-facing language MUST be French (UI strings, validation messages via `z.config(z.locales.fr())` in `src/router.tsx`).
+- `[NG-1]` Public or anonymous access to recipes; every route is behind approved membership.
+- `[NG-2]` Identity providers other than Google, and password or email-link authentication.
+- `[NG-3]` Analytical or reporting workloads over D1.
+- `[NG-4]` Offline mutation: writes require connectivity; the service worker serves reads only.
+- `[NG-5]` Localisation beyond French.
+- `[NG-6]` Real-time collaboration or multi-user concurrent editing of one recipe.
 
-### Security requirements
+## 6. Caveats
 
-- **SEC-001**: Sessions MUST be encrypted server-side (TanStack `useSession`, keyed by `SESSION_SECRET`). Cookies MUST be `httpOnly`, `sameSite=lax`, and `secure` in production.
-- **SEC-002**: OAuth state MUST be validated against an `oauth-session` cookie before exchanging the code (CSRF defense).
-- **SEC-003**: Admin-only operations MUST use `authGuard('admin')`; failing the role check MUST throw `Permission denied`.
-- **SEC-004**: User-supplied content MUST be validated server-side with Zod before reaching the database (every `createServerFn` write uses `.validator(schema)`).
-- **SEC-005**: R2 file keys MUST be `crypto.randomUUID()` to prevent guessable URLs.
-- **SEC-006**: Secrets (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET`) MUST be configured as Cloudflare Worker secrets — never committed.
+- `[C-1]` The Worker is stateless and its isolate may be recycled at any point; per-request handles
+  such as the database client must not be held across requests.
+- `[C-2]` D1 is SQLite: no cross-database joins, limited concurrency, and multi-row atomicity only
+  through `batch([...])`.
+- `[C-3]` The generated route tree is a build artefact, so adding or moving a route file requires a
+  dev-server restart.
+- `[C-4]` The development bypass in the auth guard yields a fake admin, so development builds
+  exercise no OAuth path.
+- `[C-5]` The shopping-list query key contains the selected recipe identifiers, so each selection
+  change mints a new key and refetches; this holds at tens of entries, not thousands.
+- `[C-6]` Google's userinfo response shape is an external contract; only `id` and `email` are
+  persisted, but a change in that payload breaks sign-in.
+- `[C-7]` Session encryption, OAuth client credentials and their rotation are Cloudflare Worker
+  secrets; the application cannot function without them being provisioned out of band.
 
-### Constraints
+## 7. High-Level Components
 
-- **CON-001**: The worker has the standard Cloudflare Workers limits — there is no long-running process, no filesystem, and no `Buffer` unless `nodejs_compat` is enabled (it is, per `wrangler.jsonc`).
-- **CON-002**: D1 has SQLite semantics (no `RETURNING *` in some flows, integer-only PKs by convention here). Multi-row atomicity uses `getDb().batch([...])`.
-- **CON-003**: TanStack Router's route tree is generated at build/dev time (`src/routeTree.gen.ts`). New route files require a dev-server restart.
-- **CON-004**: Persistent client state (TanStack Store via the `persistedStore` helper) is `localStorage`-based and therefore client-only. The app renders all route content client-only (`src/start.ts` `defaultSsr: false`; root `ssr: true`), so consumers render directly — no `<ClientOnly>` boundary or `client-only` directive is used.
-- **CON-005**: `compatibility_date` is `2026-01-28` with `nodejs_compat` enabled; do not regress these without auditing the Worker runtime APIs the app relies on (e.g. `node:crypto`).
-
-### Guidelines
-
-- **GUD-001**: Prefer reads via TanStack Query loaders; prefer writes via mutations with `mutationOptions(...)` factories that handle cache invalidation and toasts in one place.
-- **GUD-002**: Keep server functions thin: validation → DB → optional R2 → return. Push expensive logic to dedicated helpers in `src/lib/`.
-- **GUD-003**: Don't duplicate server data in a client store. Stores hold ids/selections; the actual data comes back from queries keyed by those ids.
-- **GUD-004**: Use the relational query API (`getDb().query.<table>.findMany({ with, columns, where, orderBy })`) instead of hand-rolling joins. Keep relations in `defineRelations` in sync.
-- **GUD-005**: Surface user-visible errors via `toastManager`; let server function failures bubble up as plain `Error("Une erreur est survenue")` thanks to `withServerError(...)`.
-
-### Patterns
-
-- **PAT-001**: Feature module pattern — `api/`, `components/`, optional `hooks/`/`contexts/`/`utils/`/`types/`/`lib/`, and a colocated spec.
-- **PAT-002**: Server-function-per-file pattern — each `api/<verb>.ts` exports both the bare `createServerFn(...)` and a TanStack Query `*Options()` factory.
-- **PAT-003**: Form pattern — Zod schema in the API file → `withForm(...)` view → wrap in `getFormDialog(...)` (modal) or use directly in a route (page form). Errors flow through `formatFormErrors`.
-- **PAT-004**: Authoring pattern for cross-cutting infra — add helper to `src/lib/<topic>.ts`, document in `docs/infrastructure/<topic>.spec.md`, link from this file.
-
-## 4. Interfaces & Data Contracts
-
-### Runtime topology
-
-```
-            ┌────────────────────────────────────────────────────────┐
-            │                  Cloudflare Edge POP                   │
-            │                                                        │
-   Browser  │   ┌──────────────────────────────────────────────┐     │
-  ───HTTP──▶│   │   Worker (recipe-organizer)                  │     │
-            │   │                                              │     │
-            │   │   • TanStack Start SSR (server-entry)        │     │
-            │   │   • TanStack Router (file-based)             │     │
-            │   │   • createServerFn handlers (RPC + loaders)  │     │
-            │   │   • useSession (encrypted cookies)           │     │
-            │   │                                              │     │
-            │   │   bindings:  DB  ─────▶ Cloudflare D1        │     │
-            │   │              R2_BUCKET ─▶ Cloudflare R2      │     │
-            │   │              IMAGES   ─▶ Cloudflare Images   │     │
-            │   │   caches.default ──▶ Edge HTTP cache         │     │
-            │   └──────────────────────────────────────────────┘     │
-            └────────────────────────────────────────────────────────┘
-                       ▲
-                       │ Google OAuth 2.0 (token + userinfo)
-                       ▼
-            ┌────────────────────────────────────────┐
-            │ accounts.google.com / oauth2.googleapis.com │
-            └────────────────────────────────────────┘
+```text
+                    ┌───────────────────────── Cloudflare Worker ─────────────────────────┐
+   Browser          │                                                                     │
+   ┌──────────┐     │   ┌────────────┐   ┌──────────────────┐   ┌────────────────────┐    │
+   │ Router   │────▶│   │ Root shell │──▶│ Server functions │──▶│ Data layer         │───▶│──▶ D1
+   │ Query    │ RPC │   │ + auth     │   │ (validate/guard) │   │ (Drizzle schema)   │    │
+   │ Store    │     │   └────────────┘   └──────────────────┘   └────────────────────┘    │
+   │ Forms    │     │          │                   │                                      │
+   └──────────┘     │          │                   └──────────────▶ media handlers ───────│──▶ R2 / Images
+        │           │          └──────────────────────────────────▶ OAuth exchange ───────│──▶ Google
+   ┌──────────┐     └─────────────────────────────────────────────────────────────────────┘
+   │ Serwist  │
+   └──────────┘
 ```
 
-### Layered overview
+| Component         | Module type            | Responsibility                                                         | Public API surface                                               |
+| ----------------- | ---------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Repository layout | Convention             | Where each kind of module lives and what may import what               | Directory contract under `src/`                                  |
+| Platform          | Worker configuration   | Worker entry, bindings, edge cache, media handlers, service worker, CI | `wrangler.jsonc` bindings, `src/lib/{r2,cache-manager}.ts`       |
+| Data layer        | Library                | Drizzle schema, relations, per-request client, migrations              | `getDb()`, table and relation exports                            |
+| Server functions  | Library + convention   | Validated, guarded RPC and its query/mutation option factories         | `createServerFn` handlers, `*Options()` factories, `authGuard()` |
+| Auth              | Feature-adjacent infra | Google OAuth exchange, encrypted sessions, role and status enforcement | `getAuthUser()`, `authGuard()`, auth routes                      |
+| Routing & SSR     | Convention             | File-based routes, route context, loaders, render-mode boundaries      | Route tree, `beforeLoad` context                                 |
+| Forms             | Library                | Single application form hook over TanStack Form, Zod and Base UI       | `useAppForm`, `withForm`, field components                       |
+| Client state      | Library                | Persisted UI state stores and their layering against server state      | `src/stores/*`, `persistedStore`                                 |
+| Feature modules   | Feature directories    | Recipe, ingredients, search, shopping list and users domains           | Per-feature `api/` and components                                |
 
-| Layer                   | Lives in                                                    | Responsibility                                                                                                    |
-| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **UI primitives**       | `src/components/ui/`                                        | Owned design-system components built on Base UI — buttons, dialogs, fields. One file per component, no data deps. |
-| **Form fields**         | `src/components/forms/`                                     | TanStack Form-aware fields built on UI primitives.                                                                |
-| **Layout / Navigation** | `src/components/layout/`, `src/components/navigation/`      | Mobile/desktop chrome (`ScreenLayout`, `Navbar`, `TabBar`).                                                       |
-| **Feature components**  | `src/features/<name>/components/`                           | Feature-specific UI: forms, dialogs, lists, editors.                                                              |
-| **Hooks & contexts**    | `src/hooks/`, `src/features/<name>/{hooks,contexts}/`       | Cross-cutting hooks (forms, file upload, swipe), feature-scoped contexts (e.g. linked recipes).                   |
-| **Server functions**    | `src/features/<name>/api/`                                  | Validation + DB/R2 + cache invalidation.                                                                          |
-| **Data layer**          | `src/lib/db/`                                               | Drizzle schema, relations, `getDb()`.                                                                             |
-| **Platform helpers**    | `src/lib/{r2,session,cache-manager,theme,toast-helpers}.ts` | R2 upload/download + edge cache, session helpers, theme/toast plumbing.                                           |
-| **Stores**              | `src/stores/`                                               | Persistent client-only TanStack Store stores (shopping list, recipe quantities, recent recipes).                  |
-| **Routes**              | `src/routes/`                                               | File-based pages and API handlers; SSR loaders prefetch queries.                                                  |
+Leaf execution order:
 
-### Cross-feature data flow (page render)
+| Leaf                                                              | Depends on                       | Rationale                                                        |
+| ----------------------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------- |
+| [`file-structure`](./file-structure.spec.md)                      | —                                | Names the directories every other spec places code into          |
+| [`infrastructure/server`](./infrastructure/server/server.spec.md) | `file-structure`                 | Owns the runtime, storage, RPC and identity the client builds on |
+| [`infrastructure/client`](./infrastructure/client/client.spec.md) | `infrastructure/server` `[KD-3]` | Routing, forms and stores consume the server contracts           |
 
-1. Client requests `/recipe/$id`.
-2. Worker invokes `__root.tsx` `beforeLoad` → fetches `authUser` (cookie-based session) and `theme` (cookie). Adds `isAdmin` to context.
-3. Router resolves `recipe/$id.tsx`:
-   - `loader` calls `context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))`.
-   - That option is backed by `getRecipe` (a `createServerFn`) which queries D1 via Drizzle and returns a serialized recipe.
-4. Worker renders the React tree to HTML and ships it back along with the query cache as a serialized payload.
-5. Client hydrates and runs the (client-only) route loader/component: `useQuery(getRecipeDetailsOptions(id))` and `useShoppingListIds()` (TanStack Store) are read directly on the client — no `<ClientOnly>` needed, since the route never rendered on the server.
-6. User actions (add to shopping list, update quantity) call store action functions (e.g. `addToShoppingList(id)`) that run `store.setState(...)`; `localStorage` persists the change.
+Feature modules are specified beside their code and refine this umbrella through `related:` rather
+than owning any section of it.
 
-### Cross-feature data flow (mutation)
+## 8. Detailed Design
 
-1. User submits a recipe via TanStack Form.
-2. Client calls `objectToFormData(value)` and invokes the `createRecipeOptions` mutation.
-3. Worker enters `createRecipe`: `authGuard()` middleware validates session → input validator parses FormData → handler uploads image to R2 (via Cloudflare Images), computes auto-tags, inserts rows in D1.
-4. On success, the mutation `onSuccess` invalidates `queryKeys.recipeLists()`, fires a success toast, and the router redirects.
+| Component         | Specified in                                                                                                                                                                                                                                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository layout | [`file-structure.spec.md`](./file-structure.spec.md)                                                                                                                                                                                                                                               |
+| Platform          | [`infrastructure/server/platform.spec.md`](./infrastructure/server/platform.spec.md)                                                                                                                                                                                                               |
+| Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                           |
+| Server functions  | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
+| Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                       |
+| Routing & SSR     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
+| Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                     |
+| Client state      | [`infrastructure/client/client-state.spec.md`](./infrastructure/client/client-state.spec.md)                                                                                                                                                                                                       |
+| Feature modules   | [`recipe`](../src/features/recipe/spec/index.spec.md), [`ingredients`](../src/features/ingredients/ingredients.spec.md), [`search`](../src/features/search/search.spec.md), [`shopping-list`](../src/features/shopping-list/shopping-list.spec.md), [`users`](../src/features/users/users.spec.md) |
 
-### Service worker / offline
+### 8.1 Request lifecycle
 
-- `tanstackSerwistPlugin` (in `scripts/generate-sw.ts`) emits `/sw.js` from `src/sw.ts` at build time.
-- Client registers `new Serwist('/sw.js', { scope: '/', type: 'module' })` from the root route.
-- Defaults: `clientsClaim`, `navigationPreload`, `skipWaiting`, Serwist `defaultCache`. Page navigations return a per-request, auth-dependent shell and are not publicly cacheable; R2 asset responses under `/api/*` still set `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`.
+A page request reaches the Worker, whose root route resolves the session cookie and theme cookie into
+the route context `{ authUser, queryClient, theme, isAdmin }`, then returns the document shell. The
+client router takes over: the matched route's loader prefetches through
+`queryClient.ensureQueryData(...)`, which calls the feature's server function over RPC; that handler
+runs its guard, parses its input, reads D1 and returns serialisable data. Store-backed UI state is
+read directly from `localStorage` on the same pass, since no server render of the page exists to
+diverge from.
 
-## 5. Acceptance Criteria
+### 8.2 Write lifecycle
 
-- **AC-001**: Given a fresh browser, When the user opens any non-auth page, Then SSR HTML is served with the route's loader-prefetched data and the page renders before hydration completes.
-- **AC-002**: Given an unauthenticated user, When they navigate to `/recipe/new`, `/recipe/edit/$id`, or `/settings`, Then the route's `beforeLoad` redirects them to `/auth/login`.
-- **AC-003**: Given a non-admin user, When they call any admin server function (users CRUD, ingredient delete), Then the request fails with "Permission denied".
-- **AC-004**: Given a recipe creation, When the request succeeds, Then `queryKeys.recipeLists()` is invalidated and a success toast is shown.
-- **AC-005**: Given a deployed worker, When inspecting `wrangler.jsonc`, Then bindings `DB` (D1), `R2_BUCKET` (R2), and `IMAGES` (Cloudflare Images) are present.
-- **AC-006**: Given a service worker registration failure, When it occurs, Then the app continues to work (silent failure in `__root.tsx`).
-- **AC-007**: Given an image upload, When the server function persists it, Then the stored object is `image/webp` (output of the Images transform).
+A form submission serialises to `FormData`, a mutation invokes the feature's server function, and the
+handler runs guard → validator → blob write → row writes, in that order, so a rejected input never
+reaches storage. On success the mutation invalidates the affected query keys, raises a toast and lets
+the router navigate; on failure the error surfaces as a single French message and the form maps field
+errors back onto their inputs.
 
-## 6. Test Automation Strategy
+### 8.3 Trust boundary
 
-- **Test Levels**: lint (`vp lint`), format (`vp fmt`), type-check (`vp check`), unit/integration via Vitest (`vp test`), manual smoke (browser).
-- **Frameworks**: Oxlint (with TS + React + Unicorn + Import plugins), Oxfmt, Vitest (`vite-plus/test`), Wrangler `dev` for local Worker emulation.
-- **Test Data Management**: D1 dump/restore via `pnpm db:dump` / `pnpm db:import` (`wrangler d1 export/execute`).
-- **CI/CD Integration**: GitHub Actions with `voidzero-dev/setup-vp@v1`, `vp install`, `vp check`, `vp test`. Migrations applied to remote D1 during deploy (`pnpm db:migrate:remote` → `drizzle-kit migrate`).
-- **Coverage Requirements**: not enforced; cover unit-converter, shopping list aggregation, auth guard.
-- **Performance Testing**: not in scope; observability comes from Cloudflare Worker logs (`observability.logs.enabled = true`).
+Membership state, role, ownership and input shape are all decided inside the Worker. A guard resolves
+the session before any handler body runs; handlers that mutate user-owned rows additionally compare
+the row's owner with the caller unless the caller is an admin. Blob keys are random UUIDs, so
+possession of a URL is never a capability derived from guessing.
 
-## 7. Rationale & Context
+## 9. Open Questions
 
-- **Why TanStack Start + Cloudflare Workers**: same TS code on edge SSR and client; no separate API service. Loaders + Query make optimistic SSR cheap. D1/R2/Images keep all infra in one provider.
-- **Why D1 + Drizzle**: SQLite at the edge avoids cold-start connections. Drizzle gives type-safe relational queries with `defineRelations`. `batch([...])` provides multi-statement atomicity.
-- **Why TanStack Store for selected client state**: we need persisted UI state (shopping list, per-recipe servings). React Query is for server state, not for "this user picked these recipes". The two never overlap (PAT-005 in client-state spec). `@tanstack/react-store` is already in the tree (TanStack React Form/Router depend on it), so it adds no new dependency.
-- **Why Cloudflare Images for uploads**: zero-effort WebP conversion + resize at the edge. Avoids storing huge JPEGs in R2 and serves the optimization tax once at upload time.
-- **Why Lexical for instructions**: rich-text editor with first-class custom-node support, used to embed Magimix programs and subrecipes inside instructions.
-- **Why French-only UI**: the app targets French-speaking users (Pelico domain context). All copy and validation messages are localized.
-- **Why no separate API service**: every server-side concern (RPC, OAuth callback, image streaming) is reachable through TanStack Router's `server.handlers` or `createServerFn`. The Worker is the API.
-
-### Trade-offs
-
-- D1 is the primary storage; running large analytical queries is not its strength. If reporting is added, prefer pulling data into a separate analytics store rather than scaling D1.
-- The shopping-list cache key includes the array of recipe ids. Adding/removing recipes mints a new key and re-fetches; acceptable for ≤~50 entries, would need a different cache strategy at higher scale.
-- DEV bypass in `getAuthUser` returns a fake admin in development (`import.meta.env.DEV`). Useful for local UI work, but means dev builds skip OAuth entirely.
-
-## 8. Dependencies & External Integrations
-
-### External Systems
-
-- **EXT-001**: Google OAuth 2.0 (`accounts.google.com`, `oauth2.googleapis.com/token`, `www.googleapis.com/oauth2/v2/userinfo`) — sole identity provider.
-
-### Third-Party Services
-
-- **SVC-001**: Cloudflare Workers — application runtime, request routing, edge cache.
-- **SVC-002**: Cloudflare D1 — relational storage (SQLite). Binding `DB`.
-- **SVC-003**: Cloudflare R2 — object storage. Binding `R2_BUCKET`.
-- **SVC-004**: Cloudflare Images — input/output image transformation. Binding `IMAGES`.
-
-### Infrastructure Dependencies
-
-- **INF-001**: Cloudflare account with D1, R2, and Images enabled.
-- **INF-002**: GitHub Actions for CI; `voidzero-dev/setup-vp@v1` action.
-
-### Data Dependencies
-
-- **DAT-001**: Google userinfo response shape (`id`, `email`, `name`, `picture`); the app stores `id` and `email`.
-- **DAT-002**: Recipe instructions are persisted as Lexical JSON strings (used by `EditorField` and the tag detector that searches for `"types":"magimixProgram"`).
-
-### Technology Platform Dependencies
-
-- **PLT-001**: TanStack Start + Router (1.16x) + React Query (5.99) + React 19.
-- **PLT-002**: Drizzle ORM 1.0 beta + Drizzle Kit 1.0 beta (D1 dialect).
-- **PLT-003**: Vite+ 0.1.18 (wrapping Vite, Rolldown, Vitest, tsdown, Oxlint, Oxfmt).
-- **PLT-004**: TypeScript 6, React 19.2, Tailwind 4.2, TanStack Store (`@tanstack/react-store` 0.11), Zod 4.
-- **PLT-005**: Lexical 0.46 (rich-text editor).
-
-### Compliance Dependencies
-
-- **COM-001**: Personally-identifiable data stored: user `id` (Google sub), `email`, role, status. No passwords. Cookies are encrypted; storage is on Cloudflare's global network.
-
-## 9. Examples & Edge Cases
-
-### Example: end-to-end recipe creation
-
-```
-[Client]
-  RecipeForm → objectToFormData(values) → mutate(createRecipeOptions)
-                                              │
-                                              ▼
-[Worker]
-  createServerFn({ method:'POST' })
-    .middleware([authGuard()])
-    .validator((fd) => recipeSchema.parse(parseFormData(fd)))
-    .handler(async ({ data, context }) => {
-      const imageKey = await uploadFile(data.image)         // R2 + IMAGES
-      // …compute autoTags…
-      const [createdRecipe] = await getDb().insert(recipe).values({...}).returning()
-      // …insert ingredient groups + linked recipes…
-    })
-                                              │
-                                              ▼
-[Client]
-  onSuccess → invalidate queryKeys.recipeLists() → toastSuccess → router.navigate('/')
-```
-
-### Edge: persistent stores under client-only rendering
-
-`QuantityControls` reads from `useRecipeQuantitiesState()` (`localStorage`). Because the app runs in client-only render mode (`src/start.ts` `defaultSsr: false`; only the root shell is SSR'd), `QuantityControls` and other store-backed components never render on the server — they render directly on the client with no `<ClientOnly>` wrapper and no hydration mismatch.
-
-### Edge: Worker stateless lifetime
-
-`getDb()` is called per request and returns a fresh drizzle client bound to `cloudflareEnv.DB`. Holding a reference across requests is unsupported; isolates may be recycled at any time.
-
-### Edge: image streaming
-
-`/api/image/$id` is a `server.handlers.GET` route. It pulls from R2, wraps the body in a `Response` with `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`, and stores the response in `caches.default` via `CacheManager.getWithCache(...)` so subsequent worker invocations bypass R2 entirely on cache hit.
-
-## 10. Validation Criteria
-
-- **VAL-001**: `vp check` passes — type-check, lint, format are green.
-- **VAL-002**: `vp test` passes.
-- **VAL-003**: `wrangler deploy --dry-run` succeeds with the configured bindings.
-- **VAL-004**: A fresh local checkout can run `vp install`, `pnpm db:migrate:local`, `pnpm dev`, and serve `/` without errors.
-- **VAL-005**: All sibling specs referenced under §11 exist and validate against the spec template (front matter + 11 sections).
-
-## 11. Related Specifications / Further Reading
-
-- [Folder Structure](./file-structure.spec.md)
-- [Platform (Cloudflare Workers)](./infrastructure/platform.spec.md)
-- [Data Layer (Drizzle + D1)](./infrastructure/data-layer.spec.md)
-- [Server Functions](./infrastructure/server-functions.spec.md)
-- [Routing & SSR](./infrastructure/routing-ssr.spec.md)
-- [Forms](./infrastructure/forms.spec.md)
-- [Client State Layering](./infrastructure/client-state.spec.md)
-- [Auth](./infrastructure/auth.spec.md)
-- [Ingredients Feature](../src/features/ingredients/ingredients.spec.md)
-- [Recipe Feature (index)](../src/features/recipe/spec/index.spec.md)
-- [Shopping List Feature](../src/features/shopping-list/shopping-list.spec.md)
-- [Users Feature](../src/features/users/users.spec.md)
-- TanStack Start: <https://tanstack.com/start>
-- Cloudflare Workers + D1 + R2 + Images: <https://developers.cloudflare.com/>
-- Drizzle ORM: <https://orm.drizzle.team/>
+- `[OQ-1]` Whether a growing recipe corpus warrants moving search off D1 `LIKE` scans onto a
+  dedicated index — owner: @antoine

@@ -1,306 +1,145 @@
 ---
-title: Recipe Feature - CRUD (Create / Update / Delete)
-version: 1.0
-date_created: 2026-05-08
-last_updated: 2026-05-08
-owner: recipe-organizer
-tags: [feature, recipe, crud, server-functions, r2, auto-tags]
+title: Recipe CRUD
+status: implemented
+author: Antoine Bouteiller
+date: 2026-08-14
+parent-spec: src/features/recipe/spec/index.spec.md
+related: [docs/infrastructure/server/data-layer.spec.md, docs/infrastructure/server/server-functions.spec.md]
 ---
 
-# Introduction
+## 2. Problem Statement
 
-This spec covers the write-side of the recipe feature: the `createRecipe`, `updateRecipe`, and
-`deleteRecipe` server functions, the form-data parsing pipeline, the R2 image/video upload
-contract, the auto-tag computation (vegetarian, magimix), and the batched relational delete
-strategy that satisfies the `ON DELETE RESTRICT` foreign keys.
+N/A — goals remain owned by `src/features/recipe/spec/index.spec.md` [G-1] and [G-4]. This leaf
+owns the server-side boundary that turns a submitted recipe form into a valid, authorized aggregate.
 
-Source files:
+## 3. Key Design Decisions
 
-- `src/features/recipe/api/create.ts`
-- `src/features/recipe/api/update.ts`
-- `src/features/recipe/api/delete.ts`
-- `src/features/recipe/utils/{constants,form,get-recipe-title}.ts`
-- `src/lib/r2.ts`
-- `src/routes/recipe/{new,edit.$id}.tsx`
+| Decision                       | Choice                                                                                                              | Rationale                                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Validation boundary   | Create and update accept `FormData`, parse it into typed values, and validate it inside guarded server functions.   | Multipart files and structured form fields reach one trust boundary that gates storage effects.           |
+| `[KD-2]` Aggregate replacement | Update removes outgoing graph rows atomically and writes the submitted ingredient and link graph.                   | The submitted form is the complete aggregate, avoiding an error-prone row-level diff.                     |
+| `[KD-3]` Derived flags         | The write path derives `isVegetarian`, `isMagimix`, and `isSpice` from ingredients, links, meals, and instructions. | Durable flags stay consistent with the graph that produced them.                                          |
+| `[KD-4]` Media lifecycle       | Images pass through a transform into R2; videos retain uploaded bytes; stale keys use best-effort deletion.         | Images have a bounded delivery format while media-cleanup failure does not invalidate a committed recipe. |
 
-## 1. Purpose & Scope
+## 4. Principles & Intents
 
-### Purpose
+- `[PI-1]` **Validation gates effects** — malformed data does not reach R2 or D1.
+- `[PI-2]` **Ownership protects every mutation** — an owner or admin alone can alter or remove a
+  recipe, refining the umbrella [PI-1].
+- `[PI-3]` **Graph writes are cohesive** — ingredient groups, their ingredients, and recipe links
+  describe one submitted recipe.
 
-Provide a single, authoritative server-side write path for recipes that:
+## 5. Non-Goals
 
-- enforces authentication and ownership;
-- validates form-data input with Zod;
-- uploads images via Cloudflare Images and videos as raw bytes to R2;
-- computes auto-tags from the persisted graph (own ingredients, linked recipes, instructions);
-- persists changes with a `getDb().batch([...])` so partial writes can't leave dangling rows.
+- `[NG-1]` Editing individual ingredient or link rows outside a recipe submission.
+- `[NG-2]` Direct browser access to R2 write bindings.
+- `[NG-3]` Deriving recipe flags in the editor or display layer.
 
-### Out of scope
+## 6. Caveats
 
-- Reading recipes (see [display.spec.md](./display.spec.md)).
-- The Lexical editor that produces the `instructions` JSON string (see [editor.spec.md](./editor.spec.md)).
-- The R2 GET/HEAD handlers used at read-time (see [display.spec.md](./display.spec.md)).
+- `[C-1]` Foreign-key constraints require child rows to disappear ahead of their recipe or ingredient
+  group parent.
+- `[C-2]` A linked recipe relation prevents deleting the linked target until the referencing recipe
+  removes its relation.
+- `[C-3]` An instruction sub-recipe node is serialized JSON rather than a relational foreign key.
+- `[C-4]` A graph-write failure triggers compensation that avoids exposing a partial aggregate.
 
-## 2. Definitions
+## 7. High-Level Components
 
-| Term                      | Meaning                                                                                                                                |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `recipeSchema`            | Zod schema in `api/create.ts` for the full create input. Re-used by update via `.extend({ id })`.                                      |
-| `parseFormData(formData)` | Helper from `@/utils/form-data` that turns the multipart body into a JS object, preserving `File` instances and JSON-parsing the rest. |
-| `objectToFormData(value)` | Inverse helper used on the client to serialize the form before submitting.                                                             |
-| `authGuard()`             | Middleware from `src/lib/auth/auth-guard.ts` that injects `context.user`.                                                              |
-| `withServerError(fn)`     | Wrapper from `@/utils/error-handler` that translates thrown errors into typed server-fn errors.                                        |
-| Auto-tag                  | Server-computed entry in `recipes.tags`. Two are emitted: `vegetarian` and `magimix`.                                                  |
-| Image key / Video key     | Opaque `randomUUID()` string used as the R2 object key and stored in `recipes.image` / `recipes.video`.                                |
+| Component     | Module type     | Responsibility                                          | Public API surface                               |
+| ------------- | --------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| Create recipe | Server function | Validate input, store media, derive flags, create graph | `createRecipeOptions`, `recipeSchema`            |
+| Update recipe | Server function | Authorize and replace aggregate data                    | `updateRecipeOptions`, `updateRecipeSchema`      |
+| Delete recipe | Server function | Authorize and remove graph and image                    | `deleteRecipeOptions`                            |
+| Write utility | Server utility  | Derive flags and write ingredient/link rows             | `resolveAutoFlags`, `writeRecipeIngredientGraph` |
 
-## 3. Requirements, Constraints & Guidelines
+## 8. Detailed Design
 
-### Requirements
+### 8.1 Aggregate shape
 
-- **REQ-001** `createRecipe` is `POST` + `authGuard()` + `validator(formData =>
-recipeSchema.parse(parseFormData(formData)))`. It MUST set `recipes.createdBy = context.user.id`.
-- **REQ-002** `updateRecipe` re-uses `recipeSchema.extend({ id: z.number() })` and MUST throw
-  `notFound()` if the row doesn't exist, then throw `'Permission denied'` unless
-  `context.user.role === 'admin' || currentRecipe.createdBy === context.user.id`.
-- **REQ-003** `deleteRecipe` accepts `z.number()` (the recipe id) and applies the same ownership
-  rule as `updateRecipe`.
-- **REQ-004** `recipeSchema` MUST validate:
-
-  ```ts
-  {
-    image: File | { id: string; url: string },
-    ingredientGroups: Array<{
-      _key: string,
-      groupName?: string,
-      ingredients: Array<{ _key: string; id: number ≥ 0; quantity: number ≥ 0; unitSlug?: UnitSlug }>
-    }>,
-    instructions: string,
-    linkedRecipes?: Array<{ _key?: string; id: number ≥ 0; ratio: number ≥ 0 }>,
-    name: string (≥ 2 chars),
-    servings: number ≥ 0,
-    tags: Array<RECIPE_TAGS[number]>,
-    video?: File | { id: string; url: string }
-  }
-  ```
-
-- **REQ-005** Image upload pipeline (`uploadFile` in `src/lib/r2.ts`) MUST optimize the source
-  image with `env.IMAGES.input(stream).transform({ width: 1024 }).output({ format: 'image/webp',
-quality: 80 })`, copy the response to an `ArrayBuffer`, and `R2_BUCKET.put(key, buffer, {
-httpMetadata: { contentType: optimizedImage.contentType() } })` where `key = randomUUID()`.
-- **REQ-006** Video upload (`uploadVideo`) MUST upload raw bytes (`file.arrayBuffer()`) with
-  `httpMetadata.contentType = file.type`. No transformation.
-- **REQ-007** When `image` is a `File` and there is a previous image key, update MUST `deleteFile`
-  the old key before uploading the new one. Same rule for `video`. When `video === undefined` on
-  update, the existing key is preserved (intentional semantic to allow keeping video unchanged).
-- **REQ-008** Auto-tag rules executed server-side after the `Promise.all` resolves the
-  ingredient categories and linked-recipe tags:
-  - `vegetarian` is added IFF
-    `ingredientCategories.every(c.category !== 'meat' && c.category !== 'fish')`
-    AND `linkedRecipesData.every(r.tags?.includes('vegetarian'))`
-    AND `!tags.includes('dessert')`.
-  - `magimix` is added IFF `instructions.includes('"type":"magimixProgram"')`.
-- **REQ-009** The update batch MUST execute these statements atomically, in this order:
-  1. `update(recipe).set(...).where(eq(recipe.id, id)).returning(...)`,
-  2. `delete(groupIngredient).where(inArray(groupIngredient.groupId, currentRecipe.ingredientGroups.map(...)))`,
-  3. `delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id))`,
-  4. `delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id))`.
-     Then re-insert ingredient groups via `Promise.all` (one insert per group, then bulk-insert its
-     ingredients), then bulk-insert `recipeLinkedRecipes` if `isNotEmpty(linkedRecipes)`.
-- **REQ-010** The delete batch MUST execute, in this order:
-  `delete(groupIngredient) → delete(recipeIngredientGroup) → delete(recipeLinkedRecipes) →
-delete(recipe)`. After the batch resolves, `deleteFile(currentRecipe.image)` is called. The
-  video key is currently NOT cleaned up on delete (TODO: track in backlog).
-- **REQ-011** All three mutations invalidate the recipe list query through their
-  `mutationOptions.onSuccess`:
-  - create: `invalidateQueries({ queryKey: queryKeys.recipeLists() })`,
-  - update: `invalidateQueries({ queryKey: queryKeys.allRecipes })`,
-  - delete: `invalidateQueries({ queryKey: queryKeys.allRecipes })`.
-
-### Constraints
-
-- **CON-001** Foreign keys in `recipe_ingredient_groups`, `group_ingredients`, and
-  `recipe_linked_recipes` are `ON DELETE RESTRICT`. Without the explicit batch deletes the
-  recipe row cannot be removed.
-- **CON-002** Drizzle's `getDb().batch([...])` is the only construct that gives D1
-  multi-statement atomicity.
-- **CON-003** The first ingredient group is implicitly the "default" group and is persisted with
-  `isDefault: true`. Subsequent groups are `isDefault: false`. The form does not surface the flag.
-- **CON-004** Image optimization with `env.IMAGES.input(...)` requires R2 to receive a
-  known-length body, hence the `arrayBuffer()` round-trip.
-
-### Guidelines
-
-- **GUD-001** When auto-tag inputs are partially absent (no own ingredients OR no linked recipes),
-  the corresponding "vegetarian" sub-condition defaults to `true`. See `api/create.ts` for the
-  three-branch optimization that skips the empty-set query.
-- **GUD-002** The form's `_key` random keys exist purely for React stable list keys; the schema
-  accepts but otherwise ignores them.
-- **GUD-003** Always extend `recipeSchema` rather than re-declaring fields in `update.ts`.
-
-## 4. Interfaces & Data Contracts
-
-### Server functions
-
-```ts
-const createRecipe = createServerFn()
-  .middleware([authGuard()])
-  .validator((formData: FormData) => recipeSchema.parse(parseFormData(formData)))
-  .handler(async ({ data, context }) => {
-    /* ... */
-  })
-
-const updateRecipe = createServerFn()
-  .middleware([authGuard()])
-  .validator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
-  .handler(
-    withServerError(async ({ data, context }) => {
-      /* ... returns id */
-    })
-  )
-
-const deleteRecipe = createServerFn()
-  .middleware([authGuard()])
-  .validator(z.number())
-  .handler(
-    withServerError(async ({ data: id, context }) => {
-      /* ... */
-    })
-  )
+```text
+recipe
+├── ingredientGroups[]
+│   └── ingredients[] { ingredientId, quantity, unitSlug? }
+├── linkedRecipes[] { recipeId, ratio }
+├── image key
+├── video key?
+└── instructions: Lexical JSON
 ```
 
-### Mutation options
+The submitted aggregate includes a name, servings, meals, cuisine types, image, optional video,
+ingredient groups, linked recipes, and instructions. The first persisted ingredient group is the
+default group; named groups remain additional preparation groupings. List and detail leaves consume
+the resulting recipe shapes.
 
-```ts
-createRecipeOptions(): MutationOptions  // success: invalidate queryKeys.recipeLists() + toast
-updateRecipeOptions(): MutationOptions  // success: invalidate queryKeys.allRecipes + toast
-deleteRecipeOptions(): MutationOptions  // success: invalidate queryKeys.allRecipes
+### 8.2 Mutation flow
+
+```text
+FormData → guarded validator → ownership lookup → media keys + derived flags
+         → D1 recipe and graph writes → query invalidation + French feedback
 ```
 
-### R2 helpers (`src/lib/r2.ts`)
+Create assigns the authenticated user as owner. Update and delete load the recipe and require its
+owner or an admin. Update batches the recipe update, group-ingredient removal, ingredient-group
+removal, and outgoing linked-recipe removal, then writes the submitted graph. Delete batches child
+removal ahead of recipe removal and attempts image deletion once the database operation completes.
 
-```ts
-uploadFile(file: File): Promise<string>     // image key (Cloudflare Images optimized → webp)
-uploadVideo(file: File): Promise<string>    // video key (raw bytes)
-deleteFile(key: string): Promise<void>
-```
+### 8.3 Input and authorization contract
 
-### Form-data round-trip
+The form-data parser preserves `File` values for media and decodes structured scalar fields for the
+schema. A valid image is either a file or an already-held media reference; video is optional under
+the same representation. Ingredient entries pair a non-negative ingredient id and quantity with an
+optional unit. Linked-recipe entries pair a non-negative target id with a non-negative ratio.
 
-- Client (`src/routes/recipe/{new,edit.$id}.tsx`):
-  `objectToFormData(value)` → POST.
-- Server (`api/{create,update}.ts`):
-  `recipeSchema.parse(parseFormData(formData))`.
+Create binds `createdBy` to the authenticated user. Update and delete resolve the target aggregate
+and apply the shared owner-or-admin policy. A missing target returns the route's not-found behavior;
+an unauthorized target produces no media or database effect. The mutation-option layer translates
+failure into the application's French feedback conventions.
 
-## 5. Acceptance Criteria
+### 8.4 Graph persistence and failure handling
 
-- **AC-001** Posting `createRecipe` without a session yields a 401-equivalent server error from
-  `authGuard()`.
-- **AC-002** Posting `createRecipe` with a 1-character `name` rejects with a Zod validation error.
-- **AC-003** A successful `createRecipe` writes one `recipes` row, one `recipe_ingredient_groups`
-  row per group with `isDefault: true` only on index 0, one `group_ingredients` row per
-  ingredient, and one `recipe_linked_recipes` row per linked recipe.
-- **AC-004** A successful `createRecipe` with all-vegetable ingredients and no `dessert` tag
-  persists `tags: [...userTags, 'vegetarian']`.
-- **AC-005** A successful `createRecipe` whose `instructions` contains the literal substring
-  `"type":"magimixProgram"` persists `tags` including `'magimix'`.
-- **AC-006** `updateRecipe` invoked by a non-owner non-admin throws `'Permission denied'` and
-  performs no writes.
-- **AC-007** `updateRecipe` with `image` as a `{ id, url }` object preserves the existing
-  `recipes.image` value and does NOT call `deleteFile`.
-- **AC-008** `updateRecipe` replaces the entire ingredient/linked-recipe graph: the four
-  delete/update statements execute in a single `batch`.
-- **AC-009** `deleteRecipe` invoked on a non-existent id throws `'Recipe not found'`.
-- **AC-010** `deleteRecipe` removes children before the parent and calls
-  `deleteFile(currentRecipe.image)`.
+The graph writer persists each ingredient group, marks the first group as default, persists its
+ingredient rows, and persists outgoing recipe links. A D1 batch groups the destructive phase of an
+update or delete to satisfy foreign-key ordering. Create writes the recipe identity first, then
+writes the graph; a graph error compensates by deleting that identity.
 
-## 6. Test Automation Strategy
+Media replacement stores the incoming file under an opaque key and later attempts deletion of stale
+keys. The best-effort cleanup policy preserves the committed recipe when object deletion is
+unavailable. Deleting a recipe similarly removes its image key as a separate object-store effect.
 
-- **PAT-001** Unit-test `recipeSchema` and `updateRecipeSchema` on representative valid and invalid
-  payloads (short name, negative quantity, unknown tag, malformed unit).
-- **PAT-002** Mock `getDb()` to assert the exact `batch([...])` argument shape and order in update
-  and delete handlers. Mock `env.R2_BUCKET` and `env.IMAGES` to verify upload pipelines.
-- **PAT-003** Cover the auto-tag matrix:
+### 8.5 Query invalidation and caller contract
 
-  | own ingredients | linked recipes           | dessert? | magimix? | expected auto-tags                            |
-  | --------------- | ------------------------ | -------- | -------- | --------------------------------------------- |
-  | none            | none                     | no       | no       | `[]` (vegetarian short-circuits true)         |
-  | all veg         | all `vegetarian`         | no       | no       | `['vegetarian']`                              |
-  | all veg         | all `vegetarian`         | yes      | no       | `[]`                                          |
-  | meat present    | any                      | no       | no       | `[]`                                          |
-  | any             | one missing `vegetarian` | no       | no       | `[]`                                          |
-  | any             | any                      | no       | yes      | `['magimix']` (or `['vegetarian','magimix']`) |
+Each mutation exposes a React Query mutation-options factory rather than asking callers to know its
+server-function details. Create invalidates recipe-list keys; update and delete invalidate the
+all-recipes key family. A successful create or update also communicates the recipe title through the
+French toast surface, while error handling maps a rejected server operation to the same UI language.
 
-- **PAT-004** Verify that ownership checks fire BEFORE any `deleteFile`/`uploadFile` call in
-  update.
+The write boundary returns the durable identity where a caller needs it and otherwise leaves rendered
+server state to the query layer. This preserves the architecture separation between server data and
+client UI state: mutation completion causes a refetch instead of maintaining a second recipe copy in
+a browser store.
 
-## 7. Rationale & Context
+### 8.6 Media representation
 
-- **Why batch deletes instead of `ON DELETE CASCADE`?** D1 enforces FK constraints; cascade
-  semantics across child tables are simulated explicitly so we can audit the order and reason
-  about partial failures.
-- **Why image optimization to webp/1024?** The shopping app's hero card needs to look acceptable
-  on mobile data. 1024px wide @ webp/q80 gives a ~5–10× size reduction over the original upload.
-- **Why store `instructions` as a JSON string?** Lexical's serialized state is a JSON tree; we
-  persist it verbatim to round-trip exactly. The substring marker `"type":"magimixProgram"`
-  intentionally piggy-backs on this serialization to avoid a separate scan pass.
-- **Why drop the entire ingredient/linked graph on update?** The form is the source of truth and
-  diffing structured rows against the current DB state would be more code than a batched replace,
-  with no real performance benefit at our row counts.
+An image file becomes a Cloudflare Images transformed WebP object with a bounded width and quality,
+then stores under a random R2 key. A video file stores its bytes and supplied content type under the
+same opaque-key model. A retained media reference supplies its stored id rather than triggering an
+upload, allowing an unchanged file to stay attached to a revised aggregate.
 
-## 8. Dependencies & External Integrations
+The database stores keys rather than public object URLs. Display resolves keys through application
+media routes, which own read-time cache headers and development placeholder behavior. Possession of a
+key is therefore an internal storage reference, not a browser upload capability.
 
-- **`authGuard()`** middleware from the auth feature.
-- **`@/lib/db`** Drizzle client (`getDb()`), schema modules, and the `batch` API.
-- **`env.IMAGES`** Cloudflare Images binding for transformations.
-- **`env.R2_BUCKET`** Cloudflare R2 binding.
-- **`@/utils/form-data`** for `parseFormData` / `objectToFormData`.
-- **`@/utils/error-handler`** for `withServerError`.
-- **`zod`** for input validation.
-- **`@tanstack/react-query`** for `mutationOptions` and the invalidation contract.
-- **`@/components/common/toast`** + **`@/lib/toast-helpers`** for user feedback (`toastError`, success
-  toasts on create/update).
+### 8.7 Flags and media
 
-## 9. Examples & Edge Cases
+Vegetarian status requires no meat or fish among own ingredients, vegetarian linked recipes, and no
+dessert meal. Magimix status follows the `"type":"magimixProgram"` marker emitted by the editor
+leaf [KD-2]. Spice status derives from the submitted meal selection and ingredient graph. Image
+uploads pass through the Cloudflare Images transformation and receive opaque R2 keys; video uploads
+keep their content type and opaque keys.
 
-- **EC-001** All-vegetable recipe tagged `dessert`: stored tags = `['dessert']`, no auto
-  `vegetarian`.
-- **EC-002** Recipe with one Magimix step but a meat ingredient: stored tags include `'magimix'`
-  but NOT `'vegetarian'`.
-- **EC-003** Update with `video: undefined` (field omitted from `FormData`): `recipes.video`
-  unchanged. Update with `video: null`-equivalent (not currently possible from the form): would
-  set `recipes.video = null`. Update with `video` as `{ id, url }`: stores `id`. Update with
-  `video` as a `File`: deletes old key (if any) and uploads the new one.
-- **EC-004** Deleting a recipe whose id is referenced by another recipe via
-  `recipe_linked_recipes.linkedRecipeId`: the final
-  `delete(recipe).where(eq(recipe.id, id))` fails with a FK error because the parent's
-  `recipe_linked_recipes` row still references this id. Resolution: remove the link from the
-  parent recipe first.
-- **EC-005** A linked recipe's id 0/-1 (placeholder from the form): `z.number().min(0)` rejects
-  -1 and `id: 0` would reach the DB. The form initializes new linked rows with `id: -1`, so
-  validation forces the user to pick a real recipe before submit.
-- **EC-006** A `File` upload smaller than 1024px: Cloudflare Images still re-encodes to webp/q80;
-  the resulting key is independent of the source format.
+Mutation success invalidates recipe list keys so display and search refetch the aggregate projection.
 
-## 10. Validation Criteria
+## 9. Open Questions
 
-- The Zod schema in source MUST match §3 REQ-004.
-- The `getDb().batch([...])` call sites in `api/update.ts` and `api/delete.ts` MUST match the
-  ordering in REQ-009 and REQ-010.
-- The auto-tag function `computeAutoTags` (update) and the inline computation (create) MUST
-  produce identical outputs for identical inputs.
-- The mutation options `onSuccess` callbacks MUST invalidate the keys listed in REQ-011.
-
-## 11. Related Specifications / Further Reading
-
-- [./index.spec.md](./index.spec.md)
-- [./display.spec.md](./display.spec.md) — read-side counterpart; explains how the persisted graph
-  is consumed.
-- [./editor.spec.md](./editor.spec.md) — defines the editor side of the auto-magimix contract
-  (the `"type":"magimixProgram"` substring marker).
-- [../../../../docs/architecture.spec.md](../../../../docs/architecture.spec.md)
-- [../../../../docs/infrastructure/data-layer.spec.md](../../../../docs/infrastructure/data-layer.spec.md)
-- [../../../../docs/infrastructure/server-functions.spec.md](../../../../docs/infrastructure/server-functions.spec.md)
-- [../../../../docs/infrastructure/forms.spec.md](../../../../docs/infrastructure/forms.spec.md)
-- [../../../../docs/infrastructure/routing-ssr.spec.md](../../../../docs/infrastructure/routing-ssr.spec.md)
-- [../../shopping-list/shopping-list.spec.md](../../shopping-list/shopping-list.spec.md)
-- [../../ingredients/ingredients.spec.md](../../ingredients/ingredients.spec.md)
+N/A

@@ -1,543 +1,147 @@
 ---
-title: Users Feature Specification
-version: 1.0
-date_created: 2026-05-08
-last_updated: 2026-05-08
-owner: recipe-organizer
-tags: [feature, users, admin, rbac]
+title: User Administration
+status: implemented
+author: Antoine Bouteiller
+date: 2026-08-14
+related: [docs/architecture.spec.md]
 ---
 
-# Introduction
+## 2. Problem Statement
 
-This specification defines the **users** feature of `recipe-organizer`: an
-admin-only management surface for the application's user directory. It allows
-administrators to list, create, approve, and block users from the
-`/settings/users` route. The feature complements the OAuth sign-in flow defined
-in the auth feature: a Google sign-in produces a `pending` user record that an
-admin must approve before the user can authenticate.
+A private recipe group needs an administrator-controlled membership directory: Google proves a
+person's identity, while an administrator decides whether that person may access the product. The
+user-administration screen gives administrators a focused way to list members by admission state,
+create trusted accounts, approve pending accounts, and block access. This fulfils architecture [G-3]
+and refines its identity and membership decisions [KD-5] and [KD-6].
 
-## 1. Purpose & Scope
+- `[G-1]` Restrict every user-directory read and lifecycle transition to active administrators.
+- `[G-2]` Make pending, active, and blocked membership states visible and actionable in one French interface.
+- `[G-3]` Keep membership lists coherent when an administrative mutation succeeds.
 
-### 1.1 Purpose
+## 3. Key Design Decisions
 
-Provide a deterministic, auditable contract for managing the lifecycle of a
-`user` row in the application database, exposed through admin-only TanStack
-Start server functions and a single React route under
-`/settings/users`.
+| Decision                         | Choice                                                                                        | Rationale                                                                                                            |
+| -------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Authorization           | Every user API composes `authGuard('admin')`; the route also redirects non-admin visitors.    | The Worker remains the enforcement boundary while the route avoids presenting an unavailable screen.                 |
+| `[KD-2]` Membership model        | A user has `user` or `admin` role and `pending`, `active`, or `blocked` status.               | Role grants administrative capability; status expresses admission independently of capability.                       |
+| `[KD-3]` Administrative creation | An administrator-created account receives a generated ID and the schema's active status.      | A pre-approved invitation path does not depend on an OAuth callback to establish membership.                         |
+| `[KD-4]` Lifecycle actions       | Approve sets `active`; block sets `blocked`; no delete operation exists.                      | Reversible state transitions preserve an account's identity and allow an administrator to restore access.            |
+| `[KD-5]` List coherence          | Successful mutations invalidate the users query-key family.                                   | A status transition moves a person between cached lists, so each status view must refresh from the Worker.           |
+| `[KD-6]` Directory interaction   | The route preloads three status lists and presents them in swipeable tabs with shared search. | Administrators can inspect all admission states without a route change while retaining a compact mobile interaction. |
 
-### 1.2 In scope
+## 4. Principles & Intents
 
-- `user` SQLite table schema (`db/schema/user.ts`).
-- Server functions in `src/features/users/api/`: `getUsersList`, `createUser`,
-  `approveUser`, `blockUser`.
-- React Query options exposed by those modules
-  (`getUserListOptions`, `createUserOptions`, `approveUserOptions`,
-  `blockUserOptions`).
-- React components in `src/features/users/components/`: `UserForm`, `AddUser`,
-  `ApproveUser`, `BlockUser`.
-- The route file `src/routes/settings/users.tsx` (tabs, search,
-  desktop/mobile UX).
-- RBAC enforcement through `authGuard('admin')` on every server function.
+- `[PI-1]` **Approval grants membership** — refine architecture [KD-6]; provider identity alone does
+  not grant an application session.
+- `[PI-2]` **Guarded data access** — refine architecture [PI-3]; validation and persistence run
+  behind the server authorization decision.
+- `[PI-3]` **Status is operational** — session admission and administration interpret the same stored
+  status rather than treating it as a display label.
+- `[PI-4]` **French feedback at the feature boundary** — mutations communicate success and failure
+  in the product language.
 
-### 1.3 Out of scope
+## 5. Non-Goals
 
-- OAuth sign-in, session creation, and the redirects that produce
-  `pending`/`blocked` states (see `../auth/auth.spec.md`).
-- User self-service profile editing.
-- Account deletion (no `deleteUser` server function exists).
-- Password storage or credential management (the app uses OAuth only).
+- `[NG-1]` OAuth protocol handling, session-cookie construction, or provider credential storage;
+  [authentication](../../../docs/infrastructure/server/auth.spec.md) owns those concerns.
+- `[NG-2]` Passwords, email links, profile self-service, or identity providers other than Google.
+- `[NG-3]` Account deletion, email notifications, background approval, or audit reporting.
+- `[NG-4]` Allowing a browser-supplied ID, role, or status to bypass server policy.
 
-### 1.4 Audience
+## 6. Caveats
 
-Engineers and LLM coding agents working on the recipe-organizer codebase.
+- `[C-1]` The development auth resolver supplies a synthetic active administrator, so provider
+  callback behavior requires an environment with Google configuration, refining architecture [C-4].
+- `[C-2]` A database uniqueness violation for an existing email reaches the server error boundary;
+  the create mutation displays its localized error path.
+- `[C-3]` Blocking an administrator, including the last administrator, is a permitted state
+  transition; the directory does not impose a minimum-admin invariant.
+- `[C-4]` A status update for an absent ID succeeds as an empty database update; the mutation still
+  refreshes the relevant query family.
 
-## 2. Definitions
+## 7. High-Level Components
 
-| Term                              | Definition                                                                                                                                                                                                                          |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **User entity**                   | A row in the `user` SQLite table with columns `id`, `email`, `role`, `status`.                                                                                                                                                      |
-| **Admin**                         | A `user` row whose `role = 'admin'`. Required by `authGuard('admin')`.                                                                                                                                                              |
-| **Pending user**                  | A `user` row whose `status = 'pending'`. Created automatically by the OAuth sign-in flow when an unknown email signs in; cannot authenticate until approved.                                                                        |
-| **Active user**                   | A `user` row whose `status = 'active'`. Default for admin-created records and for approved users. Allowed to authenticate.                                                                                                          |
-| **Blocked user**                  | A `user` row whose `status = 'blocked'`. Cannot authenticate (the auth guard redirects to login with `error=account_blocked`).                                                                                                      |
-| **`authGuard(role?)`**            | Server middleware in `src/lib/auth/auth-guard.ts` that resolves the current user, redirects unauthenticated/blocked/pending users, and throws `new Error('Permission denied')` when `role === 'admin'` and the caller is not admin. |
-| **Server function**               | TanStack Start `createServerFn(...)` callable that runs only on the server.                                                                                                                                                         |
-| **`queryKeys.allUsers`**          | Root React Query key for user lists. Invalidated after every mutation.                                                                                                                                                              |
-| **`queryKeys.listUsers(status)`** | Per-status React Query key produced by `getUserListOptions`.                                                                                                                                                                        |
-| **`SwipeTabs`**                   | Shared component in `src/components/ui/tabs.tsx` (backed by `src/hooks/use-swipe-tabs.ts`) that makes a tab set navigable by horizontal drag and mounts every panel simultaneously.                                                 |
-| **`DeleteDialog`**                | Generic confirm dialog component reused by `BlockUser` with a custom action label and icon.                                                                                                                                         |
-
-## 3. Requirements, Constraints & Guidelines
-
-### 3.1 Functional requirements
-
-- **REQ-001** The `user` table MUST have schema:
-
-  ```ts
-  export const user = sqliteTable('user', {
-    email: text('email').notNull().unique(),
-    id: text('id').primaryKey(),
-    role: text('role', { enum: ['user', 'admin'] })
-      .notNull()
-      .default('user'),
-    status: text('status', { enum: ['pending', 'active', 'blocked'] })
-      .notNull()
-      .default('active'),
-  })
-  ```
-
-- **REQ-002** `id` MUST be a string primary key. For OAuth users it MUST be the
-  Google user id (set by the auth feature); for admin-created users it MUST be
-  generated with `crypto.randomUUID()` inside `createUser`.
-- **REQ-003** `email` MUST be globally unique (database-enforced).
-- **REQ-004** `getUsersList` MUST return all users matching the requested
-  status, ordered by `email` ascending. Default status is `'active'`.
-- **REQ-005** `createUser` MUST insert a row with the provided `email` and
-  `role`, a freshly generated UUID `id`, and rely on the column default for
-  `status` (`'active'`). It MUST bypass the OAuth `pending` flow.
-- **REQ-006** `approveUser` MUST update the targeted user's `status` to
-  `'active'` and not modify any other column.
-- **REQ-007** `blockUser` MUST update the targeted user's `status` to
-  `'blocked'` and not modify any other column.
-- **REQ-008** Each mutation (`createUser`, `approveUser`, `blockUser`) MUST,
-  on success, invalidate the `queryKeys.allUsers` query subtree
-  (`createUser` calls `invalidateQueries({ queryKey: queryKeys.listUsers() })`
-  with no arg, which targets the same root key).
-- **REQ-009** Each mutation MUST display a localized success toast on
-  success and a `toastError` notification on failure.
-- **REQ-010** The route `/settings/users` MUST preload all three lists
-  (`active`, `pending`, `blocked`) in its loader via
-  `context.queryClient.ensureQueryData(getUserListOptions(status))`.
-- **REQ-011** The route MUST render three tabs in this order with these
-  French labels: `Actifs` (active), `En attente` (pending), `Bloqués`
-  (blocked). Default selected tab is `active`.
-- **REQ-012** The route MUST provide a search input that filters the
-  visible list by case-insensitive substring match on `email` OR `role`.
-- **REQ-013** The three tabs MUST be swipeable via `SwipeTabs` /
-  `SwipeTabsPanels`. All three panels are mounted simultaneously, and a
-  horizontal drag released past `SWIPE_THRESHOLD = 50` (px) or
-  `VELOCITY_THRESHOLD = 500` (px/s) MUST commit a tab change. Each panel
-  scrolls vertically on its own; the direction lock in `use-swipe-tabs.ts`
-  MUST leave vertical scrolling to the browser.
-- **REQ-014** When the current tab is `active` or `pending`, each row MUST
-  display an explicit `BlockUser` button (`variant="destructive-outline"`)
-  on every viewport.
-- **REQ-015** When the current tab is `blocked` or `pending`, each row
-  MUST display an `ApproveUser` button.
-- **REQ-016** The "Add user" `AddUser` dialog MUST validate input
-  with the shared `userSchema` and submit through `createUserOptions`,
-  resetting the form and closing the dialog on success.
-- **REQ-017** The `BlockUser` confirm dialog MUST use `DeleteDialog` with
-  `actionLabel="Bloquer"`, `icon={ProhibitIcon}`, and a description of the
-  form `Êtes-vous sûr de vouloir bloquer l'utilisateur ${userEmail} ?`.
-
-### 3.2 Security requirements
-
-- **SEC-001** Every server function in this feature MUST attach
-  `.middleware([authGuard('admin')])`. This is non-negotiable: it is the only
-  authorization barrier between unauthenticated callers and the user table.
-- **SEC-002** `authGuard('admin')` MUST throw `new Error('Permission denied')`
-  for non-admin authenticated users. Unauthenticated, blocked, or pending
-  callers MUST be redirected to `/auth/login` (with `error=account_blocked`
-  or `error=account_pending` where applicable) before role checks run.
-- **SEC-003** The `/settings/users` entry point in the settings UI MUST only
-  be rendered when the route context exposes `isAdmin === true`. The link
-  MUST NOT be exposed to non-admin users (defense in depth on top of
-  SEC-001).
-- **SEC-004** Inputs to every server function MUST be validated server-side
-  with the Zod schema declared in the same file
-  (`getUsersListSchema`, `userSchema`, `approveUserSchema`,
-  `blockUserSchema`). Client-side validation MUST NOT be the sole gate.
-- **SEC-005** `createUser` MUST NOT accept `id` or `status` from the client.
-  The `id` is generated server-side with `crypto.randomUUID()`; `status`
-  defaults from the schema.
-
-### 3.3 Constraints
-
-- **CON-001** The feature targets Cloudflare Workers + Drizzle ORM over D1.
-  All DB calls go through `getDb()` from `@/lib/db`.
-- **CON-002** Server function input shapes are immutable contracts (clients
-  rely on them). Schemas in source MUST stay in sync with this spec.
-- **CON-003** UI strings MUST stay in French to match the rest of the
-  application.
-- **CON-004** No background jobs, no email notifications: approval is a
-  synchronous DB write only.
-- **CON-005** The feature MUST NOT introduce a `deleteUser` server function;
-  the only state transitions are `pending -> active` and `* -> blocked`.
-
-### 3.4 Guidelines
-
-- **GUD-001** Co-locate server functions and their React Query
-  `*Options` factories in the same file under
-  `src/features/users/api/`.
-- **GUD-002** Prefer `useSuspenseQuery(getUserListOptions(status))` inside a
-  `<React.Suspense>` boundary to keep loading states declarative.
-- **GUD-003** Wrap the optimistic UI side effects (form reset, dialog close)
-  in the mutation's per-call `onSuccess` callback rather than inside
-  `*Options` so reusable options remain side-effect free.
-- **GUD-004** Use `useTransition` around approve calls (as `ApproveUser`
-  does) to keep the icon button responsive while the mutation runs.
-
-### 3.5 Patterns
-
-- **PAT-001** Server-function shape:
-
-  ```ts
-  const approveUser = createServerFn()
-    .middleware([authGuard('admin')])
-    .validator(approveUserSchema)
-    .handler(async ({ data }) => {
-      /* ... */
-    })
-  ```
-
-- **PAT-002** Mutation options factory exporting both `mutationFn` and
-  paired `onSuccess`/`onError` toasts plus a single
-  `invalidateQueries({ queryKey: queryKeys.allUsers })` (or
-  `queryKeys.listUsers()` for the no-arg root form used by `createUser`).
-- **PAT-003** TanStack Form usage:
-
-  ```ts
-  useAppForm({
-    defaultValues: userDefaultValues,
-    validationLogic: revalidateLogic(),
-    validators: { onDynamic: userSchema },
-    onSubmit: async ({ value }) => {
-      /* ... */
-    },
-  })
-  ```
-
-- **PAT-004** Swipeable tab set via `SwipeTabs` + `SwipeTabsPanels`: native
-  touch events with a direction lock, an elastic clamp at either end
-  (`ELASTIC_FACTOR = 0.15`), and commit on distance or velocity threshold.
-
-## 4. Interfaces & Data Contracts
-
-### 4.1 Database schema (`db/schema/user.ts`)
-
-| Column   | Type        | Constraints                                           | Default              |
-| -------- | ----------- | ----------------------------------------------------- | -------------------- |
-| `id`     | `text`      | `primaryKey()`                                        | none (set by caller) |
-| `email`  | `text`      | `notNull()`, `unique()`                               | none                 |
-| `role`   | `text` enum | `notNull()`, `enum: ['user', 'admin']`                | `'user'`             |
-| `status` | `text` enum | `notNull()`, `enum: ['pending', 'active', 'blocked']` | `'active'`           |
-
-### 4.2 Zod schemas
-
-```ts
-// src/features/users/api/get-all.ts
-const getUsersListSchema = z.object({
-  status: z.enum(['pending', 'active', 'blocked']).default('active'),
-})
-
-// src/features/users/api/create.ts
-const userSchema = z.object({
-  email: z.email(),
-  role: z.enum(['user', 'admin']),
-})
-export type UserFormValues = z.infer<typeof userSchema>
-export type UserFormInput = Partial<UserFormValues>
-
-// src/features/users/api/approve.ts
-const approveUserSchema = z.object({ id: z.string() })
-
-// src/features/users/api/block.ts
-const blockUserSchema = z.object({ id: z.string() })
+```text
+Administrator
+   │ /settings/users
+   v
+route guard ──> status tabs + search ──> query options ──> admin server functions
+                                                          │ guard → validate → D1
+                                                          v
+                                           invalidate users query family + French toast
 ```
 
-### 4.3 Server function signatures
+| Component          | Module type              | Responsibility                                     | Public API surface                                   |
+| ------------------ | ------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
+| User schema        | Drizzle schema           | Store identity, role, and admission status         | `user` table                                         |
+| User APIs          | Feature server functions | List and transition user records                   | `getUserListOptions`, create, approve, block options |
+| Guard              | Server middleware        | Require an active administrator                    | `authGuard('admin')`                                 |
+| User form          | Feature form component   | Capture email and role for administrative creation | `UserForm`, `AddUser`                                |
+| Lifecycle controls | Feature components       | Confirm blocking and initiate approval             | `ApproveUser`, `BlockUser`                           |
+| Directory route    | File route               | Preload, filter, and partition lists by status     | `/settings/users`                                    |
 
-| Function       | HTTP method      | Input                                                                 | Output                          | Side effects                                                                       |
-| -------------- | ---------------- | --------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
-| `getUsersList` | `GET`            | `{ status: 'pending' \| 'active' \| 'blocked' }` (default `'active'`) | `User[]` ordered by `email` asc | none                                                                               |
-| `createUser`   | `POST` (default) | `{ email: string (email), role: 'user' \| 'admin' }`                  | `void`                          | inserts row with `id = crypto.randomUUID()` and column-default `status = 'active'` |
-| `approveUser`  | `POST` (default) | `{ id: string }`                                                      | `void`                          | sets `status = 'active'` where `user.id = id`                                      |
-| `blockUser`    | `POST` (default) | `{ id: string }`                                                      | `void`                          | sets `status = 'blocked'` where `user.id = id`                                     |
+## 8. Detailed Design
 
-All four MUST be wrapped with `.middleware([authGuard('admin')])`.
+### 8.1 User and admission model
 
-### 4.4 React Query keys
+The `user` table has a text primary key, unique email, display name, Better Auth timestamps, role,
+and status. Role defaults to `user`; status defaults to `active`
+(`db/schema/user.ts:5-23`). Google account creation belongs to the authentication contract; its
+account hook assigns `pending` as part of session admission
+([auth specification](../../../docs/infrastructure/server/auth.spec.md#82-account-and-session-admission)).
+An administrative create request accepts only email and role, generates `crypto.randomUUID()` on the
+server, and supplies the required display name from the email
+(`src/features/users/api/create.ts:13-26`).
 
-| Key                            | Used by                                                                         |
-| ------------------------------ | ------------------------------------------------------------------------------- |
-| `queryKeys.allUsers`           | Invalidated by `approveUser` and `blockUser`                                    |
-| `queryKeys.listUsers(status?)` | Read by `getUserListOptions(status)`; invalidated by `createUser` (no-arg form) |
+| Status    | Meaning in this feature                            | Available lifecycle control |
+| --------- | -------------------------------------------------- | --------------------------- |
+| `pending` | Identity awaits administrator approval             | approve or block            |
+| `active`  | Identity may access protected product functions    | block                       |
+| `blocked` | Identity cannot access protected product functions | approve                     |
 
-### 4.5 Component public APIs
+### 8.2 Server-function and authorization contract
 
-```ts
-// src/features/users/components/add-user.tsx
-interface AddUserProps {
-  children: JSX.Element
-}
+The list API accepts a status, defaults it to `active`, orders results by email, and pairs the call
+with `queryKeys.listUsers(status)` (`src/features/users/api/get-all.ts:10-31`). Create, approve, and
+block validate their respective payloads and use the same `authGuard('admin')` middleware
+(`src/features/users/api/create.ts:13-26`, `src/features/users/api/approve.ts:14-27`,
+`src/features/users/api/block.ts:14-27`). The guard redirects anonymous, pending, and blocked
+callers and rejects an active non-admin ahead of handler execution
+(`src/lib/auth/auth-guard.ts:6-27`).
 
-// src/features/users/components/approve-user.tsx
-interface ApproveUserProps {
-  userId: string
-}
+Approve writes `status: 'active'`; block writes `status: 'blocked'`. Their mutation options
+invalidate `queryKeys.allUsers`; create invalidates the no-argument users-list prefix. Each option
+also emits French success or error feedback (`src/features/users/api/create.ts:28-44`,
+`src/features/users/api/approve.ts:29-43`, `src/features/users/api/block.ts:29-43`). This refines the
+[server-functions](../../../docs/infrastructure/server/server-functions.spec.md) cache contract.
 
-// src/features/users/components/block-user.tsx
-interface BlockUserProps {
-  userId: string
-  userEmail: string
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-}
-```
+### 8.3 Directory route and search
 
-`UserForm` is a `withForm({ defaultValues: userDefaultValues, render })`
-factory that exposes `email` (TextField) and `role` (SelectField with items
-`Utilisateur`/`Administrateur`).
+The route redirects visitors whose route-context user lacks the admin role, prefetches active,
+blocked, and pending query options, and renders three panels in `active`, `pending`, `blocked`
+order (`src/routes/settings/users.tsx:86-98`). Each panel observes its own status query with
+`useSuspenseQuery`, while a shared case-insensitive search matches email or role
+(`src/routes/settings/users.tsx:22-31`). The tab labels are `Actifs`, `En attente`, and `Bloqués`.
 
-### 4.6 Route
+`SwipeTabs` makes the panels available in one screen. Active rows expose blocking; pending rows
+expose approval and blocking; blocked rows expose approval. Empty results distinguish an empty
+status from a search with no match (`src/routes/settings/users.tsx:27-56`).
 
-| Path              | File                            | Loader                                                                         |
-| ----------------- | ------------------------------- | ------------------------------------------------------------------------------ |
-| `/settings/users` | `src/routes/settings/users.tsx` | `ensureQueryData` for `getUserListOptions('active' \| 'blocked' \| 'pending')` |
+### 8.4 Administrative controls
 
-## 5. Acceptance Criteria
+`AddUser` validates against the shared user schema on dynamic form validation and at its
+mutation boundary. A successful creation resets the form and closes its dialog
+(`src/features/users/components/add-user.tsx:20-45`). The form offers French user and administrator
+role labels (`src/features/users/components/user-form.tsx:7-32`). `ApproveUser` performs its mutation
+within a React transition (`src/features/users/components/approve-user.tsx:14-29`). `BlockUser`
+uses a confirmation dialog whose destructive action is labelled `Bloquer` and identifies the target
+email (`src/features/users/components/block-user.tsx:17-29`).
 
-- **AC-001** Listing active users
-  - **Given** the caller is authenticated as admin and three users exist
-    with statuses `active`, `pending`, `blocked`
-  - **When** the client calls `getUsersList({ data: { status: 'active' } })`
-  - **Then** only the `active` user is returned, in `email` ascending order.
+The route-level redirect is a navigation affordance rather than the authorization mechanism. The
+same API guard protects direct RPC invocation and performs the authoritative admission and role
+decision. Cache refresh occurs only when that guarded write resolves, so each status tab resumes from
+the persisted membership state.
 
-- **AC-002** Non-admin denied
-  - **Given** the caller is authenticated with `role = 'user'` and
-    `status = 'active'`
-  - **When** any of `getUsersList`, `createUser`, `approveUser`, `blockUser`
-    is invoked
-  - **Then** the call rejects with `Error('Permission denied')` (thrown by
-    `authGuard('admin')`) and no DB read or write occurs.
+## 9. Open Questions
 
-- **AC-003** Unauthenticated redirect
-  - **Given** there is no authenticated user
-  - **When** any users server function is invoked
-  - **Then** `authGuard` throws `redirect({ to: '/auth/login' })` before the
-    role check runs.
-
-- **AC-004** Create user
-  - **Given** an admin submits the `AddUser` dialog with
-    `{ email: 'a@b.co', role: 'user' }`
-  - **When** validation passes and `createUser` resolves
-  - **Then** a new `user` row exists with that email, role `'user'`, status
-    `'active'`, and a UUID `id`; the `queryKeys.listUsers()` cache is
-    invalidated; a success toast displays
-    `Utilisateur a@b.co créé`; the dialog closes and the form resets.
-
-- **AC-005** Create user with invalid email
-  - **Given** the dialog is filled with `email = 'not-an-email'`
-  - **When** the form attempts to submit
-  - **Then** `userSchema.parse` throws under `onDynamic` validation, the
-    server function is never called, and the dialog stays open.
-
-- **AC-006** Approve a pending user
-  - **Given** a user `u` with `status = 'pending'` and an admin caller
-  - **When** the admin clicks the `ApproveUser` icon for `u`
-  - **Then** `u.status` becomes `'active'`, `queryKeys.allUsers` is
-    invalidated, and a `Utilisateur approuvé` success toast displays.
-
-- **AC-007** Approve a blocked user
-  - **Given** a user `u` with `status = 'blocked'` and an admin caller
-  - **When** the admin clicks `ApproveUser` on the `Bloqués` tab
-  - **Then** `u.status` becomes `'active'` and the row disappears from the
-    `Bloqués` tab on cache refresh.
-
-- **AC-008** Block on desktop
-  - **Given** an active user row rendered on desktop
-  - **When** the admin clicks the destructive-outline button and confirms
-    `Bloquer` in the `DeleteDialog`
-  - **Then** `blockUser` is called with that user id, status becomes
-    `'blocked'`, `queryKeys.allUsers` is invalidated, and the
-    `Utilisateur bloqué` toast displays.
-
-- **AC-009** Swipe between tabs
-  - **Given** the `Actifs` tab is selected on a mobile viewport
-  - **When** the admin drags the panel area left past
-    `SWIPE_THRESHOLD = 50` and releases
-  - **Then** the `En attente` panel becomes active and the `TabsList`
-    indicator moves to it.
-
-- **AC-010** Block on mobile
-  - **Given** mobile viewport and an active user row
-  - **When** the admin taps the row's destructive-outline `BlockUser`
-    button
-  - **Then** the `BlockUser` confirm dialog opens; confirming triggers
-    AC-008.
-
-- **AC-011** Search filtering
-  - **Given** a list with users `alice@x.io (user)` and
-    `bob@x.io (admin)`
-  - **When** the admin types `admin` in the search box
-  - **Then** only `bob@x.io` is shown; typing `alice` shows only Alice;
-    typing `xyz` shows the empty-search message
-    `Aucun utilisateur trouvé pour cette recherche.`.
-
-- **AC-012** Empty tab
-  - **Given** there are no `pending` users
-  - **When** the `En attente` tab is visible and the search input is empty
-  - **Then** the panel renders the message
-    `Aucun utilisateur en attente.`.
-
-- **AC-013** Tab visibility of buttons
-  - **Given** the active tab is `Actifs`
-  - **Then** rows show no `ApproveUser` and show `BlockUser`.
-  - **Given** the active tab is `Bloqués`
-  - **Then** rows show `ApproveUser` and no `BlockUser`.
-  - **Given** the active tab is `En attente`
-  - **Then** rows show `ApproveUser` AND `BlockUser`.
-
-- **AC-014** OAuth approval flow
-  - **Given** a Google sign-in by an unknown email creates a user with
-    `status = 'pending'` (auth feature) and an admin approves them
-  - **When** the user retries Google sign-in
-  - **Then** sign-in succeeds (`authGuard` no longer redirects with
-    `error=account_pending`).
-
-## 6. Test Automation Strategy
-
-- **Levels.** Unit-test each server function handler against an in-memory or
-  miniflare-bound D1 instance. Component-test `AddUser`, `ApproveUser`,
-  `BlockUser`, and the `SwipeTabs` interaction with React Testing Library
-  (firing `touchstart`/`touchmove`/`touchend` on the panel track).
-  Route-level tests cover loader behavior and tab/search rendering.
-- **Frameworks.** Vitest via `vp test`. Mocking via Vitest spies on
-  `@/lib/db` and `@tanstack/react-query` mutation results.
-- **RBAC tests.** For each server function, assert two negative paths:
-  unauthenticated (redirect) and authenticated non-admin (`'Permission
-denied'`). One positive path per function.
-- **Schema tests.** Snapshot-test `userSchema`, `approveUserSchema`,
-  `blockUserSchema`, `getUsersListSchema` for accepted/rejected inputs.
-- **Cache invalidation.** Assert that calling each mutation triggers
-  `queryClient.invalidateQueries` with the documented key.
-- **CI.** `vp check` then `vp test` in the standard pipeline.
-
-## 7. Rationale & Context
-
-- **Admin-only by design.** A small private app for a known group; admin
-  approval prevents arbitrary Google accounts from gaining access while
-  still letting Google handle credentials.
-- **Two creation paths.** OAuth produces `pending` users (status reset by
-  admin); `createUser` exists for admin convenience to pre-create accounts
-  that bypass the pending step.
-- **Default `status = 'active'` at the column level.** Admin-created users
-  are trusted by definition; the default lives on the column so the server
-  function does not need to set it explicitly and the OAuth flow can opt
-  into `pending` by passing it.
-- **Soft-blocking instead of deletion.** Preserves history and allows
-  re-approval; the auth feature uses `status = 'blocked'` to redirect the
-  user out of the app.
-- **Single root invalidation key (`queryKeys.allUsers`).** Avoids stale
-  per-status caches when a user changes status (e.g. pending -> active
-  must update both lists).
-- **Explicit block button on every viewport.** The former mobile
-  swipe-to-block gesture was removed because it competed with the tab pan
-  for the same pixels: both started as a horizontal drag on a row, so the
-  row swallowed gestures meant for tab navigation. Tabs won — swiping
-  between the three lists is the more frequent action — and blocking falls
-  back to the same explicit button desktop already used.
-
-## 8. Dependencies & External Integrations
-
-| Kind     | Reference                                                                                      | Use                                     |
-| -------- | ---------------------------------------------------------------------------------------------- | --------------------------------------- |
-| Internal | `@/lib/auth/auth-guard`                                                                        | RBAC enforcement (`authGuard('admin')`) |
-| Internal | `@/lib/db` (`getDb`)                                                                           | Drizzle D1 client                       |
-| Internal | `@schema` (`user`)                                                                             | Drizzle table definition                |
-| Internal | `@/lib/query-keys` (`queryKeys.allUsers`, `queryKeys.listUsers`)                               | React Query key factory                 |
-| Internal | `@/components/common/toast` (`toastManager`) and `@/lib/toast-helpers` (`toastError`)          | User feedback                           |
-| Internal | `@/components/dialogs/delete-dialog` (`DeleteDialog`)                                          | Confirmation UX for `BlockUser`         |
-| Internal | `@/components/dialogs/form-dialog` (`getFormDialog`)                                           | Form host for `AddUser`                 |
-| Internal | `@/hooks/use-app-form` (`useAppForm`, `withForm`)                                              | TanStack Form integration               |
-| Internal | `@/components/ui/tabs` (`SwipeTabs`, `SwipeTabsPanels`) + `@/hooks/use-swipe-tabs`             | Swipeable tab navigation                |
-| External | `@tanstack/react-start` (`createServerFn`, `createMiddleware`)                                 | Server-function runtime                 |
-| External | `@tanstack/react-query` (`queryOptions`, `mutationOptions`, `useMutation`, `useSuspenseQuery`) | Cache + mutations                       |
-| External | `@tanstack/react-form` (`revalidateLogic`, `useStore`)                                         | Form state                              |
-| External | `@tanstack/react-router` (`createFileRoute`, `redirect`)                                       | Route + redirects                       |
-| External | `drizzle-orm` (`eq`) and `drizzle-orm/sqlite-core`                                             | DB query/schema                         |
-| External | `zod`                                                                                          | Input validation                        |
-| Native   | Touch events (`onTouchStart`/`onTouchMove`/`onTouchEnd`) + CSS transition                      | Tab swipe gesture (`use-swipe-tabs`)    |
-| External | `@phosphor-icons/react` (`CheckIcon`, `PlusIcon`, `ProhibitIcon`)                              | Icons                                   |
-
-## 9. Examples & Edge Cases
-
-### 9.1 Approve from pending
-
-```ts
-const m = useMutation(approveUserOptions())
-await m.mutateAsync({ data: { id: userId } })
-// user.status -> 'active'; queryKeys.allUsers invalidated
-```
-
-### 9.2 Create then immediately re-create same email
-
-The unique constraint on `email` causes the second `createUser` to throw at
-the DB layer; the `onError` handler emits
-`Erreur lors de la création de l'utilisateur <email>`.
-
-### 9.3 Approving an already-active user
-
-`approveUser` is idempotent: `UPDATE ... SET status = 'active'` is a no-op
-on an already-active row but still triggers cache invalidation and the
-success toast.
-
-### 9.4 Blocking the last admin
-
-Not prevented by the spec or code: an admin can block another admin (or, in
-principle, themselves on a different session). UI surfaces this only as a
-toast; recovery requires direct DB access.
-
-### 9.5 Search on empty input
-
-`search.trim().toLowerCase()` returns an empty string; `'foo'.includes('')`
-is `true`, so an empty search shows all rows.
-
-### 9.6 Swipe drag clamping
-
-`clampOffset` in `use-swipe-tabs.ts` caps the track between `0` and
-`-(tabs.length - 1) * width`; past either end the excess is scaled by
-`ELASTIC_FACTOR = 0.15`, so over-swiping on `Actifs` or `Bloqués` gives a
-small elastic overshoot before snapping back.
-
-### 9.7 Pending tab on desktop
-
-The pending tab shows BOTH `ApproveUser` (because status is `'pending'`)
-AND `BlockUser` (because `showBlockButton = status === 'active' || status
-=== 'pending'`).
-
-### 9.8 OAuth user id collision
-
-Admin-created users use `crypto.randomUUID()`, which has negligible
-collision probability with Google user ids; nevertheless the `id` column is
-a primary key, so a colliding insert would fail loudly rather than silently
-overwrite.
-
-## 10. Validation Criteria
-
-- **VAL-001** Type-check passes (`vp check`).
-- **VAL-002** Lint and format pass (`vp lint`, `vp fmt`).
-- **VAL-003** All four server functions in
-  `src/features/users/api/*.ts` start with
-  `.middleware([authGuard('admin')])`.
-- **VAL-004** `userSchema` matches the schema quoted in section 4.2 exactly
-  (used by both `AddUser` and `createUser`).
-- **VAL-005** The route loader in `src/routes/settings/users.tsx`
-  preloads `getUserListOptions('active' | 'pending' | 'blocked')`.
-- **VAL-006** `src/routes/settings/users.tsx` renders `SwipeTabs` with
-  `tabs={USER_TABS}` and three `SwipeTabsPanels` children.
-- **VAL-007** `BlockUser` passes `actionLabel="Bloquer"` and
-  `icon={ProhibitIcon}` to `DeleteDialog`.
-- **VAL-008** Each mutation factory invalidates either
-  `queryKeys.allUsers` (approve, block) or `queryKeys.listUsers()`
-  (create) on success.
-- **VAL-009** No `deleteUser` server function exists in
-  `src/features/users/api/`.
-
-## 11. Related Specifications / Further Reading
-
-- [Architecture overview](../../docs/architecture.spec.md)
-- [Server functions infrastructure](../../docs/infrastructure/server-functions.spec.md)
-- [Data layer (Drizzle + D1)](../../docs/infrastructure/data-layer.spec.md)
-- [Auth feature spec](../auth/auth.spec.md)
+N/A

@@ -27,13 +27,13 @@ Canonical reference = the `*.spec.md` files under `docs/` + `docs/infrastructure
 colocated with the code.
 
 - [Project Structure](docs/file-structure.spec.md)
-- [Platform (Cloudflare Workers)](docs/infrastructure/platform.spec.md)
-- [Data Layer (Drizzle + D1)](docs/infrastructure/data-layer.spec.md)
-- [Server Functions](docs/infrastructure/server-functions.spec.md)
-- [Form Patterns](docs/infrastructure/forms.spec.md)
-- [Client State Layering](docs/infrastructure/client-state.spec.md)
-- [Routing & SSR](docs/infrastructure/routing-ssr.spec.md)
-- [Auth (Better Auth)](docs/infrastructure/auth.spec.md)
+- [Platform (Cloudflare Workers)](docs/infrastructure/server/platform.spec.md)
+- [Data Layer (Drizzle + D1)](docs/infrastructure/server/data-layer.spec.md)
+- [Server Functions](docs/infrastructure/server/server-functions.spec.md)
+- [Form Patterns](docs/infrastructure/client/forms.spec.md)
+- [Client State Layering](docs/infrastructure/client/client-state.spec.md)
+- [Routing & SSR](docs/infrastructure/client/routing-ssr.spec.md)
+- [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
 - Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 
 <!--VITE PLUS START-->
