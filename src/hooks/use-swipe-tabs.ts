@@ -15,7 +15,6 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
   const activeIndex = tabs.indexOf(activeTab)
   // Read via ref so containerRef stays stable; re-invoking it on re-render would snap the offset and kill the release slide.
   const activeIndexRef = useRef(activeIndex)
-  activeIndexRef.current = activeIndex
 
   const touchState = useRef({
     baseOffset: 0,
@@ -56,6 +55,7 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
   const goTo = useCallback(
     (tab: TTab) => {
       setActiveTab(tab)
+      activeIndexRef.current = tabs.indexOf(tab)
       setOffset(-tabs.indexOf(tab) * widthRef.current, true)
     },
     [setOffset, tabs]
@@ -141,6 +141,7 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
       }
 
       setActiveTab(tabs[newIndex])
+      activeIndexRef.current = newIndex
       setOffset(-newIndex * widthRef.current, true)
     },
     [activeTab, tabs, setOffset]

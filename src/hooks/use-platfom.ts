@@ -1,6 +1,6 @@
 import { createIsomorphicFn } from '@tanstack/react-start'
 import { getRequestHeader } from '@tanstack/react-start/server'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 type Platform = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Windows'
 
@@ -27,12 +27,7 @@ const getPlatformFromUserAgent = (userAgent: string | undefined) => {
   return 'Unknown'
 }
 
-export const usePlatform = () => {
-  const [platform, setPlatform] = useState<Platform>(getPlatform())
+// The platform never changes for a given document, so there is nothing to subscribe to.
+const subscribe = () => () => undefined
 
-  useEffect(() => {
-    setPlatform(getPlatform())
-  }, [])
-
-  return platform
-}
+export const usePlatform = (): Platform => useSyncExternalStore(subscribe, getPlatform, getPlatform)

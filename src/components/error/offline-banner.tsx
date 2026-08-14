@@ -1,32 +1,24 @@
 import { WifiSlashIcon } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
+
+const subscribe = (onStoreChange: () => void) => {
+  globalThis.addEventListener('online', onStoreChange)
+  globalThis.addEventListener('offline', onStoreChange)
+
+  return () => {
+    globalThis.removeEventListener('online', onStoreChange)
+    globalThis.removeEventListener('offline', onStoreChange)
+  }
+}
 
 export default function OfflineBanner() {
-  const [isOnline, setIsOnline] = useState(true)
-  const [isMounted, setIsMounted] = useState(false)
+  const isOnline = useSyncExternalStore(
+    subscribe,
+    () => globalThis.navigator.onLine,
+    () => true
+  )
 
-  useEffect(() => {
-    setIsOnline(globalThis.navigator.onLine)
-    setIsMounted(true)
-
-    const handleOnline = () => {
-      setIsOnline(true)
-    }
-
-    const handleOffline = () => {
-      setIsOnline(false)
-    }
-
-    globalThis.addEventListener('online', handleOnline)
-    globalThis.addEventListener('offline', handleOffline)
-
-    return () => {
-      globalThis.removeEventListener('online', handleOnline)
-      globalThis.removeEventListener('offline', handleOffline)
-    }
-  }, [])
-
-  if (!isMounted || isOnline) {
+  if (isOnline) {
     return null
   }
 

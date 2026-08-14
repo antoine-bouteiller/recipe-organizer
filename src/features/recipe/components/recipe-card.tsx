@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -24,13 +24,14 @@ const Tag = ({ children }: { readonly children: React.ReactNode }) => (
 let entrancePlayed = false
 
 const useEntranceAnimation = () => {
-  const animate = useRef(!entrancePlayed)
+  // oxlint-disable-next-line react/hook-use-state -- captured once at mount, never updated
+  const [animate] = useState(() => !entrancePlayed)
 
   useEffect(() => {
     entrancePlayed = true
   }, [])
 
-  return animate.current
+  return animate
 }
 
 export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardProps>) {

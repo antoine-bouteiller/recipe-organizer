@@ -98,6 +98,9 @@ const viteConfig = defineConfig({
       'no-underscore-dangle': 'off',
       'max-nested-calls': 'off',
       'function-component-definition': 'off', // conflict with func-style
+
+      // nusery
+      'react-compiler': 'error',
     },
   },
   fmt: {

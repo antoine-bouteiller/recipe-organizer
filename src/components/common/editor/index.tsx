@@ -37,7 +37,7 @@ const LexicalErrorBoundary = ({ children }: { children: ReactNode }) => <>{child
 const EditorToolbarButton = ({ children, command }: { children: ReactNode; command: Command }) => {
   const [editor] = useLexicalComposerContext()
   const [isActive, setIsActive] = useState(false)
-  const [canExecute, setCanExecute] = useState(false)
+  const [canExecute, setCanExecute] = useState(command !== 'undo' && command !== 'redo')
 
   useEffect(() => {
     const formatCommands = new Set<TextFormatType>(['bold', 'italic', 'underline'])
@@ -75,7 +75,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
     const cleanups = [unregisterSelection, unregisterUpdate]
 
     if (command === 'undo') {
-      setCanExecute(false)
       cleanups.push(
         editor.registerCommand(
           CAN_UNDO_COMMAND,
@@ -87,7 +86,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
         )
       )
     } else if (command === 'redo') {
-      setCanExecute(false)
       cleanups.push(
         editor.registerCommand(
           CAN_REDO_COMMAND,
@@ -98,8 +96,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
           COMMAND_PRIORITY_LOW
         )
       )
-    } else {
-      setCanExecute(true)
     }
 
     return () => {
