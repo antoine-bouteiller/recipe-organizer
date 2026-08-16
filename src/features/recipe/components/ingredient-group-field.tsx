@@ -20,9 +20,11 @@ interface IngredientFormProps {
 
 const unitPickerItems = [{ label: 'Aucune', value: null }, ...unitOptions]
 
+const ingredientFormProps: IngredientFormProps = { addNewIngredientOption: () => null, groupIndex: 0, ingredientOptions: [] }
+
 export const IngredientGroupField = withForm({
   defaultValues: recipeDefaultValues,
-  props: {} as IngredientFormProps,
+  props: ingredientFormProps,
   render: ({ form, groupIndex, addNewIngredientOption, ingredientOptions }) => {
     const { AppField } = form
     const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)

@@ -40,7 +40,7 @@ const $createSubrecipeNode = (data: SubrecipeNodeData): SubrecipeNodeType =>
 const $isSubrecipeNode = (node: LexicalNode | null | undefined): node is SubrecipeNodeType => node instanceof SubrecipeNodeType
 
 const filterNodes = (state: string, hideFirstNodes: number, hideLastNodes: number): string => {
-  const parsedState = JSON.parse(state) as SerializedEditorState
+  const parsedState: SerializedEditorState = JSON.parse(state)
   const { children } = parsedState.root
   const totalNodes = children.length - 1
   const startIndex = hideFirstNodes ?? 0

@@ -15,10 +15,12 @@ interface FormModalProps {
   trigger?: ReactElement
 }
 
+const formModalProps: FormModalProps = { children: null, open: false, setOpen: () => undefined, submitLabel: '', title: '' }
+
 export const getFormDialog = <TValues,>(defaultValues: TValues) =>
   withForm({
     defaultValues,
-    props: {} as FormModalProps,
+    props: formModalProps,
     render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
       const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
 

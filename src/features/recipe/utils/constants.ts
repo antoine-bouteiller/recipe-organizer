@@ -12,7 +12,7 @@ export const CUISINE_TYPES = [
 
 export const MEALS = ['breakfast', 'lunch', 'diner', 'dessert'] as const satisfies readonly Meal[]
 
-export const CUISINE_TYPE_LABELS: Record<CuisineType, string> = {
+export const CUISINE_TYPE_LABELS = {
   chinese: 'Chinois',
   french: 'Français',
   indian: 'Indien',
@@ -20,14 +20,14 @@ export const CUISINE_TYPE_LABELS: Record<CuisineType, string> = {
   japanese: 'Japonais',
   mediterranean: 'Méditerranéen',
   mexican: 'Mexicain',
-}
+} satisfies Record<CuisineType, string>
 
-export const MEAL_LABELS: Record<Meal, string> = {
+export const MEAL_LABELS = {
   breakfast: 'Petit-déjeuner',
   dessert: 'Dessert',
   diner: 'Dîner',
   lunch: 'Déjeuner',
-}
+} satisfies Record<Meal, string>
 
 export const VEGETARIAN_LABEL = 'Végétarien'
 export const MAGIMIX_LABEL = 'Magimix'

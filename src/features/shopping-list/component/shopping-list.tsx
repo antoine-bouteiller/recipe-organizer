@@ -1,9 +1,9 @@
 import { BasketIcon } from '@phosphor-icons/react'
+import { ingredientCategory } from '@schema'
 
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { Skeleton } from '@/components/ui/skeleton'
 import { incrementalArray } from '@/utils/array'
-import { typedEntriesOf } from '@/utils/object'
 
 import { useShoppingList } from '../hooks/use-shopping-list'
 import { CartItem } from './cart-item'
@@ -24,7 +24,10 @@ export const ShoppingList = () => {
     ))
   }
 
-  const groups = typedEntriesOf(shoppingListIngredients)
+  const groups = Object.entries(shoppingListIngredients).flatMap(([key, ingredients]) => {
+    const category = ingredientCategory.find((item) => item === key)
+    return category && ingredients?.length ? [{ category, ingredients }] : []
+  })
 
   if (groups.length === 0) {
     return (
@@ -38,7 +41,7 @@ export const ShoppingList = () => {
     )
   }
 
-  return groups.map(([key, ingredients]) => (
+  return groups.map(({ category: key, ingredients }) => (
     <div key={key}>
       <h2 className="mb-2 flex items-center gap-1.5 px-1 text-[11px] font-semibold tracking-wider text-primary uppercase">
         {ingredientCategoryIcons[key]}

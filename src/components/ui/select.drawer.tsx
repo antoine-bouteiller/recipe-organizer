@@ -13,7 +13,10 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactE
 
   const handleSelect = (value: TValue | null) => {
     if (props.multiple) {
-      props.onValueChange(props.value.includes(value as TValue) ? props.value.filter((item) => item !== value) : [...props.value, value as TValue])
+      if (value === null) {
+        return
+      }
+      props.onValueChange(props.value.includes(value) ? props.value.filter((item) => item !== value) : [...props.value, value])
     } else {
       props.onValueChange(value)
       setOpen(false)

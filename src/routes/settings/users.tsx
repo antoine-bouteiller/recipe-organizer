@@ -16,10 +16,10 @@ import { BlockUser } from '@/features/users/components/block-user'
 
 const USER_TABS = ['active', 'pending', 'blocked'] as const
 
-const roleLabels: Record<string, string> = {
-  admin: 'Admin',
-  user: 'Utilisateur',
-}
+const roleLabels = new Map([
+  ['admin', 'Admin'],
+  ['user', 'Utilisateur'],
+])
 
 const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: string; status: 'active' | 'pending' | 'blocked' }) => {
   const { data: users } = useSuspenseQuery(getUserListOptions(status))
@@ -47,7 +47,7 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
             title={
               <>
                 <span className="text-nowrap text-ellipsis">{userItem.email}</span>
-                <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels[userItem.role]}</Badge>
+                <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels.get(userItem.role)}</Badge>
               </>
             }
           />

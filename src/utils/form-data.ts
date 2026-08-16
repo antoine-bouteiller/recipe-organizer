@@ -1,4 +1,8 @@
-export const objectToFormData = (object: Record<string, unknown>) => {
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
+
+type FormValue = File | JsonValue | undefined
+
+export const objectToFormData = (object: Record<string, FormValue>) => {
   const formData = new FormData()
   for (const [key, value] of Object.entries(object)) {
     if (value instanceof File) {
@@ -20,7 +24,7 @@ const isJsonString = (str: string): boolean => {
 }
 
 export const parseFormData = (formData: FormData) => {
-  const data: Record<string, unknown> = {}
+  const data: Record<string, FormValue> = {}
   for (const [key, value] of formData.entries()) {
     data[key] = typeof value === 'string' && isJsonString(value) ? JSON.parse(value) : value
   }

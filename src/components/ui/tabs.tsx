@@ -55,7 +55,16 @@ export const SwipeTabs = <TTab extends string>({ tabs, defaultTab, className, ch
 
   return (
     <SwipeTabsContext.Provider value={{ activeIndex, containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
-      <Tabs className={className} onValueChange={(value) => goTo(value as TTab)} value={activeTab}>
+      <Tabs
+        className={className}
+        onValueChange={(value) => {
+          const nextTab = tabs.find((tab) => tab === value)
+          if (nextTab) {
+            goTo(nextTab)
+          }
+        }}
+        value={activeTab}
+      >
         {children}
       </Tabs>
     </SwipeTabsContext.Provider>

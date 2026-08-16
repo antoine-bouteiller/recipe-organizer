@@ -5,13 +5,13 @@ import type React from 'react'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
 
-const TOAST_ICONS = {
-  error: WarningCircleIcon,
-  info: InfoIcon,
-  loading: CircleNotchIcon,
-  success: CheckCircleIcon,
-  warning: WarningIcon,
-} as const
+const TOAST_ICONS = new Map([
+  ['error', WarningCircleIcon],
+  ['info', InfoIcon],
+  ['loading', CircleNotchIcon],
+  ['success', CheckCircleIcon],
+  ['warning', WarningIcon],
+])
 
 type SwipeDirection = 'up' | 'down' | 'left' | 'right'
 
@@ -50,7 +50,7 @@ const Toasts = ({ position }: { position: ToastPosition }): React.ReactElement =
         data-slot="toast-viewport"
       >
         {toasts.map((toast) => {
-          const Icon = toast.type ? TOAST_ICONS[toast.type as keyof typeof TOAST_ICONS] : null
+          const Icon = toast.type ? (TOAST_ICONS.get(toast.type) ?? null) : null
 
           return (
             <Toast.Root

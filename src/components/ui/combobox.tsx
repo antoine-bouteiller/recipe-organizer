@@ -48,23 +48,20 @@ const Combobox = <TValue extends ValueOptions>({
   const isMobile = useIsMobile()
   const selectedOption = useMemo(() => options.find((opt) => opt.value === value), [options, value])
 
-  const Impl = (isMobile ? ComboboxDrawer : ComboboxBase) as unknown as (props: ComboboxImplProps<TValue>) => ReactElement
+  // Lazy boundaries erase the generic, so impls emit widened options: look the original typed option back up.
+  const implProps: ComboboxImplProps<ValueOptions> = {
+    addNew,
+    disabled,
+    isInvalid,
+    onChange: (option) => onChange(options.find((opt) => opt.value === option?.value) ?? null),
+    options,
+    placeholder,
+    searchPlaceholder,
+    selectedOption,
+    title: title ?? placeholder,
+  }
 
-  return (
-    <Suspense fallback={<ComboboxFallback />}>
-      <Impl
-        addNew={addNew}
-        disabled={disabled}
-        isInvalid={isInvalid}
-        onChange={onChange}
-        options={options}
-        placeholder={placeholder}
-        searchPlaceholder={searchPlaceholder}
-        selectedOption={selectedOption}
-        title={title ?? placeholder}
-      />
-    </Suspense>
-  )
+  return <Suspense fallback={<ComboboxFallback />}>{isMobile ? <ComboboxDrawer {...implProps} /> : <ComboboxBase {...implProps} />}</Suspense>
 }
 
 export { Combobox }

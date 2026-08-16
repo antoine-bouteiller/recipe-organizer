@@ -2,23 +2,26 @@ import * as v from 'valibot'
 
 export type Dimension = 'mass' | 'volume' | 'count' | 'length'
 
-export type UnitSlug =
-  | 'g'
-  | 'kg'
-  | 'ml'
-  | 'l'
-  | 'tbsp'
-  | 'tsp'
-  | 'piece'
-  | 'pinch'
-  | 'cube'
-  | 'bottle'
-  | 'sheet'
-  | 'box'
-  | 'can'
-  | 'handful'
-  | 'packet'
-  | 'cm'
+export const unitSlugs = [
+  'g',
+  'kg',
+  'ml',
+  'l',
+  'tbsp',
+  'tsp',
+  'piece',
+  'pinch',
+  'cube',
+  'bottle',
+  'sheet',
+  'box',
+  'can',
+  'handful',
+  'packet',
+  'cm',
+] as const
+
+export type UnitSlug = (typeof unitSlugs)[number]
 
 export interface Unit {
   readonly slug: UnitSlug
@@ -49,7 +52,7 @@ export const UNITS = {
 } as const satisfies Record<UnitSlug, Unit>
 /* eslint-enable id-length */
 
-export const unitSlugSchema = v.picklist(Object.keys(UNITS) as [UnitSlug, ...UnitSlug[]])
+export const unitSlugSchema = v.picklist(unitSlugs)
 
 export const unitOptions: { label: string; value: UnitSlug }[] = Object.values(UNITS).map((unit) => ({
   label: unit.name,

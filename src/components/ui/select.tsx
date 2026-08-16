@@ -30,7 +30,11 @@ const SelectDrawer = lazy(() => import('@/components/ui/select.drawer'))
 export const Select = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
   const isMobile = useIsMobile()
   const { displayLabel, isEmpty } = getSelectDisplay(props)
-  const Impl = (isMobile ? SelectDrawer : SelectBase) as unknown as (props: SelectProps<TValue>) => ReactElement
+  // Lazy boundaries erase the generic, so impls emit plain strings: map them back to typed option values.
+  const typedValue = (value: string | null): TValue | null => props.items.find((item) => item.value === value)?.value ?? null
+  const implProps: SelectProps<string> = props.multiple
+    ? { ...props, multiple: true, onValueChange: (values: string[]) => props.onValueChange(values.map(typedValue).filter((value) => value !== null)) }
+    : { ...props, multiple: false, onValueChange: (value: string | null) => props.onValueChange(typedValue(value)) }
 
   return (
     <Suspense
@@ -40,7 +44,7 @@ export const Select = <TValue extends string>(props: SelectProps<TValue>): React
         </SelectButton>
       }
     >
-      <Impl {...props} />
+      {isMobile ? <SelectDrawer {...implProps} /> : <SelectBase {...implProps} />}
     </Suspense>
   )
 }

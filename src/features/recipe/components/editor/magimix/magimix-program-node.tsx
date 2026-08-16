@@ -15,7 +15,7 @@ import {
 } from 'lexical'
 
 import { Item } from '@/components/ui/item'
-import { magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
+import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'
 
 import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
@@ -59,13 +59,16 @@ interface MagimixProgramComponentProps {
   time: number
 }
 
+const toProgram = (value: string) => magimixProgram.find((item) => item === value) ?? 'expert'
+const toRotationSpeed = (value: string) => allowedRotationSpeed.find((item) => item === value) ?? 'auto'
+
 const MagimixItem = ({ isEditable, program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'nodeKey'>) => (
   <Item
     variant="outline"
     render={isEditable ? <button /> : undefined}
     className="w-full"
     media={<img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />}
-    title={magimixProgramLabels[program as keyof typeof magimixProgramLabels]}
+    title={magimixProgramLabels[toProgram(program)]}
   >
     <TimerIcon className="size-4" />
     <span>{formatTime(time)}</span>/
@@ -81,8 +84,8 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
   const [editor] = useLexicalComposerContext()
 
   const formInitialValues: MagimixProgramFormInput = {
-    program: program as MagimixProgramFormInput['program'],
-    rotationSpeed: rotationSpeed as MagimixProgramFormInput['rotationSpeed'],
+    program: toProgram(program),
+    rotationSpeed: toRotationSpeed(rotationSpeed),
     temperature: temperature ?? undefined,
     timeMinutes: Math.floor(time / 60),
     timeSeconds: time % 60,

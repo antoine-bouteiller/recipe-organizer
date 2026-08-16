@@ -6,6 +6,7 @@ import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIA
 import { addRecentRecipe } from '@/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@/types/recipe'
 import { cn } from '@/utils/cn'
+import { staggerStyle } from '@/utils/stagger'
 
 interface RecipeSearchCardProps {
   recipe: ReducedRecipe
@@ -16,7 +17,7 @@ interface RecipeSearchCardProps {
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
   <div
     className="relative animate-in animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*45ms)] fade-in slide-in-from-bottom-2"
-    style={{ '--stagger': Math.min(index, 10) } as React.CSSProperties}
+    style={staggerStyle(index, 10)}
   >
     <Link
       className={cn('flex items-center gap-3 rounded-2xl border bg-card p-2.5', action && 'pr-14')}

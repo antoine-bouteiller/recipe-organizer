@@ -157,7 +157,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     onFilesChange?.(newFiles)
   }
 
-  const processFiles = (newFilesArray: File[]): { errors: string[]; validFiles: FileWithPreview[] } => {
+  const processFiles = (newFilesArray: File[]) => {
     const errors: string[] = []
     const validFiles: FileWithPreview[] = []
 
@@ -289,7 +289,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     event.preventDefault()
     event.stopPropagation()
 
-    if (event.currentTarget.contains(event.relatedTarget as Node)) {
+    if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
       return
     }
 

@@ -90,6 +90,9 @@ importers:
       '@commitlint/config-conventional':
         specifier: 21.2.2
         version: 21.2.2
+      '@oxlint/plugins':
+        specifier: 1.78.0
+        version: 1.78.0
       '@rolldown/plugin-babel':
         specifier: 0.2.3
         version: 0.2.3(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@7.29.7)(@voidzero-dev/vite-plus-core@0.2.9)(rolldown@1.1.0)
@@ -1978,6 +1981,10 @@ packages:
 
   '@oxlint/plugins@1.73.0':
     resolution: {integrity: sha512-OhgMQeMmZA0dcFcX4/priaJZWdFECxiClgq6mRX6aatZEcV9PbKC3P3/v8U1hVjviT1i5U+vR8lAtBV6m4FXAA==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+
+  '@oxlint/plugins@1.78.0':
+    resolution: {integrity: sha512-Ypt8KeRYw+4jUtlPirfcHWMrn5ms12VrrFPD+Mds477/7tJxG1Kcz2Yrg2nVcTQEUx/GdlhS+BUg1kmxNm04Ug==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
   '@phosphor-icons/react@2.1.10':
@@ -6019,6 +6026,8 @@ snapshots:
     optional: true
 
   '@oxlint/plugins@1.73.0': {}
+
+  '@oxlint/plugins@1.78.0': {}
 
   '@phosphor-icons/react@2.1.10(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:

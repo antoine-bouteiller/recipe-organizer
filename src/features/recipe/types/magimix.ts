@@ -27,7 +27,7 @@ export interface MagimixProgramData {
   time: number
 }
 
-export const magimixProgramLabels: Record<MagimixProgram, string> = {
+export const magimixProgramLabels = {
   'beaten-egg-white': 'Blanc en neige',
   'bread-brioche': 'Pain/Brioche',
   chocolate: 'Chocolat',
@@ -43,4 +43,4 @@ export const magimixProgramLabels: Record<MagimixProgram, string> = {
   smoothie: 'Smoothie',
   steam: 'Vapeur',
   'stir-fry': 'Rissolage',
-}
+} satisfies Record<MagimixProgram, string>

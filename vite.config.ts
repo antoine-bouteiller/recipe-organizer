@@ -18,6 +18,7 @@ const viteConfig = defineConfig({
   lint: {
     options: { typeAware: true, typeCheck: true },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
+    jsPlugins: [{ name: 'recipe-oranizer', specifier: './oxlint/index.ts' }],
     categories: {
       correctness: 'error',
       suspicious: 'error',
@@ -59,7 +60,6 @@ const viteConfig = defineConfig({
       'react-in-jsx-scope': 'off',
       'no-unneeded-ternary': 'off',
       'style-prop-object': 'off',
-      'no-unsafe-type-assertion': 'off',
       'react/jsx-no-constructed-context-values': 'off',
 
       // Pedantic
@@ -101,6 +101,14 @@ const viteConfig = defineConfig({
 
       // nusery
       'react-compiler': 'error',
+
+      'recipe-oranizer/no-conditional-empty-object-spread': 'error',
+      'recipe-oranizer/no-known-value-widening': 'error',
+      'recipe-oranizer/no-module-mocking': 'error',
+      'recipe-oranizer/no-object-parameters': 'error',
+      'recipe-oranizer/no-shape-in-symbol-names': 'error',
+      'recipe-oranizer/no-unknown-type-aliases': 'error',
+      'recipe-oranizer/no-unsafe-dictionary-type': 'error',
     },
   },
   fmt: {
@@ -162,7 +170,8 @@ const viteConfig = defineConfig({
     port: 3000,
   },
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'oxlint/**/*.test.ts'],
+    globals: true,
   },
 })
 

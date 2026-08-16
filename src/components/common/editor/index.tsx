@@ -40,15 +40,16 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
   const [canExecute, setCanExecute] = useState(command !== 'undo' && command !== 'redo')
 
   useEffect(() => {
-    const formatCommands = new Set<TextFormatType>(['bold', 'italic', 'underline'])
+    const formatCommands: TextFormatType[] = ['bold', 'italic', 'underline']
 
     const updateActiveState = () => {
       const selection = $getSelection()
       if (!$isRangeSelection(selection)) {
         return
       }
-      if (formatCommands.has(command as TextFormatType)) {
-        setIsActive(selection.hasFormat(command as TextFormatType))
+      const format = formatCommands.find((formatCommand) => formatCommand === command)
+      if (format) {
+        setIsActive(selection.hasFormat(format))
       } else if (command === 'bulletList') {
         const anchorNode = selection.anchor.getNode()
         const element = anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()

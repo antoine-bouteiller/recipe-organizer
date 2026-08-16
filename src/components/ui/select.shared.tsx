@@ -51,11 +51,10 @@ export const SelectButton = ({ className, size, render, children, ...props }: Se
   })
 }
 
-export const getSelectDisplay = <TValue extends string>(
-  props: SelectProps<TValue>
-): { displayLabel: string; isEmpty: boolean; isSelected: (value: string | null) => boolean } => {
+export const getSelectDisplay = <TValue extends string>(props: SelectProps<TValue>) => {
   const { items, placeholder = 'Sélectionner' } = props
-  const isSelected = (value: string | null): boolean => (props.multiple ? props.value.includes(value as TValue) : (props.value ?? null) === value)
+  const isSelected = (value: string | null): boolean =>
+    props.multiple ? props.value.some((item) => item === value) : (props.value ?? null) === value
   const selectedLabels = items.filter((item) => isSelected(item.value)).map((item) => item.label)
   const isEmpty = selectedLabels.length === 0
   const displayLabel = isEmpty ? placeholder : selectedLabels[0] + (selectedLabels.length > 1 ? ` (+${selectedLabels.length - 1})` : '')

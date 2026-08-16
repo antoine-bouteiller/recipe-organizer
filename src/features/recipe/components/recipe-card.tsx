@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'
 import { cn } from '@/utils/cn'
+import { staggerStyle } from '@/utils/stagger'
 
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '../utils/constants'
 import { QuantityControls } from './quantity-controls'
@@ -39,7 +40,7 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
 
   return (
     <div
-      style={animate ? ({ '--stagger': Math.min(index, 6) } as React.CSSProperties) : undefined}
+      style={animate ? staggerStyle(index, 6) : undefined}
       className={cn(
         'rounded-[30px] bg-white/5 p-[3px] shadow-lg ring-1 shadow-primary/10 ring-black/5 transition-transform duration-200 ease-out-snappy has-[a:hover]:-translate-y-0.5 has-[a:active]:scale-[0.99] dark:ring-white/10',
         animate &&

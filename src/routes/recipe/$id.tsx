@@ -70,7 +70,7 @@ const RecipePage = () => {
     recipe.isMagimix && MAGIMIX_LABEL,
     ...recipe.meals.map((meal) => MEAL_LABELS[meal]),
     ...recipe.cuisineTypes.map((cuisineType) => CUISINE_TYPE_LABELS[cuisineType]),
-  ].filter(Boolean) as string[]
+  ].filter((tag) => tag !== false)
 
   return (
     <ScreenLayout

@@ -37,9 +37,11 @@ interface RecipeFormProps extends Record<string, unknown> {
   ingredientOptions: Option<number>[]
 }
 
+const recipeFormProps: RecipeFormProps = { addNewIngredientOption: () => null, ingredientOptions: [] }
+
 export const RecipeForm = withForm({
   defaultValues: recipeDefaultValues,
-  props: {} as RecipeFormProps,
+  props: recipeFormProps,
   render: ({ form, initialImage, initialVideo, id, addNewIngredientOption, ingredientOptions }) => {
     const { AppField, Field } = form
 
