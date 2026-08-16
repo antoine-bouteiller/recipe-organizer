@@ -67,7 +67,7 @@
     "serwist": "9.5.12",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
-    "vite-plus": "0.2.8",
+    "vite-plus": "0.2.9",
     "wrangler": "4.123.0"
   },
   "overrides": {
