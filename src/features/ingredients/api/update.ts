@@ -2,7 +2,7 @@ import { ingredient } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq } from 'drizzle-orm'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/lib/auth/auth-guard'
@@ -13,9 +13,9 @@ import { withServerError } from '@/utils/error-handler'
 
 import { ingredientSchema } from './create'
 
-const updateIngredientSchema = v.object({ ...ingredientSchema.entries, id: v.number() })
+const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
 
-type UpdateIngredientFormValues = v.InferOutput<typeof updateIngredientSchema>
+type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
 export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
 
 const updateIngredient = createServerFn()

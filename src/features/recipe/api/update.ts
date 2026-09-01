@@ -3,7 +3,7 @@ import { mutationOptions } from '@tanstack/react-query'
 import { notFound } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
 import { recipeSchema } from '@/features/recipe/api/create'
@@ -19,9 +19,9 @@ import { parseFormData } from '@/utils/form-data'
 import { getTitle } from '../utils/get-recipe-title'
 import { resolveAutoFlags, writeRecipeIngredientGraph } from '../utils/recipe-write.server'
 
-const updateRecipeSchema = v.object({ ...recipeSchema.entries, id: v.number() })
+const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
 
-type UpdateRecipeFormValues = v.InferOutput<typeof updateRecipeSchema>
+type UpdateRecipeFormValues = z.infer<typeof updateRecipeSchema>
 type UpdateRecipeFormInput = Partial<UpdateRecipeFormValues>
 
 const resolveImageKey = async (
@@ -51,7 +51,7 @@ const updateRecipe = createServerFn({
   method: 'POST',
 })
   .middleware([authGuard()])
-  .validator((formData: FormData) => v.parse(updateRecipeSchema, parseFormData(formData)))
+  .validator((formData: FormData) => updateRecipeSchema.parse(parseFormData(formData)))
   .handler(
     withServerError(async ({ data, context }) => {
       const { cuisineTypes, id, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data

@@ -2,7 +2,7 @@ import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } f
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
 import { eq, inArray } from 'drizzle-orm'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { authGuard } from '@/lib/auth/auth-guard'
 import { getDb } from '@/lib/db'
@@ -11,7 +11,7 @@ import { deleteFile } from '@/lib/r2'
 import { assertOwnerOrAdmin } from '@/utils/assert-owner-or-admin'
 import { withServerError } from '@/utils/error-handler'
 
-const deleteRecipeSchema = v.number()
+const deleteRecipeSchema = z.number()
 
 const deleteRecipe = createServerFn({
   method: 'POST',

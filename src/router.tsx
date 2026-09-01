@@ -1,12 +1,10 @@
 import { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { DefaultErrorComponent } from '@/components/error/default-error-component'
 import { NotFound } from '@/components/error/not-found'
-
-import '@valibot/i18n/fr'
 
 import { routeTree } from './routeTree.gen'
 
@@ -18,7 +16,7 @@ declare module '@tanstack/react-router' {
 
 const MAX_AGE = 1000 * 60 * 60 * 24 // 24 hours
 
-v.setGlobalConfig({ lang: 'fr' })
+z.config(z.locales.fr())
 
 export const getRouter = () => {
   const queryClient = new QueryClient({

@@ -1,7 +1,6 @@
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type JSX } from 'react'
-import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { createUserOptions, userSchema } from '@/features/users/api/create'
@@ -23,7 +22,7 @@ export const AddUser = ({ children }: AddUserProps) => {
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
-          data: v.parse(userSchema, value),
+          data: userSchema.parse(value),
         },
         {
           onSuccess: () => {

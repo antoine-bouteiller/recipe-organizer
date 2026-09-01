@@ -2,7 +2,6 @@ import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type JSX } from 'react'
-import * as v from 'valibot'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
 import { Button } from '@/components/ui/button'
@@ -26,7 +25,7 @@ export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) =>
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(
         {
-          data: v.parse(ingredientSchema, value),
+          data: ingredientSchema.parse(value),
         },
         {
           onSuccess: () => {

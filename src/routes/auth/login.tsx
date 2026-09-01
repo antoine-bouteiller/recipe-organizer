@@ -1,7 +1,7 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -9,7 +9,7 @@ import { toastManager } from '@/components/ui/toast'
 import { authClient } from '@/lib/auth/auth-client'
 import { loadAuthUser, resetAuthUserCache } from '@/lib/auth/get-auth-user'
 
-const searchSchema = v.object({ error: v.optional(v.string()) })
+const searchSchema = z.object({ error: z.string().optional() })
 
 const signInWithGoogle = () =>
   authClient.signIn.social({
@@ -69,5 +69,5 @@ export const Route = createFileRoute('/auth/login')({
     }
   },
   component: LoginPage,
-  validateSearch: (search) => v.parse(searchSchema, search),
+  validateSearch: (search) => searchSchema.parse(search),
 })

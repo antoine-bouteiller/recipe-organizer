@@ -1,7 +1,7 @@
 import { user } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/lib/auth/auth-guard'
@@ -10,12 +10,12 @@ import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
 
-const userSchema = v.object({
-  email: v.pipe(v.string(), v.email()),
-  role: v.picklist(['user', 'admin']),
+const userSchema = z.object({
+  email: z.email(),
+  role: z.enum(['user', 'admin']),
 })
 
-type UserFormValues = v.InferOutput<typeof userSchema>
+type UserFormValues = z.infer<typeof userSchema>
 export type UserFormInput = Partial<UserFormValues>
 
 const createUser = createServerFn()
