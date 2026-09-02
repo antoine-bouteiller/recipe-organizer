@@ -2,5 +2,5 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
   "entry": ["src/sw.ts", "src/**/*.test.ts", "oxlint/**/*.test.ts"],
-  "ignoreDependencies": ["cloudflare", "@commitlint/cli", "lefthook", "oxlint", "@vitejs/devtools"]
+  "ignoreDependencies": ["cloudflare", "@commitlint/cli", "oxlint", "@oxlint/plugins", "@vitejs/devtools"]
 }

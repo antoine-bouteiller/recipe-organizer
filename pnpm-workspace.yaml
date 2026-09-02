@@ -6,3 +6,7 @@ allowBuilds:
 
 overrides:
   vite: 'npm:@voidzero-dev/vite-plus-core@latest'
+
+publicHoistPattern:
+  - 'oxlint'
+  - '@oxlint/plugins'
