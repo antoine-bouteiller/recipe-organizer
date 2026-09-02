@@ -77,5 +77,5 @@ const RouteComponent = () => <IngredientsManagement />
 
 export const Route = createFileRoute('/settings/ingredients')({
   component: RouteComponent,
-  loader: ({ context }) => context.queryClient.ensureQueryData(getIngredientListOptions()),
+  loader: ({ context }) => context.queryClient.query({ ...getIngredientListOptions(), staleTime: 'static' }),
 })

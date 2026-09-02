@@ -69,7 +69,7 @@ const RecipeList = () => {
 export const Route = createFileRoute('/')({
   component: RecipeList,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(getRecipeListOptions())
+    await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
   },
   pendingComponent: RecipeListSkeleton,
   ssr: 'data-only',

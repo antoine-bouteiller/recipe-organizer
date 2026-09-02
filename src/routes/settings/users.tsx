@@ -110,8 +110,8 @@ export const Route = createFileRoute('/settings/users')({
   },
   component: RouteComponent,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(getUserListOptions('active'))
-    await context.queryClient.ensureQueryData(getUserListOptions('blocked'))
-    await context.queryClient.ensureQueryData(getUserListOptions('pending'))
+    await context.queryClient.query({ ...getUserListOptions('active'), staleTime: 'static' })
+    await context.queryClient.query({ ...getUserListOptions('blocked'), staleTime: 'static' })
+    await context.queryClient.query({ ...getUserListOptions('pending'), staleTime: 'static' })
   },
 })
