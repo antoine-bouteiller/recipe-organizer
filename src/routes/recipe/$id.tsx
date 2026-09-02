@@ -171,7 +171,7 @@ export const Route = createFileRoute('/recipe/$id')({
     }
     const { id } = result.output
 
-    await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
+    await context.queryClient.query({ ...getRecipeDetailsOptions(id), staleTime: 'static' })
 
     return { id }
   },

@@ -118,7 +118,7 @@ const SearchSkeleton = () => (
 export const Route = createFileRoute('/search')({
   component: SearchPage,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(getRecipeListOptions())
+    await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
   },
   pendingComponent: SearchSkeleton,
   ssr: 'data-only',

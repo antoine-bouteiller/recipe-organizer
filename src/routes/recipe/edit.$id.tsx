@@ -147,9 +147,9 @@ export const Route = createFileRoute('/recipe/edit/$id')({
       throw new Error(result.issues[0]?.message ?? 'Invalid id')
     }
     const { id } = result.output
-    await context.queryClient.ensureQueryData(getRecipeDetailsOptions(id))
-    await context.queryClient.ensureQueryData(getIngredientListOptions())
-    await context.queryClient.ensureQueryData(getRecipeListOptions())
+    await context.queryClient.query({ ...getRecipeDetailsOptions(id), staleTime: 'static' })
+    await context.queryClient.query({ ...getIngredientListOptions(), staleTime: 'static' })
+    await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
 
     return { id }
   },
