@@ -28,19 +28,17 @@ const getAllRecipes = createServerFn({
       },
     })
 
-    return rows.map(
-      (row): ReducedRecipe => ({
-        cuisineTypes: row.cuisineTypes ?? [],
-        id: row.id,
-        image: getImageUrl(row.image),
-        isMagimix: row.isMagimix,
-        isSpice: row.isSpice,
-        isVegetarian: row.isVegetarian,
-        meals: row.meals ?? [],
-        name: row.name,
-        servings: row.servings,
-      })
-    )
+    return rows.map((row): ReducedRecipe => ({
+      cuisineTypes: row.cuisineTypes ?? [],
+      id: row.id,
+      image: getImageUrl(row.image),
+      isMagimix: row.isMagimix,
+      isSpice: row.isSpice,
+      isVegetarian: row.isVegetarian,
+      meals: row.meals ?? [],
+      name: row.name,
+      servings: row.servings,
+    }))
   })
 )
 
