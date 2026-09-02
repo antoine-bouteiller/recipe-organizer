@@ -1,9 +1,9 @@
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox'
+import { cn } from 'cn'
 import type React from 'react'
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { useFieldContext } from '@/hooks/use-form-context'
-import { cn } from '@/utils/cn'
 
 const Checkbox = ({ className, ...props }: CheckboxPrimitive.Root.Props): React.ReactElement => (
   <CheckboxPrimitive.Root

@@ -1,7 +1,7 @@
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
+import { cn } from 'cn'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/utils/cn'
 
 export const Drawer = (props: DrawerPrimitive.Root.Props): React.ReactElement => <DrawerPrimitive.Root swipeDirection="down" {...props} />
 

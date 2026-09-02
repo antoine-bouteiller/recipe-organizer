@@ -1,12 +1,12 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
 import { CaretUpDownIcon, XIcon } from '@phosphor-icons/react'
+import { cn } from 'cn'
 import React, { useState, type ReactElement } from 'react'
 
 import { type ComboboxImplProps, type ValueOptions } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { type Option } from '@/hooks/use-options'
-import { cn } from '@/utils/cn'
 
 const ComboboxContext: React.Context<{
   chipsRef: React.RefObject<Element | null> | null

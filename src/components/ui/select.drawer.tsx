@@ -1,10 +1,10 @@
 import { CheckIcon } from '@phosphor-icons/react'
+import { cn } from 'cn'
 import { useState, type ReactElement } from 'react'
 
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { type SelectProps } from '@/components/ui/select'
 import { getSelectDisplay, SelectButton } from '@/components/ui/select.shared'
-import { cn } from '@/utils/cn'
 
 const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
   const { items, placeholder = 'Sélectionner', title, disabled, className } = props

@@ -1,7 +1,6 @@
 import { Separator as SeparatorPrimitive } from '@base-ui/react/separator'
+import { cn } from 'cn'
 import type React from 'react'
-
-import { cn } from '@/utils/cn'
 
 export const Separator = ({ className, orientation = 'horizontal', ...props }: SeparatorPrimitive.Props): React.ReactElement => (
   <SeparatorPrimitive

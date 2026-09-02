@@ -1,11 +1,11 @@
 import { Link } from '@tanstack/react-router'
+import { cn } from 'cn'
 import { type ReactNode } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/utils/constants'
 import { addRecentRecipe } from '@/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@/types/recipe'
-import { cn } from '@/utils/cn'
 import { staggerStyle } from '@/utils/stagger'
 
 interface RecipeSearchCardProps {

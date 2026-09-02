@@ -1,4 +1,4 @@
-import { cn } from '@/utils/cn'
+import { cn } from 'cn'
 
 export const Kbd = ({ className, ...props }: React.ComponentProps<'kbd'>): React.ReactElement => (
   <kbd

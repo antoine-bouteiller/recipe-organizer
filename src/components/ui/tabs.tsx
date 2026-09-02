@@ -1,8 +1,8 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
+import { cn } from 'cn'
 import React, { Children, cloneElement, createContext, isValidElement, useContext } from 'react'
 
 import { useSwipeTabs } from '@/hooks/use-swipe-tabs'
-import { cn } from '@/utils/cn'
 
 const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props): React.ReactElement => (
   <TabsPrimitive.Root className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)} data-slot="tabs" {...props} />

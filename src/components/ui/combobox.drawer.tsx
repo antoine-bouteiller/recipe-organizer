@@ -1,4 +1,5 @@
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
+import { cn } from 'cn'
 import { useMemo, useState, type ReactElement } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -6,7 +7,6 @@ import { type ComboboxImplProps, type ValueOptions } from '@/components/ui/combo
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/utils/cn'
 
 const ComboboxDrawer = <TValue extends ValueOptions>({
   addNew,

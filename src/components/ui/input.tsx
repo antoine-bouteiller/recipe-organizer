@@ -1,6 +1,5 @@
 import { Input as InputPrimitive } from '@base-ui/react/input'
-
-import { cn } from '@/utils/cn'
+import { cn } from 'cn'
 
 export type InputProps = Omit<InputPrimitive.Props & React.RefAttributes<HTMLInputElement>, 'size' | 'style'> & {
   size?: 'sm' | 'default' | 'lg' | number

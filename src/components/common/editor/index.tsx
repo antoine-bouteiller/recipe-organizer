@@ -8,6 +8,7 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
+import { cn } from 'cn'
 import {
   $getSelection,
   $isRangeSelection,
@@ -26,7 +27,6 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 
 import { Toggle } from '@/components/ui/toggle'
 import { ToolbarButton } from '@/components/ui/toolbar'
-import { cn } from '@/utils/cn'
 
 import { OnChangePlugin } from './plugins/on-change-plugin'
 

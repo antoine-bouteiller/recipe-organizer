@@ -1,6 +1,5 @@
+import { cn } from 'cn'
 import type React from 'react'
-
-import { cn } from '@/utils/cn'
 
 export const Skeleton = ({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (
   <div

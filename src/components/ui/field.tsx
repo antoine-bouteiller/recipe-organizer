@@ -1,7 +1,6 @@
 import { Field as FieldPrimitive } from '@base-ui/react/field'
+import { cn } from 'cn'
 import type React from 'react'
-
-import { cn } from '@/utils/cn'
 
 export const Field = ({ className, ...props }: FieldPrimitive.Root.Props): React.ReactElement => (
   <FieldPrimitive.Root className={cn('flex flex-col items-start gap-2 w-full', className)} data-slot="field" {...props} />

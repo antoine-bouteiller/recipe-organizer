@@ -1,8 +1,8 @@
 import { MinusIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { cn } from 'cn'
 
 import { Button } from '@/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
-import { cn } from '@/utils/cn'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'

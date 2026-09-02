@@ -1,11 +1,11 @@
 import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomplete'
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { cn } from 'cn'
 import React from 'react'
 
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { cn } from '@/utils/cn'
 
 const Autocomplete: typeof AutocompletePrimitive.Root = AutocompletePrimitive.Root
 

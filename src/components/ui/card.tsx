@@ -1,6 +1,5 @@
+import { cn } from 'cn'
 import { type ReactElement, type ReactNode } from 'react'
-
-import { cn } from '@/utils/cn'
 
 interface CardProps {
   title?: ReactNode

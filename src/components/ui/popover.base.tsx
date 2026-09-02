@@ -1,8 +1,8 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
+import { cn } from 'cn'
 import { type ReactElement } from 'react'
 
 import { type PopoverProps } from '@/components/ui/popover'
-import { cn } from '@/utils/cn'
 
 const PopoverRoot = PopoverPrimitive.Root
 

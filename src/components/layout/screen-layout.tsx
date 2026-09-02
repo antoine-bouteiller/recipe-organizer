@@ -1,9 +1,9 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { useRouter } from '@tanstack/react-router'
+import { cn } from 'cn'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { cn } from '@/utils/cn'
 
 import { TabBar } from '../navigation/tabbar'
 

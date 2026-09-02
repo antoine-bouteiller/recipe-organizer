@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
+import { cn } from 'cn'
 import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { type ReducedRecipe } from '@/types/recipe'
-import { cn } from '@/utils/cn'
 import { staggerStyle } from '@/utils/stagger'
 
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '../utils/constants'

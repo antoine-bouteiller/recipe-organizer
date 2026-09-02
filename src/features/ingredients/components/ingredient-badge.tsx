@@ -1,6 +1,7 @@
+import { cn } from 'cn'
+
 import { Badge } from '@/components/ui/badge'
 import { type IngredientCategory } from '@/types/ingredient'
-import { cn } from '@/utils/cn'
 
 const categoryStyles = {
   fish: 'bg-blue-200 text-blue-600',

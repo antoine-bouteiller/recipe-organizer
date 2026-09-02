@@ -1,8 +1,8 @@
+import { cn } from 'cn'
 import { lazy, Suspense, type ReactElement } from 'react'
 
 import { getSelectDisplay, SelectButton, type SelectButtonProps } from '@/components/ui/select.shared'
 import { useIsMobile } from '@/hooks/use-is-mobile'
-import { cn } from '@/utils/cn'
 
 interface SelectOption<TValue extends string> {
   label: string

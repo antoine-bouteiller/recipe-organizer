@@ -1,10 +1,10 @@
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react'
+import { cn } from 'cn'
 import { type ReactElement } from 'react'
 
 import { type SelectProps } from '@/components/ui/select'
 import { getSelectDisplay, selectTriggerIconClassName, selectTriggerVariants } from '@/components/ui/select.shared'
-import { cn } from '@/utils/cn'
 
 const SelectRoot = SelectPrimitive.Root
 
