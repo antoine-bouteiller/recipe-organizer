@@ -174,14 +174,14 @@ const viteConfig = defineConfig({
     },
   },
   plugins: [
+    devtools({
+      injectSource: { enabled: false },
+    }),
     tanstackStart(),
     react({ compiler: true }),
     ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),
     tailwindcss(),
     tanstackSerwistPlugin(),
-    devtools({
-      injectSource: { enabled: false },
-    }),
   ],
   server: {
     port: 3000,
