@@ -77,7 +77,7 @@ handlers.
 `objectToFormData` appends `File` values unchanged, skips nullish values, and JSON-stringifies other
 values (`src/utils/form-data.ts:1-11`). `parseFormData` reverses JSON only for parseable string
 entries and retains non-string values (`src/utils/form-data.ts:13-28`). A handler passes the parsed
-object to its Valibot schema before it treats data as domain input.
+object to its Zod schema before it treats data as domain input.
 
 ### 8.3 Authorization and ownership contract
 

@@ -1,7 +1,7 @@
 import { ingredient, ingredientCategory, unitSlugSchema } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
 import { createServerFn } from '@tanstack/react-start'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
 import { authGuard } from '@/lib/auth/auth-guard'
@@ -10,16 +10,16 @@ import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
 import { withServerError } from '@/utils/error-handler'
 
-const ingredientSchema = v.object({
-  category: v.picklist(ingredientCategory),
-  countWeightG: v.optional(v.nullable(v.pipe(v.number(), v.minValue(0)))),
-  densityGPerMl: v.optional(v.nullable(v.pipe(v.number(), v.minValue(0)))),
-  name: v.pipe(v.string(), v.minLength(2)),
-  parentId: v.optional(v.number()),
-  preferredUnitSlug: v.optional(v.nullable(unitSlugSchema)),
+const ingredientSchema = z.object({
+  category: z.enum(ingredientCategory),
+  countWeightG: z.number().min(0).nullable().optional(),
+  densityGPerMl: z.number().min(0).nullable().optional(),
+  name: z.string().min(2),
+  parentId: z.number().optional(),
+  preferredUnitSlug: unitSlugSchema.nullable().optional(),
 })
 
-type IngredientFormValues = v.InferOutput<typeof ingredientSchema>
+type IngredientFormValues = z.infer<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>
 
 const createIngredient = createServerFn()

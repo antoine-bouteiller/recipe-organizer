@@ -75,7 +75,7 @@ desktop navigation, outlet, and scripts (`src/routes/__root.tsx:41-93`).
 
 ### 8.2 Page-route contract
 
-A page route declares its file-route path, optional `beforeLoad` gate, optional Valibot
+A page route declares its file-route path, optional `beforeLoad` gate, optional Zod
 `validateSearch`, and a loader that awaits `context.queryClient.ensureQueryData(options)`. The home
 route demonstrates validated search input and list prefetch (`src/routes/index.tsx:70-83`); dynamic
 routes parse their segment and return typed loader data for the component. A settings route redirects
@@ -94,7 +94,7 @@ that redirect and uses route context only to choose presentation affordances. Ad
 uses an additional role gate at the matching route, while Worker handlers make the final access
 decision under [`../server/auth.spec.md`](../server/auth.spec.md).
 
-Search state is parsed through a route-local Valibot schema. Invalid input fails before the screen
+Search state is parsed through a route-local Zod schema. Invalid input fails before the screen
 receives it; valid output is the sole search-state surface for that screen. Dynamic segments follow
 the same rule: parse the path parameter in the loader, prefetch with the parsed identifier, and
 return the typed identifier as loader data. URL strings therefore never become implicit feature IDs.
