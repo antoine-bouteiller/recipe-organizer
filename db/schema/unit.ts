@@ -1,4 +1,4 @@
-import * as v from 'valibot'
+import * as z from 'zod'
 
 export type Dimension = 'mass' | 'volume' | 'count' | 'length'
 
@@ -52,7 +52,7 @@ export const UNITS = {
 } as const satisfies Record<UnitSlug, Unit>
 /* eslint-enable id-length */
 
-export const unitSlugSchema = v.picklist(unitSlugs)
+export const unitSlugSchema = z.enum(unitSlugs)
 
 export const unitOptions: { label: string; value: UnitSlug }[] = Object.values(UNITS).map((unit) => ({
   label: unit.name,

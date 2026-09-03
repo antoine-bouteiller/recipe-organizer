@@ -1,11 +1,11 @@
-import { ValiError } from 'valibot'
+import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
 
 export const toastError = (message: string, error?: unknown) => {
-  if (error instanceof ValiError) {
+  if (error instanceof z.ZodError) {
     toastManager.add({
-      description: error.message,
+      description: z.prettifyError(error),
       title: message,
       type: 'error',
     })

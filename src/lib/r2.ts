@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { notFound } from '@tanstack/react-router'
 import { env } from 'cloudflare:workers'
-import * as v from 'valibot'
+import * as z from 'zod'
 
 import { cache } from './cache-manager'
 
@@ -41,12 +41,12 @@ const deleteFile = async (key: string) => {
   await env.R2_BUCKET.delete(key)
 }
 
-const paramsSchema = v.object({ id: v.string() })
+const paramsSchema = z.object({ id: z.string() })
 
 export const createR2GetHandler =
   (defaultContentType: string) =>
   ({ params, request }: { params: unknown; request: Request }) => {
-    const { id } = v.parse(paramsSchema, params)
+    const { id } = paramsSchema.parse(params)
 
     return cache.getWithCache(request.url)(async () => {
       const file = await env.R2_BUCKET.get(id)
@@ -67,7 +67,7 @@ export const createR2GetHandler =
 export const createR2HeadHandler =
   (defaultContentType: string) =>
   ({ params, request }: { params: unknown; request: Request }) => {
-    const { id } = v.parse(paramsSchema, params)
+    const { id } = paramsSchema.parse(params)
 
     return cache.getWithCache(request.url)(async () => {
       const file = await env.R2_BUCKET.head(id)
