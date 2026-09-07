@@ -1,20 +1,18 @@
-import { $isListNode, INSERT_UNORDERED_LIST_COMMAND, ListItemNode, ListNode, REMOVE_LIST_COMMAND } from '@lexical/list'
-import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
-import { LexicalComposer, type InitialConfigType } from '@lexical/react/LexicalComposer'
+import { HistoryExtension } from '@lexical/history'
+import { $isListNode, CheckListExtension, INSERT_UNORDERED_LIST_COMMAND, ListNode, REMOVE_LIST_COMMAND } from '@lexical/list'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
-import { ListPlugin } from '@lexical/react/LexicalListPlugin'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { LexicalExtensionComposer } from '@lexical/react/LexicalExtensionComposer'
+import { useExtensionSignalValue } from '@lexical/react/useExtensionSignalValue'
+import { RichTextExtension } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
 import { cn } from 'cn'
 import {
   $getSelection,
   $isRangeSelection,
-  CAN_REDO_COMMAND,
-  CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_LOW,
+  configExtension,
+  defineExtension,
   FORMAT_TEXT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
@@ -23,7 +21,7 @@ import {
   type LexicalNode,
   type TextFormatType,
 } from 'lexical'
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 
 import { Toggle } from '@/components/ui/toggle'
 import { ToolbarButton } from '@/components/ui/toolbar'
@@ -32,12 +30,12 @@ import { OnChangePlugin } from './plugins/on-change-plugin'
 
 type Command = 'bold' | 'bulletList' | 'italic' | 'redo' | 'underline' | 'undo'
 
-const LexicalErrorBoundary = ({ children }: { children: ReactNode }) => <>{children}</>
-
 const EditorToolbarButton = ({ children, command }: { children: ReactNode; command: Command }) => {
   const [editor] = useLexicalComposerContext()
   const [isActive, setIsActive] = useState(false)
-  const [canExecute, setCanExecute] = useState(command !== 'undo' && command !== 'redo')
+  const canUndo = useExtensionSignalValue(HistoryExtension, 'canUndo')
+  const canRedo = useExtensionSignalValue(HistoryExtension, 'canRedo')
+  const canExecute = (command !== 'undo' || canUndo) && (command !== 'redo' || canRedo)
 
   useEffect(() => {
     const formatCommands: TextFormatType[] = ['bold', 'italic', 'underline']
@@ -73,36 +71,9 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
       })
     })
 
-    const cleanups = [unregisterSelection, unregisterUpdate]
-
-    if (command === 'undo') {
-      cleanups.push(
-        editor.registerCommand(
-          CAN_UNDO_COMMAND,
-          (payload) => {
-            setCanExecute(payload)
-            return false
-          },
-          COMMAND_PRIORITY_LOW
-        )
-      )
-    } else if (command === 'redo') {
-      cleanups.push(
-        editor.registerCommand(
-          CAN_REDO_COMMAND,
-          (payload) => {
-            setCanExecute(payload)
-            return false
-          },
-          COMMAND_PRIORITY_LOW
-        )
-      )
-    }
-
     return () => {
-      for (const cleanup of cleanups) {
-        cleanup()
-      }
+      unregisterSelection()
+      unregisterUpdate()
     }
   }, [editor, command])
 
@@ -159,14 +130,14 @@ interface EditorProps {
 }
 
 const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: EditorProps) => {
-  const allNodes = useMemo(() => [HeadingNode, QuoteNode, ListNode, ListItemNode, ...(extraNodes ?? [])], [extraNodes])
-
-  const initialConfig = useMemo<InitialConfigType>(
-    () => ({
+  const [extension, ,] = useState(() =>
+    defineExtension({
+      $initialEditorState: content,
+      dependencies: [RichTextExtension, CheckListExtension, configExtension(HistoryExtension, { delay: 1000 })],
       editable: !readOnly,
-      editorState: content,
+      name: 'RecipeEditor',
       namespace: 'RecipeEditor',
-      nodes: allNodes,
+      nodes: [...(extraNodes ?? [])],
       onError: (error: Error) => {
         throw error
       },
@@ -178,18 +149,14 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
           underline: 'underline',
         },
       },
-    }),
-    [readOnly, allNodes, content]
+    })
   )
 
   return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <ListPlugin />
-      <CheckListPlugin />
-      <HistoryPlugin />
+    <LexicalExtensionComposer extension={extension} contentEditable={null}>
       {onChange && <OnChangePlugin onChange={onChange} />}
       {children}
-    </LexicalComposer>
+    </LexicalExtensionComposer>
   )
 }
 
@@ -203,20 +170,14 @@ const EditorContent = ({ className, disabled }: EditorContentProps) => {
   const isEditable = editor.isEditable()
 
   return (
-    <RichTextPlugin
-      contentEditable={
-        <ContentEditable
-          aria-disabled={disabled}
-          className={cn(
-            'focus:outline-none prose prose-sm max-w-none dark:prose-invert',
-            isEditable &&
-              'w-full rounded-lg border border-input bg-background bg-clip-padding p-4 shadow-xs ring-ring/24 transition-shadow not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:border-ring has-focus-visible:ring-[3px] has-disabled:opacity-64 has-aria-invalid:border-destructive/36 has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)] dark:has-aria-invalid:ring-destructive/24',
-            className
-          )}
-        />
-      }
-      ErrorBoundary={LexicalErrorBoundary}
-      placeholder={null}
+    <ContentEditable
+      aria-disabled={disabled}
+      className={cn(
+        'focus:outline-none prose prose-sm max-w-none dark:prose-invert',
+        isEditable &&
+          'w-full rounded-lg border border-input bg-background bg-clip-padding p-4 shadow-xs ring-ring/24 transition-shadow not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:border-ring has-focus-visible:ring-[3px] has-disabled:opacity-64 has-aria-invalid:border-destructive/36 has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)] dark:has-aria-invalid:ring-destructive/24',
+        className
+      )}
     />
   )
 }
