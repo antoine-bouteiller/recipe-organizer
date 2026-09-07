@@ -1,5 +1,4 @@
-import { VideoIcon, XIcon } from '@phosphor-icons/react'
-
+import { VideoIcon, XIcon } from '@/components/icons'
 import { Field, FieldControl, FieldError, FieldLabel } from '@/components/ui/field'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { useFileUpload, type FileMetadata } from '@/hooks/use-file-upload'

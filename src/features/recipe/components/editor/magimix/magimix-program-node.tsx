@@ -1,5 +1,4 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@phosphor-icons/react'
 import {
   $getNodeByKey,
   DecoratorNode,
@@ -14,6 +13,7 @@ import {
   type Spread,
 } from 'lexical'
 
+import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@/components/icons'
 import { Item } from '@/components/ui/item'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@/features/recipe/types/magimix'
 import { capitalize } from '@/utils/string'

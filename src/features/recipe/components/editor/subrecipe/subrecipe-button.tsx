@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { BookOpenIcon } from '@phosphor-icons/react'
 
+import { BookOpenIcon } from '@/components/icons'
 import { Toggle } from '@/components/ui/toggle'
 import { type SubrecipeNodeData } from '@/features/recipe/types/subrecipe'
 

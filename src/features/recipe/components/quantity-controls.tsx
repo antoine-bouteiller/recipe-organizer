@@ -1,6 +1,6 @@
-import { MinusIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 
+import { MinusIcon, PlusIcon, TrashIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
 

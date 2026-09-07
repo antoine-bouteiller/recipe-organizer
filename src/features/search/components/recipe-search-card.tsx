@@ -15,10 +15,7 @@ interface RecipeSearchCardProps {
 }
 
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
-  <div
-    className="relative animate-in animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*45ms)] fade-in slide-in-from-bottom-2"
-    style={staggerStyle(index, 10)}
-  >
+  <div className="relative stagger-in-45" style={staggerStyle(index, 10)}>
     <Link
       className={cn('flex items-center gap-3 rounded-2xl border bg-card p-2.5', action && 'pr-14')}
       onClick={() => addRecentRecipe(recipe.id)}

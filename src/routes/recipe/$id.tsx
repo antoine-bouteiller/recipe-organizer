@@ -1,10 +1,10 @@
-import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@phosphor-icons/react'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
 import { Editor, EditorContent } from '@/components/common/editor'
 import { NotFound } from '@/components/error/not-found'
+import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@/components/icons'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

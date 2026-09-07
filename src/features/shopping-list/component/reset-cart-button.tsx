@@ -1,5 +1,4 @@
-import { ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
-
+import { ArrowCounterClockwiseIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { resetShoppingList } from '@/stores/shopping-list.store'
 

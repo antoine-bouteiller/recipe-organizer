@@ -1,8 +1,8 @@
 import { Toast } from '@base-ui/react/toast'
-import { CheckCircleIcon, CircleNotchIcon, InfoIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 import type React from 'react'
 
+import { CheckCircleIcon, CircleNotchIcon, InfoIcon, WarningCircleIcon, WarningIcon } from '@/components/icons'
 import { buttonVariants } from '@/components/ui/button'
 
 const TOAST_ICONS = new Map([

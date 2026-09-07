@@ -1,6 +1,6 @@
-import { CaretLeftIcon } from '@phosphor-icons/react/dist/ssr'
 import { Link } from '@tanstack/react-router'
 
+import { CaretLeftIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 
 export const NotFound = () => (

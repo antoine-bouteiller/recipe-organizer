@@ -1,6 +1,6 @@
-import { BasketIcon } from '@phosphor-icons/react'
 import { ingredientCategory } from '@schema'
 
+import { BasketIcon } from '@/components/icons'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { Skeleton } from '@/components/ui/skeleton'
 import { incrementalArray } from '@/utils/array'

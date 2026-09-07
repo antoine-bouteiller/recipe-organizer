@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
 @import 'tailwindcss/preflight.css' layer(base);
 
 @plugin '@tailwindcss/typography';
@@ -188,6 +187,19 @@
       @slot;
     }
   }
+}
+
+/* --stagger is injected per item by utils/stagger.ts */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@utility stagger-in-* {
+  animation: stagger-in 300ms both;
+  animation-delay: calc(var(--stagger, 0) * --value(integer) * 1ms);
 }
 
 /* View Transitions - mobile only */

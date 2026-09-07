@@ -1,8 +1,8 @@
-import { CheckIcon } from '@phosphor-icons/react'
 import { UNITS, type UnitSlug } from '@schema'
 import { cn } from 'cn'
 import { useState } from 'react'
 
+import { CheckIcon } from '@/components/icons'
 import { formatNumber } from '@/utils/number'
 
 import { type IngredientCartItem } from '../types/ingredient-cart-item'

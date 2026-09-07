@@ -1,8 +1,8 @@
-import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
+import { PlusIcon } from '@/components/icons'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { glassSurface, SearchInput } from '@/components/search-input'
 import { Badge } from '@/components/ui/badge'

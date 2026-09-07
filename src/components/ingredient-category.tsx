@@ -1,6 +1,6 @@
-import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@phosphor-icons/react'
 import { type ReactNode } from 'react'
 
+import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@/components/icons'
 import { type IngredientCategory } from '@/types/ingredient'
 
 export const ingredientCategoryLabels = {

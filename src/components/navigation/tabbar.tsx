@@ -16,7 +16,7 @@ export const TabBar = () => (
       >
         {({ isActive }) => (
           <>
-            <item.icon className="size-6" {...(isActive ? item.iconFilledProps : undefined)} />
+            {isActive ? item.activeIcon : item.icon}
             {item.label}
           </>
         )}

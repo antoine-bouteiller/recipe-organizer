@@ -1,7 +1,7 @@
-import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 import { useMemo, useState, type ReactElement } from 'react'
 
+import { CaretDownIcon, CheckIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { type ComboboxImplProps, type ValueOptions } from '@/components/ui/combobox'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'

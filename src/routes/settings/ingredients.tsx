@@ -1,8 +1,8 @@
-import { PlusIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
+import { PlusIcon } from '@/components/icons'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-category'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { glassSurface, SearchInput } from '@/components/search-input'

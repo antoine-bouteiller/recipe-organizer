@@ -43,8 +43,7 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
       style={animate ? staggerStyle(index, 6) : undefined}
       className={cn(
         'rounded-[30px] bg-white/5 p-[3px] shadow-lg ring-1 shadow-primary/10 ring-black/5 transition-transform duration-200 ease-out-snappy has-[a:hover]:-translate-y-0.5 has-[a:active]:scale-[0.99] dark:ring-white/10',
-        animate &&
-          'animate-in animation-duration-300 fill-mode-backwards [--tw-animation-delay:calc(var(--stagger)*35ms)] fade-in slide-in-from-bottom-2'
+        animate && 'stagger-in-35'
       )}
     >
       <Card className="h-60 overflow-hidden rounded-[27px] border-0 bg-[#1b2426] shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]" key={recipe.id}>

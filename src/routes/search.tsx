@@ -1,9 +1,9 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
-import { FunnelSimpleIcon } from '@phosphor-icons/react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 
+import { FunnelSimpleIcon } from '@/components/icons'
 import { ScreenLayout } from '@/components/layout/screen-layout'
 import { glassSurface, SearchInput } from '@/components/search-input'
 import { Button } from '@/components/ui/button'

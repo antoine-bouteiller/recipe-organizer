@@ -1,6 +1,6 @@
-import { TrashIcon } from '@phosphor-icons/react'
 import { cloneElement, useState, useTransition, type ElementType, type ReactElement } from 'react'
 
+import { TrashIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'

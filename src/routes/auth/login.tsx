@@ -1,8 +1,8 @@
-import { ArrowLeftIcon } from '@phosphor-icons/react'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import * as z from 'zod'
 
+import { ArrowLeftIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { toastManager } from '@/components/ui/toast'

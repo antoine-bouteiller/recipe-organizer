@@ -21,7 +21,6 @@
     "@lexical/react": "0.49.0",
     "@lexical/rich-text": "0.49.0",
     "@lexical/utils": "0.49.0",
-    "@phosphor-icons/react": "2.1.10",
     "@tanstack/react-form": "1.33.5",
     "@tanstack/react-query": "5.102.8",
     "@tanstack/react-router": "1.170.32",
@@ -35,7 +34,6 @@
     "lexical": "0.49.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "tw-animate-css": "1.4.0",
     "zod": "4.5.4"
   },
   "devDependencies": {

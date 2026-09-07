@@ -1,8 +1,8 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
-import { CaretUpDownIcon, XIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 import React, { useState, type ReactElement } from 'react'
 
+import { CaretUpDownIcon, XIcon } from '@/components/icons'
 import { type ComboboxImplProps, type ValueOptions } from '@/components/ui/combobox'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'

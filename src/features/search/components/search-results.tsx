@@ -1,5 +1,4 @@
-import { CheckIcon, MagnifyingGlassIcon, PlusIcon } from '@phosphor-icons/react'
-
+import { CheckIcon, MagnifyingGlassIcon, PlusIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { useIsInShoppingList } from '@/features/recipe/hooks/use-is-in-shopping-list'
 import { RecipeSearchCard } from '@/features/search/components/recipe-search-card'

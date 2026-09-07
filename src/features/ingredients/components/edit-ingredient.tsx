@@ -1,9 +1,9 @@
-import { PencilSimpleIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { PencilSimpleIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { ingredientSchema } from '@/features/ingredients/api/create'
 import { updateIngredientOptions, updateIngredientSchema, type UpdateIngredientFormInput } from '@/features/ingredients/api/update'

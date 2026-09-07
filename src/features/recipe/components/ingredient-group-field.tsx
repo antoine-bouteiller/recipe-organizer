@@ -1,9 +1,9 @@
-import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { unitOptions } from '@schema'
 import { useSelector } from '@tanstack/react-store'
 import { type ReactNode } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 
+import { PlusIcon, TrashIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'

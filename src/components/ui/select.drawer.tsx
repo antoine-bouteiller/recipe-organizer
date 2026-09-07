@@ -1,7 +1,7 @@
-import { CheckIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 import { useState, type ReactElement } from 'react'
 
+import { CheckIcon } from '@/components/icons'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { type SelectProps } from '@/components/ui/select'
 import { getSelectDisplay, SelectButton } from '@/components/ui/select.shared'

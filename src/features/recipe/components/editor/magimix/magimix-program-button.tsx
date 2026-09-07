@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
-import { CookingPotIcon } from '@phosphor-icons/react'
 
+import { CookingPotIcon } from '@/components/icons'
 import { Toggle } from '@/components/ui/toggle'
 import { type MagimixProgramData } from '@/features/recipe/types/magimix'
 

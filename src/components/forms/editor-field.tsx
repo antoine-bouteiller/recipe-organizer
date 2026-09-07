@@ -1,8 +1,8 @@
-import { ArrowUUpLeftIcon, ArrowUUpRightIcon, ListBulletsIcon, TextBolderIcon, TextItalicIcon, TextUnderlineIcon } from '@phosphor-icons/react'
 import { type Klass, type LexicalNode } from 'lexical'
 import { type ReactNode } from 'react'
 
 import { Editor, EditorContent, EditorToolbarButton } from '@/components/common/editor'
+import { ArrowUUpLeftIcon, ArrowUUpRightIcon, ListBulletsIcon, TextBolderIcon, TextItalicIcon, TextUnderlineIcon } from '@/components/icons'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '@/components/ui/toolbar'
 import { useFieldContext } from '@/hooks/use-form-context'

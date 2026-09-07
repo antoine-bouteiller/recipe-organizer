@@ -1,10 +1,10 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { CaretUpDownIcon } from '@phosphor-icons/react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'
 import { type ButtonHTMLAttributes, type ReactElement } from 'react'
 
+import { CaretUpDownIcon } from '@/components/icons'
 import { type SelectProps } from '@/components/ui/select'
 
 export const selectTriggerVariants = cva(

@@ -1,8 +1,8 @@
-import { ArrowElbowDownLeftIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { ArrowElbowDownLeftIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import {
   Command,

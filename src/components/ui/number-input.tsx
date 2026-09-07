@@ -1,8 +1,8 @@
 import { NumberField as NumberFieldPrimitive } from '@base-ui/react/number-field'
-import { MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { cn } from 'cn'
 import React, { type ComponentProps } from 'react'
 
+import { MinusIcon, PlusIcon } from '@/components/icons'
 import { Label } from '@/components/ui/label'
 
 const NumberInputContext: React.Context<{

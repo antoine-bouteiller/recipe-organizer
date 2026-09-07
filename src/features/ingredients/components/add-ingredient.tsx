@@ -1,9 +1,9 @@
-import { PlusIcon } from '@phosphor-icons/react'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { useState, type JSX } from 'react'
 
 import { getFormDialog } from '@/components/dialogs/form-dialog'
+import { PlusIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { createIngredientOptions, ingredientSchema } from '@/features/ingredients/api/create'
 import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/components/ingredient-form'

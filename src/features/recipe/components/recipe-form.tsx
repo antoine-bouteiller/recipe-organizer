@@ -1,7 +1,7 @@
-import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
 import { useSelector } from '@tanstack/react-store'
 import { Suspense, type ReactNode } from 'react'
 
+import { PlusIcon, TrashIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'

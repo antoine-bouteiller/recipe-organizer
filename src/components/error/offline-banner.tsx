@@ -1,5 +1,6 @@
-import { WifiSlashIcon } from '@phosphor-icons/react'
 import { useSyncExternalStore } from 'react'
+
+import { WifiSlashIcon } from '@/components/icons'
 
 const subscribe = (onStoreChange: () => void) => {
   globalThis.addEventListener('online', onStoreChange)
@@ -25,7 +26,7 @@ export default function OfflineBanner() {
   return (
     <div className="fixed top-0 right-0 left-0 z-40 w-full bg-yellow-500 px-4 py-3 text-sm font-medium text-yellow-900 shadow-md">
       <div className="mx-auto flex max-w-7xl items-center gap-3">
-        <WifiSlashIcon className="h-5 w-5 shrink-0" weight="fill" />
+        <WifiSlashIcon className="h-5 w-5 shrink-0" />
         <span>Vous êtes hors ligne. Certaines fonctionnalités peuvent être indisponibles.</span>
       </div>
     </div>

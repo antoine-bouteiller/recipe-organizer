@@ -1,8 +1,8 @@
-import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'
 import type React from 'react'
 
+import { MagnifyingGlassIcon } from '@/components/icons'
 import { Input, type InputProps as InputControlProps } from '@/components/ui/input'
 
 const inputGroupAddonVariants = cva(
