@@ -1,6 +1,5 @@
 import { cloudflare } from '@cloudflare/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
-import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
@@ -8,12 +7,8 @@ import { defineConfig } from 'vite-plus'
 import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
 
 const isTest = Boolean(process.env.VITEST)
-const isAnalyze = Boolean(process.env.ANALYZE)
 
 const viteConfig = defineConfig({
-  devtools: {
-    enabled: isAnalyze,
-  },
   lint: {
     options: { typeAware: true, typeCheck: true },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
@@ -174,9 +169,6 @@ const viteConfig = defineConfig({
     },
   },
   plugins: [
-    devtools({
-      injectSource: { enabled: false },
-    }),
     tanstackStart(),
     react({ compiler: true }),
     ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),

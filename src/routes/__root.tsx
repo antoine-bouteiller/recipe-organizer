@@ -1,9 +1,6 @@
 import { Serwist } from '@serwist/window'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 import { type QueryClient } from '@tanstack/react-query'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { lazy, Suspense, useEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
@@ -61,20 +58,6 @@ const RootComponent = () => {
           </main>
         </ToastProvider>
         <Scripts />
-        <TanStackDevtools
-          plugins={[
-            {
-              defaultOpen: true,
-              name: 'TanStack Query',
-              render: <ReactQueryDevtoolsPanel />,
-            },
-            {
-              defaultOpen: false,
-              name: 'TanStack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
       </body>
     </html>
   )
