@@ -51,7 +51,7 @@
     "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "6.1.1",
     "drizzle-kit": "1.0.0-rc.3",
-    "knip": "6.34.0",
+    "knip": "6.35.0",
     "lefthook": "2.1.12",
     "oxc-transform-react": "0.149.0",
     "serwist": "9.5.12",
