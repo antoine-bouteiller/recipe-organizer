@@ -9,7 +9,7 @@ export const DefaultErrorComponent = ({ error }: ErrorComponentProps) => (
       <h2 className="text-3xl font-semibold">Une erreur est survenue</h2>
       <p>Une erreur est survenue lors du chargement de la page, nous vous suggérons de revenir à la page d'accueil.</p>
     </div>
-    {import.meta.env.DEV && (
+    {import.meta.env.DEV && error instanceof Error && (
       <div className="rounded-sm border border-destructive p-1 text-sm text-destructive">{error.message ? <code>{error.message}</code> : null}</div>
     )}
     <Button render={<Link to="/" />} size="lg">
