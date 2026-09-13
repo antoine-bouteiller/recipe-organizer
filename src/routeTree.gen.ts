@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ShoppingListRouteImport } from './routes/shopping-list'
+import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as RecipeIdRouteImport } from './routes/recipe/$id'
 import { Route as RecipeNewRouteImport } from './routes/recipe/new'
@@ -20,9 +21,6 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as SettingsAccountRouteImport } from './routes/settings/account'
 import { Route as SettingsIngredientsRouteImport } from './routes/settings/ingredients'
 import { Route as SettingsUsersRouteImport } from './routes/settings/users'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiImageIdRouteImport } from './routes/api/image/$id'
-import { Route as ApiVideoIdRouteImport } from './routes/api/video/$id'
 import { Route as RecipeEditIdRouteImport } from './routes/recipe/edit.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -43,6 +41,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ShoppingListRoute = ShoppingListRouteImport.update({
   id: '/shopping-list',
   path: '/shopping-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -80,21 +83,6 @@ const SettingsUsersRoute = SettingsUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => SettingsRoute,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiImageIdRoute = ApiImageIdRouteImport.update({
-  id: '/api/image/$id',
-  path: '/api/image/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVideoIdRoute = ApiVideoIdRouteImport.update({
-  id: '/api/video/$id',
-  path: '/api/video/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RecipeEditIdRoute = RecipeEditIdRouteImport.update({
   id: '/recipe/edit/$id',
   path: '/recipe/edit/$id',
@@ -106,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/shopping-list': typeof ShoppingListRoute
+  '/api/$': typeof ApiSplatRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -113,15 +102,13 @@ export interface FileRoutesByFullPath {
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/image/$id': typeof ApiImageIdRoute
-  '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/search': typeof SearchRoute
   '/shopping-list': typeof ShoppingListRoute
+  '/api/$': typeof ApiSplatRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -129,9 +116,6 @@ export interface FileRoutesByTo {
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings': typeof SettingsIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/image/$id': typeof ApiImageIdRoute
-  '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
 }
 export interface FileRoutesById {
@@ -140,6 +124,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRouteWithChildren
   '/shopping-list': typeof ShoppingListRoute
+  '/api/$': typeof ApiSplatRoute
   '/auth/login': typeof AuthLoginRoute
   '/recipe/$id': typeof RecipeIdRoute
   '/recipe/new': typeof RecipeNewRoute
@@ -147,9 +132,6 @@ export interface FileRoutesById {
   '/settings/ingredients': typeof SettingsIngredientsRoute
   '/settings/users': typeof SettingsUsersRoute
   '/settings/': typeof SettingsIndexRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/image/$id': typeof ApiImageIdRoute
-  '/api/video/$id': typeof ApiVideoIdRoute
   '/recipe/edit/$id': typeof RecipeEditIdRoute
 }
 export interface FileRouteTypes {
@@ -159,6 +141,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shopping-list'
+    | '/api/$'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -166,15 +149,13 @@ export interface FileRouteTypes {
     | '/settings/ingredients'
     | '/settings/users'
     | '/settings/'
-    | '/api/auth/$'
-    | '/api/image/$id'
-    | '/api/video/$id'
     | '/recipe/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/search'
     | '/shopping-list'
+    | '/api/$'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -182,9 +163,6 @@ export interface FileRouteTypes {
     | '/settings/ingredients'
     | '/settings/users'
     | '/settings'
-    | '/api/auth/$'
-    | '/api/image/$id'
-    | '/api/video/$id'
     | '/recipe/edit/$id'
   id:
     | '__root__'
@@ -192,6 +170,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/shopping-list'
+    | '/api/$'
     | '/auth/login'
     | '/recipe/$id'
     | '/recipe/new'
@@ -199,9 +178,6 @@ export interface FileRouteTypes {
     | '/settings/ingredients'
     | '/settings/users'
     | '/settings/'
-    | '/api/auth/$'
-    | '/api/image/$id'
-    | '/api/video/$id'
     | '/recipe/edit/$id'
   fileRoutesById: FileRoutesById
 }
@@ -210,12 +186,10 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   ShoppingListRoute: typeof ShoppingListRoute
+  ApiSplatRoute: typeof ApiSplatRoute
   AuthLoginRoute: typeof AuthLoginRoute
   RecipeIdRoute: typeof RecipeIdRoute
   RecipeNewRoute: typeof RecipeNewRoute
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiImageIdRoute: typeof ApiImageIdRoute
-  ApiVideoIdRoute: typeof ApiVideoIdRoute
   RecipeEditIdRoute: typeof RecipeEditIdRoute
 }
 
@@ -247,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/shopping-list'
       fullPath: '/shopping-list'
       preLoaderRoute: typeof ShoppingListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/login': {
@@ -298,27 +279,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsUsersRouteImport
       parentRoute: typeof SettingsRoute
     }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/image/$id': {
-      id: '/api/image/$id'
-      path: '/api/image/$id'
-      fullPath: '/api/image/$id'
-      preLoaderRoute: typeof ApiImageIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/video/$id': {
-      id: '/api/video/$id'
-      path: '/api/video/$id'
-      fullPath: '/api/video/$id'
-      preLoaderRoute: typeof ApiVideoIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/recipe/edit/$id': {
       id: '/recipe/edit/$id'
       path: '/recipe/edit/$id'
@@ -352,12 +312,10 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRouteWithChildren,
   ShoppingListRoute: ShoppingListRoute,
+  ApiSplatRoute: ApiSplatRoute,
   AuthLoginRoute: AuthLoginRoute,
   RecipeIdRoute: RecipeIdRoute,
   RecipeNewRoute: RecipeNewRoute,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiImageIdRoute: ApiImageIdRoute,
-  ApiVideoIdRoute: ApiVideoIdRoute,
   RecipeEditIdRoute: RecipeEditIdRoute,
 }
 export const routeTree = rootRouteImport

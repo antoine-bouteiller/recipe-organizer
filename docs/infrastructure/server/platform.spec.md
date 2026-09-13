@@ -93,7 +93,7 @@ visited content an offline fallback without changing the server mutation contrac
 
 ### 8.5 Interaction boundary
 
-Server functions invoke media writers after authorization and validation. File routes use media
+Hono feature routes invoke media writers after authorization and validation. Hono media routes use
 read helpers for binary responses; application data remains behind RPC and D1 contracts owned by
 sibling leaves.
 
@@ -103,9 +103,9 @@ A media response carries the stored content type when present and uses the helpe
 a fallback. This permits the image route to advertise WebP and the video route to preserve its
 stored MIME type without asking a client to infer the object representation.
 
-A missing object is not represented as an empty successful response. The helper throws router
-not-found control flow before a response is built (`src/lib/r2.ts:51-55`), allowing the route
-boundary to render its ordinary missing-resource result.
+A missing object is not represented as an empty successful response. The helper throws a Hono
+`HTTPException(404)` before a response is built (`src/lib/r2.ts:51-55`), allowing the shared API
+boundary to return its `not_found` error envelope without caching a missing object.
 
 ### 8.7 Cache lifetime boundary
 
@@ -171,7 +171,8 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                          | Sections affected |
-| ---------- | -------------------------------------------------- | ----------------- |
-| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.   | 3, 8              |
-| 2026-09-12 | Add a dry-run-first migration for existing images. | 8.11              |
+| Date       | Amendment                                                                      | Sections affected |
+| ---------- | ------------------------------------------------------------------------------ | ----------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                               | 3, 8              |
+| 2026-09-12 | Add a dry-run-first migration for existing images.                             | 8.11              |
+| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary. | 8.5–8.6           |

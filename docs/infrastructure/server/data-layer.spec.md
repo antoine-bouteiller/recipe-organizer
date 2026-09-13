@@ -1,6 +1,6 @@
 ---
 title: D1 Data Layer
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/infrastructure/server/server.spec.md
@@ -51,12 +51,12 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component                | Module type           | Responsibility                                    | Public API surface             |
-| ------------------------ | --------------------- | ------------------------------------------------- | ------------------------------ |
-| Database factory         | Server library        | Bind Drizzle to request-scoped D1                 | `getDb(): DrizzleD1Database`   |
-| Schema exports           | Type modules          | Tables, value types, and relation graph           | `@schema` exports, `relations` |
-| Recipe graph persistence | Feature server helper | Write dependent ingredient and linked-recipe rows | `writeRecipeIngredientGraph()` |
-| Query keys               | Shared library        | Stable server-data cache namespaces               | `queryKeys`                    |
+| Component                | Module type     | Responsibility                                                                   | Public API surface                    |
+| ------------------------ | --------------- | -------------------------------------------------------------------------------- | ------------------------------------- |
+| Database factory         | Server library  | Bind Drizzle to request-scoped D1                                                | `getDb(): DrizzleD1Database`          |
+| Schema exports           | Type modules    | Tables, value types, and relation graph                                          | `@schema` exports, `relations`        |
+| Recipe graph persistence | Feature utility | Write dependent ingredient and linked-recipe rows with caller-supplied D1 client | `writeRecipeIngredientGraph(db, ...)` |
+| Query keys               | Shared library  | Stable server-data cache namespaces                                              | `queryKeys`                           |
 
 ## 8. Detailed Design
 
@@ -79,15 +79,15 @@ nested `with` access that relies on it.
 
 Read handlers prefer `getDb().query.<table>.findFirst` or `findMany` with a narrow `columns`,
 `where`, `with`, and ordering shape. The relation graph determines valid `with` keys, making the
-selected object shape a server-function contract rather than a client-assembled query.
+selected object shape a feature-route contract rather than a client-assembled query.
 
 ### 8.4 Write and deletion contract
 
-A graph write persists its root row and dependent rows within the feature write boundary. For
-deletion, dependent `groupIngredient`, ingredient-group, and linked-recipe rows precede the recipe
-row in one batch (`src/features/recipe/api/delete.ts:40-55`); the owned R2 file is removed only
-after that batch resolves (`src/features/recipe/api/delete.ts:56`). This keeps a database failure
-from leaving a row that points to a missing object.
+A graph write persists its root row and dependent rows within the feature route's write boundary.
+For deletion, dependent `groupIngredient`, ingredient-group, and linked-recipe rows precede the
+recipe row in one batch; the owned R2 file is removed only after that batch resolves
+(`src/features/recipe/api/routes.ts:177-201`). This keeps a database failure from leaving a row that
+points to a missing object.
 
 ### 8.5 Query-key contract
 
@@ -98,8 +98,8 @@ client cache is server data, while UI stores retain selections only.
 
 ### 8.6 Interaction boundary
 
-Server functions own validation, authorization, and the API return shape. The data layer owns typed
-persistence primitives; it does not decide who may mutate a row. Platform owns the `DB` binding
+Hono feature routes own validation, authorization, and the API return shape. The data layer owns
+typed persistence primitives; it does not decide who may mutate a row. Platform owns the `DB` binding
 whose configured name is `DB` (`wrangler.jsonc:15-21`).
 
 ### 8.7 Table ownership boundary
@@ -121,7 +121,7 @@ the identifier and then writes the dependent rows through its graph helper. This
 atomic unit from dependencies that only exist after a return value is available.
 
 A batch failure leaves its grouped relational statements unapplied. Object storage is outside that
-unit, so server functions order object effects deliberately and surface failures instead of treating
+unit, so feature routes order object effects deliberately and surface failures instead of treating
 them as database success.
 
 ### 8.9 Cache invalidation boundary
@@ -140,8 +140,8 @@ A missing row remains a feature API concern because different calls may return a
 router not-found control flow. The data layer exposes the query result without imposing either
 response semantics.
 
-Constraint failures and provider failures propagate to the server-function error boundary. That
-boundary maps user-visible errors while retaining the original cause for server diagnosis.
+Constraint failures and provider failures propagate to the Hono API error boundary. That boundary
+maps user-visible errors while retaining the original cause for server diagnosis.
 
 ### 8.11 Contract sketch
 
@@ -151,3 +151,9 @@ inputs to that client. Feature APIs use these shapes to state their own read and
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                           | Sections affected          | Reason                                                                |
+| ---------- | ------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------- |
+| 2026-09-13 | Inject the D1 client into recipe graph helpers used by Hono routes. | 7, 8.3–8.4, 8.6, 8.8, 8.10 | Keep graph writes within the request-scoped API transaction boundary. |

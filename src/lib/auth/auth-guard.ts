@@ -1,27 +1,27 @@
-import { redirect } from '@tanstack/react-router'
-import { createMiddleware } from '@tanstack/react-start'
+import { createMiddleware } from 'hono/factory'
+import { HTTPException } from 'hono/http-exception'
 
-import { getAuthUser } from '@/lib/auth/get-auth-user'
+import { type ApiEnvironment } from '@/lib/api-context'
+
+import { getApiUser } from './api-user'
 
 export const authGuard = (role?: string) =>
-  createMiddleware({ type: 'function' }).server(async ({ next }) => {
-    const user = await getAuthUser()
+  createMiddleware<ApiEnvironment>(async (context, next) => {
+    const user = await getApiUser(context)
 
     if (!user) {
-      throw redirect({ to: '/auth/login' })
+      throw new HTTPException(401, { message: 'unauthorized' })
     }
-
     if (user.status === 'blocked') {
-      throw redirect({ search: { error: 'account_blocked' }, to: '/auth/login' })
+      throw new HTTPException(403, { message: 'account_blocked' })
     }
-
     if (user.status === 'pending') {
-      throw redirect({ search: { error: 'account_pending' }, to: '/auth/login' })
+      throw new HTTPException(403, { message: 'account_pending' })
+    }
+    if (role === 'admin' && user.role !== 'admin') {
+      throw new HTTPException(403, { message: 'Permission denied' })
     }
 
-    if (role === 'admin' && user?.role !== 'admin') {
-      throw new Error('Permission denied')
-    }
-
-    return next({ context: { user } })
+    context.set('user', user)
+    await next()
   })

@@ -1,65 +1,9 @@
-import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { eq, inArray } from 'drizzle-orm'
-import * as z from 'zod'
 
-import { authGuard } from '@/lib/auth/auth-guard'
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
-import { deleteFile } from '@/lib/r2'
-import { assertOwnerOrAdmin } from '@/utils/assert-owner-or-admin'
-import { withServerError } from '@/utils/error-handler'
 
-const deleteRecipeSchema = z.number()
-
-const deleteRecipe = createServerFn({
-  method: 'POST',
-})
-  .middleware([authGuard()])
-  .validator(deleteRecipeSchema)
-  .handler(
-    withServerError(async ({ data: id, context }) => {
-      const currentRecipe = await getDb().query.recipe.findFirst({
-        columns: {
-          createdBy: true,
-          id: true,
-          image: true,
-        },
-        where: {
-          id,
-        },
-        with: {
-          ingredientGroups: {
-            columns: {
-              id: true,
-            },
-          },
-        },
-      })
-
-      if (!currentRecipe) {
-        throw new Error('Recipe not found')
-      }
-
-      assertOwnerOrAdmin(context.user, currentRecipe)
-
-      await getDb().batch([
-        getDb()
-          .delete(groupIngredient)
-          .where(
-            inArray(
-              groupIngredient.groupId,
-              currentRecipe.ingredientGroups.map(({ id: groupId }) => groupId)
-            )
-          ),
-        getDb().delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
-        getDb().delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
-        getDb().delete(recipe).where(eq(recipe.id, id)),
-      ])
-      await deleteFile(currentRecipe.image)
-    })
-  )
+const deleteRecipe = async ({ data }: { data: number }) => readResponse(apiClient.recipes.delete.$post({ json: data }))
 
 const deleteRecipeOptions = () =>
   mutationOptions({

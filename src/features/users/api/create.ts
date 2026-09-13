@@ -1,49 +1,29 @@
-import { user } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
-import { authGuard } from '@/lib/auth/auth-guard'
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
-import { withServerError } from '@/utils/error-handler'
 
-const userSchema = z.object({
-  email: z.email(),
-  role: z.enum(['user', 'admin']),
-})
+import { type UserFormValues } from './schemas'
 
-type UserFormValues = z.infer<typeof userSchema>
-export type UserFormInput = Partial<UserFormValues>
-
-const createUser = createServerFn()
-  .middleware([authGuard('admin')])
-  .validator(userSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      await getDb()
-        .insert(user)
-        .values({ ...data, id: crypto.randomUUID(), name: data.email })
-    })
-  )
+export { type UserFormInput, userSchema } from './schemas'
 
 const createUserOptions = () =>
   mutationOptions({
-    mutationFn: createUser,
+    mutationFn: ({ data }: { data: UserFormValues }) => readResponse(apiClient.users.$post({ json: data })),
     onError: (error, variables) => {
-      toastError(`Erreur lors de la création de l'utilisateur ${(variables as { data: UserFormValues }).data.email}`, error)
+      toastError(`Erreur lors de la création de l'utilisateur ${variables.data.email}`, error)
     },
     onSuccess: async (_data, variables, _result, context) => {
       await context.client.invalidateQueries({
         queryKey: queryKeys.listUsers(),
       })
       toastManager.add({
-        title: `Utilisateur ${(variables as { data: UserFormValues }).data.email} créé`,
+        title: `Utilisateur ${variables.data.email} créé`,
         type: 'success',
       })
     },
   })
 
-export { createUserOptions, userSchema }
+export { createUserOptions }

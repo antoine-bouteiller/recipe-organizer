@@ -1,6 +1,6 @@
 ---
 title: Repository Layout
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/architecture.spec.md
@@ -76,7 +76,7 @@ recipe-organizer/
 │   ├── components/             # Shared UI, form, layout and error components
 │   ├── features/
 │   │   └── <feature>/
-│   │       ├── api/            # Feature server functions and query options
+│   │       ├── api/            # Feature Hono routes, schemas, and query/mutation wrappers
 │   │       ├── components/     # Feature UI
 │   │       ├── contexts/       # Feature React contexts
 │   │       ├── hooks/          # Feature React hooks
@@ -99,9 +99,10 @@ recipe-organizer/
 └── wrangler.jsonc              # Worker bindings and deployment configuration
 ```
 
-A feature owns only the subdirectories that carry its domain code. `api/` holds one server function
-per verb-oriented file and its TanStack Query option factory (`src/features/recipe/api/get-all.ts:10`,
-`src/features/recipe/api/get-all.ts:47`). `components/`, `contexts/`, `hooks/`, `types/` and `utils/`
+A feature owns only the subdirectories that carry its domain code. `api/routes.ts` owns its Hono
+route group; `api/schemas.ts` owns route input schemas; verb-oriented API files own TanStack Query
+wrappers over the typed Hono client (`src/features/recipe/api/routes.ts:45-203`,
+`src/features/users/api/get-all.ts:8-21`). `components/`, `contexts/`, `hooks/`, `types/` and `utils/`
 hold feature-scoped code. A feature does not carry `lib/`: code coupled to a
 binding or SDK belongs under the appropriate `src/lib/` topic.
 
@@ -112,7 +113,7 @@ cross-feature TanStack Store state, while a feature-local store remains in its f
 
 `src/utils/` contains helpers without React, DOM, fetch, database or Worker-binding dependencies.
 `src/lib/` contains application services and dependencies that need those runtime capabilities,
-including authentication, database access, R2 access, cache management and persistence helpers.
+including the Hono API and client, authentication, database access, R2 access, cache management and persistence helpers.
 
 Routes use `src/routes/` and mirror their URL segments. A dynamic segment uses the TanStack Router
 `$parameter` filename form. Server HTTP handlers also live under this tree, such as `routes/api/`.
@@ -130,3 +131,9 @@ feature's public API and do not reach into another feature's private implementat
 ## 9. Open Questions
 
 N/A.
+
+## Changelog
+
+| Date       | Amendment                                                                 | Sections affected | Reason                                   |
+| ---------- | ------------------------------------------------------------------------- | ----------------- | ---------------------------------------- |
+| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers. | 8.1               | Reflect the migrated feature API layout. |

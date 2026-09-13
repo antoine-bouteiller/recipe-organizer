@@ -1,37 +1,17 @@
-import { ingredient } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
-import { authGuard } from '@/lib/auth/auth-guard'
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
-import { withServerError } from '@/utils/error-handler'
 
-import { ingredientSchema } from './create'
+import { type UpdateIngredientFormValues } from './schemas'
 
-const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
-
-type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
-export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>
-
-const updateIngredient = createServerFn()
-  .middleware([authGuard()])
-  .validator(updateIngredientSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      const { id, ...newIngredient } = data
-
-      await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
-    })
-  )
+export { type UpdateIngredientFormInput, updateIngredientSchema } from './schemas'
 
 const updateIngredientOptions = () =>
   mutationOptions({
-    mutationFn: updateIngredient,
+    mutationFn: ({ data }: { data: UpdateIngredientFormValues }) => readResponse(apiClient.ingredients.update.$post({ json: data })),
     onError: (error, variables) => {
       toastError(`Erreur lors de la mise à jour de l'ingrédient ${variables.data.name}`, error)
     },
@@ -46,4 +26,4 @@ const updateIngredientOptions = () =>
     },
   })
 
-export { updateIngredientOptions, updateIngredientSchema }
+export { updateIngredientOptions }

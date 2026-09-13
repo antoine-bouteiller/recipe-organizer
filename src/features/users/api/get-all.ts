@@ -1,32 +1,20 @@
 import { queryOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import * as z from 'zod'
 
-import { authGuard } from '@/lib/auth/auth-guard'
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
 
-const getUsersListSchema = z.object({
-  status: z.enum(['pending', 'active', 'blocked']).default('active'),
-})
+import { type UserStatus } from './schemas'
 
-const getUsersList = createServerFn({
-  method: 'GET',
-})
-  .middleware([authGuard('admin')])
-  .validator(getUsersListSchema)
-  .handler(({ data }) =>
-    getDb().query.user.findMany({
-      orderBy: {
-        email: 'asc',
-      },
-      where: { status: data.status },
-    })
-  )
-
-const getUserListOptions = (status: 'pending' | 'active' | 'blocked' = 'active') =>
+const getUserListOptions = (status: UserStatus = 'active') =>
   queryOptions({
-    queryFn: () => getUsersList({ data: { status } }),
+    queryFn: async () => {
+      const users = await readResponse(apiClient.users.$get({ query: { status } }))
+      return users.map((user) => ({
+        ...user,
+        createdAt: new Date(user.createdAt),
+        updatedAt: new Date(user.updatedAt),
+      }))
+    },
     queryKey: queryKeys.listUsers(status),
   })
 

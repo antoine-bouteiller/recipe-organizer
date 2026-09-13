@@ -1,22 +1,11 @@
 import { queryOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
 
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
-
-const getIngredientsList = createServerFn({
-  method: 'GET',
-}).handler(() =>
-  getDb().query.ingredient.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-  })
-)
 
 const getIngredientListOptions = () =>
   queryOptions({
-    queryFn: getIngredientsList,
+    queryFn: () => readResponse(apiClient.ingredients.$get()),
     queryKey: queryKeys.listIngredients(),
   })
 

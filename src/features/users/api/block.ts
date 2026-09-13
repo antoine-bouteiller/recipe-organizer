@@ -1,33 +1,13 @@
-import { user } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import * as z from 'zod'
 
 import { toastManager } from '@/components/ui/toast'
-import { authGuard } from '@/lib/auth/auth-guard'
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
 import { toastError } from '@/lib/toast-helpers'
-import { withServerError } from '@/utils/error-handler'
-
-const blockUserSchema = z.object({
-  id: z.string(),
-})
-
-const blockUser = createServerFn()
-  .middleware([authGuard('admin')])
-  .validator(blockUserSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      const { id } = data
-      await getDb().update(user).set({ status: 'blocked' }).where(eq(user.id, id))
-    })
-  )
 
 const blockUserOptions = () =>
   mutationOptions({
-    mutationFn: blockUser,
+    mutationFn: ({ data }: { data: { id: string } }) => readResponse(apiClient.users.block.$post({ json: data })),
     onError: (error) => {
       toastError("Erreur lors du blocage de l'utilisateur", error)
     },
@@ -35,10 +15,7 @@ const blockUserOptions = () =>
       await context.client.invalidateQueries({
         queryKey: queryKeys.allUsers,
       })
-      toastManager.add({
-        title: `Utilisateur bloqué`,
-        type: 'success',
-      })
+      toastManager.add({ title: 'Utilisateur bloqué', type: 'success' })
     },
   })
 

@@ -1,6 +1,6 @@
 ---
 title: Forms
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/infrastructure/client/client.spec.md
@@ -23,7 +23,7 @@ feature from independently composing field state, error presentation, and submis
 | Decision                     | Choice                                                                                         | Rationale                                                                                                                             |
 | ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `src/hooks/use-app-form.ts:18-42`. |
-| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding server function                          | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.         |
+| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding feature API route                        | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.         |
 | `[KD-3]` Error projection    | TanStack Form errors are projected into Base UI Form and Field primitives                      | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                       |
 | `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/utils/form-data.ts:1-28`).  |
 
@@ -31,8 +31,8 @@ feature from independently composing field state, error presentation, and submis
 
 - `[PI-1]` **One form vocabulary** — refine `client.spec.md` `[PI-3]`: feature forms compose
   registered fields rather than owning form-framework setup.
-- `[PI-2]` **Validation is informative, not authoritative** — client errors guide users; server
-  functions validate all writes under `../../architecture.spec.md` `[PI-3]`.
+- `[PI-2]` **Validation is informative, not authoritative** — client errors guide users; Hono
+  routes validate all writes under `../../architecture.spec.md` `[PI-3]`.
 - `[PI-3]` **Fields own control wiring** — a field translates its framework context into a UI
   primitive and error slot, keeping feature views declarative.
 
@@ -85,10 +85,11 @@ dialog produced by `getFormDialog(defaultValues)` selects errors from form state
 while submitting, stops propagation, and supplies its typed submit component
 (`src/components/dialogs/form-dialog.tsx:18-54`).
 
-The submit contract is `values -> FormData -> server parser -> schema`. `objectToFormData` appends a
-raw `File` and JSON-stringifies other present values; `parseFormData` restores parseable string
-entries before server validation (`src/utils/form-data.ts:1-28`). File fields hold either a browser
-`File` or `{ id, url }` metadata so an unchanged asset retains its reference.
+The multipart submit contract is `values -> FormData -> Hono route parser -> schema`; JSON-only
+mutations send their validated values through the typed Hono client. `objectToFormData` appends a raw
+`File` and JSON-stringifies other present values; `parseFormData` restores parseable string entries
+before route validation (`src/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
+`{ id, url }` metadata so an unchanged asset retains its reference.
 
 ### 8.3 Field value and UI contract
 
@@ -161,3 +162,9 @@ remain shared.
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                             | Sections affected | Reason                                              |
+| ---------- | --------------------------------------------------------------------- | ----------------- | --------------------------------------------------- |
+| 2026-09-13 | Align form schemas and submission transport with Hono feature routes. | 3, 4, 8.2         | Preserve multipart support while migrating actions. |

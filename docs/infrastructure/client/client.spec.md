@@ -1,7 +1,7 @@
 ---
 title: Client Infrastructure
 kind: umbrella
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/architecture.spec.md
@@ -27,10 +27,10 @@ boundary while leaving product goals and system-wide principles to
 
 ## 3. Key Design Decisions
 
-| Decision                 | Choice                                                                            | Rationale                                                                                                               |
-| ------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Client split    | Routing, forms, and client state have separate leaves                             | Each area has a distinct public contract and verification surface, while their boundaries remain explicit.              |
-| `[KD-2]` Server boundary | Route and form consumers use the server contracts rather than a browser API layer | This refines the Worker-as-API decision in `docs/architecture.spec.md` `[KD-1]` and keeps access control at the Worker. |
+| Decision                 | Choice                                                                 | Rationale                                                                                                               |
+| ------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Client split    | Routing, forms, and client state have separate leaves                  | Each area has a distinct public contract and verification surface, while their boundaries remain explicit.              |
+| `[KD-2]` Server boundary | Route and form consumers use typed Hono RPC query and mutation clients | This refines the Worker-as-API decision in `docs/architecture.spec.md` `[KD-1]` and keeps access control at the Worker. |
 
 ## 4. Principles & Intents
 
@@ -43,8 +43,8 @@ boundary while leaving product goals and system-wide principles to
 
 ## 5. Non-Goals
 
-- `[NG-1]` A browser-side API, authorization system, or duplicate server-data cache; this refines
-  `docs/architecture.spec.md` `[PI-1]` and `[PI-4]`.
+- `[NG-1]` A second browser-side API abstraction, authorization system, or duplicate server-data
+  cache; this refines `docs/architecture.spec.md` `[PI-1]` and `[PI-4]`.
 - `[NG-2]` Offline mutation, consistent with `docs/architecture.spec.md` `[NG-4]`.
 
 ## 6. Caveats
@@ -66,8 +66,8 @@ Leaf execution order:
 
 | Leaf                                     | Depends on                                                                      | Rationale                                                                   |
 | ---------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [`routing-ssr`](./routing-ssr.spec.md)   | `../server/auth.spec.md`, `../server/server-functions.spec.md`                  | Route context and loaders consume authentication and RPC contracts.         |
-| [`forms`](./forms.spec.md)               | `../server/server-functions.spec.md`                                            | Form schemas and submissions meet the Worker validation boundary.           |
+| [`routing-ssr`](./routing-ssr.spec.md)   | `../server/auth.spec.md`, `../server/server-functions.spec.md`                  | Route context and loaders consume authentication and Hono RPC contracts.    |
+| [`forms`](./forms.spec.md)               | `../server/server-functions.spec.md`                                            | Form schemas and Hono RPC submissions meet the Worker validation boundary.  |
 | [`client-state`](./client-state.spec.md) | [`routing-ssr`](./routing-ssr.spec.md) `[KD-1]`, `../server/data-layer.spec.md` | Query lifecycle follows router context and represents Worker-owned records. |
 
 ## 8. Detailed Design
@@ -81,3 +81,9 @@ Leaf execution order:
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                   | Sections affected | Reason                                          |
+| ---------- | ----------------------------------------------------------- | ----------------- | ----------------------------------------------- |
+| 2026-09-13 | Adopt typed Hono RPC clients as the client server boundary. | 3, 5, 7           | Reflect the completed feature-action migration. |

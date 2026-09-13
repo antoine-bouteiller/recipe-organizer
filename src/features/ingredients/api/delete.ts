@@ -1,31 +1,11 @@
-import { ingredient } from '@schema'
 import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { eq } from 'drizzle-orm'
-import * as z from 'zod'
 
-import { authGuard } from '@/lib/auth/auth-guard'
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerError } from '@/utils/error-handler'
-
-const deleteIngredientSchema = z.object({
-  id: z.number(),
-})
-
-const deleteIngredient = createServerFn()
-  .middleware([authGuard('admin')])
-  .validator(deleteIngredientSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      const { id } = data
-      await getDb().delete(ingredient).where(eq(ingredient.id, id))
-    })
-  )
 
 const deleteIngredientOptions = () =>
   mutationOptions({
-    mutationFn: deleteIngredient,
+    mutationFn: ({ data }: { data: { id: number } }) => readResponse(apiClient.ingredients.delete.$post({ json: data })),
     onSuccess: async (_data, _variables, _result, context) => {
       await context.client.invalidateQueries({
         queryKey: queryKeys.listIngredients(),
