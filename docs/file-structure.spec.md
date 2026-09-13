@@ -24,16 +24,16 @@ module so feature ownership and import boundaries remain legible.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                                                                                   | Rationale                                                                                                                   |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Ownership boundary       | `src/features/<feature>/` contains one product domain's API, UI, local hooks, types and utilities; shared concerns live outside feature directories.                     | A domain change remains discoverable in one directory while dependencies shared by several domains have an explicit home.   |
-| `[KD-2]` Shared-code placement    | `src/components/`, `src/hooks/`, `src/lib/`, `src/stores/`, `src/types/` and `src/utils/` separate reusable code by runtime responsibility.                              | The directory names make client, server and pure-code boundaries visible before an import is written.                       |
-| `[KD-3]` Route and data placement | Routes follow URL hierarchy in `src/routes/`; Drizzle schema and history artefacts live in `db/schema/` and `db/migrations/`.                                            | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
-| `[KD-4]` Naming and imports       | Files use kebab-case except TanStack Router dynamic segments; TypeScript imports use `@/` for cross-directory application paths and relative imports within a directory. | Filenames match the lint convention and import paths reveal whether a dependency is local or crosses a module boundary.     |
+| Decision                          | Choice                                                                                                                                                                                                                                                   | Rationale                                                                                                                   |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Ownership boundary       | A product domain spans `src/client/features/<feature>/` for UI and query wrappers and `src/server/routes/<feature>/` for Hono routes and DB utilities; `src/shared/<feature>/` holds only cross-runtime contracts.                                       | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
+| `[KD-2]` Runtime-code placement   | Browser code lives in `src/client/`; Worker code lives in `src/server/`; only actual cross-runtime modules live in `src/shared/`.                                                                                                                        | The top-level directories make runtime boundaries visible before an import is written.                                      |
+| `[KD-3]` Route and data placement | Browser routes follow URL hierarchy in `src/client/routes/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                   | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
+| `[KD-4]` Naming and imports       | Files use kebab-case except TanStack Router dynamic segments; TypeScript imports use `@client/*`, `@server/*`, and `@shared/*` for cross-directory runtime paths, and `@schema` for database schema exports; relative imports remain within a directory. | Filenames match the lint convention and import paths reveal whether a dependency is local or crosses a module boundary.     |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **Feature first** — product-domain code remains inside its feature until at least two features need the same abstraction.
+- `[PI-1]` **Runtime first, then feature** — group product-domain code by feature within each runtime; share modules only when both runtimes need them.
 - `[PI-2]` **Runtime boundaries are visible** — code that requires React, the database or Worker bindings never presents as a pure utility.
 - `[PI-3]` **Generated artefacts are tool-owned** — route and Worker type outputs are consumed, not edited.
 - `[PI-4]` **Public seams are explicit** — a feature imports another feature through its public API rather than its implementation directories, refining architecture [PI-5].
@@ -45,15 +45,15 @@ module so feature ownership and import boundaries remain legible.
 
 ## 6. Caveats
 
-- `[C-1]` The generated `src/routeTree.gen.ts` and `worker-configuration.d.ts` files are overwritten by their respective tools and do not accept hand edits; tooling excludes the route tree from formatting and linting (`vite.config.ts:34`, `vite.config.ts:115`).
-- `[C-2]` Worker-only imports, including `cloudflare:workers`, stay on server execution paths; importing them into client-rendered components breaks the runtime boundary (`src/lib/db.ts:2`).
-- `[C-3]` `migrations_tmp/` belongs to Wrangler (`wrangler.jsonc:21`), while authored Drizzle schema history belongs in `db/migrations/`.
+- `[C-1]` The generated `src/client/routeTree.gen.ts` and `worker-configuration.d.ts` files are overwritten by their respective tools and do not accept hand edits; tooling excludes the route tree from formatting and linting (`vite.config.ts:48`, `vite.config.ts:188`).
+- `[C-2]` Worker-only imports, including `cloudflare:workers`, stay on server execution paths; importing them into client-rendered components breaks the runtime boundary (`src/server/lib/db.ts:2`).
+- `[C-3]` `migrations_tmp/` belongs to Wrangler (`wrangler.jsonc:21`), while authored Drizzle schema history belongs in `src/db/migrations/`.
 
 ## 7. High-Level Components
 
-| Component         | Module type | Responsibility                                                                           | Public API surface                                                            |
-| ----------------- | ----------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Repository layout | Convention  | Places application, database, documentation, static assets and tooling by responsibility | Directory contract rooted at `src/`, `db/`, `docs/`, `public/` and `scripts/` |
+| Component         | Module type | Responsibility                                                                           | Public API surface                                                     |
+| ----------------- | ----------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Repository layout | Convention  | Places application, database, documentation, static assets and tooling by responsibility | Directory contract rooted at `src/`, `docs/`, `public/` and `scripts/` |
 
 ## 8. Detailed Design
 
@@ -61,9 +61,6 @@ module so feature ownership and import boundaries remain legible.
 
 ```text
 recipe-organizer/
-├── db/
-│   ├── migrations/             # Authored Drizzle schema-history artefacts
-│   └── schema/                 # Table modules and relation exports
 ├── docs/
 │   ├── architecture.spec.md    # Architecture umbrella
 │   ├── file-structure.spec.md  # This repository-layout leaf
@@ -73,63 +70,78 @@ recipe-organizer/
 ├── public/                     # Static assets
 ├── scripts/                    # Build and development tooling
 ├── src/
-│   ├── components/             # Shared UI, form, layout and error components
-│   ├── features/
-│   │   └── <feature>/
-│   │       ├── api/            # Feature Hono routes, schemas, and query/mutation wrappers
-│   │       ├── components/     # Feature UI
-│   │       ├── contexts/       # Feature React contexts
-│   │       ├── hooks/          # Feature React hooks
-│   │       ├── types/          # Feature-only types
-│   │       ├── utils/          # Feature-only helpers
-│   │       └── spec/           # Feature specs when the domain has a spec tree
-│   ├── hooks/                  # Shared React hooks
-│   ├── lib/                    # Binding-, SDK- or application-runtime-dependent code
-│   ├── routes/                 # File-based browser pages
-│   ├── stores/                 # Cross-feature persisted UI state
-│   ├── styles/                 # Global styles
-│   ├── types/                  # Types shared by feature domains
-│   ├── utils/                  # Pure reusable helpers
-│   ├── main.tsx                # Browser SPA entry
-│   ├── routeTree.gen.ts        # Generated TanStack Router tree
-│   ├── router.tsx              # Router factory and Query provider
-│   └── sw.ts                   # Service-worker entry
+│   ├── client/
+│   │   ├── components/         # Browser UI, forms, layout, navigation, and errors
+│   │   ├── features/
+│   │   │   └── <feature>/      # UI, query wrappers, local state, and colocated feature specs
+│   │   ├── hooks/              # Shared React hooks
+│   │   ├── lib/                # Browser application services and API client
+│   │   ├── routes/             # File-based browser pages
+│   │   ├── stores/             # Cross-feature persisted UI state
+│   │   ├── styles/             # Global browser styles
+│   │   ├── types/              # Frontend-inferred API types
+│   │   ├── utils/              # Browser-only helpers
+│   │   ├── main.tsx            # Browser SPA entry
+│   │   ├── routeTree.gen.ts    # Generated TanStack Router tree
+│   │   ├── router.tsx          # Router factory and Query provider
+│   │   └── sw.ts               # Service-worker entry
+│   ├── db/
+│   │   ├── migrations/         # Authored Drizzle schema-history artefacts
+│   │   └── schema/             # Table modules and relation exports
+│   ├── server/
+│   │   ├── routes/<feature>/   # Hono routes and feature DB utilities
+│   │   ├── lib/                # Auth, D1, R2, cache, and Worker services
+│   │   ├── utils/              # Server helpers and authorization checks
+│   │   ├── api-context.ts      # Request API context
+│   │   ├── api.ts              # Hono API composition
+│   │   └── index.ts            # Worker entry
+│   └── shared/
+│       ├── <feature>/schemas.ts # Cross-runtime feature schemas
+│       ├── recipe/constants.ts  # Shared recipe constants
+│       ├── ingredients/categories.ts
+│       ├── units.ts
+│       └── utils/               # Cross-runtime helpers
 ├── AGENTS.md                   # Contributor guidance
 ├── tsconfig.json               # TypeScript aliases and compiler configuration
 ├── vite.config.ts              # Application tooling configuration
 └── wrangler.jsonc              # Worker bindings and deployment configuration
 ```
 
-A feature owns only the subdirectories that carry its domain code. `api/routes.ts` owns its Hono
-route group; `api/schemas.ts` owns route input schemas; verb-oriented API files own TanStack Query
-wrappers over the typed Hono client (`src/features/recipe/api/routes.ts:45-203`,
-`src/features/users/api/get-all.ts:8-21`). `components/`, `contexts/`, `hooks/`, `types/` and `utils/`
-hold feature-scoped code. A feature does not carry `lib/`: code coupled to a
-binding or SDK belongs under the appropriate `src/lib/` topic.
+A feature spans runtime-specific directories: `src/client/features/<feature>/` owns its UI,
+query/mutation wrappers, and browser-local code; `src/server/routes/<feature>/` owns its Hono route
+group and feature DB utilities; `src/shared/<feature>/schemas.ts` owns schemas needed by both. Shared
+is not a general reuse bucket: only modules imported by both runtimes belong there. Frontend-inferred
+API types remain in `src/client/types/`. Feature specs remain colocated in `src/client/features/` so
+one spec tree documents both the browser surface and the matching server feature without crossing the
+runtime boundary in code.
 
-`src/components/` holds shared presentation by role: `ui/` contains repository-owned Base UI
-primitives; `forms/`, `dialogs/`, `layout/`, `navigation/`, `error/` and `icons/` hold their matching
-reusable component classes. Shared React hooks live in `src/hooks/`. `src/stores/` contains
-cross-feature TanStack Store state, while a feature-local store remains in its feature directory.
+Oxlint import restrictions in `vite.config.ts` enforce the runtime boundary: client and server may
+import shared modules, but shared imports neither runtime, and server does not import client code.
+Client code cannot import database schemas, Worker modules, or server code, except for the type-only
+`@server/api` import in `src/client/lib/api-client.ts` used by `hc<typeof api>`. This exception preserves
+inferred Hono contracts without including the server implementation in the browser bundle.
 
-`src/utils/` contains helpers without React, DOM, fetch, database or Worker-binding dependencies.
-`src/lib/` contains application services and dependencies that need those runtime capabilities,
-including the Hono API and client, authentication, database access, R2 access, cache management and persistence helpers.
+`src/client/components/` holds shared presentation by role: `ui/` contains repository-owned Base UI
+primitives; `forms/`, `dialogs/`, `layout/`, `navigation/`, `error/`, and `icons/` hold their matching
+reusable component classes. Shared React hooks and persisted stores live in `src/client/hooks/` and
+`src/client/stores/`. `src/client/lib/` and `src/client/utils/` contain browser application services
+and browser-only helpers. `src/server/lib/` contains Worker-bound auth, database, R2, and cache
+services. `src/shared/` contains cross-runtime schemas, constants, units, and helpers. Shared media URL
+helpers use the common Vite `import.meta.env.DEV` flag; they do not depend on browser or Worker bindings.
 
-`index.html` loads `src/main.tsx`, which mounts the browser SPA. Routes use `src/routes/` and mirror
-their URL segments. A dynamic segment uses the TanStack Router `$parameter` filename form. The
-Worker entry is `src/lib/api-handler.ts`; it dispatches `/api/*` to Hono rather than using route
-files as HTTP handlers. Route files do not become feature internals: they compose a feature's public
-UI surface.
+`index.html` loads `src/client/main.tsx`, which mounts the browser SPA. Routes use
+`src/client/routes/` and mirror their URL segments. A dynamic segment uses the TanStack Router
+`$parameter` filename form. The Worker entry is `src/server/index.ts`; it dispatches `/api/*` to Hono
+rather than using route files as HTTP handlers. Route files do not become feature internals: they
+compose a feature's public UI surface.
 
-Database table modules live under `db/schema/`, which exports the schema and relations; generated
-schema-history artefacts live under `db/migrations/`. Root configuration and tool-owned directories remain
-at the repository root, separating application code from deployment and build configuration.
+Database table modules live under `src/db/schema/`, which exports the schema and relations; generated
+schema-history artefacts live under `src/db/migrations/`. Root configuration and tool-owned directories
+remain at the repository root, separating deployment and build configuration from application code.
 
-All ordinary filenames use kebab-case (`vite.config.ts:74`). `.ts` identifies modules without JSX and
+All ordinary filenames use kebab-case (`vite.config.ts:120`). `.ts` identifies modules without JSX and
 `.tsx` identifies modules that contain JSX. Specs use the `.spec.md` suffix. Cross-directory
-application imports use `@/` (`tsconfig.json:26`); same-directory dependencies use relative imports. Feature-to-feature imports use the owning
-feature's public API and do not reach into another feature's private implementation directories.
+application imports use `@client/*`, `@server/*`, and `@shared/*` for runtime paths, and `@schema` for database schema exports (`tsconfig.json:26-29`); same-directory dependencies use relative imports. Feature-to-feature imports use the owning feature's public API and do not reach into another feature's private implementation directories.
 
 ## 9. Open Questions
 
@@ -137,7 +149,9 @@ N/A.
 
 ## Changelog
 
-| Date       | Amendment                                                                 | Sections affected | Reason                                    |
-| ---------- | ------------------------------------------------------------------------- | ----------------- | ----------------------------------------- |
-| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers. | 8.1               | Reflect the migrated feature API layout.  |
-| 2026-09-13 | Add the SPA entry and direct Hono Worker handler boundary.                | 8.1               | Remove route-file HTTP handler placement. |
+| Date       | Amendment                                                                    | Sections affected | Reason                                                                  |
+| ---------- | ---------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
+| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers.    | 8.1               | Reflect the migrated feature API layout.                                |
+| 2026-09-13 | Add the SPA entry and direct Hono Worker handler boundary.                   | 8.1               | Remove route-file HTTP handler placement.                               |
+| 2026-09-13 | Separate client, server, and shared modules with enforced import boundaries. | 3, 4, 6, 8.1      | Make runtime ownership explicit without adding packages or deployments. |
+| 2026-09-13 | Rename the server feature directory to `routes`.                             | 3, 8.1            | Match the server route layout.                                          |

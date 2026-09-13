@@ -20,12 +20,12 @@ feature from independently composing field state, error presentation, and submis
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                         | Rationale                                                                                                                             |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `src/hooks/use-app-form.ts:18-42`. |
-| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding feature API route                        | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.         |
-| `[KD-3]` Error projection    | TanStack Form errors are projected into Base UI Form and Field primitives                      | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                       |
-| `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/utils/form-data.ts:1-28`).  |
+| Decision                     | Choice                                                                                         | Rationale                                                                                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `src/client/hooks/use-app-form.ts:18-42`. |
+| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding feature API route                        | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.                |
+| `[KD-3]` Error projection    | TanStack Form errors are projected into Base UI Form and Field primitives                      | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                              |
+| `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/shared/utils/form-data.ts:1-28`).  |
 
 ## 4. Principles & Intents
 
@@ -46,22 +46,22 @@ feature from independently composing field state, error presentation, and submis
 ## 6. Caveats
 
 - `[C-1]` `FormData` omits `undefined` and `null`; an input contract that distinguishes an explicit
-  clearing value represents it directly rather than relying on an absent entry (`src/utils/form-data.ts:1-10`).
+  clearing value represents it directly rather than relying on an absent entry (`src/shared/utils/form-data.ts:1-10`).
 - `[C-2]` File previews use browser resources and upload acceptance is a user-experience check;
   server validation and storage controls remain required.
 - `[C-3]` Nested dialog forms stop submit propagation because a dialog can render within a page
-  form (`src/components/dialogs/form-dialog.tsx:29-40`).
+  form (`src/client/components/dialogs/form-dialog.tsx:29-40`).
 
 ## 7. High-Level Components
 
-| Component         | Module type                              | Responsibility                                      | Public API surface                  |
-| ----------------- | ---------------------------------------- | --------------------------------------------------- | ----------------------------------- |
-| Form factory      | `src/hooks/use-app-form.ts`              | Register fields and form components                 | `useAppForm`, `withForm`            |
-| Field components  | `src/components/forms/*`                 | Bind a typed field value to a UI control            | registered `*Field` components      |
-| UI wrappers       | `src/components/ui/{form,field}.tsx`     | Associate errors, labels, controls, and messages    | `Form`, `Field`, error slots        |
-| File adapter      | `src/hooks/use-file-upload.ts`           | Select, validate, preview, and remove browser files | `useFileUpload`, `FileMetadata`     |
-| Dialog adapter    | `src/components/dialogs/form-dialog.tsx` | Place a shared form inside dialog chrome            | `getFormDialog()`                   |
-| Transport helpers | `src/utils/form-data.ts`                 | Convert values to and from multipart payloads       | `objectToFormData`, `parseFormData` |
+| Component         | Module type                                     | Responsibility                                      | Public API surface                  |
+| ----------------- | ----------------------------------------------- | --------------------------------------------------- | ----------------------------------- |
+| Form factory      | `src/client/hooks/use-app-form.ts`              | Register fields and form components                 | `useAppForm`, `withForm`            |
+| Field components  | `src/client/components/forms/*`                 | Bind a typed field value to a UI control            | registered `*Field` components      |
+| UI wrappers       | `src/client/components/ui/{form,field}.tsx`     | Associate errors, labels, controls, and messages    | `Form`, `Field`, error slots        |
+| File adapter      | `src/client/hooks/use-file-upload.ts`           | Select, validate, preview, and remove browser files | `useFileUpload`, `FileMetadata`     |
+| Dialog adapter    | `src/client/components/dialogs/form-dialog.tsx` | Place a shared form inside dialog chrome            | `getFormDialog()`                   |
+| Transport helpers | `src/shared/utils/form-data.ts`                 | Convert values to and from multipart payloads       | `objectToFormData`, `parseFormData` |
 
 ## 8. Detailed Design
 
@@ -69,9 +69,9 @@ feature from independently composing field state, error presentation, and submis
 
 `useAppForm(options)` returns a form with `AppField`, `AppForm`, and `FormSubmit`; `withForm(config)`
 produces a typed reusable form view. The registry includes text, numeric, selection, toggle, file,
-and editor fields plus Base UI field slots (`src/hooks/use-app-form.ts:18-40`). A field reads its
+and editor fields plus Base UI field slots (`src/client/hooks/use-app-form.ts:18-40`). A field reads its
 value and metadata from field context, updates through the field handler, and renders a named Field
-with an error slot; the text implementation demonstrates that boundary (`src/components/forms/text-field.tsx:10-25`).
+with an error slot; the text implementation demonstrates that boundary (`src/client/components/forms/text-field.tsx:10-25`).
 
 Feature forms provide typed defaults, a server-owned schema, submit behavior, and reusable child
 views. Dynamic collections use the form array-field surface; each row carries a stable browser key
@@ -83,12 +83,12 @@ Forms apply their schema through TanStack Form revalidation and project the firs
 `Form errors`. Page submission prevents browser navigation and invokes `form.handleSubmit()`. A
 dialog produced by `getFormDialog(defaultValues)` selects errors from form state, disables cancel
 while submitting, stops propagation, and supplies its typed submit component
-(`src/components/dialogs/form-dialog.tsx:18-54`).
+(`src/client/components/dialogs/form-dialog.tsx:18-54`).
 
 The multipart submit contract is `values -> FormData -> Hono route parser -> schema`; JSON-only
 mutations send their validated values through the typed Hono client. `objectToFormData` appends a raw
 `File` and JSON-stringifies other present values; `parseFormData` restores parseable string entries
-before route validation (`src/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
+before route validation (`src/shared/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
 `{ id, url }` metadata so an unchanged asset retains its reference.
 
 ### 8.3 Field value and UI contract
@@ -107,7 +107,7 @@ comboboxes, checkboxes, and toggle groups differ only in the value/control trans
 | Image and video          | `File                        | FileMetadata                                                               | undefined` | Selection exposes a browser file or an unchanged asset reference. |
 | Array field              | collection of typed items    | Parent form owns add, remove, and stable browser keys.                     |
 
-The editor field is lazy in the registry (`src/hooks/use-app-form.ts:16-33`). A screen placing it in
+The editor field is lazy in the registry (`src/client/hooks/use-app-form.ts:16-33`). A screen placing it in
 the form provides a suspense boundary sized for the editor region, so editor loading does not change
 the form's structural contract.
 
@@ -128,7 +128,7 @@ inventing a server record.
 `useFileUpload` accepts type, size, multiplicity, initial metadata, and change callbacks. It exposes
 drag/drop, picker, and removal interactions, rejects unacceptable files, and supplies previews. Its
 paste listener ignores focused textareas and contenteditable elements, preserving rich-text editing
-(`src/hooks/use-file-upload.ts:181-205`).
+(`src/client/hooks/use-file-upload.ts:181-205`).
 
 A single-file field replaces its selected value. A file metadata value supplies an existing preview
 and travels back through form state when the user retains that asset. Image and video fields set the

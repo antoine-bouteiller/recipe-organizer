@@ -25,10 +25,10 @@ of Worker-owned data while preserving responsive, device-local interactions.
 | Decision                    | Choice                                                                                 | Rationale                                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | `[KD-1]` Server records     | TanStack Query owns data returned by Hono RPC clients                                  | Cache invalidation and refetch remain possible because server data has one browser representation; this refines `client.spec.md` `[PI-1]`. |
-| `[KD-2]` Query identity     | Feature query options use central `queryKeys` helpers                                  | Stable keys make prefetch and invalidation address the same resource; key families are defined in `src/lib/query-keys.ts:1-13`.            |
+| `[KD-2]` Query identity     | Feature query options use central `queryKeys` helpers                                  | Stable keys make prefetch and invalidation address the same resource; key families are defined in `src/client/lib/query-keys.ts:1-13`.     |
 | `[KD-3]` Durable UI state   | TanStack Store persists data-only, user-controlled selections through `persistedStore` | Small ID- and preference-shaped stores survive reload without copying server entities.                                                     |
 | `[KD-4]` Shareable state    | Route search schemas own bookmarkable and history-sensitive values                     | URL state participates in browser navigation and validates at the route boundary.                                                          |
-| `[KD-5]` Browser preference | Theme uses browser cookies and route context                                           | The browser application selects its theme before feature screens render (`src/lib/theme.ts`; `src/routes/__root.tsx`).                     |
+| `[KD-5]` Browser preference | Theme uses browser cookies and route context                                           | The browser application selects its theme before feature screens render (`src/client/lib/theme.ts`; `src/client/routes/__root.tsx`).       |
 
 ## 4. Principles & Intents
 
@@ -50,22 +50,22 @@ of Worker-owned data while preserving responsive, device-local interactions.
 ## 6. Caveats
 
 - `[C-1]` Browser storage can be unavailable or contain malformed values. `persistedStore` guards
-  storage access and falls back to the supplied initial value (`src/lib/persisted-store.ts:3-22`).
+  storage access and falls back to the supplied initial value (`src/client/lib/persisted-store.ts:3-22`).
 - `[C-2]` Query cache freshness is five minutes and garbage collection is one day, so a visible
-  screen can require invalidation after a successful write (`src/router.tsx:23-30`).
+  screen can require invalidation after a successful write (`src/client/router.tsx:23-30`).
 - `[C-3]` A selection-derived query key changes when selection changes; it suits compact user
   selections rather than unbounded collections.
 
 ## 7. High-Level Components
 
-| Component              | Module type                   | Responsibility                                    | Public API surface                          |
-| ---------------------- | ----------------------------- | ------------------------------------------------- | ------------------------------------------- |
-| Query cache            | Router `QueryClientProvider`  | Cache Worker-owned records and loader prefetch    | `QueryClient`, feature `*Options()`         |
-| Query keys             | `src/lib/query-keys.ts`       | Name query resource families                      | `queryKeys`                                 |
-| Persisted stores       | `src/stores/*.store.ts`       | Hold durable user selections and quantities       | selector hooks and action functions         |
-| Persistence adapter    | `src/lib/persisted-store.ts`  | Hydrate and write a data-only Store               | `persistedStore<T>()`                       |
-| Route and cookie state | Routes and `src/lib/theme.ts` | Represent shareable values and browser preference | `validateSearch`, `getTheme`, `toggleTheme` |
-| Feature context        | `src/features/*/contexts/*`   | Thread a value through one feature subtree        | feature provider and hook                   |
+| Component              | Module type                          | Responsibility                                    | Public API surface                          |
+| ---------------------- | ------------------------------------ | ------------------------------------------------- | ------------------------------------------- |
+| Query cache            | Router `QueryClientProvider`         | Cache Worker-owned records and loader prefetch    | `QueryClient`, feature `*Options()`         |
+| Query keys             | `src/client/lib/query-keys.ts`       | Name query resource families                      | `queryKeys`                                 |
+| Persisted stores       | `src/client/stores/*.store.ts`       | Hold durable user selections and quantities       | selector hooks and action functions         |
+| Persistence adapter    | `src/client/lib/persisted-store.ts`  | Hydrate and write a data-only Store               | `persistedStore<T>()`                       |
+| Route and cookie state | Routes and `src/client/lib/theme.ts` | Represent shareable values and browser preference | `validateSearch`, `getTheme`, `toggleTheme` |
+| Feature context        | `src/client/features/*/contexts/*`   | Thread a value through one feature subtree        | feature provider and hook                   |
 
 ## 8. Detailed Design
 
@@ -80,7 +80,7 @@ value uses feature context.
 ### 8.2 Query cache and routing
 
 `getRouter()` creates the QueryClient and explicitly wraps the Router in `QueryClientProvider`
-(`src/router.tsx`). A loader awaits `ensureQueryData(options)` and its screen consumes the same
+(`src/client/router.tsx`). A loader awaits `ensureQueryData(options)` and its screen consumes the same
 options through `useSuspenseQuery` or `useQuery`; the home route is the reference prefetch shape.
 Mutations invalidate the affected `queryKeys` family so subsequent readers obtain Worker-owned state.
 
@@ -88,16 +88,16 @@ Mutations invalidate the affected `queryKeys` family so subsequent readers obtai
 
 A store file exports a selector hook plus action functions over a data-only Store. The shopping-list
 store, for example, persists only recipe IDs and exposes add, remove, and reset operations
-(`src/stores/shopping-list.store.ts:1-12`). The shopping-list hook reads those IDs and quantities,
+(`src/client/stores/shopping-list.store.ts:1-12`). The shopping-list hook reads those IDs and quantities,
 then queries recipes with an IDs-derived query option before aggregation
-(`src/features/shopping-list/hooks/use-shopping-list.ts:23-39`). It therefore retains no copy of
+(`src/client/features/shopping-list/hooks/use-shopping-list.ts:23-39`). It therefore retains no copy of
 recipe records in local persistence.
 
 ### 8.4 Persistent-store contract
 
 `persistedStore<T>(key, initial)` reads storage when the browser provides it, constructs a Store from
 the recovered value or initial value, and serialises each subsequent state update
-(`src/lib/persisted-store.ts:3-22`). Store state is data only: actions are exported functions that
+(`src/client/lib/persisted-store.ts:3-22`). Store state is data only: actions are exported functions that
 call `setState`, rather than functions embedded in the persisted state. A selector hook is the public
 read surface, allowing a component to subscribe to precisely the state it displays.
 
@@ -124,7 +124,7 @@ component, and mutation all address the same cache entry.
 
 The selection-to-query pattern is intentionally two-stage: store hooks produce IDs, a feature query
 option accepts those IDs, and the feature derives display data from the returned records. The
-shopping-list hook follows that arrangement (`src/features/shopping-list/hooks/use-shopping-list.ts:23-39`).
+shopping-list hook follows that arrangement (`src/client/features/shopping-list/hooks/use-shopping-list.ts:23-39`).
 An empty selection remains a valid query input and a screen determines its empty presentation.
 
 ### 8.6 Cookie, URL, local, and feature state
@@ -135,7 +135,7 @@ locally. A feature provider is appropriate only when a value must cross a deep s
 feature.
 
 Cookie state uses browser getter/setter helpers. Theme resolution falls back to the system preference
-when the cookie has no value (`src/lib/theme.ts`). Session cookies remain in the server authentication
+when the cookie has no value (`src/client/lib/theme.ts`). Session cookies remain in the server authentication
 contract, not in this state layer. Route context carries resolved cross-cutting values through matched
 routes and avoids a second global Context.
 

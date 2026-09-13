@@ -15,7 +15,7 @@ A modern recipe management application with a TanStack Router browser SPA and a 
 ## Tech Stack
 
 - **Frontend**: React 19, TanStack Router, TanStack Query, TanStack Form, TanStack Store
-- **Application**: TanStack Router browser SPA (`index.html` + `src/main.tsx`), React Query
+- **Application**: TanStack Router browser SPA (`index.html` + `src/client/main.tsx`), React Query
 - **Backend**: Hono on a Cloudflare Worker (`/api/*`)
 - **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
 - **Storage**: Cloudflare R2 for image storage
@@ -92,15 +92,10 @@ bun cf-typegen
 
 ```
 src/
-├── components/       # Reusable UI components
-│   ├── forms/       # Generic form fields
-│   └── ui/          # Shadcn UI components
-├── features/        # Feature modules (auth, recipe, ingredients)
-├── lib/             # Database, auth, utilities
-├── routes/          # File-based routing
-├── stores/          # Client state management
-├── types/           # TypeScript definitions
-└── hooks/           # Custom React hooks
+├── client/          # Browser UI, routes, query wrappers, state, and utilities
+├── db/              # Drizzle schema and migrations
+├── server/          # Worker entry, Hono API, feature routes, and Worker-bound libraries
+└── shared/          # Cross-runtime schemas, constants, units, and helpers
 ```
 
 ## Contributing
@@ -116,7 +111,7 @@ This project uses:
 
 Configured for Cloudflare Workers with:
 
-- `src/lib/api-handler.ts` as the Worker entry, exporting `fetch`
+- `src/server/index.ts` as the Worker entry, exporting `fetch`
 - Static browser assets with SPA fallback; `/api` and `/api/*` run the Worker first
 - D1 database binding
 - R2 bucket for images

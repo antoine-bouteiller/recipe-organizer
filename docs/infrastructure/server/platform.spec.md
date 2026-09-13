@@ -20,7 +20,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 | Decision                      | Choice                                                                                            | Rationale                                                                                                 |
 | ----------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | `src/lib/api-handler.ts` exports the direct Cloudflare Worker `fetch` handler.                    | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA. |
+| `[KD-1]` Worker runtime       | `src/server/index.ts` exports the direct Cloudflare Worker `fetch` handler.                       | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA. |
 | `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                  |
 | `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                     |
 | `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.              |
@@ -45,11 +45,11 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[C-1]` The Worker runtime feature set is pinned by compatibility date and `nodejs_compat`
   (`wrangler.jsonc:4-6`); a change can affect runtime behavior.
 - `[C-2]` R2 receives a materialized image buffer because the transformed response needs a known
-  length (`src/lib/r2.ts:17-21`).
+  length (`src/server/lib/r2.ts:17-21`).
 - `[C-3]` Edge cache entries are local to an edge; the cache header remains the client-visible
   freshness contract.
 - `[C-4]` Service-worker caching only applies to GET requests under the selected runtime matcher
-  (`src/sw.ts:15-18`).
+  (`src/client/sw.ts:15-18`).
 
 ## 7. High-Level Components
 
@@ -65,7 +65,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Worker configuration
 
-The Worker entry is `src/lib/api-handler.ts`, whose default export supplies `fetch`; the
+The Worker entry is `src/server/index.ts`, whose default export supplies `fetch`; the
 configuration declares the `DB`, `R2_BUCKET`, and `IMAGES` bindings (`wrangler.jsonc:3-8`,
 `wrangler.jsonc:20-36`). Cloudflare assets serve the built browser SPA with
 `not_found_handling: "single-page-application"`, while `/api` and `/api/*` use
@@ -76,22 +76,22 @@ environment types so utility contracts stay typed.
 ### 8.2 Media write contract
 
 `uploadFile(file)` mints a UUID, transforms the stream to WebP `{ width: 640, quality: 80 }`,
-and writes the resulting bytes with its content type (`src/lib/r2.ts:9-23`). `uploadVideo(file)`
-writes the file bytes and supplied MIME type under the same opaque-key rule (`src/lib/r2.ts:28-36`).
+and writes the resulting bytes with its content type (`src/server/lib/r2.ts:9-23`). `uploadVideo(file)`
+writes the file bytes and supplied MIME type under the same opaque-key rule (`src/server/lib/r2.ts:28-36`).
 Callers persist keys, never public URLs or filename-derived paths.
 
 ### 8.3 Media read and cache contract
 
 The GET helper validates `{ id: string }`, returns 404 control flow when R2 has no object, and
-responds with object content type or the caller's fallback (`src/lib/r2.ts:42-65`). Image GET
+responds with object content type or the caller's fallback (`src/server/lib/r2.ts:42-65`). Image GET
 responses use `public, max-age=31536000, immutable`; video GET and HEAD responses use
-`public, max-age=86400, stale-while-revalidate=604800` (`src/lib/r2.ts:60-61`,
-`src/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
+`public, max-age=86400, stale-while-revalidate=604800` (`src/server/lib/r2.ts:60-61`,
+`src/server/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
 
 ### 8.4 Offline shell
 
 The Serwist worker owns the generated precache manifest and claims clients immediately
-(`src/sw.ts:9-25`). `serwistPlugin` builds and injects that manifest in `dist/client`
+(`src/client/sw.ts:9-25`). `serwistPlugin` builds and injects that manifest in `dist/client`
 (`scripts/generate-sw.ts:6-58`). The worker retains Serwist's `defaultCache`; it has no custom
 `_serverFn` runtime rule and does not promise additional offline behavior.
 
@@ -108,7 +108,7 @@ a fallback. This permits the image route to advertise WebP and the video route t
 stored MIME type without asking a client to infer the object representation.
 
 A missing object is not represented as an empty successful response. The helper throws a Hono
-`HTTPException(404)` before a response is built (`src/lib/r2.ts:51-55`), allowing the shared API
+`HTTPException(404)` before a response is built (`src/server/lib/r2.ts:51-55`), allowing the shared API
 boundary to return its `not_found` error envelope without caching a missing object.
 
 ### 8.7 Cache lifetime boundary

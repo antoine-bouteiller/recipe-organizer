@@ -131,9 +131,9 @@ const viteConfig = defineConfig({
     printWidth: 150,
     experimentalSortImports: {},
     experimentalTailwindcss: {
-      stylesheet: 'src/styles/app.css',
+      stylesheet: 'src/client/styles/app.css',
     },
-    ignorePatterns: ['src/routeTree.gen.ts'],
+    ignorePatterns: ['src/client/routeTree.gen.ts'],
   },
   resolve: {
     tsconfigPaths: true,
@@ -169,7 +169,12 @@ const viteConfig = defineConfig({
     },
   },
   plugins: [
-    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
+    tanstackRouter({
+      target: 'react',
+      autoCodeSplitting: true,
+      routesDirectory: 'src/client/routes',
+      generatedRouteTree: 'src/client/routeTree.gen.ts',
+    }),
     react({ compiler: true }),
     ...(isTest ? [] : [cloudflare()]),
     tailwindcss(),
