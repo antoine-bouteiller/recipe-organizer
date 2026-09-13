@@ -9,10 +9,8 @@ import { getDb } from '@/lib/db'
 
 // Better Auth must be instantiated per request: the Cloudflare `env` binding and
 // The D1 database are only available inside a request scope on Workers.
-export const getAuth = () => {
-  const db = getDb()
-
-  return betterAuth({
+export const getAuth = (db = getDb()) =>
+  betterAuth({
     baseURL: import.meta.env.VITE_PUBLIC_URL,
     database: drizzleAdapter(db, {
       provider: 'sqlite',
@@ -61,4 +59,3 @@ export const getAuth = () => {
       },
     },
   })
-}

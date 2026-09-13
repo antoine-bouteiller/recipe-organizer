@@ -1,6 +1,6 @@
 ---
 title: Client State
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/infrastructure/client/client.spec.md
@@ -24,7 +24,7 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 | Decision                        | Choice                                                                                 | Rationale                                                                                                                                  |
 | ------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Server records         | TanStack Query owns data returned by Worker contracts                                  | Cache invalidation and refetch remain possible because server data has one browser representation; this refines `client.spec.md` `[PI-1]`. |
+| `[KD-1]` Server records         | TanStack Query owns data returned by Hono RPC clients                                  | Cache invalidation and refetch remain possible because server data has one browser representation; this refines `client.spec.md` `[PI-1]`. |
 | `[KD-2]` Query identity         | Feature query options use central `queryKeys` helpers                                  | Stable keys make prefetch and invalidation address the same resource; key families are defined in `src/lib/query-keys.ts:1-13`.            |
 | `[KD-3]` Durable UI state       | TanStack Store persists data-only, user-controlled selections through `persistedStore` | Small ID- and preference-shaped stores survive reload without copying server entities.                                                     |
 | `[KD-4]` Shareable state        | Route search schemas own bookmarkable and history-sensitive values                     | URL state participates in browser navigation and validates at the route boundary.                                                          |
@@ -118,8 +118,8 @@ values have different invalidation, security, or lifetime semantics.
 
 ### 8.5 Invalidation and mutation boundary
 
-A feature mutation calls its server-function contract and, on success, invalidates the query key
-family representing the affected records. Components do not patch a parallel Store copy of a recipe,
+A feature mutation calls its Hono RPC client and, on success, invalidates the query key family
+representing the affected records. Components do not patch a parallel Store copy of a recipe,
 ingredient, or user. Query options and their keys identify the data relationship, so a loader,
 component, and mutation all address the same cache entry.
 
@@ -162,3 +162,9 @@ context merely to avoid a direct prop where the value has one consumer.
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                        | Sections affected | Reason                                            |
+| ---------- | ---------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| 2026-09-13 | Specify Hono RPC clients as TanStack Query's server-data source. | 3, 8.5            | Reflect the migrated query and mutation wrappers. |

@@ -1,6 +1,6 @@
 ---
 title: Authentication and Membership
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/infrastructure/server/server.spec.md
@@ -22,7 +22,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | ----------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | `[KD-1]` Identity framework   | Better Auth drives Google OAuth, session issuance, and its HTTP catch-all.               | OAuth state, PKCE, and cookie protocol stay in a maintained identity boundary.               |
 | `[KD-2]` Account admission    | Google-created accounts have `pending` status; only `active` accounts receive a session. | OAuth proves identity but does not establish group membership.                               |
-| `[KD-3]` Authorization shape  | `authGuard(role?)` resolves a user and injects it into protected server functions.       | Handlers obtain a consistent status and role decision before their body executes.            |
+| `[KD-3]` Authorization shape  | `authGuard(role?)` resolves a user and injects it into protected Hono routes.            | Routes obtain a consistent status and role decision before their body executes.              |
 | `[KD-4]` Session construction | `getAuth()` is a request-scoped factory using D1 and Worker secrets.                     | Worker bindings are request-scoped and sessions need the same persistence boundary as users. |
 | `[KD-5]` Login feedback       | Login consumes authorization failure codes and displays French messages.                 | A rejected member receives an actionable explanation without exposing server internals.      |
 
@@ -33,7 +33,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[PI-2]` **Server-side secrets** — refine architecture [C-7]; OAuth credentials and session
   secret only enter server-side factory configuration.
 - `[PI-3]` **Guard before effects** — refine server-functions [KD-2]; route context may inform UI,
-  but protected RPC repeats its authorization decision.
+  but protected Hono RPC repeats its authorization decision.
 
 ## 5. Non-Goals
 
@@ -59,16 +59,17 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | ------------------------- | ------------------------- | -------------------------------------------------- | ------------------------------------------ |
 | Auth factory              | Server library            | Configure Better Auth with D1, secrets, and Google | `getAuth()`                                |
 | Membership hooks          | Auth configuration        | Set pending accounts and reject inactive sessions  | `databaseHooks`                            |
-| Auth user resolver        | GET server function       | Resolve session identity or development identity   | `getAuthUser()`                            |
-| Guard middleware          | Server middleware         | Enforce presence, status, and optional role        | `authGuard(role?)`                         |
-| Browser client and routes | Client library and routes | Start sign-in, sign out, surface login outcomes    | `authClient`, `/auth/login`, `/api/auth/$` |
+| Auth user resolver        | Hono session route        | Resolve session identity or development identity   | `GET /api/session`                         |
+| Guard middleware          | Hono middleware           | Enforce presence, status, and optional role        | `authGuard(role?)`                         |
+| Browser client and routes | Client library and routes | Start sign-in, sign out, surface login outcomes    | `authClient`, `/auth/login`, `/api/auth/*` |
 
 ## 8. Detailed Design
 
 ### 8.1 Auth factory and secrets
 
-`getAuth()` creates Better Auth per request, connects the Drizzle adapter to `getDb()`, and exposes
-the account, session, user, and verification schema (`src/lib/auth/auth-server.ts:1-20`). It uses
+`getAuth(db = getDb())` creates Better Auth per request, connects the Drizzle adapter to that client,
+and exposes the account, session, user, and verification schema (`src/lib/auth/auth-server.ts:1-18`).
+The Hono request handler supplies its request-scoped database client. It uses
 `SESSION_SECRET` as the auth secret and passes Google client credentials only in the social-provider
 configuration (`src/lib/auth/auth-server.ts:45-51`). The TanStack cookie plugin joins framework
 responses to Better Auth cookie writes (`src/lib/auth/auth-server.ts:44-45`).
@@ -83,18 +84,20 @@ so client-facing auth calls cannot provide them (`src/lib/auth/auth-server.ts:52
 
 ### 8.3 User resolution and guard
 
-`getAuthUser()` is a GET server function. Development returns the bounded synthetic identity; other
-execution reads the Better Auth session headers and returns its id, role, and status
-(`src/lib/auth/get-auth-user.ts:33-51`). `authGuard()` redirects an absent user to login, redirects
-inactive statuses with their error code, rejects a missing admin role, and otherwise calls `next`
-with the user context (`src/lib/auth/auth-guard.ts:6-27`).
+`GET /api/session` returns the session identity or `null`; `getAuthUser()` consumes it through the
+typed Hono client and converts `null` to `undefined` (`src/lib/auth/get-auth-user.ts:1-30`).
+`getApiUser()` receives an explicit request-scoped development boolean, returning the bounded
+synthetic identity only when it is true; other execution reads Better Auth session headers
+(`src/lib/auth/api-user.ts:5-17`). `authGuard()` returns authorization failures or calls `next` with
+the user context.
 
 ### 8.4 OAuth and HTTP route contract
 
-The `/api/auth/$` file route delegates both GET and POST requests to the per-request Better Auth
-handler (`src/routes/api/auth/$.ts:6-14`). Better Auth owns the OAuth redirect, callback, state,
-PKCE, provider exchange, and session protocol. Application server functions never construct OAuth
-state or session cookies directly.
+The `/api/$` file route mounts Hono, which delegates GET and POST `/api/auth/*` requests to the
+per-request Better Auth handler (`src/lib/api.ts:17`). Request bodies, cookies, response headers and
+redirects pass through unchanged. Better Auth owns the OAuth redirect, callback, state, PKCE,
+provider exchange, and session protocol. Application Hono routes never construct OAuth state or
+session cookies directly.
 
 ### 8.5 Login and sign-out contract
 
@@ -106,8 +109,8 @@ an account UI; protected calls become anonymous once the session is absent.
 
 ### 8.6 Interaction boundary
 
-Auth owns identity, membership status, and role. Server functions consume `authGuard()` and enforce
-resource ownership; the data layer owns storage mechanics; platform owns Worker secret provisioning.
+Auth owns identity, membership status, and role. Hono feature routes consume `authGuard()` and
+enforce resource ownership; the data layer owns storage mechanics; platform owns Worker secret provisioning.
 This division refines the server umbrella dependency direction [KD-2].
 
 ### 8.7 Session semantics
@@ -123,8 +126,8 @@ This refines architecture [KD-5] and keeps cookie mechanics within the identity 
 ### 8.8 Role and ownership boundary
 
 `role` distinguishes administrative capability from ordinary membership. It does not make an
-administrator the owner of every row at the data-layer level; server functions explicitly decide
-where an administrator may bypass ownership, as specified in the server-functions leaf.
+administrator the owner of every row at the data-layer level; feature routes explicitly decide where
+an administrator may bypass ownership, as specified in the server-functions leaf.
 
 `status` is an admission state rather than a UI-only label. Both session issuance and guard
 execution interpret it, so a stale route screen cannot authorize a server mutation.
@@ -140,9 +143,9 @@ application message, while provider and server details remain in server-side dia
 
 ### 8.10 Development boundary
 
-The development identity is a bounded local capability selected only by `import.meta.env.DEV`
-(`src/lib/auth/get-auth-user.ts:34-41`). Production session resolution always calls Better Auth,
-so a deployed request has no synthetic identity path.
+The development identity is a bounded local capability selected by the explicit `development` value
+passed into the API request context (`src/lib/auth/api-user.ts:5-17`). Production session resolution
+always calls Better Auth, so a deployed request has no synthetic identity path.
 
 Tests can exercise status and role branches by supplying controlled resolver results. End-to-end
 provider verification remains dependent on configured Google credentials and callback origin.
@@ -150,3 +153,10 @@ provider verification remains dependent on configured Google credentials and cal
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                                   | Sections affected            | Reason                                                            |
+| ---------- | --------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------- |
+| 2026-09-13 | Mount Better Auth through Hono with a shared request-scoped Drizzle client. | 7, 8.1, 8.4                  | Preserve the auth contract while introducing the shared HTTP API. |
+| 2026-09-13 | Move session resolution and protected actions to Hono RPC.                  | 3, 4, 7, 8.3, 8.6, 8.8, 8.10 | Preserve membership policy across the migrated transport.         |

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 
-import { notFound } from '@tanstack/react-router'
 import { env } from 'cloudflare:workers'
+import { HTTPException } from 'hono/http-exception'
 import * as z from 'zod'
 
 import { cache } from './cache-manager'
@@ -52,7 +52,7 @@ export const createR2GetHandler =
       const file = await env.R2_BUCKET.get(id)
 
       if (!file) {
-        throw notFound()
+        throw new HTTPException(404, { message: 'not_found' })
       }
 
       return new Response(file.body, {
@@ -74,7 +74,7 @@ export const createR2HeadHandler =
       const file = await env.R2_BUCKET.head(id)
 
       if (!file) {
-        throw notFound()
+        throw new HTTPException(404, { message: 'not_found' })
       }
 
       return new Response(null, {

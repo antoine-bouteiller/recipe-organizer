@@ -23,13 +23,13 @@ membership. Recipe Organizer is a single isomorphic React application served fro
 Worker, with all state — relational data, blobs, sessions — kept inside one provider so there is no
 second service to operate.
 
-- `[G-1]` Serve the whole product — pages, RPC, OAuth callback, media streaming — from a single
-  Cloudflare Worker with no separate API tier.
+- `[G-1]` Serve the whole product — pages, Hono RPC, OAuth callback, and media streaming — from a
+  single Cloudflare Worker with no separate API tier.
 - `[G-2]` Keep every persistent byte on Cloudflare: relational rows in D1, blobs in R2.
 - `[G-3]` Admit users only through Google OAuth plus explicit admin approval, and enforce ownership
   on every write.
-- `[G-4]` Give each product domain a self-contained feature module that owns its server functions,
-  UI and client state.
+- `[G-4]` Give each product domain a self-contained feature module that owns its Hono routes, UI,
+  and client state.
 - `[G-5]` Work offline as an installable PWA for browsing already-visited content.
 - `[G-6]` Present a French-only interface, including validation messages.
 
@@ -37,7 +37,7 @@ second service to operate.
 
 | Decision                          | Choice                                                             | Rationale                                                                                                                                                                                                                   |
 | --------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Runtime                  | TanStack Start on one Cloudflare Worker                            | One TypeScript codebase covers document rendering, RPC and HTTP handlers; the Worker is the API, so there is no second deployment target to keep in sync.                                                                   |
+| `[KD-1]` Runtime                  | TanStack Start and Hono on one Cloudflare Worker                   | One TypeScript codebase covers document rendering, Hono RPC and HTTP handlers; the Worker is the API, so there is no second deployment target to keep in sync.                                                              |
 | `[KD-2]` Render mode              | Client-only routes, SSR limited to the root shell                  | Every page is personalised and auth-dependent, so server-rendered page HTML is never shareable; rendering only the shell removes hydration mismatch as a class of bug and lets `localStorage`-backed state render directly. |
 | `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                                                                                      |
 | `[KD-4]` ORM                      | Drizzle with `defineRelations`                                     | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                                                                                     |
@@ -51,12 +51,12 @@ second service to operate.
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **The Worker is the API** — any server-side concern is reachable as a server function or a
-  route handler; no separate service is introduced.
-- `[PI-2]` **Thin server functions** — validate, touch the database or bucket, return; substantial
-  logic moves to `src/lib/`.
-- `[PI-3]` **Validate at the trust boundary** — every write parses its input with Zod inside the
-  server function, never relying on client-side validation.
+- `[PI-1]` **The Worker is the API** — any server-side concern is reachable through Hono or a route
+  handler; no separate service is introduced.
+- `[PI-2]` **Thin feature routes** — validate, touch the database or bucket, return; substantial
+  logic moves to feature utilities or `src/lib/`.
+- `[PI-3]` **Validate at the trust boundary** — every write parses its input with Zod inside its
+  Hono route, never relying on client-side validation.
 - `[PI-4]` **Never duplicate server data in a store** — stores hold identifiers and selections; the
   data behind them is refetched by query.
 - `[PI-5]` **Features are self-contained** — cross-feature use goes through a feature's public API,
@@ -96,7 +96,7 @@ second service to operate.
                     ┌───────────────────────── Cloudflare Worker ─────────────────────────┐
    Browser          │                                                                     │
    ┌──────────┐     │   ┌────────────┐   ┌──────────────────┐   ┌────────────────────┐    │
-   │ Router   │────▶│   │ Root shell │──▶│ Server functions │──▶│ Data layer         │───▶│──▶ D1
+   │ Router   │────▶│   │ Root shell │──▶│ Hono routes      │──▶│ Data layer         │───▶│──▶ D1
    │ Query    │ RPC │   │ + auth     │   │ (validate/guard) │   │ (Drizzle schema)   │    │
    │ Store    │     │   └────────────┘   └──────────────────┘   └────────────────────┘    │
    │ Forms    │     │          │                   │                                      │
@@ -107,17 +107,17 @@ second service to operate.
    └──────────┘
 ```
 
-| Component         | Module type            | Responsibility                                                         | Public API surface                                               |
-| ----------------- | ---------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| Repository layout | Convention             | Where each kind of module lives and what may import what               | Directory contract under `src/`                                  |
-| Platform          | Worker configuration   | Worker entry, bindings, edge cache, media handlers, service worker, CI | `wrangler.jsonc` bindings, `src/lib/{r2,cache-manager}.ts`       |
-| Data layer        | Library                | Drizzle schema, relations, per-request client, migrations              | `getDb()`, table and relation exports                            |
-| Server functions  | Library + convention   | Validated, guarded RPC and its query/mutation option factories         | `createServerFn` handlers, `*Options()` factories, `authGuard()` |
-| Auth              | Feature-adjacent infra | Google OAuth exchange, encrypted sessions, role and status enforcement | `getAuthUser()`, `authGuard()`, auth routes                      |
-| Routing & SSR     | Convention             | File-based routes, route context, loaders, render-mode boundaries      | Route tree, `beforeLoad` context                                 |
-| Forms             | Library                | Single application form hook over TanStack Form, Zod and Base UI       | `useAppForm`, `withForm`, field components                       |
-| Client state      | Library                | Persisted UI state stores and their layering against server state      | `src/stores/*`, `persistedStore`                                 |
-| Feature modules   | Feature directories    | Recipe, ingredients, search, shopping list and users domains           | Per-feature `api/` and components                                |
+| Component         | Module type            | Responsibility                                                         | Public API surface                                              |
+| ----------------- | ---------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Repository layout | Convention             | Where each kind of module lives and what may import what               | Directory contract under `src/`                                 |
+| Platform          | Worker configuration   | Worker entry, bindings, edge cache, media handlers, service worker, CI | `wrangler.jsonc` bindings, `src/lib/{r2,cache-manager}.ts`      |
+| Data layer        | Library                | Drizzle schema, relations, per-request client, migrations              | `getDb()`, table and relation exports                           |
+| Hono API          | Library + convention   | Validated, guarded feature routes and query/mutation option factories  | Hono routes, `apiClient`, `*Options()` factories, `authGuard()` |
+| Auth              | Feature-adjacent infra | Google OAuth exchange, encrypted sessions, role and status enforcement | `getAuthUser()`, `authGuard()`, auth routes                     |
+| Routing & SSR     | Convention             | File-based routes, route context, loaders, render-mode boundaries      | Route tree, `beforeLoad` context                                |
+| Forms             | Library                | Single application form hook over TanStack Form, Zod and Base UI       | `useAppForm`, `withForm`, field components                      |
+| Client state      | Library                | Persisted UI state stores and their layering against server state      | `src/stores/*`, `persistedStore`                                |
+| Feature modules   | Feature directories    | Recipe, ingredients, search, shopping list and users domains           | Per-feature `api/` and components                               |
 
 Leaf execution order:
 
@@ -137,7 +137,7 @@ than owning any section of it.
 | Repository layout | [`file-structure.spec.md`](./file-structure.spec.md)                                                                                                                                                                                                                                               |
 | Platform          | [`infrastructure/server/platform.spec.md`](./infrastructure/server/platform.spec.md)                                                                                                                                                                                                               |
 | Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                           |
-| Server functions  | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
+| Hono API          | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
 | Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                       |
 | Routing & SSR     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
 | Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                     |
@@ -149,16 +149,15 @@ than owning any section of it.
 A page request reaches the Worker, whose root route resolves the session cookie and theme cookie into
 the route context `{ authUser, queryClient, theme, isAdmin }`, then returns the document shell. The
 client router takes over: the matched route's loader prefetches through
-`queryClient.ensureQueryData(...)`, which calls the feature's server function over RPC; that handler
-runs its guard, parses its input, reads D1 and returns serialisable data. Store-backed UI state is
-read directly from `localStorage` on the same pass, since no server render of the page exists to
-diverge from.
+`queryClient.ensureQueryData(...)`, which calls the feature's Hono RPC query client; the route runs
+its guard, parses its input, reads D1 and returns JSON data. Store-backed UI state is read directly
+from `localStorage` on the same pass, since no server render of the page exists to diverge from.
 
 ### 8.2 Write lifecycle
 
-A form submission serialises to `FormData`, a mutation invokes the feature's server function, and the
-handler runs guard → validator → blob write → row writes, in that order, so a rejected input never
-reaches storage. On success the mutation invalidates the affected query keys, raises a toast and lets
+A form submission serialises to JSON or `FormData`, a mutation invokes the feature's Hono RPC
+client, and the route runs guard → validator → blob write → row writes, in that order, so a rejected
+input never reaches storage. On success the mutation invalidates the affected query keys, raises a toast and lets
 the router navigate; on failure the error surfaces as a single French message and the form maps field
 errors back onto their inputs.
 
@@ -176,6 +175,7 @@ possession of a URL is never a capability derived from guessing.
 
 ## Changelog
 
-| Date       | Amendment                   | Sections affected |
-| ---------- | --------------------------- | ----------------- |
-| 2026-09-12 | Use 640px WebP q80 uploads. | 3                 |
+| Date       | Amendment                                            | Sections affected   | Reason                                                                        |
+| ---------- | ---------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads.                          | 3                   |                                                                               |
+| 2026-09-13 | Move feature actions to Hono RPC routes and clients. | 2, 3, 4, 7, 8.1–8.2 | Keep feature transport in the shared Worker while replacing server functions. |

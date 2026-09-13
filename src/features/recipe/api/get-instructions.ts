@@ -1,31 +1,16 @@
 import { queryOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import * as z from 'zod'
 
-import { getDb } from '@/lib/db'
+import { apiClient, readResponse } from '@/lib/api-client'
 import { queryKeys } from '@/lib/query-keys'
-import { withServerError } from '@/utils/error-handler'
 
-const getRecipeInstructionsSchema = z.number()
-
-const getRecipeInstructions = createServerFn({
-  method: 'GET',
-})
-  .validator(getRecipeInstructionsSchema)
-  .handler(
-    withServerError(async ({ data }) => {
-      const result = await getDb().query.recipe.findFirst({
-        columns: { id: true, instructions: true, name: true },
-        where: { id: data },
-      })
-
-      return result ?? undefined
-    })
-  )
+const getRecipeInstructions = async (id: number) => {
+  const result = await readResponse(apiClient.recipes[':id'].instructions.$get({ param: { id: String(id) } }))
+  return result ?? undefined
+}
 
 const getRecipeInstructionsOptions = (id: number) =>
   queryOptions({
-    queryFn: () => getRecipeInstructions({ data: id }),
+    queryFn: () => getRecipeInstructions(id),
     queryKey: queryKeys.recipeInstructions(id),
     staleTime: 5 * 60 * 1000,
   })

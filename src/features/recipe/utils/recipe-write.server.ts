@@ -1,7 +1,7 @@
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes, type UnitSlug } from '@schema'
 import { inArray } from 'drizzle-orm'
 
-import { getDb } from '@/lib/db'
+import { type getDb } from '@/lib/db'
 import { isNotEmpty } from '@/utils/array'
 
 interface IngredientGroupWrite {
@@ -42,23 +42,27 @@ const computeAutoFlags = (
   }
 }
 
-export const resolveAutoFlags = async ({ allIngredientIds, linkedRecipeIds, instructions, meals }: ResolveAutoFlagsInput): Promise<AutoFlags> => {
-  const [ingredientCategories, linkedRecipesData] = await getDb().batch([
-    getDb().select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
-    getDb().select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
+export const resolveAutoFlags = async (
+  db: ReturnType<typeof getDb>,
+  { allIngredientIds, linkedRecipeIds, instructions, meals }: ResolveAutoFlagsInput
+): Promise<AutoFlags> => {
+  const [ingredientCategories, linkedRecipesData] = await db.batch([
+    db.select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
+    db.select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
   ])
 
   return computeAutoFlags(ingredientCategories, linkedRecipesData, instructions, meals)
 }
 
 export const writeRecipeIngredientGraph = async (
+  db: ReturnType<typeof getDb>,
   recipeId: number,
   ingredientGroups: readonly IngredientGroupWrite[],
   linkedRecipes: LinkedRecipeWrite[] | undefined
 ): Promise<void> => {
   await Promise.all(
     ingredientGroups.map(async (group, index) => {
-      const [createdGroup] = await getDb()
+      const [createdGroup] = await db
         .insert(recipeIngredientGroup)
         .values({
           groupName: group.groupName,
@@ -68,29 +72,25 @@ export const writeRecipeIngredientGraph = async (
         .returning()
 
       if (group.ingredients.length > 0) {
-        await getDb()
-          .insert(groupIngredient)
-          .values(
-            group.ingredients.map((ingredientEntry) => ({
-              groupId: createdGroup.id,
-              ingredientId: ingredientEntry.id,
-              quantity: ingredientEntry.quantity,
-              unitSlug: ingredientEntry.unitSlug ?? undefined,
-            }))
-          )
+        await db.insert(groupIngredient).values(
+          group.ingredients.map((ingredientEntry) => ({
+            groupId: createdGroup.id,
+            ingredientId: ingredientEntry.id,
+            quantity: ingredientEntry.quantity,
+            unitSlug: ingredientEntry.unitSlug ?? undefined,
+          }))
+        )
       }
     })
   )
 
   if (isNotEmpty(linkedRecipes)) {
-    await getDb()
-      .insert(recipeLinkedRecipes)
-      .values(
-        linkedRecipes.map((lr) => ({
-          linkedRecipeId: lr.id,
-          ratio: lr.ratio,
-          recipeId,
-        }))
-      )
+    await db.insert(recipeLinkedRecipes).values(
+      linkedRecipes.map((lr) => ({
+        linkedRecipeId: lr.id,
+        ratio: lr.ratio,
+        recipeId,
+      }))
+    )
   }
 }

@@ -1,6 +1,6 @@
 ---
 title: Routing and SSR
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/infrastructure/client/client.spec.md
@@ -56,12 +56,12 @@ without becoming a feature data layer.
 
 ## 7. High-Level Components
 
-| Component      | Module type              | Responsibility                                                             | Public API surface                     |
-| -------------- | ------------------------ | -------------------------------------------------------------------------- | -------------------------------------- |
-| Router factory | `src/router.tsx`         | Create route context, query cache, matching defaults, and SSR-query bridge | `getRouter()`                          |
-| Root route     | `src/routes/__root.tsx`  | Resolve request context and render document shell                          | root `Route` context, `shellComponent` |
-| Page routes    | `src/routes/**/*.tsx`    | Parse URL state, gate entry, prefetch feature queries, render screens      | `createFileRoute()` declarations       |
-| HTTP routes    | `src/routes/api/**/*.ts` | Dispatch HTTP requests to platform and auth handlers                       | server `GET`, `POST`, `HEAD` handlers  |
+| Component      | Module type             | Responsibility                                                             | Public API surface                     |
+| -------------- | ----------------------- | -------------------------------------------------------------------------- | -------------------------------------- |
+| Router factory | `src/router.tsx`        | Create route context, query cache, matching defaults, and SSR-query bridge | `getRouter()`                          |
+| Root route     | `src/routes/__root.tsx` | Resolve request context and render document shell                          | root `Route` context, `shellComponent` |
+| Page routes    | `src/routes/**/*.tsx`   | Parse URL state, gate entry, prefetch feature queries, render screens      | `createFileRoute()` declarations       |
+| API adapter    | `src/routes/api/$.ts`   | Forward all HTTP methods, including media requests, to the shared Hono API | method-keyed server handlers           |
 
 ## 8. Detailed Design
 
@@ -113,10 +113,10 @@ not-found rendering remain router-level surfaces so a failed match has one consi
 
 ### 8.5 Errors, HTTP, and navigation
 
-The router supplies the root error and not-found surfaces (`src/router.tsx:39-52`). Route handlers
-under `/api` expose HTTP methods without a page component and delegate media, authentication, and
-platform behavior to the corresponding server-side contracts. A handler returns the response shape
-owned by that contract, including its headers and redirect semantics; page routes do not wrap it.
+The router supplies the root error and not-found surfaces (`src/router.tsx:39-52`). The `/api/$` route exposes HTTP methods without a page component and forwards them to the shared
+Hono API, which owns feature, authentication, session, health, and media responses. Hono media
+handlers delegate binary reads to platform R2 helpers. Each handler preserves the response shape, headers, and redirects
+owned by its contract; page routes do not wrap it.
 
 Forward links request view transitions; the router determines back navigation from history indexes
 (`src/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
@@ -144,7 +144,7 @@ screen-specific work colocated with the URL that needs it.
 
 A loader may read through a query option and return URL-derived values. It does not submit a form,
 write browser persistence, or perform a mutation. A component may render from loader data and the
-query cache, then delegates writes to the form and server-function contracts. These boundaries make
+query cache, then delegates writes to the form and Hono RPC contracts. These boundaries make
 intent preloading safe: visiting a link intent can populate a cache without causing a side effect.
 
 A route's pending UI represents the same screen shape as its resolved UI where practical. It does
@@ -155,3 +155,10 @@ render-time access fallback.
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                                      | Sections affected | Reason                                         |
+| ---------- | ------------------------------------------------------------------------------ | ----------------- | ---------------------------------------------- |
+| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.     |
+| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary. |
