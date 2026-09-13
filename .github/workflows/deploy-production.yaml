@@ -43,7 +43,7 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Build project
-        run: vp run build
+        run: vpr build
         env:
           VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
 
