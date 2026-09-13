@@ -6,8 +6,9 @@ on:
     branches:
       - main
     paths:
-      - src/**/*
-      - package.json
+      - apps/**/*
+      - packages/**/*
+      - pnpm-workspace.yaml
       - pnpm-lock.yaml
       - .github/workflows/deploy-production.yaml
 
@@ -42,13 +43,15 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Build project
-        run: vp build
+        run: vp run build
         env:
           VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
+          workingDirectory: apps/api
+          command: deploy dist/index.js --config wrangler.jsonc --no-bundle --keep-vars --var VITE_PUBLIC_URL:${{ vars.VITE_PUBLIC_URL }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 

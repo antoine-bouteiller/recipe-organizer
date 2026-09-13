@@ -1,6 +1,19 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
-  "entry": ["src/client/sw.ts", "src/client/routeTree.gen.ts", "src/**/*.test.ts", "oxlint/**/*.test.ts"],
-  "ignoreDependencies": ["cloudflare", "oxlint", "@oxlint/plugins"]
+  "workspaces": {
+    "apps/web": {
+      "entry": ["src/sw.ts", "src/**/*.test.ts"]
+    },
+    "apps/api": {
+      "entry": ["src/**/*.test.ts"]
+    },
+    "packages/shared": {
+      "entry": ["src/**/*.test.ts"]
+    },
+    "packages/oxlint": {
+      "entry": ["**/*.test.ts"]
+    }
+  },
+  "ignoreDependencies": ["cloudflare"]
 }

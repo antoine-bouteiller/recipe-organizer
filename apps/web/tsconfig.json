@@ -1,0 +1,12 @@
+{
+  "extends": "@recipe-organizer/config/tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite-plus/client", "@recipe-organizer/api/worker-configuration"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@client/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

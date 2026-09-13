@@ -1,18 +1,10 @@
-import { cloudflare } from '@cloudflare/vite-plugin'
-import tailwindcss from '@tailwindcss/vite'
-import { tanstackRouter } from '@tanstack/router-plugin/vite'
-import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
-
-import { serwistPlugin } from './scripts/generate-sw.ts'
-
-const isTest = Boolean(process.env.VITEST)
 
 const viteConfig = defineConfig({
   lint: {
     options: { typeAware: true, typeCheck: true },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
-    jsPlugins: [{ name: 'recipe-oranizer', specifier: './oxlint/index.ts' }],
+    jsPlugins: [{ name: 'recipe-oranizer', specifier: '@recipe-organizer/oxlint' }],
     categories: {
       correctness: 'error',
       suspicious: 'error',
@@ -131,60 +123,14 @@ const viteConfig = defineConfig({
     printWidth: 150,
     experimentalSortImports: {},
     experimentalTailwindcss: {
-      stylesheet: 'src/client/styles/app.css',
+      stylesheet: 'apps/web/src/styles/app.css',
     },
-    ignorePatterns: ['src/client/routeTree.gen.ts'],
+    ignorePatterns: ['apps/web/src/routeTree.gen.ts'],
   },
   resolve: {
     tsconfigPaths: true,
   },
-  build: {
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          groups: [
-            {
-              test: /node_modules\/react/,
-              name: 'react',
-            },
-            {
-              test: /node_modules\/react-dom/,
-              name: 'react-dom',
-            },
-            {
-              test: /node_modules\/@tanstack\/react-query/,
-              name: 'tanstack-query',
-            },
-          ],
-        },
-      },
-      onLog(level, log, defaultHandler) {
-        // Supress Lexical Warning
-        if (log.code === 'INVALID_ANNOTATION') {
-          return
-        }
-        // Handle all other logs normally
-        defaultHandler(level, log)
-      },
-    },
-  },
-  plugins: [
-    tanstackRouter({
-      target: 'react',
-      autoCodeSplitting: true,
-      routesDirectory: 'src/client/routes',
-      generatedRouteTree: 'src/client/routeTree.gen.ts',
-    }),
-    react({ compiler: true }),
-    ...(isTest ? [] : [cloudflare()]),
-    tailwindcss(),
-    serwistPlugin(),
-  ],
-  server: {
-    port: 3000,
-  },
   test: {
-    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts', 'oxlint/**/*.test.ts'],
     globals: true,
   },
 })

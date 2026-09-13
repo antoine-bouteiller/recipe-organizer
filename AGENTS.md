@@ -5,8 +5,8 @@ Full-stack recipe management app with a TanStack Router browser SPA and Hono API
 ## Quick Reference
 
 - **Toolchain:** Vite+ (`vp`) wrapping pnpm + Vite + Vitest + Oxlint + Oxfmt
-- **Dev:** `pnpm dev` (sets `CLOUDFLARE_ENV=dev`, then runs `vp dev`)
-- **Build:** `vp build`
+- **Dev:** `pnpm dev` (runs Vite on 3000 and Wrangler on 8787 in parallel)
+- **Build:** `pnpm build` (web assets, then the Worker bundle)
 - **Test:** `vp test`
 - **Check (fmt + lint + types):** `vp check`
 - **Lint:** `vp lint`
@@ -18,8 +18,8 @@ See the Vite+ section below for the full command reference.
 
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
-- **Runtime boundary:** the browser SPA starts at `index.html` and `src/client/main.tsx`; the Worker entry is `src/server/index.ts`'s default `fetch` export. Browser API calls use same-origin `/api/*` fetches.
-- **UI components are owned:** `src/client/components/ui/*` are our design system (one file per component, built on Base UI) — edit them directly, don't re-pull from a registry. `knip` enforces no dead exports there.
+- **Runtime boundary:** the browser SPA starts at `apps/web/index.html` and `apps/web/src/main.tsx`; the Worker entry is `apps/api/src/index.ts`'s default `fetch` export. Browser API calls use same-origin `/api/*` fetches.
+- **UI components are owned:** `apps/web/src/components/ui/*` are our design system (one file per component, built on Base UI) — edit them directly, don't re-pull from a registry. `knip` enforces no dead exports there.
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
 ## Guidelines
@@ -35,7 +35,7 @@ colocated with the code.
 - [Client State Layering](docs/infrastructure/client/client-state.spec.md)
 - [Routing & SPA](docs/infrastructure/client/routing-ssr.spec.md)
 - [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
-- Per-feature specs: `src/client/features/<name>/<name>.spec.md` (or `src/client/features/<name>/spec/index.spec.md`)
+- Per-feature specs: `apps/web/src/features/<name>/<name>.spec.md` (or `apps/web/src/features/<name>/spec/index.spec.md`)
 
 <!--VITE PLUS START-->
 

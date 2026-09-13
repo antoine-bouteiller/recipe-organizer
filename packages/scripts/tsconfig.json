@@ -1,0 +1,7 @@
+{
+  "extends": "@recipe-organizer/config/tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node", "@recipe-organizer/api/worker-configuration"]
+  },
+  "include": ["**/*.ts"]
+}

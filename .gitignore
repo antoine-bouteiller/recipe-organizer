@@ -7,8 +7,8 @@ dist
 database.sql*
 
 # Serwist
-public/sw*
-public/swe-worker*
+apps/web/public/sw*
+apps/web/public/swe-worker*
 
 # Tanstack
 .tanstack
