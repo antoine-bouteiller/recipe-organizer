@@ -71,8 +71,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 and exposes the account, session, user, and verification schema (`src/lib/auth/auth-server.ts:1-18`).
 The Hono request handler supplies its request-scoped database client. It uses
 `SESSION_SECRET` as the auth secret and passes Google client credentials only in the social-provider
-configuration (`src/lib/auth/auth-server.ts:45-51`). The TanStack cookie plugin joins framework
-responses to Better Auth cookie writes (`src/lib/auth/auth-server.ts:44-45`).
+configuration (`src/lib/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
+Better Auth's raw `Response` cookie headers are returned unchanged by the Hono/Worker boundary.
 
 ### 8.2 Account and session admission
 
@@ -93,8 +93,8 @@ the user context.
 
 ### 8.4 OAuth and HTTP route contract
 
-The `/api/$` file route mounts Hono, which delegates GET and POST `/api/auth/*` requests to the
-per-request Better Auth handler (`src/lib/api.ts:17`). Request bodies, cookies, response headers and
+The direct Worker Hono handler delegates GET and POST `/api/auth/*` requests to the per-request
+Better Auth handler (`src/lib/api.ts:17`). Request bodies, cookies, raw `Response` headers, and
 redirects pass through unchanged. Better Auth owns the OAuth redirect, callback, state, PKCE,
 provider exchange, and session protocol. Application Hono routes never construct OAuth state or
 session cookies directly.
@@ -119,9 +119,11 @@ A session represents an already-approved identity at the time the session hook r
 the persisted status before issuance, so a pending or blocked account does not receive the session
 that protected functions would otherwise resolve (`src/lib/auth/auth-server.ts:21-36`).
 
-Session cookies are framework-managed response state. Application code obtains the session through
-Better Auth and request headers, rather than parsing, encrypting, or setting a cookie directly.
-This refines architecture [KD-5] and keeps cookie mechanics within the identity library.
+Session cookies are Better Auth response state. The direct Worker preserves the raw `Response`
+cookie headers. Hono session resolution calls `auth.api.getSession({ headers, returnHeaders: true })`
+and appends each returned `Set-Cookie` header, including refreshed or expired session cookies, to
+its response. Application code does not parse or encrypt session cookies. This refines architecture
+[KD-5] and keeps cookie mechanics within the identity library.
 
 ### 8.8 Role and ownership boundary
 
@@ -160,3 +162,4 @@ N/A
 | ---------- | --------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------- |
 | 2026-09-13 | Mount Better Auth through Hono with a shared request-scoped Drizzle client. | 7, 8.1, 8.4                  | Preserve the auth contract while introducing the shared HTTP API. |
 | 2026-09-13 | Move session resolution and protected actions to Hono RPC.                  | 3, 4, 7, 8.3, 8.6, 8.8, 8.10 | Preserve membership policy across the migrated transport.         |
+| 2026-09-13 | Remove the Start cookie adapter from the Worker boundary.                   | 8.1, 8.4, 8.7                | Preserve Better Auth raw response cookies in the direct handler.  |

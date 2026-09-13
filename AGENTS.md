@@ -1,6 +1,6 @@
 # Recipe Organizer
 
-Full-stack recipe management app built with TanStack Start, deployed on Cloudflare Workers.
+Full-stack recipe management app with a TanStack Router browser SPA and Hono API, deployed on Cloudflare Workers.
 
 ## Quick Reference
 
@@ -18,6 +18,7 @@ See the Vite+ section below for the full command reference.
 
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
+- **Runtime boundary:** the browser SPA starts at `index.html` and `src/main.tsx`; the Worker entry is `src/lib/api-handler.ts`'s default `fetch` export. Browser API calls use same-origin `/api/*` fetches.
 - **UI components are owned:** `src/components/ui/*` are our design system (one file per component, built on Base UI) — edit them directly, don't re-pull from a registry. `knip` enforces no dead exports there.
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
@@ -29,10 +30,10 @@ colocated with the code.
 - [Project Structure](docs/file-structure.spec.md)
 - [Platform (Cloudflare Workers)](docs/infrastructure/server/platform.spec.md)
 - [Data Layer (Drizzle + D1)](docs/infrastructure/server/data-layer.spec.md)
-- [Server Functions](docs/infrastructure/server/server-functions.spec.md)
+- [Hono API](docs/infrastructure/server/server-functions.spec.md)
 - [Form Patterns](docs/infrastructure/client/forms.spec.md)
 - [Client State Layering](docs/infrastructure/client/client-state.spec.md)
-- [Routing & SSR](docs/infrastructure/client/routing-ssr.spec.md)
+- [Routing & SPA](docs/infrastructure/client/routing-ssr.spec.md)
 - [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
 - Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 

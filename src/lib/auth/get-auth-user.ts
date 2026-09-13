@@ -2,12 +2,7 @@ import { apiClient, readResponse } from '@/lib/api-client'
 
 let pending: ReturnType<typeof getAuthUser> | undefined = undefined
 
-// Client-only by design: module scope on Workers is shared across requests, so caching a session there leaks it between users.
 export const loadAuthUser = () => {
-  if (import.meta.env.SSR || globalThis.window === undefined) {
-    return getAuthUser()
-  }
-
   if (!pending) {
     const request = getAuthUser()
     pending = request

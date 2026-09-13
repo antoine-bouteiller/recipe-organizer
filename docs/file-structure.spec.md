@@ -85,13 +85,14 @@ recipe-organizer/
 │   │       └── spec/           # Feature specs when the domain has a spec tree
 │   ├── hooks/                  # Shared React hooks
 │   ├── lib/                    # Binding-, SDK- or application-runtime-dependent code
-│   ├── routes/                 # File-based pages and HTTP handlers
+│   ├── routes/                 # File-based browser pages
 │   ├── stores/                 # Cross-feature persisted UI state
 │   ├── styles/                 # Global styles
 │   ├── types/                  # Types shared by feature domains
 │   ├── utils/                  # Pure reusable helpers
+│   ├── main.tsx                # Browser SPA entry
 │   ├── routeTree.gen.ts        # Generated TanStack Router tree
-│   ├── router.tsx              # Router factory
+│   ├── router.tsx              # Router factory and Query provider
 │   └── sw.ts                   # Service-worker entry
 ├── AGENTS.md                   # Contributor guidance
 ├── tsconfig.json               # TypeScript aliases and compiler configuration
@@ -115,9 +116,11 @@ cross-feature TanStack Store state, while a feature-local store remains in its f
 `src/lib/` contains application services and dependencies that need those runtime capabilities,
 including the Hono API and client, authentication, database access, R2 access, cache management and persistence helpers.
 
-Routes use `src/routes/` and mirror their URL segments. A dynamic segment uses the TanStack Router
-`$parameter` filename form. Server HTTP handlers also live under this tree, such as `routes/api/`.
-Route files do not become feature internals: they compose a feature's public UI and API surface.
+`index.html` loads `src/main.tsx`, which mounts the browser SPA. Routes use `src/routes/` and mirror
+their URL segments. A dynamic segment uses the TanStack Router `$parameter` filename form. The
+Worker entry is `src/lib/api-handler.ts`; it dispatches `/api/*` to Hono rather than using route
+files as HTTP handlers. Route files do not become feature internals: they compose a feature's public
+UI surface.
 
 Database table modules live under `db/schema/`, which exports the schema and relations; generated
 schema-history artefacts live under `db/migrations/`. Root configuration and tool-owned directories remain
@@ -134,6 +137,7 @@ N/A.
 
 ## Changelog
 
-| Date       | Amendment                                                                 | Sections affected | Reason                                   |
-| ---------- | ------------------------------------------------------------------------- | ----------------- | ---------------------------------------- |
-| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers. | 8.1               | Reflect the migrated feature API layout. |
+| Date       | Amendment                                                                 | Sections affected | Reason                                    |
+| ---------- | ------------------------------------------------------------------------- | ----------------- | ----------------------------------------- |
+| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers. | 8.1               | Reflect the migrated feature API layout.  |
+| 2026-09-13 | Add the SPA entry and direct Hono Worker handler boundary.                | 8.1               | Remove route-file HTTP handler placement. |

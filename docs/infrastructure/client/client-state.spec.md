@@ -22,13 +22,13 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 ## 3. Key Design Decisions
 
-| Decision                        | Choice                                                                                 | Rationale                                                                                                                                  |
-| ------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Server records         | TanStack Query owns data returned by Hono RPC clients                                  | Cache invalidation and refetch remain possible because server data has one browser representation; this refines `client.spec.md` `[PI-1]`. |
-| `[KD-2]` Query identity         | Feature query options use central `queryKeys` helpers                                  | Stable keys make prefetch and invalidation address the same resource; key families are defined in `src/lib/query-keys.ts:1-13`.            |
-| `[KD-3]` Durable UI state       | TanStack Store persists data-only, user-controlled selections through `persistedStore` | Small ID- and preference-shaped stores survive reload without copying server entities.                                                     |
-| `[KD-4]` Shareable state        | Route search schemas own bookmarkable and history-sensitive values                     | URL state participates in browser navigation and validates at the route boundary.                                                          |
-| `[KD-5]` SSR-visible preference | Theme uses an isomorphic cookie and root route context                                 | The document shell can select its theme before feature screens render (`src/lib/theme.ts:1-13`; `src/routes/__root.tsx:83-93`).            |
+| Decision                    | Choice                                                                                 | Rationale                                                                                                                                  |
+| --------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Server records     | TanStack Query owns data returned by Hono RPC clients                                  | Cache invalidation and refetch remain possible because server data has one browser representation; this refines `client.spec.md` `[PI-1]`. |
+| `[KD-2]` Query identity     | Feature query options use central `queryKeys` helpers                                  | Stable keys make prefetch and invalidation address the same resource; key families are defined in `src/lib/query-keys.ts:1-13`.            |
+| `[KD-3]` Durable UI state   | TanStack Store persists data-only, user-controlled selections through `persistedStore` | Small ID- and preference-shaped stores survive reload without copying server entities.                                                     |
+| `[KD-4]` Shareable state    | Route search schemas own bookmarkable and history-sensitive values                     | URL state participates in browser navigation and validates at the route boundary.                                                          |
+| `[KD-5]` Browser preference | Theme uses browser cookies and route context                                           | The browser application selects its theme before feature screens render (`src/lib/theme.ts`; `src/routes/__root.tsx`).                     |
 
 ## 4. Principles & Intents
 
@@ -58,14 +58,14 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 ## 7. High-Level Components
 
-| Component              | Module type                   | Responsibility                                        | Public API surface                          |
-| ---------------------- | ----------------------------- | ----------------------------------------------------- | ------------------------------------------- |
-| Query cache            | Router integration            | Cache Worker-owned records and loader prefetch        | `QueryClient`, feature `*Options()`         |
-| Query keys             | `src/lib/query-keys.ts`       | Name query resource families                          | `queryKeys`                                 |
-| Persisted stores       | `src/stores/*.store.ts`       | Hold durable user selections and quantities           | selector hooks and action functions         |
-| Persistence adapter    | `src/lib/persisted-store.ts`  | Hydrate and write a data-only Store                   | `persistedStore<T>()`                       |
-| Route and cookie state | Routes and `src/lib/theme.ts` | Represent shareable values and SSR-visible preference | `validateSearch`, `getTheme`, `toggleTheme` |
-| Feature context        | `src/features/*/contexts/*`   | Thread a value through one feature subtree            | feature provider and hook                   |
+| Component              | Module type                   | Responsibility                                    | Public API surface                          |
+| ---------------------- | ----------------------------- | ------------------------------------------------- | ------------------------------------------- |
+| Query cache            | Router `QueryClientProvider`  | Cache Worker-owned records and loader prefetch    | `QueryClient`, feature `*Options()`         |
+| Query keys             | `src/lib/query-keys.ts`       | Name query resource families                      | `queryKeys`                                 |
+| Persisted stores       | `src/stores/*.store.ts`       | Hold durable user selections and quantities       | selector hooks and action functions         |
+| Persistence adapter    | `src/lib/persisted-store.ts`  | Hydrate and write a data-only Store               | `persistedStore<T>()`                       |
+| Route and cookie state | Routes and `src/lib/theme.ts` | Represent shareable values and browser preference | `validateSearch`, `getTheme`, `toggleTheme` |
+| Feature context        | `src/features/*/contexts/*`   | Thread a value through one feature subtree        | feature provider and hook                   |
 
 ## 8. Detailed Design
 
@@ -73,17 +73,16 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 A database-backed value uses a feature query option and TanStack Query. A value intended for a link,
 bookmark, or back/forward navigation uses a route search schema. A user-controlled value that must
-survive reload on one device uses a persisted store. A value required by the document shell uses an
-isomorphic cookie and route context. A short-lived control value uses component state; a deeply
-shared feature-only value uses feature context.
+survive reload on one device uses a persisted store. A browser-wide preference uses a browser cookie
+and route context. A short-lived control value uses component state; a deeply shared feature-only
+value uses feature context.
 
 ### 8.2 Query cache and routing
 
-`getRouter()` creates the QueryClient, supplies it through route context, and installs the router
-query bridge (`src/router.tsx:23-60`). A loader awaits `ensureQueryData(options)` and its screen
-consumes the same options through `useSuspenseQuery` or `useQuery`; the home route is the reference
-prefetch shape (`src/routes/index.tsx:70-83`). Mutations invalidate the affected `queryKeys` family
-so subsequent readers obtain Worker-owned state.
+`getRouter()` creates the QueryClient and explicitly wraps the Router in `QueryClientProvider`
+(`src/router.tsx`). A loader awaits `ensureQueryData(options)` and its screen consumes the same
+options through `useSuspenseQuery` or `useQuery`; the home route is the reference prefetch shape.
+Mutations invalidate the affected `queryKeys` family so subsequent readers obtain Worker-owned state.
 
 ### 8.3 Persisted selection and derived data
 
@@ -107,14 +106,14 @@ examples include selected recipe IDs, overridden quantities, and recently opened
 hold a computed shopping-list result, a query response, a session, or a dialog's open flag. Those
 values have different invalidation, security, or lifetime semantics.
 
-| State question                          | Placement                           | Reason                                              |
-| --------------------------------------- | ----------------------------------- | --------------------------------------------------- |
-| Is the Worker the source of truth?      | Query cache                         | Invalidation and refetch preserve record freshness. |
-| Is it part of a navigable URL?          | Route search state                  | Links and history retain the value.                 |
-| Is it an SSR-visible preference?        | Isomorphic cookie and route context | The document shell can read it.                     |
-| Is it durable, personal browser intent? | Persisted Store                     | Device-local data survives reload.                  |
-| Is it a short interaction?              | Component state                     | No cross-screen or durable ownership exists.        |
-| Does one feature subtree need it?       | Feature context                     | It avoids unrelated global wiring.                  |
+| State question                          | Placement                        | Reason                                              |
+| --------------------------------------- | -------------------------------- | --------------------------------------------------- |
+| Is the Worker the source of truth?      | Query cache                      | Invalidation and refetch preserve record freshness. |
+| Is it part of a navigable URL?          | Route search state               | Links and history retain the value.                 |
+| Is it a browser-wide preference?        | Browser cookie and route context | The application can read it.                        |
+| Is it durable, personal browser intent? | Persisted Store                  | Device-local data survives reload.                  |
+| Is it a short interaction?              | Component state                  | No cross-screen or durable ownership exists.        |
+| Does one feature subtree need it?       | Feature context                  | It avoids unrelated global wiring.                  |
 
 ### 8.5 Invalidation and mutation boundary
 
@@ -130,15 +129,15 @@ An empty selection remains a valid query input and a screen determines its empty
 
 ### 8.6 Cookie, URL, local, and feature state
 
-The root resolves the cookie-backed theme with authentication context before rendering its document
-shell (`src/routes/__root.tsx:83-93`). Routes validate search input and expose the typed result to
-their screens (`src/routes/index.tsx:70-83`). Components keep ephemeral interaction state locally.
-A feature provider is appropriate only when a value must cross a deep subtree within that feature.
+The browser application resolves the cookie-backed theme before rendering its routes. Routes validate
+search input and expose the typed result to their screens. Components keep ephemeral interaction state
+locally. A feature provider is appropriate only when a value must cross a deep subtree within that
+feature.
 
-Cookie state uses the same getter/setter boundary on the server and in the browser. Theme resolution
-falls back to the system preference when the cookie has no value (`src/lib/theme.ts:1-13`). Session
-cookies remain in the server authentication contract, not in this state layer. Route context carries
-resolved cross-cutting values through matched routes and avoids a second global Context.
+Cookie state uses browser getter/setter helpers. Theme resolution falls back to the system preference
+when the cookie has no value (`src/lib/theme.ts`). Session cookies remain in the server authentication
+contract, not in this state layer. Route context carries resolved cross-cutting values through matched
+routes and avoids a second global Context.
 
 Feature context has a narrow scope: a provider and consumer live under the feature that owns their
 value. It does not expose a substitute application state layer. A consumer outside the provider uses
@@ -151,7 +150,7 @@ the feature's documented fallback rather than relying on another feature's provi
 | Worker record          | feature query hook      | server mutation followed by query invalidation |
 | Durable browser intent | store selector hook     | exported store action                          |
 | URL value              | typed route search hook | typed route navigation                         |
-| Theme preference       | route context           | cookie-backed theme helper                     |
+| Theme preference       | route context           | browser cookie-backed theme helper             |
 | Ephemeral interaction  | component hook          | component event handler                        |
 | Feature subtree value  | feature context hook    | owning feature provider                        |
 
@@ -165,6 +164,7 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                        | Sections affected | Reason                                            |
-| ---------- | ---------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
-| 2026-09-13 | Specify Hono RPC clients as TanStack Query's server-data source. | 3, 8.5            | Reflect the migrated query and mutation wrappers. |
+| Date       | Amendment                                                        | Sections affected | Reason                                                           |
+| ---------- | ---------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------- |
+| 2026-09-13 | Specify Hono RPC clients as TanStack Query's server-data source. | 3, 8.5            | Reflect the migrated query and mutation wrappers.                |
+| 2026-09-13 | Use an explicit browser Query provider.                          | 3, 7, 8.1–8.2     | Replace the SSR-query bridge and isomorphic preference boundary. |

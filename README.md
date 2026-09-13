@@ -1,6 +1,6 @@
 # Recipe Organizer
 
-A modern, full-stack recipe management application built with TanStack Start and deployed on Cloudflare Workers.
+A modern recipe management application with a TanStack Router browser SPA and a Hono API, deployed on Cloudflare Workers.
 
 ## Features
 
@@ -15,7 +15,8 @@ A modern, full-stack recipe management application built with TanStack Start and
 ## Tech Stack
 
 - **Frontend**: React 19, TanStack Router, TanStack Query, TanStack Form, TanStack Store
-- **Backend**: TanStack Start (SSR), Cloudflare Workers
+- **Application**: TanStack Router browser SPA (`index.html` + `src/main.tsx`), React Query
+- **Backend**: Hono on a Cloudflare Worker (`/api/*`)
 - **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
 - **Storage**: Cloudflare R2 for image storage
 - **Styling**: Tailwind CSS v4, Shadcn UI components
@@ -115,6 +116,8 @@ This project uses:
 
 Configured for Cloudflare Workers with:
 
+- `src/lib/api-handler.ts` as the Worker entry, exporting `fetch`
+- Static browser assets with SPA fallback; `/api` and `/api/*` run the Worker first
 - D1 database binding
 - R2 bucket for images
 - Cloudflare Images integration
@@ -123,8 +126,8 @@ See `wrangler.jsonc` for configuration details.
 
 ## Learn More
 
-- [TanStack Start](https://tanstack.com/start)
 - [TanStack Router](https://tanstack.com/router)
+- [Hono](https://hono.dev/)
 - [TanStack Query](https://tanstack.com/query)
 - [Cloudflare Workers](https://workers.cloudflare.com/)
 - [Drizzle ORM](https://orm.drizzle.team/)

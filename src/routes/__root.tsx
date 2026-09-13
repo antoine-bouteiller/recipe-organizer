@@ -1,15 +1,13 @@
 import { Serwist } from '@serwist/window'
 import { type QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from '@tanstack/react-router'
-import { lazy, Suspense, useEffect } from 'react'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
 
 import OfflineBanner from '@/components/error/offline-banner'
 import { Navbar } from '@/components/navigation/navbar'
 import { ToastProvider } from '@/components/ui/toast'
 import { loadAuthUser, type getAuthUser } from '@/lib/auth/get-auth-user'
 import { getTheme } from '@/lib/theme'
-
-import appCss from '../styles/app.css?url'
 
 const SearchBar = lazy(() => import('@/features/recipe/components/search-bar'))
 
@@ -18,6 +16,10 @@ type Theme = ReturnType<typeof getTheme>
 
 const RootComponent = () => {
   const { theme } = Route.useRouteContext()
+
+  useLayoutEffect(() => {
+    document.documentElement.className = theme
+  }, [theme])
 
   useEffect(() => {
     const registerServiceWorker = async () => {
@@ -36,30 +38,21 @@ const RootComponent = () => {
   }, [])
 
   return (
-    <html className={theme} lang="fr">
-      <head>
-        <HeadContent />
-      </head>
-
-      <body className="fixed top-0 isolate flex h-dvh! w-screen flex-col overflow-hidden">
-        <ToastProvider>
-          <OfflineBanner />
-          <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
-            <Navbar
-              search={
-                <Suspense fallback={<div className="h-9 w-56" />}>
-                  <SearchBar />
-                </Suspense>
-              }
-            />
-          </header>
-          <main className="flex min-h-0 flex-1 flex-col md:pb-0">
-            <Outlet />
-          </main>
-        </ToastProvider>
-        <Scripts />
-      </body>
-    </html>
+    <ToastProvider>
+      <OfflineBanner />
+      <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
+        <Navbar
+          search={
+            <Suspense fallback={<div className="h-9 w-56" />}>
+              <SearchBar />
+            </Suspense>
+          }
+        />
+      </header>
+      <main className="flex min-h-0 flex-1 flex-col md:pb-0">
+        <Outlet />
+      </main>
+    </ToastProvider>
   )
 }
 
@@ -74,42 +67,5 @@ export const Route = createRootRouteWithContext<{
 
     return { authUser, isAdmin: authUser?.role === 'admin', theme }
   },
-  head: () => ({
-    links: [
-      { href: appCss, rel: 'stylesheet' },
-      { href: '/manifest.json', rel: 'manifest' },
-      { href: '/favicon.ico', rel: 'icon' },
-      { href: '/favicon.ico', rel: 'icon', type: 'image/svg+xml' },
-      {
-        href: 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap',
-        rel: 'stylesheet',
-      },
-      {
-        href: 'https://fonts.googleapis.com',
-        rel: 'preconnect',
-      },
-      {
-        crossOrigin: 'anonymous',
-        href: 'https://fonts.gstatic.com',
-        rel: 'preconnect',
-      },
-    ],
-    meta: [
-      {
-        charSet: 'utf8',
-      },
-      {
-        content: 'width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content',
-        name: 'viewport',
-      },
-      {
-        title: 'Recipe Organizer',
-      },
-      {
-        content: '#0e6e7e',
-        name: 'theme-color',
-      },
-    ],
-  }),
-  shellComponent: RootComponent,
+  component: RootComponent,
 })

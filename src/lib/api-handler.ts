@@ -4,7 +4,7 @@ import { getAuth } from '@/lib/auth/auth-server'
 import { getDb } from '@/lib/db'
 import { createR2GetHandler, createR2HeadHandler, deleteFile, uploadFile, uploadVideo } from '@/lib/r2'
 
-export const handleApiRequest = (request: Request) => {
+const handleApiRequest = (request: Request) => {
   const db = getDb()
   const services: ApiEnvironment['Bindings'] = {
     auth: getAuth(db),
@@ -14,3 +14,5 @@ export const handleApiRequest = (request: Request) => {
   }
   return api.fetch(request, services)
 }
+
+export default { fetch: handleApiRequest } satisfies ExportedHandler<Env>

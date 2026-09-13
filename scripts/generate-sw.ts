@@ -3,7 +3,7 @@ import path from 'node:path'
 import { injectManifest } from '@serwist/build'
 import { build, type Plugin } from 'vite-plus'
 
-export const tanstackSerwistPlugin = (): Plugin => {
+export const serwistPlugin = (): Plugin => {
   let rootDir = ''
   let isProduction = false
 
@@ -54,6 +54,6 @@ export const tanstackSerwistPlugin = (): Plugin => {
       ;({ isProduction, root: rootDir } = config)
     },
     enforce: 'post',
-    name: 'tanstack-serwist',
+    name: 'serwist',
   }
 }

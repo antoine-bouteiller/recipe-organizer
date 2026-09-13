@@ -27,8 +27,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **One Worker boundary** — refine architecture [PI-1]: bindings, TanStack file-route
-  handlers, Hono RPC, and media routes remain capabilities of the same Worker.
+- `[PI-1]` **One Worker boundary** — refine architecture [PI-1]: bindings, the direct Worker
+  `fetch` handler, Hono RPC, and media routes remain capabilities of the same Worker.
 - `[PI-2]` **Trust at the server boundary** — refine architecture [PI-3]: input, membership, role,
   and ownership decisions execute before protected persistence effects.
 - `[PI-3]` **Request-scoped resources** — refine architecture [C-1]: factories obtain Worker-bound
@@ -83,3 +83,4 @@ N/A
 | Date       | Amendment                                                                     | Sections affected | Reason                                                                               |
 | ---------- | ----------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------ |
 | 2026-09-13 | Replace feature server functions with Hono RPC routes in the existing Worker. | 2, 3, 4, 7–8      | Record the feature-action transport boundary without introducing a separate service. |
+| 2026-09-13 | Make the Hono handler the direct Worker entry.                                | 4                 | Remove the former file-route handler boundary.                                       |

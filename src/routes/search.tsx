@@ -121,5 +121,4 @@ export const Route = createFileRoute('/search')({
     await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
   },
   pendingComponent: SearchSkeleton,
-  ssr: 'data-only',
 })

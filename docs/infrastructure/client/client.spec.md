@@ -51,14 +51,14 @@ boundary while leaving product goals and system-wide principles to
 
 - `[C-1]` Browser persistence is device-local and can be absent or malformed, so persisted values
   require safe fallback behavior.
-- `[C-2]` Route render modes and generated route metadata constrain where browser-only state can
-  be read.
+- `[C-2]` Generated route metadata constrains route declarations; browser-only state is read only
+  after the SPA mounts.
 
 ## 7. High-Level Components
 
 | Leaf                                     | Module type       | Responsibility                                                   | Public API surface                         |
 | ---------------------------------------- | ----------------- | ---------------------------------------------------------------- | ------------------------------------------ |
-| [`routing-ssr`](./routing-ssr.spec.md)   | Router convention | URL matching, route context, document shell, prefetch            | Route declarations, `getRouter()`          |
+| [`routing-ssr`](./routing-ssr.spec.md)   | Router convention | URL matching, route context, browser SPA mount, prefetch         | Route declarations, `getRouter()`          |
 | [`forms`](./forms.spec.md)               | Form library      | Typed form composition, validation display, multipart submission | `useAppForm`, `withForm`, field registry   |
 | [`client-state`](./client-state.spec.md) | State convention  | Query, persistent UI state, URL and cookie state                 | `queryKeys`, `persistedStore`, store hooks |
 
@@ -74,7 +74,7 @@ Leaf execution order:
 
 | Component     | Specified in                                     |
 | ------------- | ------------------------------------------------ |
-| Routing & SSR | [`routing-ssr.spec.md`](./routing-ssr.spec.md)   |
+| Routing & SPA | [`routing-ssr.spec.md`](./routing-ssr.spec.md)   |
 | Forms         | [`forms.spec.md`](./forms.spec.md)               |
 | Client state  | [`client-state.spec.md`](./client-state.spec.md) |
 
@@ -84,6 +84,7 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                   | Sections affected | Reason                                          |
-| ---------- | ----------------------------------------------------------- | ----------------- | ----------------------------------------------- |
-| 2026-09-13 | Adopt typed Hono RPC clients as the client server boundary. | 3, 5, 7           | Reflect the completed feature-action migration. |
+| Date       | Amendment                                                   | Sections affected | Reason                                                 |
+| ---------- | ----------------------------------------------------------- | ----------------- | ------------------------------------------------------ |
+| 2026-09-13 | Adopt typed Hono RPC clients as the client server boundary. | 3, 5, 7           | Reflect the completed feature-action migration.        |
+| 2026-09-13 | Document the browser SPA mount and query provider.          | 6–8               | Remove SSR render-mode and document-shell assumptions. |
