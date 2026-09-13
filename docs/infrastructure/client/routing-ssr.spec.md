@@ -22,12 +22,12 @@ without becoming a feature data layer.
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                     | Rationale                                                                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Route declaration   | File routes declare matching, context gates, parameter/search parsing, and loader prefetch | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                |
-| `[KD-2]` Query lifecycle     | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`         | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`src/router.tsx`). |
-| `[KD-3]` Browser application | `index.html` and `src/main.tsx` mount the Router and page chrome in the browser            | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                 |
-| `[KD-4]` Navigation feedback | Router links use view-transition support and route resolution owns back/forward direction  | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`src/router.tsx:42-49`).         |
+| Decision                     | Choice                                                                                     | Rationale                                                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Route declaration   | File routes declare matching, context gates, parameter/search parsing, and loader prefetch | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                       |
+| `[KD-2]` Query lifecycle     | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`         | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`src/client/router.tsx`). |
+| `[KD-3]` Browser application | `index.html` and `src/client/main.tsx` mount the Router and page chrome in the browser     | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                        |
+| `[KD-4]` Navigation feedback | Router links use view-transition support and route resolution owns back/forward direction  | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`src/client/router.tsx:42-49`).         |
 
 ## 4. Principles & Intents
 
@@ -52,26 +52,26 @@ without becoming a feature data layer.
 - `[C-2]` Intent preloading runs loaders before an explicit navigation, so loaders remain
   idempotent and read-only.
 - `[C-3]` Service-worker registration is progressive: the root catches registration failure and
-  continues rendering (`src/routes/__root.tsx:25-39`).
+  continues rendering (`src/client/routes/__root.tsx:25-39`).
 
 ## 7. High-Level Components
 
-| Component      | Module type                  | Responsibility                                                           | Public API surface               |
-| -------------- | ---------------------------- | ------------------------------------------------------------------------ | -------------------------------- |
-| Browser entry  | `index.html`, `src/main.tsx` | Mount the browser SPA and Router                                         | application mount                |
-| Router factory | `src/router.tsx`             | Create route context, query cache, matching defaults, and Query provider | `getRouter()`                    |
-| Root route     | `src/routes/__root.tsx`      | Render application-wide browser chrome and outlet                        | root `Route` context             |
-| Page routes    | `src/routes/**/*.tsx`        | Parse URL state, gate entry, prefetch feature queries, render screens    | `createFileRoute()` declarations |
-| API handler    | `src/lib/api-handler.ts`     | Serve Hono API, auth, and media requests                                 | Worker `fetch`, `/api/*`         |
+| Component      | Module type                         | Responsibility                                                           | Public API surface               |
+| -------------- | ----------------------------------- | ------------------------------------------------------------------------ | -------------------------------- |
+| Browser entry  | `index.html`, `src/client/main.tsx` | Mount the browser SPA and Router                                         | application mount                |
+| Router factory | `src/client/router.tsx`             | Create route context, query cache, matching defaults, and Query provider | `getRouter()`                    |
+| Root route     | `src/client/routes/__root.tsx`      | Render application-wide browser chrome and outlet                        | root `Route` context             |
+| Page routes    | `src/client/routes/**/*.tsx`        | Parse URL state, gate entry, prefetch feature queries, render screens    | `createFileRoute()` declarations |
+| API handler    | `src/server/index.ts`               | Serve Hono API, auth, and media requests                                 | Worker `fetch`, `/api/*`         |
 
 ## 8. Detailed Design
 
 ### 8.1 Router and root context
 
-`index.html` loads `src/main.tsx`, which mounts the browser application. `getRouter()` creates a
+`index.html` loads `src/client/main.tsx`, which mounts the browser application. `getRouter()` creates a
 `QueryClient`, explicitly wraps the router in `QueryClientProvider`, and registers the generated
 route tree with `defaultPreload: 'intent'`, root not-found handling, and scroll restoration
-(`src/router.tsx`). This browser provider replaces the former SSR-query bridge. The root route
+(`src/client/router.tsx`). This browser provider replaces the former SSR-query bridge. The root route
 provides application chrome and the outlet; it does not resolve a Worker request or render an HTML
 document shell. Both query and mutation caches handle Router redirect errors through the same
 callback, preserving login redirects for expired sessions and blocked or pending accounts.
@@ -80,9 +80,9 @@ callback, preserving login redirects for expired sessions and blocked or pending
 
 A page route declares its file-route path, optional `beforeLoad` gate, optional Zod
 `validateSearch`, and a loader that awaits `context.queryClient.ensureQueryData(options)`. The home
-route demonstrates validated search input and list prefetch (`src/routes/index.tsx:70-83`); dynamic
+route demonstrates validated search input and list prefetch (`src/client/routes/index.tsx:70-83`); dynamic
 routes parse their segment and return typed loader data for the component. A settings route redirects
-unauthenticated navigation before screen render (`src/routes/settings.tsx:3-9`).
+unauthenticated navigation before screen render (`src/client/routes/settings.tsx:3-9`).
 
 Routes render screens and select layouts; feature components own the content. A route consumes
 `useSuspenseQuery(options)` only after its loader has populated the matching options. Public routes
@@ -92,7 +92,7 @@ than replacing Worker checks.
 ### 8.3 Access and URL parsing
 
 A route that requires membership throws a redirect from `beforeLoad`; the settings layout supplies
-that gate to its descendant settings screens (`src/routes/settings.tsx:3-9`). A public route omits
+that gate to its descendant settings screens (`src/client/routes/settings.tsx:3-9`). A public route omits
 that redirect and uses route context only to choose presentation affordances. Admin-only navigation
 uses an additional role gate at the matching route, while Worker handlers make the final access
 decision under [`../server/auth.spec.md`](../server/auth.spec.md).
@@ -116,15 +116,15 @@ not-found rendering remain router-level surfaces so a failed match has one consi
 
 ### 8.5 Errors, HTTP, and navigation
 
-The router supplies the root error and not-found surfaces (`src/router.tsx:39-52`). The Worker entry's `fetch` dispatches `/api/*` directly to the shared Hono API, which owns feature,
+The router supplies the root error and not-found surfaces (`src/client/router.tsx:39-52`). The Worker entry's `fetch` dispatches `/api/*` directly to the shared Hono API, which owns feature,
 authentication, session, health, and media responses. Hono media handlers delegate binary reads to
 platform R2 helpers. Each handler preserves the response shape, headers, and redirects owned by its
 contract; browser page routes do not wrap it.
 
 Forward links request view transitions; the router determines back navigation from history indexes
-(`src/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
+(`src/client/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
 transition support. Scroll restoration targets the screen containers configured by the router
-(`src/router.tsx:51-54`), so screen layouts identify their scrollable regions rather than managing
+(`src/client/router.tsx:51-54`), so screen layouts identify their scrollable regions rather than managing
 history manually.
 
 ### 8.6 Route contract summary

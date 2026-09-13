@@ -1,0 +1,70 @@
+import { getFormDialog } from '@client/components/dialogs/form-dialog'
+import { PencilSimpleIcon } from '@client/components/icons'
+import { Button } from '@client/components/ui/button'
+import { ingredientSchema } from '@client/features/ingredients/api/create'
+import { updateIngredientOptions, updateIngredientSchema, type UpdateIngredientFormInput } from '@client/features/ingredients/api/update'
+import { getIngredientDefaultValues, IngredientForm } from '@client/features/ingredients/components/ingredient-form'
+import { useAppForm } from '@client/hooks/use-app-form'
+import { type Ingredient } from '@client/types/ingredient'
+import { revalidateLogic } from '@tanstack/react-form'
+import { useMutation } from '@tanstack/react-query'
+import { useState } from 'react'
+
+interface EditIngredientProps {
+  ingredient: Ingredient
+}
+
+const FormDialog = getFormDialog(getIngredientDefaultValues())
+
+export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
+  const updateMutation = useMutation(updateIngredientOptions())
+  const [open, setOpen] = useState(false)
+
+  const initialValues: UpdateIngredientFormInput = {
+    category: ingredient.category,
+    countWeightG: ingredient.countWeightG,
+    densityGPerMl: ingredient.densityGPerMl,
+    id: ingredient.id,
+    name: ingredient.name,
+    parentId: ingredient.parentId ?? undefined,
+    preferredUnitSlug: ingredient.preferredUnitSlug,
+  }
+
+  const form = useAppForm({
+    defaultValues: initialValues,
+    onSubmit: async (data) => {
+      await updateMutation.mutateAsync(
+        {
+          data: updateIngredientSchema.parse(data.value),
+        },
+        {
+          onSuccess: () => {
+            form.reset()
+            setOpen(false)
+          },
+        }
+      )
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: ingredientSchema,
+    },
+  })
+
+  return (
+    <FormDialog
+      form={form}
+      open={open}
+      setOpen={setOpen}
+      submitLabel="Mettre à jour"
+      title="Modifier l'ingrédient"
+      trigger={
+        <Button size="icon" variant="outline">
+          <PencilSimpleIcon />
+        </Button>
+      }
+    >
+      <IngredientForm form={form} />
+    </FormDialog>
+  )
+}

@@ -30,7 +30,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[PI-1]` **Validate inside the Worker** — refine architecture [PI-3]; client validation is never
   authorization for a write.
-- `[PI-2]` **One feature API owns one route group** — feature `api/routes.ts` modules expose
+- `[PI-2]` **One feature API owns one route group** — `src/server/routes/<feature>/routes.ts` modules expose
   contracts rather than routes reaching into another feature's persistence.
 - `[PI-3]` **Control flow is semantic** — HTTP `401`, membership `403`, and `404` become Router
   controls; ordinary failures have one application error envelope.
@@ -54,50 +54,51 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component                 | Module type             | Responsibility                                    | Public API surface                         |
-| ------------------------- | ----------------------- | ------------------------------------------------- | ------------------------------------------ |
-| Route declaration         | Feature `api/routes.ts` | Typed read and mutation HTTP RPC                  | Hono GET/POST routes                       |
-| Schema boundary           | Feature API module      | Validate JSON, query, params, and multipart input | Zod schemas, `zValidator`, `parseFormData` |
-| Error boundary            | Shared API client       | Map HTTP statuses to Router controls and errors   | `readResponse`                             |
-| Authorization composition | Hono middleware         | Inject active authorized caller                   | `authGuard()`                              |
-| Query integration         | Feature API module      | Query/mutation options and cache refresh          | `apiClient`, `get*Options`, `*Options`     |
-| API handler               | Worker entry + Hono     | Dispatch API, auth, and media requests            | `/api/*`                                   |
+| Component                 | Module type                         | Responsibility                                    | Public API surface                         |
+| ------------------------- | ----------------------------------- | ------------------------------------------------- | ------------------------------------------ |
+| Route declaration         | Server `routes/<feature>/routes.ts` | Typed read and mutation HTTP RPC                  | Hono GET/POST routes                       |
+| Schema boundary           | Feature API module                  | Validate JSON, query, params, and multipart input | Zod schemas, `zValidator`, `parseFormData` |
+| Error boundary            | Shared API client                   | Map HTTP statuses to Router controls and errors   | `readResponse`                             |
+| Authorization composition | Hono middleware                     | Inject active authorized caller                   | `authGuard()`                              |
+| Query integration         | Feature API module                  | Query/mutation options and cache refresh          | `apiClient`, `get*Options`, `*Options`     |
+| API handler               | Worker entry + Hono                 | Dispatch API, auth, and media requests            | `/api/*`                                   |
 
 ## 8. Detailed Design
 
 ### 8.1 Function declaration and placement
 
-A feature owns `api/routes.ts` for its Hono route group and small query/mutation wrapper files for
-client consumption. Reads use GET; writes use POST and compose `authGuard()` before `zValidator`.
+A feature owns `src/server/routes/<feature>/routes.ts` for its Hono route group and small
+query/mutation wrapper files in `src/client/features/<feature>/api/` for client consumption.
+Reads use GET; writes use POST and compose `authGuard()` before `zValidator`.
 The recipe group demonstrates multipart parsing, ownership checks, media effects, and graph writes
-(`src/features/recipe/api/routes.ts:45-203`). Schemas live separately in `api/schemas.ts`.
+(`src/server/routes/recipe/routes.ts:45-203`). Schemas live separately in `src/shared/<feature>/schemas.ts`.
 
 ### 8.2 Validation and FormData contract
 
 JSON routes validate their body with `zValidator('json', schema)`. Multipart recipe routes validate
 the wire form, parse it with `parseFormData`, then validate the domain shape. The browser preserves
 `File` values in `FormData`; scalar structured values JSON-round-trip through the helper
-(`src/utils/form-data.ts:1-28`).
+(`src/shared/utils/form-data.ts:1-28`).
 
 ### 8.3 Authorization and ownership contract
 
 Protected routes compose `authGuard()`; admin-only routes request its admin role variant. The guard
 returns HTTP authorization failures and supplies `{ user }` to success paths. A route that updates
 or removes a user-owned row also compares row ownership after loading the row; recipe deletion calls
-`assertOwnerOrAdmin` before its batch (`src/features/recipe/api/routes.ts:177-201`).
+`assertOwnerOrAdmin` before its batch (`src/server/routes/recipe/routes.ts:177-201`).
 
 ### 8.4 Error contract
 
 The API returns route-owned HTTP statuses and `{ error }` failures. `readResponse` maps `401` to the
 login redirect, membership `403` to the corresponding login outcome, and `404` to Router `notFound`;
-other failures become `Invalid Schema` for `400` or the safe server error (`src/lib/api-client.ts:26-46`).
+other failures become `Invalid Schema` for `400` or the safe server error (`src/client/lib/api-client.ts:26-46`).
 
 ### 8.5 Effects and ordering
 
 A mutation validates and authorizes before it reads or writes. It performs related D1 statements
 through data-layer primitives, then executes compensating or object-store effects according to its
 feature contract. Recipe deletion batches relational removal before `deleteFile`; creation writes
-the root then delegates its ingredient graph (`src/features/recipe/api/routes.ts:111-201`).
+the root then delegates its ingredient graph (`src/server/routes/recipe/routes.ts:111-201`).
 
 ### 8.6 Query and mutation option contract
 
@@ -107,16 +108,16 @@ localized feedback in their feature module; client UI state remains outside this
 
 ### 8.7 API route boundary
 
-`src/lib/api-handler.ts` is the Wrangler entry: its default export provides `fetch`, which creates
+`src/server/index.ts` is the Wrangler entry: its default export provides `fetch`, which creates
 the request-scoped Drizzle and Better Auth services before calling the module-level Hono app
-(`src/lib/api-handler.ts:7-18`). `src/lib/api.ts` mounts ingredient, recipe, shopping-list, and user
+(`src/server/index.ts:7-18`). `src/server/api.ts` mounts ingredient, recipe, shopping-list, and user
 route groups, Better Auth at `/api/auth/*`, the session endpoint, and public image and video
 endpoints. It applies CSRF protection after auth, so non-auth feature routes are protected while the
-Better Auth protocol passes through unchanged (`src/lib/api.ts:14-43`). Cloudflare runs the Worker
+Better Auth protocol passes through unchanged (`src/server/api.ts:14-43`). Cloudflare runs the Worker
 first for `/api` and `/api/*`; browser routes remain SPA asset requests.
 
 `apiClient` is an `hc<typeof api>` client using native same-origin `fetch` with credentials in the
-browser (`src/lib/api-client.ts`). It has no SSR bridge or server-side in-process transport.
+browser (`src/client/lib/api-client.ts`). It has no SSR bridge or server-side in-process transport.
 
 `GET /api/health` is a liveness check. Unmatched requests return `404 { "error": "not_found" }`; Zod,
 HTTP, and unexpected failures receive the API error envelope. Hono serves `GET /api/image/:id`
@@ -134,7 +135,7 @@ access remains a feature-level policy; user-scoped and administrative reads comp
 HTTP dates are ISO strings: the user-list wrapper revives `createdAt` and `updatedAt` to `Date`
 instances. Routes that use `null` as an HTTP absence value convert it to the existing client contract
 where needed: the session and recipe-instructions wrappers expose `undefined`
-(`src/features/users/api/get-all.ts:8-21`, `src/features/recipe/api/get-instructions.ts:6-18`).
+(`src/client/features/users/api/get-all.ts:8-21`, `src/client/features/recipe/api/get-instructions.ts:6-18`).
 
 ### 8.9 Mutation contract
 
@@ -167,9 +168,10 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                 | Sections affected | Reason                                                                       |
-| ---------- | ------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------- |
-| 2026-09-13 | Add the Hono HTTP foundation with request-scoped Drizzle and Better Auth. | 5, 7, 8.1, 8.7    | Prepare a shared API without migrating feature actions.                      |
-| 2026-09-13 | Migrate all feature actions to Hono RPC routes and clients.               | 2–8               | Replace `createServerFn` contracts while retaining the same Worker boundary. |
-| 2026-09-13 | Move media endpoints into Hono.                                           | 5, 7, 8.7         | Use one API dispatcher while preserving binary HTTP delivery.                |
-| 2026-09-13 | Make Hono the direct Wrangler entry and browser fetch boundary.           | 3, 5, 7, 8.7      | Remove the file-route and SSR transport adapters.                            |
+| Date       | Amendment                                                                 | Sections affected   | Reason                                                                       |
+| ---------- | ------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------- |
+| 2026-09-13 | Add the Hono HTTP foundation with request-scoped Drizzle and Better Auth. | 5, 7, 8.1, 8.7      | Prepare a shared API without migrating feature actions.                      |
+| 2026-09-13 | Migrate all feature actions to Hono RPC routes and clients.               | 2–8                 | Replace `createServerFn` contracts while retaining the same Worker boundary. |
+| 2026-09-13 | Move media endpoints into Hono.                                           | 5, 7, 8.7           | Use one API dispatcher while preserving binary HTTP delivery.                |
+| 2026-09-13 | Make Hono the direct Wrangler entry and browser fetch boundary.           | 3, 5, 7, 8.7        | Remove the file-route and SSR transport adapters.                            |
+| 2026-09-13 | Document Hono route groups under `src/server/routes/`.                    | 4, 7, 8.1, 8.3, 8.5 | Match the server route layout and runtime-specific API placement.            |

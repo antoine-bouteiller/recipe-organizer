@@ -12,7 +12,7 @@ export const serwistPlugin = (): Plugin => {
     applyToEnvironment: (env) => env.name === 'client',
     async closeBundle() {
       const outDir = path.resolve(rootDir, 'dist', 'client')
-      const swSrc = path.resolve(rootDir, 'src', 'sw.ts')
+      const swSrc = path.resolve(rootDir, 'src', 'client', 'sw.ts')
       const swDest = path.resolve(outDir, 'sw.js')
 
       await build({

@@ -46,10 +46,10 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[C-1]` Google callback availability and userinfo shape remain external dependencies, refining
   architecture [C-6].
-- `[C-2]` The development branch returns a synthetic active admin (`src/lib/auth/get-auth-user.ts:34-41`),
+- `[C-2]` The development branch returns a synthetic active admin (`src/client/lib/auth/get-auth-user.ts:34-41`),
   so it does not exercise provider callbacks.
 - `[C-3]` `VITE_PUBLIC_URL` must resolve to an origin accepted by Google because Better Auth uses it
-  as `baseURL` (`src/lib/auth/auth-server.ts:16-20`).
+  as `baseURL` (`src/server/lib/auth/auth-server.ts:16-20`).
 - `[C-4]` Role checks authorize a capability; handlers still perform row-ownership checks where a
   resource belongs to a user.
 
@@ -68,33 +68,33 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 ### 8.1 Auth factory and secrets
 
 `getAuth(db = getDb())` creates Better Auth per request, connects the Drizzle adapter to that client,
-and exposes the account, session, user, and verification schema (`src/lib/auth/auth-server.ts:1-18`).
+and exposes the account, session, user, and verification schema (`src/server/lib/auth/auth-server.ts:1-18`).
 The Hono request handler supplies its request-scoped database client. It uses
 `SESSION_SECRET` as the auth secret and passes Google client credentials only in the social-provider
-configuration (`src/lib/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
+configuration (`src/server/lib/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
 Better Auth's raw `Response` cookie headers are returned unchanged by the Hono/Worker boundary.
 
 ### 8.2 Account and session admission
 
 The user-create hook sets every Google-created account to `pending`
-(`src/lib/auth/auth-server.ts:38-42`). Before session creation, the session hook loads the user and
+(`src/server/lib/auth/auth-server.ts:38-42`). Before session creation, the session hook loads the user and
 rejects `blocked` or `pending` statuses with `account_blocked` or `account_pending`
-(`src/lib/auth/auth-server.ts:21-36`). Additional `role` and `status` fields have `input: false`,
-so client-facing auth calls cannot provide them (`src/lib/auth/auth-server.ts:52-57`).
+(`src/server/lib/auth/auth-server.ts:21-36`). Additional `role` and `status` fields have `input: false`,
+so client-facing auth calls cannot provide them (`src/server/lib/auth/auth-server.ts:52-57`).
 
 ### 8.3 User resolution and guard
 
 `GET /api/session` returns the session identity or `null`; `getAuthUser()` consumes it through the
-typed Hono client and converts `null` to `undefined` (`src/lib/auth/get-auth-user.ts:1-30`).
+typed Hono client and converts `null` to `undefined` (`src/client/lib/auth/get-auth-user.ts:1-30`).
 `getApiUser()` receives an explicit request-scoped development boolean, returning the bounded
 synthetic identity only when it is true; other execution reads Better Auth session headers
-(`src/lib/auth/api-user.ts:5-17`). `authGuard()` returns authorization failures or calls `next` with
+(`src/server/lib/auth/api-user.ts:5-17`). `authGuard()` returns authorization failures or calls `next` with
 the user context.
 
 ### 8.4 OAuth and HTTP route contract
 
 The direct Worker Hono handler delegates GET and POST `/api/auth/*` requests to the per-request
-Better Auth handler (`src/lib/api.ts:17`). Request bodies, cookies, raw `Response` headers, and
+Better Auth handler (`src/server/api.ts:17`). Request bodies, cookies, raw `Response` headers, and
 redirects pass through unchanged. Better Auth owns the OAuth redirect, callback, state, PKCE,
 provider exchange, and session protocol. Application Hono routes never construct OAuth state or
 session cookies directly.
@@ -102,9 +102,9 @@ session cookies directly.
 ### 8.5 Login and sign-out contract
 
 The login action invokes `authClient.signIn.social` with provider `google`, callback `/`, and login
-error callback (`src/routes/auth/login.tsx:13-18`). The login route maps pending and blocked codes
-to French messages (`src/routes/auth/login.tsx:20-29`) and redirects an authenticated visitor away
-from login (`src/routes/auth/login.tsx:59-65`). Browser sign-out uses `authClient.signOut()` from
+error callback (`src/client/routes/auth/login.tsx:13-18`). The login route maps pending and blocked codes
+to French messages (`src/client/routes/auth/login.tsx:20-29`) and redirects an authenticated visitor away
+from login (`src/client/routes/auth/login.tsx:59-65`). Browser sign-out uses `authClient.signOut()` from
 an account UI; protected calls become anonymous once the session is absent.
 
 ### 8.6 Interaction boundary
@@ -117,7 +117,7 @@ This division refines the server umbrella dependency direction [KD-2].
 
 A session represents an already-approved identity at the time the session hook runs. The hook checks
 the persisted status before issuance, so a pending or blocked account does not receive the session
-that protected functions would otherwise resolve (`src/lib/auth/auth-server.ts:21-36`).
+that protected functions would otherwise resolve (`src/server/lib/auth/auth-server.ts:21-36`).
 
 Session cookies are Better Auth response state. The direct Worker preserves the raw `Response`
 cookie headers. Hono session resolution calls `auth.api.getSession({ headers, returnHeaders: true })`
@@ -146,7 +146,7 @@ application message, while provider and server details remain in server-side dia
 ### 8.10 Development boundary
 
 The development identity is a bounded local capability selected by the explicit `development` value
-passed into the API request context (`src/lib/auth/api-user.ts:5-17`). Production session resolution
+passed into the API request context (`src/server/lib/auth/api-user.ts:5-17`). Production session resolution
 always calls Better Auth, so a deployed request has no synthetic identity path.
 
 Tests can exercise status and role branches by supplying controlled resolver results. End-to-end

@@ -62,17 +62,17 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Database factory
 
-`getDb()` returns `drizzle(cloudflareEnv.DB, { relations })` (`src/lib/db.ts:1-5`). It is the only
+`getDb()` returns `drizzle(cloudflareEnv.DB, { relations })` (`src/server/lib/db.ts:1-5`). It is the only
 application construction point for the D1 client. Consumers use the returned query builder for
 reads, inserts, updates, deletes, and batches; they do not retain a binding-derived client in
 module state.
 
 ### 8.2 Schema and relation graph
 
-The schema index re-exports domain tables and units (`db/schema/index.ts:9-15`) and defines the
-relation graph (`db/schema/index.ts:17-76`). Recipe traversal includes creator, ingredient groups,
-and both directions of linked recipes (`db/schema/index.ts:34-49`); ingredient traversal includes
-its parent and group uses (`db/schema/index.ts:28-33`). A relation addition accompanies each
+The schema index re-exports domain tables and units (`src/db/schema/index.ts:9-15`) and defines the
+relation graph (`src/db/schema/index.ts:17-76`). Recipe traversal includes creator, ingredient groups,
+and both directions of linked recipes (`src/db/schema/index.ts:34-49`); ingredient traversal includes
+its parent and group uses (`src/db/schema/index.ts:28-33`). A relation addition accompanies each
 nested `with` access that relies on it.
 
 ### 8.3 Read contract
@@ -86,13 +86,13 @@ selected object shape a feature-route contract rather than a client-assembled qu
 A graph write persists its root row and dependent rows within the feature route's write boundary.
 For deletion, dependent `groupIngredient`, ingredient-group, and linked-recipe rows precede the
 recipe row in one batch; the owned R2 file is removed only after that batch resolves
-(`src/features/recipe/api/routes.ts:177-201`). This keeps a database failure from leaving a row that
+(`src/server/routes/recipe/routes.ts:177-201`). This keeps a database failure from leaving a row that
 points to a missing object.
 
 ### 8.5 Query-key contract
 
 `queryKeys` groups recipes, ingredients, and users under broad roots and derives list/detail keys
-from them (`src/lib/query-keys.ts:1-12`). A query factory uses the narrow key needed to read;
+from them (`src/client/lib/query-keys.ts:1-12`). A query factory uses the narrow key needed to read;
 a mutation invalidates the broadest affected root or list. This refines architecture [PI-4]: the
 client cache is server data, while UI stores retain selections only.
 
@@ -111,7 +111,7 @@ business-policy layer.
 
 The schema index is the import boundary for table and relation symbols. Its explicit exports allow
 Drizzle configuration and application code to use one typed vocabulary instead of reaching into
-unrelated schema modules (`db/schema/index.ts:9-17`).
+unrelated schema modules (`src/db/schema/index.ts:9-17`).
 
 ### 8.8 Batch boundary
 
@@ -127,7 +127,7 @@ them as database success.
 ### 8.9 Cache invalidation boundary
 
 Query keys form prefixes: `allRecipes` contains recipe lists, details, and instructions, while the
-more specific helpers add a purpose and identifier (`src/lib/query-keys.ts:1-12`). A mutation
+more specific helpers add a purpose and identifier (`src/client/lib/query-keys.ts:1-12`). A mutation
 chooses a prefix that covers every representation it can make stale.
 
 Invalidation requests a refetch on later observation; it does not modify cached domain objects in
@@ -157,3 +157,4 @@ N/A
 | Date       | Amendment                                                           | Sections affected          | Reason                                                                |
 | ---------- | ------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------- |
 | 2026-09-13 | Inject the D1 client into recipe graph helpers used by Hono routes. | 7, 8.3–8.4, 8.6, 8.8, 8.10 | Keep graph writes within the request-scoped API transaction boundary. |
+| 2026-09-13 | Update the recipe route citation to `src/server/routes/`.           | 8.4                        | Match the server route layout.                                        |

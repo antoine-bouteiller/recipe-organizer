@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
-  "entry": ["src/sw.ts", "src/**/*.test.ts", "oxlint/**/*.test.ts"],
+  "entry": ["src/client/sw.ts", "src/client/routeTree.gen.ts", "src/**/*.test.ts", "oxlint/**/*.test.ts"],
   "ignoreDependencies": ["cloudflare", "oxlint", "@oxlint/plugins"]
 }

@@ -2,7 +2,7 @@ import { exec } from 'node:child_process'
 import { copyFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 
-const SOURCE_DIR = 'db/migrations'
+const SOURCE_DIR = 'src/db/migrations'
 const TMP_DIR = 'migrations_tmp'
 
 rmSync(TMP_DIR, { force: true, recursive: true })

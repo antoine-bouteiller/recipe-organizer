@@ -1,0 +1,45 @@
+import { getFormDialog } from '@client/components/dialogs/form-dialog'
+import { createUserOptions, userSchema } from '@client/features/users/api/create'
+import { userDefaultValues, UserForm } from '@client/features/users/components/user-form'
+import { useAppForm } from '@client/hooks/use-app-form'
+import { revalidateLogic } from '@tanstack/react-form'
+import { useMutation } from '@tanstack/react-query'
+import { useState, type JSX } from 'react'
+
+interface AddUserProps {
+  children: JSX.Element
+}
+
+const FormDialog = getFormDialog(userDefaultValues)
+
+export const AddUser = ({ children }: AddUserProps) => {
+  const createMutation = useMutation(createUserOptions())
+  const [open, setOpen] = useState(false)
+
+  const form = useAppForm({
+    defaultValues: userDefaultValues,
+    onSubmit: async ({ value }) => {
+      await createMutation.mutateAsync(
+        {
+          data: userSchema.parse(value),
+        },
+        {
+          onSuccess: () => {
+            form.reset()
+            setOpen(false)
+          },
+        }
+      )
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: userSchema,
+    },
+  })
+
+  return (
+    <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un utilisateur" trigger={children}>
+      <UserForm form={form} />
+    </FormDialog>
+  )
+}
