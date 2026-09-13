@@ -1,6 +1,6 @@
 ---
 title: Worker Platform
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: docs/infrastructure/server/server.spec.md
@@ -18,13 +18,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                             | Rationale                                                                                    |
-| ----------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | TanStack Start runs through Cloudflare's Worker server entry.                                      | One deployment serves document shell, RPC, OAuth routes, and media.                          |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                 | Named bindings make provider services available without application-managed credentials.     |
-| `[KD-3]` Media representation | Images become WebP at width 1024 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.        |
-| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                              | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes. |
-| `[KD-5]` Offline scope        | Serwist precaches the shell and uses GET response caching as a fallback.                           | This refines architecture [NG-4] by supporting reading rather than offline writes.           |
+| Decision                      | Choice                                                                                            | Rationale                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `[KD-1]` Worker runtime       | TanStack Start runs through Cloudflare's Worker server entry.                                     | One deployment serves document shell, RPC, OAuth routes, and media.                          |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.     |
+| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.        |
+| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes. |
+| `[KD-5]` Offline scope        | Serwist precaches the shell and uses GET response caching as a fallback.                          | This refines architecture [NG-4] by supporting reading rather than offline writes.           |
 
 ## 4. Principles & Intents
 
@@ -72,7 +72,7 @@ changes require regenerated Worker environment types so utility contracts stay t
 
 ### 8.2 Media write contract
 
-`uploadFile(file)` mints a UUID, transforms the stream to WebP `{ width: 1024, quality: 80 }`,
+`uploadFile(file)` mints a UUID, transforms the stream to WebP `{ width: 640, quality: 80 }`,
 and writes the resulting bytes with its content type (`src/lib/r2.ts:9-23`). `uploadVideo(file)`
 writes the file bytes and supplied MIME type under the same opaque-key rule (`src/lib/r2.ts:28-36`).
 Callers persist keys, never public URLs or filename-derived paths.
@@ -80,8 +80,9 @@ Callers persist keys, never public URLs or filename-derived paths.
 ### 8.3 Media read and cache contract
 
 The GET helper validates `{ id: string }`, returns 404 control flow when R2 has no object, and
-responds with object content type or the caller's fallback (`src/lib/r2.ts:42-65`). GET and HEAD
-responses use `public, max-age=86400, stale-while-revalidate=604800` (`src/lib/r2.ts:60-61`,
+responds with object content type or the caller's fallback (`src/lib/r2.ts:42-65`). Image GET
+responses use `public, max-age=31536000, immutable`; video GET and HEAD responses use
+`public, max-age=86400, stale-while-revalidate=604800` (`src/lib/r2.ts:60-61`,
 `src/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
 
 ### 8.4 Offline shell
@@ -145,6 +146,32 @@ The service-worker contract is `/sw.js` plus its manifest-driven cache behavior.
 code do not invoke cache APIs directly, which keeps offline behavior separate from domain state.
 The Worker remains the authority when connectivity is available.
 
+### 8.11 Existing-image migration
+
+`scripts/migrate-images.ts` uses Wrangler's remote bindings for the D1, R2, and Images resources
+configured in `wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
+endpoint or deployment is needed.
+
+- `pnpm images:migrate` previews changes without writing D1 or R2.
+- `pnpm images:migrate --apply` resizes referenced images wider than 640px to WebP quality 80.
+- Pause recipe edits and uploads during application, and back up D1/R2 before running it.
+
+Each replacement gets a fresh UUID URL, bypassing immutable browser and edge caches. One conditional
+SQL update replaces every recipe reference still using the original key, then the original R2 object
+is deleted. Already-small images and videos are untouched. Only recipe-referenced images are scanned.
+
+The script stops on failure and can be rerun: completed replacements are skipped by their width.
+If an upload or database update fails, originals remain intact. An uncertain database result can leave
+an extra uploaded object; a failed deletion can leave an unreferenced original. These safe leftovers
+are not automatically garbage-collected on retry. Refresh the app after migration to refetch recipe URLs.
+
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                          | Sections affected |
+| ---------- | -------------------------------------------------- | ----------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.   | 3, 8              |
+| 2026-09-12 | Add a dry-run-first migration for existing images. | 8.11              |

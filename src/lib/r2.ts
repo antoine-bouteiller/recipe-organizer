@@ -13,7 +13,7 @@ const uploadFile = async (file: File) => {
 
   const optimizedImage = await env.IMAGES.input(imageStream)
     .transform({
-      width: 1024,
+      width: 640,
     })
     .output({ format: 'image/webp', quality: 80 })
 
@@ -57,7 +57,8 @@ export const createR2GetHandler =
 
       return new Response(file.body, {
         headers: {
-          'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+          'Cache-Control':
+            defaultContentType === 'image/webp' ? 'public, max-age=31536000, immutable' : 'public, max-age=86400, stale-while-revalidate=604800',
           'Content-Type': file.httpMetadata?.contentType ?? defaultContentType,
         },
       })

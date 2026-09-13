@@ -1,6 +1,6 @@
 ---
 title: Recipe Display
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 parent-spec: src/features/recipe/spec/index.spec.md
@@ -136,10 +136,17 @@ objects through the cache manager with their stored content type or a media fall
 reports byte-range metadata so a browser can inspect and seek the object without retrieving it.
 
 The handlers validate the requested opaque key, return not-found for absent objects, and use media
-content metadata with image and video fallbacks. Their cache policy permits a day of freshness and a
-week of stale-while-revalidate delivery. This contract applies to media objects only; recipe query
-responses remain part of the client application's server-data lifecycle.
+content metadata with image and video fallbacks. Image GET responses use
+`public, max-age=31536000, immutable`; video GET and HEAD responses use
+`public, max-age=86400, stale-while-revalidate=604800`. This contract applies to media objects only;
+recipe query responses remain part of the client application's server-data lifecycle.
 
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                               | Sections affected |
+| ---------- | --------------------------------------- | ----------------- |
+| 2026-09-12 | Define image and video cache lifetimes. | 8                 |

@@ -1,7 +1,7 @@
 ---
 title: Recipe Organizer Architecture
 kind: umbrella
-status: implemented
+status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
 related:
@@ -44,7 +44,7 @@ second service to operate.
 | `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                   | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                                                                           |
 | `[KD-6]` Membership               | New accounts land `pending` until an admin approves                | The product is private by intent, and OAuth alone would let any Google account in.                                                                                                                                          |
 | `[KD-7]` Server-state vs UI-state | TanStack Query owns server data; TanStack Store owns UI selections | The two have different lifetimes and invalidation rules; keeping them disjoint stops persisted UI state from going stale against the database.                                                                              |
-| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 1024/q80 before the R2 write   | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                                                                       |
+| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write    | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                                                                       |
 | `[KD-9]` Rich instructions        | Lexical with custom nodes                                          | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.                                                                       |
 | `[KD-10]` Module boundary         | One directory per feature owning `api/`, `components/`, state      | Feature-local ownership keeps a change to one domain inside one directory and makes the spec tree mirror the code tree.                                                                                                     |
 | `[KD-11]` Offline                 | Serwist service worker for shell and asset caching                 | The kitchen is a poor-connectivity environment; caching the shell and already-fetched assets keeps a consulted recipe readable without network.                                                                             |
@@ -173,3 +173,9 @@ possession of a URL is never a capability derived from guessing.
 
 - `[OQ-1]` Whether a growing recipe corpus warrants moving search off D1 `LIKE` scans onto a
   dedicated index — owner: @antoine
+
+## Changelog
+
+| Date       | Amendment                   | Sections affected |
+| ---------- | --------------------------- | ----------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads. | 3                 |

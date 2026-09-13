@@ -179,7 +179,7 @@ const viteConfig = defineConfig({
     port: 3000,
   },
   test: {
-    include: ['src/**/*.test.ts', 'oxlint/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts', 'oxlint/**/*.test.ts'],
     globals: true,
   },
 })
