@@ -6,7 +6,7 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "zod": "4.6.2"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*"

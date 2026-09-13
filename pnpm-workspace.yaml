@@ -1,6 +1,6 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - apps/*
+  - packages/*
 
 allowBuilds:
   esbuild: false
@@ -9,8 +9,53 @@ allowBuilds:
   workerd: false
 
 overrides:
-  vite: 'npm:@voidzero-dev/vite-plus-core@latest'
+  vite: npm:@voidzero-dev/vite-plus-core@latest
 
 publicHoistPattern:
-  - 'oxlint'
-  - '@oxlint/plugins'
+  - oxlint
+  - "@oxlint/plugins"
+
+catalog:
+  "@base-ui/react": 1.8.0
+  "@commitlint/cli": 21.2.2
+  "@commitlint/config-conventional": 21.2.2
+  "@hono/zod-validator": 0.9.1
+  "@lexical/history": 0.50.0
+  "@lexical/list": 0.50.0
+  "@lexical/react": 0.50.0
+  "@lexical/rich-text": 0.50.0
+  "@lexical/utils": 0.50.0
+  "@oxlint/plugins": 1.79.0
+  "@serwist/build": 9.5.12
+  "@serwist/vite": 9.5.12
+  "@serwist/window": 9.5.12
+  "@tailwindcss/typography": 0.5.20
+  "@tailwindcss/vite": 4.3.3
+  "@tanstack/react-form": 1.33.5
+  "@tanstack/react-query": 5.102.8
+  "@tanstack/react-router": 1.170.35
+  "@tanstack/react-store": 0.11.1
+  "@tanstack/router-plugin": 1.168.37
+  "@types/node": 25.9.6
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
+  "@vitejs/plugin-react": 6.1.1
+  better-auth: 1.7.4
+  class-variance-authority: 0.7.1
+  cn: 0.3.0
+  drizzle-kit: 1.0.0-rc.3
+  drizzle-orm: 1.0.0-rc.3
+  hono: 4.13.7
+  knip: 6.35.1
+  lefthook: 2.1.12
+  lexical: 0.50.0
+  oxc-transform-react: 0.149.0
+  oxlint: 1.81.0
+  react: 19.3.0
+  react-dom: 19.3.0
+  serwist: 9.5.12
+  tailwindcss: 4.3.3
+  typescript: 7.0.2
+  vite-plus: 0.3.1
+  wrangler: 4.131.1
+  zod: 4.6.2

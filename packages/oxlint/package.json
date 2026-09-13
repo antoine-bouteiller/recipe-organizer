@@ -10,11 +10,11 @@
     "test": "vp -C ../.. test packages/oxlint"
   },
   "dependencies": {
-    "@oxlint/plugins": "1.79.0"
+    "@oxlint/plugins": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",
-    "oxlint": "1.81.0",
-    "vite-plus": "0.3.1"
+    "oxlint": "catalog:",
+    "vite-plus": "catalog:"
   }
 }
