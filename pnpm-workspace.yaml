@@ -25,7 +25,7 @@ catalog:
   "@lexical/react": 0.50.0
   "@lexical/rich-text": 0.50.0
   "@lexical/utils": 0.50.0
-  "@oxlint/plugins": 1.79.0
+  "@oxlint/plugins": 1.82.0
   "@serwist/build": 9.5.12
   "@serwist/vite": 9.5.12
   "@serwist/window": 9.5.12
@@ -50,7 +50,7 @@ catalog:
   lefthook: 2.1.12
   lexical: 0.50.0
   oxc-transform-react: 0.149.0
-  oxlint: 1.81.0
+  oxlint: 1.82.0
   react: 19.3.0
   react-dom: 19.3.0
   serwist: 9.5.12
