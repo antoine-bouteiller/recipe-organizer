@@ -1,12 +1,8 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
-import { getRequestHeader } from '@tanstack/react-start/server'
 import { useSyncExternalStore } from 'react'
 
 type Platform = 'Android' | 'iOS' | 'macOS' | 'Unknown' | 'Windows'
 
-const getPlatform = createIsomorphicFn()
-  .server(() => getPlatformFromUserAgent(getRequestHeader('user-agent')))
-  .client(() => getPlatformFromUserAgent(navigator.userAgent))
+const getPlatform = () => getPlatformFromUserAgent(navigator.userAgent)
 
 const getPlatformFromUserAgent = (userAgent: string | undefined) => {
   if (!userAgent) {

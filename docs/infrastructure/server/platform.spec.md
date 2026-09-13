@@ -18,13 +18,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                            | Rationale                                                                                    |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | TanStack Start runs through Cloudflare's Worker server entry.                                     | One deployment serves document shell, RPC, OAuth routes, and media.                          |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.     |
-| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.        |
-| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes. |
-| `[KD-5]` Offline scope        | Serwist precaches the shell and uses GET response caching as a fallback.                          | This refines architecture [NG-4] by supporting reading rather than offline writes.           |
+| Decision                      | Choice                                                                                            | Rationale                                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Worker runtime       | `src/lib/api-handler.ts` exports the direct Cloudflare Worker `fetch` handler.                    | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA. |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                  |
+| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                     |
+| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.              |
+| `[KD-5]` Offline scope        | Serwist precaches the shell and uses GET response caching as a fallback.                          | This refines architecture [NG-4] by supporting reading rather than offline writes.                        |
 
 ## 4. Principles & Intents
 
@@ -65,10 +65,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Worker configuration
 
-The Worker entry is `@tanstack/react-start/server-entry`; the configuration declares the `DB`,
-`R2_BUCKET`, and `IMAGES` bindings (`wrangler.jsonc:3-6`, `wrangler.jsonc:15-32`). Observability
-records invocation logs while trace ingestion is disabled (`wrangler.jsonc:7-14`). Binding type
-changes require regenerated Worker environment types so utility contracts stay typed.
+The Worker entry is `src/lib/api-handler.ts`, whose default export supplies `fetch`; the
+configuration declares the `DB`, `R2_BUCKET`, and `IMAGES` bindings (`wrangler.jsonc:3-8`,
+`wrangler.jsonc:20-36`). Cloudflare assets serve the built browser SPA with
+`not_found_handling: "single-page-application"`, while `/api` and `/api/*` use
+`run_worker_first` so API requests reach Hono. Observability records invocation logs while trace
+ingestion is disabled (`wrangler.jsonc:11-18`). Binding type changes require regenerated Worker
+environment types so utility contracts stay typed.
 
 ### 8.2 Media write contract
 
@@ -88,8 +91,9 @@ responses use `public, max-age=31536000, immutable`; video GET and HEAD response
 ### 8.4 Offline shell
 
 The Serwist worker owns the generated precache manifest and claims clients immediately
-(`src/sw.ts:9-25`). Its `NetworkFirst` handling of same-origin server-function GET requests gives
-visited content an offline fallback without changing the server mutation contract.
+(`src/sw.ts:9-25`). `serwistPlugin` builds and injects that manifest in `dist/client`
+(`scripts/generate-sw.ts:6-58`). The worker retains Serwist's `defaultCache`; it has no custom
+`_serverFn` runtime rule and does not promise additional offline behavior.
 
 ### 8.5 Interaction boundary
 
@@ -119,8 +123,8 @@ that endpoint.
 
 ### 8.8 Runtime configuration boundary
 
-The configuration uses one Worker name and one TanStack Start entry
-(`wrangler.jsonc:2-4`). D1, R2, and Images remain separately named capabilities, which permits
+The configuration uses one Worker name and the direct API handler entry
+(`wrangler.jsonc:3-8`). D1, R2, and Images remain separately named capabilities, which permits
 the data and media contracts to state exactly which resource they consume.
 
 Runtime secrets do not appear in this configuration. Auth defines their semantic use, while the
@@ -129,8 +133,8 @@ the secret authority.
 
 ### 8.9 Failure behavior
 
-Transformation, R2 write, and cache retrieval failures propagate to their server-function or route
-caller. The platform helper does not manufacture a successful media key or response after a failed
+Transformation, R2 write, and cache retrieval failures propagate to their API route caller. The
+platform helper does not manufacture a successful media key or response after a failed
 provider operation, because a persisted key must name bytes that actually exist.
 
 Service-worker registration and cache availability are progressive capabilities. A browser without
@@ -171,8 +175,9 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                      | Sections affected |
-| ---------- | ------------------------------------------------------------------------------ | ----------------- |
-| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                               | 3, 8              |
-| 2026-09-12 | Add a dry-run-first migration for existing images.                             | 8.11              |
-| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary. | 8.5–8.6           |
+| Date       | Amendment                                                                      | Sections affected    |
+| ---------- | ------------------------------------------------------------------------------ | -------------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                               | 3, 8                 |
+| 2026-09-12 | Add a dry-run-first migration for existing images.                             | 8.11                 |
+| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary. | 8.5–8.6              |
+| 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                             | 3, 8.1, 8.4, 8.8–8.9 |

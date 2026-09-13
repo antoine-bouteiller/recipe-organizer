@@ -173,5 +173,4 @@ export const Route = createFileRoute('/recipe/$id')({
     return { id }
   },
   pendingComponent: RecipeDetailsSkeleton,
-  ssr: 'data-only',
 })

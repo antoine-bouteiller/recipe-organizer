@@ -8,7 +8,10 @@ export const getApiUser = async (context: Context<ApiEnvironment>): Promise<ApiE
     return { email: 'admin@test.fr', id: 'string', role: 'admin', status: 'active' }
   }
 
-  const session = await context.env.auth.api.getSession({ headers: context.req.raw.headers })
+  const { headers, response: session } = await context.env.auth.api.getSession({ headers: context.req.raw.headers, returnHeaders: true })
+  for (const cookie of headers.getSetCookie()) {
+    context.header('set-cookie', cookie, { append: true })
+  }
   if (session === null) {
     return undefined
   }

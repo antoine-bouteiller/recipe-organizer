@@ -19,9 +19,9 @@ related:
 A small, closed group of French-speaking home cooks needs one place to write, find, scale and shop
 their recipes, including rich instructions that embed Magimix programs and reusable sub-recipes.
 Off-the-shelf recipe apps neither model those instructions nor allow a private, invitation-controlled
-membership. Recipe Organizer is a single isomorphic React application served from one Cloudflare
-Worker, with all state — relational data, blobs, sessions — kept inside one provider so there is no
-second service to operate.
+membership. Recipe Organizer is a browser React SPA and same-origin Hono API served from one
+Cloudflare deployment, with all state — relational data, blobs, sessions — kept inside one provider
+so there is no second service to operate.
 
 - `[G-1]` Serve the whole product — pages, Hono RPC, OAuth callback, and media streaming — from a
   single Cloudflare Worker with no separate API tier.
@@ -35,19 +35,19 @@ second service to operate.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                             | Rationale                                                                                                                                                                                                                   |
-| --------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Runtime                  | TanStack Start and Hono on one Cloudflare Worker                   | One TypeScript codebase covers document rendering, Hono RPC and HTTP handlers; the Worker is the API, so there is no second deployment target to keep in sync.                                                              |
-| `[KD-2]` Render mode              | Client-only routes, SSR limited to the root shell                  | Every page is personalised and auth-dependent, so server-rendered page HTML is never shareable; rendering only the shell removes hydration mismatch as a class of bug and lets `localStorage`-backed state render directly. |
-| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                                                                                      |
-| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                     | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                                                                                     |
-| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                   | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                                                                           |
-| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                | The product is private by intent, and OAuth alone would let any Google account in.                                                                                                                                          |
-| `[KD-7]` Server-state vs UI-state | TanStack Query owns server data; TanStack Store owns UI selections | The two have different lifetimes and invalidation rules; keeping them disjoint stops persisted UI state from going stale against the database.                                                                              |
-| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write    | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                                                                       |
-| `[KD-9]` Rich instructions        | Lexical with custom nodes                                          | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.                                                                       |
-| `[KD-10]` Module boundary         | One directory per feature owning `api/`, `components/`, state      | Feature-local ownership keeps a change to one domain inside one directory and makes the spec tree mirror the code tree.                                                                                                     |
-| `[KD-11]` Offline                 | Serwist service worker for shell and asset caching                 | The kitchen is a poor-connectivity environment; caching the shell and already-fetched assets keeps a consulted recipe readable without network.                                                                             |
+| Decision                          | Choice                                                             | Rationale                                                                                                                                                                    |
+| --------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Runtime                  | TanStack Router browser SPA and Hono on one Cloudflare deployment  | `index.html` and `src/main.tsx` start the browser application; the Worker is the same-origin API, so there is no second deployment target to keep in sync.                   |
+| `[KD-2]` Render mode              | Browser SPA; no SSR or server actions                              | Every page is personalised and auth-dependent, so page HTML is rendered in the browser; this avoids hydration concerns and lets `localStorage`-backed state render directly. |
+| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                                       |
+| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                     | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                                      |
+| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                   | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                            |
+| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                | The product is private by intent, and OAuth alone would let any Google account in.                                                                                           |
+| `[KD-7]` Server-state vs UI-state | TanStack Query owns server data; TanStack Store owns UI selections | The two have different lifetimes and invalidation rules; keeping them disjoint stops persisted UI state from going stale against the database.                               |
+| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write    | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                        |
+| `[KD-9]` Rich instructions        | Lexical with custom nodes                                          | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.                        |
+| `[KD-10]` Module boundary         | One directory per feature owning `api/`, `components/`, state      | Feature-local ownership keeps a change to one domain inside one directory and makes the spec tree mirror the code tree.                                                      |
+| `[KD-11]` Offline                 | Serwist service worker for shell and asset caching                 | The kitchen is a poor-connectivity environment; caching the shell and already-fetched assets keeps a consulted recipe readable without network.                              |
 
 ## 4. Principles & Intents
 
@@ -93,31 +93,25 @@ second service to operate.
 ## 7. High-Level Components
 
 ```text
-                    ┌───────────────────────── Cloudflare Worker ─────────────────────────┐
-   Browser          │                                                                     │
-   ┌──────────┐     │   ┌────────────┐   ┌──────────────────┐   ┌────────────────────┐    │
-   │ Router   │────▶│   │ Root shell │──▶│ Hono routes      │──▶│ Data layer         │───▶│──▶ D1
-   │ Query    │ RPC │   │ + auth     │   │ (validate/guard) │   │ (Drizzle schema)   │    │
-   │ Store    │     │   └────────────┘   └──────────────────┘   └────────────────────┘    │
-   │ Forms    │     │          │                   │                                      │
-   └──────────┘     │          │                   └──────────────▶ media handlers ───────│──▶ R2 / Images
-        │           │          └──────────────────────────────────▶ OAuth exchange ───────│──▶ Google
-   ┌──────────┐     └─────────────────────────────────────────────────────────────────────┘
-   │ Serwist  │
-   └──────────┘
+Browser SPA (`index.html` + `src/main.tsx`)       Cloudflare Worker
+┌──────────────────────────────────────────────┐  ┌──────────────────────────────────────────┐
+│ Router · Query provider · Store · Forms       │──▶│ Hono `/api/*` → Data layer → D1          │
+│ Serwist                                       │   │       └───────────▶ media → R2 / Images  │
+└──────────────────────────────────────────────┘   │       └───────────▶ OAuth → Google       │
+                                                   └──────────────────────────────────────────┘
 ```
 
-| Component         | Module type            | Responsibility                                                         | Public API surface                                              |
-| ----------------- | ---------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Repository layout | Convention             | Where each kind of module lives and what may import what               | Directory contract under `src/`                                 |
-| Platform          | Worker configuration   | Worker entry, bindings, edge cache, media handlers, service worker, CI | `wrangler.jsonc` bindings, `src/lib/{r2,cache-manager}.ts`      |
-| Data layer        | Library                | Drizzle schema, relations, per-request client, migrations              | `getDb()`, table and relation exports                           |
-| Hono API          | Library + convention   | Validated, guarded feature routes and query/mutation option factories  | Hono routes, `apiClient`, `*Options()` factories, `authGuard()` |
-| Auth              | Feature-adjacent infra | Google OAuth exchange, encrypted sessions, role and status enforcement | `getAuthUser()`, `authGuard()`, auth routes                     |
-| Routing & SSR     | Convention             | File-based routes, route context, loaders, render-mode boundaries      | Route tree, `beforeLoad` context                                |
-| Forms             | Library                | Single application form hook over TanStack Form, Zod and Base UI       | `useAppForm`, `withForm`, field components                      |
-| Client state      | Library                | Persisted UI state stores and their layering against server state      | `src/stores/*`, `persistedStore`                                |
-| Feature modules   | Feature directories    | Recipe, ingredients, search, shopping list and users domains           | Per-feature `api/` and components                               |
+| Component         | Module type            | Responsibility                                                           | Public API surface                                              |
+| ----------------- | ---------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Repository layout | Convention             | Where each kind of module lives and what may import what                 | Directory contract under `src/`                                 |
+| Platform          | Worker configuration   | Worker entry, bindings, edge cache, media handlers, service worker, CI   | `wrangler.jsonc` bindings, `src/lib/{r2,cache-manager}.ts`      |
+| Data layer        | Library                | Drizzle schema, relations, per-request client, migrations                | `getDb()`, table and relation exports                           |
+| Hono API          | Library + convention   | Validated, guarded feature routes and query/mutation option factories    | Hono routes, `apiClient`, `*Options()` factories, `authGuard()` |
+| Auth              | Feature-adjacent infra | Google OAuth exchange, encrypted sessions, role and status enforcement   | `getAuthUser()`, `authGuard()`, auth routes                     |
+| Routing & SPA     | Convention             | File-based browser routes, route context, loaders, and provider boundary | Route tree, `beforeLoad` context                                |
+| Forms             | Library                | Single application form hook over TanStack Form, Zod and Base UI         | `useAppForm`, `withForm`, field components                      |
+| Client state      | Library                | Persisted UI state stores and their layering against server state        | `src/stores/*`, `persistedStore`                                |
+| Feature modules   | Feature directories    | Recipe, ingredients, search, shopping list and users domains             | Per-feature `api/` and components                               |
 
 Leaf execution order:
 
@@ -139,19 +133,18 @@ than owning any section of it.
 | Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                           |
 | Hono API          | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
 | Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                       |
-| Routing & SSR     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
+| Routing & SPA     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
 | Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                     |
 | Client state      | [`infrastructure/client/client-state.spec.md`](./infrastructure/client/client-state.spec.md)                                                                                                                                                                                                       |
 | Feature modules   | [`recipe`](../src/features/recipe/spec/index.spec.md), [`ingredients`](../src/features/ingredients/ingredients.spec.md), [`search`](../src/features/search/search.spec.md), [`shopping-list`](../src/features/shopping-list/shopping-list.spec.md), [`users`](../src/features/users/users.spec.md) |
 
 ### 8.1 Request lifecycle
 
-A page request reaches the Worker, whose root route resolves the session cookie and theme cookie into
-the route context `{ authUser, queryClient, theme, isAdmin }`, then returns the document shell. The
-client router takes over: the matched route's loader prefetches through
-`queryClient.ensureQueryData(...)`, which calls the feature's Hono RPC query client; the route runs
-its guard, parses its input, reads D1 and returns JSON data. Store-backed UI state is read directly
-from `localStorage` on the same pass, since no server render of the page exists to diverge from.
+Cloudflare assets serve `index.html` for browser routes, and `src/main.tsx` starts the Router and
+an explicit React Query provider. The matched route's loader prefetches through
+`queryClient.ensureQueryData(...)`, which calls the feature's same-origin Hono API client. The API
+runs its guard, parses its input, reads D1, and returns JSON data. Store-backed UI state is read
+directly from `localStorage`; no server render or server action participates in page navigation.
 
 ### 8.2 Write lifecycle
 
@@ -179,3 +172,4 @@ possession of a URL is never a capability derived from guessing.
 | ---------- | ---------------------------------------------------- | ------------------- | ----------------------------------------------------------------------------- |
 | 2026-09-12 | Use 640px WebP q80 uploads.                          | 3                   |                                                                               |
 | 2026-09-13 | Move feature actions to Hono RPC routes and clients. | 2, 3, 4, 7, 8.1–8.2 | Keep feature transport in the shared Worker while replacing server functions. |
+| 2026-09-13 | Move to a browser SPA and direct Worker API entry.   | 2, 3, 7, 8.1        | Remove Start SSR and server-action architecture.                              |

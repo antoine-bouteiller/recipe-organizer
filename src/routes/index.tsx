@@ -72,7 +72,6 @@ export const Route = createFileRoute('/')({
     await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
   },
   pendingComponent: RecipeListSkeleton,
-  ssr: 'data-only',
   validateSearch: (search) => {
     const result = searchSchema.safeParse(search)
     if (!result.success) {

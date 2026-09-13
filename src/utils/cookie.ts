@@ -1,40 +1,33 @@
-import { createIsomorphicFn } from '@tanstack/react-start'
-import { getCookie as getCookieServer, setCookie as setCookieServer } from '@tanstack/react-start/server'
+interface CookieOptions {
+  domain?: string
+  maxAge?: number
+  path?: string
+  sameSite?: 'lax' | 'strict' | 'none'
+  secure?: boolean
+}
 
-export const getCookie = createIsomorphicFn()
-  .server(getCookieServer)
-  .client((key) => {
-    if (typeof document === 'undefined') {
-      return undefined
-    }
+export const getCookie = (key: string): string | undefined => {
+  const match = document.cookie.split('; ').find((row) => row.startsWith(`${key}=`))
 
-    const match = document.cookie.split('; ').find((row) => row.startsWith(`${key}=`))
+  if (!match) {
+    return undefined
+  }
 
-    if (!match) {
-      return undefined
-    }
+  return decodeURIComponent(match.split('=')[1])
+}
 
-    return decodeURIComponent(match.split('=')[1])
-  })
+export const setCookie = (key: string, value: string, options: CookieOptions = {}) => {
+  const { domain, maxAge = 31_536_000, path = '/', sameSite = 'lax', secure = false } = options
 
-export const setCookie = createIsomorphicFn()
-  .server(setCookieServer)
-  .client((key, value, options = {}) => {
-    if (typeof document === 'undefined') {
-      return
-    }
+  const cookieParts = [`${key}=${encodeURIComponent(value)}`, `path=${path}`, `max-age=${maxAge}`, `samesite=${sameSite}`]
 
-    const { domain, maxAge = 31_536_000, path = '/', sameSite = 'lax', secure = false } = options
+  if (domain) {
+    cookieParts.push(`domain=${domain}`)
+  }
 
-    const cookieParts = [`${key}=${encodeURIComponent(value)}`, `path=${path}`, `max-age=${maxAge}`, `samesite=${sameSite}`]
+  if (secure) {
+    cookieParts.push('secure')
+  }
 
-    if (domain) {
-      cookieParts.push(`domain=${domain}`)
-    }
-
-    if (secure) {
-      cookieParts.push('secure')
-    }
-
-    document.cookie = cookieParts.join('; ')
-  })
+  document.cookie = cookieParts.join('; ')
+}

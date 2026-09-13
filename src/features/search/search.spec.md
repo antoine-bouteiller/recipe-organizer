@@ -46,12 +46,12 @@ history of opened results, making repeat visits quick without duplicating recipe
 
 ## 6. Caveats
 
-- `[C-1]` Results are limited to the projection returned by the recipe-list server function, which contains
+- `[C-1]` Results are limited to the projection returned by the recipe-list Hono API, which contains
   recipe display fields but no ingredient names (`src/features/recipe/api/get-all.ts:10-38`).
 - `[C-2]` Recent IDs may no longer resolve when a recipe is deleted; rendering skips them and uses the
   catalogue fallback when none resolve (`src/features/search/components/recent-recipes.tsx:19-25`).
-- `[C-3]` The route uses `ssr: 'data-only'`, so its screen components render through client-side data
-  handling rather than as full route HTML (`src/routes/search.tsx:103-108`).
+- `[C-3]` Search renders in the browser SPA; its route loader populates the query cache before the
+  screen renders (`src/routes/search.tsx`).
 
 ## 7. High-Level Components
 

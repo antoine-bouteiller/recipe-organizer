@@ -1,6 +1,5 @@
-import { QueryClient } from '@tanstack/react-query'
-import { createRouter } from '@tanstack/react-router'
-import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createRouter, isRedirect } from '@tanstack/react-router'
 import * as z from 'zod'
 
 import { DefaultErrorComponent } from '@/components/error/default-error-component'
@@ -29,6 +28,7 @@ export const getRouter = () => {
   })
 
   const router = createRouter({
+    Wrap: ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>,
     context: {
       authUser: undefined,
       queryClient,
@@ -52,10 +52,16 @@ export const getRouter = () => {
     scrollToTopSelectors: ['[data-scroll-restoration-id="screen-outer"]', '[data-scroll-restoration-id="screen-inner"]'],
   })
 
-  setupRouterSsrQueryIntegration({
-    queryClient,
-    router,
-  })
+  const handleQueryError = (error: unknown) => {
+    if (isRedirect(error)) {
+      error.options._fromLocation = router.stores.location.get()
+      return router.navigate(router.resolveRedirect(error).options)
+    }
+    return undefined
+  }
+
+  queryClient.getQueryCache().config.onError = handleQueryError
+  queryClient.getMutationCache().config.onError = handleQueryError
 
   return router
 }

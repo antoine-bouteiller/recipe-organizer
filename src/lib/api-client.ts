@@ -1,27 +1,10 @@
 import { notFound, redirect } from '@tanstack/react-router'
-import { createIsomorphicFn } from '@tanstack/react-start'
-import { getRequest } from '@tanstack/react-start/server'
 import { hc, parseResponse, type ClientResponse } from 'hono/client'
 import * as z from 'zod'
 
 import { type api } from '@/lib/api'
 
-const apiFetch = createIsomorphicFn()
-  .server(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const incoming = getRequest()
-    const url = new URL(input instanceof Request ? input.url : String(input), incoming.url)
-    const headers = new Headers(init?.headers)
-    const cookie = incoming.headers.get('cookie')
-    if (cookie) {
-      headers.set('cookie', cookie)
-    }
-    headers.set('origin', new URL(incoming.url).origin)
-    const { handleApiRequest } = await import('./api-handler')
-    return handleApiRequest(new Request(url, { ...init, headers }))
-  })
-  .client((input: RequestInfo | URL, init?: RequestInit) => fetch(input, init))
-
-export const apiClient = hc<typeof api>('/', { fetch: apiFetch, init: { credentials: 'same-origin' } }).api
+export const apiClient = hc<typeof api>('/', { init: { credentials: 'same-origin' } }).api
 
 const errorSchema = z.object({ error: z.string() })
 

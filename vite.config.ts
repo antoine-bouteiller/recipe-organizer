@@ -1,10 +1,10 @@
 import { cloudflare } from '@cloudflare/vite-plugin'
 import tailwindcss from '@tailwindcss/vite'
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
 
-import { tanstackSerwistPlugin } from './scripts/generate-sw.ts'
+import { serwistPlugin } from './scripts/generate-sw.ts'
 
 const isTest = Boolean(process.env.VITEST)
 
@@ -169,11 +169,11 @@ const viteConfig = defineConfig({
     },
   },
   plugins: [
-    tanstackStart(),
+    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react({ compiler: true }),
-    ...(isTest ? [] : [cloudflare({ viteEnvironment: { name: 'ssr' } })]),
+    ...(isTest ? [] : [cloudflare()]),
     tailwindcss(),
-    tanstackSerwistPlugin(),
+    serwistPlugin(),
   ],
   server: {
     port: 3000,

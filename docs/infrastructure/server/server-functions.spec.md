@@ -18,13 +18,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                | Rationale                                                                                                    |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` RPC declaration          | Feature APIs expose Hono GET reads and POST mutations; `hc` supplies their typed clients.             | One route contract serves browser fetches and in-process server calls without server-function serialization. |
-| `[KD-2]` Trust sequence           | A protected route guards, validates, checks row ownership where applicable, then effects writes.      | Rejected requests cannot reach persistence and role-only checks cannot substitute for ownership.             |
-| `[KD-3]` Wire transport           | JSON carries scalar values and multipart `FormData` carries files; route schemas validate wire input. | Files retain their binary identity while schemas receive typed structured input.                             |
-| `[KD-4]` Error envelope           | `readResponse` maps HTTP failures to Router controls or a safe application error.                     | Navigation semantics survive while internal failures do not leak to callers.                                 |
-| `[KD-5]` Client cache integration | Feature API modules export query or mutation option factories beside their RPC client calls.          | Reads and writes share keys, invalidation, and localized feedback at the feature boundary.                   |
+| Decision                          | Choice                                                                                                | Rationale                                                                                         |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `[KD-1]` RPC declaration          | Feature APIs expose Hono GET reads and POST mutations; `hc` supplies their typed clients.             | One route contract serves native same-origin browser fetches without server-action serialization. |
+| `[KD-2]` Trust sequence           | A protected route guards, validates, checks row ownership where applicable, then effects writes.      | Rejected requests cannot reach persistence and role-only checks cannot substitute for ownership.  |
+| `[KD-3]` Wire transport           | JSON carries scalar values and multipart `FormData` carries files; route schemas validate wire input. | Files retain their binary identity while schemas receive typed structured input.                  |
+| `[KD-4]` Error envelope           | `readResponse` maps HTTP failures to Router controls or a safe application error.                     | Navigation semantics survive while internal failures do not leak to callers.                      |
+| `[KD-5]` Client cache integration | Feature API modules export query or mutation option factories beside their RPC client calls.          | Reads and writes share keys, invalidation, and localized feedback at the feature boundary.        |
 
 ## 4. Principles & Intents
 
@@ -37,8 +37,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 5. Non-Goals
 
-- `[NG-1]` A separately deployed API tier; Hono feature routes share the existing Worker and
-  TanStack file-route adapter, refining architecture [PI-1].
+- `[NG-1]` A separately deployed API tier; Hono feature routes share the existing Worker entry,
+  refining architecture [PI-1].
 - `[NG-2]` Authorization based only on a browser-provided user identifier.
 - `[NG-3]` Binary media streaming through an RPC payload; Hono media routes return raw HTTP responses.
 
@@ -61,7 +61,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | Error boundary            | Shared API client       | Map HTTP statuses to Router controls and errors   | `readResponse`                             |
 | Authorization composition | Hono middleware         | Inject active authorized caller                   | `authGuard()`                              |
 | Query integration         | Feature API module      | Query/mutation options and cache refresh          | `apiClient`, `get*Options`, `*Options`     |
-| API adapter               | File route + Hono       | Dispatch API, auth, and media requests            | `/api/$`                                   |
+| API handler               | Worker entry + Hono     | Dispatch API, auth, and media requests            | `/api/*`                                   |
 
 ## 8. Detailed Design
 
@@ -107,17 +107,16 @@ localized feedback in their feature module; client UI state remains outside this
 
 ### 8.7 API route boundary
 
-The `/api/$` TanStack file route forwards all HTTP methods to `handleApiRequest`, which creates the
-request-scoped Drizzle and Better Auth services before calling the module-level Hono app
-(`src/routes/api/$.ts:1-19`, `src/lib/api-handler.ts:7-16`). `src/lib/api.ts` mounts ingredient,
-recipe, shopping-list, and user route groups, Better Auth at `/api/auth/*`, the session endpoint,
-and public image and video endpoints.
-It applies CSRF protection after auth, so non-auth feature routes are protected while the Better Auth
-protocol passes through unchanged (`src/lib/api.ts:14-43`).
+`src/lib/api-handler.ts` is the Wrangler entry: its default export provides `fetch`, which creates
+the request-scoped Drizzle and Better Auth services before calling the module-level Hono app
+(`src/lib/api-handler.ts:7-18`). `src/lib/api.ts` mounts ingredient, recipe, shopping-list, and user
+route groups, Better Auth at `/api/auth/*`, the session endpoint, and public image and video
+endpoints. It applies CSRF protection after auth, so non-auth feature routes are protected while the
+Better Auth protocol passes through unchanged (`src/lib/api.ts:14-43`). Cloudflare runs the Worker
+first for `/api` and `/api/*`; browser routes remain SPA asset requests.
 
-`apiClient` is an `hc<typeof api>` client. In a server-rendered call, its isomorphic fetch forwards
-the incoming cookie and origin to the in-process API handler; in the browser it uses same-origin
-`fetch` credentials (`src/lib/api-client.ts:9-25`).
+`apiClient` is an `hc<typeof api>` client using native same-origin `fetch` with credentials in the
+browser (`src/lib/api-client.ts`). It has no SSR bridge or server-side in-process transport.
 
 `GET /api/health` is a liveness check. Unmatched requests return `404 { "error": "not_found" }`; Zod,
 HTTP, and unexpected failures receive the API error envelope. Hono serves `GET /api/image/:id`
@@ -173,3 +172,4 @@ N/A
 | 2026-09-13 | Add the Hono HTTP foundation with request-scoped Drizzle and Better Auth. | 5, 7, 8.1, 8.7    | Prepare a shared API without migrating feature actions.                      |
 | 2026-09-13 | Migrate all feature actions to Hono RPC routes and clients.               | 2–8               | Replace `createServerFn` contracts while retaining the same Worker boundary. |
 | 2026-09-13 | Move media endpoints into Hono.                                           | 5, 7, 8.7         | Use one API dispatcher while preserving binary HTTP delivery.                |
+| 2026-09-13 | Make Hono the direct Wrangler entry and browser fetch boundary.           | 3, 5, 7, 8.7      | Remove the file-route and SSR transport adapters.                            |

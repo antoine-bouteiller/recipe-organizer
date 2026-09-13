@@ -14,5 +14,4 @@ const ShoppingListPage = () => (
 
 export const Route = createFileRoute('/shopping-list')({
   component: ShoppingListPage,
-  ssr: 'data-only',
 })
