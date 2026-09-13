@@ -1,0 +1,14 @@
+{
+  "name": "@recipe-organizer/shared",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "zod": "4.6.2"
+  },
+  "devDependencies": {
+    "@recipe-organizer/config": "workspace:*"
+  }
+}

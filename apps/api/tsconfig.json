@@ -1,0 +1,12 @@
+{
+  "extends": "@recipe-organizer/config/tsconfig.base.json",
+  "include": ["src", "db"],
+  "files": ["worker-configuration.d.ts"],
+  "compilerOptions": {
+    "types": ["node", "vite-plus/client"],
+    "paths": {
+      "@recipe-organizer/api/*": ["./src/*"],
+      "@recipe-organizer/api/schema": ["./db/schema/index.ts"]
+    }
+  }
+}

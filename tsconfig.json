@@ -1,34 +1,7 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@recipe-organizer/config/tsconfig.base.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "es2023",
-    "lib": ["ESNext", "DOM", "DOM.Iterable", "webworker"],
-    "types": ["vite-plus/client", "@serwist/vite/typings", "vite-plus/test/globals"],
-    "module": "esnext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-
-    "paths": {
-      "@client/*": ["./src/client/*"],
-      "@server/*": ["./src/server/*"],
-      "@shared/*": ["./src/shared/*"],
-      "@schema": ["./src/db/schema/index.ts"]
-    }
+    "types": ["node"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
-  "files": ["worker-configuration.d.ts"]
+  "include": ["vite.config.ts", "drizzle.config.ts", "apps/web/vite.config.ts"]
 }

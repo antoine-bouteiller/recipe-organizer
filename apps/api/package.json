@@ -1,0 +1,30 @@
+{
+  "name": "@recipe-organizer/api",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/api.ts",
+    "./*": "./src/*.ts",
+    "./schema": "./db/schema/index.ts",
+    "./worker-configuration": "./worker-configuration.d.ts"
+  },
+  "scripts": {
+    "dev": "wrangler dev --config wrangler.jsonc --ip 127.0.0.1 --port 8787 --env-file ../../.env --persist-to ../../.wrangler/state --assets ../web/public --define import.meta.env.DEV:true",
+    "build": "wrangler deploy --config wrangler.jsonc --dry-run --outdir dist",
+    "deploy": "wrangler deploy dist/index.js --config wrangler.jsonc --no-bundle --keep-vars",
+    "serve": "wrangler dev dist/index.js --no-bundle --config wrangler.jsonc --ip 127.0.0.1 --port 8787 --env-file ../../.env --persist-to ../../.wrangler/state",
+    "cf-typegen": "wrangler types --config wrangler.jsonc --env-file ../../.env"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "0.9.1",
+    "@recipe-organizer/shared": "workspace:*",
+    "better-auth": "1.7.4",
+    "drizzle-orm": "1.0.0-rc.3",
+    "hono": "4.13.7",
+    "zod": "4.6.2"
+  },
+  "devDependencies": {
+    "@recipe-organizer/config": "workspace:*",
+    "wrangler": "4.131.1"
+  }
+}
