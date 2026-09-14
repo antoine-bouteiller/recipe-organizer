@@ -11,6 +11,9 @@ import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '@
 import { fieldContext, formContext } from '@client/hooks/use-form-context'
 import { createFormHook } from '@tanstack/react-form'
 import { lazy } from 'react'
+import * as z from 'zod'
+
+z.config(z.locales.fr())
 
 const EditorField = lazy(() => import('@client/components/forms/editor-field'))
 

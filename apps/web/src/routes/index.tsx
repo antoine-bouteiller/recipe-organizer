@@ -4,14 +4,10 @@ import { Button } from '@client/components/ui/button'
 import { Skeleton } from '@client/components/ui/skeleton'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import RecipeCard from '@client/features/recipe/components/recipe-card'
+import { parseRecipeListSearch } from '@client/lib/route-params'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import * as z from 'zod'
-
-const searchSchema = z.object({
-  search: z.boolean().optional(),
-})
 
 const RecipeListSkeleton = () => (
   <ScreenLayout title="Recettes" pageKey="/">
@@ -71,11 +67,5 @@ export const Route = createFileRoute('/')({
     await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
   },
   pendingComponent: RecipeListSkeleton,
-  validateSearch: (search) => {
-    const result = searchSchema.safeParse(search)
-    if (!result.success) {
-      throw new Error(result.error.issues[0]?.message ?? 'Invalid search params')
-    }
-    return result.data
-  },
+  validateSearch: parseRecipeListSearch,
 })

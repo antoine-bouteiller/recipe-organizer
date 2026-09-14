@@ -2,7 +2,6 @@ import { DefaultErrorComponent } from '@client/components/error/default-error-co
 import { NotFound } from '@client/components/error/not-found'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, isRedirect } from '@tanstack/react-router'
-import * as z from 'zod'
 
 import { routeTree } from './routeTree.gen'
 
@@ -13,8 +12,6 @@ declare module '@tanstack/react-router' {
 }
 
 const MAX_AGE = 1000 * 60 * 60 * 24 // 24 hours
-
-z.config(z.locales.fr())
 
 export const getRouter = () => {
   const queryClient = new QueryClient({

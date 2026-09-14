@@ -12,6 +12,7 @@ import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } f
 import { RecipeForm } from '@client/features/recipe/components/recipe-form'
 import { recipeFormFields } from '@client/features/recipe/utils/form'
 import { useAppForm } from '@client/hooks/use-app-form'
+import { parseRecipeId } from '@client/lib/route-params'
 import { formatFormErrors } from '@client/utils/format-form-errors'
 import { objectToFormData } from '@recipe-organizer/shared/utils/form-data'
 import { getVideoUrl } from '@recipe-organizer/shared/utils/get-file-url'
@@ -19,7 +20,6 @@ import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
-import * as z from 'zod'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   _key: Math.random().toString(36).substring(7),
@@ -126,10 +126,6 @@ const EditRecipePage = () => {
   )
 }
 
-const paramsSchema = z.object({
-  id: z.string().transform((str) => Number.parseInt(str, 10)),
-})
-
 export const Route = createFileRoute('/recipe/edit/$id')({
   beforeLoad: ({ context }) => {
     if (!context.authUser) {
@@ -138,11 +134,7 @@ export const Route = createFileRoute('/recipe/edit/$id')({
   },
   component: EditRecipePage,
   loader: async ({ context, params }) => {
-    const result = paramsSchema.safeParse(params)
-    if (!result.success) {
-      throw new Error(result.error.issues[0]?.message ?? 'Invalid id')
-    }
-    const { id } = result.data
+    const { id } = parseRecipeId(params)
     await Promise.all([
       context.queryClient.query({ ...getRecipeDetailsOptions(id), staleTime: 'static' }),
       context.queryClient.query({ ...getIngredientListOptions(), staleTime: 'static' }),

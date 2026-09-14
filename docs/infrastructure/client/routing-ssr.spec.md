@@ -22,12 +22,13 @@ without becoming a feature data layer.
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                     | Rationale                                                                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Route declaration   | File routes declare matching, context gates, parameter/search parsing, and loader prefetch | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                       |
-| `[KD-2]` Query lifecycle     | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`         | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`src/client/router.tsx`). |
-| `[KD-3]` Browser application | `index.html` and `src/client/main.tsx` mount the Router and page chrome in the browser     | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                        |
-| `[KD-4]` Navigation feedback | Router links use view-transition support and route resolution owns back/forward direction  | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`src/client/router.tsx:42-49`).         |
+| Decision                      | Choice                                                                                                        | Rationale                                                                                                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Route declaration    | File routes declare matching, context gates, parameter/search parsing, and loader prefetch                    | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                       |
+| `[KD-2]` Query lifecycle      | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`                            | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`src/client/router.tsx`). |
+| `[KD-3]` Browser application  | `index.html` and `src/client/main.tsx` mount the Router and page chrome in the browser                        | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                        |
+| `[KD-4]` Navigation feedback  | Router links use view-transition support and route resolution owns back/forward direction                     | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`src/client/router.tsx:42-49`).         |
+| `[KD-5]` Route URL validation | Route-owned parsers reproduce the corresponding Zod schema's accepted values, rejections, and stripped output | URL validation remains off the startup-critical Zod path without weakening the established route contract.                                                   |
 
 ## 4. Principles & Intents
 
@@ -78,11 +79,13 @@ callback, preserving login redirects for expired sessions and blocked or pending
 
 ### 8.2 Page-route contract
 
-A page route declares its file-route path, optional `beforeLoad` gate, optional Zod
-`validateSearch`, and a loader that awaits `context.queryClient.ensureQueryData(options)`. The home
-route demonstrates validated search input and list prefetch (`src/client/routes/index.tsx:70-83`); dynamic
-routes parse their segment and return typed loader data for the component. A settings route redirects
-unauthenticated navigation before screen render (`src/client/routes/settings.tsx:3-9`).
+A page route declares its file-route path, optional `beforeLoad` gate, optional
+`validateSearch`, and a loader that awaits `context.queryClient.ensureQueryData(options)`. Route-owned
+parsers must validate the same accepted values and rejections as the Zod schema they replace, and must
+strip unknown keys from their output. The home route demonstrates validated search input and list prefetch
+(`src/client/routes/index.tsx:70-83`); dynamic routes parse their segment and return typed loader data for
+the component. A settings route redirects unauthenticated navigation before screen render
+(`src/client/routes/settings.tsx:3-9`).
 
 Routes render screens and select layouts; feature components own the content. A route consumes
 `useSuspenseQuery(options)` only after its loader has populated the matching options. Public routes
@@ -97,10 +100,11 @@ that redirect and uses route context only to choose presentation affordances. Ad
 uses an additional role gate at the matching route, while Worker handlers make the final access
 decision under [`../server/auth.spec.md`](../server/auth.spec.md).
 
-Search state is parsed through a route-local Zod schema. Invalid input fails before the screen
-receives it; valid output is the sole search-state surface for that screen. Dynamic segments follow
-the same rule: parse the path parameter in the loader, prefetch with the parsed identifier, and
-return the typed identifier as loader data. URL strings therefore never become implicit feature IDs.
+Search state is parsed through a route-owned parser that is behaviorally equivalent to its prior Zod
+schema: invalid input fails before the screen receives it, and valid output strips unknown keys and is the
+sole search-state surface for that screen. Dynamic segments follow the same rule: parse the path parameter
+in the loader, prefetch with the parsed identifier, and return the typed identifier as loader data. URL
+strings therefore never become implicit feature IDs.
 
 ### 8.4 Screen and layout boundary
 
@@ -160,8 +164,9 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                      | Sections affected | Reason                                                  |
-| ---------- | ------------------------------------------------------------------------------ | ----------------- | ------------------------------------------------------- |
-| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.              |
-| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.          |
-| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit. |
+| Date       | Amendment                                                                                | Sections affected | Reason                                                                       |
+| ---------- | ---------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------- |
+| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers.           | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                                   |
+| 2026-09-13 | Dispatch media through the API catch-all.                                                | 7, 8.5            | Give all API endpoints the same Hono boundary.                               |
+| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry.           | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                      |
+| 2026-09-14 | Require route-owned parsers to retain the replaced Zod schemas' URL-validation behavior. | 3, 8.2–8.3        | Keep Zod off the startup-critical route path without changing URL contracts. |

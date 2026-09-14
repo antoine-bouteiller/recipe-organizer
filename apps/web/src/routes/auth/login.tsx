@@ -4,11 +4,9 @@ import { Card } from '@client/components/ui/card'
 import { toastManager } from '@client/components/ui/toast'
 import { authClient } from '@client/lib/auth/auth-client'
 import { loadAuthUser, resetAuthUserCache } from '@client/lib/auth/get-auth-user'
+import { parseLoginSearch } from '@client/lib/route-params'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import * as z from 'zod'
-
-const searchSchema = z.object({ error: z.string().optional() })
 
 const signInWithGoogle = () =>
   authClient.signIn.social({
@@ -68,5 +66,5 @@ export const Route = createFileRoute('/auth/login')({
     }
   },
   component: LoginPage,
-  validateSearch: (search) => searchSchema.parse(search),
+  validateSearch: parseLoginSearch,
 })

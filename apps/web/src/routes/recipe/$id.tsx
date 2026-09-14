@@ -15,11 +15,11 @@ import DeleteRecipe from '@client/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@client/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
+import { parseRecipeId } from '@client/lib/route-params'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import * as z from 'zod'
 
 const RecipeDetailsSkeleton = () => {
   const { id } = Route.useParams()
@@ -154,18 +154,10 @@ const RecipePage = () => {
   )
 }
 
-const paramsSchema = z.object({
-  id: z.string().transform((str) => Number.parseInt(str, 10)),
-})
-
 export const Route = createFileRoute('/recipe/$id')({
   component: RecipePage,
   loader: async ({ context, params }) => {
-    const result = paramsSchema.safeParse(params)
-    if (!result.success) {
-      throw new Error(result.error.issues[0]?.message ?? 'Invalid id')
-    }
-    const { id } = result.data
+    const { id } = parseRecipeId(params)
 
     await context.queryClient.query({ ...getRecipeDetailsOptions(id), staleTime: 'static' })
 
