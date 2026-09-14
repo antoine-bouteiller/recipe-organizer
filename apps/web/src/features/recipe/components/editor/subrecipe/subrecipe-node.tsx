@@ -18,9 +18,14 @@ import {
   type SerializedLexicalNode,
   type Spread,
 } from 'lexical'
+import { lazy, Suspense } from 'react'
 
 import { recipeNodes } from '../extensions'
-import { SubrecipeDialog } from './subrecipe-dialog'
+
+const SubrecipeDialog = lazy(async () => {
+  const dialog = await import('./subrecipe-dialog')
+  return { default: dialog.SubrecipeDialog }
+})
 
 type SerializedSubrecipeNode = Spread<
   {
@@ -119,19 +124,21 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
     </>
   )
 
+  const trigger = (
+    <div className="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start">{content}</div>
+  )
+
   if (isEditable) {
     return (
-      <SubrecipeDialog
-        initialData={formInitialValues}
-        onSubmit={updateAttributes}
-        submitLabel="Enregistrer"
-        title="Modifier la sous-recette"
-        triggerRender={
-          <div className="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start">
-            {content}
-          </div>
-        }
-      />
+      <Suspense fallback={trigger}>
+        <SubrecipeDialog
+          initialData={formInitialValues}
+          onSubmit={updateAttributes}
+          submitLabel="Enregistrer"
+          title="Modifier la sous-recette"
+          triggerRender={trigger}
+        />
+      </Suspense>
     )
   }
 
