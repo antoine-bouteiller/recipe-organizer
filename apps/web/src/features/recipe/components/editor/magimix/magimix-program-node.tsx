@@ -16,8 +16,14 @@ import {
   type SerializedLexicalNode,
   type Spread,
 } from 'lexical'
+import { lazy, Suspense } from 'react'
 
-import { MagimixProgramDialog, type MagimixProgramFormInput } from './magimix-program-dialog'
+import { type MagimixProgramFormInput } from './magimix-program-dialog'
+
+const MagimixProgramDialog = lazy(async () => {
+  const dialog = await import('./magimix-program-dialog')
+  return { default: dialog.MagimixProgramDialog }
+})
 
 type SerializedMagimixProgramNode = Spread<
   {
@@ -103,19 +109,23 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
     })
   }
 
+  const item = <MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
+
   if (isEditable) {
     return (
-      <MagimixProgramDialog
-        initialData={formInitialValues}
-        onSubmit={updateAttributes}
-        submitLabel="Enregistrer"
-        title="Modifier le programme Magimix"
-        triggerRender={<MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />}
-      />
+      <Suspense fallback={item}>
+        <MagimixProgramDialog
+          initialData={formInitialValues}
+          onSubmit={updateAttributes}
+          submitLabel="Enregistrer"
+          title="Modifier le programme Magimix"
+          triggerRender={item}
+        />
+      </Suspense>
     )
   }
 
-  return <MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
+  return item
 }
 
 class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {
