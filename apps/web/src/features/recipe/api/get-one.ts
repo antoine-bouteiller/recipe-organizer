@@ -12,6 +12,7 @@ export type RecipeIngredientGroup = Recipe['ingredientGroups'][number]
 
 export const getRecipeDetailsOptions = (id: number) =>
   queryOptions({
+    networkMode: 'offlineFirst',
     queryFn: async ({ client }) => {
       const recipe = await getRecipe(id)
 

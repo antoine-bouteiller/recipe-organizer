@@ -7,8 +7,10 @@ const getRecipesByIds = async (ids: number[]) => readResponse(apiClient['shoppin
 const getRecipeByIdsOptions = (ids: number[]) =>
   queryOptions({
     enabled: ids.length > 0,
+    networkMode: 'offlineFirst',
     queryFn: () => getRecipesByIds(ids),
     queryKey: queryKeys.recipeListByIds(ids),
+    throwOnError: true,
   })
 
 export { getRecipeByIdsOptions }

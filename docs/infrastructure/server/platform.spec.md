@@ -93,13 +93,17 @@ responses use `public, max-age=31536000, immutable`; video GET and HEAD response
 The Serwist worker claims clients immediately and serves the precached `/index.html` shell for SPA
 navigations, with `/api` explicitly excluded. `serwistPlugin` reads Vite's production manifest and
 injects only the initial entry's and homepage's static import closures, their CSS/assets, and shell
-essentials (web manifest, icons, logo, and initial fonts). Dynamic imports are intentionally excluded, so edit and
+essentials (web manifest, icons, and initial fonts). Dynamic imports are intentionally excluded, so edit and
 settings code is not downloaded at installation.
 
-Runtime caches are bounded: public `GET /api/recipes`, detail, and instructions use NetworkFirst;
+Runtime caches are bounded: public `GET /api/recipes`, detail, instructions, and
+`GET /api/shopping-list/recipes?ids=…` use NetworkFirst;
 immutable `/api/image/<uuid>` responses and visited built JS/CSS assets use CacheFirst. All remaining
 `/api` traffic uses NetworkOnly. This preserves offline read-only access to visited public recipes
-without replaying auth/session, administrator, or mutation responses.
+without replaying auth/session, administrator, or mutation responses. A cold offline session lookup
+failure yields an anonymous reader; protected routes retain their authentication gates. Public queries
+attempt service-worker reads even while offline, but do not pause failed retries indefinitely. A shopping-list
+cache miss reaches the route error boundary instead of presenting an empty list.
 
 ### 8.5 Interaction boundary
 
@@ -188,3 +192,4 @@ N/A
 | 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary.                            | 8.5–8.6              |
 | 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                                                        | 3, 8.1, 8.4, 8.8–8.9 |
 | 2026-09-14 | Scope precaching to the initial shell graph and isolate public offline caches from sensitive API traffic. | 3, 6, 8.4            |
+| 2026-09-14 | Preserve cached public shopping lists and anonymous reading, with explicit offline cache-miss errors.     | 8.4                  |

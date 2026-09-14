@@ -9,6 +9,7 @@ const getRecipeInstructions = async (id: number) => {
 
 const getRecipeInstructionsOptions = (id: number) =>
   queryOptions({
+    networkMode: 'offlineFirst',
     queryFn: () => getRecipeInstructions(id),
     queryKey: queryKeys.recipeInstructions(id),
     staleTime: 5 * 60 * 1000,

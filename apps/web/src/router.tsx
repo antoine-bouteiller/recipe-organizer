@@ -18,6 +18,7 @@ export const getRouter = () => {
     defaultOptions: {
       queries: {
         gcTime: MAX_AGE,
+        retry: (failureCount) => navigator.onLine && failureCount < 3,
         staleTime: 1000 * 60 * 5, // 5 minutes
       },
     },

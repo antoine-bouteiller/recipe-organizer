@@ -6,6 +6,7 @@ const getAllRecipes = async () => readResponse(apiClient.recipes.$get())
 
 export const getRecipeListOptions = () =>
   queryOptions({
+    networkMode: 'offlineFirst',
     queryFn: getAllRecipes,
     queryKey: queryKeys.recipeList(),
   })
