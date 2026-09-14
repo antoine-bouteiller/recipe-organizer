@@ -46,7 +46,13 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
       )}
     >
       <Card className="h-60 overflow-hidden rounded-[27px] border-0 bg-[#1b2426] shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]" key={recipe.id}>
-        <img src={recipe.image} alt={recipe.name} className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={recipe.image}
+          alt={recipe.name}
+          className="absolute inset-0 h-full w-full object-cover"
+          decoding="async"
+          loading={index < 6 ? 'eager' : 'lazy'}
+        />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(8,14,14,0.93)_0%,rgba(8,14,14,0.34)_54%,rgba(8,14,14,0)_78%)]" />
         <div className="absolute inset-0 flex flex-col">
           <Link
