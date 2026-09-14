@@ -1,87 +1,59 @@
-import { ArrowElbowDownLeftIcon } from '@client/components/icons'
 import { Button } from '@client/components/ui/button'
-import {
-  Command,
-  CommandDialog,
-  CommandDialogPopup,
-  CommandDialogTrigger,
-  CommandEmpty,
-  CommandFooter,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandPanel,
-} from '@client/components/ui/command'
 import { Kbd, KbdGroup } from '@client/components/ui/kbd'
-import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
+import { useIsMobile } from '@client/hooks/use-is-mobile'
 import { usePlatform } from '@client/hooks/use-platfom'
-import { type ReducedRecipe } from '@client/types/recipe'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+
+const SearchCommandPalette = lazy(() => import('./search-command-palette'))
 
 const SearchBar = () => {
-  const [open, setOpen] = useState(false)
-
+  const [requested, setRequested] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const isMobile = useIsMobile()
   const platform = usePlatform()
-  const navigate = useNavigate()
-
-  const { data: recipes } = useQuery(getRecipeListOptions())
 
   useEffect(() => {
-    const down = (event: KeyboardEvent) => {
-      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
+    if (isMobile) {
+      return () => undefined
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault()
-        setOpen((prev) => !prev)
+        setRequested((open) => !open)
       }
     }
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [])
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [isMobile])
+
+  if (isMobile) {
+    return null
+  }
 
   return (
-    <CommandDialog onOpenChange={setOpen} open={open}>
-      <CommandDialogTrigger className="w-56 justify-start pl-2.5 font-normal shadow-none" render={<Button variant="outline" />}>
+    <>
+      <Button
+        aria-keyshortcuts="Meta+K Control+K"
+        aria-label="Rechercher une recette"
+        className="w-56 justify-start pl-2.5 font-normal shadow-none"
+        onClick={() => setRequested(true)}
+        ref={triggerRef}
+        variant="outline"
+      >
         Recherche une recette...
-        <KbdGroup className="absolute top-1.5 right-1.5 gap-1">
+        <KbdGroup aria-hidden="true" className="absolute top-1.5 right-1.5 gap-1">
           <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
           <Kbd className="aspect-square">K</Kbd>
         </KbdGroup>
-      </CommandDialogTrigger>
-      <CommandDialogPopup>
-        <Command items={recipes}>
-          <CommandInput placeholder="Rechercher une recette" />
-          <CommandPanel>
-            <CommandEmpty>Aucun résultats trouvé.</CommandEmpty>
-            <CommandList>
-              {(recipe: ReducedRecipe) => (
-                <CommandItem
-                  key={recipe.id}
-                  onClick={() => {
-                    setOpen(false)
-                    void navigate({
-                      params: { id: recipe.id.toString() },
-                      to: '/recipe/$id',
-                    })
-                  }}
-                  value={recipe.name}
-                >
-                  {recipe.name}
-                </CommandItem>
-              )}
-            </CommandList>
-          </CommandPanel>
-          <CommandFooter>
-            <div className="flex items-center gap-2 text-foreground">
-              <Kbd>
-                <ArrowElbowDownLeftIcon />
-              </Kbd>
-              <span>Open</span>
-            </div>
-          </CommandFooter>
-        </Command>
-      </CommandDialogPopup>
-    </CommandDialog>
+      </Button>
+      {requested && (
+        <Suspense fallback={null}>
+          <SearchCommandPalette finalFocus={triggerRef} onClose={() => setRequested(false)} />
+        </Suspense>
+      )}
+    </>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react'
 
-const MOBILE_QUERY = '(max-width: 768px)'
+const MOBILE_QUERY = '(width < 768px)'
 
 const getMatches = () => globalThis.matchMedia(MOBILE_QUERY).matches
 

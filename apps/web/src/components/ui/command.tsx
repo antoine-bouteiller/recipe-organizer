@@ -86,10 +86,6 @@ export const CommandDialog: typeof CommandDialogPrimitive.Root = CommandDialogPr
 
 const CommandDialogPortal: typeof CommandDialogPrimitive.Portal = CommandDialogPrimitive.Portal
 
-export const CommandDialogTrigger = (props: CommandDialogPrimitive.Trigger.Props): React.ReactElement => (
-  <CommandDialogPrimitive.Trigger data-slot="command-dialog-trigger" {...props} />
-)
-
 const CommandDialogBackdrop = ({ className, ...props }: CommandDialogPrimitive.Backdrop.Props): React.ReactElement => (
   <CommandDialogPrimitive.Backdrop
     className={cn(
