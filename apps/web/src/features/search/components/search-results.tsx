@@ -1,4 +1,6 @@
-import { CheckIcon, MagnifyingGlassIcon, PlusIcon } from '@client/components/icons'
+import { CheckIcon } from '@client/components/icons/check'
+import { MagnifyingGlassIcon } from '@client/components/icons/magnifying-glass'
+import { PlusIcon } from '@client/components/icons/plus'
 import { Button } from '@client/components/ui/button'
 import { useIsInShoppingList } from '@client/features/recipe/hooks/use-is-in-shopping-list'
 import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'

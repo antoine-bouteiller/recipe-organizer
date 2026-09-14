@@ -1,4 +1,4 @@
-import { WifiSlashIcon } from '@client/components/icons'
+import { WifiSlashIcon } from '@client/components/icons/wifi-slash'
 import { useSyncExternalStore } from 'react'
 
 const subscribe = (onStoreChange: () => void) => {

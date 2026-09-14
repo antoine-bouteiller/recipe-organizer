@@ -1,4 +1,5 @@
-import { CaretDownIcon, CheckIcon } from '@client/components/icons'
+import { CaretDownIcon } from '@client/components/icons/caret-down'
+import { CheckIcon } from '@client/components/icons/check'
 import { Button } from '@client/components/ui/button'
 import { type ComboboxImplProps, type ValueOptions } from '@client/components/ui/combobox'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@client/components/ui/drawer'

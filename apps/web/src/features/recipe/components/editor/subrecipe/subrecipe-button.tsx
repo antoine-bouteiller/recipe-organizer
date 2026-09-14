@@ -1,4 +1,4 @@
-import { BookOpenIcon } from '@client/components/icons'
+import { BookOpenIcon } from '@client/components/icons/book-open'
 import { Toggle } from '@client/components/ui/toggle'
 import { type SubrecipeNodeData } from '@client/features/recipe/types/subrecipe'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'

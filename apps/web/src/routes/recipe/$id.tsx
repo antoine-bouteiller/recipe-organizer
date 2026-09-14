@@ -1,6 +1,7 @@
 import { Editor, EditorContent } from '@client/components/common/editor/index'
 import { NotFound } from '@client/components/error/not-found'
-import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@client/components/icons'
+import { DotsThreeVerticalIcon } from '@client/components/icons/dots-three-vertical'
+import { PencilSimpleIcon } from '@client/components/icons/pencil-simple'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { Badge } from '@client/components/ui/badge'
 import { Button } from '@client/components/ui/button'

@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from '@client/components/icons'
+import { ArrowLeftIcon } from '@client/components/icons/arrow-left'
 import { Button } from '@client/components/ui/button'
 import { useRouter } from '@tanstack/react-router'
 import { cn } from 'cn'

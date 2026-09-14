@@ -1,4 +1,7 @@
-import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@client/components/icons'
+import { GearIcon } from '@client/components/icons/gear'
+import { HouseIcon } from '@client/components/icons/house'
+import { MagnifyingGlassIcon } from '@client/components/icons/magnifying-glass'
+import { ShoppingCartSimpleIcon } from '@client/components/icons/shopping-cart-simple'
 import { type LinkProps } from '@tanstack/react-router'
 import type React from 'react'
 

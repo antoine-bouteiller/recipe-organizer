@@ -1,4 +1,4 @@
-import { PlusIcon } from '@client/components/icons'
+import { PlusIcon } from '@client/components/icons/plus'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@client/components/ingredient-category'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { glassSurface, SearchInput } from '@client/components/search-input'

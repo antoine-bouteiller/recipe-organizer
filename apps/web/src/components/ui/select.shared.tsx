@@ -1,6 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { CaretUpDownIcon } from '@client/components/icons'
+import { CaretUpDownIcon } from '@client/components/icons/caret-up-down'
 import { type SelectProps } from '@client/components/ui/select'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'

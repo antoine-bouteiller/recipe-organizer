@@ -1,4 +1,4 @@
-import { CheckIcon } from '@client/components/icons'
+import { CheckIcon } from '@client/components/icons/check'
 import { formatNumber } from '@client/utils/number'
 import { UNITS, type UnitSlug } from '@recipe-organizer/shared/units'
 import { cn } from 'cn'

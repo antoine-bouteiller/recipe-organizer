@@ -1,4 +1,6 @@
-import { MinusIcon, PlusIcon, TrashIcon } from '@client/components/icons'
+import { MinusIcon } from '@client/components/icons/minus'
+import { PlusIcon } from '@client/components/icons/plus'
+import { TrashIcon } from '@client/components/icons/trash'
 import { Button } from '@client/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@client/stores/shopping-list.store'
 import { cn } from 'cn'

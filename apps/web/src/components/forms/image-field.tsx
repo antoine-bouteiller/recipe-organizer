@@ -1,4 +1,5 @@
-import { ImageIcon, XIcon } from '@client/components/icons'
+import { ImageIcon } from '@client/components/icons/image'
+import { XIcon } from '@client/components/icons/x'
 import { Field, FieldControl, FieldError, FieldLabel } from '@client/components/ui/field'
 import { Kbd, KbdGroup } from '@client/components/ui/kbd'
 import { useFileUpload, type FileMetadata } from '@client/hooks/use-file-upload'

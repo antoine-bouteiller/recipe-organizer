@@ -1,5 +1,5 @@
 import { DeleteDialog } from '@client/components/dialogs/delete-dialog'
-import { ProhibitIcon } from '@client/components/icons'
+import { ProhibitIcon } from '@client/components/icons/prohibit'
 import { Button } from '@client/components/ui/button'
 import { blockUserOptions } from '@client/features/users/api/block'
 import { useMutation } from '@tanstack/react-query'

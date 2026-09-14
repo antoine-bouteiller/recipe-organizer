@@ -1,4 +1,4 @@
-import { BasketIcon } from '@client/components/icons'
+import { BasketIcon } from '@client/components/icons/basket'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@client/components/ingredient-category'
 import { Skeleton } from '@client/components/ui/skeleton'
 import { ingredientCategory } from '@recipe-organizer/shared/ingredients/categories'

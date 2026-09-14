@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon } from '@client/components/icons'
+import { MagnifyingGlassIcon } from '@client/components/icons/magnifying-glass'
 import { Input, type InputProps as InputControlProps } from '@client/components/ui/input'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'

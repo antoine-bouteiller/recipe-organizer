@@ -1,7 +1,7 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { XIcon } from '@client/components/icons'
+import { XIcon } from '@client/components/icons/x'
 import { Button } from '@client/components/ui/button'
 import { type DialogProps } from '@client/components/ui/dialog'
 import { ScrollArea } from '@client/components/ui/scroll-area'

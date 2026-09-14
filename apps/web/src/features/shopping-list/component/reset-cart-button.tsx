@@ -1,4 +1,4 @@
-import { ArrowCounterClockwiseIcon } from '@client/components/icons'
+import { ArrowCounterClockwiseIcon } from '@client/components/icons/arrow-counter-clockwise'
 import { Button } from '@client/components/ui/button'
 import { resetShoppingList } from '@client/stores/shopping-list.store'
 

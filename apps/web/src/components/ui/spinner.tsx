@@ -1,4 +1,4 @@
-import { CircleNotchIcon } from '@client/components/icons'
+import { CircleNotchIcon } from '@client/components/icons/circle-notch'
 import { cn } from 'cn'
 import type React from 'react'
 

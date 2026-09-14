@@ -1,4 +1,4 @@
-import { CheckIcon } from '@client/components/icons'
+import { CheckIcon } from '@client/components/icons/check'
 import { Button } from '@client/components/ui/button'
 import { approveUserOptions } from '@client/features/users/api/approve'
 import { useMutation } from '@tanstack/react-query'
