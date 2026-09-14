@@ -22,7 +22,13 @@ export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCard
       to="/recipe/$id"
       viewTransition
     >
-      <img src={recipe.image} alt={recipe.name} className="size-15 shrink-0 rounded-xl object-cover" />
+      <img
+        src={recipe.image}
+        alt={recipe.name}
+        className="size-15 shrink-0 rounded-xl object-cover"
+        decoding="async"
+        loading={index < 6 ? 'eager' : 'lazy'}
+      />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <span className="truncate font-bold text-foreground">{recipe.name}</span>
         <div className="flex flex-wrap gap-1.5">
