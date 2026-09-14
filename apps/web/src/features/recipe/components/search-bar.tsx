@@ -1,4 +1,4 @@
-import { ArrowElbowDownLeftIcon } from '@client/components/icons'
+import { ArrowElbowDownLeftIcon } from '@client/components/icons/arrow-elbow-down-left'
 import { Button } from '@client/components/ui/button'
 import {
   Command,

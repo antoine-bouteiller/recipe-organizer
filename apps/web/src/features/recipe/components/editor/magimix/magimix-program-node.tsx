@@ -1,4 +1,6 @@
-import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@client/components/icons'
+import { SpinnerGapIcon } from '@client/components/icons/spinner-gap'
+import { ThermometerIcon } from '@client/components/icons/thermometer'
+import { TimerIcon } from '@client/components/icons/timer'
 import { Item } from '@client/components/ui/item'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@client/features/recipe/types/magimix'
 import { capitalize } from '@client/utils/string'

@@ -1,4 +1,4 @@
-import { CaretLeftIcon } from '@client/components/icons'
+import { CaretLeftIcon } from '@client/components/icons/caret-left'
 import { Button } from '@client/components/ui/button'
 import { Link } from '@tanstack/react-router'
 

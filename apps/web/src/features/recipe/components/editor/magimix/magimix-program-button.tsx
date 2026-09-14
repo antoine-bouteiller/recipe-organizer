@@ -1,4 +1,4 @@
-import { CookingPotIcon } from '@client/components/icons'
+import { CookingPotIcon } from '@client/components/icons/cooking-pot'
 import { Toggle } from '@client/components/ui/toggle'
 import { type MagimixProgramData } from '@client/features/recipe/types/magimix'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'

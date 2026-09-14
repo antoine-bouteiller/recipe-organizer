@@ -1,5 +1,5 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
-import { FunnelSimpleIcon } from '@client/components/icons'
+import { FunnelSimpleIcon } from '@client/components/icons/funnel-simple'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { glassSurface, SearchInput } from '@client/components/search-input'
 import { Button } from '@client/components/ui/button'

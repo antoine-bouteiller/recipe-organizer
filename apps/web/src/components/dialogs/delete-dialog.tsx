@@ -1,4 +1,4 @@
-import { TrashIcon } from '@client/components/icons'
+import { TrashIcon } from '@client/components/icons/trash'
 import { Button } from '@client/components/ui/button'
 import { Dialog } from '@client/components/ui/dialog'
 import { Spinner } from '@client/components/ui/spinner'

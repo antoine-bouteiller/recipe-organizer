@@ -1,5 +1,6 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
-import { CaretUpDownIcon, XIcon } from '@client/components/icons'
+import { CaretUpDownIcon } from '@client/components/icons/caret-up-down'
+import { XIcon } from '@client/components/icons/x'
 import { type ComboboxImplProps, type ValueOptions } from '@client/components/ui/combobox'
 import { Input } from '@client/components/ui/input'
 import { ScrollArea } from '@client/components/ui/scroll-area'

@@ -1,5 +1,6 @@
 import { NumberField as NumberFieldPrimitive } from '@base-ui/react/number-field'
-import { MinusIcon, PlusIcon } from '@client/components/icons'
+import { MinusIcon } from '@client/components/icons/minus'
+import { PlusIcon } from '@client/components/icons/plus'
 import { Label } from '@client/components/ui/label'
 import { cn } from 'cn'
 import React, { type ComponentProps } from 'react'

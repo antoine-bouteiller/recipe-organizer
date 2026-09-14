@@ -1,5 +1,5 @@
 import { getFormDialog } from '@client/components/dialogs/form-dialog'
-import { PencilSimpleIcon } from '@client/components/icons'
+import { PencilSimpleIcon } from '@client/components/icons/pencil-simple'
 import { Button } from '@client/components/ui/button'
 import { ingredientSchema } from '@client/features/ingredients/api/create'
 import { updateIngredientOptions, updateIngredientSchema, type UpdateIngredientFormInput } from '@client/features/ingredients/api/update'

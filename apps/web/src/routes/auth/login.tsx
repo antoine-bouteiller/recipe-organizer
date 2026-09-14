@@ -1,4 +1,4 @@
-import { ArrowLeftIcon } from '@client/components/icons'
+import { ArrowLeftIcon } from '@client/components/icons/arrow-left'
 import { Button } from '@client/components/ui/button'
 import { Card } from '@client/components/ui/card'
 import { toastManager } from '@client/components/ui/toast'

@@ -1,4 +1,8 @@
-import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@client/components/icons'
+import { CarrotIcon } from '@client/components/icons/carrot'
+import { CowIcon } from '@client/components/icons/cow'
+import { FishIcon } from '@client/components/icons/fish'
+import { PackageIcon } from '@client/components/icons/package'
+import { PepperIcon } from '@client/components/icons/pepper'
 import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import { type ReactNode } from 'react'
 

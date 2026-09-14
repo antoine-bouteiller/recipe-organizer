@@ -1,4 +1,4 @@
-import { CheckIcon } from '@client/components/icons'
+import { CheckIcon } from '@client/components/icons/check'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '@client/components/ui/drawer'
 import { type SelectProps } from '@client/components/ui/select'
 import { getSelectDisplay, SelectButton } from '@client/components/ui/select.shared'

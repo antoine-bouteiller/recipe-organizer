@@ -1,4 +1,5 @@
-import { BookIcon, PlusIcon } from '@client/components/icons'
+import { BookIcon } from '@client/components/icons/book'
+import { PlusIcon } from '@client/components/icons/plus'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { Button } from '@client/components/ui/button'
 import { Skeleton } from '@client/components/ui/skeleton'

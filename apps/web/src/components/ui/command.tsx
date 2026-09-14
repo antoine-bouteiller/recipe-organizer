@@ -1,6 +1,6 @@
 import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomplete'
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
-import { MagnifyingGlassIcon } from '@client/components/icons'
+import { MagnifyingGlassIcon } from '@client/components/icons/magnifying-glass'
 import { Input } from '@client/components/ui/input'
 import { ScrollArea } from '@client/components/ui/scroll-area'
 import { cn } from 'cn'

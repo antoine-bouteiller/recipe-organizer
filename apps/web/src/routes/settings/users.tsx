@@ -1,4 +1,4 @@
-import { PlusIcon } from '@client/components/icons'
+import { PlusIcon } from '@client/components/icons/plus'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { glassSurface, SearchInput } from '@client/components/search-input'
 import { Badge } from '@client/components/ui/badge'

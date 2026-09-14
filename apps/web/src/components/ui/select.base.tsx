@@ -1,5 +1,7 @@
 import { Select as SelectPrimitive } from '@base-ui/react/select'
-import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@client/components/icons'
+import { CaretDownIcon } from '@client/components/icons/caret-down'
+import { CaretUpIcon } from '@client/components/icons/caret-up'
+import { CaretUpDownIcon } from '@client/components/icons/caret-up-down'
 import { type SelectProps } from '@client/components/ui/select'
 import { getSelectDisplay, selectTriggerIconClassName, selectTriggerVariants } from '@client/components/ui/select.shared'
 import { cn } from 'cn'

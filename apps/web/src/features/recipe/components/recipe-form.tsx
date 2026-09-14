@@ -1,4 +1,5 @@
-import { PlusIcon, TrashIcon } from '@client/components/icons'
+import { PlusIcon } from '@client/components/icons/plus'
+import { TrashIcon } from '@client/components/icons/trash'
 import { Button } from '@client/components/ui/button'
 import { Label } from '@client/components/ui/label'
 import { Skeleton } from '@client/components/ui/skeleton'

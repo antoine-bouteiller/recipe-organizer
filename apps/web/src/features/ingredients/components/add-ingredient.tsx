@@ -1,5 +1,5 @@
 import { getFormDialog } from '@client/components/dialogs/form-dialog'
-import { PlusIcon } from '@client/components/icons'
+import { PlusIcon } from '@client/components/icons/plus'
 import { Button } from '@client/components/ui/button'
 import { createIngredientOptions, ingredientSchema } from '@client/features/ingredients/api/create'
 import { getIngredientDefaultValues, IngredientForm } from '@client/features/ingredients/components/ingredient-form'
