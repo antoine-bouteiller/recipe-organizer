@@ -69,7 +69,9 @@ export const Route = createFileRoute('/recipe/new')({
   },
   component: NewRecipePage,
   loader: async ({ context }) => {
-    await context.queryClient.query({ ...getIngredientListOptions(), staleTime: 'static' })
-    await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
+    await Promise.all([
+      context.queryClient.query({ ...getIngredientListOptions(), staleTime: 'static' }),
+      context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' }),
+    ])
   },
 })
