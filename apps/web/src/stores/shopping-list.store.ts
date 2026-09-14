@@ -3,6 +3,8 @@ import { useSelector } from '@tanstack/react-store'
 
 const shoppingListStore = persistedStore<number[]>('shopping-list', [])
 
+export const getShoppingListIds = () => shoppingListStore.state
+
 export const useShoppingListIds = () => useSelector(shoppingListStore)
 
 export const addToShoppingList = (recipeId: number) => shoppingListStore.setState((list) => [...list, recipeId])
