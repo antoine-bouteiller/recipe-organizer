@@ -69,10 +69,9 @@ interface MagimixProgramComponentProps {
 const toProgram = (value: string) => magimixProgram.find((item) => item === value) ?? 'expert'
 const toRotationSpeed = (value: string) => allowedRotationSpeed.find((item) => item === value) ?? 'auto'
 
-const MagimixItem = ({ isEditable, program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'nodeKey'>) => (
+const MagimixItem = ({ program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'isEditable' | 'nodeKey'>) => (
   <Item
     variant="outline"
-    render={isEditable ? <button /> : undefined}
     className="w-full"
     media={<img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />}
     title={magimixProgramLabels[toProgram(program)]}
@@ -111,7 +110,7 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
     })
   }
 
-  const item = <MagimixItem isEditable={isEditable} program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
+  const item = <MagimixItem program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
 
   if (isEditable) {
     return (
@@ -121,7 +120,11 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
           onSubmit={updateAttributes}
           submitLabel="Enregistrer"
           title="Modifier le programme Magimix"
-          triggerRender={item}
+          triggerRender={
+            <button type="button" className="w-full text-start">
+              {item}
+            </button>
+          }
         />
       </Suspense>
     )
