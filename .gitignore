@@ -6,10 +6,6 @@ dist
 .wrangler
 database.sql*
 
-# Serwist
-apps/web/public/sw*
-apps/web/public/swe-worker*
-
 # Tanstack
 .tanstack
 

@@ -83,8 +83,7 @@ recipe-organizer/
 │   │   ├── utils/              # Browser-only helpers
 │   │   ├── main.tsx            # Browser SPA entry
 │   │   ├── routeTree.gen.ts    # Generated TanStack Router tree
-│   │   ├── router.tsx          # Router factory and Query provider
-│   │   └── sw.ts               # Service-worker entry
+│   │   └── router.tsx          # Router factory and Query provider
 │   ├── db/
 │   │   ├── migrations/         # Authored Drizzle schema-history artefacts
 │   │   └── schema/             # Table modules and relation exports
@@ -106,6 +105,10 @@ recipe-organizer/
 ├── vite.config.ts              # Application tooling configuration
 └── wrangler.jsonc              # Worker bindings and deployment configuration
 ```
+
+`apps/web/public/sw.js` is the registered, module service worker at the stable `/sw.js` URL. It
+supports the user-required Samsung PWA installation path while forwarding fetches to the network,
+without offline support or legacy storage cleanup.
 
 A feature spans runtime-specific directories: `src/client/features/<feature>/` owns its UI,
 query/mutation wrappers, and browser-local code; `src/server/routes/<feature>/` owns its Hono route

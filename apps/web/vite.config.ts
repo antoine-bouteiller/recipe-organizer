@@ -1,6 +1,5 @@
 import path from 'node:path'
 
-import { serwistPlugin } from '@recipe-organizer/scripts/generate-sw'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
@@ -12,7 +11,6 @@ const viteConfig = defineConfig({
     tsconfigPaths: true,
   },
   build: {
-    manifest: true,
     rolldownOptions: {
       onLog(level, log, defaultHandler) {
         // Supress Lexical Warning
@@ -31,7 +29,6 @@ const viteConfig = defineConfig({
     }),
     react({ compiler: true }),
     tailwindcss(),
-    serwistPlugin(),
   ],
   server: {
     port: 3000,

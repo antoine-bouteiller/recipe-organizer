@@ -30,7 +30,7 @@ so there is no second service to operate.
   on every write.
 - `[G-4]` Give each product domain a self-contained feature module spanning its Hono routes, UI,
   and client state.
-- `[G-5]` Work offline as an installable PWA for browsing already-visited content.
+- `[G-5]` Remain installable through the web manifest and icons, independently of offline support.
 - `[G-6]` Present a French-only interface, including validation messages.
 
 ## 3. Key Design Decisions
@@ -47,7 +47,7 @@ so there is no second service to operate.
 | `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write                                                      | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                        |
 | `[KD-9]` Rich instructions        | Lexical with custom nodes                                                                                            | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.                        |
 | `[KD-10]` Module boundary         | Features split by runtime: `src/client/features/`, `src/server/routes/`, and narrowly shared `src/shared/` contracts | Runtime-specific imports stay isolated while each domain retains clear ownership; feature specs remain client-colocated because they describe both runtime sides.            |
-| `[KD-11]` Offline                 | Serwist service worker for shell and asset caching                                                                   | The kitchen is a poor-connectivity environment; caching the shell and already-fetched assets keeps a consulted recipe readable without network.                              |
+| `[KD-11]` PWA registration        | A minimal network-only service worker remains registered at `/sw.js`, without offline support or legacy cleanup      | This is a user requirement for Samsung PWA installation, not a universal browser-installability claim. It provides no offline caching, replay, or fallback.                  |
 
 ## 4. Principles & Intents
 
@@ -69,7 +69,7 @@ so there is no second service to operate.
 - `[NG-1]` Public or anonymous access to recipes; every route is behind approved membership.
 - `[NG-2]` Identity providers other than Google, and password or email-link authentication.
 - `[NG-3]` Analytical or reporting workloads over D1.
-- `[NG-4]` Offline mutation: writes require connectivity; the service worker serves reads only.
+- `[NG-4]` Offline functionality: reads and writes require connectivity; the registered worker has no offline UI, session fallback, precaching, runtime caching, or fallback response.
 - `[NG-5]` Localisation beyond French.
 - `[NG-6]` Real-time collaboration or multi-user concurrent editing of one recipe.
 
@@ -96,7 +96,7 @@ so there is no second service to operate.
 Browser SPA (`index.html` + `src/client/main.tsx`)       Cloudflare Worker
 ┌──────────────────────────────────────────────┐  ┌──────────────────────────────────────────┐
 │ Router · Query provider · Store · Forms       │──▶│ Hono `/api/*` → Data layer → D1          │
-│ Serwist                                       │   │       └───────────▶ media → R2 / Images  │
+│ Manifest/icons · network-only SW               │   │       └───────────▶ media → R2 / Images  │
 └──────────────────────────────────────────────┘   │       └───────────▶ OAuth → Google       │
                                                    └──────────────────────────────────────────┘
 ```
@@ -104,7 +104,7 @@ Browser SPA (`index.html` + `src/client/main.tsx`)       Cloudflare Worker
 | Component         | Module type                 | Responsibility                                                           | Public API surface                                                |
 | ----------------- | --------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------- |
 | Repository layout | Convention                  | Where each kind of module lives and what may import what                 | Directory contract under `src/`                                   |
-| Platform          | Worker configuration        | Worker entry, bindings, edge cache, media handlers, service worker, CI   | `wrangler.jsonc` bindings, `src/server/lib/{r2,cache-manager}.ts` |
+| Platform          | Worker configuration        | Worker entry, bindings, edge cache, media handlers, PWA worker, CI       | `wrangler.jsonc` bindings, `src/server/lib/{r2,cache-manager}.ts` |
 | Data layer        | Library                     | Drizzle schema, relations, per-request client, migrations                | `getDb()`, table and relation exports                             |
 | Hono API          | Library + convention        | Validated, guarded feature routes and query/mutation option factories    | Server routes, client `apiClient` and `*Options()`, `authGuard()` |
 | Auth              | Feature-adjacent infra      | Google OAuth exchange, encrypted sessions, role and status enforcement   | `getAuthUser()`, `authGuard()`, auth routes                       |
@@ -176,3 +176,4 @@ possession of a URL is never a capability derived from guessing.
 | 2026-09-13 | Move to a browser SPA and direct Worker API entry.                     | 2, 3, 7, 8.1        | Remove Start SSR and server-action architecture.                              |
 | 2026-09-13 | Split feature ownership across client, server, and shared directories. | 2, 3, 4, 7, 8       | Separate runtime code while preserving one package and Cloudflare deployment. |
 | 2026-09-13 | Rename the server feature directory to `routes`.                       | 3                   | Match the server route layout.                                                |
+| 2026-09-14 | Register a network-only PWA worker while retaining offline removal.    | 2–3, 5, 7           | Meet the Samsung installation requirement without restoring offline behavior. |

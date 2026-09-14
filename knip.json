@@ -3,7 +3,7 @@
   "tags": ["-lintignore"],
   "workspaces": {
     "apps/web": {
-      "entry": ["src/sw.ts", "src/**/*.test.ts"]
+      "entry": ["public/sw.js", "src/**/*.test.ts"]
     },
     "apps/api": {
       "entry": ["src/**/*.test.ts"]

@@ -30,8 +30,6 @@
   "devDependencies": {
     "@recipe-organizer/api": "workspace:*",
     "@recipe-organizer/config": "workspace:*",
-    "@recipe-organizer/scripts": "workspace:*",
-    "@serwist/window": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/router-plugin": "catalog:",
@@ -39,7 +37,6 @@
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "oxc-transform-react": "catalog:",
-    "serwist": "catalog:",
     "tailwindcss": "catalog:"
   }
 }

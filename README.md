@@ -10,7 +10,7 @@ A modern recipe management application with a TanStack Router browser SPA and a 
 - **Search & Filter**: Find recipes quickly with real-time search
 - **Authentication**: Secure Google OAuth authentication via Better Auth
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Offline Support**: Service worker integration for offline functionality
+- **Installable PWA**: Web manifest, icons, and a minimal registered service worker support Samsung PWA installation; the app requires connectivity
 
 ## Tech Stack
 
@@ -94,7 +94,7 @@ apps/
 packages/
 ├── config/          # Runtime-neutral TypeScript base configuration
 ├── shared/          # Cross-runtime schemas, constants, units, and helpers
-├── scripts/         # Service-worker build helper and local database migration command
+├── scripts/         # Local database migration command
 └── oxlint/          # Custom lint plugin and its tests
 ```
 

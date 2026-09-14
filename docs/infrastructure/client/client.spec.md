@@ -45,7 +45,7 @@ boundary while leaving product goals and system-wide principles to
 
 - `[NG-1]` A second browser-side API abstraction, authorization system, or duplicate server-data
   cache; this refines `docs/architecture.spec.md` `[PI-1]` and `[PI-4]`.
-- `[NG-2]` Offline mutation, consistent with `docs/architecture.spec.md` `[NG-4]`.
+- `[NG-2]` Offline functionality, consistent with `docs/architecture.spec.md` `[NG-4]`.
 
 ## 6. Caveats
 

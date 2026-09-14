@@ -1,14 +1,12 @@
-import OfflineBanner from '@client/components/error/offline-banner'
 import { Navbar } from '@client/components/navigation/navbar'
 import { ToastProvider } from '@client/components/ui/toast'
 import { loadAuthUser, type getAuthUser } from '@client/lib/auth/get-auth-user'
 import { getTheme } from '@client/lib/theme'
 import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
-import { lazy, Suspense, useEffect, useLayoutEffect } from 'react'
+import { lazy, Suspense, useLayoutEffect } from 'react'
 
 const SearchBar = lazy(() => import('@client/features/recipe/components/search-bar'))
-const loadSerwist = () => import('@serwist/window')
 
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
@@ -20,26 +18,8 @@ const RootComponent = () => {
     document.documentElement.className = theme
   }, [theme])
 
-  useEffect(() => {
-    const registerServiceWorker = async () => {
-      if ('serviceWorker' in navigator) {
-        try {
-          const { Serwist } = await loadSerwist()
-          const serwist = new Serwist('/sw.js', { scope: '/', type: 'module' })
-          await serwist.register()
-        } catch {
-          // App still works without SW - silent failure is OK
-          // Service worker provides offline support, not critical functionality
-        }
-      }
-    }
-
-    void registerServiceWorker()
-  }, [])
-
   return (
     <ToastProvider>
-      <OfflineBanner />
       <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
         <Navbar
           search={

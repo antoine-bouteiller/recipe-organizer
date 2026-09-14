@@ -12,3 +12,7 @@ const root = document.getElementById('root')
 if (root) {
   createRoot(root).render(<RouterProvider router={getRouter()} />)
 }
+
+if ('serviceWorker' in navigator) {
+  void navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' }).catch(() => undefined)
+}

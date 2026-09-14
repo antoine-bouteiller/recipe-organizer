@@ -51,8 +51,7 @@ without becoming a feature data layer.
   from its file is invalid.
 - `[C-2]` Intent preloading runs loaders before an explicit navigation, so loaders remain
   idempotent and read-only.
-- `[C-3]` Service-worker registration is progressive: the root catches registration failure and
-  continues rendering (`src/client/routes/__root.tsx:25-39`).
+- `[C-3]` `src/client/main.tsx` progressively registers `/sw.js` with `{ scope: '/', type: 'module' }` through `navigator.serviceWorker.register(...)` for the user-required Samsung PWA installation path. Registration failure does not block rendering; the worker provides no offline UI or session fallback, and route and query requests require connectivity.
 
 ## 7. High-Level Components
 
@@ -68,9 +67,12 @@ without becoming a feature data layer.
 
 ### 8.1 Router and root context
 
-`index.html` loads `src/client/main.tsx`, which mounts the browser application. `getRouter()` creates a
-`QueryClient`, explicitly wraps the router in `QueryClientProvider`, and registers the generated
-route tree with `defaultPreload: 'intent'`, root not-found handling, and scroll restoration
+`index.html` loads `src/client/main.tsx`, which progressively registers `/sw.js` with
+`navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })` and mounts the browser
+application. The registration serves the user-required Samsung PWA installation path; it does not
+provide offline behavior or delay rendering if it fails. `getRouter()` creates a `QueryClient`,
+explicitly wraps the router in `QueryClientProvider`, and registers the generated route tree with
+`defaultPreload: 'intent'`, root not-found handling, and scroll restoration
 (`src/client/router.tsx`). This browser provider replaces the former SSR-query bridge. The root route
 provides application chrome and the outlet; it does not resolve a Worker request or render an HTML
 document shell. Both query and mutation caches handle Router redirect errors through the same
@@ -105,7 +107,7 @@ return the typed identifier as loader data. URL strings therefore never become i
 ### 8.4 Screen and layout boundary
 
 The browser entry owns application mounting; the router provider owns the query context. The root
-route owns application chrome, desktop navigation, offline feedback, and the outlet. A page route
+route owns application chrome, desktop navigation, and the outlet. A page route
 owns screen selection, pending UI, and its route-specific layout inputs. Feature components own
 recipe cards, editors, settings controls, and all domain presentation. This division lets a layout
 consume route context without importing a feature's private API.

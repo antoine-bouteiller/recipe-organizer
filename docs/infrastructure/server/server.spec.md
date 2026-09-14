@@ -39,7 +39,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[NG-1]` A separately deployed API service, refining architecture [NG-1] and [PI-1].
 - `[NG-2]` Password, email-link, or provider-specific identity flows beyond Google, refining
   architecture [NG-2].
-- `[NG-3]` Offline mutation, refining architecture [NG-4].
+- `[NG-3]` Offline functionality, refining architecture [NG-4].
 
 ## 6. Caveats
 
@@ -51,12 +51,12 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component  | Module type                        | Responsibility                                       | Public API surface                        |
-| ---------- | ---------------------------------- | ---------------------------------------------------- | ----------------------------------------- |
-| Platform   | Worker configuration and utilities | Bindings, media transformation, cache, offline shell | bindings, R2 helpers                      |
-| Data layer | Library                            | Typed D1 schema, relations, and client               | `getDb()`                                 |
-| Hono API   | Convention and library             | Validated RPC, errors, query integration             | Hono routes, API client, option factories |
-| Auth       | Library and routes                 | Google identity, sessions, membership guards         | `getAuth()`, `authGuard()`                |
+| Component  | Module type                        | Responsibility                                                      | Public API surface                        |
+| ---------- | ---------------------------------- | ------------------------------------------------------------------- | ----------------------------------------- |
+| Platform   | Worker configuration and utilities | Bindings, media transformation, edge cache, network-only PWA worker | bindings, R2 helpers                      |
+| Data layer | Library                            | Typed D1 schema, relations, and client                              | `getDb()`                                 |
+| Hono API   | Convention and library             | Validated RPC, errors, query integration                            | Hono routes, API client, option factories |
+| Auth       | Library and routes                 | Google identity, sessions, membership guards                        | `getAuth()`, `authGuard()`                |
 
 | Leaf                                             | Depends on                                                  | Rationale                                                                |
 | ------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------ |

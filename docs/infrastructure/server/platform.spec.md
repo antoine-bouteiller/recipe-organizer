@@ -9,22 +9,21 @@ related: [docs/infrastructure/server/data-layer.spec.md, docs/infrastructure/ser
 
 ## 2. Problem Statement
 
-The product needs a single edge runtime that serves the application, gives server code typed access
-to relational and object storage, and keeps consulted content available during unreliable kitchen
-connectivity. This leaf refines the architecture umbrella's runtime, storage, image, and offline
-decisions [KD-1], [KD-3], [KD-8], and [KD-11].
+The product needs a single edge runtime that serves the application and gives server code typed
+access to relational and object storage. This leaf refines the architecture umbrella's runtime,
+storage, image, and PWA decisions [KD-1], [KD-3], [KD-8], and [KD-11].
 
 N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                                                                                 | Rationale                                                                                                           |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | `src/server/index.ts` exports the direct Cloudflare Worker `fetch` handler.                                                                            | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA.           |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                                                                     | Named bindings make provider services available without application-managed credentials.                            |
-| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes.                                                      | Canonical image bytes limit storage and read transfer while preserving video content.                               |
-| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                                                                                  | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                        |
-| `[KD-5]` Offline scope        | Serwist precaches only the initial shell graph, caches visited public recipe reads and immutable images, and keeps all other API traffic network-only. | This refines architecture [NG-4] by supporting public reading without replaying session, admin, or write responses. |
+| Decision                      | Choice                                                                                            | Rationale                                                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Worker runtime       | `src/server/index.ts` exports the direct Cloudflare Worker `fetch` handler.                       | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA.                           |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                                            |
+| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                               |
+| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                        |
+| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker and forwards every fetch to the network.   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior. |
 
 ## 4. Principles & Intents
 
@@ -38,7 +37,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[NG-1]` An origin server, container fleet, or object-store proxy, refining umbrella [NG-1].
 - `[NG-2]` Browser-side image transformation or arbitrary rendition negotiation.
-- `[NG-3]` Offline write queues, refining `docs/architecture.spec.md` [NG-4].
+- `[NG-3]` Offline reads, writes, queues, or fallbacks, refining `docs/architecture.spec.md` [NG-4].
 
 ## 6. Caveats
 
@@ -48,18 +47,17 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
   length (`src/server/lib/r2.ts:17-21`).
 - `[C-3]` Edge cache entries are local to an edge; the cache header remains the client-visible
   freshness contract.
-- `[C-4]` Service-worker caching only applies to selected GET requests. Session, admin, and mutation
-  API responses are never stored or replayed by the service worker.
+- `[C-4]` Normal browser HTTP and TanStack Query caches provide no offline guarantee, though they can yield already-loaded data; server edge media caches remain unchanged.
 
 ## 7. High-Level Components
 
-| Component            | Module type        | Responsibility                                     | Public API surface                          |
-| -------------------- | ------------------ | -------------------------------------------------- | ------------------------------------------- |
-| Worker configuration | JSON configuration | Server entry, compatibility, D1/R2/Images bindings | `wrangler.jsonc`                            |
-| Media writer         | Server utility     | UUID keys, image transform, R2 writes              | `uploadFile`, `uploadVideo`, `deleteFile`   |
-| Media reader         | Route helper       | Cached GET and HEAD responses from R2              | `createR2GetHandler`, `createR2HeadHandler` |
-| Edge cache           | Server utility     | Cache read-through and response metadata           | `cache.getWithCache()`                      |
-| Service worker       | Worker script      | Shell precache and offline GET fallback            | `/sw.js`                                    |
+| Component            | Module type          | Responsibility                                                | Public API surface                          |
+| -------------------- | -------------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| Worker configuration | JSON configuration   | Server entry, compatibility, D1/R2/Images bindings            | `wrangler.jsonc`                            |
+| Media writer         | Server utility       | UUID keys, image transform, R2 writes                         | `uploadFile`, `uploadVideo`, `deleteFile`   |
+| Media reader         | Route helper         | Cached GET and HEAD responses from R2                         | `createR2GetHandler`, `createR2HeadHandler` |
+| Edge cache           | Server utility       | Cache read-through and response metadata                      | `cache.getWithCache()`                      |
+| PWA service worker   | Static module worker | Supports Samsung installation and forwards fetches to network | `/sw.js`                                    |
 
 ## 8. Detailed Design
 
@@ -88,18 +86,21 @@ responses use `public, max-age=31536000, immutable`; video GET and HEAD response
 `public, max-age=86400, stale-while-revalidate=604800` (`src/server/lib/r2.ts:60-61`,
 `src/server/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
 
-### 8.4 Offline shell
+### 8.4 PWA registration
 
-The Serwist worker claims clients immediately and serves the precached `/index.html` shell for SPA
-navigations, with `/api` explicitly excluded. `serwistPlugin` reads Vite's production manifest and
-injects only the initial entry's and homepage's static import closures, their CSS/assets, and shell
-essentials (web manifest, icons, logo, and initial fonts). Dynamic imports are intentionally excluded, so edit and
-settings code is not downloaded at installation.
+`src/client/main.tsx` progressively registers `apps/web/public/sw.js` at `/sw.js` with
+`navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })`. This registered worker
+is required by the user for Samsung PWA installation; it is not a claim that every browser requires
+a worker to install the manifest. Registration failure does not block application rendering.
 
-Runtime caches are bounded: public `GET /api/recipes`, detail, and instructions use NetworkFirst;
-immutable `/api/image/<uuid>` responses and visited built JS/CSS assets use CacheFirst. All remaining
-`/api` traffic uses NetworkOnly. This preserves offline read-only access to visited public recipes
-without replaying auth/session, administrator, or mutation responses.
+The worker calls `skipWaiting()` on install and `clients.claim()` on activation.
+It remains registered and does not reload pages or clean up legacy storage. Its fetch handler uses
+`event.respondWith(fetch(event.request))`; it does not cache, precache, or provide an offline
+fallback, UI, or session fallback. Navigations and API requests therefore require connectivity.
+
+The web manifest and icons remain available for installability. Normal online browser HTTP caching
+and TanStack Query caching continue unchanged, while providing no offline guarantee. The Worker edge
+media cache and its response freshness headers also remain unchanged.
 
 ### 8.5 Interaction boundary
 
@@ -143,8 +144,9 @@ Transformation, R2 write, and cache retrieval failures propagate to their API ro
 platform helper does not manufacture a successful media key or response after a failed
 provider operation, because a persisted key must name bytes that actually exist.
 
-Service-worker registration and cache availability are progressive capabilities. A browser without
-them still reaches the Worker online, preserving the same server and media contracts.
+Service-worker registration is progressive: a registration failure does not block the browser from
+reaching the Worker online through normal navigation and requests. The registered worker only forwards
+requests to the network, preserving the same server and media contracts without offline behavior.
 
 ### 8.10 Public contract sketch
 
@@ -152,9 +154,9 @@ The media helper contract is intentionally small: `uploadFile(file) -> key`,
 `uploadVideo(file) -> key`, and `createR2GetHandler(contentType) -> route handler`. A key is opaque
 and is sufficient for server-side persistence and route URL construction.
 
-The service-worker contract is `/sw.js` plus its manifest-driven cache behavior. Page and feature
-code do not invoke cache APIs directly, which keeps offline behavior separate from domain state.
-The Worker remains the authority when connectivity is available.
+The PWA-worker contract is the stable `/sw.js` URL and the minimal lifecycle in section 8.4.
+Page and feature code do not invoke Cache APIs. The Worker remains the authority while connectivity
+is available.
 
 ### 8.11 Existing-image migration
 
@@ -181,10 +183,11 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                                                 | Sections affected    |
-| ---------- | --------------------------------------------------------------------------------------------------------- | -------------------- |
-| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                                                          | 3, 8                 |
-| 2026-09-12 | Add a dry-run-first migration for existing images.                                                        | 8.11                 |
-| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary.                            | 8.5–8.6              |
-| 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                                                        | 3, 8.1, 8.4, 8.8–8.9 |
-| 2026-09-14 | Scope precaching to the initial shell graph and isolate public offline caches from sensitive API traffic. | 3, 6, 8.4            |
+| Date       | Amendment                                                                                                    | Sections affected    |
+| ---------- | ------------------------------------------------------------------------------------------------------------ | -------------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                                                             | 3, 8                 |
+| 2026-09-12 | Add a dry-run-first migration for existing images.                                                           | 8.11                 |
+| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary.                               | 8.5–8.6              |
+| 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                                                           | 3, 8.1, 8.4, 8.8–8.9 |
+| 2026-09-14 | Scope precaching to the initial shell graph and isolate public offline caches from sensitive API traffic.    | 3, 6, 8.4            |
+| 2026-09-14 | Register a minimal network-only `/sw.js` for Samsung installation without offline support or legacy cleanup. | 2–3, 5–8             |
