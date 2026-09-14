@@ -16,6 +16,7 @@ import DeleteRecipe from '@client/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@client/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
+import { useIsMobile } from '@client/hooks/use-is-mobile'
 import { parseRecipeId } from '@client/lib/route-params'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
@@ -43,6 +44,7 @@ const RecipePage = () => {
   const { id } = Route.useLoaderData()
   const { data: recipe, isLoading } = useSuspenseQuery(getRecipeDetailsOptions(id))
   const { authUser } = Route.useRouteContext()
+  const isMobile = useIsMobile()
 
   if (isLoading) {
     return (
@@ -118,38 +120,40 @@ const RecipePage = () => {
       <QuantityControls className="my-2" recipeId={id} servings={recipe.servings} />
 
       <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground dark:prose-invert">
-        <div className="-mb-4 flex min-h-0 flex-1 flex-col md:hidden">
-          <SwipeTabs className="flex min-h-0 flex-1 flex-col" defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
-            <TabsList className="w-full">
-              <TabsTab value="ingredients">Ingrédients</TabsTab>
-              <TabsTab value="preparation">Préparation</TabsTab>
-            </TabsList>
-            <SwipeTabsPanels>
-              <div className="overflow-y-auto px-2 pb-4">
-                <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-              </div>
-              <div className="overflow-y-auto p-2 pb-4">
-                <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                  <EditorContent className="max-w-[65ch]" />
-                </Editor>
-              </div>
-            </SwipeTabsPanels>
-          </SwipeTabs>
-        </div>
+        {isMobile ? (
+          <div className="-mb-4 flex min-h-0 flex-1 flex-col">
+            <SwipeTabs className="flex min-h-0 flex-1 flex-col" defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
+              <TabsList className="w-full">
+                <TabsTab value="ingredients">Ingrédients</TabsTab>
+                <TabsTab value="preparation">Préparation</TabsTab>
+              </TabsList>
+              <SwipeTabsPanels>
+                <div className="overflow-y-auto px-2 pb-4">
+                  <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
+                </div>
+                <div className="overflow-y-auto p-2 pb-4">
+                  <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                    <EditorContent className="max-w-[65ch]" />
+                  </Editor>
+                </div>
+              </SwipeTabsPanels>
+            </SwipeTabs>
+          </div>
+        ) : (
+          <div className="grid grid-cols-5 items-stretch gap-8 pt-4">
+            <Card className="col-span-2 rounded-3xl border-0 px-8 pb-8 shadow-lg [&_ul]:rounded-none [&_ul]:border-0 [&_ul]:bg-transparent [&_ul]:px-0">
+              <h2>Ingrédients</h2>
+              <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
+            </Card>
 
-        <div className="hidden grid-cols-5 items-stretch gap-8 pt-4 md:grid">
-          <Card className="col-span-2 rounded-3xl border-0 px-8 pb-8 shadow-lg [&_ul]:rounded-none [&_ul]:border-0 [&_ul]:bg-transparent [&_ul]:px-0">
-            <h2>Ingrédients</h2>
-            <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-          </Card>
-
-          <Card className="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
-            <h2>Préparation</h2>
-            <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-              <EditorContent className="max-w-[65ch] pb-4" />
-            </Editor>
-          </Card>
-        </div>
+            <Card className="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
+              <h2>Préparation</h2>
+              <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                <EditorContent className="max-w-[65ch] pb-4" />
+              </Editor>
+            </Card>
+          </div>
+        )}
       </div>
     </ScreenLayout>
   )
