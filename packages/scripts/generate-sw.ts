@@ -1,7 +1,60 @@
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { injectManifest } from '@serwist/build'
 import { build, type Plugin } from 'vite-plus'
+
+interface ViteManifestEntry {
+  assets?: string[]
+  css?: string[]
+  dynamicImports?: string[]
+  file: string
+  imports?: string[]
+  isEntry?: boolean
+}
+
+type ViteManifest = Record<string, ViteManifestEntry>
+
+const shellFiles = [
+  'index.html',
+  'manifest.json',
+  'favicon.ico',
+  'icon-192.png',
+  'icon-512.png',
+  'fonts/bricolage-grotesque-latin.woff2',
+  'fonts/bricolage-grotesque-latin-ext.woff2',
+]
+
+/**
+ * Returns the initial application's and public homepage's static dependency
+ * graphs. Other dynamic imports remain on-demand, rather than making every lazy
+ * route an install-time download.
+ */
+export const getInitialPrecacheFiles = (manifest: ViteManifest): string[] => {
+  const entryKeys = Object.keys(manifest)
+    .filter((key) => manifest[key]?.isEntry || key.split('?')[0]?.endsWith('/routes/index.tsx'))
+    .toSorted()
+  const pending = entryKeys
+  const visited = new Set<string>()
+  const files = new Set(shellFiles)
+
+  while (pending.length > 0) {
+    const key = pending.pop()
+    if (key && !visited.has(key)) {
+      visited.add(key)
+      const entry = manifest[key]
+      if (entry) {
+        files.add(entry.file)
+        for (const file of [...(entry.assets ?? []), ...(entry.css ?? [])]) {
+          files.add(file)
+        }
+        pending.push(...(entry.imports ?? []))
+      }
+    }
+  }
+
+  return [...files].toSorted()
+}
 
 export const serwistPlugin = (): Plugin => {
   let rootDir = ''
@@ -41,9 +94,12 @@ export const serwistPlugin = (): Plugin => {
       })
 
       if (isProduction) {
+        const manifestPath = path.join(outDir, '.vite', 'manifest.json')
+        const manifest: ViteManifest = JSON.parse(await readFile(manifestPath, 'utf8'))
         await injectManifest({
+          dontCacheBustURLsMatching: /^assets\/.*-[\w-]+\.(?:js|css)$/,
           globDirectory: outDir,
-          globPatterns: ['**/*.{js,css,html,png,svg,ico,webmanifest,woff,woff2}'],
+          globPatterns: getInitialPrecacheFiles(manifest),
           injectionPoint: 'self.__SW_MANIFEST',
           swDest,
           swSrc: swDest,

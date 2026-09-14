@@ -27,7 +27,6 @@ catalog:
   '@lexical/utils': 0.50.0
   '@oxlint/plugins': 1.82.0
   '@serwist/build': 9.5.12
-  '@serwist/vite': 9.5.12
   '@serwist/window': 9.5.12
   '@tailwindcss/typography': 0.5.20
   '@tailwindcss/vite': 4.3.3

@@ -31,7 +31,6 @@
     "@recipe-organizer/api": "workspace:*",
     "@recipe-organizer/config": "workspace:*",
     "@recipe-organizer/scripts": "workspace:*",
-    "@serwist/vite": "catalog:",
     "@serwist/window": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",

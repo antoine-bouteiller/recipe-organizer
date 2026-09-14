@@ -18,13 +18,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                            | Rationale                                                                                                 |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | `src/server/index.ts` exports the direct Cloudflare Worker `fetch` handler.                       | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA. |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                  |
-| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                     |
-| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.              |
-| `[KD-5]` Offline scope        | Serwist precaches the shell and uses GET response caching as a fallback.                          | This refines architecture [NG-4] by supporting reading rather than offline writes.                        |
+| Decision                      | Choice                                                                                                                                                 | Rationale                                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Worker runtime       | `src/server/index.ts` exports the direct Cloudflare Worker `fetch` handler.                                                                            | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA.           |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                                                                     | Named bindings make provider services available without application-managed credentials.                            |
+| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes.                                                      | Canonical image bytes limit storage and read transfer while preserving video content.                               |
+| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                                                                                  | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                        |
+| `[KD-5]` Offline scope        | Serwist precaches only the initial shell graph, caches visited public recipe reads and immutable images, and keeps all other API traffic network-only. | This refines architecture [NG-4] by supporting public reading without replaying session, admin, or write responses. |
 
 ## 4. Principles & Intents
 
@@ -48,8 +48,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
   length (`src/server/lib/r2.ts:17-21`).
 - `[C-3]` Edge cache entries are local to an edge; the cache header remains the client-visible
   freshness contract.
-- `[C-4]` Service-worker caching only applies to GET requests under the selected runtime matcher
-  (`src/client/sw.ts:15-18`).
+- `[C-4]` Service-worker caching only applies to selected GET requests. Session, admin, and mutation
+  API responses are never stored or replayed by the service worker.
 
 ## 7. High-Level Components
 
@@ -90,10 +90,16 @@ responses use `public, max-age=31536000, immutable`; video GET and HEAD response
 
 ### 8.4 Offline shell
 
-The Serwist worker owns the generated precache manifest and claims clients immediately
-(`src/client/sw.ts:9-25`). `serwistPlugin` builds and injects that manifest in `dist/client`
-(`scripts/generate-sw.ts:6-58`). The worker retains Serwist's `defaultCache`; it has no custom
-`_serverFn` runtime rule and does not promise additional offline behavior.
+The Serwist worker claims clients immediately and serves the precached `/index.html` shell for SPA
+navigations, with `/api` explicitly excluded. `serwistPlugin` reads Vite's production manifest and
+injects only the initial entry's and homepage's static import closures, their CSS/assets, and shell
+essentials (web manifest, icons, logo, and initial fonts). Dynamic imports are intentionally excluded, so edit and
+settings code is not downloaded at installation.
+
+Runtime caches are bounded: public `GET /api/recipes`, detail, and instructions use NetworkFirst;
+immutable `/api/image/<uuid>` responses and visited built JS/CSS assets use CacheFirst. All remaining
+`/api` traffic uses NetworkOnly. This preserves offline read-only access to visited public recipes
+without replaying auth/session, administrator, or mutation responses.
 
 ### 8.5 Interaction boundary
 
@@ -175,9 +181,10 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                      | Sections affected    |
-| ---------- | ------------------------------------------------------------------------------ | -------------------- |
-| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                               | 3, 8                 |
-| 2026-09-12 | Add a dry-run-first migration for existing images.                             | 8.11                 |
-| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary. | 8.5–8.6              |
-| 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                             | 3, 8.1, 8.4, 8.8–8.9 |
+| Date       | Amendment                                                                                                 | Sections affected    |
+| ---------- | --------------------------------------------------------------------------------------------------------- | -------------------- |
+| 2026-09-12 | Use 640px WebP q80 uploads; define media caches.                                                          | 3, 8                 |
+| 2026-09-12 | Add a dry-run-first migration for existing images.                                                        | 8.11                 |
+| 2026-09-13 | Route media reads and missing-object errors through Hono for one API boundary.                            | 8.5–8.6              |
+| 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                                                        | 3, 8.1, 8.4, 8.8–8.9 |
+| 2026-09-14 | Scope precaching to the initial shell graph and isolate public offline caches from sensitive API traffic. | 3, 6, 8.4            |

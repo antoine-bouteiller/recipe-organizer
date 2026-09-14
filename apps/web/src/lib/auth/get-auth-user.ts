@@ -14,7 +14,13 @@ export const loadAuthUser = () => {
     })
   }
 
-  return pending
+  return pending.catch((error: unknown) => {
+    // A cold offline visit can read public cached recipes without replaying a session.
+    if (!navigator.onLine) {
+      return undefined
+    }
+    throw error
+  })
 }
 
 export const resetAuthUserCache = () => {

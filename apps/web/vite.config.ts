@@ -12,6 +12,7 @@ const viteConfig = defineConfig({
     tsconfigPaths: true,
   },
   build: {
+    manifest: true,
     rolldownOptions: {
       onLog(level, log, defaultHandler) {
         // Supress Lexical Warning
