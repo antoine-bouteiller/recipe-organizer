@@ -28,6 +28,9 @@ const viteConfig = defineConfig({
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
+      codeSplittingOptions: {
+        splitBehavior: ({ routeId }) => (routeId === '/' ? [] : undefined),
+      },
     }),
     react({ compiler: true }),
     tailwindcss(),
