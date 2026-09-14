@@ -7,6 +7,7 @@
     "dev": "vp run --parallel --filter './apps/*' dev",
     "check": "vp check --fix",
     "serve": "vp run @recipe-organizer/api#serve",
+    "test:web-performance": "vp run @recipe-organizer/web#build && node packages/scripts/check-web-performance.ts",
     "analyze": "ANALYZE=1 vp -C apps/web build",
     "cf-typegen": "vp run @recipe-organizer/api#cf-typegen",
     "db:migrate:local": "pnpm --filter @recipe-organizer/scripts db:migrate:local",
