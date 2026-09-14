@@ -1,5 +1,5 @@
 import { ingredientCategory } from '@recipe-organizer/shared/ingredients/categories'
-import { unitSlugSchema } from '@recipe-organizer/shared/units'
+import { unitSlugSchema } from '@recipe-organizer/shared/unit-schema'
 import * as z from 'zod'
 
 export const ingredientSchema = z.object({

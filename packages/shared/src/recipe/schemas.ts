@@ -1,4 +1,4 @@
-import { unitSlugSchema } from '@recipe-organizer/shared/units'
+import { unitSlugSchema } from '@recipe-organizer/shared/unit-schema'
 import * as z from 'zod'
 
 import { CUISINE_TYPES, MEALS } from './constants'
