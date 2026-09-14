@@ -105,6 +105,14 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
     })
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <Spinner />
+      </div>
+    )
+  }
+
   if (!recipe) {
     return null
   }
@@ -114,13 +122,7 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
       <p>
         <strong>{recipe.name}</strong>
       </p>
-      {isLoading ? (
-        <div className="flex items-center justify-center py-4">
-          <Spinner />
-        </div>
-      ) : (
-        <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe.instructions} />
-      )}
+      <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe.instructions} />
     </>
   )
 
