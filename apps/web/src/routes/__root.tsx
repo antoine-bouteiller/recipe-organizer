@@ -1,6 +1,7 @@
 import OfflineBanner from '@client/components/error/offline-banner'
 import { Navbar } from '@client/components/navigation/navbar'
 import { ToastProvider } from '@client/components/ui/toast'
+import { prefetchPublicRecipeRoute } from '@client/features/recipe/api/prefetch-public-route'
 import { loadAuthUser, type getAuthUser } from '@client/lib/auth/get-auth-user'
 import { getTheme } from '@client/lib/theme'
 import { Serwist } from '@serwist/window'
@@ -12,7 +13,6 @@ const SearchBar = lazy(() => import('@client/features/recipe/components/search-b
 
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
 type Theme = ReturnType<typeof getTheme>
-
 const RootComponent = () => {
   const { theme } = Route.useRouteContext()
 
@@ -60,7 +60,9 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
   theme: Theme
 }>()({
-  beforeLoad: async () => {
+  beforeLoad: async ({ context, matches }) => {
+    void prefetchPublicRecipeRoute(context.queryClient, matches)
+
     const authUser = await loadAuthUser()
     const theme = getTheme()
 
