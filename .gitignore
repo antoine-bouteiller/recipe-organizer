@@ -13,3 +13,7 @@ database.sql*
 .env
 .DS_Store
 scheduled_tasks.lock
+
+# Skills
+skills-lock.json
+skills
