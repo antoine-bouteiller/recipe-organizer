@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type InputHTMLAttributes } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type InputHTMLAttributes } from 'react'
 
 export interface FileMetadata {
   id: string
@@ -17,32 +17,19 @@ interface FileWithPreview {
 interface FileUploadOptions {
   accept?: string
   initialFiles?: FileMetadata[]
-  maxFiles?: number // Only used when multiple is true, defaults to Infinity
   maxSize?: number // In bytes
-  multiple?: boolean // Defaults to false
-  onFilesAdded?: (addedFiles: FileWithPreview[]) => void // Callback when new files are added
   onFilesChange?: (files: FileWithPreview[]) => void // Callback when files change
 }
 
 interface FileUploadState {
   errors: string[]
   files: FileWithPreview[]
-  isDragging: boolean
 }
 
 interface FileUploadActions {
-  addFiles: (files: File[] | FileList) => void
-  clearErrors: () => void
-  clearFiles: () => void
-  getInputProps: (props?: InputHTMLAttributes<HTMLInputElement>) => InputHTMLAttributes<HTMLInputElement> & {
+  getInputProps: () => InputHTMLAttributes<HTMLInputElement> & {
     ref: React.Ref<HTMLInputElement>
   }
-  handleDragEnter: (event: DragEvent<HTMLElement>) => void
-  handleDragLeave: (event: DragEvent<HTMLElement>) => void
-  handleDragOver: (event: DragEvent<HTMLElement>) => void
-  handleDrop: (event: DragEvent<HTMLElement>) => void
-  handleFileChange: (event: ChangeEvent<HTMLInputElement>) => void
-  openFileDialog: () => void
   removeFile: (id: string) => void
 }
 
@@ -80,13 +67,8 @@ const isEditableElementFocused = () => {
   return activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.hasAttribute('contenteditable'))
 }
 
-const handleDragOver = (event: DragEvent<HTMLElement>) => {
-  event.preventDefault()
-  event.stopPropagation()
-}
-
 export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState, FileUploadActions] => {
-  const { accept = '*', initialFiles = [], maxFiles = Infinity, maxSize = Infinity, multiple = false, onFilesAdded, onFilesChange } = options
+  const { accept = '*', initialFiles = [], maxSize = Infinity, onFilesChange } = options
 
   const [state, setState] = useState<FileUploadState>({
     errors: [],
@@ -95,7 +77,6 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
       id: file.id,
       preview: file.url,
     })),
-    isDragging: false,
   })
 
   const inputRef = useRef<HTMLInputElement>(null)
@@ -159,11 +140,7 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     const errors: string[] = []
     const validFiles: FileWithPreview[] = []
 
-    const filesToProcess = multiple
-      ? newFilesArray.filter((file) => !state.files.some((existing) => existing.file.name === file.name && existing.file.size === file.size))
-      : newFilesArray
-
-    for (const file of filesToProcess) {
+    for (const file of newFilesArray) {
       const error = validateFile(file)
       if (error) {
         errors.push(error)
@@ -184,22 +161,13 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
 
     setState((prev) => ({ ...prev, errors: [] }))
 
-    if (!multiple) {
-      clearFiles()
-    }
-
-    if (multiple && maxFiles !== Infinity && state.files.length + newFilesArray.length > maxFiles) {
-      setState((prev) => ({ ...prev, errors: [`Vous ne pouvez uploader qu'un maximum de ${maxFiles} fichiers.`] }))
-      return
-    }
+    clearFiles()
 
     const { errors, validFiles } = processFiles(newFilesArray)
 
     if (validFiles.length > 0) {
-      onFilesAdded?.(validFiles)
-      const updatedFiles = multiple ? [...state.files, ...validFiles] : validFiles
-      setState((prev) => ({ ...prev, errors, files: updatedFiles }))
-      onFilesChange?.(updatedFiles)
+      setState((prev) => ({ ...prev, errors, files: validFiles }))
+      onFilesChange?.(validFiles)
     } else if (errors.length > 0) {
       setState((prev) => ({ ...prev, errors }))
     }
@@ -225,13 +193,6 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
         files: newFiles,
       }
     })
-  }
-
-  const clearErrors = () => {
-    setState((prev) => ({
-      ...prev,
-      errors: [],
-    }))
   }
 
   const fetchImageFromUrl = async (url: string) => {
@@ -277,60 +238,14 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
     }
   }, [handlePaste])
 
-  const handleDragEnter = (event: DragEvent<HTMLElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setState((prev) => ({ ...prev, isDragging: true }))
-  }
-
-  const handleDragLeave = (event: DragEvent<HTMLElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-
-    if (event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget)) {
-      return
-    }
-
-    setState((prev) => ({ ...prev, isDragging: false }))
-  }
-
-  const handleDrop = (event: DragEvent<HTMLElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setState((prev) => ({ ...prev, isDragging: false }))
-
-    // Don't process files if the input is disabled
-    if (inputRef.current?.disabled) {
-      return
-    }
-
-    if (event.dataTransfer.files.length > 0) {
-      // In single file mode, only use the first file
-      if (multiple) {
-        addFiles(event.dataTransfer.files)
-      } else {
-        const [file] = event.dataTransfer.files
-        addFiles([file])
-      }
-    }
-  }
-
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       addFiles(event.target.files)
     }
   }
 
-  const openFileDialog = () => {
-    if (inputRef.current) {
-      inputRef.current.click()
-    }
-  }
-
-  const getInputProps = (props: InputHTMLAttributes<HTMLInputElement> = {}) => ({
-    ...props,
-    accept: props.accept || accept,
-    multiple: props.multiple === undefined ? multiple : props.multiple,
+  const getInputProps = () => ({
+    accept,
     onChange: handleFileChange,
     ref: inputRef,
     type: 'file' as const,
@@ -339,32 +254,22 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
   return [
     state,
     {
-      addFiles,
-      clearErrors,
-      clearFiles,
       getInputProps,
-      handleDragEnter,
-      handleDragLeave,
-      handleDragOver,
-      handleDrop,
-      handleFileChange,
-      openFileDialog,
       removeFile,
     },
   ]
 }
 
 // Helper function to format bytes to human-readable format
-const formatBytes = (bytes: number, decimals = 2): string => {
+const formatBytes = (bytes: number): string => {
   if (bytes === 0) {
     return '0 Bytes'
   }
 
   const base = 1024
-  const dm = Math.max(0, decimals)
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   const index = Math.floor(Math.log(bytes) / Math.log(base))
 
-  return Number.parseFloat((bytes / base ** index).toFixed(dm)) + sizes[index]
+  return Number.parseFloat((bytes / base ** index).toFixed(2)) + sizes[index]
 }

@@ -28,7 +28,7 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactE
       <DrawerTrigger
         disabled={disabled}
         render={
-          <SelectButton className={className} size={props.size}>
+          <SelectButton className={className}>
             <span className={cn(isEmpty && 'text-muted-foreground')}>{displayLabel}</span>
           </SelectButton>
         }

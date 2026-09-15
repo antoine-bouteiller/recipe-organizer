@@ -2,7 +2,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { Input } from '../input/input'
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from './field'
+import { Field, FieldControl, FieldError, FieldLabel } from './field'
 
 const meta = {
   component: Field,
@@ -20,14 +20,12 @@ export const Overview: Story = {
         <Field name="email">
           <FieldLabel>Email address</FieldLabel>
           <FieldControl render={<Input placeholder="name@example.com" type="email" />} />
-          <FieldDescription>We will only use this to contact you about your account.</FieldDescription>
         </Field>
       </StorySection>
       <StorySection title="Invalid">
         <Field invalid name="email">
           <FieldLabel>Email address</FieldLabel>
           <FieldControl render={<Input aria-invalid placeholder="name@example.com" type="email" />} />
-          <FieldDescription>Enter the address associated with your account.</FieldDescription>
           <FieldError>Please enter a valid email address.</FieldError>
         </Field>
       </StorySection>
@@ -35,7 +33,6 @@ export const Overview: Story = {
         <Field disabled name="email">
           <FieldLabel>Email address</FieldLabel>
           <FieldControl render={<Input disabled defaultValue="name@example.com" type="email" />} />
-          <FieldDescription>This field is unavailable while the account is locked.</FieldDescription>
         </Field>
       </StorySection>
     </div>

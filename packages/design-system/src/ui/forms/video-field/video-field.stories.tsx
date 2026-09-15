@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
@@ -23,6 +24,19 @@ const meta = { component: VideoFieldExample, tags: ['autodocs'], title: 'Forms/V
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
+  play: async ({ canvasElement }) => {
+    const empty = within(within(canvasElement).getByRole('region', { name: 'Empty' }))
+    const input = empty.getByLabelText('Recipe video')
+    await userEvent.upload(input, new File(['video'], 'recipe.mp4', { type: 'video/mp4' }))
+    await expect(empty.getByText('recipe.mp4')).toBeVisible()
+    await userEvent.click(empty.getByRole('button', { name: 'Remove video' }))
+    await expect(empty.queryByText('recipe.mp4')).not.toBeInTheDocument()
+
+    const oversized = new File(['video'], 'oversized.mp4', { type: 'video/mp4' })
+    Object.defineProperty(oversized, 'size', { value: 100 * 1024 * 1024 + 1 })
+    await userEvent.upload(input, oversized)
+    await expect(empty.queryByText('oversized.mp4')).not.toBeInTheDocument()
+  },
   render: () => (
     <div className="flex w-full min-w-0 flex-col gap-8">
       <StorySection title="Empty">

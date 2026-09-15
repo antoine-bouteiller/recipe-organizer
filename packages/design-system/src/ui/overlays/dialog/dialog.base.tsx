@@ -36,37 +36,23 @@ const DialogViewport = ({ className, ...props }: DialogPrimitive.Viewport.Props)
   />
 )
 
-const DialogPopup = ({
-  className,
-  children,
-  showCloseButton = true,
-  bottomStickOnMobile = true,
-  closeProps,
-  ...props
-}: DialogPrimitive.Popup.Props & {
-  showCloseButton?: boolean
-  bottomStickOnMobile?: boolean
-  closeProps?: DialogPrimitive.Close.Props
-}): ReactElement => (
+const DialogPopup = ({ className, children, ...props }: DialogPrimitive.Popup.Props): ReactElement => (
   <DialogPortal>
     <DialogBackdrop />
-    <DialogViewport className={cn(bottomStickOnMobile && 'max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12')}>
+    <DialogViewport className="max-sm:grid-rows-[1fr_auto] max-sm:p-0 max-sm:pt-12">
       <DialogPrimitive.Popup
         className={cn(
           'relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 max-w-lg origin-center flex-col rounded-2xl border bg-popover not-dark:bg-clip-padding text-popover-foreground opacity-[calc(1-var(--nested-dialogs))] shadow-lg/5 outline-none transition-[scale,opacity,translate] duration-200 ease-in-out will-change-transform before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] data-ending-style:opacity-0 data-starting-style:opacity-0 sm:scale-[calc(1-0.1*var(--nested-dialogs))] sm:data-ending-style:scale-98 sm:data-starting-style:scale-98 dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-          bottomStickOnMobile &&
-            'max-sm:max-w-none max-sm:origin-bottom max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0 max-sm:data-ending-style:translate-y-4 max-sm:data-starting-style:translate-y-4 max-sm:before:hidden max-sm:before:rounded-none',
+          'max-sm:max-w-none max-sm:origin-bottom max-sm:rounded-none max-sm:border-x-0 max-sm:border-t max-sm:border-b-0 max-sm:data-ending-style:translate-y-4 max-sm:data-starting-style:translate-y-4 max-sm:before:hidden max-sm:before:rounded-none',
           className
         )}
         data-slot="dialog-popup"
         {...props}
       >
         {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close aria-label="Close" className="absolute end-2 top-2" render={<Button size="icon" variant="ghost" />} {...closeProps}>
-            <XIcon />
-          </DialogPrimitive.Close>
-        )}
+        <DialogPrimitive.Close aria-label="Close" className="absolute end-2 top-2" render={<Button size="icon" variant="ghost" />}>
+          <XIcon />
+        </DialogPrimitive.Close>
       </DialogPrimitive.Popup>
     </DialogViewport>
   </DialogPortal>
@@ -85,19 +71,11 @@ const DialogHeader = ({ className, render, ...props }: useRender.ComponentProps<
   })
 }
 
-const DialogFooter = ({
-  className,
-  variant = 'default',
-  render,
-  ...props
-}: useRender.ComponentProps<'div'> & {
-  variant?: 'default' | 'bare'
-}): ReactElement => {
+const DialogFooter = ({ className, render, ...props }: useRender.ComponentProps<'div'>): ReactElement => {
   const defaultProps = {
     className: cn(
       'flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]',
-      variant === 'default' && 'border-t bg-muted/72 py-4',
-      variant === 'bare' && 'in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6',
+      'border-t bg-muted/72 py-4',
       className
     ),
     'data-slot': 'dialog-footer',
@@ -114,14 +92,7 @@ const DialogTitle = ({ className, ...props }: DialogPrimitive.Title.Props): Reac
   <DialogPrimitive.Title className={cn('font-heading font-semibold text-xl leading-none', className)} data-slot="dialog-title" {...props} />
 )
 
-const DialogPanel = ({
-  className,
-  scrollFade = true,
-  render,
-  ...props
-}: useRender.ComponentProps<'div'> & {
-  scrollFade?: boolean
-}): ReactElement => {
+const DialogPanel = ({ className, render, ...props }: useRender.ComponentProps<'div'>): ReactElement => {
   const defaultProps = {
     className: cn(
       'p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-header])]:pt-1 in-[[data-slot=dialog-popup]:has([data-slot=dialog-footer]:not(.border-t))]:pb-1',
@@ -131,7 +102,7 @@ const DialogPanel = ({
   }
 
   return (
-    <ScrollArea scrollFade={scrollFade}>
+    <ScrollArea scrollFade>
       {useRender({
         defaultTagName: 'div',
         props: mergeProps<'div'>(defaultProps, props),

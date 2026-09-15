@@ -26,7 +26,6 @@ import { FunnelSimpleIcon } from './funnel-simple'
 import { GearIcon } from './gear'
 import { HouseIcon } from './house'
 import { ImageIcon } from './image'
-import { InfoIcon } from './info'
 import { ListBulletsIcon } from './list-bullets'
 import { MagnifyingGlassIcon } from './magnifying-glass'
 import { MinusIcon } from './minus'
@@ -47,7 +46,6 @@ import { TrashIcon } from './trash'
 import { UserIcon } from './user'
 import { UsersIcon } from './users'
 import { VideoIcon } from './video'
-import { WarningIcon } from './warning'
 import { WarningCircleIcon } from './warning-circle'
 import { XIcon } from './x'
 
@@ -86,7 +84,6 @@ const icons = [
   ['GearIcon', GearIcon],
   ['HouseIcon', HouseIcon],
   ['ImageIcon', ImageIcon],
-  ['InfoIcon', InfoIcon],
   ['ListBulletsIcon', ListBulletsIcon],
   ['MagnifyingGlassIcon', MagnifyingGlassIcon],
   ['MinusIcon', MinusIcon],
@@ -107,7 +104,6 @@ const icons = [
   ['UserIcon', UserIcon],
   ['UsersIcon', UsersIcon],
   ['VideoIcon', VideoIcon],
-  ['WarningIcon', WarningIcon],
   ['WarningCircleIcon', WarningCircleIcon],
   ['XIcon', XIcon],
 ] as const

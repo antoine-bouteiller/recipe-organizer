@@ -14,10 +14,6 @@ export const FieldLabel = ({ className, ...props }: FieldPrimitive.Label.Props):
   />
 )
 
-export const FieldDescription = ({ className, ...props }: FieldPrimitive.Description.Props): React.ReactElement => (
-  <FieldPrimitive.Description className={cn('text-muted-foreground text-xs', className)} data-slot="field-description" {...props} />
-)
-
 export const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props): React.ReactElement => (
   <FieldPrimitive.Error className={cn('text-destructive-foreground text-xs', className)} data-slot="field-error" {...props} />
 )

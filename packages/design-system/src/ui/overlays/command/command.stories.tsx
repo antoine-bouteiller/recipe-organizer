@@ -63,9 +63,6 @@ export const Overview: Story = {
       <StorySection title="Default">
         <CommandExample />
       </StorySection>
-      <StorySection title="Search">
-        <CommandExample />
-      </StorySection>
     </div>
   ),
 }

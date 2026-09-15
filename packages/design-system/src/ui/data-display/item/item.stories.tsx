@@ -29,14 +29,8 @@ export const Overview: Story = {
           <Item media={<CheckCircleIcon />} title="Default">
             A standard item.
           </Item>
-          <Item media={<CheckCircleIcon />} title="Muted" variant="muted">
-            A subdued item.
-          </Item>
           <Item media={<CheckCircleIcon />} title="Outline" variant="outline">
             An outlined item.
-          </Item>
-          <Item size="sm" title="Small item">
-            A compact item.
           </Item>
         </div>
       </StorySection>

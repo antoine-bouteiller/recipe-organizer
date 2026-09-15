@@ -19,12 +19,10 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
   const MAX_VIDEO_SIZE_MB = 100
   const maxVideoSizeBytes = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
-  const [{ files, isDragging }, { getInputProps, removeFile }] = useFileUpload({
+  const [{ files }, { getInputProps, removeFile }] = useFileUpload({
     accept: 'video/*',
     initialFiles: initialVideo ? [initialVideo] : [],
-    maxFiles: 1,
     maxSize: maxVideoSizeBytes,
-    multiple: false,
     onFilesChange: (newFiles) => {
       field.setValue(newFiles[0]?.file)
     },
@@ -35,10 +33,7 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
-      <FieldLabel
-        className="relative flex min-h-32 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive data-[dragging=true]:bg-accent/50"
-        data-dragging={isDragging || undefined}
-      >
+      <FieldLabel className="relative flex min-h-32 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive">
         {videoFile ? (
           <div className="flex w-full items-center justify-between gap-4 px-4">
             <div className="flex items-center gap-3">
@@ -83,16 +78,15 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
   )
 }
 
-const formatBytes = (bytes: number, decimals = 1): string => {
+const formatBytes = (bytes: number): string => {
   if (bytes === 0) {
     return '0 Bytes'
   }
 
   const base = 1024
-  const dm = Math.max(0, decimals)
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
 
   const index = Math.floor(Math.log(bytes) / Math.log(base))
 
-  return `${Number.parseFloat((bytes / base ** index).toFixed(dm))} ${sizes[index]}`
+  return `${Number.parseFloat((bytes / base ** index).toFixed(1))} ${sizes[index]}`
 }

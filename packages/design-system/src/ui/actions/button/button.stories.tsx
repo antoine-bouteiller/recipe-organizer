@@ -26,18 +26,15 @@ export const Overview: Story = {
           <Button variant="secondary">Secondary</Button>
           <Button variant="outline">Outline</Button>
           <Button variant="ghost">Ghost</Button>
-          <Button variant="link">Link</Button>
           <Button variant="destructive">Delete</Button>
           <Button variant="destructive-outline">Remove</Button>
         </div>
       </StorySection>
       <StorySection title="Sizes">
         <div className="flex flex-wrap items-center gap-3">
-          <Button size="xs">Extra small</Button>
           <Button size="sm">Small</Button>
           <Button>Default</Button>
           <Button size="lg">Large</Button>
-          <Button size="xl">Extra large</Button>
           <Button aria-label="Add item" size="icon">
             <PlusIcon />
           </Button>
@@ -45,9 +42,6 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Disabled">
         <Button disabled>Unavailable</Button>
-      </StorySection>
-      <StorySection title="Loading">
-        <Button loading>Saving changes</Button>
       </StorySection>
     </div>
   ),

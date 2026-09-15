@@ -1,5 +1,3 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from 'cn'
 import { type ComponentProps, type ReactElement, type ReactNode } from 'react'
@@ -24,73 +22,30 @@ const itemVariants = cva(
   `,
   {
     defaultVariants: {
-      size: 'default',
       variant: 'default',
     },
     variants: {
-      size: {
-        default: 'gap-4 p-4',
-        sm: 'gap-2.5 px-4 py-3',
-      },
       variant: {
-        default: 'bg-transparent',
-        muted: 'bg-muted/50',
-        outline: 'border-border',
+        default: 'gap-4 bg-transparent p-4',
+        outline: 'gap-4 border-border p-4',
       },
     },
   }
 )
 
-const ItemRoot = ({
-  className,
-  render,
-  size = 'default',
-  variant = 'default',
-  ...props
-}: ComponentProps<'div'> & VariantProps<typeof itemVariants> & { render?: useRender.RenderProp }) =>
-  useRender({
-    defaultTagName: 'div',
-    props: mergeProps(
-      {
-        className: cn(itemVariants({ className, size, variant })),
-        'data-size': size,
-        'data-slot': 'item',
-        'data-variant': variant,
-      },
-      props
-    ),
-    render,
-  })
-
-const itemMediaVariants = cva(
-  `
-    flex shrink-0 items-center justify-center gap-2
-    group-has-data-[slot=item-description]/item:translate-y-0.5
-    group-has-data-[slot=item-description]/item:self-start
-    [&_svg]:pointer-events-none
-  `,
-  {
-    defaultVariants: {
-      variant: 'default',
-    },
-    variants: {
-      variant: {
-        default: 'bg-transparent',
-        icon: `
-          size-8 rounded-sm border bg-muted
-          [&_svg:not([class*='size-'])]:size-4
-        `,
-        image: `
-          size-10 overflow-hidden rounded-sm
-          [&_img]:size-full [&_img]:object-cover
-        `,
-      },
-    },
-  }
+const ItemRoot = ({ className, variant = 'default', ...props }: ComponentProps<'div'> & VariantProps<typeof itemVariants>) => (
+  <div className={cn(itemVariants({ className, variant }))} data-slot="item" data-variant={variant} {...props} />
 )
 
-const ItemMedia = ({ className, variant = 'default', ...props }: ComponentProps<'div'> & VariantProps<typeof itemMediaVariants>) => (
-  <div className={cn(itemMediaVariants({ className, variant }))} data-slot="item-media" data-variant={variant} {...props} />
+const ItemMedia = ({ className, ...props }: ComponentProps<'div'>) => (
+  <div
+    className={cn(
+      'flex shrink-0 items-center justify-center gap-2 bg-transparent group-has-data-[slot=item-description]/item:translate-y-0.5 group-has-data-[slot=item-description]/item:self-start [&_svg]:pointer-events-none',
+      className
+    )}
+    data-slot="item-media"
+    {...props}
+  />
 )
 
 const ItemContent = ({ className, ...props }: ComponentProps<'div'>) => (
@@ -125,17 +80,14 @@ interface ItemProps {
   children?: ReactNode
   actions?: ReactNode
   variant?: ItemRootProps['variant']
-  size?: ItemRootProps['size']
   className?: string
-  render?: ItemRootProps['render']
-  onClick?: ItemRootProps['onClick']
 }
 
-export const Item = ({ media, title, children, actions, variant, size, className, render, onClick }: ItemProps): ReactElement => {
+export const Item = ({ media, title, children, actions, variant, className }: ItemProps): ReactElement => {
   const hasContent = title !== undefined || children !== undefined
 
   return (
-    <ItemRoot className={className} onClick={onClick} render={render} size={size} variant={variant}>
+    <ItemRoot className={className} variant={variant}>
       {media !== undefined && <ItemMedia>{media}</ItemMedia>}
       {hasContent && (
         <ItemContent>

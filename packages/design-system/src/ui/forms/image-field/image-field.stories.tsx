@@ -1,6 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
-import { expect, waitFor, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
@@ -33,6 +33,13 @@ export const Overview: Story = {
   play: async ({ canvasElement }) => {
     const section = within(canvasElement).getByRole('region', { name: 'Initial Image' })
     await waitFor(() => expect(section.querySelector('img')?.naturalWidth).toBeGreaterThan(0))
+
+    const empty = within(within(canvasElement).getByRole('region', { name: 'Empty' }))
+    const file = new File(['<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"/>'], 'image.svg', { type: 'image/svg+xml' })
+    await userEvent.upload(empty.getByLabelText('Recipe image'), file)
+    await waitFor(() => expect(empty.getByAltText('Aperçu')).toHaveAttribute('src', expect.stringMatching(/^blob:/)))
+    await userEvent.click(empty.getByRole('button', { name: "Supprimer l'image" }))
+    await expect(empty.queryByAltText('Aperçu')).not.toBeInTheDocument()
   },
   render: () => (
     <div className="flex w-full min-w-0 flex-col gap-8">

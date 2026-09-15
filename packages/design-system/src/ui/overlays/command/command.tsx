@@ -12,45 +12,37 @@ const Autocomplete: typeof AutocompletePrimitive.Root = AutocompletePrimitive.Ro
 const AutocompleteInput = ({
   className,
   startAddon,
-  size,
   ...props
 }: Omit<AutocompletePrimitive.Input.Props, 'size'> & {
   startAddon?: React.ReactNode
-  size?: 'sm' | 'default' | 'lg' | number
   ref?: React.Ref<HTMLInputElement>
-}): React.ReactElement => {
-  const sizeValue = size ?? 'default'
-
-  return (
-    <AutocompletePrimitive.InputGroup
-      className="relative w-full text-foreground not-has-[>*.w-full]:w-fit has-disabled:opacity-64"
-      data-slot="autocomplete-input-group"
-    >
-      {startAddon && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 start-px z-10 flex items-center ps-[calc(--spacing(3)-1px)] opacity-80 has-[+[data-size=sm]]:ps-[calc(--spacing(2.5)-1px)] [&_svg]:-mx-0.5 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4"
-          data-slot="autocomplete-start-addon"
-        >
-          {startAddon}
-        </div>
+}): React.ReactElement => (
+  <AutocompletePrimitive.InputGroup
+    className="relative w-full text-foreground not-has-[>*.w-full]:w-fit has-disabled:opacity-64"
+    data-slot="autocomplete-input-group"
+  >
+    {startAddon && (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 start-px z-10 flex items-center ps-[calc(--spacing(3)-1px)] opacity-80 [&_svg]:-mx-0.5 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4"
+        data-slot="autocomplete-start-addon"
+      >
+        {startAddon}
+      </div>
+    )}
+    <AutocompletePrimitive.Input
+      className={cn(
+        startAddon &&
+          '*:data-[slot=autocomplete-input]:ps-[calc(--spacing(8.5)-1px)] sm:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(8)-1px)]',
+        'has-[+[data-slot=autocomplete-trigger],+[data-slot=autocomplete-clear]]:*:data-[slot=autocomplete-input]:pe-7',
+        className
       )}
-      <AutocompletePrimitive.Input
-        className={cn(
-          startAddon &&
-            'data-[size=sm]:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(7.5)-1px)] *:data-[slot=autocomplete-input]:ps-[calc(--spacing(8.5)-1px)] sm:data-[size=sm]:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(7)-1px)] sm:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(8)-1px)]',
-          sizeValue === 'sm'
-            ? 'has-[+[data-slot=autocomplete-trigger],+[data-slot=autocomplete-clear]]:*:data-[slot=autocomplete-input]:pe-6.5'
-            : 'has-[+[data-slot=autocomplete-trigger],+[data-slot=autocomplete-clear]]:*:data-[slot=autocomplete-input]:pe-7',
-          className
-        )}
-        data-slot="autocomplete-input"
-        render={<Input nativeInput size={sizeValue} />}
-        {...props}
-      />
-    </AutocompletePrimitive.InputGroup>
-  )
-}
+      data-slot="autocomplete-input"
+      render={<Input nativeInput size="lg" />}
+      {...props}
+    />
+  </AutocompletePrimitive.InputGroup>
+)
 
 const AutocompleteItem = ({ className, children, ...props }: AutocompletePrimitive.Item.Props): React.ReactElement => (
   <AutocompletePrimitive.Item
@@ -142,7 +134,6 @@ export const CommandInput = ({ className, placeholder, ...props }: React.Compone
       autoFocus
       className={cn('border-transparent! bg-transparent! shadow-none before:hidden has-focus-visible:ring-0', className)}
       placeholder={placeholder}
-      size="lg"
       startAddon={<MagnifyingGlassIcon />}
       {...props}
     />

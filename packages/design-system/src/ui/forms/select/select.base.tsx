@@ -6,17 +6,12 @@ import { CaretDownIcon } from '../../data-display/icons/caret-down'
 import { CaretUpIcon } from '../../data-display/icons/caret-up'
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
-import { getSelectDisplay, selectTriggerIconClassName, selectTriggerVariants } from './select.shared'
+import { getSelectDisplay, selectTriggerClassName, selectTriggerIconClassName } from './select.shared'
 
 const SelectRoot = SelectPrimitive.Root
 
-const SelectTrigger = ({
-  className,
-  size = 'default',
-  children,
-  ...props
-}: SelectPrimitive.Trigger.Props & { size?: 'sm' | 'default' | 'lg' }): React.ReactElement => (
-  <SelectPrimitive.Trigger className={cn(selectTriggerVariants({ size }), className)} data-slot="select-trigger" {...props}>
+const SelectTrigger = ({ className, children, ...props }: SelectPrimitive.Trigger.Props): React.ReactElement => (
+  <SelectPrimitive.Trigger className={cn(selectTriggerClassName, className)} data-slot="select-trigger" {...props}>
     {children}
     <SelectPrimitive.Icon data-slot="select-icon">
       <CaretUpDownIcon className={selectTriggerIconClassName} />

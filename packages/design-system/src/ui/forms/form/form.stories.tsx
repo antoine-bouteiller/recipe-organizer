@@ -3,7 +3,7 @@ import { useState, type SubmitEvent, type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
 import { Button } from '../../actions/button/button'
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
 import { Input } from '../input/input'
 import { Form } from './form'
 
@@ -19,7 +19,6 @@ const RecipeForm = (): ReactElement => {
       <Field name="recipeName">
         <FieldLabel>Recipe name</FieldLabel>
         <FieldControl render={<Input placeholder="e.g. Tomato soup" required />} />
-        <FieldDescription>Use a name your household will recognize.</FieldDescription>
         <FieldError match="valueMissing">A recipe name is required.</FieldError>
       </Field>
       <Button type="submit">Save recipe</Button>

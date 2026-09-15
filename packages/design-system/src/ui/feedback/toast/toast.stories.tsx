@@ -5,7 +5,7 @@ import { Button } from '../../actions/button/button'
 import { toastManager, ToastProvider } from './toast'
 
 const ToastExample = (): React.ReactElement => (
-  <ToastProvider position="bottom-right">
+  <ToastProvider>
     <div className="flex flex-wrap gap-2">
       <Button onClick={() => toastManager.add({ description: 'Your recipe has been saved.', title: 'Saved', type: 'success' })}>Success toast</Button>
       <Button
@@ -13,9 +13,6 @@ const ToastExample = (): React.ReactElement => (
         variant="outline"
       >
         Error toast
-      </Button>
-      <Button onClick={() => toastManager.add({ description: 'We are syncing your recipes.', title: 'Syncing', type: 'loading' })} variant="outline">
-        Loading toast
       </Button>
     </div>
   </ToastProvider>

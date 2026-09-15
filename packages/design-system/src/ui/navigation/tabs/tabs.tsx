@@ -4,10 +4,6 @@ import React, { Children, cloneElement, createContext, isValidElement, useContex
 
 import { useSwipeTabs } from '../../../hooks/use-swipe-tabs'
 
-const Tabs = ({ className, ...props }: TabsPrimitive.Root.Props): React.ReactElement => (
-  <TabsPrimitive.Root className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)} data-slot="tabs" {...props} />
-)
-
 export const TabsList = ({ className, children, ...props }: TabsPrimitive.List.Props): React.ReactElement => (
   <TabsPrimitive.List
     className={cn(
@@ -55,8 +51,9 @@ export const SwipeTabs = <TTab extends string>({ tabs, defaultTab, className, ch
 
   return (
     <SwipeTabsContext.Provider value={{ activeIndex, containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
-      <Tabs
-        className={className}
+      <TabsPrimitive.Root
+        className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)}
+        data-slot="tabs"
         onValueChange={(value) => {
           const nextTab = tabs.find((tab) => tab === value)
           if (nextTab) {
@@ -66,7 +63,7 @@ export const SwipeTabs = <TTab extends string>({ tabs, defaultTab, className, ch
         value={activeTab}
       >
         {children}
-      </Tabs>
+      </TabsPrimitive.Root>
     </SwipeTabsContext.Provider>
   )
 }

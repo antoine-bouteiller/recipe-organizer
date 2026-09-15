@@ -2,7 +2,7 @@ import { cn } from 'cn'
 import { lazy, Suspense, type ReactElement } from 'react'
 
 import { useIsMobile } from '../../../hooks/use-is-mobile'
-import { getSelectDisplay, SelectButton, type SelectButtonProps } from './select.shared'
+import { getSelectDisplay, SelectButton } from './select.shared'
 
 interface SelectOption<TValue extends string> {
   label: string
@@ -15,7 +15,6 @@ interface SelectBaseProps<TValue extends string> {
   title?: string
   disabled?: boolean
   className?: string
-  size?: SelectButtonProps['size']
 }
 
 export type SelectProps<TValue extends string> = SelectBaseProps<TValue> &
@@ -39,7 +38,7 @@ export const Select = <TValue extends string>(props: SelectProps<TValue>): React
   return (
     <Suspense
       fallback={
-        <SelectButton className={props.className} disabled={props.disabled} size={props.size}>
+        <SelectButton className={props.className} disabled={props.disabled}>
           <span className={cn(isEmpty && 'text-muted-foreground')}>{displayLabel}</span>
         </SelectButton>
       }

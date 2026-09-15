@@ -16,10 +16,8 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
   const platform = usePlatform()
   const field = useFieldContext<File | FileMetadata>()
 
-  const [{ files, isDragging }, { getInputProps, removeFile }] = useFileUpload({
+  const [{ files }, { getInputProps, removeFile }] = useFileUpload({
     initialFiles: initialImage ? [initialImage] : [],
-    maxFiles: 1,
-    multiple: false,
     onFilesChange: (newFiles) => {
       field.setValue(newFiles[0]?.file)
     },
@@ -30,10 +28,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
-      <FieldLabel
-        className="relative flex min-h-52 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive data-[dragging=true]:bg-accent/50"
-        data-dragging={isDragging || undefined}
-      >
+      <FieldLabel className="relative flex min-h-52 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive">
         {previewUrl ? (
           <div className="absolute inset-0">
             <img alt="Aperçu" className="size-full object-cover" src={previewUrl} />
