@@ -27,7 +27,6 @@ catalog:
   '@lexical/react': 0.50.0
   '@lexical/rich-text': 0.50.0
   '@lexical/utils': 0.50.0
-  '@oxlint/plugins': 1.83.0
   '@tailwindcss/typography': 0.5.20
   '@tailwindcss/vite': 4.3.3
   '@tanstack/react-form': 1.33.5

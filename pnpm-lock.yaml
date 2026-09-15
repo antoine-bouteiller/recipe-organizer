@@ -191,9 +191,6 @@ catalogs:
     '@lexical/utils':
       specifier: 0.50.0
       version: 0.50.0
-    '@oxlint/plugins':
-      specifier: 1.83.0
-      version: 1.83.0
     '@storybook/react-vite':
       specifier: 10.6.0
       version: 10.6.0
@@ -503,10 +500,6 @@ importers:
         version: 4.3.3
 
   packages/oxlint:
-    dependencies:
-      '@oxlint/plugins':
-        specifier: 'catalog:'
-        version: 1.83.0
     devDependencies:
       '@recipe-organizer/config':
         specifier: workspace:*
@@ -2620,10 +2613,6 @@ packages:
 
   '@oxlint/plugins@1.79.0':
     resolution: {integrity: sha512-S0uyoxakDINJ4DPgqxGlEEvrdSMeQb7Z2lKVjxoY2gwsbZbfg2Xr8Klfeo5ZeraHmmdBCELFUHkSe6KEmBpMvg==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-
-  '@oxlint/plugins@1.83.0':
-    resolution: {integrity: sha512-qD64wr6SS1DL7YbJQ8WWjyUfFfrJsvAy9Vo0sG/PYUQy30w0uemN2h6j4xuvj4noyETDpzcGC20sv+FH7GrN5A==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
   '@polka/url@1.0.0-next.29':
@@ -6357,8 +6346,6 @@ snapshots:
     optional: true
 
   '@oxlint/plugins@1.79.0': {}
-
-  '@oxlint/plugins@1.83.0': {}
 
   '@polka/url@1.0.0-next.29': {}
 

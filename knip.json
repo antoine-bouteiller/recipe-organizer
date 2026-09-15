@@ -18,5 +18,5 @@
       "entry": ["**/*.test.ts"]
     }
   },
-  "ignoreDependencies": ["cloudflare"]
+  "ignoreDependencies": ["cloudflare", "@oxlint/plugins"]
 }

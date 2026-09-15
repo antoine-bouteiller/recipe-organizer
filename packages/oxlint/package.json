@@ -9,9 +9,6 @@
     "check": "vp -C ../.. check packages/oxlint",
     "test": "vp -C ../.. test packages/oxlint"
   },
-  "dependencies": {
-    "@oxlint/plugins": "catalog:"
-  },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",
     "oxlint": "catalog:",
