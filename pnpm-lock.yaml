@@ -289,7 +289,7 @@ catalogs:
       version: 4.6.5
 
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite: npm:@voidzero-dev/vite-plus-core@0.3.1
 
 importers:
 
