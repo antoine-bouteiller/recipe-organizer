@@ -8,18 +8,15 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
-    "@lexical/history": "catalog:",
-    "@lexical/list": "catalog:",
     "@lexical/react": "catalog:",
-    "@lexical/rich-text": "catalog:",
     "@lexical/utils": "catalog:",
+    "@recipe-organizer/design-system": "workspace:*",
     "@recipe-organizer/shared": "workspace:*",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-store": "catalog:",
     "better-auth": "catalog:",
-    "class-variance-authority": "catalog:",
     "cn": "catalog:",
     "hono": "catalog:",
     "lexical": "catalog:",
@@ -30,13 +27,11 @@
   "devDependencies": {
     "@recipe-organizer/api": "workspace:*",
     "@recipe-organizer/config": "workspace:*",
-    "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitejs/plugin-react": "catalog:",
-    "oxc-transform-react": "catalog:",
-    "tailwindcss": "catalog:"
+    "oxc-transform-react": "catalog:"
   }
 }

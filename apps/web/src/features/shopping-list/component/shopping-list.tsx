@@ -1,6 +1,6 @@
-import { BasketIcon } from '@client/components/icons/basket'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@client/components/ingredient-category'
-import { Skeleton } from '@client/components/ui/skeleton'
+import { BasketIcon } from '@recipe-organizer/design-system/icons/basket'
+import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { ingredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 

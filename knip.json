@@ -11,6 +11,9 @@
     "packages/shared": {
       "entry": ["src/**/*.test.ts"]
     },
+    "packages/design-system": {
+      "includeEntryExports": true
+    },
     "packages/oxlint": {
       "entry": ["**/*.test.ts"]
     }

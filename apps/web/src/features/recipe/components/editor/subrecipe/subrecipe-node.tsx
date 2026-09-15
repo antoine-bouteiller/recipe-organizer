@@ -1,8 +1,8 @@
-import { Editor, EditorContent } from '@client/components/common/editor/index'
-import { Spinner } from '@client/components/ui/spinner'
 import { getRecipeInstructionsOptions } from '@client/features/recipe/api/get-instructions'
 import { type SubrecipeNodeData } from '@client/features/recipe/types/subrecipe'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { Editor, EditorContent } from '@recipe-organizer/design-system/editor'
+import { Spinner } from '@recipe-organizer/design-system/spinner'
 import { useQuery } from '@tanstack/react-query'
 import {
   $getNodeByKey,

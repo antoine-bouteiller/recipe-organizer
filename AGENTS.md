@@ -19,7 +19,8 @@ See the Vite+ section below for the full command reference.
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
 - **Runtime boundary:** the browser SPA starts at `apps/web/index.html` and `apps/web/src/main.tsx`; the Worker entry is `apps/api/src/index.ts`'s default `fetch` export. Browser API calls use same-origin `/api/*` fetches.
-- **UI components are owned:** `apps/web/src/components/ui/*` are our design system (one file per component, built on Base UI) — edit them directly, don't re-pull from a registry. `knip` enforces no dead exports there.
+- **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports.
+- **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update the colocated stories when changing UI components; use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
 ## Guidelines

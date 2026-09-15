@@ -1,4 +1,4 @@
-import { withForm } from '@client/hooks/use-app-form'
+import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { useSelector } from '@tanstack/react-store'
 
 import { type UserFormInput } from '../api/create'

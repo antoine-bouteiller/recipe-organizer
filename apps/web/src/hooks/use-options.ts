@@ -1,9 +1,7 @@
+import { type Option } from '@recipe-organizer/design-system/combobox/options'
 import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/react-query'
 
-export interface Option<TValue = number | undefined> {
-  label: string
-  value: TValue
-}
+export type { Option } from '@recipe-organizer/design-system/combobox/options'
 
 export const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(
   getQueryOptions: () => UseQueryOptions<TQueryOptionData, TError, TData, TQueryKey>,

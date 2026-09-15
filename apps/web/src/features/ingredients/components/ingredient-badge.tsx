@@ -1,4 +1,4 @@
-import { Badge } from '@client/components/ui/badge'
+import { Badge } from '@recipe-organizer/design-system/badge'
 import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import { cn } from 'cn'
 

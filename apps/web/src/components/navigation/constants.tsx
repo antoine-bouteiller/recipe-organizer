@@ -1,7 +1,7 @@
-import { GearIcon } from '@client/components/icons/gear'
-import { HouseIcon } from '@client/components/icons/house'
-import { MagnifyingGlassIcon } from '@client/components/icons/magnifying-glass'
-import { ShoppingCartSimpleIcon } from '@client/components/icons/shopping-cart-simple'
+import { GearIcon } from '@recipe-organizer/design-system/icons/gear'
+import { HouseIcon } from '@recipe-organizer/design-system/icons/house'
+import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
+import { ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons/shopping-cart-simple'
 import { type LinkProps } from '@tanstack/react-router'
 import type React from 'react'
 

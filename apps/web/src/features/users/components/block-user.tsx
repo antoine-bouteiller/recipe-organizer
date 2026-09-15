@@ -1,7 +1,7 @@
-import { DeleteDialog } from '@client/components/dialogs/delete-dialog'
-import { ProhibitIcon } from '@client/components/icons/prohibit'
-import { Button } from '@client/components/ui/button'
 import { blockUserOptions } from '@client/features/users/api/block'
+import { Button } from '@recipe-organizer/design-system/button'
+import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
+import { ProhibitIcon } from '@recipe-organizer/design-system/icons/prohibit'
 import { useMutation } from '@tanstack/react-query'
 
 interface BlockUserProps {

@@ -1,8 +1,8 @@
 import { ScreenLayout } from '@client/components/layout/screen-layout'
-import { Button } from '@client/components/ui/button'
-import { Card } from '@client/components/ui/card'
 import { authClient } from '@client/lib/auth/auth-client'
 import { resetAuthUserCache } from '@client/lib/auth/get-auth-user'
+import { Button } from '@recipe-organizer/design-system/button'
+import { Card } from '@recipe-organizer/design-system/card'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 
 const RouteComponent = () => {

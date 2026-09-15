@@ -1,5 +1,5 @@
-import { CheckIcon } from '@client/components/icons/check'
 import { formatNumber } from '@client/utils/number'
+import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { UNITS, type UnitSlug } from '@recipe-organizer/shared/units'
 import { cn } from 'cn'
 import { useState } from 'react'

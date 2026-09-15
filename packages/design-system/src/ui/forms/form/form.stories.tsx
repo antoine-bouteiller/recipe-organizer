@@ -1,0 +1,51 @@
+import { type Meta, type StoryObj } from '@storybook/react-vite'
+import { useState, type SubmitEvent, type ReactElement } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
+
+import { Button } from '../../actions/button/button'
+import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from '../field/field'
+import { Input } from '../input/input'
+import { Form } from './form'
+
+const RecipeForm = (): ReactElement => {
+  const [submitted, setSubmitted] = useState(false)
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>): void => {
+    event.preventDefault()
+    setSubmitted(true)
+  }
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Field name="recipeName">
+        <FieldLabel>Recipe name</FieldLabel>
+        <FieldControl render={<Input placeholder="e.g. Tomato soup" required />} />
+        <FieldDescription>Use a name your household will recognize.</FieldDescription>
+        <FieldError match="valueMissing">A recipe name is required.</FieldError>
+      </Field>
+      <Button type="submit">Save recipe</Button>
+      {submitted && <p role="status">Recipe saved.</p>}
+    </Form>
+  )
+}
+
+const meta = {
+  component: Form,
+  tags: ['autodocs'],
+  title: 'Forms/Form',
+} satisfies Meta<typeof Form>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const ValidationAndSubmission: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Save recipe' }))
+    await expect(canvas.getByText('A recipe name is required.')).toBeVisible()
+    await expect(canvas.queryByRole('status')).not.toBeInTheDocument()
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Recipe name' }), 'Tomato soup')
+    await userEvent.click(canvas.getByRole('button', { name: 'Save recipe' }))
+    await expect(canvas.getByRole('status')).toHaveTextContent('Recipe saved.')
+  },
+  render: () => <RecipeForm />,
+}

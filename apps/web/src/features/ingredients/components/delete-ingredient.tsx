@@ -1,5 +1,5 @@
-import { DeleteDialog } from '@client/components/dialogs/delete-dialog'
 import { deleteIngredientOptions } from '@client/features/ingredients/api/delete'
+import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
 import { useMutation } from '@tanstack/react-query'
 
 interface DeleteIngredientProps {

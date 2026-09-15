@@ -1,7 +1,7 @@
-import { toastManager } from '@client/components/ui/toast'
 import { apiClient, readResponse } from '@client/lib/api-client'
 import { queryKeys } from '@client/lib/query-keys'
 import { toastError } from '@client/lib/toast-helpers'
+import { toastManager } from '@recipe-organizer/design-system/toast'
 import { type UserFormValues } from '@recipe-organizer/shared/users/schemas'
 import { mutationOptions } from '@tanstack/react-query'
 

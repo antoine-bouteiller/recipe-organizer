@@ -1,6 +1,6 @@
 import { ingredientsCategoryOptions } from '@client/components/ingredient-category'
 import { useIngredientOptions } from '@client/features/ingredients/hooks/use-ingredient-options'
-import { withForm } from '@client/hooks/use-app-form'
+import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { unitOptions } from '@recipe-organizer/shared/units'
 import { useSelector } from '@tanstack/react-store'
 

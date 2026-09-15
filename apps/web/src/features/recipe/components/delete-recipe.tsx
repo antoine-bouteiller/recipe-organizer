@@ -1,7 +1,7 @@
-import { DeleteDialog } from '@client/components/dialogs/delete-dialog'
-import { Button } from '@client/components/ui/button'
-import { toastManager } from '@client/components/ui/toast'
 import { deleteRecipeOptions } from '@client/features/recipe/api/delete'
+import { Button } from '@recipe-organizer/design-system/button'
+import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
+import { toastManager } from '@recipe-organizer/design-system/toast'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 

@@ -1,14 +1,14 @@
-import { PlusIcon } from '@client/components/icons/plus'
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@client/components/ingredient-category'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
-import { glassSurface, SearchInput } from '@client/components/search-input'
-import { Button } from '@client/components/ui/button'
-import { Item, ItemGroup, ItemSeparator } from '@client/components/ui/item'
 import { getIngredientListOptions } from '@client/features/ingredients/api/get-all'
 import { AddIngredient } from '@client/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@client/features/ingredients/components/delete-ingredient'
 import { EditIngredient } from '@client/features/ingredients/components/edit-ingredient'
 import { IngredientBadge } from '@client/features/ingredients/components/ingredient-badge'
+import { Button } from '@recipe-organizer/design-system/button'
+import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
+import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
@@ -27,7 +27,7 @@ const IngredientsManagement = () => {
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
       <div className="sticky top-(--screen-header-height) z-10 flex shrink-0 items-center gap-4 pb-2 md:top-0 md:bg-muted">
-        <SearchInput search={search} setSearch={setSearch} />
+        <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddIngredient>
           <Button className={glassSurface} size="icon-lg" variant="outline">
             <PlusIcon />

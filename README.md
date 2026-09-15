@@ -19,7 +19,7 @@ A modern recipe management application with a TanStack Router browser SPA and a 
 - **Backend**: Hono on a Cloudflare Worker (`/api/*`)
 - **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
 - **Storage**: Cloudflare R2 for image storage
-- **Styling**: Tailwind CSS v4, Shadcn UI components
+- **Styling**: Tailwind CSS v4, owned Base UI components in `@recipe-organizer/design-system`, Storybook
 - **Authentication**: Better Auth with Google OAuth
 
 ## Getting Started
@@ -62,6 +62,25 @@ vp test
 
 Vite proxies `/api/*` to Wrangler. Development needs no production build, and local D1/R2 data stays in the root `.wrangler/state`.
 
+### Design system
+
+Reusable controls, forms, rich-text editing, navigation, error screens, and layouts live in `packages/design-system/src/ui/<category>/<component>/`, with the implementation and its
+`<component>.stories.tsx` together. Responsive desktop/drawer implementations stay in the same family folder.
+Form contexts and the shared `useAppForm` registry move with their controls.
+Supporting hooks live in `packages/design-system/src/hooks/`; shared icons live in `src/ui/data-display/icons/`.
+Import components from `@recipe-organizer/design-system/button` (and equivalent component subpaths).
+The app and Storybook share `@recipe-organizer/design-system/styles.css`, including theme tokens and fonts;
+only app-global scrolling and navigation transitions remain in `apps/web/src/styles/app.css`.
+Thin web adapters supply routing, menus, theme/back actions, footer selection, and error-detail visibility.
+
+Folder categories match the Storybook sidebar: `actions`, `data-display`, `feedback`, `forms`,
+`layout`, `navigation`, and `overlays`. Component imports remain independent of these physical folders.
+
+```bash
+vp run storybook        # Component explorer on port 6006; light/dark theme toolbar
+vp run storybook:build  # Static output: packages/design-system/storybook-static
+```
+
 ### Building
 
 ```bash
@@ -93,6 +112,7 @@ apps/
 └── api/             # Cloudflare Worker, Hono API, and db/ schema and migrations
 packages/
 ├── config/          # Runtime-neutral TypeScript base configuration
+├── design-system/   # Reusable UI, shared styles/fonts, and colocated Storybook stories
 ├── shared/          # Cross-runtime schemas, constants, units, and helpers
 ├── scripts/         # Local database migration command
 └── oxlint/          # Custom lint plugin and its tests

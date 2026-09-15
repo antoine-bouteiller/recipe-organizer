@@ -1,8 +1,8 @@
-import { BookOpenIcon } from '@client/components/icons/book-open'
-import { Toggle } from '@client/components/ui/toggle'
 import { type SubrecipeNodeData } from '@client/features/recipe/types/subrecipe'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
+import { BookOpenIcon } from '@recipe-organizer/design-system/icons/book-open'
+import { Toggle } from '@recipe-organizer/design-system/toggle'
 
 import { SubrecipeDialog } from './subrecipe-dialog'
 import { $createSubrecipeNode } from './subrecipe-node'

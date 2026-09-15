@@ -1,14 +1,14 @@
-import { PlusIcon } from '@client/components/icons/plus'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
-import { glassSurface, SearchInput } from '@client/components/search-input'
-import { Badge } from '@client/components/ui/badge'
-import { Button } from '@client/components/ui/button'
-import { Item, ItemGroup, ItemSeparator } from '@client/components/ui/item'
-import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@client/components/ui/tabs'
 import { getUserListOptions } from '@client/features/users/api/get-all'
 import { AddUser } from '@client/features/users/components/add-user'
 import { ApproveUser } from '@client/features/users/components/approve-user'
 import { BlockUser } from '@client/features/users/components/block-user'
+import { Badge } from '@recipe-organizer/design-system/badge'
+import { Button } from '@recipe-organizer/design-system/button'
+import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
+import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
+import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
@@ -63,7 +63,7 @@ const UsersManagement = () => {
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
       <div className="flex shrink-0 items-center gap-4 bg-muted pb-2">
-        <SearchInput search={search} setSearch={setSearch} />
+        <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddUser>
           <Button className={glassSurface} size="icon-lg" variant="outline">
             <PlusIcon />

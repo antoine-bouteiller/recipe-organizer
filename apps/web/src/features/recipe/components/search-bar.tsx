@@ -1,5 +1,6 @@
-import { ArrowElbowDownLeftIcon } from '@client/components/icons/arrow-elbow-down-left'
-import { Button } from '@client/components/ui/button'
+import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
+import { type ReducedRecipe } from '@client/types/recipe'
+import { Button } from '@recipe-organizer/design-system/button'
 import {
   Command,
   CommandDialog,
@@ -11,11 +12,10 @@ import {
   CommandItem,
   CommandList,
   CommandPanel,
-} from '@client/components/ui/command'
-import { Kbd, KbdGroup } from '@client/components/ui/kbd'
-import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
-import { usePlatform } from '@client/hooks/use-platfom'
-import { type ReducedRecipe } from '@client/types/recipe'
+} from '@recipe-organizer/design-system/command'
+import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
+import { ArrowElbowDownLeftIcon } from '@recipe-organizer/design-system/icons/arrow-elbow-down-left'
+import { Kbd, KbdGroup } from '@recipe-organizer/design-system/kbd'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'

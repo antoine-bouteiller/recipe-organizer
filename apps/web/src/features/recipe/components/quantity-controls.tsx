@@ -1,8 +1,8 @@
-import { MinusIcon } from '@client/components/icons/minus'
-import { PlusIcon } from '@client/components/icons/plus'
-import { TrashIcon } from '@client/components/icons/trash'
-import { Button } from '@client/components/ui/button'
 import { addToShoppingList, removeFromShoppingList } from '@client/stores/shopping-list.store'
+import { Button } from '@recipe-organizer/design-system/button'
+import { MinusIcon } from '@recipe-organizer/design-system/icons/minus'
+import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
 import { cn } from 'cn'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'

@@ -1,15 +1,15 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
-import { FunnelSimpleIcon } from '@client/components/icons/funnel-simple'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
-import { glassSurface, SearchInput } from '@client/components/search-input'
-import { Button } from '@client/components/ui/button'
-import { Select } from '@client/components/ui/select'
-import { Skeleton } from '@client/components/ui/skeleton'
-import { Toggle } from '@client/components/ui/toggle'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import { RecentRecipes } from '@client/features/search/components/recent-recipes'
 import { SearchResults } from '@client/features/search/components/search-results'
 import { EMPTY_FILTERS, filterRecipes, hasActiveFilters, type SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
+import { Button } from '@recipe-organizer/design-system/button'
+import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons/funnel-simple'
+import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
+import { Select } from '@recipe-organizer/design-system/select'
+import { Skeleton } from '@recipe-organizer/design-system/skeleton'
+import { Toggle } from '@recipe-organizer/design-system/toggle'
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -44,7 +44,12 @@ const SearchPage = () => {
         <CollapsiblePrimitive.Root>
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <SearchInput autoFocus search={filters.query} setSearch={(query) => setFilters({ ...filters, query })} />
+              <SearchInput
+                placeholder="Rechercher une recette, un ingrédient…"
+                autoFocus
+                search={filters.query}
+                setSearch={(query) => setFilters({ ...filters, query })}
+              />
             </div>
             <CollapsiblePrimitive.Trigger
               render={<Button aria-label="Filtrer par catégorie" className={glassSurface} size="icon-lg" variant="outline" />}

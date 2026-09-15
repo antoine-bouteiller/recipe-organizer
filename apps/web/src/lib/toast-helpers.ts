@@ -1,4 +1,4 @@
-import { toastManager } from '@client/components/ui/toast'
+import { toastManager } from '@recipe-organizer/design-system/toast'
 import * as z from 'zod'
 
 export const toastError = (message: string, error?: unknown) => {

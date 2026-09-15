@@ -1,10 +1,10 @@
-import { SpinnerGapIcon } from '@client/components/icons/spinner-gap'
-import { ThermometerIcon } from '@client/components/icons/thermometer'
-import { TimerIcon } from '@client/components/icons/timer'
-import { Item } from '@client/components/ui/item'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@client/features/recipe/types/magimix'
 import { capitalize } from '@client/utils/string'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { SpinnerGapIcon } from '@recipe-organizer/design-system/icons/spinner-gap'
+import { ThermometerIcon } from '@recipe-organizer/design-system/icons/thermometer'
+import { TimerIcon } from '@recipe-organizer/design-system/icons/timer'
+import { Item } from '@recipe-organizer/design-system/item'
 import {
   $getNodeByKey,
   DecoratorNode,

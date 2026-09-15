@@ -1,7 +1,7 @@
 import { Navbar } from '@client/components/navigation/navbar'
-import { ToastProvider } from '@client/components/ui/toast'
 import { loadAuthUser, type getAuthUser } from '@client/lib/auth/get-auth-user'
 import { getTheme } from '@client/lib/theme'
+import { ToastProvider } from '@recipe-organizer/design-system/toast'
 import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useLayoutEffect } from 'react'

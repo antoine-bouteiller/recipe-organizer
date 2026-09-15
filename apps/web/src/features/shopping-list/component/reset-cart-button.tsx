@@ -1,6 +1,6 @@
-import { ArrowCounterClockwiseIcon } from '@client/components/icons/arrow-counter-clockwise'
-import { Button } from '@client/components/ui/button'
 import { resetShoppingList } from '@client/stores/shopping-list.store'
+import { Button } from '@recipe-organizer/design-system/button'
+import { ArrowCounterClockwiseIcon } from '@recipe-organizer/design-system/icons/arrow-counter-clockwise'
 
 export const ResetCartButton = () => (
   <Button aria-label="Vider la liste" onClick={resetShoppingList} size="icon" variant="outline">

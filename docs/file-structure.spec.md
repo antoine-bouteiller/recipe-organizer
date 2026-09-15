@@ -124,10 +124,27 @@ Client code cannot import database schemas, Worker modules, or server code, exce
 `@server/api` import in `src/client/lib/api-client.ts` used by `hc<typeof api>`. This exception preserves
 inferred Hono contracts without including the server implementation in the browser bundle.
 
-`src/client/components/` holds shared presentation by role: `ui/` contains repository-owned Base UI
-primitives; `forms/`, `dialogs/`, `layout/`, `navigation/`, `error/`, and `icons/` hold their matching
-reusable component classes. Shared React hooks and persisted stores live in `src/client/hooks/` and
-`src/client/stores/`. `src/client/lib/` and `src/client/utils/` contain browser application services
+`packages/design-system/src/ui/<category>/<component>/` holds repository-owned component families with
+colocated `<component>.stories.tsx` files. Desktop, drawer, and shared implementation files stay with
+the matching family. Package subpath exports (`@recipe-organizer/design-system/button`, for example)
+expose source modules without a separate library build. Generic hooks live in `src/hooks/` and icons
+in `src/ui/data-display/icons/` inside the package; it never imports the web app. The combobox option type is shared, while query-backed option
+hooks remain app-owned. Shared Tailwind theme styles and fonts live in the package and are consumed
+by both the app and Storybook, including screen header and safe-area tokens. Only app-global scrolling
+and navigation transitions remain in the web stylesheet. Categories are `actions`, `data-display`,
+`feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the matching category as
+its title prefix. Physical categorization does not change package subpath imports.
+
+`apps/web/src/components/` retains thin `layout/`, `navigation/`, and `error/` adapters,
+plus domain-specific ingredient-category presentation. Typed form adapters and their context/registry,
+file-input support, rich-text editing, generic dialogs, search input, and all icons live in the design
+system, along with screen layout, navigation, and error presentation. App adapters own menus, routing
+and exact matching, theme/back actions, footer selection, scroll-restoration IDs, and DEV-only error
+detail disclosure. Shared presentation receives slots and callbacks and does not depend on TanStack
+Router or application environment policy. Feature schemas, query-backed options, API calls, and
+persisted app state do not move.
+App-specific React hooks and persisted stores live in `apps/web/src/hooks/` and
+`apps/web/src/stores/`. `src/client/lib/` and `src/client/utils/` contain browser application services
 and browser-only helpers. `src/server/lib/` contains Worker-bound auth, database, R2, and cache
 services. `src/shared/` contains cross-runtime schemas, constants, units, and helpers. Shared media URL
 helpers use the common Vite `import.meta.env.DEV` flag; they do not depend on browser or Worker bindings.
@@ -152,9 +169,12 @@ N/A.
 
 ## Changelog
 
-| Date       | Amendment                                                                    | Sections affected | Reason                                                                  |
-| ---------- | ---------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
-| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers.    | 8.1               | Reflect the migrated feature API layout.                                |
-| 2026-09-13 | Add the SPA entry and direct Hono Worker handler boundary.                   | 8.1               | Remove route-file HTTP handler placement.                               |
-| 2026-09-13 | Separate client, server, and shared modules with enforced import boundaries. | 3, 4, 6, 8.1      | Make runtime ownership explicit without adding packages or deployments. |
-| 2026-09-13 | Rename the server feature directory to `routes`.                             | 3, 8.1            | Match the server route layout.                                          |
+| Date       | Amendment                                                                                            | Sections affected | Reason                                                                  |
+| ---------- | ---------------------------------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
+| 2026-09-13 | Document feature Hono routes, separate schemas, and typed query wrappers.                            | 8.1               | Reflect the migrated feature API layout.                                |
+| 2026-09-13 | Add the SPA entry and direct Hono Worker handler boundary.                                           | 8.1               | Remove route-file HTTP handler placement.                               |
+| 2026-09-13 | Separate client, server, and shared modules with enforced import boundaries.                         | 3, 4, 6, 8.1      | Make runtime ownership explicit without adding packages or deployments. |
+| 2026-09-13 | Rename the server feature directory to `routes`.                                                     | 3, 8.1            | Match the server route layout.                                          |
+| 2026-09-15 | Extract owned UI, supporting hooks/icons, styles, and colocated stories to `packages/design-system`. | 8.1               | Share UI independently of the web app and provide Storybook examples.   |
+
+| 2026-09-15 | Extract app-shell presentation behind app adapters and group UI folders/stories by category. | 8.1 | Keep business logic in web while making presentation discoverable and reusable. |

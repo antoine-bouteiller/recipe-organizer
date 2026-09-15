@@ -14,7 +14,9 @@
     "db:dump": "vp run @recipe-organizer/scripts#db:dump",
     "db:import": "wrangler d1 execute recipe-organizer --config apps/api/wrangler.jsonc --local --persist-to .wrangler/state --file ./database.sql",
     "knip": "knip",
-    "deploy": "vp run @recipe-organizer/api#deploy"
+    "deploy": "vp run @recipe-organizer/api#deploy",
+    "storybook": "vp run @recipe-organizer/design-system#storybook",
+    "storybook:build": "vp run @recipe-organizer/design-system#storybook:build"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
