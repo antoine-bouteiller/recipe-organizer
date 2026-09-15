@@ -6,7 +6,6 @@ import { NumberInput } from './number-input'
 const meta = {
   args: { defaultValue: 2, label: 'Servings', max: 12, min: 0 },
   component: NumberInput,
-  tags: ['autodocs'],
   title: 'Forms/Number Input',
 } satisfies Meta<typeof NumberInput>
 

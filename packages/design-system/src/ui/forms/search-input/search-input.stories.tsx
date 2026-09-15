@@ -32,7 +32,6 @@ const CustomPlaceholderExample = (): ReactElement => {
 
 const meta = {
   component: SearchInputExample,
-  tags: ['autodocs'],
   title: 'Forms/SearchInput',
 } satisfies Meta<typeof SearchInputExample>
 

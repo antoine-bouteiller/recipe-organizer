@@ -6,7 +6,6 @@ import { Field, FieldControl, FieldError, FieldLabel } from './field'
 
 const meta = {
   component: Field,
-  tags: ['autodocs'],
   title: 'Forms/Field',
 } satisfies Meta<typeof Field>
 

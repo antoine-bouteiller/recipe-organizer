@@ -37,7 +37,6 @@ const ControlledMultiple = (): ReactElement => {
 const meta = {
   args: { items: [...items], onValueChange: () => undefined, value: null },
   component: Select,
-  tags: ['autodocs'],
   title: 'Forms/Select',
 } satisfies Meta<typeof Select>
 

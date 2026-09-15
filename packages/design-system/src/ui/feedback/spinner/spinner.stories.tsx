@@ -5,7 +5,6 @@ import { Spinner } from './spinner'
 
 const meta = {
   component: Spinner,
-  tags: ['autodocs'],
   title: 'Feedback/Spinner',
 } satisfies Meta<typeof Spinner>
 export default meta

@@ -21,7 +21,7 @@ const EditorFieldExample = ({ disabled = false }: { disabled?: boolean }): React
   )
 }
 
-const meta = { component: EditorField, tags: ['autodocs'], title: 'Forms/EditorField' } satisfies Meta<typeof EditorField>
+const meta = { component: EditorField, title: 'Forms/EditorField' } satisfies Meta<typeof EditorField>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

@@ -97,7 +97,6 @@ const ReadOnlyEditor = (): ReactElement => (
 
 const meta = {
   component: ControlledEditor,
-  tags: ['autodocs'],
   title: 'Forms/Editor',
 } satisfies Meta<typeof ControlledEditor>
 

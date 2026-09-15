@@ -22,7 +22,7 @@ const ComboboxFieldExample = ({ disabled = false, initialValue }: { disabled?: b
   )
 }
 
-const meta = { component: ComboboxFieldExample, tags: ['autodocs'], title: 'Forms/ComboboxField' } satisfies Meta<typeof ComboboxFieldExample>
+const meta = { component: ComboboxFieldExample, title: 'Forms/ComboboxField' } satisfies Meta<typeof ComboboxFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

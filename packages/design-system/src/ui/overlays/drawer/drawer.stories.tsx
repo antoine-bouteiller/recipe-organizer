@@ -22,7 +22,7 @@ const DrawerExample = (): React.ReactElement => (
   </Drawer>
 )
 
-const meta = { component: DrawerExample, tags: ['autodocs'], title: 'Overlays/Drawer' } satisfies Meta<typeof DrawerExample>
+const meta = { component: DrawerExample, title: 'Overlays/Drawer' } satisfies Meta<typeof DrawerExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}

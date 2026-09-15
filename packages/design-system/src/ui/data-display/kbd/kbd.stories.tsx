@@ -5,7 +5,6 @@ import { Kbd, KbdGroup } from './kbd'
 
 const meta = {
   component: Kbd,
-  tags: ['autodocs'],
   title: 'Data Display/Kbd',
 } satisfies Meta<typeof Kbd>
 export default meta

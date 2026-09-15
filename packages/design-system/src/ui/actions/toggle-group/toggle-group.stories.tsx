@@ -18,7 +18,6 @@ const ControlledToggleGroup = (): ReactElement => {
 const meta = {
   args: { items, onValueChange: () => undefined, value: [] },
   component: ToggleGroup,
-  tags: ['autodocs'],
   title: 'Actions/Toggle Group',
 } satisfies Meta<typeof ToggleGroup>
 

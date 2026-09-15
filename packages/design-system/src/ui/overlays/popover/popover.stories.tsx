@@ -22,7 +22,7 @@ const ResponsiveExample = (): React.ReactElement => <Popover {...popoverProps} /
 const DesktopExample = (): React.ReactElement => <PopoverBase {...popoverProps} />
 const DrawerExample = (): React.ReactElement => <PopoverDrawer {...popoverProps} />
 
-const meta = { component: ResponsiveExample, tags: ['autodocs'], title: 'Overlays/Popover' } satisfies Meta<typeof ResponsiveExample>
+const meta = { component: ResponsiveExample, title: 'Overlays/Popover' } satisfies Meta<typeof ResponsiveExample>
 export default meta
 type Story = StoryObj<typeof meta>
 

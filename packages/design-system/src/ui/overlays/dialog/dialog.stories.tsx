@@ -19,7 +19,7 @@ const ResponsiveExample = (): React.ReactElement => <Dialog {...dialogProps} />
 const DesktopExample = (): React.ReactElement => <DialogBase {...dialogProps} />
 const DrawerExample = (): React.ReactElement => <DialogDrawer {...dialogProps} />
 
-const meta = { component: ResponsiveExample, tags: ['autodocs'], title: 'Overlays/Dialog' } satisfies Meta<typeof ResponsiveExample>
+const meta = { component: ResponsiveExample, title: 'Overlays/Dialog' } satisfies Meta<typeof ResponsiveExample>
 export default meta
 type Story = StoryObj<typeof meta>
 

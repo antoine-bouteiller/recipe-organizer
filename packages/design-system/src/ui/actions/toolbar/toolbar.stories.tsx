@@ -24,7 +24,7 @@ const ToolbarExample = (): React.ReactElement => (
   </Toolbar>
 )
 
-const meta = { component: ToolbarExample, tags: ['autodocs'], title: 'Actions/Toolbar' } satisfies Meta<typeof ToolbarExample>
+const meta = { component: ToolbarExample, title: 'Actions/Toolbar' } satisfies Meta<typeof ToolbarExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}

@@ -50,7 +50,6 @@ import { WarningCircleIcon } from './warning-circle'
 import { XIcon } from './x'
 
 const meta = {
-  tags: ['autodocs'],
   title: 'Data Display/Icons',
 } satisfies Meta
 

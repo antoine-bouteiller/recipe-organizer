@@ -7,7 +7,6 @@ import { Item, ItemGroup, ItemSeparator } from './item'
 
 const meta = {
   component: Item,
-  tags: ['autodocs'],
   title: 'Data Display/Item',
 } satisfies Meta<typeof Item>
 export default meta

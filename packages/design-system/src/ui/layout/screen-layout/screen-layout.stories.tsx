@@ -35,7 +35,6 @@ const meta = {
   args: { children: content, title: 'Library' },
   component: ScreenLayout,
   parameters: { layout: 'padded' },
-  tags: ['autodocs'],
   title: 'Layout/Screen Layout',
 } satisfies Meta<typeof ScreenLayout>
 

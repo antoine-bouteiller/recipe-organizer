@@ -17,7 +17,7 @@ const NumberFieldExample = ({ disabled = false, initialValue }: { disabled?: boo
   )
 }
 
-const meta = { component: NumberField, tags: ['autodocs'], title: 'Forms/NumberField' } satisfies Meta<typeof NumberField>
+const meta = { component: NumberField, title: 'Forms/NumberField' } satisfies Meta<typeof NumberField>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

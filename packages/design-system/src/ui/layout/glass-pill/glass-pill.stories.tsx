@@ -21,7 +21,6 @@ const GlassPillExample = (): ReactElement => {
 
 const meta = {
   component: GlassPillExample,
-  tags: ['autodocs'],
   title: 'Layout/GlassPill',
 } satisfies Meta<typeof GlassPillExample>
 

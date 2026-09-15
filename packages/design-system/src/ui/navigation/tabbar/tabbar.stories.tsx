@@ -22,7 +22,7 @@ const TabBarExample = (): React.ReactElement => (
   </div>
 )
 
-const meta = { component: TabBarExample, tags: ['autodocs'], title: 'Navigation/TabBar' } satisfies Meta<typeof TabBarExample>
+const meta = { component: TabBarExample, title: 'Navigation/TabBar' } satisfies Meta<typeof TabBarExample>
 
 export default meta
 type Story = StoryObj<typeof meta>

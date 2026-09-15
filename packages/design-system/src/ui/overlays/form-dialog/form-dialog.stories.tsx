@@ -21,7 +21,7 @@ const FormDialogExample = (): ReactElement => {
   )
 }
 
-const meta = { component: FormDialogExample, tags: ['autodocs'], title: 'Overlays/FormDialog' } satisfies Meta<typeof FormDialogExample>
+const meta = { component: FormDialogExample, title: 'Overlays/FormDialog' } satisfies Meta<typeof FormDialogExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = { render: () => <FormDialogExample /> }

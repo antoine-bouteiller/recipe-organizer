@@ -2,7 +2,6 @@ import { type StorybookConfig } from '@storybook/react-vite'
 import tailwindcss from '@tailwindcss/vite'
 
 const config: StorybookConfig = {
-  addons: ['@storybook/addon-docs'],
   core: { disableTelemetry: true },
   framework: '@storybook/react-vite',
   stories: ['../src/**/*.stories.tsx'],

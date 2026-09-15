@@ -57,7 +57,6 @@
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",
-    "@storybook/addon-docs": "catalog:",
     "@storybook/react-vite": "catalog:",
     "@tailwindcss/typography": "catalog:",
     "@tailwindcss/vite": "catalog:",

@@ -25,7 +25,7 @@ const SwipeTabsExample = (): React.ReactElement => (
   </SwipeTabs>
 )
 
-const meta = { component: SwipeTabsExample, tags: ['autodocs'], title: 'Navigation/Tabs' } satisfies Meta<typeof SwipeTabsExample>
+const meta = { component: SwipeTabsExample, title: 'Navigation/Tabs' } satisfies Meta<typeof SwipeTabsExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Swipeable: Story = {

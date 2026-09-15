@@ -26,7 +26,7 @@ const ImageFieldExample = ({ disabled = false, initialImage }: { disabled?: bool
   )
 }
 
-const meta = { component: ImageFieldExample, tags: ['autodocs'], title: 'Forms/ImageField' } satisfies Meta<typeof ImageFieldExample>
+const meta = { component: ImageFieldExample, title: 'Forms/ImageField' } satisfies Meta<typeof ImageFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

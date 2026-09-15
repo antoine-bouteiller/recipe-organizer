@@ -28,7 +28,6 @@ const DeleteDialogExample = (): ReactElement => {
 
 const meta = {
   component: DeleteDialogExample,
-  tags: ['autodocs'],
   title: 'Overlays/DeleteDialog',
 } satisfies Meta<typeof DeleteDialogExample>
 

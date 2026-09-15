@@ -6,7 +6,6 @@ import { Toggle } from './toggle'
 const meta = {
   args: { 'aria-label': 'Bold text', children: 'Bold' },
   component: Toggle,
-  tags: ['autodocs'],
   title: 'Actions/Toggle',
 } satisfies Meta<typeof Toggle>
 

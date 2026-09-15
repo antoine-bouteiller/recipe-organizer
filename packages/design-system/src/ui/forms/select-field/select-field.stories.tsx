@@ -22,7 +22,7 @@ const SelectFieldExample = ({ disabled = false, initialValue }: { disabled?: boo
   )
 }
 
-const meta = { component: SelectFieldExample, tags: ['autodocs'], title: 'Forms/SelectField' } satisfies Meta<typeof SelectFieldExample>
+const meta = { component: SelectFieldExample, title: 'Forms/SelectField' } satisfies Meta<typeof SelectFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

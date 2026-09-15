@@ -20,7 +20,7 @@ const NavbarExample = (): React.ReactElement => (
   </Navbar>
 )
 
-const meta = { component: NavbarExample, tags: ['autodocs'], title: 'Navigation/Navbar' } satisfies Meta<typeof NavbarExample>
+const meta = { component: NavbarExample, title: 'Navigation/Navbar' } satisfies Meta<typeof NavbarExample>
 
 export default meta
 type Story = StoryObj<typeof meta>

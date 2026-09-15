@@ -44,7 +44,7 @@ const CommandExample = (): React.ReactElement => (
   </CommandDialog>
 )
 
-const meta = { component: CommandExample, tags: ['autodocs'], title: 'Overlays/Command' } satisfies Meta<typeof CommandExample>
+const meta = { component: CommandExample, title: 'Overlays/Command' } satisfies Meta<typeof CommandExample>
 export default meta
 type Story = StoryObj<typeof meta>
 

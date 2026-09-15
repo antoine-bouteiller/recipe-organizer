@@ -52,7 +52,6 @@ const ControlledDrawer = (): ReactElement => {
 const meta = {
   args: { onChange: () => undefined, options, value: undefined },
   component: Combobox,
-  tags: ['autodocs'],
   title: 'Forms/Combobox',
 } satisfies Meta<typeof Combobox>
 

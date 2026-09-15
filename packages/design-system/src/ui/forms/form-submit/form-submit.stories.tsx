@@ -16,7 +16,7 @@ const FormSubmitExample = (): ReactElement => {
   )
 }
 
-const meta = { component: FormSubmitExample, tags: ['autodocs'], title: 'Forms/FormSubmit' } satisfies Meta<typeof FormSubmitExample>
+const meta = { component: FormSubmitExample, title: 'Forms/FormSubmit' } satisfies Meta<typeof FormSubmitExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = { render: () => <FormSubmitExample /> }

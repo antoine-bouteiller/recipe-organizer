@@ -20,7 +20,7 @@ const VideoFieldExample = ({ disabled = false, initialVideo }: { disabled?: bool
   )
 }
 
-const meta = { component: VideoFieldExample, tags: ['autodocs'], title: 'Forms/VideoField' } satisfies Meta<typeof VideoFieldExample>
+const meta = { component: VideoFieldExample, title: 'Forms/VideoField' } satisfies Meta<typeof VideoFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

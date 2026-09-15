@@ -29,7 +29,6 @@ const RecipeForm = (): ReactElement => {
 
 const meta = {
   component: Form,
-  tags: ['autodocs'],
   title: 'Forms/Form',
 } satisfies Meta<typeof Form>
 

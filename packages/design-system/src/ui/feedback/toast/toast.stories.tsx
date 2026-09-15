@@ -18,7 +18,7 @@ const ToastExample = (): React.ReactElement => (
   </ToastProvider>
 )
 
-const meta = { component: ToastExample, tags: ['autodocs'], title: 'Feedback/Toast' } satisfies Meta<typeof ToastExample>
+const meta = { component: ToastExample, title: 'Feedback/Toast' } satisfies Meta<typeof ToastExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Default: Story = {}

@@ -7,7 +7,6 @@ import { NotFound } from './not-found'
 const meta = {
   args: { action: <Button render={<a href="#home" />}>Return home</Button> },
   component: NotFound,
-  tags: ['autodocs'],
   title: 'Feedback/Not Found',
 } satisfies Meta<typeof NotFound>
 export default meta

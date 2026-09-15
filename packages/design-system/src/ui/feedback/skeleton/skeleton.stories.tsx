@@ -5,7 +5,6 @@ import { Skeleton } from './skeleton'
 
 const meta = {
   component: Skeleton,
-  tags: ['autodocs'],
   title: 'Feedback/Skeleton',
 } satisfies Meta<typeof Skeleton>
 export default meta

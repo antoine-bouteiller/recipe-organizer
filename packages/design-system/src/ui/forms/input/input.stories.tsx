@@ -6,7 +6,6 @@ import { Input } from './input'
 const meta = {
   args: { 'aria-label': 'Email address', placeholder: 'name@example.com', type: 'email' },
   component: Input,
-  tags: ['autodocs'],
   title: 'Forms/Input',
 } satisfies Meta<typeof Input>
 

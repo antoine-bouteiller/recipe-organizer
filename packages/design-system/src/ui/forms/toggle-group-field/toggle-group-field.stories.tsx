@@ -24,9 +24,7 @@ const ToggleGroupFieldExample = ({ disabled = false, initialValue = emptyMeals }
   )
 }
 
-const meta = { component: ToggleGroupFieldExample, tags: ['autodocs'], title: 'Forms/ToggleGroupField' } satisfies Meta<
-  typeof ToggleGroupFieldExample
->
+const meta = { component: ToggleGroupFieldExample, title: 'Forms/ToggleGroupField' } satisfies Meta<typeof ToggleGroupFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

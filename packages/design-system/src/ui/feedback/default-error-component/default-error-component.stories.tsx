@@ -8,7 +8,6 @@ import { DefaultErrorComponent } from './default-error-component'
 const meta = {
   args: { action: <Button render={<a href="#retry" />}>Try again</Button> },
   component: DefaultErrorComponent,
-  tags: ['autodocs'],
   title: 'Feedback/Default Error Component',
 } satisfies Meta<typeof DefaultErrorComponent>
 
