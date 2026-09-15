@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Select } from './select'
 import SelectBase from './select.base'
 import SelectDrawer from './select.drawer'
@@ -43,9 +44,27 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Responsive: Story = { render: () => <ControlledSelect /> }
-export const Desktop: Story = { render: () => <ControlledBase /> }
-export const Drawer: Story = { render: () => <ControlledDrawer /> }
-export const Multiple: Story = { render: () => <ControlledMultiple /> }
-export const Disabled: Story = { render: () => <Select disabled items={[...items]} onValueChange={() => undefined} value="draft" /> }
-export const Empty: Story = { render: () => <Select items={[]} onValueChange={() => undefined} placeholder="No statuses available" value={null} /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Responsive">
+        <ControlledSelect />
+      </StorySection>
+      <StorySection title="Desktop">
+        <ControlledBase />
+      </StorySection>
+      <StorySection title="Drawer">
+        <ControlledDrawer />
+      </StorySection>
+      <StorySection title="Multiple">
+        <ControlledMultiple />
+      </StorySection>
+      <StorySection title="Disabled">
+        <Select disabled items={[...items]} onValueChange={() => undefined} value="draft" />
+      </StorySection>
+      <StorySection title="Empty">
+        <Select items={[]} onValueChange={() => undefined} placeholder="No statuses available" value={null} />
+      </StorySection>
+    </div>
+  ),
+}

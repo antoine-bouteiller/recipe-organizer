@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 
 const emptyMeals: string[] = []
@@ -28,6 +29,18 @@ const meta = { component: ToggleGroupFieldExample, tags: ['autodocs'], title: 'F
 >
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = { render: () => <ToggleGroupFieldExample /> }
-export const InitialValue: Story = { render: () => <ToggleGroupFieldExample initialValue={['lunch']} /> }
-export const Disabled: Story = { render: () => <ToggleGroupFieldExample disabled initialValue={['lunch']} /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <ToggleGroupFieldExample />
+      </StorySection>
+      <StorySection title="Initial Value">
+        <ToggleGroupFieldExample initialValue={['lunch']} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <ToggleGroupFieldExample disabled initialValue={['lunch']} />
+      </StorySection>
+    </div>
+  ),
+}

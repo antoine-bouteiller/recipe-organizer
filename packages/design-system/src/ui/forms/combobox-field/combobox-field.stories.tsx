@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 
 const options = [
@@ -24,6 +25,18 @@ const ComboboxFieldExample = ({ disabled = false, initialValue }: { disabled?: b
 const meta = { component: ComboboxFieldExample, tags: ['autodocs'], title: 'Forms/ComboboxField' } satisfies Meta<typeof ComboboxFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = { render: () => <ComboboxFieldExample /> }
-export const InitialValue: Story = { render: () => <ComboboxFieldExample initialValue="dinner" /> }
-export const Disabled: Story = { render: () => <ComboboxFieldExample disabled initialValue="breakfast" /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <ComboboxFieldExample />
+      </StorySection>
+      <StorySection title="Initial Value">
+        <ComboboxFieldExample initialValue="dinner" />
+      </StorySection>
+      <StorySection title="Disabled">
+        <ComboboxFieldExample disabled initialValue="breakfast" />
+      </StorySection>
+    </div>
+  ),
+}

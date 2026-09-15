@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Combobox } from './combobox'
 import ComboboxBase from './combobox.base'
 import ComboboxDrawer from './combobox.drawer'
@@ -58,11 +59,27 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Responsive: Story = { render: () => <ControlledCombobox /> }
-export const Desktop: Story = { render: () => <ControlledBase /> }
-export const Drawer: Story = { render: () => <ControlledDrawer /> }
-export const Invalid: Story = {
-  render: () => <Combobox isInvalid onChange={() => undefined} options={options} placeholder="Choose a fruit" value={undefined} />,
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Responsive">
+        <ControlledCombobox />
+      </StorySection>
+      <StorySection title="Desktop">
+        <ControlledBase />
+      </StorySection>
+      <StorySection title="Drawer">
+        <ControlledDrawer />
+      </StorySection>
+      <StorySection title="Invalid">
+        <Combobox isInvalid onChange={() => undefined} options={options} placeholder="Choose a fruit" value={undefined} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <Combobox disabled onChange={() => undefined} options={options} value="apple" />
+      </StorySection>
+      <StorySection title="Empty">
+        <Combobox onChange={() => undefined} options={[]} placeholder="No fruits available" value={undefined} />
+      </StorySection>
+    </div>
+  ),
 }
-export const Disabled: Story = { render: () => <Combobox disabled onChange={() => undefined} options={options} value="apple" /> }
-export const Empty: Story = { render: () => <Combobox onChange={() => undefined} options={[]} placeholder="No fruits available" value={undefined} /> }

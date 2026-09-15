@@ -2,6 +2,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { TextField } from './text-field'
 
@@ -20,14 +21,24 @@ const TextFieldExample = ({ disabled = false, initialValue = '' }: { disabled?: 
 const meta = { component: TextField, tags: ['autodocs'], title: 'Forms/TextField' } satisfies Meta<typeof TextField>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = {
+export const Overview: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const input = canvas.getByRole('textbox', { name: 'Recipe title' })
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const input = within(section).getByRole('textbox', { name: 'Recipe title' })
     await userEvent.type(input, 'Tomato soup')
     await expect(input).toHaveValue('Tomato soup')
   },
-  render: () => <TextFieldExample />,
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <TextFieldExample />
+      </StorySection>
+      <StorySection title="Initial Value">
+        <TextFieldExample initialValue="Tomato soup" />
+      </StorySection>
+      <StorySection title="Disabled">
+        <TextFieldExample disabled initialValue="Tomato soup" />
+      </StorySection>
+    </div>
+  ),
 }
-export const InitialValue: Story = { render: () => <TextFieldExample initialValue="Tomato soup" /> }
-export const Disabled: Story = { render: () => <TextFieldExample disabled initialValue="Tomato soup" /> }

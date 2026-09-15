@@ -2,6 +2,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { SearchInput } from './search-input'
 
 const SearchInputExample = (): ReactElement => {
@@ -18,6 +19,17 @@ const SearchInputExample = (): ReactElement => {
   )
 }
 
+const CustomPlaceholderExample = (): ReactElement => {
+  const [search, setSearch] = useState('')
+
+  return (
+    <label className="block space-y-2">
+      <span>Search ingredients</span>
+      <SearchInput placeholder="Search ingredients…" search={search} setSearch={setSearch} />
+    </label>
+  )
+}
+
 const meta = {
   component: SearchInputExample,
   tags: ['autodocs'],
@@ -27,23 +39,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const Overview: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const canvas = within(section)
     await userEvent.type(canvas.getByRole('textbox', { name: 'Rechercher…' }), 'tomato')
     await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
   },
-}
-
-export const WithCustomPlaceholder: Story = {
-  render: () => {
-    const [search, setSearch] = useState('')
-
-    return (
-      <label className="block space-y-2">
-        <span>Search ingredients</span>
-        <SearchInput placeholder="Search ingredients…" search={search} setSearch={setSearch} />
-      </label>
-    )
-  },
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <SearchInputExample />
+      </StorySection>
+      <StorySection title="With Custom Placeholder">
+        <CustomPlaceholderExample />
+      </StorySection>
+    </div>
+  ),
 }

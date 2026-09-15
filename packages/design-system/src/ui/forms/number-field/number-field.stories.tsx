@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { NumberField } from './number-field'
 
@@ -19,6 +20,18 @@ const NumberFieldExample = ({ disabled = false, initialValue }: { disabled?: boo
 const meta = { component: NumberField, tags: ['autodocs'], title: 'Forms/NumberField' } satisfies Meta<typeof NumberField>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = { render: () => <NumberFieldExample /> }
-export const InitialValue: Story = { render: () => <NumberFieldExample initialValue={4} /> }
-export const Disabled: Story = { render: () => <NumberFieldExample disabled initialValue={4} /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <NumberFieldExample />
+      </StorySection>
+      <StorySection title="Initial Value">
+        <NumberFieldExample initialValue={4} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <NumberFieldExample disabled initialValue={4} />
+      </StorySection>
+    </div>
+  ),
+}

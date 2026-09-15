@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Checkbox } from './checkbox'
 
 const CheckboxExample = (): ReactElement => {
@@ -23,22 +24,24 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
-
-export const Checked: Story = {
+export const Overview: Story = {
   render: () => (
-    <div className="flex items-center gap-2">
-      <Checkbox defaultChecked id="checked-notification" />
-      <label htmlFor="checked-notification">Receive email notifications</label>
-    </div>
-  ),
-}
-
-export const Disabled: Story = {
-  render: () => (
-    <div className="flex items-center gap-2">
-      <Checkbox disabled id="disabled-notification" />
-      <label htmlFor="disabled-notification">Receive email notifications</label>
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <CheckboxExample />
+      </StorySection>
+      <StorySection title="Checked">
+        <div className="flex items-center gap-2">
+          <Checkbox defaultChecked id="checked-notification" />
+          <label htmlFor="checked-notification">Receive email notifications</label>
+        </div>
+      </StorySection>
+      <StorySection title="Disabled">
+        <div className="flex items-center gap-2">
+          <Checkbox disabled id="disabled-notification" />
+          <label htmlFor="disabled-notification">Receive email notifications</label>
+        </div>
+      </StorySection>
     </div>
   ),
 }

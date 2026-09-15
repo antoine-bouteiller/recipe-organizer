@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { type FileMetadata } from '../../../hooks/use-file-upload'
 
@@ -21,6 +22,18 @@ const VideoFieldExample = ({ disabled = false, initialVideo }: { disabled?: bool
 const meta = { component: VideoFieldExample, tags: ['autodocs'], title: 'Forms/VideoField' } satisfies Meta<typeof VideoFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Empty: Story = { render: () => <VideoFieldExample /> }
-export const InitialVideo: Story = { render: () => <VideoFieldExample initialVideo={video} /> }
-export const Disabled: Story = { render: () => <VideoFieldExample disabled initialVideo={video} /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Empty">
+        <VideoFieldExample />
+      </StorySection>
+      <StorySection title="Initial Video">
+        <VideoFieldExample initialVideo={video} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <VideoFieldExample disabled initialVideo={video} />
+      </StorySection>
+    </div>
+  ),
+}

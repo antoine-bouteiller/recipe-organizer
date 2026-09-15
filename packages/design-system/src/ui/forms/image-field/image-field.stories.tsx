@@ -1,7 +1,8 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
-import { expect, waitFor } from 'storybook/test'
+import { expect, waitFor, within } from 'storybook/test'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { type FileMetadata } from '../../../hooks/use-file-upload'
 
@@ -28,11 +29,22 @@ const ImageFieldExample = ({ disabled = false, initialImage }: { disabled?: bool
 const meta = { component: ImageFieldExample, tags: ['autodocs'], title: 'Forms/ImageField' } satisfies Meta<typeof ImageFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Empty: Story = { render: () => <ImageFieldExample /> }
-export const InitialImage: Story = {
+export const Overview: Story = {
   play: async ({ canvasElement }) => {
-    await waitFor(() => expect(canvasElement.querySelector('img')?.naturalWidth).toBeGreaterThan(0))
+    const section = within(canvasElement).getByRole('region', { name: 'Initial Image' })
+    await waitFor(() => expect(section.querySelector('img')?.naturalWidth).toBeGreaterThan(0))
   },
-  render: () => <ImageFieldExample initialImage={image} />,
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Empty">
+        <ImageFieldExample />
+      </StorySection>
+      <StorySection title="Initial Image">
+        <ImageFieldExample initialImage={image} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <ImageFieldExample disabled initialImage={image} />
+      </StorySection>
+    </div>
+  ),
 }
-export const Disabled: Story = { render: () => <ImageFieldExample disabled initialImage={image} /> }

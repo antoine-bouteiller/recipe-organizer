@@ -2,6 +2,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Button } from '../../actions/button/button'
 import {
   Command,
@@ -47,13 +48,24 @@ const meta = { component: CommandExample, tags: ['autodocs'], title: 'Overlays/C
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
-export const Search: Story = {
+export const Overview: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: 'Search recipes' }))
-    const dialog = await within(document.body).findByRole('dialog')
+    const searchSection = canvas.getByRole('region', { name: 'Search' })
+    await userEvent.click(within(searchSection).getByRole('button', { name: 'Search recipes' }))
+    const dialog = await within(document.body).findByRole('dialog', { name: 'Search recipes' })
     await userEvent.type(within(dialog).getByPlaceholderText('Search recipes'), 'tomato')
     await expect(within(dialog).getByText('Tomato soup')).toBeVisible()
+    await userEvent.keyboard('{Escape}')
   },
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <CommandExample />
+      </StorySection>
+      <StorySection title="Search">
+        <CommandExample />
+      </StorySection>
+    </div>
+  ),
 }

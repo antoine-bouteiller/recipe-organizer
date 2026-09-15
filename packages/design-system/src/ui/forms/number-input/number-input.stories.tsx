@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { NumberInput } from './number-input'
 
 const meta = {
@@ -12,7 +13,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
-export const Empty: Story = { args: { defaultValue: undefined, label: 'Servings', placeholder: '0' } }
-export const Invalid: Story = { args: { 'aria-invalid': true, defaultValue: 20, label: 'Servings', max: 12 } }
-export const Disabled: Story = { args: { defaultValue: 2, disabled: true, label: 'Servings' } }
+export const Overview: Story = {
+  render: (args) => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <NumberInput {...args} />
+      </StorySection>
+      <StorySection title="Empty">
+        <NumberInput {...args} defaultValue={undefined} label="Servings" placeholder="0" />
+      </StorySection>
+      <StorySection title="Invalid">
+        <NumberInput {...args} aria-invalid defaultValue={20} label="Servings" max={12} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <NumberInput {...args} defaultValue={2} disabled label="Servings" />
+      </StorySection>
+    </div>
+  ),
+}

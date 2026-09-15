@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { Suspense, type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import EditorField from './editor-field'
 
@@ -23,5 +24,15 @@ const EditorFieldExample = ({ disabled = false }: { disabled?: boolean }): React
 const meta = { component: EditorField, tags: ['autodocs'], title: 'Forms/EditorField' } satisfies Meta<typeof EditorField>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = { render: () => <EditorFieldExample /> }
-export const Disabled: Story = { render: () => <EditorFieldExample disabled /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <EditorFieldExample />
+      </StorySection>
+      <StorySection title="Disabled">
+        <EditorFieldExample disabled />
+      </StorySection>
+    </div>
+  ),
+}

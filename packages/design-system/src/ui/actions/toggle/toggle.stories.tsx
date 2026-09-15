@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Toggle } from './toggle'
 
 const meta = {
@@ -12,7 +13,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
-export const Pressed: Story = { args: { defaultPressed: true } }
-export const Outline: Story = { args: { variant: 'outline' } }
-export const Disabled: Story = { args: { disabled: true } }
+export const Overview: Story = {
+  render: (args) => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <Toggle {...args} />
+      </StorySection>
+      <StorySection title="Pressed">
+        <Toggle {...args} defaultPressed />
+      </StorySection>
+      <StorySection title="Outline">
+        <Toggle {...args} variant="outline" />
+      </StorySection>
+      <StorySection title="Disabled">
+        <Toggle {...args} disabled />
+      </StorySection>
+    </div>
+  ),
+}

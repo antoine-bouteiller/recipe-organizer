@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { PlusIcon } from '../../data-display/icons/plus'
 import { Button } from './button'
 
@@ -12,43 +13,42 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const Overview: Story = {
   args: { children: 'Save changes' },
-}
-
-export const Variants: Story = {
-  render: () => (
-    <div className="flex flex-wrap gap-3">
-      <Button>Default</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="link">Link</Button>
-      <Button variant="destructive">Delete</Button>
-      <Button variant="destructive-outline">Remove</Button>
+  render: (args) => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <Button {...args} />
+      </StorySection>
+      <StorySection title="Variants">
+        <div className="flex flex-wrap gap-3">
+          <Button>Default</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="link">Link</Button>
+          <Button variant="destructive">Delete</Button>
+          <Button variant="destructive-outline">Remove</Button>
+        </div>
+      </StorySection>
+      <StorySection title="Sizes">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button size="xs">Extra small</Button>
+          <Button size="sm">Small</Button>
+          <Button>Default</Button>
+          <Button size="lg">Large</Button>
+          <Button size="xl">Extra large</Button>
+          <Button aria-label="Add item" size="icon">
+            <PlusIcon />
+          </Button>
+        </div>
+      </StorySection>
+      <StorySection title="Disabled">
+        <Button disabled>Unavailable</Button>
+      </StorySection>
+      <StorySection title="Loading">
+        <Button loading>Saving changes</Button>
+      </StorySection>
     </div>
   ),
-}
-
-export const Sizes: Story = {
-  render: () => (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button size="xs">Extra small</Button>
-      <Button size="sm">Small</Button>
-      <Button>Default</Button>
-      <Button size="lg">Large</Button>
-      <Button size="xl">Extra large</Button>
-      <Button aria-label="Add item" size="icon">
-        <PlusIcon />
-      </Button>
-    </div>
-  ),
-}
-
-export const Disabled: Story = {
-  args: { children: 'Unavailable', disabled: true },
-}
-
-export const Loading: Story = {
-  args: { children: 'Saving changes', loading: true },
 }

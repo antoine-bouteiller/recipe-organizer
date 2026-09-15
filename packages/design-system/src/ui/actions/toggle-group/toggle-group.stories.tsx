@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { ToggleGroup } from './toggle-group'
 
 const items = [
@@ -24,6 +25,18 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { render: () => <ControlledToggleGroup /> }
-export const Empty: Story = { args: { items: [], onValueChange: () => undefined, value: [] } }
-export const Disabled: Story = { args: { disabled: true, items, onValueChange: () => undefined, value: ['lunch'] } }
+export const Overview: Story = {
+  render: (args) => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <ControlledToggleGroup />
+      </StorySection>
+      <StorySection title="Empty">
+        <ToggleGroup {...args} items={[]} />
+      </StorySection>
+      <StorySection title="Disabled">
+        <ToggleGroup {...args} disabled items={items} value={['lunch']} />
+      </StorySection>
+    </div>
+  ),
+}

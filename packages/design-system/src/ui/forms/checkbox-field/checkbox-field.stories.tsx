@@ -2,6 +2,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { CheckboxField } from './checkbox-field'
 
@@ -21,14 +22,24 @@ const meta = { component: CheckboxField, tags: ['autodocs'], title: 'Forms/Check
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const Overview: Story = {
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const checkbox = canvas.getByRole('checkbox', { name: 'Published' })
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const checkbox = within(section).getByRole('checkbox', { name: 'Published' })
     await userEvent.click(checkbox)
     await expect(checkbox).toBeChecked()
   },
-  render: () => <CheckboxFieldExample />,
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <CheckboxFieldExample />
+      </StorySection>
+      <StorySection title="Checked">
+        <CheckboxFieldExample initialValue />
+      </StorySection>
+      <StorySection title="Disabled">
+        <CheckboxFieldExample disabled initialValue />
+      </StorySection>
+    </div>
+  ),
 }
-export const Checked: Story = { render: () => <CheckboxFieldExample initialValue /> }
-export const Disabled: Story = { render: () => <CheckboxFieldExample disabled initialValue /> }

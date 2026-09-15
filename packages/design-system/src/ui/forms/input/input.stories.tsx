@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Input } from './input'
 
 const meta = {
@@ -12,7 +13,21 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
-export const Empty: Story = { args: { placeholder: 'Enter your email' } }
-export const Invalid: Story = { args: { 'aria-invalid': true, defaultValue: 'not-an-email', type: 'email' } }
-export const Disabled: Story = { args: { defaultValue: 'name@example.com', disabled: true } }
+export const Overview: Story = {
+  render: (args) => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <Input {...args} />
+      </StorySection>
+      <StorySection title="Empty">
+        <Input {...args} placeholder="Enter your email" />
+      </StorySection>
+      <StorySection title="Invalid">
+        <Input {...args} aria-invalid defaultValue="not-an-email" type="email" />
+      </StorySection>
+      <StorySection title="Disabled">
+        <Input {...args} defaultValue="name@example.com" disabled />
+      </StorySection>
+    </div>
+  ),
+}

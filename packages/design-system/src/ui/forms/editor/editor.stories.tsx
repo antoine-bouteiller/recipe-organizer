@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../../actions/toolbar/toolbar'
 import { ArrowCounterClockwiseIcon } from '../../data-display/icons/arrow-counter-clockwise'
 import { ArrowUUpRightIcon } from '../../data-display/icons/arrow-u-up-right'
@@ -103,5 +104,15 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Controlled: Story = {}
-export const ReadOnly: Story = { render: () => <ReadOnlyEditor /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Controlled">
+        <ControlledEditor />
+      </StorySection>
+      <StorySection title="Read Only">
+        <ReadOnlyEditor />
+      </StorySection>
+    </div>
+  ),
+}

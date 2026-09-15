@@ -65,7 +65,8 @@ Vite proxies `/api/*` to Wrangler. Development needs no production build, and lo
 ### Design system
 
 Reusable controls, forms, rich-text editing, navigation, error screens, and layouts live in `packages/design-system/src/ui/<category>/<component>/`, with the implementation and its
-`<component>.stories.tsx` together. Responsive desktop/drawer implementations stay in the same family folder.
+`<component>.stories.tsx` together. Each component exposes one story, with labeled sections for its variants and states.
+Responsive desktop/drawer implementations stay in the same family folder.
 Form contexts and the shared `useAppForm` registry move with their controls.
 Supporting hooks live in `packages/design-system/src/hooks/`; shared icons live in `src/ui/data-display/icons/`.
 Import components from `@recipe-organizer/design-system/button` (and equivalent component subpaths).

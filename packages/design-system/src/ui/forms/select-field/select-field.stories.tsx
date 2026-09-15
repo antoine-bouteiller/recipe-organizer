@@ -1,6 +1,7 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 
+import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 
 const items = [
@@ -24,6 +25,18 @@ const SelectFieldExample = ({ disabled = false, initialValue }: { disabled?: boo
 const meta = { component: SelectFieldExample, tags: ['autodocs'], title: 'Forms/SelectField' } satisfies Meta<typeof SelectFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = { render: () => <SelectFieldExample /> }
-export const InitialValue: Story = { render: () => <SelectFieldExample initialValue="published" /> }
-export const Disabled: Story = { render: () => <SelectFieldExample disabled initialValue="draft" /> }
+export const Overview: Story = {
+  render: () => (
+    <div className="flex w-full min-w-0 flex-col gap-8">
+      <StorySection title="Default">
+        <SelectFieldExample />
+      </StorySection>
+      <StorySection title="Initial Value">
+        <SelectFieldExample initialValue="published" />
+      </StorySection>
+      <StorySection title="Disabled">
+        <SelectFieldExample disabled initialValue="draft" />
+      </StorySection>
+    </div>
+  ),
+}
