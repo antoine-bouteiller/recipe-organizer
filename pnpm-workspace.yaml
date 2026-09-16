@@ -43,7 +43,7 @@ catalog:
   cn: 0.3.0
   drizzle-kit: 1.0.0-rc.3
   drizzle-orm: 1.0.0-rc.3
-  hono: 4.13.7
+  hono: 4.13.8
   knip: 6.35.1
   lefthook: 2.1.14
   lexical: 0.50.0
