@@ -1,10 +1,11 @@
 import { formatNumber } from '@client/utils/number'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { UNITS, type UnitSlug } from '@recipe-organizer/shared/units'
-import { cn } from 'cn'
 import { useState } from 'react'
 
 import { type IngredientCartItem } from '../types/ingredient-cart-item'
+
+import { check, checkState, details, detailsState, fallbackQuantity, item, quantities } from './cart-item.css'
 
 const formatUnitLabel = (slug: UnitSlug | null) => (slug ? (UNITS[slug]?.name ?? '') : '')
 
@@ -13,29 +14,22 @@ const formatQuantityWithUnit = (quantity: number, unitSlug: UnitSlug | null) => 
   return label ? `${formatNumber(quantity)} ${label}` : formatNumber(quantity)
 }
 
-export const CartItem = ({ ingredient }: { ingredient: IngredientCartItem }) => {
+export interface CartItemProps {
+  readonly ingredient: IngredientCartItem
+}
+
+export const CartItem = ({ ingredient }: CartItemProps) => {
   const [isChecked, setIsChecked] = useState(false)
 
   return (
-    <button
-      type="button"
-      onClick={() => setIsChecked((checked) => !checked)}
-      className="flex w-full items-center gap-3 border-b py-3 text-left last:border-b-0"
-    >
-      <span
-        className={cn(
-          'flex size-5.5 shrink-0 items-center justify-center rounded-full border-2',
-          isChecked ? 'border-primary bg-primary text-white' : 'border-muted-foreground/40'
-        )}
-      >
-        {isChecked && <CheckIcon weight="bold" className="size-3" />}
-      </span>
-      <span className={cn('flex flex-1 items-center justify-between gap-2', isChecked && 'text-muted-foreground line-through')}>
+    <button type="button" onClick={() => setIsChecked((checked) => !checked)} className={item}>
+      <span className={`${check} ${checkState[isChecked ? 'checked' : 'unchecked']}`}>{isChecked && <CheckIcon size="xs" weight="bold" />}</span>
+      <span className={`${details} ${detailsState[isChecked ? 'checked' : 'unchecked']}`}>
         <span>{ingredient.name}</span>
-        <span className="flex flex-col items-end text-sm font-semibold text-muted-foreground tabular-nums">
+        <span className={quantities}>
           <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>
           {ingredient.fallback.map((line) => (
-            <span className="text-xs" key={line.unitSlug ?? 'unitless'}>
+            <span className={fallbackQuantity} key={line.unitSlug ?? 'unitless'}>
               + {formatQuantityWithUnit(line.quantity, line.unitSlug)}
             </span>
           ))}

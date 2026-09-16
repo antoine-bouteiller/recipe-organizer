@@ -3,6 +3,8 @@ import { lazy, Suspense, useMemo, type ReactElement, type ReactNode } from 'reac
 import { useIsMobile } from '../../../hooks/use-is-mobile'
 import { type Option } from './options'
 
+import { fallbackClassName } from './combobox.css'
+
 export type ValueOptions = number | string | undefined
 
 export interface ComboboxImplProps<TValue extends ValueOptions> {
@@ -32,7 +34,7 @@ interface ComboboxProps<TValue extends ValueOptions> {
 const ComboboxBase = lazy(() => import('./combobox.base'))
 const ComboboxDrawer = lazy(() => import('./combobox.drawer'))
 
-const ComboboxFallback = (): ReactElement => <div aria-hidden="true" className="h-9 w-full rounded-lg border border-input bg-background" />
+const ComboboxFallback = (): ReactElement => <div aria-hidden="true" className={fallbackClassName} />
 
 const Combobox = <TValue extends ValueOptions>({
   addNew,

@@ -4,34 +4,29 @@ import { staggerStyle } from '@client/utils/stagger'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { Link } from '@tanstack/react-router'
-import { cn } from 'cn'
 import { type ReactNode } from 'react'
 
-interface RecipeSearchCardProps {
+import { action as actionClassName, badges, card, cardPadding, container, content, image, name } from './recipe-search-card.css'
+
+export interface RecipeSearchCardProps {
   recipe: ReducedRecipe
   action?: ReactNode
   index?: number
 }
 
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
-  <div className="relative stagger-in-45" style={staggerStyle(index, 10)}>
+  <div className={`${container} stagger-in-45`} style={staggerStyle(index, 10)}>
     <Link
-      className={cn('flex items-center gap-3 rounded-2xl border bg-card p-2.5', action && 'pr-14')}
+      className={`${card} ${cardPadding[action ? 'withAction' : 'withoutAction']}`}
       onClick={() => addRecentRecipe(recipe.id)}
       params={{ id: recipe.id.toString() }}
       to="/recipe/$id"
       viewTransition
     >
-      <img
-        src={recipe.image}
-        alt={recipe.name}
-        className="size-15 shrink-0 rounded-xl object-cover"
-        decoding="async"
-        loading={index < 6 ? 'eager' : 'lazy'}
-      />
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <span className="truncate font-bold text-foreground">{recipe.name}</span>
-        <div className="flex flex-wrap gap-1.5">
+      <img src={recipe.image} alt={recipe.name} className={image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
+      <div className={content}>
+        <span className={name}>{recipe.name}</span>
+        <div className={badges}>
           {recipe.isVegetarian && (
             <Badge size="sm" variant="accent">
               {VEGETARIAN_LABEL}
@@ -60,6 +55,6 @@ export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCard
         </div>
       </div>
     </Link>
-    {action && <div className="absolute top-1/2 right-2.5 -translate-y-1/2">{action}</div>}
+    {action && <div className={actionClassName}>{action}</div>}
   </div>
 )

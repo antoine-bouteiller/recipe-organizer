@@ -12,7 +12,8 @@
       "entry": ["src/**/*.test.ts"]
     },
     "packages/design-system": {
-      "includeEntryExports": true
+      "includeEntryExports": true,
+      "entry": ["src/**/*.test.ts"]
     },
     "packages/oxlint": {
       "entry": ["**/*.test.ts"]

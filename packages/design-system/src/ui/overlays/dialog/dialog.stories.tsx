@@ -7,6 +7,8 @@ import { Dialog } from './dialog'
 import DialogBase from './dialog.base'
 import DialogDrawer from './dialog.drawer'
 
+import { container } from './dialog.stories.css'
+
 const dialogProps = {
   cancelLabel: 'Cancel',
   children: <p>Changes are saved only after you confirm this action.</p>,
@@ -25,7 +27,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>

@@ -15,7 +15,7 @@ const renderAt = async (pathname: string, content: ReactNode) => {
   return renderToStaticMarkup(createElement(RouterProvider, { router }))
 }
 
-describe('navigation adapters', () => {
+describe('navigation composition', () => {
   it('preserves router link active state and exact home matching in the navbar', async () => {
     const markup = await renderAt('/settings/users', createElement(Navbar, { search: null }))
     expect(markup).toMatch(/<a(?=[^>]*href="\/settings")(?=[^>]*aria-current="page")[^>]*>/)
@@ -35,12 +35,13 @@ describe('navigation adapters', () => {
     expect(page).toContain('data-scroll-restoration-id="screen-outer"')
     expect(page).toContain('data-scroll-restoration-id="screen-inner"')
     expect(page).toContain('data-slot="tab-bar"')
-    expect(page).toContain('pb-safe-16')
+    expect(page).toContain('data-footer-present="true"')
     expect(page).not.toContain('aria-label="Retour"')
 
     // oxlint-disable-next-line react/no-children-prop -- JSX is unavailable in .test.ts.
     const detail = await renderAt('/settings', createElement(ScreenLayout, { children: 'Content', title: 'Settings', withGoBack: true }))
     expect(detail).not.toContain('data-slot="tab-bar"')
+    expect(detail).not.toContain('data-footer-present="true"')
     expect(detail).toContain('aria-label="Retour"')
   })
 })

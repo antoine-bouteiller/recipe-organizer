@@ -1,6 +1,8 @@
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { defineConfig } from 'vite-plus'
 
 const viteConfig = defineConfig({
+  plugins: [vanillaExtractPlugin()],
   lint: {
     options: { typeAware: true, typeCheck: true },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
@@ -24,6 +26,20 @@ const viteConfig = defineConfig({
         files: ['**/use-file-upload.ts'],
         rules: {
           'react-hooks/exhaustive-deps': 'off',
+        },
+      },
+      {
+        // CSS declaration and selector order determines the cascade.
+        files: ['**/*.css.ts'],
+        rules: {
+          'sort-keys': 'off',
+        },
+      },
+      {
+        // Numeric token scales are intentionally ordered by value.
+        files: ['packages/design-system/src/theme/**/*.ts'],
+        rules: {
+          'sort-keys': 'off',
         },
       },
     ],
@@ -122,9 +138,6 @@ const viteConfig = defineConfig({
     singleQuote: true,
     printWidth: 150,
     experimentalSortImports: {},
-    experimentalTailwindcss: {
-      stylesheet: 'apps/web/src/styles/app.css',
-    },
     ignorePatterns: ['apps/web/src/routeTree.gen.ts'],
   },
   resolve: {

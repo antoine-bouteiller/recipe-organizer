@@ -1,25 +1,16 @@
-import { Badge } from '@recipe-organizer/design-system/badge'
 import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
-import { cn } from 'cn'
+import type React from 'react'
 
-const categoryStyles = {
-  fish: 'bg-blue-200 text-blue-600',
-  meat: 'bg-red-200 text-red-600',
-  other: 'bg-zinc-200 text-zinc-700',
-  spices: 'bg-yellow-200 text-yellow-600',
-  vegetables: 'bg-emerald-100 text-emerald-600',
-} satisfies Record<IngredientCategory, string>
+import { badge } from './ingredient-badge.css'
 
-export const IngredientBadge = ({
-  category,
-  children,
-  className,
-}: {
-  category: IngredientCategory
-  children: React.ReactNode
-  className?: string
-}) => (
-  <Badge className={cn(categoryStyles[category], className)} data-slot="badge">
+export interface IngredientBadgeProps {
+  readonly category: IngredientCategory
+  readonly children: React.ReactNode
+}
+
+/** Domain-owned ingredient category treatment; category colors never bypass the shared Badge contract. */
+export const IngredientBadge = ({ category, children }: IngredientBadgeProps): React.ReactElement => (
+  <span className={badge[category]} data-slot="ingredient-badge">
     {children}
-  </Badge>
+  </span>
 )

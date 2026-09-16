@@ -19,7 +19,7 @@ A modern recipe management application with a TanStack Router browser SPA and a 
 - **Backend**: Hono on a Cloudflare Worker (`/api/*`)
 - **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
 - **Storage**: Cloudflare R2 for image storage
-- **Styling**: Tailwind CSS v4, owned Base UI components in `@recipe-organizer/design-system`, Storybook
+- **Styling**: vanilla-extract with colocated `.css.ts` files and a typed shared theme, owned Base UI components in `@recipe-organizer/design-system`, Storybook
 - **Authentication**: Better Auth with Google OAuth
 
 ## Getting Started
@@ -70,9 +70,8 @@ Responsive desktop/drawer implementations stay in the same family folder.
 Form contexts and the shared `useAppForm` registry move with their controls.
 Supporting hooks live in `packages/design-system/src/hooks/`; shared icons live in `src/ui/data-display/icons/`.
 Import components from `@recipe-organizer/design-system/button` (and equivalent component subpaths).
-The app and Storybook share `@recipe-organizer/design-system/styles.css`, including theme tokens and fonts;
-only app-global scrolling and navigation transitions remain in `apps/web/src/styles/app.css`.
-Thin web adapters supply routing, menus, theme/back actions, footer selection, and error-detail visibility.
+The app, Storybook, and existing tests compile colocated `.css.ts` files through the vanilla-extract Vite plugin. Import shared typed values as `theme` from `@recipe-organizer/design-system/theme`; its `src/theme/index.ts` combines the internal variable contract with `theme.spacing(...)`. `theme.spacing` accepts one to four numeric values and returns CSS `calc(4px * n)` shorthand values. The internal `src/theme/tokens.css.ts` exports variables only to `theme/index.ts` and emits the global light, dark, and keyframe CSS when the public theme module is loaded. App and Storybook entrypoints load `@recipe-organizer/design-system/global.css` for the global Vanilla Extract reset/base rules and theme; native `styles.css` retains font faces, safe-area properties, and layer order. Use typed `theme` references, including in template interpolations, rather than shared raw `var(--…)` strings in `.css.ts` files. No separate style-generation step is needed. Components own private recipes and declare minimal local props; Base UI `render` composes existing components, including the actual router `Link`. Parent wrappers own external layout. Native global CSS and component/Base UI/runtime-owned custom properties remain appropriate for owned global and runtime-only behavior.
+Thin web adapters supply routing, menus, theme/back actions, footer selection, and error-detail visibility. See `packages/design-system/styling.spec.md` for the durable ownership guidance.
 
 Folder categories match the Storybook sidebar: `actions`, `data-display`, `feedback`, `forms`,
 `layout`, `navigation`, and `overlays`. Component imports remain independent of these physical folders.

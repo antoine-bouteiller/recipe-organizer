@@ -7,10 +7,12 @@ import { Popover } from './popover'
 import PopoverBase from './popover.base'
 import PopoverDrawer from './popover.drawer'
 
+import { container, heading, container2 } from './popover.stories.css'
+
 const popoverProps = {
   children: (
-    <div className="flex w-56 flex-col gap-2">
-      <h2 className="font-medium">Recipe actions</h2>
+    <div className={container}>
+      <h2 className={heading}>Recipe actions</h2>
       <Button variant="ghost">Duplicate recipe</Button>
       <Button variant="ghost">Archive recipe</Button>
     </div>
@@ -28,7 +30,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container2}>
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>

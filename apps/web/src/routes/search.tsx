@@ -2,11 +2,10 @@ import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import { RecentRecipes } from '@client/features/search/components/recent-recipes'
+import { SearchFilterTrigger } from '@client/features/search/components/search-filter-trigger'
 import { SearchResults } from '@client/features/search/components/search-results'
 import { EMPTY_FILTERS, filterRecipes, hasActiveFilters, type SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
-import { Button } from '@recipe-organizer/design-system/button'
-import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons/funnel-simple'
-import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
+import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { Toggle } from '@recipe-organizer/design-system/toggle'
@@ -15,6 +14,8 @@ import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
+
+import { container, container2, container3, element, container4, container5, container6, container7 } from './-search.css'
 
 const cuisineItems = CUISINE_TYPES.map((cuisineType) => ({
   label: CUISINE_TYPE_LABELS[cuisineType],
@@ -25,8 +26,6 @@ const mealItems = MEALS.map((meal) => ({
   label: MEAL_LABELS[meal],
   value: meal,
 }))
-
-const toggleClassName = 'w-full justify-center data-pressed:border-primary data-pressed:bg-primary data-pressed:text-primary-foreground'
 
 const SearchPage = () => {
   const [filters, setFilters] = useState<SearchFiltersValue>(EMPTY_FILTERS)
@@ -40,10 +39,10 @@ const SearchPage = () => {
 
   return (
     <ScreenLayout title="Rechercher" pageKey="/search">
-      <div className="sticky top-(--screen-header-height) z-10 flex flex-col gap-2 pb-2 md:top-0 md:bg-muted">
+      <div className={container}>
         <CollapsiblePrimitive.Root>
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
+          <div className={container2}>
+            <div className={container3}>
               <SearchInput
                 placeholder="Rechercher une recette, un ingrédient…"
                 autoFocus
@@ -51,55 +50,55 @@ const SearchPage = () => {
                 setSearch={(query) => setFilters({ ...filters, query })}
               />
             </div>
-            <CollapsiblePrimitive.Trigger
-              render={<Button aria-label="Filtrer par catégorie" className={glassSurface} size="icon-lg" variant="outline" />}
-            >
-              <FunnelSimpleIcon />
-            </CollapsiblePrimitive.Trigger>
+            <SearchFilterTrigger />
           </div>
-          <CollapsiblePrimitive.Panel className="grid h-(--collapsible-panel-height) grid-cols-2 gap-2.5 overflow-hidden pt-2 transition-[height] duration-200 data-ending-style:h-0 data-starting-style:h-0">
-            <Select
-              items={mealItems}
-              multiple
-              onValueChange={(meals) => setFilters({ ...filters, meals })}
-              placeholder="Repas"
-              title="Repas"
-              value={filters.meals}
-              className="w-full"
-            />
-            <Select
-              items={cuisineItems}
-              multiple
-              onValueChange={(cuisineTypes) => setFilters({ ...filters, cuisineTypes })}
-              placeholder="Cuisines"
-              title="Cuisines"
-              value={filters.cuisineTypes}
-              className="w-full"
-            />
+          <CollapsiblePrimitive.Panel className={element}>
+            <div className={container4}>
+              <Select
+                items={mealItems}
+                multiple
+                onValueChange={(meals) => setFilters({ ...filters, meals })}
+                placeholder="Repas"
+                title="Repas"
+                value={filters.meals}
+              />
+            </div>
+            <div className={container5}>
+              <Select
+                items={cuisineItems}
+                multiple
+                onValueChange={(cuisineTypes) => setFilters({ ...filters, cuisineTypes })}
+                placeholder="Cuisines"
+                title="Cuisines"
+                value={filters.cuisineTypes}
+              />
+            </div>
             <Toggle
+              presentation="filter"
               variant="outline"
-              className={toggleClassName}
               pressed={filters.isVegetarian}
               onPressedChange={(pressed) => setFilters({ ...filters, isVegetarian: pressed })}
             >
               Végétarien
             </Toggle>
             <Toggle
+              presentation="filter"
               variant="outline"
-              className={toggleClassName}
               pressed={filters.isMagimix}
               onPressedChange={(pressed) => setFilters({ ...filters, isMagimix: pressed })}
             >
               Magimix
             </Toggle>
-            <Toggle
-              variant="outline"
-              className={`col-span-2 ${toggleClassName}`}
-              pressed={filters.isSpice}
-              onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}
-            >
-              Épices
-            </Toggle>
+            <div className={container6}>
+              <Toggle
+                presentation="filter"
+                variant="outline"
+                pressed={filters.isSpice}
+                onPressedChange={(pressed) => setFilters({ ...filters, isSpice: pressed })}
+              >
+                Épices
+              </Toggle>
+            </div>
           </CollapsiblePrimitive.Panel>
         </CollapsiblePrimitive.Root>
       </div>
@@ -110,10 +109,10 @@ const SearchPage = () => {
 
 const SearchSkeleton = () => (
   <ScreenLayout title="Rechercher" pageKey="/search">
-    <Skeleton className="h-11 w-full rounded-xl" />
-    <div className="flex flex-1 flex-col gap-2.5 pt-2">
+    <Skeleton preset="search-input" />
+    <div className={container7}>
       {incrementalArray({ length: 5 }).map((index) => (
-        <Skeleton className="h-20 w-full rounded-2xl" key={index} />
+        <Skeleton preset="search-result" key={index} />
       ))}
     </div>
   </ScreenLayout>

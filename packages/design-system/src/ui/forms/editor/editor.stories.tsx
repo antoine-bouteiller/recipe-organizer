@@ -1,5 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
+import { expect, within } from 'storybook/test'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../../actions/toolbar/toolbar'
@@ -10,6 +11,8 @@ import { TextBolderIcon } from '../../data-display/icons/text-bolder'
 import { TextItalicIcon } from '../../data-display/icons/text-italic'
 import { TextUnderlineIcon } from '../../data-display/icons/text-underline'
 import { Editor, EditorContent, EditorToolbarButton } from './editor'
+
+import { storyStack, storyOutput, storySections } from './editor.stories.css'
 
 const initialContent = JSON.stringify({
   root: {
@@ -75,14 +78,14 @@ const ControlledEditor = (): ReactElement => {
   const [content, setContent] = useState(initialContent)
 
   return (
-    <div className="space-y-3">
+    <div className={storyStack}>
       <section aria-label="Recipe notes editor">
         <Editor content={initialContent} onChange={setContent}>
           <EditorToolbar />
           <EditorContent />
         </Editor>
       </section>
-      <output className="block rounded-md bg-muted p-3 text-xs">{content}</output>
+      <output className={storyOutput}>{content}</output>
     </div>
   )
 }
@@ -95,6 +98,22 @@ const ReadOnlyEditor = (): ReactElement => (
   </section>
 )
 
+const NestedEditor = (): ReactElement => (
+  <div data-editor-decorator="">
+    <button type="button">Decorator action</button>
+    <Editor content={initialContent}>
+      <EditorToolbar />
+      <EditorContent />
+    </Editor>
+  </div>
+)
+
+const DisabledEditor = (): ReactElement => (
+  <Editor content={initialContent}>
+    <EditorContent disabled />
+  </Editor>
+)
+
 const meta = {
   component: ControlledEditor,
   title: 'Forms/Editor',
@@ -105,7 +124,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={storySections}>
       <StorySection title="Controlled">
         <ControlledEditor />
       </StorySection>
@@ -114,4 +133,16 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Disabled: Story = {
+  play: async ({ canvasElement }) => {
+    const editor = within(canvasElement).getByRole('textbox')
+    await expect(editor).toHaveAttribute('contenteditable', 'false')
+  },
+  render: () => <DisabledEditor />,
+}
+
+export const Nested: Story = {
+  render: () => <NestedEditor />,
 }

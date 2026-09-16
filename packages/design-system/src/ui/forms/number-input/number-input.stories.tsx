@@ -3,6 +3,8 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { NumberInput } from './number-input'
 
+import { container } from './number-input.stories.css'
+
 const meta = {
   args: { defaultValue: 2, label: 'Servings', max: 12, min: 0 },
   component: NumberInput,
@@ -14,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <NumberInput {...args} />
       </StorySection>

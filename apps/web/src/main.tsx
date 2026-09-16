@@ -3,7 +3,8 @@ import { getRouter } from '@client/router'
 import { RouterProvider } from '@tanstack/react-router'
 import { createRoot } from 'react-dom/client'
 
-import '@client/styles/app.css'
+import '@recipe-organizer/design-system/global.css'
+import '@recipe-organizer/design-system/styles.css'
 
 document.documentElement.className = getTheme()
 

@@ -15,9 +15,11 @@ export const getIngredientDefaultValues = (defaultName?: string): IngredientForm
 })
 
 const preferredUnitOptions = [{ label: 'Aucune', value: '' }, ...unitOptions]
+const ingredientFormProps = {}
 
 export const IngredientForm = withForm({
   defaultValues: getIngredientDefaultValues(),
+  props: ingredientFormProps,
   render: ({ form }) => {
     const { AppField } = form
     const ingredientOptions = useIngredientOptions({ allowEmpty: true })

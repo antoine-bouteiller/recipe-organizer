@@ -24,6 +24,7 @@
     "@recipe-organizer/config": "workspace:*",
     "@recipe-organizer/oxlint": "workspace:*",
     "@types/node": "catalog:",
+    "@vanilla-extract/vite-plugin": "catalog:",
     "drizzle-kit": "catalog:",
     "knip": "catalog:",
     "lefthook": "catalog:",

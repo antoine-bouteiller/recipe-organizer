@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const CookingPotIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M16.3326 9.5H7.6674C6.1032 9.5 5.32109 9.5 4.78248 9.91329C4.64381 10.0197 4.51969 10.1438 4.41329 10.2825C4 10.8211 4 11.6029 4 13.1667C4 16.2941 4 17.8578 4.82659 18.935C5.03939 19.2124 5.28763 19.4606 5.56495 19.6734C6.64218 20.5 8.2059 20.5 11.3333 20.5H12.6667C15.7941 20.5 17.3578 20.5 18.435 19.6734C18.7124 19.4606 18.9606 19.2124 19.1734 18.935C20 17.8578 20 16.2941 20 13.1667C20 11.6029 20 10.8211 19.5867 10.2825C19.4803 10.1438 19.3562 10.0197 19.2175 9.91329C18.6789 9.5 17.8968 9.5 16.3326 9.5Z"
       stroke="currentColor"
@@ -21,5 +22,5 @@ export const CookingPotIcon = (props: IconProps): React.ReactElement => (
       strokeLinejoin="round"
       strokeWidth={1.5}
     />
-  </svg>
+  </Icon>
 )

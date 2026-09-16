@@ -8,10 +8,12 @@ import { IngredientBadge } from '@client/features/ingredients/components/ingredi
 import { Button } from '@recipe-organizer/design-system/button'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
-import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
+import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
+
+import { container, text, text2, text3, text4 } from './-ingredients.css'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
@@ -26,24 +28,23 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky top-(--screen-header-height) z-10 flex shrink-0 items-center gap-4 pb-2 md:top-0 md:bg-muted">
+      <div className={container}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddIngredient>
-          <Button className={glassSurface} size="icon-lg" variant="outline">
+          <Button size="icon-lg" variant="search-trigger">
             <PlusIcon />
           </Button>
         </AddIngredient>
       </div>
 
       {filteredIngredients.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">
-          {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
-        </p>
+        <p className={text}>{search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}</p>
       ) : (
         <ItemGroup>
           {filteredIngredients.map((ingredient, index) => (
             <React.Fragment key={ingredient.id}>
               <Item
+                layout="row"
                 actions={
                   isAdmin ? (
                     <>
@@ -52,14 +53,15 @@ const IngredientsManagement = () => {
                     </>
                   ) : undefined
                 }
-                className="flex-nowrap"
                 title={
                   <>
-                    <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
-                    <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
-                      {ingredientCategoryIcons[ingredient.category]}
-                      <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
-                    </IngredientBadge>
+                    <span className={text2}>{ingredient.name}</span>
+                    <span className={text3}>
+                      <IngredientBadge category={ingredient.category}>
+                        {ingredientCategoryIcons[ingredient.category]}
+                        <span className={text4}>{ingredientCategoryLabels[ingredient.category]}</span>
+                      </IngredientBadge>
+                    </span>
                   </>
                 }
               />

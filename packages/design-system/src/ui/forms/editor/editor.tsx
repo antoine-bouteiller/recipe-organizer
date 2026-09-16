@@ -6,7 +6,6 @@ import { LexicalExtensionComposer } from '@lexical/react/LexicalExtensionCompose
 import { useExtensionSignalValue } from '@lexical/react/useExtensionSignalValue'
 import { RichTextExtension } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
-import { cn } from 'cn'
 import {
   $getSelection,
   $isRangeSelection,
@@ -21,15 +20,30 @@ import {
   type LexicalNode,
   type TextFormatType,
 } from 'lexical'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
 
-import { Toggle } from '../../actions/toggle/toggle'
-import { ToolbarButton } from '../../actions/toolbar/toolbar'
+import { ToolbarToggle } from '../../actions/toolbar/toolbar'
 import { OnChangePlugin } from './plugins/on-change-plugin'
 
-type Command = 'bold' | 'bulletList' | 'italic' | 'redo' | 'underline' | 'undo'
+import {
+  editorUnderline,
+  editorContentBase,
+  editorChecklist,
+  editorCheckedListItem,
+  editorContentFull,
+  editorContentReading,
+  editorContentEditable,
+} from './editor.css'
 
-const EditorToolbarButton = ({ children, command }: { children: ReactNode; command: Command }) => {
+type EditorCommand = 'bold' | 'bulletList' | 'italic' | 'redo' | 'underline' | 'undo'
+type EditorContentWidth = 'full' | 'reading'
+
+interface EditorToolbarButtonProps {
+  children: ReactNode
+  command: EditorCommand
+}
+
+const EditorToolbarButton = ({ children, command }: EditorToolbarButtonProps) => {
   const [editor] = useLexicalComposerContext()
   const [isActive, setIsActive] = useState(false)
   const canUndo = useExtensionSignalValue(HistoryExtension, 'canUndo')
@@ -38,7 +52,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
 
   useEffect(() => {
     const formatCommands: TextFormatType[] = ['bold', 'italic', 'underline']
-
     const updateActiveState = () => {
       const selection = $getSelection()
       if (!$isRangeSelection(selection)) {
@@ -52,9 +65,10 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
         const element = anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()
         const parentList = $getNearestNodeOfType(element, ListNode)
         setIsActive($isListNode(parentList) && parentList.getListType() === 'bullet')
+      } else {
+        setIsActive(false)
       }
     }
-
     const unregisterSelection = editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
       () => {
@@ -63,13 +77,7 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
       },
       COMMAND_PRIORITY_LOW
     )
-
-    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        updateActiveState()
-      })
-    })
-
+    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => editorState.read(updateActiveState))
     return () => {
       unregisterSelection()
       unregisterUpdate()
@@ -80,7 +88,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
     if (!editor.isEditable()) {
       return
     }
-
     switch (command) {
       case 'bold':
       case 'italic':
@@ -89,11 +96,7 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
         break
       }
       case 'bulletList': {
-        if (isActive) {
-          editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined)
-        } else {
-          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-        }
+        editor.dispatchCommand(isActive ? REMOVE_LIST_COMMAND : INSERT_UNORDERED_LIST_COMMAND, undefined)
         break
       }
       case 'undo': {
@@ -111,12 +114,9 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
   }, [editor, command, isActive])
 
   return (
-    <ToolbarButton
-      aria-label={command}
-      render={<Toggle aria-pressed={isActive} data-pressed={isActive ? true : undefined} disabled={!canExecute} onClick={toggle} value={command} />}
-    >
+    <ToolbarToggle aria-label={command} disabled={!canExecute} onClick={toggle} pressed={isActive} value={command}>
       {children}
-    </ToolbarButton>
+    </ToolbarToggle>
   )
 }
 
@@ -140,17 +140,9 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
       onError: (error: Error) => {
         throw error
       },
-      theme: {
-        paragraph: '',
-        text: {
-          bold: 'font-bold',
-          italic: 'italic',
-          underline: 'underline',
-        },
-      },
+      theme: { list: { checklist: editorChecklist, listitemChecked: editorCheckedListItem }, text: { underline: editorUnderline } },
     })
   )
-
   return (
     <LexicalExtensionComposer extension={extension} contentEditable={null}>
       {onChange && <OnChangePlugin onChange={onChange} />}
@@ -160,23 +152,24 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
 }
 
 interface EditorContentProps {
-  className?: string
   disabled?: boolean
+  width?: EditorContentWidth
 }
 
-const EditorContent = ({ className, disabled }: EditorContentProps) => {
+const EditorContent = ({ disabled, width = 'full' }: EditorContentProps) => {
   const [editor] = useLexicalComposerContext()
-  const isEditable = editor.isEditable()
-
+  const [initiallyEditable, ,] = useState(() => editor.isEditable())
+  useLayoutEffect(() => {
+    editor.setEditable(!disabled && initiallyEditable)
+  }, [disabled, editor, initiallyEditable])
+  const widthClassName = width === 'reading' ? editorContentReading : editorContentFull
+  const editableClassName = initiallyEditable ? ` ${editorContentEditable}` : ''
   return (
     <ContentEditable
-      aria-disabled={disabled}
-      className={cn(
-        'focus:outline-none prose prose-sm max-w-none dark:prose-invert',
-        isEditable &&
-          'w-full rounded-lg border border-input bg-background bg-clip-padding p-4 shadow-xs ring-ring/24 transition-shadow not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:border-ring has-focus-visible:ring-[3px] has-disabled:opacity-64 has-aria-invalid:border-destructive/36 has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)] dark:has-aria-invalid:ring-destructive/24',
-        className
-      )}
+      aria-disabled={disabled || undefined}
+      aria-readonly={disabled || !editor.isEditable() || undefined}
+      className={`${editorContentBase} ${widthClassName}${editableClassName}`}
+      data-editor-content=""
     />
   )
 }

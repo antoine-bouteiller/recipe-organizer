@@ -1,30 +1,31 @@
 import { Toolbar as ToolbarPrimitive } from '@base-ui/react/toolbar'
-import { cn } from 'cn'
 import type React from 'react'
 
-export const Toolbar = ({ className, ...props }: ToolbarPrimitive.Root.Props): React.ReactElement => (
-  <ToolbarPrimitive.Root
-    className={cn('relative flex gap-2 rounded-xl border bg-card not-dark:bg-clip-padding p-1 text-card-foreground w-full overflow-auto', className)}
-    data-slot="toolbar"
-    {...props}
-  />
+import { Toggle, type ToggleProps } from '../toggle/toggle'
+
+import { toolbarClassName, toolbarGroupClassName, toolbarButtonClassName, toolbarSeparatorClassName } from './toolbar.css'
+
+export type ToolbarProps = Pick<ToolbarPrimitive.Root.Props, 'aria-label' | 'children'>
+export const Toolbar = (props: ToolbarProps): React.ReactElement => (
+  <ToolbarPrimitive.Root {...props} className={toolbarClassName} data-slot="toolbar" />
 )
 
-export const ToolbarButton = ({ className, ...props }: ToolbarPrimitive.Button.Props): React.ReactElement => (
-  <ToolbarPrimitive.Button className={cn(className)} data-slot="toolbar-button" {...props} />
+export type ToolbarButtonProps = Pick<ToolbarPrimitive.Button.Props, 'aria-label' | 'children'>
+export const ToolbarButton = (props: ToolbarButtonProps): React.ReactElement => (
+  <ToolbarPrimitive.Button {...props} className={toolbarButtonClassName} data-slot="toolbar-button" />
 )
 
-export const ToolbarGroup = ({ className, ...props }: ToolbarPrimitive.Group.Props): React.ReactElement => (
-  <ToolbarPrimitive.Group className={cn('flex items-center gap-1', className)} data-slot="toolbar-group" {...props} />
+export type ToolbarGroupProps = Pick<ToolbarPrimitive.Group.Props, 'aria-label' | 'children'>
+export const ToolbarGroup = (props: ToolbarGroupProps): React.ReactElement => (
+  <ToolbarPrimitive.Group {...props} className={toolbarGroupClassName} data-slot="toolbar-group" />
 )
 
-export const ToolbarSeparator = ({ className, ...props }: ToolbarPrimitive.Separator.Props): React.ReactElement => (
-  <ToolbarPrimitive.Separator
-    className={cn(
-      "shrink-0 bg-border data-[orientation=horizontal]:my-0.5 data-[orientation=vertical]:my-1.5 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:not-[[class^='h-']]:not-[[class*='_h-']]:self-stretch",
-      className
-    )}
-    data-slot="toolbar-separator"
-    {...props}
-  />
+export type ToolbarSeparatorProps = Pick<ToolbarPrimitive.Separator.Props, 'aria-label'>
+export const ToolbarSeparator = (props: ToolbarSeparatorProps): React.ReactElement => (
+  <ToolbarPrimitive.Separator {...props} className={toolbarSeparatorClassName} data-slot="toolbar-separator" />
+)
+
+export type ToolbarToggleProps = Pick<ToggleProps, 'aria-label' | 'children' | 'disabled' | 'onClick' | 'pressed' | 'value'>
+export const ToolbarToggle = ({ children, ...props }: ToolbarToggleProps): React.ReactElement => (
+  <ToolbarPrimitive.Button render={<Toggle {...props} />}>{children}</ToolbarPrimitive.Button>
 )

@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const PepperIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M19.5 2.5L19.7379 2.73791C20.2259 3.22587 20.5 3.88768 20.5 4.57776C20.5 4.85742 20.4549 5.13526 20.3665 5.40057L20 6.5"
       stroke="currentColor"
@@ -25,5 +26,5 @@ export const PepperIcon = (props: IconProps): React.ReactElement => (
       strokeLinejoin="round"
       strokeWidth={1.5}
     />
-  </svg>
+  </Icon>
 )

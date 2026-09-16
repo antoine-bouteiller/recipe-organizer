@@ -1,10 +1,13 @@
+import { Form as FormPrimitive } from '@base-ui/react/form'
 import { useSelector } from '@tanstack/react-store'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { withForm } from '../../../hooks/use-app-form'
 import { formatFormErrors } from '../../../utils/format-form-errors'
-import { Form } from '../../forms/form/form'
 import { Dialog } from '../dialog/dialog'
+import { DialogFormProvider } from '../dialog/dialog-form.private'
+
+import { formClassName, fieldsClassName } from './form-dialog.css'
 
 interface FormModalProps {
   children: ReactNode
@@ -23,37 +26,41 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
     props: formModalProps,
     render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
       const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
-
+      const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
       return (
-        <Dialog
-          cancelDisabled={form.state.isSubmitting}
-          cancelLabel="Annuler"
-          contentRender={(content) => (
-            <Form
-              className="contents"
-              errors={errors}
-              onSubmit={async (event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                await form.handleSubmit()
-              }}
-            >
-              {content}
-            </Form>
-          )}
-          footer={
-            <form.AppForm>
-              <form.FormSubmit label={submitLabel} />
-            </form.AppForm>
-          }
-          onOpenChange={setOpen}
-          open={open}
-          panelClassName="flex flex-col gap-4"
-          title={title}
-          trigger={trigger}
+        <DialogFormProvider
+          value={{
+            wrap: (content) => (
+              <FormPrimitive
+                className={formClassName}
+                errors={errors}
+                onSubmit={async (event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  await form.handleSubmit()
+                }}
+              >
+                {content}
+              </FormPrimitive>
+            ),
+          }}
         >
-          {children}
-        </Dialog>
+          <Dialog
+            cancelDisabled={isSubmitting}
+            cancelLabel="Annuler"
+            footer={
+              <form.AppForm>
+                <form.FormSubmit label={submitLabel} />
+              </form.AppForm>
+            }
+            onOpenChange={setOpen}
+            open={open}
+            title={title}
+            trigger={trigger}
+          >
+            <div className={fieldsClassName}>{children}</div>
+          </Dialog>
+        </DialogFormProvider>
       )
     },
   })

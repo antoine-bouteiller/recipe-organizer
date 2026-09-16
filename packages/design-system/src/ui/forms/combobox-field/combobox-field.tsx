@@ -10,7 +10,6 @@ type ValueOptions = number | string | undefined
 interface ComboboxFieldProps<TValue extends ValueOptions> {
   addNew?: (inputValue: string) => ReactNode
   disabled?: boolean
-  className?: string
   label?: string
   options: Option<TValue>[]
   placeholder?: string
@@ -20,7 +19,6 @@ interface ComboboxFieldProps<TValue extends ValueOptions> {
 const ComboboxField = <TValue extends ValueOptions>({
   addNew,
   disabled,
-  className,
   label,
   options,
   placeholder = 'Sélectionner une option',
@@ -37,13 +35,7 @@ const ComboboxField = <TValue extends ValueOptions>({
   }
 
   return (
-    <Field
-      className={className}
-      dirty={field.state.meta.isDirty}
-      invalid={!field.state.meta.isValid}
-      name={field.name}
-      touched={field.state.meta.isTouched}
-    >
+    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       {label && <FieldLabel>{label}</FieldLabel>}
       <Combobox
         addNew={addNew}

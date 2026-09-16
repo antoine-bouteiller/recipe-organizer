@@ -1,0 +1,47 @@
+import { theme } from '@recipe-organizer/design-system/theme'
+import { style } from '@vanilla-extract/css'
+
+export const container = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(8),
+  minWidth: theme.spacing(0),
+  width: '100%',
+})
+
+export const container2 = style({
+  display: 'grid',
+  gap: theme.spacing(2),
+  width: theme.spacing(80),
+})
+
+export const element = style({
+  backgroundColor: theme.colors.background,
+  border: '1px solid',
+  borderColor: theme.colors.input,
+  borderRadius: theme.radii.md,
+  fontSize: theme.fontSizes.sm,
+  height: theme.spacing(9),
+  paddingInline: theme.spacing(3),
+})
+
+export const container3 = style({
+  display: 'grid',
+  gap: theme.spacing(2),
+  width: theme.spacing(80),
+})
+
+export const element2 = style({
+  backgroundColor: theme.colors.background,
+  border: '1px solid',
+  borderColor: theme.colors.input,
+  borderRadius: theme.radii.md,
+  fontSize: theme.fontSizes.sm,
+  height: theme.spacing(9),
+  paddingInline: theme.spacing(3),
+  selectors: {
+    '&[data-disabled], &:disabled': {
+      opacity: 0.64,
+    },
+  },
+})

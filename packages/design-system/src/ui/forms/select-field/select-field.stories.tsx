@@ -4,6 +4,8 @@ import { type ReactElement } from 'react'
 import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 
+import { container } from './select-field.stories.css'
+
 const items = [
   { label: 'Draft', value: 'draft' },
   { label: 'Published', value: 'published' },
@@ -27,7 +29,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <SelectFieldExample />
       </StorySection>

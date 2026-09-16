@@ -22,6 +22,9 @@ import { lazy, Suspense } from 'react'
 
 import { type MagimixProgramFormInput } from './magimix-program-dialog'
 
+import { magimixItemWidth, magimixImage, magimixTrigger } from './magimix-program-node.css'
+import '../editor.css'
+
 const MagimixProgramDialog = lazy(async () => {
   const dialog = await import('./magimix-program-dialog')
   return { default: dialog.MagimixProgramDialog }
@@ -70,20 +73,21 @@ const toProgram = (value: string) => magimixProgram.find((item) => item === valu
 const toRotationSpeed = (value: string) => allowedRotationSpeed.find((item) => item === value) ?? 'auto'
 
 const MagimixItem = ({ program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'isEditable' | 'nodeKey'>) => (
-  <Item
-    variant="outline"
-    className="w-full"
-    media={<img alt="Magimix Program Icon" className="not-prose size-10" src={`/magimix/${program}.png`} />}
-    title={magimixProgramLabels[toProgram(program)]}
-  >
-    <TimerIcon className="size-4" />
-    <span>{formatTime(time)}</span>/
-    <SpinnerGapIcon className="size-4" />
-    <span>{capitalize(rotationSpeed)}</span>
-    /
-    <ThermometerIcon className="size-4" />
-    <span>{temperature ?? '__'}°C</span>
-  </Item>
+  <div className={magimixItemWidth} data-editor-decorator="">
+    <Item
+      media={<img alt="Magimix Program Icon" className={magimixImage} src={`/magimix/${program}.png`} />}
+      title={magimixProgramLabels[toProgram(program)]}
+      variant="outline"
+    >
+      <TimerIcon size="sm" />
+      <span>{formatTime(time)}</span>/
+      <SpinnerGapIcon size="sm" />
+      <span>{capitalize(rotationSpeed)}</span>
+      /
+      <ThermometerIcon size="sm" />
+      <span>{temperature ?? '__'}°C</span>
+    </Item>
+  </div>
 )
 
 const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, temperature, time }: MagimixProgramComponentProps) => {
@@ -121,7 +125,7 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
           submitLabel="Enregistrer"
           title="Modifier le programme Magimix"
           triggerRender={
-            <button type="button" className="w-full text-start">
+            <button className={magimixTrigger} type="button">
               {item}
             </button>
           }
@@ -212,7 +216,7 @@ class MagimixProgramNodeType extends DecoratorNode<React.ReactElement> {
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
-    div.style.display = 'contents'
+    div.setAttribute('data-editor-decorator-root', '')
     return div
   }
 

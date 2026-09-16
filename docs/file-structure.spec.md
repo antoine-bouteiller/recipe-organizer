@@ -13,6 +13,7 @@ related:
     docs/infrastructure/client/routing-ssr.spec.md,
     docs/infrastructure/client/forms.spec.md,
     docs/infrastructure/client/client-state.spec.md,
+    packages/design-system/styling.spec.md,
   ]
 ---
 
@@ -30,6 +31,7 @@ module so feature ownership and import boundaries remain legible.
 | `[KD-2]` Runtime-code placement   | Browser code lives in `src/client/`; Worker code lives in `src/server/`; only actual cross-runtime modules live in `src/shared/`.                                                                                                                        | The top-level directories make runtime boundaries visible before an import is written.                                      |
 | `[KD-3]` Route and data placement | Browser routes follow URL hierarchy in `src/client/routes/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                   | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
 | `[KD-4]` Naming and imports       | Files use kebab-case except TanStack Router dynamic segments; TypeScript imports use `@client/*`, `@server/*`, and `@shared/*` for cross-directory runtime paths, and `@schema` for database schema exports; relative imports remain within a directory. | Filenames match the lint convention and import paths reveal whether a dependency is local or crosses a module boundary.     |
+| `[KD-5]` Styling compilation      | Vanilla-extract compiles owner-local `.css.ts` files; the design-system package exports its public `theme` API while components retain private colocated recipes.                                                                                        | Web, Storybook, and tests share typed theme references without generated utilities or component styling overrides.          |
 
 ## 4. Principles & Intents
 
@@ -68,7 +70,13 @@ recipe-organizer/
 │       ├── client/             # Routing, forms and client-state specs
 │       └── server/             # Platform, data, server-function and auth specs
 ├── public/                     # Static assets
-├── scripts/                    # Build and development tooling
+├── scripts/                    # Build, development, and database tooling
+├── packages/
+│   └── design-system/           # Reusable UI and owner-local .css.ts styles
+│       └── src/theme/
+│           ├── index.ts            # Public `theme` API: typed variables and spacing
+│           ├── spacing.ts          # CSS `calc(4px * n)` shorthand helper
+│           └── tokens.css.ts       # Internal variables and global theme CSS
 ├── src/
 │   ├── client/
 │   │   ├── components/         # Browser UI, forms, layout, navigation, and errors
@@ -129,11 +137,23 @@ colocated `<component>.stories.tsx` files. Desktop, drawer, and shared implement
 the matching family. Package subpath exports (`@recipe-organizer/design-system/button`, for example)
 expose source modules without a separate library build. Generic hooks live in `src/hooks/` and icons
 in `src/ui/data-display/icons/` inside the package; it never imports the web app. The combobox option type is shared, while query-backed option
-hooks remain app-owned. Shared Tailwind theme styles and fonts live in the package and are consumed
-by both the app and Storybook, including screen header and safe-area tokens. Only app-global scrolling
-and navigation transitions remain in the web stylesheet. Categories are `actions`, `data-display`,
-`feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the matching category as
-its title prefix. Physical categorization does not change package subpath imports.
+hooks remain app-owned. Vanilla-extract compiles colocated `.css.ts` files through the web,
+Storybook, and root test Vite plugins. The design-system package exports typed shared values as
+`theme` from `@recipe-organizer/design-system/theme`; the web and Storybook entrypoints load
+`@recipe-organizer/design-system/global.css`, which activates the global Vanilla Extract reset/base rules
+and shared theme. `src/global.css.ts` defines both reset and base rules, retaining their named
+cascade layers. `src/theme/index.ts` combines the internal variables from `tokens.css.ts` with the ordinary
+`theme.spacing(...)` helper, which accepts one to four numeric values and returns `calc(4px * n)`
+CSS shorthand. The internal token module exports variables only to the public theme index while
+emitting global theme CSS. `.css.ts` consumers use typed `theme` references, including template
+interpolations, instead of shared raw `var(--…)` strings. Native CSS variables remain appropriate for
+component-owned, Base UI, and runtime-owned behavior. No separate generation step or generated utility
+directory is required. Component recipes remain colocated with their owners. Route style files use a leading `-` so
+TanStack Router excludes them from route generation. Native global CSS remains for owned fonts, theme
+activation, safe-area, scrolling, transitions, and runtime-only behavior. Categories are `actions`,
+`data-display`, `feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the
+matching category as its title prefix. Physical categorization does not change package subpath imports.
+`packages/design-system/styling.spec.md` owns the styling and component-ownership guidance.
 
 `apps/web/src/components/` retains thin `layout/`, `navigation/`, and `error/` adapters,
 plus domain-specific ingredient-category presentation. Typed form adapters and their context/registry,
@@ -178,3 +198,8 @@ N/A.
 | 2026-09-15 | Extract owned UI, supporting hooks/icons, styles, and colocated stories to `packages/design-system`. | 8.1               | Share UI independently of the web app and provide Storybook examples.   |
 
 | 2026-09-15 | Extract app-shell presentation behind app adapters and group UI folders/stories by category. | 8.1 | Keep business logic in web while making presentation discoverable and reusable. |
+| 2026-09-16 | Record Panda generated-workspace placement and private component-recipe ownership. | 3, 8.1 | Keep shared generation discoverable without exposing styling overrides. |
+| 2026-09-17 | Replace generated utilities with owner-local vanilla-extract styles and shared pixel tokens. | 3, 8.1 | Mechanically migrate styling without changing component ownership. |
+| 2026-09-17 | Replace public token exports with the combined typed `theme` API. | 3, 8.1 | Keep token variables internal while standardizing `.css.ts` consumers. |
+| 2026-09-17 | Move shared reset/base rules into global Vanilla Extract styles. | 8.1 | Keep layered global rules typed and activate them from both entrypoints. |
+| 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`. | 8.1 | Use one module and public entrypoint for shared global styles. |

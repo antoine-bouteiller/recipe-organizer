@@ -5,17 +5,15 @@ import { HouseIcon } from '../../data-display/icons/house'
 import { ShoppingCartSimpleIcon } from '../../data-display/icons/shopping-cart-simple'
 import { TabBar, TabBarItem } from './tabbar'
 
+import { container } from './tabbar.stories.css'
+
 const TabBarExample = (): React.ReactElement => (
-  <div className="relative h-24">
+  <div className={container}>
     <TabBar>
-      <TabBarItem activeIcon={<HouseIcon className="size-6" weight="fill" />} aria-current="page" href="/" icon={<HouseIcon className="size-6" />}>
+      <TabBarItem activeIcon={<HouseIcon weight="fill" />} aria-current="page" href="/" icon={<HouseIcon />}>
         Home
       </TabBarItem>
-      <TabBarItem
-        activeIcon={<ShoppingCartSimpleIcon className="size-6" weight="fill" />}
-        href="/shopping-list"
-        icon={<ShoppingCartSimpleIcon className="size-6" />}
-      >
+      <TabBarItem activeIcon={<ShoppingCartSimpleIcon weight="fill" />} href="/shopping-list" icon={<ShoppingCartSimpleIcon />}>
         Shopping
       </TabBarItem>
     </TabBar>
@@ -29,11 +27,13 @@ type Story = StoryObj<typeof meta>
 
 export const Mobile: Story = {
   globals: { viewport: { isRotated: false, value: 'mobile2' } },
+  parameters: { layout: 'fullscreen' },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const activeLink = canvas.getByRole('link', { name: 'Home' })
 
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
-    await expect(activeLink).toHaveClass('aria-[current=page]:text-primary')
+    await expect(activeLink).toHaveAttribute('data-slot', 'tab-bar-item')
+    await expect(canvas.getByRole('link', { name: 'Shopping' }).getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
   },
 }

@@ -17,6 +17,8 @@ import {
   CommandPanel,
 } from './command'
 
+import { container } from './command.stories.css'
+
 const recipes = ['Apple tart', 'Mushroom risotto', 'Tomato soup']
 
 const CommandExample = (): React.ReactElement => (
@@ -59,7 +61,7 @@ export const Overview: Story = {
     await userEvent.keyboard('{Escape}')
   },
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <CommandExample />
       </StorySection>

@@ -6,6 +6,8 @@ import { Select } from './select'
 import SelectBase from './select.base'
 import SelectDrawer from './select.drawer'
 
+import { container } from './select.stories.css'
+
 const items = [
   { label: 'Draft', value: 'draft' },
   { label: 'Published', value: 'published' },
@@ -45,7 +47,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Responsive">
         <ControlledSelect />
       </StorySection>

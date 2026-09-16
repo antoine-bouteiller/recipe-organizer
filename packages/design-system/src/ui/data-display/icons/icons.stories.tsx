@@ -49,6 +49,8 @@ import { VideoIcon } from './video'
 import { WarningCircleIcon } from './warning-circle'
 import { XIcon } from './x'
 
+import { gallery, iconCell, iconName } from './icons.stories.css'
+
 const meta = {
   title: 'Data Display/Icons',
 } satisfies Meta
@@ -109,11 +111,11 @@ const icons = [
 
 export const Gallery: Story = {
   render: () => (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    <div className={gallery}>
       {icons.map(([name, Icon]) => (
-        <div className="flex flex-col items-center gap-2 rounded-md border p-4" key={name}>
-          <Icon aria-hidden="true" className="size-6" />
-          <span className="text-xs text-muted-foreground">{name}</span>
+        <div className={iconCell} key={name}>
+          <Icon size="xl" />
+          <span className={iconName}>{name}</span>
         </div>
       ))}
     </div>

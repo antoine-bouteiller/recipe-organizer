@@ -49,8 +49,8 @@ export const AddIngredient = ({ children, defaultValue }: AddIngredientProps) =>
 
 export const renderAddIngredientOption = (inputValue: string) => (
   <AddIngredient defaultValue={inputValue} key={inputValue}>
-    <Button className="w-full justify-start px-1.5 font-normal" size="sm" variant="ghost">
-      <PlusIcon aria-hidden="true" className="size-4" />
+    <Button size="sm" variant="list-action" width="full" align="start">
+      <PlusIcon aria-hidden="true" size="sm" />
       Nouvel ingrédient: {inputValue}
     </Button>
   </AddIngredient>

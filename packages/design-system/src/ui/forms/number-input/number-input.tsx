@@ -1,124 +1,98 @@
 import { NumberField as NumberFieldPrimitive } from '@base-ui/react/number-field'
-import { cn } from 'cn'
-import React, { type ComponentProps } from 'react'
+import React from 'react'
 
 import { MinusIcon } from '../../data-display/icons/minus'
 import { PlusIcon } from '../../data-display/icons/plus'
 import { Label } from '../label/label'
 
-const NumberInputContext: React.Context<{
-  fieldId: string
-} | null> = React.createContext<{
-  fieldId: string
-} | null>(null)
+import {
+  rootClassName,
+  groupClassName,
+  decrementClassName,
+  incrementClassName,
+  inputClassName,
+  scrubAreaClassName,
+  cursorClassName,
+} from './number-input.css'
 
-const NumberInputRoot = ({ id, className, ...props }: NumberFieldPrimitive.Root.Props): React.ReactElement => {
+const NumberInputContext = React.createContext<{ fieldId: string } | null>(null)
+const NumberInputRoot = ({ id, ...props }: NumberFieldPrimitive.Root.Props): React.ReactElement => {
   const generatedId = React.useId()
   const fieldId = id ?? generatedId
-
   return (
     <NumberInputContext.Provider value={{ fieldId }}>
-      <NumberFieldPrimitive.Root
-        className={cn('flex w-full flex-col items-start gap-2', className)}
-        data-slot="number-field"
-        id={fieldId}
-        {...props}
-      />
+      <NumberFieldPrimitive.Root {...props} className={rootClassName} data-slot="number-field" id={fieldId} />
     </NumberInputContext.Provider>
   )
 }
-
-const NumberInputGroup = ({ className, ...props }: NumberFieldPrimitive.Group.Props): React.ReactElement => (
-  <NumberFieldPrimitive.Group
-    className={cn(
-      "relative flex w-full justify-between rounded-lg border border-input bg-background not-dark:bg-clip-padding text-base text-foreground shadow-xs/5 ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-data-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-within:border-ring focus-within:ring-[3px] has-aria-invalid:border-destructive/36 has-autofill:bg-foreground/4 focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/48 data-disabled:pointer-events-none data-disabled:opacity-64 sm:text-sm dark:bg-input/32 dark:has-autofill:bg-foreground/8 dark:has-aria-invalid:ring-destructive/24 dark:not-data-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)] [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 [[data-disabled],:focus-within,[aria-invalid]]:shadow-none",
-      className
-    )}
-    data-slot="number-field-group"
-    {...props}
-  />
+const NumberInputGroup = ({ placeholder }: { placeholder?: string }): React.ReactElement => (
+  <NumberFieldPrimitive.Group className={groupClassName} data-slot="number-field-group">
+    <NumberFieldPrimitive.Decrement className={decrementClassName} data-slot="number-field-decrement">
+      <MinusIcon />
+    </NumberFieldPrimitive.Decrement>
+    <NumberFieldPrimitive.Input className={inputClassName} data-slot="number-field-input" placeholder={placeholder} />
+    <NumberFieldPrimitive.Increment className={incrementClassName} data-slot="number-field-increment">
+      <PlusIcon />
+    </NumberFieldPrimitive.Increment>
+  </NumberFieldPrimitive.Group>
 )
-
-const NumberInputDecrement = ({ className, ...props }: NumberFieldPrimitive.Decrement.Props): React.ReactElement => (
-  <NumberFieldPrimitive.Decrement
-    className={cn(
-      'relative flex shrink-0 cursor-pointer items-center justify-center rounded-s-[calc(var(--radius-lg)-1px)] px-[calc(--spacing(3)-1px)] transition-colors pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent',
-      className
-    )}
-    data-slot="number-field-decrement"
-    {...props}
-  >
-    <MinusIcon />
-  </NumberFieldPrimitive.Decrement>
-)
-
-const NumberInputIncrement = ({ className, ...props }: NumberFieldPrimitive.Increment.Props): React.ReactElement => (
-  <NumberFieldPrimitive.Increment
-    className={cn(
-      'relative flex shrink-0 cursor-pointer items-center justify-center rounded-e-[calc(var(--radius-lg)-1px)] px-[calc(--spacing(3)-1px)] transition-colors pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent',
-      className
-    )}
-    data-slot="number-field-increment"
-    {...props}
-  >
-    <PlusIcon />
-  </NumberFieldPrimitive.Increment>
-)
-
-const NumberInputField = ({ className, ...props }: NumberFieldPrimitive.Input.Props): React.ReactElement => (
-  <NumberFieldPrimitive.Input
-    className={cn(
-      'h-8.5 w-full min-w-0 grow bg-transparent px-[calc(--spacing(3)-1px)] text-center tabular-nums leading-8.5 outline-none [transition:background-color_5000000s_ease-in-out_0s] sm:h-7.5 sm:leading-7.5',
-      className
-    )}
-    data-slot="number-field-input"
-    {...props}
-  />
-)
-
-const NumberInputScrubArea = ({
-  className,
-  label,
-  ...props
-}: NumberFieldPrimitive.ScrubArea.Props & {
-  label: string
-}): React.ReactElement => {
+const NumberInputScrubArea = ({ label }: { label: string }): React.ReactElement => {
   const context = React.useContext(NumberInputContext)
-
   if (!context) {
     throw new Error('NumberFieldScrubArea must be used within a NumberField component for accessibility.')
   }
-
   return (
-    <NumberFieldPrimitive.ScrubArea className={cn('flex cursor-ew-resize', className)} data-slot="number-field-scrub-area" {...props}>
-      <Label className="cursor-ew-resize" htmlFor={context.fieldId}>
-        {label}
-      </Label>
-      <NumberFieldPrimitive.ScrubAreaCursor className="drop-shadow-[0_1px_1px_#0008] filter">
+    <NumberFieldPrimitive.ScrubArea className={scrubAreaClassName} data-slot="number-field-scrub-area">
+      <Label htmlFor={context.fieldId}>{label}</Label>
+      <NumberFieldPrimitive.ScrubAreaCursor className={cursorClassName}>
         <CursorGrowIcon />
       </NumberFieldPrimitive.ScrubAreaCursor>
     </NumberFieldPrimitive.ScrubArea>
   )
 }
-
 const CursorGrowIcon = (props: React.ComponentProps<'svg'>): React.ReactElement => (
   <svg aria-hidden="true" fill="black" height="14" stroke="white" viewBox="0 0 24 14" width="26" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path d="M19.5 5.5L6.49737 5.51844V2L1 6.9999L6.5 12L6.49737 8.5L19.5 8.5V12L25 6.9999L19.5 2V5.5Z" />
   </svg>
 )
-
-type NumberInputProps = ComponentProps<typeof NumberInputRoot> & {
+export interface NumberInputProps {
+  'aria-invalid'?: boolean
+  defaultValue?: number
+  disabled?: boolean
+  id?: string
   label?: string
+  max?: number
+  min?: number
+  onValueChange?: (value: number | null, eventDetails: NumberFieldPrimitive.Root.ChangeEventDetails) => void
   placeholder?: string
+  step?: number | 'any'
+  value?: number
 }
-
-export const NumberInput = ({ label, placeholder, ...props }: NumberInputProps): React.ReactElement => (
-  <NumberInputRoot {...props}>
+export const NumberInput = ({
+  'aria-invalid': ariaInvalid,
+  defaultValue,
+  disabled,
+  id,
+  label,
+  max,
+  min,
+  onValueChange,
+  placeholder,
+  step,
+  value,
+}: NumberInputProps): React.ReactElement => (
+  <NumberInputRoot
+    aria-invalid={ariaInvalid}
+    defaultValue={defaultValue}
+    disabled={disabled}
+    id={id}
+    max={max}
+    min={min}
+    onValueChange={onValueChange}
+    step={step}
+    value={value}
+  >
     {label && <NumberInputScrubArea label={label} />}
-    <NumberInputGroup>
-      <NumberInputDecrement />
-      <NumberInputField placeholder={placeholder} />
-      <NumberInputIncrement />
-    </NumberInputGroup>
+    <NumberInputGroup placeholder={placeholder} />
   </NumberInputRoot>
 )

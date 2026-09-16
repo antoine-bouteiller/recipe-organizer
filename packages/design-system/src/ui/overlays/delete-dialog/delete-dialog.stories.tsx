@@ -4,6 +4,8 @@ import { useState, type ReactElement } from 'react'
 import { Button } from '../../actions/button/button'
 import { DeleteDialog } from './delete-dialog'
 
+import { container } from './delete-dialog.stories.css'
+
 const DeleteDialogExample = (): ReactElement => {
   const [deleted, setDeleted] = useState(false)
 
@@ -13,7 +15,7 @@ const DeleteDialogExample = (): ReactElement => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className={container}>
       <DeleteDialog
         deleteButtonLabel="Delete recipe"
         description="This removes Tomato soup from your saved recipes. This action cannot be undone."

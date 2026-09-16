@@ -1,16 +1,16 @@
-import { cn } from 'cn'
+import type React from 'react'
 
-export const Kbd = ({ className, ...props }: React.ComponentProps<'kbd'>): React.ReactElement => (
-  <kbd
-    className={cn(
-      "pointer-events-none inline-flex h-5 min-w-5 select-none items-center justify-center gap-1 rounded bg-secondary px-1 font-medium font-sans text-secondary-foreground text-xs [&_svg:not([class*='size-'])]:size-3",
-      className
-    )}
-    data-slot="kbd"
-    {...props}
-  />
+import { kbdRecipe, groupRecipe } from './kbd.css'
+
+export type KbdProps = Pick<React.ComponentProps<'kbd'>, 'children'>
+
+export const Kbd = ({ children }: KbdProps): React.ReactElement => (
+  <kbd className={kbdRecipe()} data-slot="kbd">
+    {children}
+  </kbd>
 )
-
-export const KbdGroup = ({ className, ...props }: React.ComponentProps<'kbd'>): React.ReactElement => (
-  <kbd className={cn('inline-flex items-center gap-1', className)} data-slot="kbd-group" {...props} />
+export const KbdGroup = ({ children }: KbdProps): React.ReactElement => (
+  <kbd className={groupRecipe()} data-slot="kbd-group">
+    {children}
+  </kbd>
 )

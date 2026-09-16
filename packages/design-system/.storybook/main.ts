@@ -1,5 +1,5 @@
 import { type StorybookConfig } from '@storybook/react-vite'
-import tailwindcss from '@tailwindcss/vite'
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 
 const config: StorybookConfig = {
   core: { disableTelemetry: true },
@@ -7,7 +7,7 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.tsx'],
   viteFinal: (viteConfig) => ({
     ...viteConfig,
-    plugins: [...(viteConfig.plugins ?? []), tailwindcss()],
+    plugins: [...(viteConfig.plugins ?? []), vanillaExtractPlugin()],
   }),
 }
 

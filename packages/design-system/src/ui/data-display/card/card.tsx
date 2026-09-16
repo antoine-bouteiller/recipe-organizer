@@ -1,30 +1,22 @@
-import { cn } from 'cn'
-import { type ReactElement, type ReactNode } from 'react'
+import type React from 'react'
 
-interface CardProps {
-  title?: ReactNode
-  description?: ReactNode
-  className?: string
-  children?: ReactNode
-}
+import { cardRecipe, headerRecipe, titleRecipe, descriptionRecipe } from './card.css'
 
-export const Card = ({ title, description, className, children }: CardProps): ReactElement => {
+export type CardProps = Pick<React.ComponentProps<'div'>, 'children'> & { description?: React.ReactNode; title?: React.ReactNode }
+
+export const Card = ({ children, description, title }: CardProps): React.ReactElement => {
   const hasHeader = title !== undefined || description !== undefined
-
   return (
-    <div
-      className={cn(`relative flex flex-col rounded-2xl border bg-card text-card-foreground shadow-xs/5 not-dark:bg-clip-padding`, className)}
-      data-slot="card"
-    >
+    <div className={cardRecipe()} data-slot="card">
       {hasHeader && (
-        <div className="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6" data-slot="card-header">
+        <div className={headerRecipe()} data-slot="card-header">
           {title !== undefined && (
-            <div className="text-lg leading-none font-semibold" data-slot="card-title">
+            <div className={titleRecipe()} data-slot="card-title">
               {title}
             </div>
           )}
           {description !== undefined && (
-            <div className="text-sm text-muted-foreground" data-slot="card-description">
+            <div className={descriptionRecipe()} data-slot="card-description">
               {description}
             </div>
           )}

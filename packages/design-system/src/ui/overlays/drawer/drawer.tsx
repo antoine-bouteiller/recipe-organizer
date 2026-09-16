@@ -1,79 +1,78 @@
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
-import { cn } from 'cn'
+import type React from 'react'
 
+import { Button } from '../../actions/button/button'
 import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 
-export const Drawer = (props: DrawerPrimitive.Root.Props): React.ReactElement => <DrawerPrimitive.Root swipeDirection="down" {...props} />
+import {
+  backdropClassName,
+  viewportClassName,
+  popupClassName,
+  headerClassName,
+  footerClassName,
+  titleClassName,
+  panelClassName,
+  barClassName,
+  container,
+} from './drawer.css'
 
-export const DrawerTrigger = (props: DrawerPrimitive.Trigger.Props): React.ReactElement => (
-  <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />
+type DrawerRootProps = Pick<DrawerPrimitive.Root.Props, 'children' | 'onOpenChange' | 'open'>
+type DrawerTriggerProps = Pick<DrawerPrimitive.Trigger.Props, 'children' | 'render'>
+type DrawerCloseProps = Pick<DrawerPrimitive.Close.Props, 'children' | 'disabled' | 'render'>
+type DrawerPopupProps = Pick<DrawerPrimitive.Popup.Props, 'children'>
+type DrawerHeaderProps = Pick<React.ComponentProps<'div'>, 'children'>
+type DrawerContentProps = Pick<DrawerPrimitive.Content.Props, 'children'>
+type DrawerTitleProps = Pick<DrawerPrimitive.Title.Props, 'children'>
+
+const defaultDrawerActionRender = <Button />
+
+export const Drawer = ({ children, onOpenChange, open }: DrawerRootProps): React.ReactElement => (
+  <DrawerPrimitive.Root onOpenChange={onOpenChange} open={open} swipeDirection="down">
+    {children}
+  </DrawerPrimitive.Root>
 )
-
-export const DrawerClose = (props: DrawerPrimitive.Close.Props): React.ReactElement => <DrawerPrimitive.Close data-slot="drawer-close" {...props} />
-
-export const DrawerPopup = ({ className, children, ...props }: DrawerPrimitive.Popup.Props): React.ReactElement => (
+export const DrawerTrigger = ({ children, render = defaultDrawerActionRender }: DrawerTriggerProps): React.ReactElement => (
+  <DrawerPrimitive.Trigger data-slot="drawer-trigger" render={render}>
+    {children}
+  </DrawerPrimitive.Trigger>
+)
+export const DrawerClose = ({ children, disabled, render = defaultDrawerActionRender }: DrawerCloseProps): React.ReactElement => (
+  <DrawerPrimitive.Close data-slot="drawer-close" disabled={disabled} render={render}>
+    {children}
+  </DrawerPrimitive.Close>
+)
+export const DrawerPopup = ({ children }: DrawerPopupProps): React.ReactElement => (
   <DrawerPrimitive.Portal>
-    <DrawerPrimitive.Backdrop
-      className="fixed inset-0 z-50 bg-black/32 opacity-[calc(1-var(--drawer-swipe-progress))] backdrop-blur-sm transition-opacity duration-450 ease-out-snappy data-ending-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)] data-starting-style:opacity-0 data-swiping:duration-0 supports-[-webkit-touch-callout:none]:absolute"
-      data-slot="drawer-backdrop"
-    />
-    <DrawerPrimitive.Viewport
-      className="fixed inset-0 z-50 grid touch-none grid-rows-[1fr_auto] pt-12 [--bleed:--spacing(12)]"
-      data-slot="drawer-viewport"
-    >
-      <DrawerPrimitive.Popup
-        className={cn(
-          'relative row-start-2 flex max-h-full min-h-0 w-full min-w-0 touch-none flex-col rounded-t-2xl border-t bg-popover not-dark:bg-clip-padding pb-[env(safe-area-inset-bottom,0px)] text-popover-foreground shadow-lg/5 outline-none transition-[transform,box-shadow,height,background-color] duration-450 ease-out-snappy will-change-transform transform-[translateY(var(--drawer-swipe-movement-y))] before:pointer-events-none before:absolute before:inset-0 before:rounded-t-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-(--bleed) after:bg-popover has-data-[slot=drawer-bar]:pt-2 data-swiping:select-none data-ending-style:shadow-transparent data-starting-style:shadow-transparent data-ending-style:pb-0 data-starting-style:pb-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)] data-ending-style:transform-[translateY(calc(100%+env(safe-area-inset-bottom,0px)))] data-starting-style:transform-[translateY(calc(100%+env(safe-area-inset-bottom,0px)))] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-          className
-        )}
-        data-slot="drawer-popup"
-        {...props}
-      >
+    <DrawerPrimitive.Backdrop className={backdropClassName()} data-slot="drawer-backdrop" />
+    <DrawerPrimitive.Viewport className={viewportClassName()} data-slot="drawer-viewport">
+      <DrawerPrimitive.Popup className={popupClassName()} data-slot="drawer-popup">
         {children}
-        <div
-          aria-hidden
-          className="absolute inset-x-0 top-0 flex touch-none items-center justify-center p-3 before:h-1 before:w-12 before:rounded-full before:bg-input"
-          data-slot="drawer-bar"
-        />
+        <div aria-hidden className={barClassName()} data-slot="drawer-bar" />
       </DrawerPrimitive.Popup>
     </DrawerPrimitive.Viewport>
   </DrawerPrimitive.Portal>
 )
-
-export const DrawerHeader = ({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (
-  <div
-    className={cn('flex cursor-default flex-col gap-2 p-6 in-[[data-slot=drawer-popup]:has([data-slot=drawer-panel])]:pb-3 max-sm:pb-4', className)}
-    data-slot="drawer-header"
-    {...props}
-  />
+export const DrawerHeader = ({ children }: DrawerHeaderProps): React.ReactElement => (
+  <div className={headerClassName()} data-slot="drawer-header">
+    {children}
+  </div>
 )
-
-export const DrawerFooter = ({ className, ...props }: DrawerPrimitive.Content.Props): React.ReactElement => (
-  <DrawerPrimitive.Content
-    className={cn(
-      'flex flex-col-reverse gap-2 border-t bg-muted/72 px-6 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+--spacing(4))] sm:flex-row sm:justify-end',
-      className
-    )}
-    data-slot="drawer-footer"
-    {...props}
-  />
+export const DrawerFooter = ({ children }: DrawerContentProps): React.ReactElement => (
+  <DrawerPrimitive.Content className={footerClassName()} data-slot="drawer-footer">
+    {children}
+  </DrawerPrimitive.Content>
 )
-
-export const DrawerTitle = ({ className, ...props }: DrawerPrimitive.Title.Props): React.ReactElement => (
-  <DrawerPrimitive.Title className={cn('font-heading font-semibold text-xl leading-none', className)} data-slot="drawer-title" {...props} />
+export const DrawerTitle = ({ children }: DrawerTitleProps): React.ReactElement => (
+  <DrawerPrimitive.Title className={titleClassName()} data-slot="drawer-title">
+    {children}
+  </DrawerPrimitive.Title>
 )
-
-export const DrawerPanel = ({ className, children, ...props }: DrawerPrimitive.Content.Props): React.ReactElement => (
-  <ScrollArea className="touch-auto" scrollFade>
-    <DrawerPrimitive.Content
-      className={cn(
-        'p-6 in-[[data-slot=drawer-popup]:has([data-slot=drawer-header])]:pt-1 in-[[data-slot=drawer-popup]:has([data-slot=drawer-footer]:not(.border-t))]:pb-1',
-        className
-      )}
-      data-slot="drawer-panel"
-      {...props}
-    >
-      {children}
-    </DrawerPrimitive.Content>
-  </ScrollArea>
+export const DrawerPanel = ({ children }: DrawerContentProps): React.ReactElement => (
+  <div className={container()}>
+    <ScrollArea scrollFade>
+      <DrawerPrimitive.Content className={panelClassName()} data-slot="drawer-panel">
+        {children}
+      </DrawerPrimitive.Content>
+    </ScrollArea>
+  </div>
 )
