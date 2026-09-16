@@ -17,7 +17,11 @@ const DialogDrawer = ({ title, trigger, children, cancelLabel, cancelDisabled, f
       <DrawerPanel>{children}</DrawerPanel>
       {hasFooter && (
         <DrawerFooter>
-          {cancelLabel !== undefined && <DrawerClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DrawerClose>}
+          {cancelLabel !== undefined && (
+            <DrawerClose disabled={cancelDisabled} render={<Button variant="outline" />}>
+              {cancelLabel}
+            </DrawerClose>
+          )}
           {footer}
         </DrawerFooter>
       )}

@@ -16,13 +16,19 @@ export interface DialogProps {
 const DialogBase = lazy(() => import('./dialog.base'))
 const DialogDrawer = lazy(() => import('./dialog.drawer'))
 
-export const Dialog = (props: DialogProps): ReactElement => {
+export const Dialog = ({ onOpenChange, cancelDisabled, ...props }: DialogProps): ReactElement => {
   const isMobile = useIsMobile()
   const Impl = isMobile ? DialogDrawer : DialogBase
-
+  const handleOpenChange = (nextOpen: boolean, eventDetails?: { cancel: () => void }): void => {
+    if (!nextOpen && cancelDisabled) {
+      eventDetails?.cancel()
+      return
+    }
+    onOpenChange?.(nextOpen)
+  }
   return (
     <Suspense fallback={props.trigger ?? null}>
-      <Impl {...props} />
+      <Impl {...props} cancelDisabled={cancelDisabled} onOpenChange={handleOpenChange} />
     </Suspense>
   )
 }

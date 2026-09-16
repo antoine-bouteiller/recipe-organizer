@@ -27,6 +27,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
     props: formModalProps,
     render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
       const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
+      const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
       return (
         <DialogFormProvider
           value={{
@@ -46,7 +47,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
           }}
         >
           <Dialog
-            cancelDisabled={form.state.isSubmitting}
+            cancelDisabled={isSubmitting}
             cancelLabel="Annuler"
             footer={
               <form.AppForm>

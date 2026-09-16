@@ -142,7 +142,7 @@ const DialogBase = ({ title, trigger, children, cancelLabel, cancelDisabled, foo
           <DialogPrimitive.Popup className={popupClassName()} data-slot="dialog-popup">
             {formFrame?.wrap(content) ?? content}
             <div className={cva({ base: { insetInlineEnd: '2', position: 'absolute', top: '2' } })()}>
-              <DialogPrimitive.Close aria-label="Close" render={<Button size="icon" variant="ghost" />}>
+              <DialogPrimitive.Close aria-label="Close" disabled={cancelDisabled} render={<Button size="icon" variant="ghost" />}>
                 <XIcon />
               </DialogPrimitive.Close>
             </div>
