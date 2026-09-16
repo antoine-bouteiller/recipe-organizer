@@ -1,58 +1,115 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
-import { cn } from 'cn'
-import React, { Children, cloneElement, createContext, isValidElement, useContext } from 'react'
+import { cva } from '@recipe-organizer/design-system/css'
+import React, { createContext, useContext } from 'react'
 
 import { useSwipeTabs } from '../../../hooks/use-swipe-tabs'
 
-export const TabsList = ({ className, children, ...props }: TabsPrimitive.List.Props): React.ReactElement => (
-  <TabsPrimitive.List
-    className={cn(
-      `relative z-0 flex w-fit items-center justify-center gap-x-0.5 rounded-lg bg-white/50 p-0.5 text-muted-foreground/64 data-[orientation=vertical]:flex-col dark:bg-white/4`,
-      className
-    )}
-    data-slot="tabs-list"
-    {...props}
-  >
-    {children}
-    <TabsPrimitive.Indicator
-      className="absolute bottom-0 left-0 -z-1 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) rounded-md bg-background shadow-sm transition-[translate,width,height] duration-300 ease-out dark:bg-accent"
-      data-slot="tab-indicator"
-    />
+const listRecipe = cva({
+  base: {
+    '&[data-orientation=vertical]': { flexDirection: 'column' },
+    alignItems: 'center',
+    backgroundColor: { _dark: 'white/4', base: 'white/50' },
+    borderRadius: 'lg',
+    color: 'muted-foreground/64',
+    display: 'flex',
+    gap: '0.5',
+    justifyContent: 'center',
+    padding: '0.5',
+    position: 'relative',
+    width: 'fit-content',
+    zIndex: 0,
+  },
+  defaultVariants: { width: 'fit' },
+  variants: { width: { fit: {}, full: { width: 'full' } } },
+})
+const indicatorRecipe = cva({
+  base: {
+    backgroundColor: { _dark: 'accent', base: 'background' },
+    borderRadius: 'md',
+    bottom: '0',
+    boxShadow: 'sm',
+    height: 'var(--active-tab-height)',
+    left: '0',
+    position: 'absolute',
+    transform: 'translateX(var(--active-tab-left)) translateY(calc(-1 * var(--active-tab-bottom)))',
+    transitionDuration: '300ms',
+    transitionProperty: 'transform, width, height',
+    transitionTimingFunction: 'token(easings.out)',
+    width: 'var(--active-tab-width)',
+    zIndex: -1,
+  },
+})
+const tabRecipe = cva({
+  base: {
+    '& svg': { flexShrink: '0', pointerEvents: 'none' },
+    '&[data-active]': { color: 'foreground' },
+    '&[data-disabled]': { opacity: 0.64, pointerEvents: 'none' },
+    '&[data-orientation=vertical]': { justifyContent: 'flex-start', width: 'full' },
+    '--owner-icon-margin-inline': '-0.125rem',
+    '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+    _focusVisible: { outline: '2px solid token(colors.ring)', outlineOffset: '1px' },
+    _hover: { '&:not([data-active])': { color: 'muted-foreground' } },
+    alignItems: 'center',
+    borderColor: 'transparent',
+    borderRadius: 'md',
+    borderWidth: '1px',
+    cursor: 'pointer',
+    display: 'flex',
+    flexGrow: '1',
+    flexShrink: '0',
+    fontSize: { base: 'base', sm: 'sm' },
+    fontWeight: 'medium',
+    gap: '1.5',
+    height: { base: '9', sm: '8' },
+    justifyContent: 'center',
+    paddingInline: 'calc(0.625rem - 1px)',
+    position: 'relative',
+    transitionDuration: '150ms',
+    transitionProperty: 'color, background-color, box-shadow',
+    transitionTimingFunction: 'in-out',
+    whiteSpace: 'nowrap',
+  },
+})
+const rootRecipe = cva({
+  base: { '&[data-orientation=vertical]': { flexDirection: 'row' }, display: 'flex', flex: '1', flexDirection: 'column', gap: '2', minHeight: '0' },
+})
+const panelsRecipe = cva({ base: { flex: '1', minHeight: '0', overflow: 'hidden' } })
+const trackRecipe = cva({ base: { display: 'flex', height: 'full' } })
+const panelRecipe = cva({ base: { flexShrink: '0', minWidth: 'full', width: 'full' } })
+
+export type TabsListProps = Pick<TabsPrimitive.List.Props, 'aria-label' | 'children'> & { width?: 'fit' | 'full' }
+export const TabsList = ({ 'aria-label': ariaLabel, children, width = 'fit' }: TabsListProps): React.ReactElement => (
+  <TabsPrimitive.List aria-label={ariaLabel} className={listRecipe({ width })} data-slot="tabs-list">
+    <>
+      {children}
+      <TabsPrimitive.Indicator className={indicatorRecipe()} data-slot="tab-indicator" />
+    </>
   </TabsPrimitive.List>
 )
 
-export const TabsTab = ({ className, ...props }: TabsPrimitive.Tab.Props): React.ReactElement => (
-  <TabsPrimitive.Tab
-    className={cn(
-      "relative flex h-9 shrink-0 grow cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-[calc(--spacing(2.5)-1px)] font-medium text-base outline-none transition-[color,background-color,box-shadow] hover:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring data-disabled:pointer-events-none data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start data-active:text-foreground data-disabled:opacity-64 sm:h-8 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0",
-      className
-    )}
-    data-slot="tabs-tab"
-    {...props}
-  />
+export type TabsTabProps = Pick<TabsPrimitive.Tab.Props, 'children' | 'value'>
+export const TabsTab = ({ children, value }: TabsTabProps): React.ReactElement => (
+  <TabsPrimitive.Tab className={tabRecipe()} data-slot="tabs-tab" value={value}>
+    {children}
+  </TabsPrimitive.Tab>
 )
 
 type SwipeTabsContextValue = Pick<
   ReturnType<typeof useSwipeTabs>,
-  'activeIndex' | 'containerRef' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart' | 'trackRef'
+  'activeIndex' | 'activeTab' | 'containerRef' | 'onTouchEnd' | 'onTouchMove' | 'onTouchStart' | 'trackRef'
 >
-
 const SwipeTabsContext = createContext<SwipeTabsContextValue | null>(null)
 
-interface SwipeTabsProps<TTab extends string> {
-  tabs: readonly TTab[]
+export type SwipeTabsProps<TTab extends string> = Pick<TabsPrimitive.Root.Props, 'children'> & {
   defaultTab: TTab
-  className?: string
-  children: React.ReactNode
+  tabs: readonly TTab[]
 }
-
-export const SwipeTabs = <TTab extends string>({ tabs, defaultTab, className, children }: SwipeTabsProps<TTab>): React.ReactElement => {
+export const SwipeTabs = <TTab extends string>({ children, defaultTab, tabs }: SwipeTabsProps<TTab>): React.ReactElement => {
   const { activeIndex, activeTab, containerRef, trackRef, goTo, onTouchStart, onTouchMove, onTouchEnd } = useSwipeTabs(tabs, defaultTab)
-
   return (
-    <SwipeTabsContext.Provider value={{ activeIndex, containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
+    <SwipeTabsContext.Provider value={{ activeIndex, activeTab, containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
       <TabsPrimitive.Root
-        className={cn('flex flex-col gap-2 data-[orientation=vertical]:flex-row', className)}
+        className={rootRecipe()}
         data-slot="tabs"
         onValueChange={(value) => {
           const nextTab = tabs.find((tab) => tab === value)
@@ -68,23 +125,32 @@ export const SwipeTabs = <TTab extends string>({ tabs, defaultTab, className, ch
   )
 }
 
-export const SwipeTabsPanels = ({ className, children }: { className?: string; children: React.ReactNode }): React.ReactElement => {
+export type SwipeTabsPanelsProps = Pick<React.ComponentProps<'div'>, 'children'>
+export const SwipeTabsPanels = ({ children }: SwipeTabsPanelsProps): React.ReactElement => {
   const context = useContext(SwipeTabsContext)
   if (!context) {
     throw new Error('SwipeTabsPanels must be rendered inside SwipeTabs')
   }
-  const { activeIndex, containerRef, trackRef, onTouchStart, onTouchMove, onTouchEnd } = context
-
+  const { containerRef, trackRef, onTouchEnd, onTouchMove, onTouchStart } = context
   return (
-    <div ref={containerRef} className={cn('min-h-0 flex-1 overflow-hidden', className)} data-slot="swipe-tabs-panels">
-      <div className="flex h-full" onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={trackRef}>
-        {Children.map(children, (child, index) =>
-          // Without inert, off-screen panels keep their tab order and focusing one scrolls this overflow-hidden box out of sync with the track transform, unrecoverably.
-          isValidElement<{ className?: string; inert?: boolean }>(child)
-            ? cloneElement(child, { className: cn('w-full shrink-0', child.props.className), inert: index !== activeIndex })
-            : child
-        )}
+    <div className={panelsRecipe()} data-slot="swipe-tabs-panels" ref={containerRef}>
+      <div className={trackRecipe()} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={trackRef}>
+        {children}
       </div>
+    </div>
+  )
+}
+
+export type SwipeTabsPanelProps = Pick<React.ComponentProps<'div'>, 'children'> & { value: string }
+export const SwipeTabsPanel = ({ children, value }: SwipeTabsPanelProps): React.ReactElement => {
+  const context = useContext(SwipeTabsContext)
+  if (!context) {
+    throw new Error('SwipeTabsPanel must be rendered inside SwipeTabs')
+  }
+  const inactive = context.activeTab !== value
+  return (
+    <div className={panelRecipe()} data-slot="swipe-tabs-panel" inert={inactive} role="tabpanel">
+      {children}
     </div>
   )
 }

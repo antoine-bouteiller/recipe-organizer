@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
@@ -13,7 +14,7 @@ const DeleteDialogExample = (): ReactElement => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className={css({ '& > * + *': { marginTop: '3' } })}>
       <DeleteDialog
         deleteButtonLabel="Delete recipe"
         description="This removes Tomato soup from your saved recipes. This action cannot be undone."

@@ -17,3 +17,6 @@ scheduled_tasks.lock
 # Skills
 skills-lock.json
 skills
+
+# Panda generated shared runtime
+packages/design-system/styled-system/

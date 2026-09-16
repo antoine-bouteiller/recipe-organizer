@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 
@@ -6,7 +7,7 @@ import { toastManager, ToastProvider } from './toast'
 
 const ToastExample = (): React.ReactElement => (
   <ToastProvider>
-    <div className="flex flex-wrap gap-2">
+    <div className={css({ display: 'flex', flexWrap: 'wrap', gap: '2' })}>
       <Button onClick={() => toastManager.add({ description: 'Your recipe has been saved.', title: 'Saved', type: 'success' })}>Success toast</Button>
       <Button
         onClick={() => toastManager.add({ description: 'Check the required fields and try again.', title: 'Could not save', type: 'error' })}

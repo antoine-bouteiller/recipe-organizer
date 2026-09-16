@@ -13,6 +13,7 @@ import {
   CommandList,
   CommandPanel,
 } from '@recipe-organizer/design-system/command'
+import { css } from '@recipe-organizer/design-system/css'
 import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
 import { ArrowElbowDownLeftIcon } from '@recipe-organizer/design-system/icons/arrow-elbow-down-left'
 import { Kbd, KbdGroup } from '@recipe-organizer/design-system/kbd'
@@ -41,13 +42,19 @@ const SearchBar = () => {
 
   return (
     <CommandDialog onOpenChange={setOpen} open={open}>
-      <CommandDialogTrigger className="w-56 justify-start pl-2.5 font-normal shadow-none" render={<Button variant="outline" />}>
-        Recherche une recette...
-        <KbdGroup className="absolute top-1.5 right-1.5 gap-1">
-          <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-          <Kbd className="aspect-square">K</Kbd>
-        </KbdGroup>
-      </CommandDialogTrigger>
+      <div className={css({ width: '56' })}>
+        <CommandDialogTrigger render={<Button align="start" variant="search-trigger" width="full" />}>
+          Recherche une recette...
+          <span className={css({ position: 'absolute', right: '1.5', top: '1.5' })}>
+            <KbdGroup>
+              <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
+              <span className={css({ aspectRatio: '1 / 1' })}>
+                <Kbd>K</Kbd>
+              </span>
+            </KbdGroup>
+          </span>
+        </CommandDialogTrigger>
+      </div>
       <CommandDialogPopup>
         <Command items={recipes}>
           <CommandInput placeholder="Rechercher une recette" />
@@ -72,7 +79,7 @@ const SearchBar = () => {
             </CommandList>
           </CommandPanel>
           <CommandFooter>
-            <div className="flex items-center gap-2 text-foreground">
+            <div className={css({ alignItems: 'center', color: 'foreground', display: 'flex', gap: '2' })}>
               <Kbd>
                 <ArrowElbowDownLeftIcon />
               </Kbd>

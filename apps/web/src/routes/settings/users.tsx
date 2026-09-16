@@ -5,10 +5,11 @@ import { ApproveUser } from '@client/features/users/components/approve-user'
 import { BlockUser } from '@client/features/users/components/block-user'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
+import { css } from '@recipe-organizer/design-system/css'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
-import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
-import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
+import { SearchInput } from '@recipe-organizer/design-system/search-input'
+import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
@@ -26,7 +27,11 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
   const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
 
   if (filteredUsers.length === 0) {
-    return <p className="py-8 text-center text-muted-foreground">{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
+    return (
+      <p className={css({ color: 'muted-foreground', paddingBlock: '8', textAlign: 'center' })}>
+        {search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}
+      </p>
+    )
   }
 
   const showBlockButton = status === 'active' || status === 'pending'
@@ -42,10 +47,10 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
                 {showBlockButton && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
               </>
             }
-            className="flex-nowrap"
+            layout="row"
             title={
               <>
-                <span className="text-nowrap text-ellipsis">{userItem.email}</span>
+                <span className={css({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' })}>{userItem.email}</span>
                 <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels.get(userItem.role)}</Badge>
               </>
             }
@@ -62,39 +67,47 @@ const UsersManagement = () => {
 
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
-      <div className="flex shrink-0 items-center gap-4 bg-muted pb-2">
+      <div className={css({ alignItems: 'center', background: 'muted', display: 'flex', flexShrink: '0', gap: '4', paddingBottom: '2' })}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddUser>
-          <Button className={glassSurface} size="icon-lg" variant="outline">
+          <Button size="icon-lg" variant="search-trigger">
             <PlusIcon />
           </Button>
         </AddUser>
       </div>
 
-      <SwipeTabs className="-mb-4 flex min-h-0 flex-1 flex-col" defaultTab="active" tabs={USER_TABS}>
-        <TabsList className="w-full">
-          <TabsTab value="active">Actifs</TabsTab>
-          <TabsTab value="pending">En attente</TabsTab>
-          <TabsTab value="blocked">Bloqués</TabsTab>
-        </TabsList>
-        <SwipeTabsPanels>
-          <div className="overflow-y-auto pb-4">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
-            </React.Suspense>
-          </div>
-          <div className="overflow-y-auto pb-4">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-            </React.Suspense>
-          </div>
-          <div className="overflow-y-auto pb-4">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-            </React.Suspense>
-          </div>
-        </SwipeTabsPanels>
-      </SwipeTabs>
+      <div className={css({ display: 'flex', flex: '1', flexDirection: 'column', marginBottom: '-4', minHeight: '0' })}>
+        <SwipeTabs defaultTab="active" tabs={USER_TABS}>
+          <TabsList width="full">
+            <TabsTab value="active">Actifs</TabsTab>
+            <TabsTab value="pending">En attente</TabsTab>
+            <TabsTab value="blocked">Bloqués</TabsTab>
+          </TabsList>
+          <SwipeTabsPanels>
+            <SwipeTabsPanel value="active">
+              <div className={css({ height: 'full', overflowY: 'auto', paddingBottom: '4' })}>
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+                </React.Suspense>
+              </div>
+            </SwipeTabsPanel>
+            <SwipeTabsPanel value="pending">
+              <div className={css({ height: 'full', overflowY: 'auto', paddingBottom: '4' })}>
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
+                </React.Suspense>
+              </div>
+            </SwipeTabsPanel>
+            <SwipeTabsPanel value="blocked">
+              <div className={css({ height: 'full', overflowY: 'auto', paddingBottom: '4' })}>
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+                </React.Suspense>
+              </div>
+            </SwipeTabsPanel>
+          </SwipeTabsPanels>
+        </SwipeTabs>
+      </div>
     </ScreenLayout>
   )
 }

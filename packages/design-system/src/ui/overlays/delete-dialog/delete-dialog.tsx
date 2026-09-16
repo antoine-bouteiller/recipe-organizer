@@ -5,7 +5,7 @@ import { TrashIcon } from '../../data-display/icons/trash'
 import { Spinner } from '../../feedback/spinner/spinner'
 import { Dialog } from '../dialog/dialog'
 
-interface DeleteDialogProps {
+export interface DeleteDialogProps {
   actionLabel?: string
   deleteButtonLabel?: string
   description: string
@@ -29,7 +29,7 @@ export const DeleteDialog = ({
   open: openProp,
   title,
   trigger = DefaultTrigger,
-}: DeleteDialogProps) => {
+}: DeleteDialogProps): ReactElement => {
   const TriggerIcon = icon ?? TrashIcon
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = openProp !== undefined
@@ -61,6 +61,7 @@ export const DeleteDialog = ({
 
   return (
     <Dialog
+      cancelDisabled={isLoading}
       cancelLabel="Annuler"
       footer={
         <Button disabled={isLoading} onClick={handleDelete} variant="destructive">

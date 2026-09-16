@@ -35,6 +35,8 @@ feature from independently composing field state, error presentation, and submis
   routes validate all writes under `../../architecture.spec.md` `[PI-3]`.
 - `[PI-3]` **Fields own control wiring** — a field translates its framework context into a UI
   primitive and error slot, keeping feature views declarative.
+- `[PI-4]` **Dialog form composition stays private** — the form-aware dialog integration preserves
+  form semantics without exposing form-wrapper or panel-styling seams to features.
 
 ## 5. Non-Goals
 
@@ -145,8 +147,11 @@ contract; the form infrastructure does not choose those effects.
 
 A dialog uses the same lifecycle as a page form but contains it within dialog chrome. It receives
 `open`, `setOpen`, title, trigger, child fields, and submit label as view inputs; its form instance
-continues to belong to the caller. This keeps close-state local while validation and submission
-remain shared.
+continues to belong to the caller. Its form-aware dialog composition is private: public Dialog does
+not expose content-render/panel-style hooks and public Form does not gain a display/style override.
+This keeps close-state local while validation and submission remain shared, preserving Enter
+submission, async cancellation/disable behavior, errors, focus return, and submit-propagation
+handling without nested forms.
 
 ### 8.7 Form contract summary
 
@@ -174,3 +179,4 @@ N/A
 | 2026-09-13 | Align form schemas and submission transport with Hono feature routes. | 3, 4, 8.2         | Preserve multipart support while migrating actions. |
 
 | 2026-09-15 | Move reusable fields, form registry/context, file support, and dialog adapters to the design-system package. | 3, 6–8 | Share form presentation without depending on feature schemas or app services. |
+| 2026-09-16 | Make the form-aware dialog composition a private styling/render boundary. | 4, 8.6 | Preserve form behavior without reopening Dialog or Form customization APIs. |

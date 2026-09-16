@@ -1,24 +1,75 @@
 import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
-import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from 'cn'
-import React from 'react'
+import { cva } from '@recipe-organizer/design-system/css'
+import type React from 'react'
 
-const toggleVariants = cva(
-  "relative inline-flex h-9 min-w-9 shrink-0 cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg border px-[calc(--spacing(2)-1px)] font-medium text-base text-foreground outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 data-pressed:bg-input/64 data-pressed:text-accent-foreground sm:h-8 sm:min-w-8 sm:text-sm [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0",
-  {
-    defaultVariants: {
-      variant: 'default',
-    },
-    variants: {
-      variant: {
-        default: 'border-transparent',
-        outline:
-          'border-input bg-background not-dark:bg-clip-padding shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-input/32 dark:data-pressed:bg-input dark:hover:bg-input/64 dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] dark:not-disabled:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/2%)] [:disabled,:active,[data-pressed]]:shadow-none',
+const toggleRecipe = cva({
+  base: {
+    '&[data-pressed]': { backgroundColor: 'input/64', color: 'accent-foreground' },
+    '--owner-icon-margin-inline': '-0.125rem',
+    '--owner-icon-opacity': '0.8',
+    '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+    '@media (pointer: coarse)': { _after: { display: 'block' } },
+    _after: { content: '""', display: 'none', inset: '0', minHeight: '11', minWidth: 'var(--toggle-hit-min-width, 44px)', position: 'absolute' },
+    _disabled: { opacity: 0.64, pointerEvents: 'none' },
+    _focusVisible: { outline: '2px solid token(colors.ring)', outlineOffset: '1px', zIndex: '10' },
+    _hover: { backgroundColor: 'accent' },
+    alignItems: 'center',
+    borderRadius: 'lg',
+    borderWidth: '1px',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    fontSize: { base: 'base', sm: 'sm' },
+    fontWeight: 'medium',
+    gap: '2',
+    height: { base: '9', sm: '8' },
+    justifyContent: 'center',
+    minWidth: { base: '9', sm: '8' },
+    paddingInline: 'calc(token(spacing.2) - 1px)',
+    position: 'relative',
+    userSelect: 'none',
+    whiteSpace: 'nowrap',
+  },
+  defaultVariants: { presentation: 'default', variant: 'default' },
+  variants: {
+    presentation: { default: {}, filter: { '&[data-pressed]': { backgroundColor: 'primary/12', borderColor: 'primary', color: 'primary' } } },
+    variant: {
+      default: { borderColor: 'transparent' },
+      outline: {
+        '&[data-pressed]': { backgroundColor: 'input/64' },
+        _active: { boxShadow: 'none' },
+        _before: {
+          borderRadius: 'calc(token(radii.lg) - 1px)',
+          boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)',
+          content: '""',
+          inset: '0',
+          pointerEvents: 'none',
+          position: 'absolute',
+        },
+        _dark: {
+          '&[data-pressed]': { backgroundColor: 'input' },
+          _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)' },
+          _hover: { backgroundColor: 'input/64' },
+          backgroundColor: 'input/32',
+        },
+        _disabled: { boxShadow: 'none' },
+        _hover: { backgroundColor: 'accent' },
+        backgroundClip: 'padding-box',
+        backgroundColor: 'background',
+        borderColor: 'input',
+        boxShadow: 'xs',
       },
     },
-  }
-)
+  },
+})
 
-export const Toggle = ({ className, variant, ...props }: TogglePrimitive.Props & VariantProps<typeof toggleVariants>): React.ReactElement => (
-  <TogglePrimitive className={cn(toggleVariants({ className, variant }))} data-slot="toggle" {...props} />
+export type ToggleProps = Pick<
+  TogglePrimitive.Props,
+  'aria-label' | 'children' | 'defaultPressed' | 'disabled' | 'onClick' | 'onPressedChange' | 'pressed' | 'value'
+> & {
+  presentation?: 'default' | 'filter'
+  variant?: 'default' | 'outline'
+}
+
+export const Toggle = ({ presentation, variant, ...props }: ToggleProps): React.ReactElement => (
+  <TogglePrimitive {...props} className={toggleRecipe({ presentation, variant })} data-slot="toggle" />
 )

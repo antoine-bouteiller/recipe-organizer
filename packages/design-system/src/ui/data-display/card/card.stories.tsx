@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
 import { StorySection } from '../../../../.storybook/story-section'
@@ -13,18 +14,18 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   args: {
-    children: <div className="p-6 pt-0 text-sm">Card content goes here.</div>,
+    children: <div className={css({ fontSize: 'sm', padding: '6', paddingTop: '0' })}>Card content goes here.</div>,
     description: 'A concise description of this content.',
     title: 'Recipe details',
   },
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: '0', width: 'full' })}>
       <StorySection title="Default">
         <Card {...args} />
       </StorySection>
       <StorySection title="With Actions">
         <Card description="Changes are saved automatically." title="Profile settings">
-          <div className="flex items-center justify-end gap-3 p-6 pt-0">
+          <div className={css({ alignItems: 'center', display: 'flex', gap: '3', justifyContent: 'flex-end', padding: '6', paddingTop: '0' })}>
             <Button variant="outline">Cancel</Button>
             <Button>Save changes</Button>
           </div>
@@ -32,7 +33,7 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Content Only">
         <Card>
-          <div className="p-6 text-sm">A card can be used without a header.</div>
+          <div className={css({ fontSize: 'sm', padding: '6' })}>A card can be used without a header.</div>
         </Card>
       </StorySection>
     </div>

@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
 import { StorySection } from '../../../../.storybook/story-section'
@@ -13,16 +14,18 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: '0', width: 'full' })}>
       <StorySection title="Default">
-        <div className="w-80">
-          <p className="text-sm font-medium">Ingredients</p>
-          <Separator className="my-3" />
-          <p className="text-sm text-muted-foreground">Serves four people.</p>
+        <div className={css({ width: '80' })}>
+          <p className={css({ fontSize: 'sm', fontWeight: 'medium' })}>Ingredients</p>
+          <div className={css({ marginBlock: '3' })}>
+            <Separator />
+          </div>
+          <p className={css({ color: 'muted-foreground', fontSize: 'sm' })}>Serves four people.</p>
         </div>
       </StorySection>
       <StorySection title="Vertical">
-        <div className="flex h-8 items-center gap-3 text-sm">
+        <div className={css({ alignItems: 'center', display: 'flex', fontSize: 'sm', gap: '3', height: '8' })}>
           <span>Overview</span>
           <Separator orientation="vertical" />
           <span>Details</span>

@@ -8,14 +8,14 @@ import { QuantityControls } from '@client/features/recipe/components/quantity-co
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
-import { Card } from '@recipe-organizer/design-system/card'
+import { css } from '@recipe-organizer/design-system/css'
 import { Editor, EditorContent } from '@recipe-organizer/design-system/editor'
 import { DotsThreeVerticalIcon } from '@recipe-organizer/design-system/icons/dots-three-vertical'
 import { PencilSimpleIcon } from '@recipe-organizer/design-system/icons/pencil-simple'
 import { Popover } from '@recipe-organizer/design-system/popover'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
-import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
+import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
@@ -29,10 +29,12 @@ const RecipeDetailsSkeleton = () => {
 
   return (
     <ScreenLayout title={recipe?.name ?? ''} withGoBack backgroundImage={recipe?.image}>
-      <Skeleton className="mt-3 h-10 w-full rounded-lg" />
-      <div className="flex flex-col gap-3 pt-5">
+      <div className={css({ marginTop: '3' })}>
+        <Skeleton preset="recipe-details-title" />
+      </div>
+      <div className={css({ display: 'flex', flexDirection: 'column', gap: '3', paddingTop: '5' })}>
         {incrementalArray({ length: 6 }).map((index) => (
-          <Skeleton className="h-5 w-full" key={index} />
+          <Skeleton preset="recipe-details-text" key={index} />
         ))}
       </div>
     </ScreenLayout>
@@ -46,7 +48,7 @@ const RecipePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className={css({ alignItems: 'center', display: 'flex', height: '100vh', justifyContent: 'center' })}>
         <Spinner />
       </div>
     )
@@ -81,22 +83,19 @@ const RecipePage = () => {
         authUser && (
           <Popover
             trigger={
-              <Button
-                className="border-white/20 bg-white/15 text-white backdrop-blur-md hover:bg-white/25 data-pressed:bg-white/25 dark:bg-white/15 dark:hover:bg-white/25 dark:data-pressed:bg-white/25"
-                size="icon"
-                variant="outline"
-              >
+              <Button size="icon" variant="media-overlay-header">
                 <DotsThreeVerticalIcon weight="bold" />
               </Button>
             }
           >
-            <div className="flex flex-col items-start gap-2 p-4 md:p-0">
+            <div className={css({ alignItems: 'flex-start', display: 'flex', flexDirection: 'column', gap: '2', padding: { base: '4', md: '0' } })}>
               <Button
-                className="w-full justify-start"
+                align="start"
                 render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
-                variant="ghost"
+                variant="list-action"
+                width="full"
               >
-                <PencilSimpleIcon className="size-4" />
+                <PencilSimpleIcon size="sm" />
                 Modifier la recette
               </Button>
               <DeleteRecipe recipeId={recipe.id} recipeName={recipe.name} />
@@ -105,9 +104,22 @@ const RecipePage = () => {
         )
       }
     >
-      <h1 className="hidden px-4 py-2 font-heading text-3xl font-bold tracking-tight text-balance md:block">{recipe.name}</h1>
+      <h1
+        className={css({
+          display: { base: 'none', md: 'block' },
+          fontFamily: 'heading',
+          fontSize: '3xl',
+          fontWeight: 'bold',
+          letterSpacing: 'tight',
+          paddingBlock: '2',
+          paddingInline: '4',
+          textWrap: 'balance',
+        })}
+      >
+        {recipe.name}
+      </h1>
       {metaTags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 px-1 pt-1">
+        <div className={css({ display: 'flex', flexWrap: 'wrap', gap: '1.5', paddingInline: '1', paddingTop: '1' })}>
           {metaTags.map((label) => (
             <Badge key={label} size="sm" variant="eyebrow">
               {label}
@@ -115,40 +127,79 @@ const RecipePage = () => {
           ))}
         </div>
       )}
-      <QuantityControls className="my-2" recipeId={id} servings={recipe.servings} />
+      <div className={css({ marginBlock: '2' })}>
+        <QuantityControls recipeId={id} servings={recipe.servings} />
+      </div>
 
-      <div className="prose prose-sm flex min-h-0 max-w-none flex-1 flex-col text-foreground dark:prose-invert">
-        <div className="-mb-4 flex min-h-0 flex-1 flex-col md:hidden">
-          <SwipeTabs className="flex min-h-0 flex-1 flex-col" defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
-            <TabsList className="w-full">
+      <div className={css({ display: 'flex', flex: '1', flexDirection: 'column', minHeight: '0' })}>
+        <div className={css({ display: { base: 'flex', md: 'none' }, flex: '1', flexDirection: 'column', marginBottom: '-4', minHeight: '0' })}>
+          <SwipeTabs defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
+            <TabsList width="full">
               <TabsTab value="ingredients">Ingrédients</TabsTab>
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>
             <SwipeTabsPanels>
-              <div className="overflow-y-auto px-2 pb-4">
-                <RecipeIngredientGroups recipeId={recipe.id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-              </div>
-              <div className="overflow-y-auto p-2 pb-4">
-                <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                  <EditorContent className="max-w-[65ch]" />
-                </Editor>
-              </div>
+              <SwipeTabsPanel value="ingredients">
+                <div className={css({ height: 'full', overflowY: 'auto', paddingBottom: '4', paddingInline: '2' })}>
+                  <RecipeIngredientGroups
+                    recipeId={recipe.id}
+                    baseServings={recipe.servings}
+                    ingredientGroups={ingredientGroups}
+                    presentation="standalone"
+                  />
+                </div>
+              </SwipeTabsPanel>
+              <SwipeTabsPanel value="preparation">
+                <div className={css({ height: 'full', overflowY: 'auto', padding: '2', paddingBottom: '4' })}>
+                  <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                    <EditorContent width="reading" />
+                  </Editor>
+                </div>
+              </SwipeTabsPanel>
             </SwipeTabsPanels>
           </SwipeTabs>
         </div>
 
-        <div className="hidden grid-cols-5 items-stretch gap-8 pt-4 md:grid">
-          <Card className="col-span-2 rounded-3xl border-0 px-8 pb-8 shadow-lg [&_ul]:rounded-none [&_ul]:border-0 [&_ul]:bg-transparent [&_ul]:px-0">
-            <h2>Ingrédients</h2>
-            <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} />
-          </Card>
+        <div
+          className={css({
+            alignItems: 'stretch',
+            display: { base: 'none', md: 'grid' },
+            gap: '8',
+            gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+            paddingTop: '4',
+          })}
+        >
+          <section
+            className={css({
+              background: 'card',
+              borderRadius: '3xl',
+              boxShadow: 'lg',
+              gridColumn: 'span 2 / span 2',
+              paddingBottom: '8',
+              paddingInline: '8',
+            })}
+          >
+            <h2 className={css({ fontSize: 'xl', fontWeight: 'bold', lineHeight: '1.75rem', marginBottom: '4', marginTop: '8' })}>Ingrédients</h2>
+            <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} presentation="embedded" />
+          </section>
 
-          <Card className="col-span-3 rounded-3xl border-0 px-8 pb-8 shadow-lg">
-            <h2>Préparation</h2>
-            <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-              <EditorContent className="max-w-[65ch] pb-4" />
-            </Editor>
-          </Card>
+          <section
+            className={css({
+              background: 'card',
+              borderRadius: '3xl',
+              boxShadow: 'lg',
+              gridColumn: 'span 3 / span 3',
+              paddingBottom: '8',
+              paddingInline: '8',
+            })}
+          >
+            <h2 className={css({ fontSize: 'xl', fontWeight: 'bold', lineHeight: '1.75rem', marginBottom: '4', marginTop: '8' })}>Préparation</h2>
+            <div className={css({ paddingBottom: '4' })}>
+              <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
+                <EditorContent width="reading" />
+              </Editor>
+            </div>
+          </section>
         </div>
       </div>
     </ScreenLayout>

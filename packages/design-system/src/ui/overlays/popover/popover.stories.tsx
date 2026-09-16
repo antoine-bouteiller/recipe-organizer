@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 
@@ -9,8 +10,8 @@ import PopoverDrawer from './popover.drawer'
 
 const popoverProps = {
   children: (
-    <div className="flex w-56 flex-col gap-2">
-      <h2 className="font-medium">Recipe actions</h2>
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '2', width: '56' })}>
+      <h2 className={css({ fontWeight: 'medium' })}>Recipe actions</h2>
       <Button variant="ghost">Duplicate recipe</Button>
       <Button variant="ghost">Archive recipe</Button>
     </div>
@@ -28,7 +29,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: '0', width: 'full' })}>
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>

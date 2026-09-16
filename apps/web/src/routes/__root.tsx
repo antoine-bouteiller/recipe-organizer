@@ -1,6 +1,7 @@
 import { Navbar } from '@client/components/navigation/navbar'
 import { loadAuthUser, type getAuthUser } from '@client/lib/auth/get-auth-user'
 import { getTheme } from '@client/lib/theme'
+import { css } from '@recipe-organizer/design-system/css'
 import { ToastProvider } from '@recipe-organizer/design-system/toast'
 import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
@@ -20,16 +21,18 @@ const RootComponent = () => {
 
   return (
     <ToastProvider>
-      <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
+      <header
+        className={css({ background: 'muted', display: { base: 'none', md: 'block' }, position: 'sticky', top: '0', width: 'full', zIndex: '50' })}
+      >
         <Navbar
           search={
-            <Suspense fallback={<div className="h-9 w-56" />}>
+            <Suspense fallback={<div className={css({ height: '9', width: '56' })} />}>
               <SearchBar />
             </Suspense>
           }
         />
       </header>
-      <main className="flex min-h-0 flex-1 flex-col md:pb-0">
+      <main className={css({ display: 'flex', flex: '1', flexDirection: 'column', md: { paddingBottom: 0 }, minHeight: 0 })}>
         <Outlet />
       </main>
     </ToastProvider>

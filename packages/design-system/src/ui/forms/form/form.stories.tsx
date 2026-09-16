@@ -4,7 +4,6 @@ import { expect, userEvent, within } from 'storybook/test'
 
 import { Button } from '../../actions/button/button'
 import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
-import { Input } from '../input/input'
 import { Form } from './form'
 
 const RecipeForm = (): ReactElement => {
@@ -18,7 +17,7 @@ const RecipeForm = (): ReactElement => {
     <Form onSubmit={handleSubmit}>
       <Field name="recipeName">
         <FieldLabel>Recipe name</FieldLabel>
-        <FieldControl render={<Input placeholder="e.g. Tomato soup" required />} />
+        <FieldControl required />
         <FieldError match="valueMissing">A recipe name is required.</FieldError>
       </Field>
       <Button type="submit">Save recipe</Button>

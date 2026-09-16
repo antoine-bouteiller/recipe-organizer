@@ -1,12 +1,12 @@
 import path from 'node:path'
 
-import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
 
 const viteConfig = defineConfig({
   envDir: path.join(import.meta.dirname, '../..'),
+  css: { postcss: path.resolve(import.meta.dirname, '../../postcss.config.cjs') },
   resolve: {
     tsconfigPaths: true,
   },
@@ -28,7 +28,6 @@ const viteConfig = defineConfig({
       autoCodeSplitting: true,
     }),
     react({ compiler: true }),
-    tailwindcss(),
   ],
   server: {
     port: 3000,

@@ -2,6 +2,7 @@ import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { useToggleTheme } from '@client/hooks/use-toggle-theme'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
+import { css } from '@recipe-organizer/design-system/css'
 import { CaretRightIcon } from '@recipe-organizer/design-system/icons/caret-right'
 import { CookieIcon } from '@recipe-organizer/design-system/icons/cookie'
 import { ThemeIcon } from '@recipe-organizer/design-system/icons/theme'
@@ -52,29 +53,35 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Paramètres" pageKey="/settings">
-      <Button className="mb-4 w-full justify-start gap-3 md:hidden" onClick={toggleTheme} variant="outline">
-        <ThemeIcon className="size-5" />
-        Changer le thème
-      </Button>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={css({ display: { base: 'block', md: 'none' }, marginBottom: '4', width: 'full' })}>
+        <Button onClick={toggleTheme} variant="outline" width="full" align="start">
+          <ThemeIcon size="lg" />
+          Changer le thème
+        </Button>
+      </div>
+      <div className={css({ display: 'grid', gap: '4', gridTemplateColumns: { md: 'repeat(2, minmax(0, 1fr))' } })}>
         {visibleSections.map((section) => {
           const Icon = section.icon
           return (
             <Link key={section.id} to={section.path} viewTransition>
-              <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
-                <div className="flex items-start justify-between">
-                  <div className="flex flex-1 items-start gap-3">
-                    <div className="rounded-lg bg-primary/10 p-2">
-                      <Icon className="h-5 w-5 text-primary" />
+              <div className={css({ cursor: 'pointer', height: 'full', padding: '4' })}>
+                <Card>
+                  <div className={css({ alignItems: 'flex-start', display: 'flex', justifyContent: 'space-between' })}>
+                    <div className={css({ alignItems: 'flex-start', display: 'flex', flex: '1', gap: '3' })}>
+                      <div className={css({ background: 'primary/10', borderRadius: 'lg', color: 'primary', padding: '2' })}>
+                        <Icon size="lg" />
+                      </div>
+                      <div className={css({ flex: '1' })}>
+                        <h3 className={css({ fontWeight: 'semibold' })}>{section.title}</h3>
+                        <p className={css({ color: 'muted-foreground', fontSize: 'sm', marginTop: '1' })}>{section.description}</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{section.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
-                    </div>
+                    <span className={css({ color: 'muted-foreground', flexShrink: '0' })}>
+                      <CaretRightIcon size="lg" />
+                    </span>
                   </div>
-                  <CaretRightIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
-                </div>
-              </Card>
+                </Card>
+              </div>
             </Link>
           )
         })}

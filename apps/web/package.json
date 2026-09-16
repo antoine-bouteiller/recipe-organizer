@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev",
-    "build": "vp build"
+    "dev": "pnpm -w run styles:codegen && vp dev",
+    "build": "pnpm -w run styles:codegen && vp build"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
@@ -17,7 +17,6 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-store": "catalog:",
     "better-auth": "catalog:",
-    "cn": "catalog:",
     "hono": "catalog:",
     "lexical": "catalog:",
     "react": "catalog:",
@@ -27,7 +26,6 @@
   "devDependencies": {
     "@recipe-organizer/api": "workspace:*",
     "@recipe-organizer/config": "workspace:*",
-    "@tailwindcss/vite": "catalog:",
     "@tanstack/router-plugin": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

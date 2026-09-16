@@ -1,12 +1,14 @@
+import { css } from '@recipe-organizer/design-system/css'
+
 import { useFileUpload, type FileMetadata } from '../../../hooks/use-file-upload'
 import { useFieldContext } from '../../../hooks/use-form-context'
 import { usePlatform } from '../../../hooks/use-platform'
 import { ImageIcon } from '../../data-display/icons/image'
 import { XIcon } from '../../data-display/icons/x'
 import { Kbd, KbdGroup } from '../../data-display/kbd/kbd'
-import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel } from '../field/field'
 
-interface ImageFieldProps {
+export interface ImageFieldProps {
   disabled?: boolean
   initialImage?: FileMetadata
   label: string
@@ -28,28 +30,73 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
-      <FieldLabel className="relative flex min-h-52 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive">
+      <FieldLabel presentation="dropzone-image">
         {previewUrl ? (
-          <div className="absolute inset-0">
-            <img alt="Aperçu" className="size-full object-cover" src={previewUrl} />
+          <div className={css({ inset: 0, position: 'absolute' })}>
+            <img alt="Aperçu" className={css({ height: 'full', objectFit: 'cover', width: 'full' })} src={previewUrl} />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-            <div aria-hidden="true" className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border bg-background">
-              <ImageIcon className="size-4 opacity-60" />
+          <div
+            className={css({
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              paddingBlock: '3',
+              paddingInline: '4',
+              textAlign: 'center',
+            })}
+          >
+            <div
+              aria-hidden="true"
+              className={css({
+                alignItems: 'center',
+                backgroundColor: 'background',
+                borderRadius: 'full',
+                borderWidth: '1px',
+                display: 'flex',
+                flexShrink: 0,
+                height: '11',
+                justifyContent: 'center',
+                marginBottom: '2',
+                width: '11',
+              })}
+            >
+              <span className={css({ opacity: 0.6 })}>
+                <ImageIcon size="sm" />
+              </span>
             </div>
-            <p className="mb-1.5 text-sm font-medium">Déposez votre image ou cliquez pour parcourir</p>
-            <KbdGroup className="hidden items-center gap-1 md:flex">
-              <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-              <Kbd className="aspect-square">V</Kbd>
-            </KbdGroup>
+            <p className={css({ fontSize: 'sm', fontWeight: 'medium', marginBottom: '1.5' })}>Déposez votre image ou cliquez pour parcourir</p>
+            <div className={css({ display: 'none', md: { display: 'block' } })}>
+              <KbdGroup>
+                <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
+                <Kbd>V</Kbd>
+              </KbdGroup>
+            </div>
           </div>
         )}
         {previewUrl && (
-          <div className="absolute top-4 right-4">
+          <div className={css({ position: 'absolute', right: '4', top: '4' })}>
             <button
               aria-label="Supprimer l'image"
-              className="z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className={css({
+                _focusVisible: { borderColor: 'ring', boxShadow: '0 0 0 3px color-mix(in oklab, token(colors.ring) 50%, transparent)' },
+                _hover: { backgroundColor: 'black/80' },
+                alignItems: 'center',
+                backgroundColor: 'black/60',
+                borderRadius: 'full',
+                color: 'white',
+                cursor: 'pointer',
+                display: 'flex',
+                height: '8',
+                justifyContent: 'center',
+                outline: 'none',
+                transitionDuration: '150ms',
+                transitionProperty: 'color, box-shadow',
+                transitionTimingFunction: 'in-out',
+                width: '8',
+                zIndex: 50,
+              })}
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -57,12 +104,12 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
               }}
               type="button"
             >
-              <XIcon aria-hidden="true" className="size-4" />
+              <XIcon aria-hidden="true" size="sm" />
             </button>
           </div>
         )}
       </FieldLabel>
-      <FieldControl className="hidden" disabled={disabled} type="file" {...getInputProps()} />
+      <input className={css({ display: 'none' })} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

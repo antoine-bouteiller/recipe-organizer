@@ -19,7 +19,7 @@ A modern recipe management application with a TanStack Router browser SPA and a 
 - **Backend**: Hono on a Cloudflare Worker (`/api/*`)
 - **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
 - **Storage**: Cloudflare R2 for image storage
-- **Styling**: Tailwind CSS v4, owned Base UI components in `@recipe-organizer/design-system`, Storybook
+- **Styling**: Panda CSS with one root configuration and generated utility workspace, owned Base UI components in `@recipe-organizer/design-system`, Storybook
 - **Authentication**: Better Auth with Google OAuth
 
 ## Getting Started
@@ -70,9 +70,8 @@ Responsive desktop/drawer implementations stay in the same family folder.
 Form contexts and the shared `useAppForm` registry move with their controls.
 Supporting hooks live in `packages/design-system/src/hooks/`; shared icons live in `src/ui/data-display/icons/`.
 Import components from `@recipe-organizer/design-system/button` (and equivalent component subpaths).
-The app and Storybook share `@recipe-organizer/design-system/styles.css`, including theme tokens and fonts;
-only app-global scrolling and navigation transitions remain in `apps/web/src/styles/app.css`.
-Thin web adapters supply routing, menus, theme/back actions, footer selection, and error-detail visibility.
+The app and Storybook share root Panda configuration and generated output in `packages/design-system/styled-system/`; the design-system package exports it as `@recipe-organizer/design-system/css` and `@recipe-organizer/design-system/tokens`. Authored tokens and conditions remain in the design system. The root `styles:codegen` script runs native `panda codegen`; `prepare` and the web/Storybook dev and build commands call it before starting. Run `pnpm run styles:codegen` when generated utilities/types are absent or token/condition names change. PostCSS manages consumer CSS extraction and HMR. Components own private recipes and declare minimal local props; Base UI `render` composes existing components, including the actual router `Link`. Parent wrappers own external layout. Native global CSS remains for owned global and runtime-only behavior.
+Thin web adapters supply routing, menus, theme/back actions, footer selection, and error-detail visibility. See `packages/design-system/styling.spec.md` for the durable ownership guidance.
 
 Folder categories match the Storybook sidebar: `actions`, `data-display`, `feedback`, `forms`,
 `layout`, `navigation`, and `overlays`. Component imports remain independent of these physical folders.

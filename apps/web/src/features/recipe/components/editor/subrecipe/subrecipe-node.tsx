@@ -1,6 +1,7 @@
 import { getRecipeInstructionsOptions } from '@client/features/recipe/api/get-instructions'
 import { type SubrecipeNodeData } from '@client/features/recipe/types/subrecipe'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { css } from '@recipe-organizer/design-system/css'
 import { Editor, EditorContent } from '@recipe-organizer/design-system/editor'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
 import { useQuery } from '@tanstack/react-query'
@@ -21,6 +22,22 @@ import {
 import { lazy, Suspense } from 'react'
 
 import { recipeNodes } from '../extensions'
+
+import '../editor.css'
+
+const subrecipeContentInset = css({ paddingInlineStart: '4' })
+const subrecipeLoading = css({ alignItems: 'center', display: 'flex', justifyContent: 'center', paddingBlock: '4' })
+const subrecipeTrigger = css({
+  backgroundColor: 'color-mix(in oklab, token(colors.muted) 30%, transparent)',
+  borderColor: 'color-mix(in oklab, token(colors.muted-foreground) 50%, transparent)',
+  borderRadius: 'lg',
+  borderStyle: 'dashed',
+  borderWidth: '2px',
+  cursor: 'pointer',
+  padding: '4',
+  textAlign: 'start',
+  width: 'full',
+})
 
 const SubrecipeDialog = lazy(async () => {
   const dialog = await import('./subrecipe-dialog')
@@ -70,7 +87,9 @@ const SubrecipeInstructionsContent = ({
 
   return (
     <Editor content={filteredInstructions} nodes={recipeNodes} readOnly>
-      <EditorContent className="pl-4" />
+      <div className={subrecipeContentInset}>
+        <EditorContent />
+      </div>
     </Editor>
   )
 }
@@ -110,23 +129,21 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
   }
 
   const content = (
-    <>
+    <div data-editor-decorator="">
       <p>
         <strong>{recipe.name}</strong>
       </p>
       {isLoading ? (
-        <div className="flex items-center justify-center py-4">
+        <div className={subrecipeLoading}>
           <Spinner />
         </div>
       ) : (
         <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe.instructions} />
       )}
-    </>
+    </div>
   )
 
-  const trigger = (
-    <div className="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start">{content}</div>
-  )
+  const trigger = <div className={subrecipeTrigger}>{content}</div>
 
   if (isEditable) {
     return (
@@ -218,7 +235,7 @@ class SubrecipeNodeType extends DecoratorNode<React.ReactElement> {
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
-    div.style.display = 'contents'
+    div.setAttribute('data-editor-decorator-root', '')
     return div
   }
 

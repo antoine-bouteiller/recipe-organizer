@@ -13,6 +13,7 @@ related:
     docs/infrastructure/client/routing-ssr.spec.md,
     docs/infrastructure/client/forms.spec.md,
     docs/infrastructure/client/client-state.spec.md,
+    packages/design-system/styling.spec.md,
   ]
 ---
 
@@ -24,12 +25,13 @@ module so feature ownership and import boundaries remain legible.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                                                                                                                                                                   | Rationale                                                                                                                   |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Ownership boundary       | A product domain spans `src/client/features/<feature>/` for UI and query wrappers and `src/server/routes/<feature>/` for Hono routes and DB utilities; `src/shared/<feature>/` holds only cross-runtime contracts.                                       | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
-| `[KD-2]` Runtime-code placement   | Browser code lives in `src/client/`; Worker code lives in `src/server/`; only actual cross-runtime modules live in `src/shared/`.                                                                                                                        | The top-level directories make runtime boundaries visible before an import is written.                                      |
-| `[KD-3]` Route and data placement | Browser routes follow URL hierarchy in `src/client/routes/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                   | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
-| `[KD-4]` Naming and imports       | Files use kebab-case except TanStack Router dynamic segments; TypeScript imports use `@client/*`, `@server/*`, and `@shared/*` for cross-directory runtime paths, and `@schema` for database schema exports; relative imports remain within a directory. | Filenames match the lint convention and import paths reveal whether a dependency is local or crosses a module boundary.     |
+| Decision                          | Choice                                                                                                                                                                                                                                                   | Rationale                                                                                                                    |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Ownership boundary       | A product domain spans `src/client/features/<feature>/` for UI and query wrappers and `src/server/routes/<feature>/` for Hono routes and DB utilities; `src/shared/<feature>/` holds only cross-runtime contracts.                                       | Runtime-specific code remains isolated while each domain has explicit ownership.                                             |
+| `[KD-2]` Runtime-code placement   | Browser code lives in `src/client/`; Worker code lives in `src/server/`; only actual cross-runtime modules live in `src/shared/`.                                                                                                                        | The top-level directories make runtime boundaries visible before an import is written.                                       |
+| `[KD-3]` Route and data placement | Browser routes follow URL hierarchy in `src/client/routes/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                   | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations.  |
+| `[KD-4]` Naming and imports       | Files use kebab-case except TanStack Router dynamic segments; TypeScript imports use `@client/*`, `@server/*`, and `@shared/*` for cross-directory runtime paths, and `@schema` for database schema exports; relative imports remain within a directory. | Filenames match the lint convention and import paths reveal whether a dependency is local or crosses a module boundary.      |
+| `[KD-5]` Styling generation       | Root Panda configuration generates `packages/design-system/styled-system/`; the design-system package exports its `css` and `tokens` entrypoints while components retain private colocated recipes.                                                      | One generated vocabulary serves web and Storybook without a separate styled-system workspace or component styling overrides. |
 
 ## 4. Principles & Intents
 
@@ -68,7 +70,11 @@ recipe-organizer/
 │       ├── client/             # Routing, forms and client-state specs
 │       └── server/             # Platform, data, server-function and auth specs
 ├── public/                     # Static assets
-├── scripts/                    # Build and development tooling
+├── scripts/                    # Build, development, and database tooling
+├── panda.config.ts              # Shared Panda configuration; root `styles:codegen` runs `panda codegen`
+├── packages/
+│   └── design-system/           # Reusable UI, authored theme, and generated Panda output
+│       └── styled-system/       # Generated utilities/types (not hand-edited); exported as `css` and `tokens`
 ├── src/
 │   ├── client/
 │   │   ├── components/         # Browser UI, forms, layout, navigation, and errors
@@ -129,11 +135,19 @@ colocated `<component>.stories.tsx` files. Desktop, drawer, and shared implement
 the matching family. Package subpath exports (`@recipe-organizer/design-system/button`, for example)
 expose source modules without a separate library build. Generic hooks live in `src/hooks/` and icons
 in `src/ui/data-display/icons/` inside the package; it never imports the web app. The combobox option type is shared, while query-backed option
-hooks remain app-owned. Shared Tailwind theme styles and fonts live in the package and are consumed
-by both the app and Storybook, including screen header and safe-area tokens. Only app-global scrolling
-and navigation transitions remain in the web stylesheet. Categories are `actions`, `data-display`,
-`feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the matching category as
-its title prefix. Physical categorization does not change package subpath imports.
+hooks remain app-owned. `panda.config.ts` reads the design system's authored theme, uses the
+`@recipe-organizer/design-system` import map, and generates utilities/types in
+`packages/design-system/styled-system/` for both app and Storybook consumers. The design-system
+package exports those generated entrypoints as `@recipe-organizer/design-system/css` and
+`@recipe-organizer/design-system/tokens`.
+The root `styles:codegen` script runs native `panda codegen`; `prepare` and the web/Storybook dev and
+build commands invoke that script before starting, while PostCSS manages consumer CSS extraction and
+HMR. Generated output is not hand-edited and is not a component styling-override API; component
+recipes remain colocated with their owners. Native global CSS remains for owned fonts, theme
+activation, safe-area, scrolling, transitions, and runtime-only behavior. Categories are `actions`,
+`data-display`, `feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the
+matching category as its title prefix. Physical categorization does not change package subpath imports.
+`packages/design-system/styling.spec.md` owns the styling and component-ownership guidance.
 
 `apps/web/src/components/` retains thin `layout/`, `navigation/`, and `error/` adapters,
 plus domain-specific ingredient-category presentation. Typed form adapters and their context/registry,
@@ -178,3 +192,4 @@ N/A.
 | 2026-09-15 | Extract owned UI, supporting hooks/icons, styles, and colocated stories to `packages/design-system`. | 8.1               | Share UI independently of the web app and provide Storybook examples.   |
 
 | 2026-09-15 | Extract app-shell presentation behind app adapters and group UI folders/stories by category. | 8.1 | Keep business logic in web while making presentation discoverable and reusable. |
+| 2026-09-16 | Record Panda generated-workspace placement and private component-recipe ownership. | 3, 8.1 | Keep shared generation discoverable without exposing styling overrides. |

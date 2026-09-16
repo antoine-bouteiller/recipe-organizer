@@ -1,36 +1,87 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { cn } from 'cn'
+import { css } from '@recipe-organizer/design-system/css'
 import { type ButtonHTMLAttributes, type ReactElement } from 'react'
 
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
 
-export const selectTriggerClassName =
-  "relative inline-flex min-h-9 w-full min-w-36 select-none items-center justify-between gap-2 rounded-lg border border-input bg-background not-dark:bg-clip-padding px-[calc(--spacing(3)-1px)] text-left text-base text-foreground shadow-xs/5 outline-none ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-data-disabled:not-focus-visible:not-aria-invalid:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/4%)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 focus-visible:border-ring focus-visible:ring-[3px] aria-invalid:border-destructive/36 focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16 data-disabled:pointer-events-none data-disabled:opacity-64 sm:min-h-8 sm:text-sm dark:bg-input/32 dark:aria-invalid:ring-destructive/24 dark:not-data-disabled:not-focus-visible:not-aria-invalid:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 [[data-disabled],:focus-visible,[aria-invalid],[data-pressed]]:shadow-none"
-
-export const selectTriggerIconClassName = '-me-1 size-4.5 opacity-80 sm:size-4'
-
-export const SelectButton = ({ className, render, children, ...props }: useRender.ComponentProps<'button'>): ReactElement => {
-  const typeValue: ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
-
-  const defaultProps = {
-    children: (
-      <>
-        <span className="flex-1 truncate in-data-placeholder:text-muted-foreground/72">{children}</span>
-        <CaretUpDownIcon className={selectTriggerIconClassName} />
-      </>
-    ),
-    className: cn(selectTriggerClassName, 'min-w-0', className),
-    'data-slot': 'select-button',
-    type: typeValue,
-  }
-
-  return useRender({
-    defaultTagName: 'button',
-    props: mergeProps<'button'>(defaultProps, props),
-    render,
+const selectTriggerClassName = css({
+  '& svg': { flexShrink: 0, pointerEvents: 'none' },
+  '&:focus-visible': { borderColor: 'ring', boxShadow: '0 0 0 3px color-mix(in oklab, token(colors.ring) 24%, transparent)' },
+  '&:focus-visible[aria-invalid]': {
+    borderColor: 'destructive/64',
+    boxShadow: '0 0 0 3px color-mix(in oklab, token(colors.destructive) 16%, transparent)',
+  },
+  '&:not([data-disabled], :focus-visible, [aria-invalid], [data-pressed])::before': {
+    boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)',
+  },
+  '&[aria-invalid]': { borderColor: 'destructive/36', boxShadow: 'none' },
+  '&[data-disabled]': { opacity: 0.64, pointerEvents: 'none' },
+  '&[data-pressed]': { boxShadow: 'none' },
+  '--owner-icon-opacity': '0.8',
+  '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+  '@media (pointer: coarse)': { _after: { content: '""', inset: '0', minHeight: '11', position: 'absolute' } },
+  _before: { borderRadius: 'calc(token(radii.lg) - 1px)', content: '""', inset: '0', pointerEvents: 'none', position: 'absolute' },
+  _dark: {
+    '&:focus-visible[aria-invalid]': { boxShadow: '0 0 0 3px color-mix(in oklab, token(colors.destructive) 24%, transparent)' },
+    '&:not([data-disabled], :focus-visible, [aria-invalid], [data-pressed])::before': {
+      boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)',
+    },
+  },
+  alignItems: 'center',
+  backgroundClip: 'padding-box',
+  backgroundColor: { _dark: 'input/32', base: 'background' },
+  borderColor: 'input',
+  borderRadius: 'lg',
+  borderWidth: '1px',
+  color: 'foreground',
+  display: 'inline-flex',
+  fontSize: { base: 'base', sm: 'sm' },
+  gap: '2',
+  justifyContent: 'space-between',
+  minHeight: { base: '9', sm: '8' },
+  minWidth: '36',
+  outline: 'none',
+  paddingInline: 'calc(token(spacing.3) - 1px)',
+  position: 'relative',
+  ringColor: 'ring/24',
+  textAlign: 'left',
+  transitionDuration: '150ms',
+  transitionProperty: 'box-shadow',
+  transitionTimingFunction: 'in-out',
+  userSelect: 'none',
+  width: 'full',
+})
+const selectTriggerIconClassName = css({ marginInlineEnd: '-1', opacity: 0.8 })
+const selectTextClassName = (empty: boolean): string =>
+  css({
+    color: empty ? 'muted-foreground' : undefined,
+    flex: '1',
+    overflow: 'hidden',
+    textAlign: 'left',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   })
+
+export const SelectButton = ({ render, children, ...props }: useRender.ComponentProps<'button'>): ReactElement => {
+  const type: ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
+  const mergedProps = mergeProps<'button'>(
+    {
+      children: (
+        <>
+          <span className={selectTextClassName(false)}>{children}</span>
+          <span className={selectTriggerIconClassName}>
+            <CaretUpDownIcon />
+          </span>
+        </>
+      ),
+      className: selectTriggerClassName,
+      type,
+    },
+    props
+  )
+  return useRender({ defaultTagName: 'button', props: { ...mergedProps, 'data-slot': 'select-button' }, render })
 }
 
 export const getSelectDisplay = <TValue extends string>(props: SelectProps<TValue>) => {
@@ -39,7 +90,11 @@ export const getSelectDisplay = <TValue extends string>(props: SelectProps<TValu
     props.multiple ? props.value.some((item) => item === value) : (props.value ?? null) === value
   const selectedLabels = items.filter((item) => isSelected(item.value)).map((item) => item.label)
   const isEmpty = selectedLabels.length === 0
-  const displayLabel = isEmpty ? placeholder : selectedLabels[0] + (selectedLabels.length > 1 ? ` (+${selectedLabels.length - 1})` : '')
-
-  return { displayLabel, isEmpty, isSelected }
+  return {
+    displayLabel: isEmpty ? placeholder : selectedLabels[0] + (selectedLabels.length > 1 ? ` (+${selectedLabels.length - 1})` : ''),
+    isEmpty,
+    isSelected,
+  }
 }
+
+export { selectTextClassName, selectTriggerClassName, selectTriggerIconClassName }

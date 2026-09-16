@@ -6,9 +6,10 @@ import { DeleteIngredient } from '@client/features/ingredients/components/delete
 import { EditIngredient } from '@client/features/ingredients/components/edit-ingredient'
 import { IngredientBadge } from '@client/features/ingredients/components/ingredient-badge'
 import { Button } from '@recipe-organizer/design-system/button'
+import { css } from '@recipe-organizer/design-system/css'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
-import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
+import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
@@ -26,17 +27,29 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className="sticky top-(--screen-header-height) z-10 flex shrink-0 items-center gap-4 pb-2 md:top-0 md:bg-muted">
+      <div
+        className={css({
+          alignItems: 'center',
+          background: { md: 'muted' },
+          display: 'flex',
+          flexShrink: '0',
+          gap: '4',
+          paddingBottom: '2',
+          position: 'sticky',
+          top: { base: 'var(--screen-header-height)', md: '0' },
+          zIndex: '10',
+        })}
+      >
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddIngredient>
-          <Button className={glassSurface} size="icon-lg" variant="outline">
+          <Button size="icon-lg" variant="search-trigger">
             <PlusIcon />
           </Button>
         </AddIngredient>
       </div>
 
       {filteredIngredients.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">
+        <p className={css({ color: 'muted-foreground', paddingBlock: '8', textAlign: 'center' })}>
           {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
         </p>
       ) : (
@@ -44,6 +57,7 @@ const IngredientsManagement = () => {
           {filteredIngredients.map((ingredient, index) => (
             <React.Fragment key={ingredient.id}>
               <Item
+                layout="row"
                 actions={
                   isAdmin ? (
                     <>
@@ -52,14 +66,15 @@ const IngredientsManagement = () => {
                     </>
                   ) : undefined
                 }
-                className="flex-nowrap"
                 title={
                   <>
-                    <span className="text-nowrap text-ellipsis">{ingredient.name}</span>
-                    <IngredientBadge category={ingredient.category} className="aspect-square md:aspect-auto">
-                      {ingredientCategoryIcons[ingredient.category]}
-                      <span className="hidden md:block">{ingredientCategoryLabels[ingredient.category]}</span>
-                    </IngredientBadge>
+                    <span className={css({ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' })}>{ingredient.name}</span>
+                    <span className={css({ aspectRatio: { base: '1 / 1', md: 'auto' } })}>
+                      <IngredientBadge category={ingredient.category}>
+                        {ingredientCategoryIcons[ingredient.category]}
+                        <span className={css({ display: { base: 'none', md: 'block' } })}>{ingredientCategoryLabels[ingredient.category]}</span>
+                      </IngredientBadge>
+                    </span>
                   </>
                 }
               />

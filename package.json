@@ -13,20 +13,25 @@
     "db:migrate:remote": "drizzle-kit migrate",
     "db:dump": "vp run @recipe-organizer/scripts#db:dump",
     "db:import": "wrangler d1 execute recipe-organizer --config apps/api/wrangler.jsonc --local --persist-to .wrangler/state --file ./database.sql",
-    "knip": "knip",
+    "knip": "pnpm run styles:codegen && knip",
     "deploy": "vp run @recipe-organizer/api#deploy",
     "storybook": "vp run @recipe-organizer/design-system#storybook",
-    "storybook:build": "vp run @recipe-organizer/design-system#storybook:build"
+    "storybook:build": "vp run @recipe-organizer/design-system#storybook:build",
+    "styles:codegen": "panda codegen",
+    "prepare": "pnpm run styles:codegen"
   },
   "devDependencies": {
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
+    "@pandacss/dev": "catalog:",
+    "@pandacss/postcss": "catalog:",
     "@recipe-organizer/config": "workspace:*",
     "@recipe-organizer/oxlint": "workspace:*",
     "@types/node": "catalog:",
     "drizzle-kit": "catalog:",
     "knip": "catalog:",
     "lefthook": "catalog:",
+    "postcss": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "wrangler": "catalog:"

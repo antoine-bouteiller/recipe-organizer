@@ -9,6 +9,7 @@ import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } f
 import { RecipeForm } from '@client/features/recipe/components/recipe-form'
 import { recipeFormFields } from '@client/features/recipe/utils/form'
 import { Button } from '@recipe-organizer/design-system/button'
+import { css } from '@recipe-organizer/design-system/css'
 import { Form } from '@recipe-organizer/design-system/form'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
@@ -84,7 +85,7 @@ const EditRecipePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className={css({ alignItems: 'center', display: 'flex', height: '100vh', justifyContent: 'center' })}>
         <Spinner />
       </div>
     )
@@ -113,7 +114,9 @@ const EditRecipePage = () => {
           initialImage={{ id: recipe.image, url: recipe.image }}
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
-        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+        <div
+          className={css({ display: 'flex', flexDirection: { base: 'column', md: 'row' }, gap: '4', justifyContent: 'flex-end', paddingTop: '6' })}
+        >
           <Button disabled={isLoading} onClick={() => router.history.back()} type="button" variant="outline">
             Annuler
           </Button>

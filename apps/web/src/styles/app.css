@@ -1,8 +1,8 @@
 @import '@recipe-organizer/design-system/styles.css';
 
-@layer base {
+@layer panda-base {
   html {
-    @apply scroll-smooth;
+    scroll-behavior: smooth;
     height: 100%;
     overflow: hidden;
   }
@@ -23,11 +23,6 @@
     opacity: 0;
     transform: translateY(0.5rem);
   }
-}
-
-@utility stagger-in-* {
-  animation: stagger-in 300ms both;
-  animation-delay: calc(var(--stagger, 0) * --value(integer) * 1ms);
 }
 
 /* View Transitions - mobile only */

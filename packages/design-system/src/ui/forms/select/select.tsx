@@ -1,8 +1,7 @@
-import { cn } from 'cn'
 import { lazy, Suspense, type ReactElement } from 'react'
 
 import { useIsMobile } from '../../../hooks/use-is-mobile'
-import { getSelectDisplay, SelectButton } from './select.shared'
+import { getSelectDisplay, SelectButton, selectTextClassName } from './select.shared'
 
 interface SelectOption<TValue extends string> {
   label: string
@@ -14,7 +13,6 @@ interface SelectBaseProps<TValue extends string> {
   placeholder?: string
   title?: string
   disabled?: boolean
-  className?: string
 }
 
 export type SelectProps<TValue extends string> = SelectBaseProps<TValue> &
@@ -29,17 +27,32 @@ const SelectDrawer = lazy(() => import('./select.drawer'))
 export const Select = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
   const isMobile = useIsMobile()
   const { displayLabel, isEmpty } = getSelectDisplay(props)
-  // Lazy boundaries erase the generic, so impls emit plain strings: map them back to typed option values.
   const typedValue = (value: string | null): TValue | null => props.items.find((item) => item.value === value)?.value ?? null
   const implProps: SelectProps<string> = props.multiple
-    ? { ...props, multiple: true, onValueChange: (values: string[]) => props.onValueChange(values.map(typedValue).filter((value) => value !== null)) }
-    : { ...props, multiple: false, onValueChange: (value: string | null) => props.onValueChange(typedValue(value)) }
+    ? {
+        disabled: props.disabled,
+        items: props.items,
+        multiple: true,
+        onValueChange: (values: string[]) => props.onValueChange(values.map(typedValue).filter((value) => value !== null)),
+        placeholder: props.placeholder,
+        title: props.title,
+        value: props.value,
+      }
+    : {
+        disabled: props.disabled,
+        items: props.items,
+        multiple: false,
+        onValueChange: (value: string | null) => props.onValueChange(typedValue(value)),
+        placeholder: props.placeholder,
+        title: props.title,
+        value: props.value,
+      }
 
   return (
     <Suspense
       fallback={
-        <SelectButton className={props.className} disabled={props.disabled}>
-          <span className={cn(isEmpty && 'text-muted-foreground')}>{displayLabel}</span>
+        <SelectButton disabled={props.disabled}>
+          <span className={selectTextClassName(isEmpty)}>{displayLabel}</span>
         </SelectButton>
       }
     >

@@ -6,7 +6,7 @@ import { LexicalExtensionComposer } from '@lexical/react/LexicalExtensionCompose
 import { useExtensionSignalValue } from '@lexical/react/useExtensionSignalValue'
 import { RichTextExtension } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
-import { cn } from 'cn'
+import { css } from '@recipe-organizer/design-system/css'
 import {
   $getSelection,
   $isRangeSelection,
@@ -21,15 +21,63 @@ import {
   type LexicalNode,
   type TextFormatType,
 } from 'lexical'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
 
-import { Toggle } from '../../actions/toggle/toggle'
-import { ToolbarButton } from '../../actions/toolbar/toolbar'
+import { ToolbarToggle } from '../../actions/toolbar/toolbar'
 import { OnChangePlugin } from './plugins/on-change-plugin'
 
-type Command = 'bold' | 'bulletList' | 'italic' | 'redo' | 'underline' | 'undo'
+type EditorCommand = 'bold' | 'bulletList' | 'italic' | 'redo' | 'underline' | 'undo'
+type EditorContentWidth = 'full' | 'reading'
 
-const EditorToolbarButton = ({ children, command }: { children: ReactNode; command: Command }) => {
+const editorUnderline = css({ textDecoration: 'underline' })
+const editorContentBase = css({
+  '& > :not([data-editor-decorator]) :where(a)': { color: 'oklch(0.446 0.043 257.281)', textDecoration: 'underline' },
+  '& > :not([data-editor-decorator]) :where(b, strong)': { fontWeight: '700' },
+  '& > :not([data-editor-decorator]) :where(em, i)': { fontStyle: 'italic' },
+  '& > :not([data-editor-decorator]) :where(li)': { marginBottom: '4px', marginTop: '4px', paddingInlineStart: '6px' },
+  '& > :where(h1)': { fontSize: '30px', lineHeight: '36px', marginBottom: '24px', marginTop: '0px' },
+  '& > :where(h1, h2, h3, h4)': { color: 'oklch(0.21 0.034 264.665)', fontWeight: '700' },
+  '& > :where(h2)': { fontSize: '20px', lineHeight: '28px', marginBottom: '16px', marginTop: '32px' },
+  '& > :where(h3)': { fontSize: '18px', lineHeight: '28px', marginBottom: '8px', marginTop: '24px' },
+  '& > :where(h4)': { fontSize: '16px', lineHeight: '24px', marginBottom: '8px', marginTop: '20px' },
+  '& > :where(ol, ul)': { marginBottom: '12px', marginTop: '12px', paddingInlineStart: '22px' },
+  '& > :where(p)': { marginBottom: '0px', marginTop: '0px' },
+  _dark: {
+    '& > :not([data-editor-decorator]) :where(a)': { color: 'oklch(0.707 0.022 261.325)' },
+    '& > :where(h1, h2, h3, h4)': { color: 'white' },
+    color: 'oklch(0.872 0.01 258.338)',
+  },
+  color: 'oklch(0.373 0.034 259.733)',
+  fontFamily: 'sans',
+  fontSize: 'sm',
+  lineHeight: '1.5rem',
+  outline: 'none',
+})
+const editorChecklist = css({ listStyleType: 'none', paddingInlineStart: '0' })
+const editorCheckedListItem = css({ textDecoration: 'line-through' })
+const editorContentFull = css({ width: 'full' })
+const editorContentReading = css({ maxWidth: '65ch', width: 'full' })
+const editorContentEditable = css({
+  '&[aria-disabled=true]': { opacity: '64%' },
+  _dark: { backgroundColor: 'color-mix(in oklab, token(colors.input) 32%, transparent)' },
+  _focusVisible: { borderColor: 'ring', boxShadow: '0 0 0 3px color-mix(in oklab, token(colors.ring) 24%, transparent)' },
+  _invalid: { borderColor: 'color-mix(in oklab, token(colors.destructive) 36%, transparent)' },
+  backgroundClip: 'padding-box',
+  backgroundColor: 'background',
+  borderColor: 'input',
+  borderRadius: 'lg',
+  borderWidth: '1px',
+  padding: '4',
+  shadow: 'xs',
+  transition: 'box-shadow 150ms',
+})
+
+interface EditorToolbarButtonProps {
+  children: ReactNode
+  command: EditorCommand
+}
+
+const EditorToolbarButton = ({ children, command }: EditorToolbarButtonProps) => {
   const [editor] = useLexicalComposerContext()
   const [isActive, setIsActive] = useState(false)
   const canUndo = useExtensionSignalValue(HistoryExtension, 'canUndo')
@@ -38,7 +86,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
 
   useEffect(() => {
     const formatCommands: TextFormatType[] = ['bold', 'italic', 'underline']
-
     const updateActiveState = () => {
       const selection = $getSelection()
       if (!$isRangeSelection(selection)) {
@@ -52,9 +99,10 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
         const element = anchorNode.getKey() === 'root' ? anchorNode : anchorNode.getTopLevelElementOrThrow()
         const parentList = $getNearestNodeOfType(element, ListNode)
         setIsActive($isListNode(parentList) && parentList.getListType() === 'bullet')
+      } else {
+        setIsActive(false)
       }
     }
-
     const unregisterSelection = editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
       () => {
@@ -63,13 +111,7 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
       },
       COMMAND_PRIORITY_LOW
     )
-
-    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        updateActiveState()
-      })
-    })
-
+    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => editorState.read(updateActiveState))
     return () => {
       unregisterSelection()
       unregisterUpdate()
@@ -80,7 +122,6 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
     if (!editor.isEditable()) {
       return
     }
-
     switch (command) {
       case 'bold':
       case 'italic':
@@ -89,11 +130,7 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
         break
       }
       case 'bulletList': {
-        if (isActive) {
-          editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined)
-        } else {
-          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-        }
+        editor.dispatchCommand(isActive ? REMOVE_LIST_COMMAND : INSERT_UNORDERED_LIST_COMMAND, undefined)
         break
       }
       case 'undo': {
@@ -111,12 +148,9 @@ const EditorToolbarButton = ({ children, command }: { children: ReactNode; comma
   }, [editor, command, isActive])
 
   return (
-    <ToolbarButton
-      aria-label={command}
-      render={<Toggle aria-pressed={isActive} data-pressed={isActive ? true : undefined} disabled={!canExecute} onClick={toggle} value={command} />}
-    >
+    <ToolbarToggle aria-label={command} disabled={!canExecute} onClick={toggle} pressed={isActive} value={command}>
       {children}
-    </ToolbarButton>
+    </ToolbarToggle>
   )
 }
 
@@ -140,17 +174,9 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
       onError: (error: Error) => {
         throw error
       },
-      theme: {
-        paragraph: '',
-        text: {
-          bold: 'font-bold',
-          italic: 'italic',
-          underline: 'underline',
-        },
-      },
+      theme: { list: { checklist: editorChecklist, listitemChecked: editorCheckedListItem }, text: { underline: editorUnderline } },
     })
   )
-
   return (
     <LexicalExtensionComposer extension={extension} contentEditable={null}>
       {onChange && <OnChangePlugin onChange={onChange} />}
@@ -160,23 +186,24 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
 }
 
 interface EditorContentProps {
-  className?: string
   disabled?: boolean
+  width?: EditorContentWidth
 }
 
-const EditorContent = ({ className, disabled }: EditorContentProps) => {
+const EditorContent = ({ disabled, width = 'full' }: EditorContentProps) => {
   const [editor] = useLexicalComposerContext()
-  const isEditable = editor.isEditable()
-
+  const [initiallyEditable, ,] = useState(() => editor.isEditable())
+  useLayoutEffect(() => {
+    editor.setEditable(!disabled && initiallyEditable)
+  }, [disabled, editor, initiallyEditable])
+  const widthClassName = width === 'reading' ? editorContentReading : editorContentFull
+  const editableClassName = initiallyEditable ? ` ${editorContentEditable}` : ''
   return (
     <ContentEditable
-      aria-disabled={disabled}
-      className={cn(
-        'focus:outline-none prose prose-sm max-w-none dark:prose-invert',
-        isEditable &&
-          'w-full rounded-lg border border-input bg-background bg-clip-padding p-4 shadow-xs ring-ring/24 transition-shadow not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] has-focus-visible:border-ring has-focus-visible:ring-[3px] has-disabled:opacity-64 has-aria-invalid:border-destructive/36 has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-[:disabled,:focus-visible,[aria-invalid]]:shadow-none dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:not-has-disabled:not-has-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)] dark:has-aria-invalid:ring-destructive/24',
-        className
-      )}
+      aria-disabled={disabled || undefined}
+      aria-readonly={disabled || !editor.isEditable() || undefined}
+      className={`${editorContentBase} ${widthClassName}${editableClassName}`}
+      data-editor-content=""
     />
   )
 }

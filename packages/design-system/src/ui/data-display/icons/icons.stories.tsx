@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
 import { ArrowCounterClockwiseIcon } from './arrow-counter-clockwise'
@@ -56,6 +57,22 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const gallery = css({
+  display: 'grid',
+  gap: '4',
+  gridTemplateColumns: { base: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))', sm: 'repeat(3, minmax(0, 1fr))' },
+})
+const iconCell = css({
+  alignItems: 'center',
+  borderRadius: 'md',
+  borderWidth: '1px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2',
+  padding: '4',
+})
+const iconName = css({ fontSize: 'xs' })
+
 const icons = [
   ['ArrowCounterClockwiseIcon', ArrowCounterClockwiseIcon],
   ['ArrowElbowDownLeftIcon', ArrowElbowDownLeftIcon],
@@ -109,11 +126,11 @@ const icons = [
 
 export const Gallery: Story = {
   render: () => (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+    <div className={gallery}>
       {icons.map(([name, Icon]) => (
-        <div className="flex flex-col items-center gap-2 rounded-md border p-4" key={name}>
-          <Icon aria-hidden="true" className="size-6" />
-          <span className="text-xs text-muted-foreground">{name}</span>
+        <div className={iconCell} key={name}>
+          <Icon size="xl" />
+          <span className={iconName}>{name}</span>
         </div>
       ))}
     </div>

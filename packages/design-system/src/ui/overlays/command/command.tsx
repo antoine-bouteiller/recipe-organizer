@@ -1,171 +1,251 @@
 import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomplete'
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
-import { cn } from 'cn'
-import React from 'react'
+import { cva } from '@recipe-organizer/design-system/css'
+import type React from 'react'
 
+import { Button } from '../../actions/button/button'
 import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
-import { Input } from '../../forms/input/input'
 import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 
-const Autocomplete: typeof AutocompletePrimitive.Root = AutocompletePrimitive.Root
+const inputGroupClassName = cva({
+  base: {
+    '&:has(:disabled)': { opacity: '0.64' },
+    '&:not(:has(> [data-width=full]))': { width: 'fit-content' },
+    color: 'foreground',
+    position: 'relative',
+    width: 'full',
+  },
+})
+const inputClassName = cva({
+  base: {
+    _placeholder: { color: 'muted-foreground/72' },
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+    boxShadow: 'none',
+    color: 'foreground',
+    fontSize: { base: 'base', sm: 'sm' },
+    height: { base: '9.5', sm: '8.5' },
+    lineHeight: { base: '2.375rem', sm: '2.125rem' },
+    minWidth: '0',
+    outline: 'none',
+    paddingInlineEnd: '3',
+    paddingInlineStart: { base: 'calc(2.125rem - 1px)', sm: 'calc(token(spacing.8) - 1px)' },
+    transition: 'background-color 5000000s ease-in-out 0s',
+    width: 'full',
+  },
+})
+const addonClassName = cva({
+  base: {
+    '& svg': {
+      '&:not([data-size])': { height: { base: '1.125rem', sm: '1rem' }, width: { base: '1.125rem', sm: '1rem' } },
+      marginInline: '-0.125rem',
+    },
+    alignItems: 'center',
+    display: 'flex',
+    insetBlock: '0',
+    insetInlineStart: '1px',
+    opacity: '0.8',
+    paddingInlineStart: 'calc(token(spacing.3) - 1px)',
+    pointerEvents: 'none',
+    position: 'absolute',
+    zIndex: '10',
+  },
+})
+const itemClassName = cva({
+  base: {
+    '&[data-disabled]': { opacity: '0.64', pointerEvents: 'none' },
+    '&[data-highlighted]': { backgroundColor: 'accent', color: 'accent-foreground' },
+    alignItems: 'center',
+    borderRadius: 'sm',
+    cursor: 'default',
+    display: 'flex',
+    fontSize: { base: 'base', sm: 'sm' },
+    minHeight: { base: '8', sm: '7' },
+    outline: 'none',
+    paddingBlock: '1.5',
+    paddingInline: '2',
+    userSelect: 'none',
+  },
+})
+const emptyClassName = cva({
+  base: { '&:not(:empty)': { paddingBlock: '6' }, color: 'muted-foreground', fontSize: { base: 'base', sm: 'sm' }, textAlign: 'center' },
+})
+const listClassName = cva({
+  base: { '&:not(:empty)': { padding: '2', scrollPaddingBlock: '2' }, '&[data-has-overflow-y]': { paddingInlineEnd: '3' } },
+})
+const backdropClassName = cva({
+  base: {
+    '&[data-ending-style], &[data-starting-style]': { opacity: '0' },
+    backdropFilter: 'blur(4px)',
+    backgroundColor: 'black/32',
+    inset: '0',
+    position: 'fixed',
+    transition: 'opacity 200ms',
+    zIndex: '50',
+  },
+})
+const viewportClassName = cva({
+  base: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    inset: '0',
+    paddingBlock: 'max(token(spacing.4), 4vh)',
+    paddingInline: '4',
+    position: 'fixed',
+    sm: { paddingBlock: '10vh' },
+    zIndex: '50',
+  },
+})
+const popupClassName = cva({
+  base: {
+    '&[data-ending-style], &[data-starting-style]': { opacity: '0', scale: '0.98' },
+    '&[data-nested-dialog-open]': { transformOrigin: 'top' },
+    '&[data-nested][data-ending-style], &[data-nested][data-starting-style]': { translate: '0 2rem' },
+    _before: {
+      backgroundColor: 'muted/72',
+      borderRadius: 'calc(token(radii.2xl) - 1px)',
+      boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)',
+      content: '""',
+      inset: '0',
+      pointerEvents: 'none',
+      position: 'absolute',
+    },
+    _dark: { _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)' } },
+    backgroundClip: 'padding-box',
+    backgroundColor: 'popover',
+    borderRadius: '2xl',
+    borderWidth: '1px',
+    boxShadow: 'overlay',
+    color: 'popover-foreground',
+    display: 'flex',
+    flexDirection: 'column',
+    maxHeight: '26.25rem',
+    maxWidth: 'xl',
+    minHeight: '0',
+    minWidth: '0',
+    opacity: 'calc(1 - 0.1 * var(--nested-dialogs))',
+    outline: 'none',
+    position: 'relative',
+    scale: 'calc(1 - 0.1 * var(--nested-dialogs))',
+    transitionDuration: '200ms',
+    transitionProperty: 'scale, opacity, translate',
+    transitionTimingFunction: 'in-out',
+    translate: '0 calc(-1.25rem * var(--nested-dialogs))',
+    width: 'full',
+  },
+})
+const panelClassName = cva({
+  base: {
+    '&:not(:has(+ [data-slot=command-footer]))': {
+      borderBottomRadius: '2xl',
+      clipPath: 'inset(0 1px 1px 1px round 0 0 calc(token(radii.2xl) - 1px) calc(token(radii.2xl) - 1px))',
+      marginBottom: '-1px',
+    },
+    _before: { borderTopRadius: 'calc(token(radii.xl) - 1px)', content: '""', inset: '0', pointerEvents: 'none', position: 'absolute' },
+    backgroundClip: 'padding-box',
+    backgroundColor: 'popover',
+    borderBottomWidth: '0',
+    borderTopRadius: 'xl',
+    borderWidth: '1px',
+    boxShadow: 'xs',
+    clipPath: 'inset(0 1px)',
+    marginInline: '-1px',
+    minHeight: '0',
+    position: 'relative',
+  },
+})
+const footerClassName = cva({
+  base: {
+    alignItems: 'center',
+    borderBottomRadius: 'calc(token(radii.2xl) - 1px)',
+    borderTopWidth: '1px',
+    color: 'muted-foreground',
+    display: 'flex',
+    fontSize: 'xs',
+    gap: '2',
+    justifyContent: 'space-between',
+    paddingBlock: '3',
+    paddingInline: '5',
+    position: 'relative',
+  },
+})
 
-const AutocompleteInput = ({
-  className,
-  startAddon,
-  ...props
-}: Omit<AutocompletePrimitive.Input.Props, 'size'> & {
-  startAddon?: React.ReactNode
-  ref?: React.Ref<HTMLInputElement>
-}): React.ReactElement => (
-  <AutocompletePrimitive.InputGroup
-    className="relative w-full text-foreground not-has-[>*.w-full]:w-fit has-disabled:opacity-64"
-    data-slot="autocomplete-input-group"
-  >
-    {startAddon && (
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 start-px z-10 flex items-center ps-[calc(--spacing(3)-1px)] opacity-80 [&_svg]:-mx-0.5 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4"
-        data-slot="autocomplete-start-addon"
-      >
-        {startAddon}
-      </div>
-    )}
-    <AutocompletePrimitive.Input
-      className={cn(
-        startAddon &&
-          '*:data-[slot=autocomplete-input]:ps-[calc(--spacing(8.5)-1px)] sm:*:data-[slot=autocomplete-input]:ps-[calc(--spacing(8)-1px)]',
-        'has-[+[data-slot=autocomplete-trigger],+[data-slot=autocomplete-clear]]:*:data-[slot=autocomplete-input]:pe-7',
-        className
-      )}
-      data-slot="autocomplete-input"
-      render={<Input nativeInput size="lg" />}
-      {...props}
-    />
+type InputProps = Pick<AutocompletePrimitive.Input.Props, 'placeholder'>
+type ItemProps = Pick<AutocompletePrimitive.Item.Props, 'children' | 'onClick' | 'value'>
+type ListProps = Pick<AutocompletePrimitive.List.Props, 'children'>
+type EmptyProps = Pick<AutocompletePrimitive.Empty.Props, 'children'>
+type DialogRootProps = Pick<CommandDialogPrimitive.Root.Props, 'children' | 'onOpenChange' | 'open'>
+type DialogTriggerProps = Pick<CommandDialogPrimitive.Trigger.Props, 'children' | 'render'>
+type DialogPopupProps = Pick<CommandDialogPrimitive.Popup.Props, 'aria-label' | 'children'>
+type CommandProps<ItemValue> = Pick<AutocompletePrimitive.Root.Props<ItemValue>, 'children'> & { items?: readonly ItemValue[] }
+type PlainProps = Pick<React.ComponentProps<'div'>, 'children'>
+
+const defaultCommandDialogTriggerRender = <Button variant="outline" />
+
+const AutocompleteInput = ({ placeholder }: InputProps): React.ReactElement => (
+  <AutocompletePrimitive.InputGroup className={inputGroupClassName()} data-slot="autocomplete-input-group">
+    <div aria-hidden className={addonClassName()} data-slot="autocomplete-start-addon">
+      <MagnifyingGlassIcon />
+    </div>
+    <AutocompletePrimitive.Input autoFocus className={inputClassName()} data-slot="autocomplete-input" placeholder={placeholder} />
   </AutocompletePrimitive.InputGroup>
 )
 
-const AutocompleteItem = ({ className, children, ...props }: AutocompletePrimitive.Item.Props): React.ReactElement => (
-  <AutocompletePrimitive.Item
-    className={cn(
-      'flex min-h-8 cursor-default select-none items-center rounded-sm px-2 py-1 text-base outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-64 sm:min-h-7 sm:text-sm',
-      className
-    )}
-    data-slot="autocomplete-item"
-    {...props}
-  >
+export const CommandDialog = ({ children, onOpenChange, open }: DialogRootProps): React.ReactElement => (
+  <CommandDialogPrimitive.Root onOpenChange={onOpenChange} open={open}>
+    {children}
+  </CommandDialogPrimitive.Root>
+)
+export const CommandDialogTrigger = ({ children, render = defaultCommandDialogTriggerRender }: DialogTriggerProps): React.ReactElement => (
+  <CommandDialogPrimitive.Trigger data-slot="command-dialog-trigger" render={render}>
+    {children}
+  </CommandDialogPrimitive.Trigger>
+)
+export const CommandDialogPopup = ({ children, 'aria-label': ariaLabel }: DialogPopupProps): React.ReactElement => (
+  <CommandDialogPrimitive.Portal>
+    <CommandDialogPrimitive.Backdrop className={backdropClassName()} data-slot="command-dialog-backdrop" />
+    <CommandDialogPrimitive.Viewport className={viewportClassName()} data-slot="command-dialog-viewport">
+      <CommandDialogPrimitive.Popup aria-label={ariaLabel} className={popupClassName()} data-slot="command-dialog-popup">
+        {children}
+      </CommandDialogPrimitive.Popup>
+    </CommandDialogPrimitive.Viewport>
+  </CommandDialogPrimitive.Portal>
+)
+export const Command = <ItemValue,>({ children, items }: CommandProps<ItemValue>): React.ReactElement => (
+  <AutocompletePrimitive.Root<ItemValue> autoHighlight="always" inline items={items} keepHighlight open>
+    {children}
+  </AutocompletePrimitive.Root>
+)
+export const CommandInput = (props: InputProps): React.ReactElement => (
+  <div className={cva({ base: { paddingBlock: '1.5', paddingInline: '2.5' } })()}>
+    <AutocompleteInput {...props} />
+  </div>
+)
+export const CommandList = ({ children }: ListProps): React.ReactElement => (
+  <ScrollArea scrollbarGutter="compact" scrollFade>
+    <AutocompletePrimitive.List className={listClassName()} data-slot="command-list">
+      {children}
+    </AutocompletePrimitive.List>
+  </ScrollArea>
+)
+export const CommandEmpty = ({ children }: EmptyProps): React.ReactElement => (
+  <AutocompletePrimitive.Empty className={emptyClassName()} data-slot="command-empty">
+    {children}
+  </AutocompletePrimitive.Empty>
+)
+export const CommandPanel = ({ children }: PlainProps): React.ReactElement => (
+  <div className={panelClassName()} data-slot="command-panel">
+    {children}
+  </div>
+)
+export const CommandItem = ({ children, onClick, value }: ItemProps): React.ReactElement => (
+  <AutocompletePrimitive.Item className={itemClassName()} data-slot="command-item" onClick={onClick} value={value}>
     {children}
   </AutocompletePrimitive.Item>
 )
-
-const AutocompleteEmpty = ({ className, ...props }: AutocompletePrimitive.Empty.Props): React.ReactElement => (
-  <AutocompletePrimitive.Empty
-    className={cn('not-empty:p-2 text-center text-base text-muted-foreground sm:text-sm', className)}
-    data-slot="autocomplete-empty"
-    {...props}
-  />
-)
-
-const AutocompleteList = ({ className, ...props }: AutocompletePrimitive.List.Props): React.ReactElement => (
-  <ScrollArea scrollbarGutter scrollFade>
-    <AutocompletePrimitive.List
-      className={cn('not-empty:scroll-py-1 not-empty:p-1 in-data-has-overflow-y:pe-3', className)}
-      data-slot="autocomplete-list"
-      {...props}
-    />
-  </ScrollArea>
-)
-
-export const CommandDialog: typeof CommandDialogPrimitive.Root = CommandDialogPrimitive.Root
-
-const CommandDialogPortal: typeof CommandDialogPrimitive.Portal = CommandDialogPrimitive.Portal
-
-export const CommandDialogTrigger = (props: CommandDialogPrimitive.Trigger.Props): React.ReactElement => (
-  <CommandDialogPrimitive.Trigger data-slot="command-dialog-trigger" {...props} />
-)
-
-const CommandDialogBackdrop = ({ className, ...props }: CommandDialogPrimitive.Backdrop.Props): React.ReactElement => (
-  <CommandDialogPrimitive.Backdrop
-    className={cn(
-      'fixed inset-0 z-50 bg-black/32 backdrop-blur-sm transition-all duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0',
-      className
-    )}
-    data-slot="command-dialog-backdrop"
-    {...props}
-  />
-)
-
-const CommandDialogViewport = ({ className, ...props }: CommandDialogPrimitive.Viewport.Props): React.ReactElement => (
-  <CommandDialogPrimitive.Viewport
-    className={cn('fixed inset-0 z-50 flex flex-col items-center px-4 py-[max(--spacing(4),4vh)] sm:py-[10vh]', className)}
-    data-slot="command-dialog-viewport"
-    {...props}
-  />
-)
-
-export const CommandDialogPopup = ({ className, children, ...props }: CommandDialogPrimitive.Popup.Props): React.ReactElement => (
-  <CommandDialogPortal>
-    <CommandDialogBackdrop />
-    <CommandDialogViewport>
-      <CommandDialogPrimitive.Popup
-        className={cn(
-          'relative row-start-2 flex max-h-105 min-h-0 w-full min-w-0 max-w-xl -translate-y-[calc(1.25rem*var(--nested-dialogs))] scale-[calc(1-0.1*var(--nested-dialogs))] flex-col rounded-2xl border bg-popover not-dark:bg-clip-padding text-popover-foreground opacity-[calc(1-0.1*var(--nested-dialogs))] shadow-lg/5 outline-none transition-[scale,opacity,translate] duration-200 ease-in-out will-change-transform before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:bg-muted/72 before:shadow-[0_1px_--theme(--color-black/4%)] data-nested:data-ending-style:translate-y-8 data-nested:data-starting-style:translate-y-8 data-nested-dialog-open:origin-top data-ending-style:scale-98 data-starting-style:scale-98 data-ending-style:opacity-0 data-starting-style:opacity-0 **:data-[slot=scroll-area-viewport]:data-has-overflow-y:pe-1 dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-          className
-        )}
-        data-slot="command-dialog-popup"
-        {...props}
-      >
-        {children}
-      </CommandDialogPrimitive.Popup>
-    </CommandDialogViewport>
-  </CommandDialogPortal>
-)
-
-export const Command = ({
-  autoHighlight = 'always',
-  keepHighlight = true,
-  ...props
-}: React.ComponentProps<typeof Autocomplete>): React.ReactElement => (
-  <Autocomplete autoHighlight={autoHighlight} inline keepHighlight={keepHighlight} open {...props} />
-)
-
-export const CommandInput = ({ className, placeholder, ...props }: React.ComponentProps<typeof AutocompleteInput>): React.ReactElement => (
-  <div className="px-2.5 py-1.5">
-    <AutocompleteInput
-      autoFocus
-      className={cn('border-transparent! bg-transparent! shadow-none before:hidden has-focus-visible:ring-0', className)}
-      placeholder={placeholder}
-      startAddon={<MagnifyingGlassIcon />}
-      {...props}
-    />
+export const CommandFooter = ({ children }: PlainProps): React.ReactElement => (
+  <div className={footerClassName()} data-slot="command-footer">
+    {children}
   </div>
-)
-
-export const CommandList = ({ className, ...props }: React.ComponentProps<typeof AutocompleteList>): React.ReactElement => (
-  <AutocompleteList className={cn('not-empty:scroll-py-2 not-empty:p-2', className)} data-slot="command-list" {...props} />
-)
-
-export const CommandEmpty = ({ className, ...props }: React.ComponentProps<typeof AutocompleteEmpty>): React.ReactElement => (
-  <AutocompleteEmpty className={cn('not-empty:py-6', className)} data-slot="command-empty" {...props} />
-)
-
-export const CommandPanel = ({ className: _className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (
-  <div
-    className="relative -mx-px min-h-0 rounded-t-xl border border-b-0 bg-popover bg-clip-padding shadow-xs/5 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:-mb-px not-has-[+[data-slot=command-footer]]:rounded-b-2xl not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px_1px_1px_round_0_0_calc(var(--radius-2xl)-1px)_calc(var(--radius-2xl)-1px))] before:pointer-events-none before:absolute before:inset-0 before:rounded-t-[calc(var(--radius-xl)-1px)] **:data-[slot=scroll-area-scrollbar]:mt-2"
-    {...props}
-  />
-)
-
-export const CommandItem = ({ className, ...props }: React.ComponentProps<typeof AutocompleteItem>): React.ReactElement => (
-  <AutocompleteItem className={cn('py-1.5', className)} data-slot="command-item" {...props} />
-)
-
-export const CommandFooter = ({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (
-  <div
-    className={cn(
-      'relative flex items-center justify-between gap-2 rounded-b-[calc(var(--radius-2xl)-1px)] border-t px-5 py-3 text-muted-foreground text-xs',
-      className
-    )}
-    data-slot="command-footer"
-    {...props}
-  />
 )

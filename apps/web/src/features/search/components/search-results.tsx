@@ -3,11 +3,12 @@ import { RecipeSearchCard } from '@client/features/search/components/recipe-sear
 import { addToShoppingList } from '@client/stores/shopping-list.store'
 import { type ReducedRecipe } from '@client/types/recipe'
 import { Button } from '@recipe-organizer/design-system/button'
+import { css } from '@recipe-organizer/design-system/css'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 
-interface SearchResultsProps {
+export interface SearchResultsProps {
   recipes: ReducedRecipe[]
   onClearFilters: () => void
 }
@@ -17,27 +18,64 @@ const ResultAddButton = ({ recipeId }: { recipeId: number }) => {
 
   if (isInShoppingList) {
     return (
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-primary" aria-label="Déjà dans la liste">
+      <span
+        aria-label="Déjà dans la liste"
+        className={css({
+          alignItems: 'center',
+          background: 'accent',
+          borderRadius: 'full',
+          color: 'primary',
+          display: 'flex',
+          flexShrink: '0',
+          height: '9',
+          justifyContent: 'center',
+          width: '9',
+        })}
+      >
         <CheckIcon weight="bold" />
       </span>
     )
   }
 
   return (
-    <Button onClick={() => addToShoppingList(recipeId)} size="icon" className="size-9 shrink-0 rounded-full" aria-label="Ajouter à la liste">
-      <PlusIcon weight="bold" />
-    </Button>
+    <span className={css({ '--owner-icon-size': '1rem', flexShrink: '0' })}>
+      <Button aria-label="Ajouter à la liste" onClick={() => addToShoppingList(recipeId)} size="icon">
+        <PlusIcon weight="bold" />
+      </Button>
+    </span>
   )
 }
 
 export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) => {
   if (recipes.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
-          <MagnifyingGlassIcon className="size-7" />
+      <div
+        className={css({
+          alignItems: 'center',
+          display: 'flex',
+          flex: '1',
+          flexDirection: 'column',
+          gap: '4',
+          justifyContent: 'center',
+          padding: '8',
+          textAlign: 'center',
+        })}
+      >
+        <div
+          className={css({
+            alignItems: 'center',
+            background: 'accent',
+            borderRadius: 'full',
+            color: 'primary',
+            display: 'flex',
+            height: '16',
+            justifyContent: 'center',
+            width: '16',
+          })}
+        >
+          <MagnifyingGlassIcon size="xl" />
         </div>
-        <p className="text-balance text-muted-foreground">Aucune recette ne correspond à votre recherche.</p>
+        <p className={css({ color: 'muted-foreground', textWrap: 'balance' })}>Aucune recette ne correspond à votre recherche.</p>
         <Button onClick={onClearFilters} variant="outline">
           Effacer les filtres
         </Button>
@@ -46,8 +84,8 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-2.5">
-      <div className="text-xs font-semibold text-muted-foreground">
+    <div className={css({ display: 'flex', flex: '1', flexDirection: 'column', gap: '2.5' })}>
+      <div className={css({ color: 'muted-foreground', fontSize: 'xs', fontWeight: 'semibold' })}>
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>
       {recipes.map((recipe, index) => (

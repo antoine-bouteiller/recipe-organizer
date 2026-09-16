@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
@@ -42,7 +43,7 @@ export const Overview: Story = {
     await expect(empty.queryByAltText('Aperçu')).not.toBeInTheDocument()
   },
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: 0, width: 'full' })}>
       <StorySection title="Empty">
         <ImageFieldExample />
       </StorySection>

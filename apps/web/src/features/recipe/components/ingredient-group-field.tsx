@@ -1,5 +1,6 @@
 import { type Option } from '@client/hooks/use-options'
 import { Button } from '@recipe-organizer/design-system/button'
+import { css } from '@recipe-organizer/design-system/css'
 import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
@@ -32,12 +33,22 @@ export const IngredientGroupField = withForm({
     return (
       <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
         {(field) => (
-          <div className="flex w-full flex-col gap-2 pt-2">
+          <div className={css({ display: 'flex', flexDirection: 'column', gap: '2', paddingTop: '2', width: 'full' })}>
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
               <Fragment key={ingredient._key}>
-                <div className="flex gap-2">
-                  <div className="flex w-full flex-1 flex-col items-start justify-between gap-2 md:flex-row">
+                <div className={css({ display: 'flex', gap: '2' })}>
+                  <div
+                    className={css({
+                      alignItems: 'flex-start',
+                      display: 'flex',
+                      flex: '1',
+                      flexDirection: { base: 'column', md: 'row' },
+                      gap: '2',
+                      justifyContent: 'space-between',
+                      width: 'full',
+                    })}
+                  >
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
@@ -63,10 +74,12 @@ export const IngredientGroupField = withForm({
                     type="button"
                     variant="destructive-outline"
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon size="sm" />
                   </Button>
                 </div>
-                <Separator className="md:hidden" />
+                <div className={css({ md: { display: 'none' } })}>
+                  <Separator />
+                </div>
               </Fragment>
             ))}
             <field.FieldError />
@@ -83,7 +96,7 @@ export const IngredientGroupField = withForm({
               type="button"
               variant="outline"
             >
-              <PlusIcon className="h-4 w-4" />
+              <PlusIcon size="sm" />
             </Button>
           </div>
         )}

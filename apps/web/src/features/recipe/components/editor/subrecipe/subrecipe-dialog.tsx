@@ -1,6 +1,7 @@
 import { useLinkedRecipes } from '@client/features/recipe/contexts/linked-recipes-context'
 import { useRecipeOptions } from '@client/features/recipe/hooks/use-recipe-options'
 import { type SubrecipeNodeData } from '@client/features/recipe/types/subrecipe'
+import { css } from '@recipe-organizer/design-system/css'
 import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { revalidateLogic } from '@tanstack/react-form'
@@ -15,7 +16,7 @@ const subrecipeSchema = z.object({
 
 type SubrecipeFormInput = z.infer<typeof subrecipeSchema>
 
-interface SubrecipeDialogProps {
+export interface SubrecipeDialogProps {
   initialData?: SubrecipeFormInput
   onSubmit: (data: SubrecipeNodeData) => void
   submitLabel: string
@@ -30,6 +31,7 @@ const subrecipeDefaultValues: SubrecipeFormInput = {
 }
 
 const FormDialog = getFormDialog(subrecipeDefaultValues)
+const subrecipeFields = css({ display: 'grid', gap: '4', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' })
 
 export const SubrecipeDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: SubrecipeDialogProps) => {
   const [open, setOpen] = useState(false)
@@ -58,7 +60,7 @@ export const SubrecipeDialog = ({ initialData, onSubmit, submitLabel, title, tri
   return (
     <FormDialog form={form} trigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
       <form.AppField name="recipeId">{({ ComboboxField }) => <ComboboxField label="Recette" options={recipesOptions} />}</form.AppField>
-      <div className="grid grid-cols-2 gap-4">
+      <div className={subrecipeFields}>
         <form.AppField name="hideFirstNodes">{({ NumberField }) => <NumberField label="Masquer les N premières étapes" min={0} />}</form.AppField>
         <form.AppField name="hideLastNodes">{({ NumberField }) => <NumberField label="Masquer les N dernières étapes" min={0} />}</form.AppField>
       </div>

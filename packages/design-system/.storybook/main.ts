@@ -1,5 +1,6 @@
+import path from 'node:path'
+
 import { type StorybookConfig } from '@storybook/react-vite'
-import tailwindcss from '@tailwindcss/vite'
 
 const config: StorybookConfig = {
   core: { disableTelemetry: true },
@@ -7,7 +8,7 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.tsx'],
   viteFinal: (viteConfig) => ({
     ...viteConfig,
-    plugins: [...(viteConfig.plugins ?? []), tailwindcss()],
+    css: { ...viteConfig.css, postcss: path.resolve(import.meta.dirname, '../../../postcss.config.cjs') },
   }),
 }
 

@@ -9,7 +9,7 @@ const NavbarExample = (): React.ReactElement => (
   <Navbar
     actions={
       <Button aria-label="Toggle theme" size="icon" variant="ghost">
-        <ThemeIcon className="size-6" />
+        <ThemeIcon size="lg" />
       </Button>
     }
   >
@@ -31,7 +31,7 @@ export const Default: Story = {
     const activeLink = canvas.getByRole('link', { name: 'Home' })
 
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
-    await expect(activeLink).toHaveClass('aria-[current=page]:text-foreground')
+    await expect(activeLink).toHaveAttribute('data-slot', 'navbar-item')
     await expect(canvas.getByRole('button', { name: 'Toggle theme' })).toBeVisible()
   },
 }

@@ -1,50 +1,92 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
-import { cn } from 'cn'
+import { cva } from '@recipe-organizer/design-system/css'
 import { type ReactElement } from 'react'
 
 import { type PopoverProps } from './popover'
 
-const PopoverRoot = PopoverPrimitive.Root
+const positionerClassName = cva({
+  base: {
+    '&[data-instant]': { transition: 'none' },
+    height: 'var(--positioner-height)',
+    maxWidth: 'var(--available-width)',
+    position: 'relative',
+    transitionDuration: '150ms',
+    transitionProperty: 'top, left, right, bottom, transform',
+    transitionTimingFunction: 'in-out',
+    width: 'var(--positioner-width)',
+    zIndex: '50',
+  },
+})
+const popupClassName = cva({
+  base: {
+    '&:has([data-slot=calendar])': { _before: { borderRadius: 'calc(token(radii.xl) - 1px)' }, borderRadius: 'xl' },
+    '&[data-starting-style]': { opacity: '0', scale: '0.98' },
+    _before: {
+      borderRadius: 'calc(token(radii.lg) - 1px)',
+      boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)',
+      content: '""',
+      inset: '0',
+      pointerEvents: 'none',
+      position: 'absolute',
+    },
+    _dark: { _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)' } },
+    backgroundClip: 'padding-box',
+    backgroundColor: 'popover',
+    borderRadius: 'lg',
+    borderWidth: '1px',
+    boxShadow: 'overlay',
+    color: 'popover-foreground',
+    display: 'flex',
+    height: 'var(--popup-height, auto)',
+    outline: 'none',
+    position: 'relative',
+    transformOrigin: 'var(--transform-origin)',
+    transitionDuration: '150ms',
+    transitionProperty: 'width, height, scale, opacity',
+    transitionTimingFunction: 'in-out',
+    width: 'var(--popup-width, auto)',
+  },
+})
+const viewportClassName = cva({
+  base: {
+    '& :is([data-current], [data-previous])': {
+      opacity: '1',
+      transition: 'opacity 150ms token(easings.in-out)',
+      width: 'calc(var(--popup-width) - 2 * var(--viewport-inline-padding) - 2px)',
+    },
+    '& :is([data-current], [data-previous]):is([data-ending-style], [data-starting-style])': { opacity: '0' },
+    '&:has([data-slot=calendar])': { padding: '2' },
+    '&:not([data-transitioning])': { overflowY: 'auto' },
+    '&[data-instant]': { transition: 'none' },
+    '--viewport-inline-padding': 'token(spacing.4)',
+    borderRadius: 'inherit',
+    height: 'full',
+    maxHeight: 'var(--available-height)',
+    overflow: 'clip',
+    paddingBlock: '4',
+    paddingInline: 'var(--viewport-inline-padding)',
+    position: 'relative',
+  },
+})
 
-const PopoverTrigger = ({ className, children, ...props }: PopoverPrimitive.Trigger.Props): ReactElement => (
-  <PopoverPrimitive.Trigger className={className} data-slot="popover-trigger" {...props}>
-    {children}
-  </PopoverPrimitive.Trigger>
-)
+type TriggerProps = Pick<PopoverPrimitive.Trigger.Props, 'render'>
 
-const PopoverContent = ({ children, className, ...props }: PopoverPrimitive.Popup.Props): ReactElement => (
+const PopoverTrigger = ({ render }: TriggerProps): ReactElement => <PopoverPrimitive.Trigger data-slot="popover-trigger" render={render} />
+const PopoverContent = ({ children }: Pick<PopoverProps, 'children'>): ReactElement => (
   <PopoverPrimitive.Portal>
-    <PopoverPrimitive.Positioner
-      align="center"
-      className="z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom,transform] data-instant:transition-none"
-      data-slot="popover-positioner"
-      side="bottom"
-      sideOffset={4}
-    >
-      <PopoverPrimitive.Popup
-        className={cn(
-          'relative flex h-(--popup-height,auto) w-(--popup-width,auto) origin-(--transform-origin) rounded-lg border bg-popover not-dark:bg-clip-padding text-popover-foreground shadow-lg/5 outline-none transition-[width,height,scale,opacity] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] has-data-[slot=calendar]:rounded-xl has-data-[slot=calendar]:before:rounded-[calc(var(--radius-xl)-1px)] data-starting-style:scale-98 data-starting-style:opacity-0 dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-          className
-        )}
-        data-slot="popover-popup"
-        {...props}
-      >
-        <PopoverPrimitive.Viewport
-          className="relative size-full max-h-(--available-height) overflow-clip px-(--viewport-inline-padding) py-4 [--viewport-inline-padding:--spacing(4)] not-data-transitioning:overflow-y-auto has-data-[slot=calendar]:p-2 **:data-current:w-[calc(var(--popup-width)-2*var(--viewport-inline-padding)-2px)] **:data-current:opacity-100 **:data-current:transition-opacity **:data-current:data-ending-style:opacity-0 data-instant:transition-none **:data-previous:w-[calc(var(--popup-width)-2*var(--viewport-inline-padding)-2px)] **:data-previous:opacity-100 **:data-previous:transition-opacity **:data-previous:data-ending-style:opacity-0 **:data-current:data-starting-style:opacity-0 **:data-previous:data-starting-style:opacity-0"
-          data-slot="popover-viewport"
-        >
+    <PopoverPrimitive.Positioner align="center" className={positionerClassName()} data-slot="popover-positioner" side="bottom" sideOffset={4}>
+      <PopoverPrimitive.Popup className={popupClassName()} data-slot="popover-popup">
+        <PopoverPrimitive.Viewport className={viewportClassName()} data-slot="popover-viewport">
           {children}
         </PopoverPrimitive.Viewport>
       </PopoverPrimitive.Popup>
     </PopoverPrimitive.Positioner>
   </PopoverPrimitive.Portal>
 )
-
 const PopoverBase = ({ trigger, children }: PopoverProps): ReactElement => (
-  <PopoverRoot>
+  <PopoverPrimitive.Root>
     <PopoverTrigger render={trigger} />
     <PopoverContent>{children}</PopoverContent>
-  </PopoverRoot>
+  </PopoverPrimitive.Root>
 )
-
 export default PopoverBase

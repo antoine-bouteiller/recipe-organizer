@@ -7,6 +7,7 @@ import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import { RecipeForm } from '@client/features/recipe/components/recipe-form'
 import { recipeDefaultValues, recipeFormFields } from '@client/features/recipe/utils/form'
 import { Button } from '@recipe-organizer/design-system/button'
+import { css } from '@recipe-organizer/design-system/css'
 import { Form } from '@recipe-organizer/design-system/form'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { formatFormErrors } from '@recipe-organizer/design-system/utils/format-form-errors'
@@ -48,7 +49,9 @@ const NewRecipePage = () => {
         }}
       >
         <RecipeForm addNewIngredientOption={renderAddIngredientOption} fields={recipeFormFields} form={form} ingredientOptions={ingredientOptions} />
-        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+        <div
+          className={css({ display: 'flex', flexDirection: { base: 'column', md: 'row' }, gap: '4', justifyContent: 'flex-end', paddingTop: '6' })}
+        >
           <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>

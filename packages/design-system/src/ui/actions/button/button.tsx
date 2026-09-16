@@ -1,62 +1,182 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from 'cn'
+import { cva, type RecipeVariantProps } from '@recipe-organizer/design-system/css'
+import type React from 'react'
 
-const buttonVariants = cva(
-  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg border font-medium text-base outline-none transition-[box-shadow,scale] duration-150 ease-out-snappy active:scale-[0.97] data-pressed:scale-[0.97] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 sm:text-sm [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-  {
-    defaultVariants: {
-      size: 'default',
-      variant: 'default',
-    },
-    variants: {
-      size: {
-        default: 'h-9 px-[calc(--spacing(3)-1px)] sm:h-8',
-        icon: 'size-9 sm:size-8',
-        'icon-lg': 'size-10 sm:size-9',
-        'icon-sm': 'size-8 sm:size-7',
-        'icon-xl': "size-11 sm:size-10 [&_svg:not([class*='size-'])]:size-5 sm:[&_svg:not([class*='size-'])]:size-4.5",
-        'icon-xs':
-          "size-7 rounded-md before:rounded-[calc(var(--radius-md)-1px)] sm:size-6 not-in-data-[slot=input-group]:[&_svg:not([class*='size-'])]:size-4 sm:not-in-data-[slot=input-group]:[&_svg:not([class*='size-'])]:size-3.5",
-        lg: 'h-10 px-[calc(--spacing(3.5)-1px)] sm:h-9',
-        sm: 'h-8 gap-1.5 px-[calc(--spacing(2.5)-1px)] sm:h-7',
+const buttonRecipe = cva({
+  base: {
+    '&[data-pressed]': { transform: 'scale(0.97)' },
+    '--owner-icon-margin-inline': '0',
+    '--owner-icon-opacity': '0.8',
+    '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+    '@media (pointer: coarse)': { _after: { display: 'block' } },
+    _active: { transform: 'scale(0.97)' },
+    _after: { content: '""', display: 'none', inset: '0', minHeight: '11', minWidth: '11', position: 'absolute' },
+    _before: { borderRadius: 'calc(token(radii.lg) - 1px)', content: '""', inset: '0', pointerEvents: 'none', position: 'absolute' },
+    _disabled: { opacity: 0.64, pointerEvents: 'none' },
+    _focusVisible: { outline: '2px solid token(colors.ring)', outlineOffset: '1px' },
+    alignItems: 'center',
+    borderRadius: 'lg',
+    borderWidth: '1px',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    fontSize: { base: 'base', sm: 'sm' },
+    fontWeight: 'medium',
+    gap: '2',
+    justifyContent: 'center',
+    position: 'relative',
+    transition: 'box-shadow 150ms token(easings.out-snappy), transform 150ms token(easings.out-snappy)',
+    whiteSpace: 'nowrap',
+  },
+  defaultVariants: { align: 'center', size: 'default', variant: 'default', width: 'auto' },
+  variants: {
+    align: { center: {}, start: { justifyContent: 'flex-start' } },
+    size: {
+      default: { height: { base: '9', sm: '8' }, paddingInline: 'calc(token(spacing.3) - 1px)' },
+      icon: { height: { base: '9', sm: '8' }, width: { base: '9', sm: '8' } },
+      'icon-lg': { height: { base: '10', sm: '9' }, width: { base: '10', sm: '9' } },
+      'icon-sm': { height: { base: '8', sm: '7' }, width: { base: '8', sm: '7' } },
+      'icon-xl': { '--owner-icon-size': { base: '1.25rem', sm: '1.125rem' }, height: { base: '11', sm: '10' }, width: { base: '11', sm: '10' } },
+      'icon-xs': {
+        '--owner-icon-size': { base: '1rem', sm: '0.875rem' },
+        _before: { borderRadius: 'calc(token(radii.md) - 1px)' },
+        borderRadius: 'md',
+        height: { base: '7', sm: '6' },
+        width: { base: '7', sm: '6' },
       },
-      variant: {
-        default:
-          'not-disabled:inset-shadow-[0_1px_--theme(--color-white/16%)] border-primary bg-primary text-primary-foreground shadow-primary/24 shadow-xs hover:bg-primary/90 data-pressed:bg-primary/90 [:active,[data-pressed]]:inset-shadow-[0_1px_--theme(--color-black/8%)] [:disabled,:active,[data-pressed]]:shadow-none',
-        destructive:
-          'not-disabled:inset-shadow-[0_1px_--theme(--color-white/16%)] border-destructive bg-destructive text-white shadow-destructive/24 shadow-xs hover:bg-destructive/90 data-pressed:bg-destructive/90 [:active,[data-pressed]]:inset-shadow-[0_1px_--theme(--color-black/8%)] [:disabled,:active,[data-pressed]]:shadow-none',
-        'destructive-outline':
-          'border-input bg-popover not-dark:bg-clip-padding text-destructive-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/4%)] hover:border-destructive/32 hover:bg-destructive/4 data-pressed:border-destructive/32 data-pressed:bg-destructive/4 dark:bg-input/32 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none',
-        ghost: 'border-transparent text-foreground hover:bg-accent data-pressed:bg-accent',
-        outline:
-          'border-input bg-popover not-dark:bg-clip-padding text-foreground shadow-xs/5 not-disabled:not-active:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/4%)] hover:bg-accent/50 data-pressed:bg-accent/50 dark:bg-input/32 dark:data-pressed:bg-input/64 dark:hover:bg-input/64 dark:not-disabled:before:shadow-[0_-1px_--theme(--color-white/2%)] dark:not-disabled:not-active:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [:disabled,:active,[data-pressed]]:shadow-none',
-        secondary:
-          'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/90 data-pressed:bg-secondary/90 [:active,[data-pressed]]:bg-secondary/80',
+      lg: { height: { base: '10', sm: '9' }, paddingInline: 'calc(0.875rem - 1px)' },
+      sm: { gap: '1.5', height: { base: '8', sm: '7' }, paddingInline: 'calc(0.625rem - 1px)' },
+    },
+    variant: {
+      default: {
+        '&[data-pressed]': {
+          _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 8%, transparent) inset' },
+          backgroundColor: 'primary/90',
+          boxShadow: 'none',
+        },
+        _active: { _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 8%, transparent) inset' }, boxShadow: 'none' },
+        _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.white) 16%, transparent) inset' },
+        _disabled: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _hover: { backgroundColor: 'primary/90' },
+        backgroundColor: 'primary',
+        borderColor: 'primary',
+        boxShadow: '0 1px 2px 0 color-mix(in oklab, token(colors.primary) 24%, transparent)',
+        color: 'primary-foreground',
+      },
+      destructive: {
+        '&[data-pressed]': {
+          _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 8%, transparent) inset' },
+          backgroundColor: 'destructive/90',
+          boxShadow: 'none',
+        },
+        _active: { _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 8%, transparent) inset' }, boxShadow: 'none' },
+        _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.white) 16%, transparent) inset' },
+        _disabled: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _hover: { backgroundColor: 'destructive/90' },
+        backgroundColor: 'destructive',
+        borderColor: 'destructive',
+        boxShadow: '0 1px 2px 0 color-mix(in oklab, token(colors.destructive) 24%, transparent)',
+        color: 'white',
+      },
+      'destructive-ghost': {
+        _hover: { backgroundColor: 'destructive/8' },
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        color: 'destructive-foreground',
+      },
+      'destructive-outline': {
+        '&[data-pressed]': { _before: { boxShadow: 'none' }, backgroundColor: 'destructive/4', borderColor: 'destructive/32', boxShadow: 'none' },
+        _active: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)' },
+        _dark: {
+          '&:not(:disabled):not(:active):not([data-pressed])': {
+            _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)' },
+          },
+          _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 2%, transparent)' },
+          _hover: { backgroundColor: 'input/64' },
+          backgroundColor: 'input/32',
+        },
+        _disabled: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _hover: { backgroundColor: 'destructive/4', borderColor: 'destructive/32' },
+        backgroundClip: 'padding-box',
+        backgroundColor: 'popover',
+        borderColor: 'input',
+        boxShadow: 'xs',
+        color: 'destructive-foreground',
+      },
+      ghost: { _hover: { backgroundColor: 'accent' }, backgroundColor: 'transparent', borderColor: 'transparent', color: 'foreground' },
+      'list-action': {
+        _hover: { backgroundColor: 'accent' },
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        color: 'foreground',
+        justifyContent: 'flex-start',
+        width: 'full',
+      },
+      'media-overlay-card': { _hover: { backgroundColor: 'white/20' }, backgroundColor: 'white/12', borderColor: 'transparent', color: 'white' },
+      'media-overlay-header': {
+        '&[data-pressed]': { _before: { boxShadow: 'none' }, backgroundColor: 'white/25', boxShadow: 'none' },
+        _active: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)' },
+        _dark: { _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)' } },
+        _hover: { backgroundColor: 'white/25' },
+        backdropFilter: 'blur(12px)',
+        backgroundColor: 'white/15',
+        borderColor: 'white/20',
+        boxShadow: 'xs',
+        color: 'white',
+      },
+      outline: {
+        '&[data-pressed]': { _before: { boxShadow: 'none' }, backgroundColor: 'accent/50', boxShadow: 'none' },
+        _active: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _before: { boxShadow: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)' },
+        _dark: {
+          '&:not(:disabled):not(:active):not([data-pressed])': {
+            _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)' },
+          },
+          _before: { boxShadow: '0 -1px color-mix(in oklab, token(colors.white) 2%, transparent)' },
+          _hover: { backgroundColor: 'input/64' },
+          backgroundColor: 'input/32',
+        },
+        _disabled: { _before: { boxShadow: 'none' }, boxShadow: 'none' },
+        _hover: { backgroundColor: 'accent/50' },
+        backgroundClip: 'padding-box',
+        backgroundColor: 'popover',
+        borderColor: 'input',
+        boxShadow: 'xs',
+        color: 'foreground',
+      },
+      'search-trigger': {
+        _dark: { backgroundColor: 'input/48' },
+        backdropFilter: 'blur(24px)',
+        backgroundColor: 'background/72',
+        borderColor: 'input',
+        boxShadow: 'none',
+        color: 'foreground',
+      },
+      secondary: {
+        _active: { backgroundColor: 'secondary/80' },
+        _hover: { backgroundColor: 'secondary/90' },
+        backgroundColor: 'secondary',
+        borderColor: 'transparent',
+        color: 'secondary-foreground',
       },
     },
-  }
-)
+    width: { auto: {}, full: { width: 'full' } },
+  },
+})
 
-export interface ButtonProps extends useRender.ComponentProps<'button'> {
-  variant?: VariantProps<typeof buttonVariants>['variant']
-  size?: VariantProps<typeof buttonVariants>['size']
-}
+export type ButtonProps = Pick<
+  useRender.ComponentProps<'button'>,
+  'aria-label' | 'aria-pressed' | 'children' | 'disabled' | 'onClick' | 'render' | 'type'
+> &
+  RecipeVariantProps<typeof buttonRecipe>
 
-export const Button = ({ className, variant, size, render, children, ...props }: ButtonProps): React.ReactElement => {
-  const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
+export const Button = ({ align, render, size, type, variant, width, ...props }: ButtonProps): React.ReactElement => {
+  const mergedProps = mergeProps<'button'>(
+    { className: buttonRecipe({ align, size, variant, width }), type: type ?? (render ? undefined : 'button') },
+    props
+  )
 
-  const defaultProps = {
-    children,
-    className: cn(buttonVariants({ className, size, variant })),
-    'data-slot': 'button',
-    type: typeValue,
-  }
-
-  return useRender({
-    defaultTagName: 'button',
-    props: mergeProps<'button'>(defaultProps, props),
-    render,
-  })
+  return useRender({ defaultTagName: 'button', props: { ...mergedProps, 'data-slot': 'button' }, render })
 }

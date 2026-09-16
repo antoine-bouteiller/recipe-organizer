@@ -1,13 +1,14 @@
 import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'
 import { clearRecentRecipes, useRecentRecipeIds } from '@client/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@client/types/recipe'
+import { css } from '@recipe-organizer/design-system/css'
 
-interface RecentRecipesProps {
+export interface RecentRecipesProps {
   recipes: ReducedRecipe[]
 }
 
 const RecipeCardList = ({ recipes }: RecentRecipesProps) => (
-  <div className="flex flex-1 flex-col gap-2.5">
+  <div className={css({ display: 'flex', flex: '1', flexDirection: 'column', gap: '2.5' })}>
     {recipes.map((recipe) => (
       <RecipeSearchCard key={recipe.id} recipe={recipe} />
     ))}
@@ -26,10 +27,14 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
   }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between pt-2 pb-1">
-        <h2 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Recherches récentes</h2>
-        <button onClick={clearRecentRecipes} type="button" className="text-sm font-semibold text-primary">
+    <div className={css({ display: 'flex', flex: '1', flexDirection: 'column' })}>
+      <div className={css({ alignItems: 'center', display: 'flex', justifyContent: 'space-between', paddingBottom: '1', paddingTop: '2' })}>
+        <h2
+          className={css({ color: 'muted-foreground', fontSize: 'xs', fontWeight: 'semibold', letterSpacing: 'wider', textTransform: 'uppercase' })}
+        >
+          Recherches récentes
+        </h2>
+        <button className={css({ color: 'primary', fontSize: 'sm', fontWeight: 'semibold' })} onClick={clearRecentRecipes} type="button">
           Effacer
         </button>
       </div>

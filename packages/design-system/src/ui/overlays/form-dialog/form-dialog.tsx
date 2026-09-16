@@ -1,10 +1,12 @@
+import { Form as FormPrimitive } from '@base-ui/react/form'
+import { css } from '@recipe-organizer/design-system/css'
 import { useSelector } from '@tanstack/react-store'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { withForm } from '../../../hooks/use-app-form'
 import { formatFormErrors } from '../../../utils/format-form-errors'
-import { Form } from '../../forms/form/form'
 import { Dialog } from '../dialog/dialog'
+import { DialogFormProvider } from '../dialog/dialog-form.private'
 
 interface FormModalProps {
   children: ReactNode
@@ -16,6 +18,8 @@ interface FormModalProps {
 }
 
 const formModalProps: FormModalProps = { children: null, open: false, setOpen: () => undefined, submitLabel: '', title: '' }
+const formClassName = css({ display: 'contents' })
+const fieldsClassName = css({ display: 'flex', flexDirection: 'column', gap: '4' })
 
 export const getFormDialog = <TValues,>(defaultValues: TValues) =>
   withForm({
@@ -23,37 +27,40 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
     props: formModalProps,
     render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
       const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
-
       return (
-        <Dialog
-          cancelDisabled={form.state.isSubmitting}
-          cancelLabel="Annuler"
-          contentRender={(content) => (
-            <Form
-              className="contents"
-              errors={errors}
-              onSubmit={async (event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                await form.handleSubmit()
-              }}
-            >
-              {content}
-            </Form>
-          )}
-          footer={
-            <form.AppForm>
-              <form.FormSubmit label={submitLabel} />
-            </form.AppForm>
-          }
-          onOpenChange={setOpen}
-          open={open}
-          panelClassName="flex flex-col gap-4"
-          title={title}
-          trigger={trigger}
+        <DialogFormProvider
+          value={{
+            wrap: (content) => (
+              <FormPrimitive
+                className={formClassName}
+                errors={errors}
+                onSubmit={async (event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  await form.handleSubmit()
+                }}
+              >
+                {content}
+              </FormPrimitive>
+            ),
+          }}
         >
-          {children}
-        </Dialog>
+          <Dialog
+            cancelDisabled={form.state.isSubmitting}
+            cancelLabel="Annuler"
+            footer={
+              <form.AppForm>
+                <form.FormSubmit label={submitLabel} />
+              </form.AppForm>
+            }
+            onOpenChange={setOpen}
+            open={open}
+            title={title}
+            trigger={trigger}
+          >
+            <div className={fieldsClassName}>{children}</div>
+          </Dialog>
+        </DialogFormProvider>
       )
     },
   })

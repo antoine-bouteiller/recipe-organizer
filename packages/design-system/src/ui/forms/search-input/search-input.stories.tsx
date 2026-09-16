@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
@@ -9,8 +10,8 @@ const SearchInputExample = (): ReactElement => {
   const [search, setSearch] = useState('')
 
   return (
-    <div className="space-y-2">
-      <label className="block space-y-2">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
+      <label className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
         <span>Search recipes</span>
         <SearchInput search={search} setSearch={setSearch} />
       </label>
@@ -23,7 +24,7 @@ const CustomPlaceholderExample = (): ReactElement => {
   const [search, setSearch] = useState('')
 
   return (
-    <label className="block space-y-2">
+    <label className={css({ display: 'flex', flexDirection: 'column', gap: '2' })}>
       <span>Search ingredients</span>
       <SearchInput placeholder="Search ingredients…" search={search} setSearch={setSearch} />
     </label>
@@ -46,7 +47,7 @@ export const Overview: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
   },
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: 0, width: 'full' })}>
       <StorySection title="Default">
         <SearchInputExample />
       </StorySection>

@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { lazy, Suspense, useMemo, type ReactElement, type ReactNode } from 'react'
 
 import { useIsMobile } from '../../../hooks/use-is-mobile'
@@ -32,7 +33,15 @@ interface ComboboxProps<TValue extends ValueOptions> {
 const ComboboxBase = lazy(() => import('./combobox.base'))
 const ComboboxDrawer = lazy(() => import('./combobox.drawer'))
 
-const ComboboxFallback = (): ReactElement => <div aria-hidden="true" className="h-9 w-full rounded-lg border border-input bg-background" />
+const fallbackClassName = css({
+  backgroundColor: 'background',
+  borderColor: 'input',
+  borderRadius: 'lg',
+  borderWidth: '1px',
+  height: '9',
+  width: 'full',
+})
+const ComboboxFallback = (): ReactElement => <div aria-hidden="true" className={fallbackClassName} />
 
 const Combobox = <TValue extends ValueOptions>({
   addNew,

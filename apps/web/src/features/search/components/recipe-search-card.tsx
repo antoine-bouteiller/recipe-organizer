@@ -2,21 +2,30 @@ import { addRecentRecipe } from '@client/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@client/types/recipe'
 import { staggerStyle } from '@client/utils/stagger'
 import { Badge } from '@recipe-organizer/design-system/badge'
+import { css } from '@recipe-organizer/design-system/css'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { Link } from '@tanstack/react-router'
-import { cn } from 'cn'
 import { type ReactNode } from 'react'
 
-interface RecipeSearchCardProps {
+export interface RecipeSearchCardProps {
   recipe: ReducedRecipe
   action?: ReactNode
   index?: number
 }
 
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
-  <div className="relative stagger-in-45" style={staggerStyle(index, 10)}>
+  <div className={`${css({ position: 'relative' })} stagger-in-45`} style={staggerStyle(index, 10)}>
     <Link
-      className={cn('flex items-center gap-3 rounded-2xl border bg-card p-2.5', action && 'pr-14')}
+      className={css({
+        alignItems: 'center',
+        background: 'card',
+        borderRadius: '2xl',
+        borderWidth: '1px',
+        display: 'flex',
+        gap: '3',
+        padding: '2.5',
+        paddingRight: action ? '14' : undefined,
+      })}
       onClick={() => addRecentRecipe(recipe.id)}
       params={{ id: recipe.id.toString() }}
       to="/recipe/$id"
@@ -25,13 +34,15 @@ export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCard
       <img
         src={recipe.image}
         alt={recipe.name}
-        className="size-15 shrink-0 rounded-xl object-cover"
+        className={css({ borderRadius: 'xl', flexShrink: '0', height: '15', objectFit: 'cover', width: '15' })}
         decoding="async"
         loading={index < 6 ? 'eager' : 'lazy'}
       />
-      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <span className="truncate font-bold text-foreground">{recipe.name}</span>
-        <div className="flex flex-wrap gap-1.5">
+      <div className={css({ display: 'flex', flex: '1', flexDirection: 'column', gap: '1.5', minWidth: '0' })}>
+        <span className={css({ color: 'foreground', fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' })}>
+          {recipe.name}
+        </span>
+        <div className={css({ display: 'flex', flexWrap: 'wrap', gap: '1.5' })}>
           {recipe.isVegetarian && (
             <Badge size="sm" variant="accent">
               {VEGETARIAN_LABEL}
@@ -60,6 +71,6 @@ export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCard
         </div>
       </div>
     </Link>
-    {action && <div className="absolute top-1/2 right-2.5 -translate-y-1/2">{action}</div>}
+    {action && <div className={css({ position: 'absolute', right: '2.5', top: '50%', transform: 'translateY(-50%)' })}>{action}</div>}
   </div>
 )

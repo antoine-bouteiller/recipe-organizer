@@ -2,26 +2,19 @@ import { useFieldContext } from '../../../hooks/use-form-context'
 import { Field, FieldError } from '../field/field'
 import { NumberInput } from '../number-input/number-input'
 
-interface NumberFieldProps {
+export interface NumberFieldProps {
   disabled?: boolean
   label?: string
   max?: number
   min?: number
   placeholder?: string
-  className?: string
 }
 
-export const NumberField = ({ disabled, label, max, min, placeholder, className }: NumberFieldProps) => {
+export const NumberField = ({ disabled, label, max, min, placeholder }: NumberFieldProps) => {
   const field = useFieldContext<number | undefined>()
 
   return (
-    <Field
-      dirty={field.state.meta.isDirty}
-      invalid={!field.state.meta.isValid}
-      name={field.name}
-      touched={field.state.meta.isTouched}
-      className={className}
-    >
+    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <NumberInput
         defaultValue={field.state.value}
         disabled={disabled}

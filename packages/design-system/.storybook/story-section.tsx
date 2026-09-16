@@ -1,10 +1,25 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { useId, type ReactNode } from 'react'
 
-export const StorySection = ({ title, children }: { title: string; children: ReactNode }) => {
+export interface StorySectionProps {
+  children: ReactNode
+  title: string
+}
+
+export const StorySection = ({ title, children }: StorySectionProps) => {
   const id = useId()
   return (
-    <section aria-labelledby={id} className="space-y-4 border-b border-border pb-8 last:border-0 last:pb-0">
-      <h2 className="text-lg font-semibold" id={id}>
+    <section
+      aria-labelledby={id}
+      className={css({
+        '& > * + *': { marginTop: '4' },
+        '&:last-child': { borderBottomWidth: '0', paddingBottom: '0' },
+        borderBottomWidth: '1px',
+        borderColor: 'border',
+        paddingBottom: '8',
+      })}
+    >
+      <h2 className={css({ fontSize: 'lg', fontWeight: 'semibold' })} id={id}>
         {title}
       </h2>
       {children}

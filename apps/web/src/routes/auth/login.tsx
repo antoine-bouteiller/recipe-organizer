@@ -2,6 +2,7 @@ import { authClient } from '@client/lib/auth/auth-client'
 import { loadAuthUser, resetAuthUserCache } from '@client/lib/auth/get-auth-user'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
+import { css } from '@recipe-organizer/design-system/css'
 import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons/arrow-left'
 import { toastManager } from '@recipe-organizer/design-system/toast'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
@@ -40,20 +41,22 @@ const LoginPage = () => {
   }, [error])
 
   return (
-    <div className="grid flex-1 place-items-center p-4">
-      <Card className="w-full max-w-sm" description="Connectez-vous pour accéder à vos recettes" title="Connexion">
-        <div className="px-6 pb-6">
-          <Button className="w-full" onClick={() => signInWithGoogle()} variant="outline">
-            <img alt="Google" className="h-4" src="/google.svg" /> Connexion avec Google
-          </Button>
-        </div>
-        <div className="flex items-center justify-center px-6 pb-6">
-          <Button render={<Link to="/" />} size="sm" variant="ghost">
-            <ArrowLeftIcon className="h-4 w-4" />
-            Retour à l&apos;accueil
-          </Button>
-        </div>
-      </Card>
+    <div className={css({ display: 'grid', flex: '1', padding: '4', placeItems: 'center' })}>
+      <div className={css({ maxWidth: 'sm', width: 'full' })}>
+        <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
+          <div className={css({ paddingBottom: '6', paddingInline: '6' })}>
+            <Button onClick={() => signInWithGoogle()} variant="outline" width="full">
+              <img alt="Google" className={css({ height: '4' })} src="/google.svg" /> Connexion avec Google
+            </Button>
+          </div>
+          <div className={css({ alignItems: 'center', display: 'flex', justifyContent: 'center', paddingBottom: '6', paddingInline: '6' })}>
+            <Button render={<Link to="/" />} size="sm" variant="ghost">
+              <ArrowLeftIcon size="sm" />
+              Retour à l&apos;accueil
+            </Button>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

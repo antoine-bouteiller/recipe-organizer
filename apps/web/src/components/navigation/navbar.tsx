@@ -18,7 +18,7 @@ export const Navbar = ({ search }: { search: ReactNode }) => {
         <>
           {search}
           <Button onClick={toggleTheme} size="icon" variant="ghost">
-            <ThemeIcon className="size-6" />
+            <ThemeIcon size="lg" />
           </Button>
         </>
       }

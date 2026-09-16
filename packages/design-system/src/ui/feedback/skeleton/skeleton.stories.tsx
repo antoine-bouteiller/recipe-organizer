@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
 import { StorySection } from '../../../../.storybook/story-section'
@@ -11,18 +12,27 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
-  args: { className: 'h-5 w-48' },
+  args: { preset: 'recipe-details-text' },
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: '0', width: 'full' })}>
       <StorySection title="Default">
         <Skeleton {...args} />
       </StorySection>
       <StorySection title="Recipe Card">
-        <div className="w-80 space-y-3 rounded-2xl border p-4">
-          <Skeleton className="h-40 w-full rounded-lg" />
-          <Skeleton className="h-5 w-3/5" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-4/5" />
+        <div
+          className={css({
+            '& > * + *': { marginTop: '3' },
+            borderColor: 'border',
+            borderRadius: '2xl',
+            borderWidth: '1px',
+            padding: '4',
+            width: '80',
+          })}
+        >
+          <Skeleton preset="recipe-card" />
+          <Skeleton preset="recipe-details-title" />
+          <Skeleton preset="recipe-details-text" />
+          <Skeleton preset="recipe-details-text" />
         </div>
       </StorySection>
     </div>

@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
 import { StorySection } from '../../../../.storybook/story-section'
@@ -19,12 +20,12 @@ export const Overview: Story = {
     title: 'Saved recipe',
   },
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: '0', width: 'full' })}>
       <StorySection title="Default">
         <Item {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className="grid gap-3">
+        <div className={css({ display: 'grid', gap: '3' })}>
           <Item media={<CheckCircleIcon />} title="Default">
             A standard item.
           </Item>
@@ -33,13 +34,13 @@ export const Overview: Story = {
           </Item>
         </div>
       </StorySection>
-      <StorySection title="With Actions">
-        <Item actions={<Button size="sm">View</Button>} media={<CheckCircleIcon />} title="Pasta primavera">
+      <StorySection title="Row layout">
+        <Item actions={<Button size="sm">View</Button>} layout="row" media={<CheckCircleIcon />} title="Pasta primavera">
           Open the recipe to review its ingredients.
         </Item>
       </StorySection>
       <StorySection title="Group">
-        <ItemGroup className="max-w-md rounded-md border">
+        <ItemGroup>
           <Item title="First item">A grouped item.</Item>
           <ItemSeparator />
           <Item title="Second item">Another grouped item.</Item>

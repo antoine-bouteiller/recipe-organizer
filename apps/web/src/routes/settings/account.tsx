@@ -3,6 +3,7 @@ import { authClient } from '@client/lib/auth/auth-client'
 import { resetAuthUserCache } from '@client/lib/auth/get-auth-user'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
+import { css } from '@recipe-organizer/design-system/css'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 
 const RouteComponent = () => {
@@ -18,26 +19,28 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Compte" withGoBack>
-      <Card className="p-6">
-        <div className="space-y-6">
-          <div>
-            <h2 className="mb-4 text-lg font-semibold">Informations du compte</h2>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Email</p>
-                <p className="mt-1 text-sm">{authUser?.email}</p>
+      <div className={css({ padding: '6' })}>
+        <Card>
+          <div className={css({ display: 'flex', flexDirection: 'column', gap: '6' })}>
+            <div>
+              <h2 className={css({ fontSize: 'lg', fontWeight: 'semibold', marginBottom: '4' })}>Informations du compte</h2>
+              <div className={css({ display: 'flex', flexDirection: 'column', gap: '3' })}>
+                <div>
+                  <p className={css({ color: 'muted-foreground', fontSize: 'sm', fontWeight: 'medium' })}>Email</p>
+                  <p className={css({ fontSize: 'sm', marginTop: '1' })}>{authUser?.email}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="border-t pt-6">
-            <h2 className="mb-4 text-lg font-semibold">Actions</h2>
-            <Button onClick={handleLogout} variant="outline">
-              Se déconnecter
-            </Button>
+            <div className={css({ borderTopWidth: '1px', paddingTop: '6' })}>
+              <h2 className={css({ fontSize: 'lg', fontWeight: 'semibold', marginBottom: '4' })}>Actions</h2>
+              <Button onClick={handleLogout} variant="outline">
+                Se déconnecter
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </ScreenLayout>
   )
 }

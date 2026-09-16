@@ -1,86 +1,138 @@
 import { Select as SelectPrimitive } from '@base-ui/react/select'
-import { cn } from 'cn'
+import { css } from '@recipe-organizer/design-system/css'
 import { type ReactElement } from 'react'
 
 import { CaretDownIcon } from '../../data-display/icons/caret-down'
 import { CaretUpIcon } from '../../data-display/icons/caret-up'
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
-import { getSelectDisplay, selectTriggerClassName, selectTriggerIconClassName } from './select.shared'
+import { getSelectDisplay, selectTextClassName, selectTriggerClassName, selectTriggerIconClassName } from './select.shared'
 
-const SelectRoot = SelectPrimitive.Root
-
-const SelectTrigger = ({ className, children, ...props }: SelectPrimitive.Trigger.Props): React.ReactElement => (
-  <SelectPrimitive.Trigger className={cn(selectTriggerClassName, className)} data-slot="select-trigger" {...props}>
-    {children}
-    <SelectPrimitive.Icon data-slot="select-icon">
-      <CaretUpDownIcon className={selectTriggerIconClassName} />
-    </SelectPrimitive.Icon>
+const positionerClassName = css({ userSelect: 'none', zIndex: '50' })
+const popupClassName = css({ color: 'foreground', outline: 'none', transformOrigin: 'var(--transform-origin)' })
+const popupFrameClassName = css({
+  '&::before': {
+    borderRadius: 'calc(token(radii.lg) - 1px)',
+    boxShadow: {
+      _dark: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)',
+      base: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)',
+    },
+    content: '""',
+    inset: '0',
+    pointerEvents: 'none',
+    position: 'absolute',
+  },
+  backgroundClip: 'padding-box',
+  backgroundColor: 'popover',
+  borderRadius: 'lg',
+  borderWidth: '1px',
+  boxShadow: 'overlay',
+  height: 'full',
+  minWidth: 'var(--anchor-width)',
+  position: 'relative',
+})
+const listClassName = css({ maxHeight: 'var(--available-height)', overflowY: 'auto', padding: '1' })
+const arrowClassName = css({
+  alignItems: 'center',
+  cursor: 'default',
+  display: 'flex',
+  height: '6',
+  justifyContent: 'center',
+  position: 'relative',
+  width: 'full',
+  zIndex: '50',
+})
+const scrollUpArrowClassName = css({
+  '&::before': {
+    backgroundImage: 'linear-gradient(to bottom, token(colors.popover) 50%, transparent)',
+    borderStartEndRadius: 'calc(token(radii.lg) - 1px)',
+    borderStartStartRadius: 'calc(token(radii.lg) - 1px)',
+    content: '""',
+    height: '200%',
+    insetInline: '1px',
+    pointerEvents: 'none',
+    position: 'absolute',
+    top: '1px',
+  },
+})
+const scrollDownArrowClassName = css({
+  '&::before': {
+    backgroundImage: 'linear-gradient(to top, token(colors.popover) 50%, transparent)',
+    borderEndEndRadius: 'calc(token(radii.lg) - 1px)',
+    borderEndStartRadius: 'calc(token(radii.lg) - 1px)',
+    bottom: '1px',
+    content: '""',
+    height: '200%',
+    insetInline: '1px',
+    pointerEvents: 'none',
+    position: 'absolute',
+  },
+})
+const itemClassName = css({
+  '& svg': { flexShrink: 0, pointerEvents: 'none' },
+  '&[data-disabled]': { opacity: 0.64, pointerEvents: 'none' },
+  '&[data-highlighted]': { backgroundColor: 'accent', color: 'accent-foreground' },
+  '&[data-side="none"]': { minWidth: 'calc(var(--anchor-width) + 1.25rem)' },
+  '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+  alignItems: 'center',
+  borderRadius: 'sm',
+  cursor: 'default',
+  display: 'grid',
+  fontSize: { base: 'base', sm: 'sm' },
+  gap: '2',
+  gridTemplateColumns: '1rem 1fr',
+  minHeight: { base: '8', sm: '7' },
+  outline: 'none',
+  paddingBlock: '1',
+  paddingInlineEnd: '4',
+  paddingInlineStart: '2',
+})
+const iconClassName = css({ height: { base: '4.5', sm: '4' }, position: 'relative', width: { base: '4.5', sm: '4' } })
+const indicatorClassName = css({ gridColumnStart: '1' })
+const itemTextClassName = css({ gridColumnStart: '2', minWidth: 0 })
+const SelectTrigger = (props: SelectPrimitive.Trigger.Props): ReactElement => (
+  <SelectPrimitive.Trigger className={selectTriggerClassName} data-slot="select-trigger" {...props}>
+    <>
+      {props.children}
+      <SelectPrimitive.Icon className={selectTriggerIconClassName} data-slot="select-icon">
+        <CaretUpDownIcon />
+      </SelectPrimitive.Icon>
+    </>
   </SelectPrimitive.Trigger>
 )
-
-const SelectPopup = ({
-  className,
-  children,
-  side = 'bottom',
-  sideOffset = 4,
-  align = 'start',
-  alignOffset = 0,
-  alignItemWithTrigger = true,
-  anchor,
-  ...props
-}: SelectPrimitive.Popup.Props & {
-  side?: SelectPrimitive.Positioner.Props['side']
-  sideOffset?: SelectPrimitive.Positioner.Props['sideOffset']
-  align?: SelectPrimitive.Positioner.Props['align']
-  alignOffset?: SelectPrimitive.Positioner.Props['alignOffset']
-  alignItemWithTrigger?: SelectPrimitive.Positioner.Props['alignItemWithTrigger']
-  anchor?: SelectPrimitive.Positioner.Props['anchor']
-}): React.ReactElement => (
+const SelectPopup = ({ children, ...props }: SelectPrimitive.Popup.Props): ReactElement => (
   <SelectPrimitive.Portal>
     <SelectPrimitive.Positioner
-      align={align}
-      alignItemWithTrigger={alignItemWithTrigger}
-      alignOffset={alignOffset}
-      anchor={anchor}
-      className="z-50 select-none"
+      align="start"
+      alignItemWithTrigger
+      className={positionerClassName}
       data-slot="select-positioner"
-      side={side}
-      sideOffset={sideOffset}
+      side="bottom"
+      sideOffset={4}
     >
-      <SelectPrimitive.Popup className="origin-(--transform-origin) text-foreground outline-none" data-slot="select-popup" {...props}>
-        <SelectPrimitive.ScrollUpArrow
-          className="top-0 z-50 flex h-6 w-full cursor-default items-center justify-center before:pointer-events-none before:absolute before:inset-x-px before:top-px before:h-[200%] before:rounded-t-[calc(var(--radius-lg)-1px)] before:bg-linear-to-b before:from-popover before:from-50%"
-          data-slot="select-scroll-up-arrow"
-        >
-          <CaretUpIcon className="relative size-4.5 sm:size-4" />
+      <SelectPrimitive.Popup className={popupClassName} data-slot="select-popup" {...props}>
+        <SelectPrimitive.ScrollUpArrow className={`${arrowClassName} ${scrollUpArrowClassName}`} data-slot="select-scroll-up-arrow">
+          <span className={iconClassName}>
+            <CaretUpIcon />
+          </span>
         </SelectPrimitive.ScrollUpArrow>
-        <div className="relative h-full min-w-(--anchor-width) rounded-lg border bg-popover shadow-lg/5 not-dark:bg-clip-padding before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]">
-          <SelectPrimitive.List className={cn('max-h-(--available-height) overflow-y-auto p-1', className)} data-slot="select-list">
+        <div className={popupFrameClassName}>
+          <SelectPrimitive.List className={listClassName} data-slot="select-list">
             {children}
           </SelectPrimitive.List>
         </div>
-        <SelectPrimitive.ScrollDownArrow
-          className="bottom-0 z-50 flex h-6 w-full cursor-default items-center justify-center before:pointer-events-none before:absolute before:inset-x-px before:bottom-px before:h-[200%] before:rounded-b-[calc(var(--radius-lg)-1px)] before:bg-linear-to-t before:from-popover before:from-50%"
-          data-slot="select-scroll-down-arrow"
-        >
-          <CaretDownIcon className="relative size-4.5 sm:size-4" />
+        <SelectPrimitive.ScrollDownArrow className={`${arrowClassName} ${scrollDownArrowClassName}`} data-slot="select-scroll-down-arrow">
+          <span className={iconClassName}>
+            <CaretDownIcon />
+          </span>
         </SelectPrimitive.ScrollDownArrow>
       </SelectPrimitive.Popup>
     </SelectPrimitive.Positioner>
   </SelectPrimitive.Portal>
 )
-
-const SelectItem = ({ className, children, ...props }: SelectPrimitive.Item.Props): React.ReactElement => (
-  <SelectPrimitive.Item
-    className={cn(
-      "grid min-h-8 in-data-[side=none]:min-w-[calc(var(--anchor-width)+1.25rem)] cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-sm py-1 ps-2 pe-4 text-base outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-64 sm:min-h-7 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-      className
-    )}
-    data-slot="select-item"
-    {...props}
-  >
-    <SelectPrimitive.ItemIndicator className="col-start-1">
+const SelectItem = (props: SelectPrimitive.Item.Props): ReactElement => (
+  <SelectPrimitive.Item className={itemClassName} data-slot="select-item" {...props}>
+    <SelectPrimitive.ItemIndicator className={indicatorClassName}>
       <svg
         aria-hidden="true"
         fill="none"
@@ -91,50 +143,40 @@ const SelectItem = ({ className, children, ...props }: SelectPrimitive.Item.Prop
         strokeWidth="2"
         viewBox="0 0 24 24"
         width="24"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
       </svg>
     </SelectPrimitive.ItemIndicator>
-    <SelectPrimitive.ItemText className="col-start-2 min-w-0">{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText className={itemTextClassName}>{props.children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 )
-
 const SelectBase = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
-  const { items, disabled, className } = props
+  const { items, disabled } = props
   const { displayLabel, isEmpty } = getSelectDisplay(props)
-
   const trigger = (
-    <SelectTrigger className={className} disabled={disabled}>
-      <span className={cn('flex-1 truncate text-left', isEmpty && 'text-muted-foreground')}>{displayLabel}</span>
+    <SelectTrigger disabled={disabled}>
+      <span className={selectTextClassName(isEmpty)}>{displayLabel}</span>
     </SelectTrigger>
   )
-
   const popup = (
     <SelectPopup>
       {items.map((item) => (
-        <SelectItem className="justify-start" key={item.value ?? 'none'} value={item.value}>
+        <SelectItem key={item.value ?? 'none'} value={item.value}>
           {item.label}
         </SelectItem>
       ))}
     </SelectPopup>
   )
-
-  if (props.multiple) {
-    return (
-      <SelectRoot disabled={disabled} items={items} multiple onValueChange={props.onValueChange} value={props.value}>
-        {trigger}
-        {popup}
-      </SelectRoot>
-    )
-  }
-
-  return (
-    <SelectRoot disabled={disabled} items={items} onValueChange={props.onValueChange} value={props.value ?? null}>
+  return props.multiple ? (
+    <SelectPrimitive.Root disabled={disabled} items={items} multiple onValueChange={props.onValueChange} value={props.value}>
       {trigger}
       {popup}
-    </SelectRoot>
+    </SelectPrimitive.Root>
+  ) : (
+    <SelectPrimitive.Root disabled={disabled} items={items} onValueChange={props.onValueChange} value={props.value ?? null}>
+      {trigger}
+      {popup}
+    </SelectPrimitive.Root>
   )
 }
-
 export default SelectBase

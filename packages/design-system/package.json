@@ -8,6 +8,10 @@
     "./card": "./src/ui/data-display/card/card.tsx",
     "./combobox/options": "./src/ui/forms/combobox/options.ts",
     "./command": "./src/ui/overlays/command/command.tsx",
+    "./css": {
+      "types": "./styled-system/css/index.d.ts",
+      "import": "./styled-system/css/index.mjs"
+    },
     "./default-error-component": "./src/ui/feedback/default-error-component/default-error-component.tsx",
     "./delete-dialog": "./src/ui/overlays/delete-dialog/delete-dialog.tsx",
     "./editor": "./src/ui/forms/editor/editor.tsx",
@@ -17,6 +21,8 @@
     "./hooks/use-file-upload": "./src/hooks/use-file-upload.ts",
     "./hooks/use-platform": "./src/hooks/use-platform.ts",
     "./icons/*": "./src/ui/data-display/icons/*.tsx",
+    "./icons/*.stories": null,
+    "./icons/icon": null,
     "./icons/types": "./src/ui/data-display/icons/types.ts",
     "./item": "./src/ui/data-display/item/item.tsx",
     "./kbd": "./src/ui/data-display/kbd/kbd.tsx",
@@ -35,12 +41,16 @@
     "./tabs": "./src/ui/navigation/tabs/tabs.tsx",
     "./toast": "./src/ui/feedback/toast/toast.tsx",
     "./toggle": "./src/ui/actions/toggle/toggle.tsx",
+    "./tokens": {
+      "types": "./styled-system/tokens/index.d.ts",
+      "import": "./styled-system/tokens/index.mjs"
+    },
     "./toolbar": "./src/ui/actions/toolbar/toolbar.tsx",
     "./utils/format-form-errors": "./src/utils/format-form-errors.ts"
   },
   "scripts": {
-    "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build"
+    "storybook": "pnpm -w run styles:codegen && PANDA_STORYBOOK=1 storybook dev -p 6006",
+    "storybook:build": "pnpm -w run styles:codegen && PANDA_STORYBOOK=1 storybook build"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
@@ -51,21 +61,16 @@
     "@lexical/utils": "catalog:",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-store": "catalog:",
-    "class-variance-authority": "catalog:",
-    "cn": "catalog:",
     "lexical": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",
     "@storybook/react-vite": "catalog:",
-    "@tailwindcss/typography": "catalog:",
-    "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "storybook": "catalog:",
-    "tailwindcss": "catalog:"
+    "storybook": "catalog:"
   },
   "peerDependencies": {
     "react": "^19.0.0",

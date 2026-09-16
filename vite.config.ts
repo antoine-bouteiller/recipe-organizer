@@ -18,12 +18,19 @@ const viteConfig = defineConfig({
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
+    ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts', 'packages/design-system/styled-system/**'],
     overrides: [
       {
         files: ['**/use-file-upload.ts'],
         rules: {
           'react-hooks/exhaustive-deps': 'off',
+        },
+      },
+      {
+        // Numeric token scales are intentionally ordered by value.
+        files: ['packages/design-system/src/theme/**/*.ts'],
+        rules: {
+          'sort-keys': 'off',
         },
       },
     ],
@@ -122,10 +129,7 @@ const viteConfig = defineConfig({
     singleQuote: true,
     printWidth: 150,
     experimentalSortImports: {},
-    experimentalTailwindcss: {
-      stylesheet: 'apps/web/src/styles/app.css',
-    },
-    ignorePatterns: ['apps/web/src/routeTree.gen.ts'],
+    ignorePatterns: ['apps/web/src/routeTree.gen.ts', 'packages/design-system/styled-system/**'],
   },
   resolve: {
     tsconfigPaths: true,

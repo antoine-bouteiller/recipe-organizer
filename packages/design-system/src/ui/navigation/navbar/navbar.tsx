@@ -1,6 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { cn } from 'cn'
+import { css } from '@recipe-organizer/design-system/css'
 import type React from 'react'
 
 export interface NavbarProps {
@@ -9,30 +9,43 @@ export interface NavbarProps {
 }
 
 export const Navbar = ({ actions, children }: NavbarProps): React.ReactElement => (
-  <div className="flex h-14 items-center gap-2 px-6" data-slot="navbar">
-    <nav className="flex items-center gap-1" data-slot="navbar-items">
+  <div className={css({ alignItems: 'center', display: 'flex', gap: '2', height: '14', paddingInline: '6' })} data-slot="navbar">
+    <nav className={css({ alignItems: 'center', display: 'flex', gap: '1' })} data-slot="navbar-items">
       {children}
     </nav>
-    <div className="flex flex-1 items-center justify-end gap-2" data-slot="navbar-actions">
+    <div className={css({ alignItems: 'center', display: 'flex', flex: '1', gap: '2', justifyContent: 'flex-end' })} data-slot="navbar-actions">
       {actions}
     </div>
   </div>
 )
 
-export type NavbarItemProps = useRender.ComponentProps<'a'>
+export type NavbarItemProps = Pick<useRender.ComponentProps<'a'>, 'aria-current' | 'children' | 'href' | 'render'>
 
-export const NavbarItem = ({ className, render, ...props }: NavbarItemProps): React.ReactElement => {
-  const defaultProps = {
-    className: cn(
-      'relative rounded-md px-2.5 py-1 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-2.5 aria-[current=page]:after:-bottom-0.5 aria-[current=page]:after:h-0.5 aria-[current=page]:after:rounded-full aria-[current=page]:after:bg-primary',
-      className
-    ),
-    'data-slot': 'navbar-item',
-  }
+const navbarItemClassName = css({
+  '&[aria-current=page]': { color: 'foreground' },
+  '&[aria-current=page]::after': {
+    backgroundColor: 'primary',
+    borderRadius: 'full',
+    bottom: '-0.5',
+    content: '""',
+    height: '0.5',
+    insetInline: '2.5',
+    position: 'absolute',
+  },
+  _hover: { backgroundColor: 'accent', color: 'foreground' },
+  borderRadius: 'md',
+  color: 'muted-foreground',
+  fontSize: 'sm',
+  fontWeight: 'medium',
+  paddingBlock: '1',
+  paddingInline: '2.5',
+  position: 'relative',
+  transitionDuration: '150ms',
+  transitionProperty: 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
+  transitionTimingFunction: 'in-out',
+})
+export const NavbarItem = ({ render, ...props }: NavbarItemProps): React.ReactElement => {
+  const mergedProps = mergeProps<'a'>({ className: navbarItemClassName }, props)
 
-  return useRender({
-    defaultTagName: 'a',
-    props: mergeProps<'a'>(defaultProps, props),
-    render,
-  })
+  return useRender({ defaultTagName: 'a', props: { ...mergedProps, 'data-slot': 'navbar-item' }, render })
 }

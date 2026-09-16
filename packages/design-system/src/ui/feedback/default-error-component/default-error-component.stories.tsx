@@ -1,3 +1,4 @@
+import { css } from '@recipe-organizer/design-system/css'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
@@ -24,7 +25,7 @@ export const Overview: Story = {
     await expect(detailsSection.getByText('A caller-provided diagnostic message.')).toBeVisible()
   },
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={css({ display: 'flex', flexDirection: 'column', gap: '8', minWidth: '0', width: 'full' })}>
       <StorySection title="Default">
         <DefaultErrorComponent {...args} />
       </StorySection>

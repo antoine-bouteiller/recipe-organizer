@@ -1,161 +1,141 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
-import { cn } from 'cn'
+import { css } from '@recipe-organizer/design-system/css'
 import React, { useState, type ReactElement } from 'react'
 
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { XIcon } from '../../data-display/icons/x'
 import { ScrollArea } from '../../layout/scroll-area/scroll-area'
-import { Input } from '../input/input'
 import { type ComboboxImplProps, type ValueOptions } from './combobox'
 import { type Option } from './options'
 
-const ComboboxContext: React.Context<{
-  chipsRef: React.RefObject<Element | null> | null
-  multiple: boolean
-}> = React.createContext<{
-  chipsRef: React.RefObject<Element | null> | null
-  multiple: boolean
-}>({
-  chipsRef: null,
-  multiple: false,
+const inputGroupClassName = css({ '&:has(:disabled)': { opacity: 0.64 }, color: 'foreground', position: 'relative', width: 'full' })
+const inputClassName = css({
+  '&:disabled': { opacity: 1 },
+  '&:has(+ [data-slot="combobox-trigger"], + [data-slot="combobox-clear"])': { paddingInlineEnd: '7' },
+  backgroundColor: 'transparent',
+  height: { base: '8.5', sm: '7.5' },
+  lineHeight: { base: '2.125rem', sm: '1.875rem' },
+  minWidth: '0',
+  outline: 'none',
+  paddingInline: 'calc(token(spacing.3) - 1px)',
+  transition: 'background-color 5000000s ease-in-out 0s',
+  width: 'full',
 })
-
-const ComboboxRoot = <Value, Multiple extends boolean | undefined = false>(
-  props: ComboboxPrimitive.Root.Props<Value, Multiple>
-): React.ReactElement => {
+const actionClassName = css({
+  '& svg': { flexShrink: 0, pointerEvents: 'none' },
+  '&:has(+ [data-slot="combobox-clear"])': { display: 'none' },
+  '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+  '@media (pointer: coarse)': { _after: { content: '""', minHeight: '11', minWidth: '11', position: 'absolute' } },
+  _hover: { opacity: 1 },
+  alignItems: 'center',
+  borderColor: 'transparent',
+  borderRadius: 'md',
+  borderWidth: '1px',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  height: { base: '8', sm: '7' },
+  justifyContent: 'center',
+  opacity: 0.8,
+  outline: 'none',
+  position: 'absolute',
+  right: '.5',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  transitionDuration: '150ms',
+  transitionProperty: 'opacity',
+  transitionTimingFunction: 'in-out',
+  width: { base: '8', sm: '7' },
+})
+const positionerClassName = css({ userSelect: 'none', zIndex: '50' })
+const frameClassName = css({
+  '&::before': {
+    borderRadius: 'calc(token(radii.lg) - 1px)',
+    boxShadow: {
+      _dark: '0 -1px color-mix(in oklab, token(colors.white) 6%, transparent)',
+      base: '0 1px color-mix(in oklab, token(colors.black) 4%, transparent)',
+    },
+    content: '""',
+    inset: '0',
+    pointerEvents: 'none',
+    position: 'absolute',
+  },
+  backgroundClip: 'padding-box',
+  backgroundColor: 'popover',
+  borderRadius: 'lg',
+  borderWidth: '1px',
+  boxShadow: 'overlay',
+  display: 'flex',
+  maxHeight: 'full',
+  maxWidth: 'var(--available-width)',
+  minWidth: 'var(--anchor-width)',
+  position: 'relative',
+  transformOrigin: 'var(--transform-origin)',
+  transitionDuration: '150ms',
+  transitionProperty: 'scale, opacity',
+  transitionTimingFunction: 'in-out',
+})
+const popupClassName = css({
+  color: 'foreground',
+  display: 'flex',
+  flex: '1',
+  flexDirection: 'column',
+  maxHeight: 'min(var(--available-height), 23rem)',
+})
+const itemClassName = css({
+  '& svg': { flexShrink: 0, pointerEvents: 'none' },
+  '&[data-disabled]': { opacity: 0.64, pointerEvents: 'none' },
+  '&[data-highlighted]': { backgroundColor: 'accent', color: 'accent-foreground' },
+  '--owner-icon-size': { base: '1.125rem', sm: '1rem' },
+  alignItems: 'center',
+  borderRadius: 'sm',
+  cursor: 'default',
+  display: 'grid',
+  fontSize: { base: 'base', sm: 'sm' },
+  gap: '2',
+  gridTemplateColumns: '1rem 1fr',
+  minHeight: { base: '8', sm: '7' },
+  outline: 'none',
+  paddingBlock: '1',
+  paddingInlineEnd: '4',
+  paddingInlineStart: '2',
+})
+const separatorClassName = css({ '&:last-child': { display: 'none' }, backgroundColor: 'border', height: 'px', marginBlock: '1', marginInline: '2' })
+const emptyClassName = css({
+  '&:not(:empty)': { padding: '2' },
+  color: 'muted-foreground',
+  fontSize: { base: 'base', sm: 'sm' },
+  textAlign: 'center',
+})
+const listClassName = css({ '&:not(:empty)': { padding: '1' }, '&[data-has-overflow-y]': { paddingInlineEnd: '3' }, scrollPaddingBlock: '1' })
+const addClassName = css({ padding: '1' })
+const Context = React.createContext<{ chipsRef: React.RefObject<Element | null> | null }>({ chipsRef: null })
+const Root = <Value, Multiple extends boolean | undefined = false>(props: ComboboxPrimitive.Root.Props<Value, Multiple>): React.ReactElement => {
   const chipsRef = React.useRef<Element | null>(null)
   return (
-    <ComboboxContext.Provider value={{ chipsRef, multiple: Boolean(props.multiple) }}>
+    <Context.Provider value={{ chipsRef }}>
       <ComboboxPrimitive.Root {...props} />
-    </ComboboxContext.Provider>
+    </Context.Provider>
   )
 }
-
-const ComboboxTrigger = ({ className, children, ...props }: ComboboxPrimitive.Trigger.Props): React.ReactElement => (
-  <ComboboxPrimitive.Trigger className={className} data-slot="combobox-trigger" {...props}>
-    {children}
-  </ComboboxPrimitive.Trigger>
-)
-
-const ComboboxClear = ({ className, ...props }: ComboboxPrimitive.Clear.Props): React.ReactElement => (
-  <ComboboxPrimitive.Clear className={className} data-slot="combobox-clear" {...props} />
-)
-
-const ComboboxInput = ({
-  className,
+const Input = ({
   showClear = false,
   ...props
-}: Omit<ComboboxPrimitive.Input.Props, 'size'> & {
-  showClear?: boolean
-  ref?: React.Ref<HTMLInputElement>
-}): React.ReactElement => (
-  <ComboboxPrimitive.InputGroup
-    className="relative w-full text-foreground not-has-[>*.w-full]:w-fit has-disabled:opacity-64"
-    data-slot="combobox-input-group"
-  >
-    <ComboboxPrimitive.Input
-      className={cn('has-[+[data-slot=combobox-trigger],+[data-slot=combobox-clear]]:*:data-[slot=combobox-input]:pe-7', className)}
-      data-slot="combobox-input"
-      render={<Input className="has-disabled:opacity-100" nativeInput />}
-      {...props}
-    />
-    <ComboboxTrigger className="absolute end-0.5 top-1/2 inline-flex size-8 shrink-0 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border border-transparent opacity-80 transition-opacity outline-none hover:opacity-100 has-[+[data-slot=combobox-clear]]:hidden sm:size-7 pointer-coarse:after:absolute pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4">
-      <ComboboxPrimitive.Icon data-slot="combobox-icon">
+}: Omit<ComboboxPrimitive.Input.Props, 'size'> & { showClear?: boolean; ref?: React.Ref<HTMLInputElement> }): React.ReactElement => (
+  <ComboboxPrimitive.InputGroup className={inputGroupClassName} data-slot="combobox-input-group">
+    <ComboboxPrimitive.Input className={inputClassName} data-slot="combobox-input" render={<input />} {...props} />
+    <ComboboxPrimitive.Trigger className={actionClassName} data-slot="combobox-trigger">
+      <ComboboxPrimitive.Icon>
         <CaretUpDownIcon />
       </ComboboxPrimitive.Icon>
-    </ComboboxTrigger>
+    </ComboboxPrimitive.Trigger>
     {showClear && (
-      <ComboboxClear className="absolute end-0.5 top-1/2 inline-flex size-8 shrink-0 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border border-transparent opacity-80 transition-opacity outline-none hover:opacity-100 has-[+[data-slot=combobox-clear]]:hidden sm:size-7 pointer-coarse:after:absolute pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4">
+      <ComboboxPrimitive.Clear className={actionClassName} data-slot="combobox-clear">
         <XIcon />
-      </ComboboxClear>
+      </ComboboxPrimitive.Clear>
     )}
   </ComboboxPrimitive.InputGroup>
 )
-
-const ComboboxPopup = ({ className, children, ...props }: ComboboxPrimitive.Popup.Props): React.ReactElement => {
-  const { chipsRef: anchor } = React.useContext(ComboboxContext)
-
-  return (
-    <ComboboxPrimitive.Portal>
-      <ComboboxPrimitive.Positioner
-        align="start"
-        anchor={anchor}
-        className="z-50 select-none"
-        data-slot="combobox-positioner"
-        side="bottom"
-        sideOffset={4}
-      >
-        <span
-          className={cn(
-            'relative flex max-h-full min-w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) rounded-lg border bg-popover not-dark:bg-clip-padding shadow-lg/5 transition-[scale,opacity] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
-            className
-          )}
-        >
-          <ComboboxPrimitive.Popup
-            className="flex max-h-[min(var(--available-height),23rem)] flex-1 flex-col text-foreground"
-            data-slot="combobox-popup"
-            {...props}
-          >
-            {children}
-          </ComboboxPrimitive.Popup>
-        </span>
-      </ComboboxPrimitive.Positioner>
-    </ComboboxPrimitive.Portal>
-  )
-}
-
-const ComboboxItem = ({ className, children, ...props }: ComboboxPrimitive.Item.Props): React.ReactElement => (
-  <ComboboxPrimitive.Item
-    className={cn(
-      "grid min-h-8 in-data-[side=none]:min-w-[calc(var(--anchor-width)+1.25rem)] cursor-default grid-cols-[1rem_1fr] items-center gap-2 rounded-sm py-1 ps-2 pe-4 text-base outline-none data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-64 sm:min-h-7 sm:text-sm [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-      className
-    )}
-    data-slot="combobox-item"
-    {...props}
-  >
-    <ComboboxPrimitive.ItemIndicator className="col-start-1">
-      <svg
-        aria-hidden="true"
-        fill="none"
-        height="24"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-        width="24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
-      </svg>
-    </ComboboxPrimitive.ItemIndicator>
-    <div className="col-start-2">{children}</div>
-  </ComboboxPrimitive.Item>
-)
-
-const ComboboxSeparator = ({ className, ...props }: ComboboxPrimitive.Separator.Props): React.ReactElement => (
-  <ComboboxPrimitive.Separator className={cn('mx-2 my-1 h-px bg-border last:hidden', className)} data-slot="combobox-separator" {...props} />
-)
-
-const ComboboxEmpty = ({ className, ...props }: ComboboxPrimitive.Empty.Props): React.ReactElement => (
-  <ComboboxPrimitive.Empty
-    className={cn('not-empty:p-2 text-center text-base text-muted-foreground sm:text-sm', className)}
-    data-slot="combobox-empty"
-    {...props}
-  />
-)
-
-const ComboboxList = ({ className, ...props }: ComboboxPrimitive.List.Props): React.ReactElement => (
-  <ScrollArea scrollbarGutter scrollFade>
-    <ComboboxPrimitive.List
-      className={cn('not-empty:scroll-py-1 not-empty:px-1 not-empty:py-1 in-data-has-overflow-y:pe-3', className)}
-      data-slot="combobox-list"
-      {...props}
-    />
-  </ScrollArea>
-)
-
-const ComboboxBase = <TValue extends ValueOptions>({
+const Base = <TValue extends ValueOptions>({
   addNew,
   disabled,
   isInvalid,
@@ -165,35 +145,57 @@ const ComboboxBase = <TValue extends ValueOptions>({
   selectedOption,
 }: ComboboxImplProps<TValue>): ReactElement => {
   const [inputValue, setInputValue] = useState('')
-
+  const { chipsRef: anchor } = React.useContext(Context)
   return (
-    <ComboboxRoot<Option<TValue>>
+    <Root<Option<TValue>>
       aria-invalid={isInvalid || undefined}
       disabled={disabled}
       items={options}
       onInputValueChange={setInputValue}
-      onValueChange={(option) => onChange(option)}
+      onValueChange={onChange}
       value={selectedOption ?? null}
     >
-      <ComboboxInput placeholder={placeholder} showClear={Boolean(selectedOption)} />
-      <ComboboxPopup>
-        <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
-        <ComboboxList>
-          {(item) => (
-            <ComboboxItem key={String(item.value)} value={item}>
-              {item.label}
-            </ComboboxItem>
-          )}
-        </ComboboxList>
-        {addNew && (
-          <>
-            <ComboboxSeparator />
-            <div className="p-1">{addNew(inputValue)}</div>
-          </>
-        )}
-      </ComboboxPopup>
-    </ComboboxRoot>
+      <Input placeholder={placeholder} showClear={Boolean(selectedOption)} />
+      <ComboboxPrimitive.Portal>
+        <ComboboxPrimitive.Positioner align="start" anchor={anchor} className={positionerClassName} side="bottom" sideOffset={4}>
+          <span className={frameClassName}>
+            <ComboboxPrimitive.Popup className={popupClassName} data-slot="combobox-popup">
+              <ComboboxPrimitive.Empty className={emptyClassName}>Aucun résultat</ComboboxPrimitive.Empty>
+              <ScrollArea scrollbarGutter scrollFade>
+                <ComboboxPrimitive.List className={listClassName}>
+                  {(item) => (
+                    <ComboboxPrimitive.Item className={itemClassName} key={String(item.value)} value={item}>
+                      <ComboboxPrimitive.ItemIndicator>
+                        <svg
+                          aria-hidden="true"
+                          fill="none"
+                          height="24"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          width="24"
+                        >
+                          <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
+                        </svg>
+                      </ComboboxPrimitive.ItemIndicator>
+                      <div>{item.label}</div>
+                    </ComboboxPrimitive.Item>
+                  )}
+                </ComboboxPrimitive.List>
+              </ScrollArea>
+              {addNew && (
+                <>
+                  <ComboboxPrimitive.Separator className={separatorClassName} />
+                  <div className={addClassName}>{addNew(inputValue)}</div>
+                </>
+              )}
+            </ComboboxPrimitive.Popup>
+          </span>
+        </ComboboxPrimitive.Positioner>
+      </ComboboxPrimitive.Portal>
+    </Root>
   )
 }
-
-export default ComboboxBase
+export default Base

@@ -1,45 +1,32 @@
+import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
 import { type ReactElement, type ReactNode } from 'react'
 
 import { Button } from '../../actions/button/button'
-import { DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, Drawer as DrawerRoot, DrawerTitle, DrawerTrigger } from '../drawer/drawer'
+import { DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, Drawer as DrawerRoot, DrawerTitle } from '../drawer/drawer'
 import { type DialogProps } from './dialog'
+import { useDialogFormFrame } from './dialog-form.private'
 
-const DialogDrawer = ({
-  title,
-  trigger,
-  children,
-  cancelLabel,
-  cancelDisabled,
-  footer,
-  open,
-  onOpenChange,
-  contentRender,
-  panelClassName,
-}: DialogProps): ReactElement => {
+const DialogDrawer = ({ title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
+  const formFrame = useDialogFormFrame()
   const hasFooter = cancelLabel !== undefined || footer !== undefined
-  const wrap = (body: ReactNode): ReactNode => (contentRender ? contentRender(body) : body)
-
+  const content: ReactNode = (
+    <>
+      <DrawerHeader>
+        <DrawerTitle>{title}</DrawerTitle>
+      </DrawerHeader>
+      <DrawerPanel>{children}</DrawerPanel>
+      {hasFooter && (
+        <DrawerFooter>
+          {cancelLabel !== undefined && <DrawerClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DrawerClose>}
+          {footer}
+        </DrawerFooter>
+      )}
+    </>
+  )
   return (
     <DrawerRoot onOpenChange={onOpenChange} open={open}>
-      {trigger !== undefined && <DrawerTrigger render={trigger} />}
-      <DrawerPopup>
-        {wrap(
-          <>
-            <DrawerHeader>
-              <DrawerTitle>{title}</DrawerTitle>
-            </DrawerHeader>
-            <DrawerPanel className={panelClassName}>{children}</DrawerPanel>
-            {hasFooter && (
-              <DrawerFooter>
-                {cancelLabel !== undefined && (
-                  <DrawerClose render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DrawerClose>
-                )}
-                {footer}
-              </DrawerFooter>
-            )}
-          </>
-        )}
-      </DrawerPopup>
+      {trigger !== undefined && <DrawerPrimitive.Trigger data-slot="drawer-trigger" render={trigger} />}
+      <DrawerPopup>{formFrame?.wrap(content) ?? content}</DrawerPopup>
     </DrawerRoot>
   )
 }
