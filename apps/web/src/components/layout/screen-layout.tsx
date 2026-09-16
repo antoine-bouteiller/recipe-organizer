@@ -1,25 +1,33 @@
 import { ScreenLayout as ScreenLayoutView } from '@recipe-organizer/design-system/screen-layout'
 import { useRouter } from '@tanstack/react-router'
-import { type ComponentProps } from 'react'
+import type React from 'react'
 
 import { TabBar } from '../navigation/tabbar'
 
-type ScreenLayoutProps = Omit<ComponentProps<typeof ScreenLayoutView>, 'onBack' | 'footer' | 'outerScrollId' | 'innerScrollId'> & {
-  withGoBack?: boolean
+interface ScreenLayoutProps {
+  backgroundImage?: string
+  children: React.ReactNode
+  headerEndItem?: React.ReactNode
   pageKey?: string
+  title: string
+  withGoBack?: boolean
 }
 
-export const ScreenLayout = ({ withGoBack = false, pageKey, ...props }: ScreenLayoutProps) => {
+export const ScreenLayout = ({ backgroundImage, children, headerEndItem, title, withGoBack = false, pageKey }: ScreenLayoutProps) => {
   const router = useRouter()
 
   return (
     <ScreenLayoutView
-      {...props}
+      backgroundImage={backgroundImage}
+      headerEndItem={headerEndItem}
+      title={title}
       footer={pageKey ? <TabBar /> : undefined}
       onBack={withGoBack ? () => router.history.back() : undefined}
       // These ids match the router's scrollToTopSelectors.
-      outerScrollId="screen-outer"
       innerScrollId="screen-inner"
-    />
+      outerScrollId="screen-outer"
+    >
+      {children}
+    </ScreenLayoutView>
   )
 }

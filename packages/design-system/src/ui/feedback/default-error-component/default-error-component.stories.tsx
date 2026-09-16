@@ -5,6 +5,8 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { Button } from '../../actions/button/button'
 import { DefaultErrorComponent } from './default-error-component'
 
+import { container } from './default-error-component.stories.css'
+
 const meta = {
   args: { action: <Button render={<a href="#retry" />}>Try again</Button> },
   component: DefaultErrorComponent,
@@ -24,7 +26,7 @@ export const Overview: Story = {
     await expect(detailsSection.getByText('A caller-provided diagnostic message.')).toBeVisible()
   },
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <DefaultErrorComponent {...args} />
       </StorySection>

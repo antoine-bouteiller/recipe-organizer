@@ -10,6 +10,8 @@ import { UserIcon } from '@recipe-organizer/design-system/icons/user'
 import { UsersIcon } from '@recipe-organizer/design-system/icons/users'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
+import { container, container2, container3, container4, container5, container6, container7, heading, text, text2 } from './-index.css'
+
 interface SettingsSection {
   adminOnly?: boolean
   description: string
@@ -52,29 +54,35 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Paramètres" pageKey="/settings">
-      <Button className="mb-4 w-full justify-start gap-3 md:hidden" onClick={toggleTheme} variant="outline">
-        <ThemeIcon className="size-5" />
-        Changer le thème
-      </Button>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className={container}>
+        <Button onClick={toggleTheme} variant="outline" width="full" align="start">
+          <ThemeIcon size="lg" />
+          Changer le thème
+        </Button>
+      </div>
+      <div className={container2}>
         {visibleSections.map((section) => {
           const Icon = section.icon
           return (
             <Link key={section.id} to={section.path} viewTransition>
-              <Card className="h-full cursor-pointer p-4 transition-colors hover:bg-accent">
-                <div className="flex items-start justify-between">
-                  <div className="flex flex-1 items-start gap-3">
-                    <div className="rounded-lg bg-primary/10 p-2">
-                      <Icon className="h-5 w-5 text-primary" />
+              <div className={container3}>
+                <Card>
+                  <div className={container4}>
+                    <div className={container5}>
+                      <div className={container6}>
+                        <Icon size="lg" />
+                      </div>
+                      <div className={container7}>
+                        <h3 className={heading}>{section.title}</h3>
+                        <p className={text}>{section.description}</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{section.title}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
-                    </div>
+                    <span className={text2}>
+                      <CaretRightIcon size="lg" />
+                    </span>
                   </div>
-                  <CaretRightIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
-                </div>
-              </Card>
+                </Card>
+              </div>
             </Link>
           )
         })}

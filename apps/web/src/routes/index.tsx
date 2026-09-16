@@ -1,3 +1,4 @@
+import { FloatingCreateRecipeAction } from '@client/components/floating-create-recipe-action'
 import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import RecipeCard from '@client/features/recipe/components/recipe-card'
@@ -10,15 +11,17 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
+import { container, container2, container3, text, container4 } from './-index.css'
+
 const searchSchema = z.object({
   search: z.boolean().optional(),
 })
 
 const RecipeListSkeleton = () => (
   <ScreenLayout title="Recettes" pageKey="/">
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+    <div className={container}>
       {incrementalArray({ length: 6 }).map((index) => (
-        <Skeleton className="h-60 rounded-[28px]" key={index} />
+        <Skeleton preset="recipe-card" key={index} />
       ))}
     </div>
   </ScreenLayout>
@@ -33,35 +36,26 @@ const RecipeList = () => {
   return (
     <ScreenLayout title="Recettes" pageKey="/">
       {visibleRecipes.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-          <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
-            <BookIcon className="size-7" />
+        <div className={container2}>
+          <div className={container3}>
+            <BookIcon size="xl" />
           </div>
-          <p className="text-balance text-muted-foreground">Aucune recette</p>
+          <p className={text}>Aucune recette</p>
           {authUser && (
             <Button render={<Link to="/recipe/new" viewTransition />}>
-              <PlusIcon className="size-4" />
+              <PlusIcon size="sm" />
               Ajouter une recette
             </Button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <div className={container4}>
           {visibleRecipes.map((recipe, index) => (
             <RecipeCard recipe={recipe} index={index} key={recipe.id} />
           ))}
         </div>
       )}
-      {authUser && (
-        <Button
-          aria-label="Ajouter une recette"
-          className="fixed right-2 bottom-16 transition-transform duration-200 ease-out-snappy hover:-translate-y-0.5 active:scale-95 md:hidden"
-          render={<Link to="/recipe/new" viewTransition />}
-          size="icon-xl"
-        >
-          <PlusIcon className="size-6" />
-        </Button>
-      )}
+      {authUser && <FloatingCreateRecipeAction />}
     </ScreenLayout>
   )
 }

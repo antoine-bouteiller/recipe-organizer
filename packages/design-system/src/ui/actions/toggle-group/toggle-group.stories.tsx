@@ -4,6 +4,8 @@ import { useState, type ReactElement } from 'react'
 import { StorySection } from '../../../../.storybook/story-section'
 import { ToggleGroup } from './toggle-group'
 
+import { container } from './toggle-group.stories.css'
+
 const items = [
   { label: 'Breakfast', value: 'breakfast' },
   { label: 'Lunch', value: 'lunch' },
@@ -26,7 +28,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <ControlledToggleGroup />
       </StorySection>

@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const FishIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M13.6677 15C13.2984 14.0429 13.1016 13.0373 13.1016 12C13.1016 10.9627 13.2984 9.95713 13.6677 9"
       stroke="currentColor"
@@ -25,5 +26,5 @@ export const FishIcon = (props: IconProps): React.ReactElement => (
       strokeLinejoin="round"
       strokeWidth={1.5}
     />
-  </svg>
+  </Icon>
 )

@@ -6,6 +6,8 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { type FileMetadata } from '../../../hooks/use-file-upload'
 
+import { container } from './image-field.stories.css'
+
 const image: FileMetadata = {
   id: 'recipe-image',
   name: 'recipe.svg',
@@ -42,7 +44,7 @@ export const Overview: Story = {
     await expect(empty.queryByAltText('Aperçu')).not.toBeInTheDocument()
   },
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Empty">
         <ImageFieldExample />
       </StorySection>

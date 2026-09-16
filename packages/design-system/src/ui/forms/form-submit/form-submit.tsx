@@ -2,7 +2,11 @@ import { useFormContext } from '../../../hooks/use-form-context'
 import { Button } from '../../actions/button/button'
 import { Spinner } from '../../feedback/spinner/spinner'
 
-export const FormSubmit = ({ label }: { label: string }) => {
+export interface FormSubmitProps {
+  label: string
+}
+
+export const FormSubmit = ({ label }: FormSubmitProps) => {
   const form = useFormContext()
   return (
     <form.Subscribe>

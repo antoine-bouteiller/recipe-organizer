@@ -1,21 +1,34 @@
 import { Field as FieldPrimitive } from '@base-ui/react/field'
-import { cn } from 'cn'
 import type React from 'react'
 
-export const Field = ({ className, ...props }: FieldPrimitive.Root.Props): React.ReactElement => (
-  <FieldPrimitive.Root className={cn('flex flex-col items-start gap-2 w-full', className)} data-slot="field" {...props} />
-)
+import { error, field, label } from './field.css'
 
-export const FieldLabel = ({ className, ...props }: FieldPrimitive.Label.Props): React.ReactElement => (
-  <FieldPrimitive.Label
-    className={cn('inline-flex items-center gap-2 font-medium text-base/4.5 text-foreground sm:text-sm/4', className)}
-    data-slot="field-label"
-    {...props}
-  />
-)
+const fieldClassName = field
+const labelRecipe = label
+const errorClassName = error
 
-export const FieldError = ({ className, ...props }: FieldPrimitive.Error.Props): React.ReactElement => (
-  <FieldPrimitive.Error className={cn('text-destructive-foreground text-xs', className)} data-slot="field-error" {...props} />
-)
+type FieldProps = Pick<FieldPrimitive.Root.Props, 'children' | 'dirty' | 'disabled' | 'invalid' | 'name' | 'touched'>
+type FieldLabelProps = Pick<FieldPrimitive.Label.Props, 'children'> & {
+  presentation?: 'dropzone-image' | 'dropzone-video'
+}
+type FieldErrorProps = Pick<FieldPrimitive.Error.Props, 'children' | 'match'>
+type FieldControlProps = Pick<FieldPrimitive.Control.Props, 'required'>
 
-export const FieldControl: typeof FieldPrimitive.Control = FieldPrimitive.Control
+export const Field = ({ children, dirty, disabled, invalid, name, touched }: FieldProps): React.ReactElement => (
+  <FieldPrimitive.Root className={fieldClassName} data-slot="field" dirty={dirty} disabled={disabled} invalid={invalid} name={name} touched={touched}>
+    {children}
+  </FieldPrimitive.Root>
+)
+export const FieldLabel = ({ children, presentation }: FieldLabelProps): React.ReactElement => (
+  <FieldPrimitive.Label className={labelRecipe({ presentation })} data-slot="field-label">
+    {children}
+  </FieldPrimitive.Label>
+)
+export const FieldError = ({ children, match }: FieldErrorProps): React.ReactElement => (
+  <FieldPrimitive.Error className={errorClassName} data-slot="field-error" match={match}>
+    {children}
+  </FieldPrimitive.Error>
+)
+export const FieldControl = ({ required }: FieldControlProps): React.ReactElement => (
+  <FieldPrimitive.Control data-slot="field-control" required={required} />
+)

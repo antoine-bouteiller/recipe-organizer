@@ -1,13 +1,18 @@
-import { cn } from 'cn'
 import type React from 'react'
 
-export const Skeleton = ({ className, ...props }: React.ComponentProps<'div'>): React.ReactElement => (
-  <div
-    className={cn(
-      'animate-skeleton rounded-sm [--skeleton-highlight:--alpha(var(--color-white)/64%)] [background:linear-gradient(120deg,transparent_40%,var(--skeleton-highlight),transparent_60%)_var(--color-muted)_0_0/200%_100%_fixed] dark:[--skeleton-highlight:--alpha(var(--color-white)/4%)]',
-      className
-    )}
-    data-slot="skeleton"
-    {...props}
-  />
+import { skeletonRecipe } from './skeleton.css'
+
+export interface SkeletonProps {
+  preset?:
+    | 'recipe-card'
+    | 'recipe-details-text'
+    | 'recipe-details-title'
+    | 'recipe-form'
+    | 'search-input'
+    | 'search-result'
+    | 'shopping-list-row'
+    | 'shopping-list-title'
+}
+export const Skeleton = ({ preset }: SkeletonProps): React.ReactElement => (
+  <div aria-hidden className={skeletonRecipe({ preset })} data-slot="skeleton" />
 )

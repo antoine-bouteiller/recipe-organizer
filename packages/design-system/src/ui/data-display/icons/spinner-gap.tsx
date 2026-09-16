@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const SpinnerGapIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M4 2V5.13219C4 5.42605 4.36724 5.55908 4.55527 5.33333C6.3854 3.2875 9.04499 2 12.0051 2C17.5251 2 22 6.47715 22 12C22 15.9582 19.7015 19.3793 16.367 21"
       stroke="currentColor"
@@ -18,5 +19,5 @@ export const SpinnerGapIcon = (props: IconProps): React.ReactElement => (
       strokeLinejoin="round"
       strokeWidth={1.5}
     />
-  </svg>
+  </Icon>
 )

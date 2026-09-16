@@ -2,6 +2,7 @@ import { getTheme } from '@client/lib/theme'
 import { getRouter } from '@client/router'
 import { RouterProvider } from '@tanstack/react-router'
 import { createRoot } from 'react-dom/client'
+import '@recipe-organizer/design-system/tokens'
 
 import '@client/styles/app.css'
 

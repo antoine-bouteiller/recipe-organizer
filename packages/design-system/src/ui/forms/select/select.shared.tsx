@@ -1,36 +1,34 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { cn } from 'cn'
 import { type ButtonHTMLAttributes, type ReactElement } from 'react'
 
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
 
-export const selectTriggerClassName =
-  "relative inline-flex min-h-9 w-full min-w-36 select-none items-center justify-between gap-2 rounded-lg border border-input bg-background not-dark:bg-clip-padding px-[calc(--spacing(3)-1px)] text-left text-base text-foreground shadow-xs/5 outline-none ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] not-data-disabled:not-focus-visible:not-aria-invalid:not-data-pressed:before:shadow-[0_1px_--theme(--color-black/4%)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 focus-visible:border-ring focus-visible:ring-[3px] aria-invalid:border-destructive/36 focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16 data-disabled:pointer-events-none data-disabled:opacity-64 sm:min-h-8 sm:text-sm dark:bg-input/32 dark:aria-invalid:ring-destructive/24 dark:not-data-disabled:not-focus-visible:not-aria-invalid:not-data-pressed:before:shadow-[0_-1px_--theme(--color-white/6%)] [&_svg:not([class*='opacity-'])]:opacity-80 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 [[data-disabled],:focus-visible,[aria-invalid],[data-pressed]]:shadow-none"
+import { selectText, selectTextState, selectTrigger, selectTriggerIcon } from './select.shared.css'
 
-export const selectTriggerIconClassName = '-me-1 size-4.5 opacity-80 sm:size-4'
+const selectTriggerClassName = selectTrigger
+const selectTriggerIconClassName = selectTriggerIcon
+const selectTextClassName = (empty: boolean): string => `${selectText} ${selectTextState[empty ? 'empty' : 'selected']}`
 
-export const SelectButton = ({ className, render, children, ...props }: useRender.ComponentProps<'button'>): ReactElement => {
-  const typeValue: ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
-
-  const defaultProps = {
-    children: (
-      <>
-        <span className="flex-1 truncate in-data-placeholder:text-muted-foreground/72">{children}</span>
-        <CaretUpDownIcon className={selectTriggerIconClassName} />
-      </>
-    ),
-    className: cn(selectTriggerClassName, 'min-w-0', className),
-    'data-slot': 'select-button',
-    type: typeValue,
-  }
-
-  return useRender({
-    defaultTagName: 'button',
-    props: mergeProps<'button'>(defaultProps, props),
-    render,
-  })
+export const SelectButton = ({ render, children, ...props }: useRender.ComponentProps<'button'>): ReactElement => {
+  const type: ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
+  const mergedProps = mergeProps<'button'>(
+    {
+      children: (
+        <>
+          <span className={selectTextClassName(false)}>{children}</span>
+          <span className={selectTriggerIconClassName}>
+            <CaretUpDownIcon />
+          </span>
+        </>
+      ),
+      className: selectTriggerClassName,
+      type,
+    },
+    props
+  )
+  return useRender({ defaultTagName: 'button', props: { ...mergedProps, 'data-slot': 'select-button' }, render })
 }
 
 export const getSelectDisplay = <TValue extends string>(props: SelectProps<TValue>) => {
@@ -39,7 +37,11 @@ export const getSelectDisplay = <TValue extends string>(props: SelectProps<TValu
     props.multiple ? props.value.some((item) => item === value) : (props.value ?? null) === value
   const selectedLabels = items.filter((item) => isSelected(item.value)).map((item) => item.label)
   const isEmpty = selectedLabels.length === 0
-  const displayLabel = isEmpty ? placeholder : selectedLabels[0] + (selectedLabels.length > 1 ? ` (+${selectedLabels.length - 1})` : '')
-
-  return { displayLabel, isEmpty, isSelected }
+  return {
+    displayLabel: isEmpty ? placeholder : selectedLabels[0] + (selectedLabels.length > 1 ? ` (+${selectedLabels.length - 1})` : ''),
+    isEmpty,
+    isSelected,
+  }
 }
+
+export { selectTextClassName, selectTriggerClassName, selectTriggerIconClassName }

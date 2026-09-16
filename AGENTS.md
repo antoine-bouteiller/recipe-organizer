@@ -19,7 +19,8 @@ See the Vite+ section below for the full command reference.
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
 - **Runtime boundary:** the browser SPA starts at `apps/web/index.html` and `apps/web/src/main.tsx`; the Worker entry is `apps/api/src/index.ts`'s default `fetch` export. Browser API calls use same-origin `/api/*` fetches.
-- **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports.
+- **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports. Follow `packages/design-system/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and preserve Base UI `render` composition with actual router `Link` components. Parent wrappers own external layout.
+- **Styling:** Vanilla Extract compiles owner-local `*.css.ts` files through the web and Storybook Vite plugins. Shared variables are exported from `@recipe-organizer/design-system/tokens`; native global styles remain in `@recipe-organizer/design-system/styles.css`. Keep component and app styles unlayered so they override the layered reset/base defaults.
 - **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update the colocated stories when changing UI components; use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
@@ -29,6 +30,7 @@ Canonical reference = the `*.spec.md` files under `docs/` + `docs/infrastructure
 colocated with the code.
 
 - [Project Structure](docs/file-structure.spec.md)
+- [Design-system styling and ownership](packages/design-system/styling.spec.md)
 - [Platform (Cloudflare Workers)](docs/infrastructure/server/platform.spec.md)
 - [Data Layer (Drizzle + D1)](docs/infrastructure/server/data-layer.spec.md)
 - [Hono API](docs/infrastructure/server/server-functions.spec.md)

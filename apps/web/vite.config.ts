@@ -1,7 +1,7 @@
 import path from 'node:path'
 
-import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
 
@@ -23,12 +23,12 @@ const viteConfig = defineConfig({
     },
   },
   plugins: [
+    vanillaExtractPlugin(),
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
     }),
     react({ compiler: true }),
-    tailwindcss(),
   ],
   server: {
     port: 3000,

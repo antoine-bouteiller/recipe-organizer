@@ -4,14 +4,18 @@ import { useState, type ReactElement } from 'react'
 import { Button } from '../../actions/button/button'
 import { GlassPill } from './glass-pill'
 
+import { container, container2, text } from './glass-pill.stories.css'
+
 const GlassPillExample = (): ReactElement => {
   const [on, setOn] = useState(true)
 
   return (
-    <div className="space-y-3 rounded-xl bg-gradient-to-br from-primary/30 via-background to-muted p-6">
-      <GlassPill className="px-4 py-2" on={on}>
-        <p className="font-medium">{on ? 'Filters are visible' : 'Filters are hidden'}</p>
-      </GlassPill>
+    <div className={container}>
+      <div className={container2}>
+        <GlassPill on={on}>
+          <p className={text}>{on ? 'Filters are visible' : 'Filters are hidden'}</p>
+        </GlassPill>
+      </div>
       <Button aria-pressed={on} onClick={() => setOn((visible) => !visible)} variant="outline">
         Toggle glass surface
       </Button>

@@ -5,6 +5,8 @@ import { Button } from '../../actions/button/button'
 import { CheckCircleIcon } from '../icons/check-circle'
 import { Item, ItemGroup, ItemSeparator } from './item'
 
+import { container, container2 } from './item.stories.css'
+
 const meta = {
   component: Item,
   title: 'Data Display/Item',
@@ -19,12 +21,12 @@ export const Overview: Story = {
     title: 'Saved recipe',
   },
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <Item {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className="grid gap-3">
+        <div className={container2}>
           <Item media={<CheckCircleIcon />} title="Default">
             A standard item.
           </Item>
@@ -33,13 +35,13 @@ export const Overview: Story = {
           </Item>
         </div>
       </StorySection>
-      <StorySection title="With Actions">
-        <Item actions={<Button size="sm">View</Button>} media={<CheckCircleIcon />} title="Pasta primavera">
+      <StorySection title="Row layout">
+        <Item actions={<Button size="sm">View</Button>} layout="row" media={<CheckCircleIcon />} title="Pasta primavera">
           Open the recipe to review its ingredients.
         </Item>
       </StorySection>
       <StorySection title="Group">
-        <ItemGroup className="max-w-md rounded-md border">
+        <ItemGroup>
           <Item title="First item">A grouped item.</Item>
           <ItemSeparator />
           <Item title="Second item">Another grouped item.</Item>

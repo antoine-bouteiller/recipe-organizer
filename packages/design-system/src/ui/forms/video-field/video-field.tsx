@@ -4,9 +4,27 @@ import { usePlatform } from '../../../hooks/use-platform'
 import { VideoIcon } from '../../data-display/icons/video'
 import { XIcon } from '../../data-display/icons/x'
 import { Kbd, KbdGroup } from '../../data-display/kbd/kbd'
-import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel } from '../field/field'
 
-interface VideoFieldProps {
+import {
+  container,
+  container2,
+  container3,
+  text,
+  container4,
+  text2,
+  text3,
+  element,
+  container5,
+  container6,
+  text4,
+  text5,
+  text6,
+  container7,
+  element2,
+} from './video-field.css'
+
+export interface VideoFieldProps {
   disabled?: boolean
   initialVideo?: FileMetadata
   label: string
@@ -33,21 +51,23 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
-      <FieldLabel className="relative flex min-h-32 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive">
+      <FieldLabel presentation="dropzone-video">
         {videoFile ? (
-          <div className="flex w-full items-center justify-between gap-4 px-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-background">
-                <VideoIcon className="size-5 opacity-60" />
+          <div className={container}>
+            <div className={container2}>
+              <div className={container3}>
+                <span className={text}>
+                  <VideoIcon size="lg" />
+                </span>
               </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-medium">{videoFile.file.name || 'Video'}</p>
-                {videoFile.file.size && <p className="text-xs text-muted-foreground">{formatBytes(videoFile.file.size)}</p>}
+              <div className={container4}>
+                <p className={text2}>{videoFile.file.name || 'Video'}</p>
+                {videoFile.file.size && <p className={text3}>{formatBytes(videoFile.file.size)}</p>}
               </div>
             </div>
             <button
               aria-label="Remove video"
-              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-destructive/10 text-destructive transition-colors outline-none hover:bg-destructive/20 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className={element}
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -55,24 +75,28 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
               }}
               type="button"
             >
-              <XIcon aria-hidden="true" className="size-4" />
+              <XIcon aria-hidden="true" size="sm" />
             </button>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-            <div aria-hidden="true" className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border bg-background">
-              <VideoIcon className="size-4 opacity-60" />
+          <div className={container5}>
+            <div aria-hidden="true" className={container6}>
+              <span className={text4}>
+                <VideoIcon size="sm" />
+              </span>
             </div>
-            <p className="mb-1.5 text-sm font-medium">Déposez votre vidéo ou cliquez pour parcourir</p>
-            <p className="mb-2 text-xs text-muted-foreground">Formats supportés: MP4, WebM, MOV (max 100MB)</p>
-            <KbdGroup className="hidden items-center gap-1 md:flex">
-              <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-              <Kbd className="aspect-square">V</Kbd>
-            </KbdGroup>
+            <p className={text5}>Déposez votre vidéo ou cliquez pour parcourir</p>
+            <p className={text6}>Formats supportés: MP4, WebM, MOV (max 100MB)</p>
+            <div className={container7}>
+              <KbdGroup>
+                <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
+                <Kbd>V</Kbd>
+              </KbdGroup>
+            </div>
           </div>
         )}
       </FieldLabel>
-      <FieldControl className="hidden" disabled={disabled} type="file" {...getInputProps()} />
+      <input className={element2} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

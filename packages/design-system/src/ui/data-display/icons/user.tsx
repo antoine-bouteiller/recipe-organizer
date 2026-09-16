@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const UserIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M20 21C20 18.7328 20 17.5992 19.5929 16.7097C19.1649 15.7746 18.4287 15.0144 17.5071 14.5558C16.6305 14.1196 15.5 14 13.2263 14.0051L10.7728 14C8.49999 14 7.39496 14.1069 6.52924 14.528C5.57859 14.9904 4.82688 15.7651 4.39412 16.7284C4.00001 17.6057 4.00001 18.7371 4 21"
       stroke="currentColor"
@@ -18,5 +19,5 @@ export const UserIcon = (props: IconProps): React.ReactElement => (
       strokeLinejoin="round"
       strokeWidth={1.5}
     />
-  </svg>
+  </Icon>
 )

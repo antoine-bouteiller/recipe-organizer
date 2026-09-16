@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const ArrowElbowDownLeftIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M11 6H15.5C17.9853 6 20 8.01472 20 10.5C20 12.9853 17.9853 15 15.5 15H4"
       stroke="currentColor"
@@ -18,5 +19,5 @@ export const ArrowElbowDownLeftIcon = (props: IconProps): React.ReactElement => 
       strokeLinejoin="round"
       strokeWidth={1.5}
     />
-  </svg>
+  </Icon>
 )

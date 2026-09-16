@@ -17,6 +17,8 @@
     "./hooks/use-file-upload": "./src/hooks/use-file-upload.ts",
     "./hooks/use-platform": "./src/hooks/use-platform.ts",
     "./icons/*": "./src/ui/data-display/icons/*.tsx",
+    "./icons/*.stories": null,
+    "./icons/icon": null,
     "./icons/types": "./src/ui/data-display/icons/types.ts",
     "./item": "./src/ui/data-display/item/item.tsx",
     "./kbd": "./src/ui/data-display/kbd/kbd.tsx",
@@ -35,6 +37,10 @@
     "./tabs": "./src/ui/navigation/tabs/tabs.tsx",
     "./toast": "./src/ui/feedback/toast/toast.tsx",
     "./toggle": "./src/ui/actions/toggle/toggle.tsx",
+    "./tokens": {
+      "types": "./src/theme/tokens.css.ts",
+      "import": "./src/theme/tokens.css.ts"
+    },
     "./toolbar": "./src/ui/actions/toolbar/toolbar.tsx",
     "./utils/format-form-errors": "./src/utils/format-form-errors.ts"
   },
@@ -51,21 +57,19 @@
     "@lexical/utils": "catalog:",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-store": "catalog:",
-    "class-variance-authority": "catalog:",
-    "cn": "catalog:",
     "lexical": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",
     "@storybook/react-vite": "catalog:",
-    "@tailwindcss/typography": "catalog:",
-    "@tailwindcss/vite": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vanilla-extract/css": "catalog:",
+    "@vanilla-extract/recipes": "catalog:",
+    "@vanilla-extract/vite-plugin": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "storybook": "catalog:",
-    "tailwindcss": "catalog:"
+    "storybook": "catalog:"
   },
   "peerDependencies": {
     "react": "^19.0.0",

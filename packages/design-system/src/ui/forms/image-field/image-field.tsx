@@ -4,9 +4,11 @@ import { usePlatform } from '../../../hooks/use-platform'
 import { ImageIcon } from '../../data-display/icons/image'
 import { XIcon } from '../../data-display/icons/x'
 import { Kbd, KbdGroup } from '../../data-display/kbd/kbd'
-import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel } from '../field/field'
 
-interface ImageFieldProps {
+import { container, image, container2, container3, text, text2, container4, container5, element, element2 } from './image-field.css'
+
+export interface ImageFieldProps {
   disabled?: boolean
   initialImage?: FileMetadata
   label: string
@@ -28,28 +30,32 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
-      <FieldLabel className="relative flex min-h-52 w-full flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed border-input p-4 transition-colors hover:bg-accent/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none has-[input:focus]:border-ring has-[input:focus]:ring-[3px] has-[input:focus]:ring-ring/50 data-invalid:border-destructive">
+      <FieldLabel presentation="dropzone-image">
         {previewUrl ? (
-          <div className="absolute inset-0">
-            <img alt="Aperçu" className="size-full object-cover" src={previewUrl} />
+          <div className={container}>
+            <img alt="Aperçu" className={image} src={previewUrl} />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-            <div aria-hidden="true" className="mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border bg-background">
-              <ImageIcon className="size-4 opacity-60" />
+          <div className={container2}>
+            <div aria-hidden="true" className={container3}>
+              <span className={text}>
+                <ImageIcon size="sm" />
+              </span>
             </div>
-            <p className="mb-1.5 text-sm font-medium">Déposez votre image ou cliquez pour parcourir</p>
-            <KbdGroup className="hidden items-center gap-1 md:flex">
-              <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-              <Kbd className="aspect-square">V</Kbd>
-            </KbdGroup>
+            <p className={text2}>Déposez votre image ou cliquez pour parcourir</p>
+            <div className={container4}>
+              <KbdGroup>
+                <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
+                <Kbd>V</Kbd>
+              </KbdGroup>
+            </div>
           </div>
         )}
         {previewUrl && (
-          <div className="absolute top-4 right-4">
+          <div className={container5}>
             <button
               aria-label="Supprimer l'image"
-              className="z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className={element}
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -57,12 +63,12 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
               }}
               type="button"
             >
-              <XIcon aria-hidden="true" className="size-4" />
+              <XIcon aria-hidden="true" size="sm" />
             </button>
           </div>
         )}
       </FieldLabel>
-      <FieldControl className="hidden" disabled={disabled} type="file" {...getInputProps()} />
+      <input className={element2} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

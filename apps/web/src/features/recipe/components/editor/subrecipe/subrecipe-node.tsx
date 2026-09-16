@@ -22,6 +22,9 @@ import { lazy, Suspense } from 'react'
 
 import { recipeNodes } from '../extensions'
 
+import { subrecipeContentInset, subrecipeLoading, subrecipeTrigger } from './subrecipe-node.css'
+import '../editor.css'
+
 const SubrecipeDialog = lazy(async () => {
   const dialog = await import('./subrecipe-dialog')
   return { default: dialog.SubrecipeDialog }
@@ -70,7 +73,9 @@ const SubrecipeInstructionsContent = ({
 
   return (
     <Editor content={filteredInstructions} nodes={recipeNodes} readOnly>
-      <EditorContent className="pl-4" />
+      <div className={subrecipeContentInset}>
+        <EditorContent />
+      </div>
     </Editor>
   )
 }
@@ -110,23 +115,21 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
   }
 
   const content = (
-    <>
+    <div data-editor-decorator="">
       <p>
         <strong>{recipe.name}</strong>
       </p>
       {isLoading ? (
-        <div className="flex items-center justify-center py-4">
+        <div className={subrecipeLoading}>
           <Spinner />
         </div>
       ) : (
         <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe.instructions} />
       )}
-    </>
+    </div>
   )
 
-  const trigger = (
-    <div className="w-full cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/30 p-4 text-start">{content}</div>
-  )
+  const trigger = <div className={subrecipeTrigger}>{content}</div>
 
   if (isEditable) {
     return (
@@ -218,7 +221,7 @@ class SubrecipeNodeType extends DecoratorNode<React.ReactElement> {
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
-    div.style.display = 'contents'
+    div.setAttribute('data-editor-decorator-root', '')
     return div
   }
 

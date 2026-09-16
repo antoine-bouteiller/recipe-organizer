@@ -1,9 +1,10 @@
 import type React from 'react'
 
+import { Icon } from './icon'
 import { type IconProps } from './types'
 
 export const VideoIcon = (props: IconProps): React.ReactElement => (
-  <svg fill="none" height="1em" viewBox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <Icon {...props}>
     <path
       d="M2 11C2 7.70017 2 6.05025 3.02513 5.02513C4.05025 4 5.70017 4 9 4H10C13.2998 4 14.9497 4 15.9749 5.02513C17 6.05025 17 7.70017 17 11V13C17 16.2998 17 17.9497 15.9749 18.9749C14.9497 20 13.2998 20 10 20H9C5.70017 20 4.05025 20 3.02513 18.9749C2 17.9497 2 16.2998 2 13V11Z"
       stroke="currentColor"
@@ -19,5 +20,5 @@ export const VideoIcon = (props: IconProps): React.ReactElement => (
       strokeWidth={1.5}
     />
     <path d="M10 9.5a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
-  </svg>
+  </Icon>
 )

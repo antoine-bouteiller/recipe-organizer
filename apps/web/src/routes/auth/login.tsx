@@ -8,6 +8,8 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import * as z from 'zod'
 
+import { container, container2, container3, image, container4 } from './-login.css'
+
 const searchSchema = z.object({ error: z.string().optional() })
 
 const signInWithGoogle = () =>
@@ -40,20 +42,22 @@ const LoginPage = () => {
   }, [error])
 
   return (
-    <div className="grid flex-1 place-items-center p-4">
-      <Card className="w-full max-w-sm" description="Connectez-vous pour accéder à vos recettes" title="Connexion">
-        <div className="px-6 pb-6">
-          <Button className="w-full" onClick={() => signInWithGoogle()} variant="outline">
-            <img alt="Google" className="h-4" src="/google.svg" /> Connexion avec Google
-          </Button>
-        </div>
-        <div className="flex items-center justify-center px-6 pb-6">
-          <Button render={<Link to="/" />} size="sm" variant="ghost">
-            <ArrowLeftIcon className="h-4 w-4" />
-            Retour à l&apos;accueil
-          </Button>
-        </div>
-      </Card>
+    <div className={container}>
+      <div className={container2}>
+        <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
+          <div className={container3}>
+            <Button onClick={() => signInWithGoogle()} variant="outline" width="full">
+              <img alt="Google" className={image} src="/google.svg" /> Connexion avec Google
+            </Button>
+          </div>
+          <div className={container4}>
+            <Button render={<Link to="/" />} size="sm" variant="ghost">
+              <ArrowLeftIcon size="sm" />
+              Retour à l&apos;accueil
+            </Button>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

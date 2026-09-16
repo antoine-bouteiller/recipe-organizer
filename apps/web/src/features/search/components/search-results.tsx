@@ -7,7 +7,9 @@ import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 
-interface SearchResultsProps {
+import { text, text2, container, container2, text3, container3, container4 } from './search-results.css'
+
+export interface SearchResultsProps {
   recipes: ReducedRecipe[]
   onClearFilters: () => void
 }
@@ -17,27 +19,29 @@ const ResultAddButton = ({ recipeId }: { recipeId: number }) => {
 
   if (isInShoppingList) {
     return (
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-primary" aria-label="Déjà dans la liste">
+      <span aria-label="Déjà dans la liste" className={text}>
         <CheckIcon weight="bold" />
       </span>
     )
   }
 
   return (
-    <Button onClick={() => addToShoppingList(recipeId)} size="icon" className="size-9 shrink-0 rounded-full" aria-label="Ajouter à la liste">
-      <PlusIcon weight="bold" />
-    </Button>
+    <span className={text2}>
+      <Button aria-label="Ajouter à la liste" onClick={() => addToShoppingList(recipeId)} size="icon">
+        <PlusIcon weight="bold" />
+      </Button>
+    </span>
   )
 }
 
 export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) => {
   if (recipes.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
-          <MagnifyingGlassIcon className="size-7" />
+      <div className={container}>
+        <div className={container2}>
+          <MagnifyingGlassIcon size="xl" />
         </div>
-        <p className="text-balance text-muted-foreground">Aucune recette ne correspond à votre recherche.</p>
+        <p className={text3}>Aucune recette ne correspond à votre recherche.</p>
         <Button onClick={onClearFilters} variant="outline">
           Effacer les filtres
         </Button>
@@ -46,8 +50,8 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-2.5">
-      <div className="text-xs font-semibold text-muted-foreground">
+    <div className={container3}>
+      <div className={container4}>
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>
       {recipes.map((recipe, index) => (

@@ -3,19 +3,19 @@ import { Button } from '@recipe-organizer/design-system/button'
 import { MinusIcon } from '@recipe-organizer/design-system/icons/minus'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
-import { cn } from 'cn'
 
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 
-interface QuantityControlsProps {
+import { container, text, container2, container3, text2, container4, text3 } from './quantity-controls.css'
+
+export interface QuantityControlsProps {
   readonly recipeId: number
   readonly servings: number
   readonly variant?: 'default' | 'card'
-  readonly className?: string
 }
 
-export const QuantityControls = ({ recipeId, servings, variant = 'default', className }: QuantityControlsProps) => {
+export const QuantityControls = ({ recipeId, servings, variant = 'default' }: QuantityControlsProps) => {
   const isInShoppingList = useIsInShoppingList(recipeId)
   const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipeId, servings)
 
@@ -30,28 +30,15 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
     }
 
     return (
-      <div className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-white/15 p-1 ring-1 ring-white/20 backdrop-blur-md ring-inset">
-        <Button
-          onClick={decrementQuantity}
-          disabled={quantity === 1}
-          aria-label="Retirer un couvert"
-          size="icon-xs"
-          variant="secondary"
-          className="bg-white/12 text-white hover:bg-white/20"
-        >
+      <div className={container}>
+        <Button onClick={decrementQuantity} disabled={quantity === 1} aria-label="Retirer un couvert" size="icon-xs" variant="media-overlay-card">
           <MinusIcon weight="bold" />
         </Button>
-        <span className="min-w-18 text-center text-[13px] font-bold text-white tabular-nums">{quantity} couverts</span>
+        <span className={text}>{quantity} couverts</span>
         <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs">
           <PlusIcon weight="bold" />
         </Button>
-        <Button
-          onClick={() => removeFromShoppingList(recipeId)}
-          aria-label="Retirer de la liste"
-          size="icon-xs"
-          variant="secondary"
-          className="bg-white/12 text-white hover:bg-white/20"
-        >
+        <Button onClick={() => removeFromShoppingList(recipeId)} aria-label="Retirer de la liste" size="icon-xs" variant="media-overlay-card">
           <TrashIcon />
         </Button>
       </div>
@@ -59,14 +46,14 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default', clas
   }
 
   return (
-    <div className={cn('flex items-center justify-between gap-3 rounded-2xl border bg-card p-2 pl-4', className)}>
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-bold">Couverts</span>
-        <div className="flex items-center gap-2">
+    <div className={container2}>
+      <div className={container3}>
+        <span className={text2}>Couverts</span>
+        <div className={container4}>
           <Button disabled={quantity === 1} onClick={decrementQuantity} aria-label="Retirer un couvert" size="icon-sm" variant="outline">
             <MinusIcon />
           </Button>
-          <span className="min-w-5 text-center font-bold tabular-nums">{quantity}</span>
+          <span className={text3}>{quantity}</span>
           <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-sm">
             <PlusIcon />
           </Button>

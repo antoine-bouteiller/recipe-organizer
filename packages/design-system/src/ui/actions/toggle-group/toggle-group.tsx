@@ -1,21 +1,21 @@
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui/react/toggle-group'
-import { cn } from 'cn'
 import { type ReactElement } from 'react'
 
 import { Toggle } from '../toggle/toggle'
 
-interface ToggleGroupProps {
-  items: { label: string; value: string }[]
-  value: string[]
-  onValueChange: (value: string[]) => void
+import { wrapperClassName, groupClassName, itemClassName } from './toggle-group.css'
+
+export interface ToggleGroupProps {
   disabled?: boolean
-  className?: string
+  items: readonly { label: string; value: string }[]
+  onValueChange: (value: string[]) => void
+  value: readonly string[]
 }
 
-export const ToggleGroup = ({ items, value, onValueChange, disabled, className }: ToggleGroupProps): ReactElement => (
-  <div className={cn('max-w-full overflow-x-auto overflow-y-hidden', className)}>
+export const ToggleGroup = ({ items, value, onValueChange, disabled }: ToggleGroupProps): ReactElement => (
+  <div className={wrapperClassName}>
     <ToggleGroupPrimitive
-      className="flex w-fit gap-0.5 *:focus-visible:z-10 *:pointer-coarse:after:min-w-auto"
+      className={groupClassName}
       data-slot="toggle-group"
       disabled={disabled}
       multiple
@@ -23,9 +23,9 @@ export const ToggleGroup = ({ items, value, onValueChange, disabled, className }
       value={value}
     >
       {items.map(({ label, value: itemValue }) => (
-        <Toggle className="shrink-0" key={itemValue} value={itemValue}>
-          {label}
-        </Toggle>
+        <span className={itemClassName} key={itemValue}>
+          <Toggle value={itemValue}>{label}</Toggle>
+        </span>
       ))}
     </ToggleGroupPrimitive>
   </div>

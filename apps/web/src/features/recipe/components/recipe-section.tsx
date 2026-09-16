@@ -4,21 +4,33 @@ import { formatNumber } from '@client/utils/number'
 import { UNITS } from '@recipe-organizer/shared/units'
 import { scaleQuantity } from '@recipe-organizer/shared/utils/scale-quantity'
 
+import {
+  bullet,
+  group as groupClassName,
+  groupName,
+  ingredient,
+  ingredientLine,
+  ingredientName,
+  ingredients,
+  quantity as quantityClassName,
+} from './recipe-section.css'
+
 interface RecipeGroupIngredientsProps {
   baseServings: number
   groupIngredients: RecipeIngredientGroup['groupIngredients']
   servings: number
+  presentation: 'standalone' | 'embedded'
 }
 
-const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: RecipeGroupIngredientsProps) =>
+const RecipeGroupIngredients = ({ baseServings, groupIngredients, presentation, servings }: RecipeGroupIngredientsProps) =>
   groupIngredients.length > 0 && (
-    <ul className="mt-0 mb-0 list-none overflow-hidden rounded-2xl border bg-card px-3.5 pl-3.5">
+    <ul className={ingredients[presentation]}>
       {groupIngredients.map((groupIngredient) => (
-        <li className="mt-0 mb-0 border-b py-3 last:border-b-0" key={groupIngredient.id}>
-          <div className="flex items-center gap-3 text-nowrap text-ellipsis">
-            <span className="size-1.5 shrink-0 rounded-full bg-primary" />
-            <div className="flex-1">{groupIngredient.ingredient.name}</div>
-            <div className="font-semibold text-muted-foreground tabular-nums">
+        <li className={ingredient} key={groupIngredient.id}>
+          <div className={ingredientLine}>
+            <span className={bullet} />
+            <div className={ingredientName}>{groupIngredient.ingredient.name}</div>
+            <div className={quantityClassName}>
               {formatNumber(scaleQuantity(groupIngredient.quantity, servings, baseServings))}
               {groupIngredient.unitSlug && ` ${UNITS[groupIngredient.unitSlug]?.name ?? ''}`}
             </div>
@@ -28,20 +40,21 @@ const RecipeGroupIngredients = ({ baseServings, groupIngredients, servings }: Re
     </ul>
   )
 
-interface RecipeIngredientGroupsProps {
+export interface RecipeIngredientGroupsProps {
   readonly recipeId: number
   readonly baseServings: number
   readonly ingredientGroups: Recipe['ingredientGroups']
+  readonly presentation?: 'standalone' | 'embedded'
 }
 
-export const RecipeIngredientGroups = ({ recipeId, baseServings, ingredientGroups }: RecipeIngredientGroupsProps) => {
+export const RecipeIngredientGroups = ({ recipeId, baseServings, ingredientGroups, presentation = 'standalone' }: RecipeIngredientGroupsProps) => {
   const { quantity } = useRecipeQuantities(recipeId, baseServings)
 
   return ingredientGroups.map((group) => (
-    <div className="mb-4 last:mb-0" key={group.id}>
-      {group.groupName && <div className="mb-2 px-1 font-semibold">{group.groupName}</div>}
+    <div className={groupClassName} key={group.id}>
+      {group.groupName && <div className={groupName}>{group.groupName}</div>}
 
-      <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} servings={quantity} />
+      <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} presentation={presentation} servings={quantity} />
     </div>
   ))
 }

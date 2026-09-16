@@ -3,6 +3,8 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Toggle } from './toggle'
 
+import { container } from './toggle.stories.css'
+
 const meta = {
   args: { 'aria-label': 'Bold text', children: 'Bold' },
   component: Toggle,
@@ -14,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <Toggle {...args} />
       </StorySection>
@@ -23,6 +25,11 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Outline">
         <Toggle {...args} variant="outline" />
+      </StorySection>
+      <StorySection title="Filter">
+        <Toggle {...args} aria-label="Filter recipes" defaultPressed presentation="filter">
+          Filter recipes
+        </Toggle>
       </StorySection>
       <StorySection title="Disabled">
         <Toggle {...args} disabled />

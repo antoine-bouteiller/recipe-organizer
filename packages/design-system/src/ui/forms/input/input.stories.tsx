@@ -3,6 +3,8 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Input } from './input'
 
+import { container } from './input.stories.css'
+
 const meta = {
   args: { 'aria-label': 'Email address', placeholder: 'name@example.com', type: 'email' },
   component: Input,
@@ -14,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <Input {...args} />
       </StorySection>

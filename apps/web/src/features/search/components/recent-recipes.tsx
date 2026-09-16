@@ -2,12 +2,14 @@ import { RecipeSearchCard } from '@client/features/search/components/recipe-sear
 import { clearRecentRecipes, useRecentRecipeIds } from '@client/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@client/types/recipe'
 
-interface RecentRecipesProps {
+import { container, container2, container3, heading, element } from './recent-recipes.css'
+
+export interface RecentRecipesProps {
   recipes: ReducedRecipe[]
 }
 
 const RecipeCardList = ({ recipes }: RecentRecipesProps) => (
-  <div className="flex flex-1 flex-col gap-2.5">
+  <div className={container}>
     {recipes.map((recipe) => (
       <RecipeSearchCard key={recipe.id} recipe={recipe} />
     ))}
@@ -26,10 +28,10 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
   }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex items-center justify-between pt-2 pb-1">
-        <h2 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">Recherches récentes</h2>
-        <button onClick={clearRecentRecipes} type="button" className="text-sm font-semibold text-primary">
+    <div className={container2}>
+      <div className={container3}>
+        <h2 className={heading}>Recherches récentes</h2>
+        <button className={element} onClick={clearRecentRecipes} type="button">
           Effacer
         </button>
       </div>

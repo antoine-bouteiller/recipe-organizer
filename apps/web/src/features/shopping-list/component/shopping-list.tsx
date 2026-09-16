@@ -7,16 +7,18 @@ import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useShoppingList } from '../hooks/use-shopping-list'
 import { CartItem } from './cart-item'
 
+import { container, container2, container3, container4, text, text2, heading, container5 } from './shopping-list.css'
+
 export const ShoppingList = () => {
   const { shoppingListIngredients, isLoading } = useShoppingList()
 
   if (isLoading) {
     return incrementalArray({ length: 4 }).map((index) => (
-      <div className="space-y-2" key={index}>
-        <Skeleton className="h-6 w-32" />
-        <div className="space-y-2">
+      <div className={container} key={index}>
+        <Skeleton preset="shopping-list-title" />
+        <div className={container2}>
           {incrementalArray({ length: 3 }).map((innerIndex) => (
-            <Skeleton className="h-8 w-full" key={innerIndex} />
+            <Skeleton preset="shopping-list-row" key={innerIndex} />
           ))}
         </div>
       </div>
@@ -30,23 +32,23 @@ export const ShoppingList = () => {
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-        <div className="flex size-16 items-center justify-center rounded-full bg-accent text-primary">
-          <BasketIcon className="size-7" />
+      <div className={container3}>
+        <div className={container4}>
+          <BasketIcon size="xl" />
         </div>
-        <p className="font-medium text-balance">Votre liste de courses est vide</p>
-        <p className="text-sm text-balance text-muted-foreground">Ajoutez des recettes depuis la recherche</p>
+        <p className={text}>Votre liste de courses est vide</p>
+        <p className={text2}>Ajoutez des recettes depuis la recherche</p>
       </div>
     )
   }
 
   return groups.map(({ category: key, ingredients }) => (
     <div key={key}>
-      <h2 className="mb-2 flex items-center gap-1.5 px-1 text-[11px] font-semibold tracking-wider text-primary uppercase">
+      <h2 className={heading}>
         {ingredientCategoryIcons[key]}
         {ingredientCategoryLabels[key]}
       </h2>
-      <div className="overflow-hidden rounded-2xl border bg-card px-3.5">
+      <div className={container5}>
         {ingredients?.map((ingredient) => (
           <CartItem ingredient={ingredient} key={ingredient.id} />
         ))}

@@ -20,6 +20,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { container, text, text2, container2 } from './search-bar.css'
+
 const SearchBar = () => {
   const [open, setOpen] = useState(false)
 
@@ -41,13 +43,19 @@ const SearchBar = () => {
 
   return (
     <CommandDialog onOpenChange={setOpen} open={open}>
-      <CommandDialogTrigger className="w-56 justify-start pl-2.5 font-normal shadow-none" render={<Button variant="outline" />}>
-        Recherche une recette...
-        <KbdGroup className="absolute top-1.5 right-1.5 gap-1">
-          <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-          <Kbd className="aspect-square">K</Kbd>
-        </KbdGroup>
-      </CommandDialogTrigger>
+      <div className={container}>
+        <CommandDialogTrigger render={<Button align="start" variant="search-trigger" width="full" />}>
+          Recherche une recette...
+          <span className={text}>
+            <KbdGroup>
+              <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
+              <span className={text2}>
+                <Kbd>K</Kbd>
+              </span>
+            </KbdGroup>
+          </span>
+        </CommandDialogTrigger>
+      </div>
       <CommandDialogPopup>
         <Command items={recipes}>
           <CommandInput placeholder="Rechercher une recette" />
@@ -72,7 +80,7 @@ const SearchBar = () => {
             </CommandList>
           </CommandPanel>
           <CommandFooter>
-            <div className="flex items-center gap-2 text-foreground">
+            <div className={container2}>
               <Kbd>
                 <ArrowElbowDownLeftIcon />
               </Kbd>

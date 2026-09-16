@@ -6,6 +6,8 @@ import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useLayoutEffect } from 'react'
 
+import { element, container, element2 } from './-root.css'
+
 const SearchBar = lazy(() => import('@client/features/recipe/components/search-bar'))
 
 type AuthUser = Awaited<ReturnType<typeof getAuthUser>>
@@ -20,16 +22,16 @@ const RootComponent = () => {
 
   return (
     <ToastProvider>
-      <header className="sticky top-0 z-50 hidden w-full bg-muted md:block">
+      <header className={element}>
         <Navbar
           search={
-            <Suspense fallback={<div className="h-9 w-56" />}>
+            <Suspense fallback={<div className={container} />}>
               <SearchBar />
             </Suspense>
           }
         />
       </header>
-      <main className="flex min-h-0 flex-1 flex-col md:pb-0">
+      <main className={element2}>
         <Outlet />
       </main>
     </ToastProvider>

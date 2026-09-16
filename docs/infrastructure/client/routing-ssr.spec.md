@@ -37,6 +37,8 @@ without becoming a feature data layer.
   with Worker enforcement remaining authoritative under `../../architecture.spec.md` `[PI-3]`.
 - `[PI-3]` **URLs are typed input** — path parameters and search values parse before a screen uses
   them.
+- `[PI-4]` **Compose the actual router link** — app callers use Base UI `render` with TanStack
+  `Link`; design-system components remain router-independent.
 
 ## 5. Non-Goals
 
@@ -125,9 +127,13 @@ contract; browser page routes do not wrap it.
 
 Forward links request view transitions; the router determines back navigation from history indexes
 (`src/client/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
-transition support. Scroll restoration targets the screen containers configured by the router
-(`src/client/router.tsx:51-54`), so screen layouts identify their scrollable regions rather than managing
-history manually.
+transition support. App callers compose actions/navigation items with `render={<Link ... />}`.
+The actual TanStack `Link` retains typed route parameters, search, modified clicks, preloading,
+refs, and view-transition behavior; do not replace it with a native anchor or a filtered
+`useLinkProps` adapter. Design-system components remain router-independent and use the resulting
+`aria-current` for active presentation.
+Scroll restoration targets the screen containers configured by the router (`src/client/router.tsx:51-54`),
+so screen layouts identify their scrollable regions rather than managing history manually.
 
 ### 8.6 Route contract summary
 
@@ -162,8 +168,9 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                      | Sections affected | Reason                                                  |
-| ---------- | ------------------------------------------------------------------------------ | ----------------- | ------------------------------------------------------- |
-| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.              |
-| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.          |
-| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit. |
+| Date       | Amendment                                                                      | Sections affected | Reason                                                            |
+| ---------- | ------------------------------------------------------------------------------ | ----------------- | ----------------------------------------------------------------- |
+| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                        |
+| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.                    |
+| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.           |
+| 2026-09-16 | Document Base UI render composition with the actual router Link.               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters. |

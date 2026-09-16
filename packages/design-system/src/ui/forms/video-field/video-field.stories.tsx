@@ -6,6 +6,8 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { type FileMetadata } from '../../../hooks/use-file-upload'
 
+import { container } from './video-field.stories.css'
+
 const video: FileMetadata = { id: 'recipe-video', name: 'tomato-soup.mp4', size: 1_572_864, type: 'video/mp4', url: 'data:video/mp4;base64,' }
 
 const VideoFieldExample = ({ disabled = false, initialVideo }: { disabled?: boolean; initialVideo?: FileMetadata }): ReactElement => {
@@ -38,7 +40,7 @@ export const Overview: Story = {
     await expect(empty.queryByText('oversized.mp4')).not.toBeInTheDocument()
   },
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Empty">
         <VideoFieldExample />
       </StorySection>

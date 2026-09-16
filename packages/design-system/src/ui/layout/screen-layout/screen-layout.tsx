@@ -1,12 +1,26 @@
-import { cn } from 'cn'
 import { useState } from 'react'
 
 import { Button } from '../../actions/button/button'
 import { ArrowLeftIcon } from '../../data-display/icons/arrow-left'
 import { GlassPill } from '../glass-pill/glass-pill'
 
-const GoBackButton = ({ className, onBack }: { className?: string; onBack: () => void }) => (
-  <Button onClick={onBack} variant="ghost" size="icon" className={className} aria-label="Retour">
+import {
+  screenRecipe,
+  contentRecipe,
+  imageHeaderRecipe,
+  headerRecipe,
+  titlePillRecipe,
+  imageRecipe,
+  imageOverlayRecipe,
+  imageBackRecipe,
+  imageTitleRecipe,
+  imageActionRecipe,
+  headerActionRecipe,
+  titleRecipe,
+} from './screen-layout.css'
+
+const GoBackButton = ({ onBack }: { onBack: () => void }) => (
+  <Button aria-label="Retour" onClick={onBack} size="icon" variant="ghost">
     <ArrowLeftIcon />
   </Button>
 )
@@ -19,85 +33,77 @@ interface ScreenHeaderProps {
   onBack?: () => void
 }
 
-const ScreenHeader = ({ backgroundImage, headerEndItem, scrolled, title, onBack }: ScreenHeaderProps) => {
+const ScreenHeader = ({ backgroundImage, headerEndItem, scrolled, title, onBack }: ScreenHeaderProps): React.ReactElement => {
   if (backgroundImage) {
     return (
-      <div className="relative flex w-full shrink-0 items-center gap-2 overflow-hidden bg-linear-to-b from-[#0d3b42] to-primary px-6 pt-safe-4 pb-12 text-primary-foreground md:hidden">
-        <img src={backgroundImage} alt="" className="absolute inset-0 size-full object-cover object-center" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-black/10 md:rounded-t-2xl" />
-        {onBack && <GoBackButton className="-ml-4 text-white" onBack={onBack} />}
-        <h1 className="z-10 min-w-0 flex-1 truncate font-heading text-2xl font-bold tracking-tight">{title}</h1>
-        {headerEndItem && <div className="z-10">{headerEndItem}</div>}
+      <div className={imageHeaderRecipe()}>
+        <img alt="" className={imageRecipe()} src={backgroundImage} />
+        <div className={imageOverlayRecipe()} />
+        {onBack && (
+          <span className={imageBackRecipe()}>
+            <GoBackButton onBack={onBack} />
+          </span>
+        )}
+        <h1 className={imageTitleRecipe()}>{title}</h1>
+        {headerEndItem && <div className={imageActionRecipe()}>{headerEndItem}</div>}
       </div>
     )
   }
-
   return (
-    // Height is fixed so the collapse never reflows the content below: a sticky box that actually shrinks slides the page up mid-scroll.
-    <div className="pointer-events-none sticky top-0 z-20 -mx-4 flex h-(--screen-header-height) w-auto shrink-0 items-center gap-2 px-2 pt-safe-1 text-foreground md:hidden">
+    <div className={headerRecipe()}>
       {onBack && (
         <GlassPill on={scrolled}>
           <GoBackButton onBack={onBack} />
         </GlassPill>
       )}
-      {/* Vertical padding + the collapsed text-base line-height adds up to the go-back button's size-9 pill. */}
-      <GlassPill className="min-w-0 px-4 py-1.5" on={scrolled}>
-        <h1
-          className={cn(
-            'truncate font-heading font-bold tracking-tight transition-[font-size,line-height] duration-200 ease-out-snappy',
-            scrolled ? 'text-base' : 'text-3xl'
-          )}
-        >
-          {title}
-        </h1>
+      <GlassPill on={scrolled}>
+        <div className={titlePillRecipe()}>
+          <h1 className={titleRecipe({ scrolled })} data-scrolled={scrolled ? 'true' : undefined}>
+            {title}
+          </h1>
+        </div>
       </GlassPill>
-      {headerEndItem && <div className="pointer-events-auto ms-auto">{headerEndItem}</div>}
+      {headerEndItem && <div className={headerActionRecipe()}>{headerEndItem}</div>}
     </div>
   )
 }
 
-interface ScreenLayoutProps {
-  children: React.ReactNode
-  headerEndItem?: React.ReactNode
-  title: string
-  onBack?: () => void
+export type ScreenLayoutProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   backgroundImage?: string
   footer?: React.ReactNode
-  outerScrollId?: string
+  headerEndItem?: React.ReactNode
   innerScrollId?: string
+  onBack?: () => void
+  outerScrollId?: string
+  title: string
 }
 
 export const ScreenLayout = ({
-  children,
-  headerEndItem,
-  title,
-  onBack,
   backgroundImage,
+  children,
   footer,
-  outerScrollId,
+  headerEndItem,
   innerScrollId,
-}: ScreenLayoutProps) => {
+  onBack,
+  outerScrollId,
+  title,
+}: ScreenLayoutProps): React.ReactElement => {
   const [scrolled, setScrolled] = useState(false)
-
-  const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} scrolled={scrolled} title={title} onBack={onBack} />
-
+  const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} onBack={onBack} scrolled={scrolled} title={title} />
   return (
     <div
-      className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-hidden bg-muted pt-0 md:overflow-y-auto"
+      className={screenRecipe()}
+      data-footer-present={footer ? 'true' : undefined}
       data-scroll-restoration-id={outerScrollId}
+      data-slot="screen-layout"
     >
       {backgroundImage && header}
       <div
-        className={cn(
-          'z-10 flex min-h-0 w-full flex-1 flex-col overflow-y-auto bg-muted px-4 md:mt-0 md:max-w-5xl md:overflow-y-visible',
-          backgroundImage ? 'pt-1' : 'pt-0',
-          footer ? 'pb-safe-16' : 'pb-4',
-          backgroundImage && '-mt-10 rounded-t-3xl'
-        )}
+        className={contentRecipe({ hasBackground: Boolean(backgroundImage), hasFooter: Boolean(footer) })}
         data-scroll-restoration-id={innerScrollId}
+        data-slot="screen-layout-content"
         onScroll={(event) => {
           const offset = event.currentTarget.scrollTop
-          // Asymmetric thresholds: a single one flickers when a finger rests right on it.
           setScrolled((wasScrolled) => (wasScrolled ? offset > 24 : offset > 40))
         }}
       >

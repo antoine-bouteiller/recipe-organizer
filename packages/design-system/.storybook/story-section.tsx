@@ -1,10 +1,17 @@
 import { useId, type ReactNode } from 'react'
 
-export const StorySection = ({ title, children }: { title: string; children: ReactNode }) => {
+import { section, heading } from './story-section.css'
+
+export interface StorySectionProps {
+  children: ReactNode
+  title: string
+}
+
+export const StorySection = ({ title, children }: StorySectionProps) => {
   const id = useId()
   return (
-    <section aria-labelledby={id} className="space-y-4 border-b border-border pb-8 last:border-0 last:pb-0">
-      <h2 className="text-lg font-semibold" id={id}>
+    <section aria-labelledby={id} className={section}>
+      <h2 className={heading} id={id}>
         {title}
       </h2>
       {children}

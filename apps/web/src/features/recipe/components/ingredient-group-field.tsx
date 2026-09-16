@@ -12,6 +12,8 @@ import { Fragment } from 'react/jsx-runtime'
 
 import { recipeDefaultValues } from '../utils/form'
 
+import { container, container2, container3, container4 } from './ingredient-group-field.css'
+
 interface IngredientFormProps {
   groupIndex: number
   addNewIngredientOption: (inputValue: string) => ReactNode
@@ -32,12 +34,12 @@ export const IngredientGroupField = withForm({
     return (
       <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
         {(field) => (
-          <div className="flex w-full flex-col gap-2 pt-2">
+          <div className={container}>
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
               <Fragment key={ingredient._key}>
-                <div className="flex gap-2">
-                  <div className="flex w-full flex-1 flex-col items-start justify-between gap-2 md:flex-row">
+                <div className={container2}>
+                  <div className={container3}>
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
@@ -63,10 +65,12 @@ export const IngredientGroupField = withForm({
                     type="button"
                     variant="destructive-outline"
                   >
-                    <TrashIcon className="h-4 w-4" />
+                    <TrashIcon size="sm" />
                   </Button>
                 </div>
-                <Separator className="md:hidden" />
+                <div className={container4}>
+                  <Separator />
+                </div>
               </Fragment>
             ))}
             <field.FieldError />
@@ -83,7 +87,7 @@ export const IngredientGroupField = withForm({
               type="button"
               variant="outline"
             >
-              <PlusIcon className="h-4 w-4" />
+              <PlusIcon size="sm" />
             </Button>
           </div>
         )}

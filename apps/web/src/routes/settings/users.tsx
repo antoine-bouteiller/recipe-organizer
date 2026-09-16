@@ -7,11 +7,13 @@ import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
-import { glassSurface, SearchInput } from '@recipe-organizer/design-system/search-input'
-import { SwipeTabs, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
+import { SearchInput } from '@recipe-organizer/design-system/search-input'
+import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
+
+import { text, text2, container, container2, container3, container4, container5 } from './-users.css'
 
 const USER_TABS = ['active', 'pending', 'blocked'] as const
 
@@ -26,7 +28,7 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
   const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
 
   if (filteredUsers.length === 0) {
-    return <p className="py-8 text-center text-muted-foreground">{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
+    return <p className={text}>{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
   }
 
   const showBlockButton = status === 'active' || status === 'pending'
@@ -42,10 +44,10 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
                 {showBlockButton && <BlockUser userEmail={userItem.email} userId={userItem.id} />}
               </>
             }
-            className="flex-nowrap"
+            layout="row"
             title={
               <>
-                <span className="text-nowrap text-ellipsis">{userItem.email}</span>
+                <span className={text2}>{userItem.email}</span>
                 <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels.get(userItem.role)}</Badge>
               </>
             }
@@ -62,39 +64,47 @@ const UsersManagement = () => {
 
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
-      <div className="flex shrink-0 items-center gap-4 bg-muted pb-2">
+      <div className={container}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddUser>
-          <Button className={glassSurface} size="icon-lg" variant="outline">
+          <Button size="icon-lg" variant="search-trigger">
             <PlusIcon />
           </Button>
         </AddUser>
       </div>
 
-      <SwipeTabs className="-mb-4 flex min-h-0 flex-1 flex-col" defaultTab="active" tabs={USER_TABS}>
-        <TabsList className="w-full">
-          <TabsTab value="active">Actifs</TabsTab>
-          <TabsTab value="pending">En attente</TabsTab>
-          <TabsTab value="blocked">Bloqués</TabsTab>
-        </TabsList>
-        <SwipeTabsPanels>
-          <div className="overflow-y-auto pb-4">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
-            </React.Suspense>
-          </div>
-          <div className="overflow-y-auto pb-4">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-            </React.Suspense>
-          </div>
-          <div className="overflow-y-auto pb-4">
-            <React.Suspense fallback={null}>
-              <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-            </React.Suspense>
-          </div>
-        </SwipeTabsPanels>
-      </SwipeTabs>
+      <div className={container2}>
+        <SwipeTabs defaultTab="active" tabs={USER_TABS}>
+          <TabsList width="full">
+            <TabsTab value="active">Actifs</TabsTab>
+            <TabsTab value="pending">En attente</TabsTab>
+            <TabsTab value="blocked">Bloqués</TabsTab>
+          </TabsList>
+          <SwipeTabsPanels>
+            <SwipeTabsPanel value="active">
+              <div className={container3}>
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+                </React.Suspense>
+              </div>
+            </SwipeTabsPanel>
+            <SwipeTabsPanel value="pending">
+              <div className={container4}>
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
+                </React.Suspense>
+              </div>
+            </SwipeTabsPanel>
+            <SwipeTabsPanel value="blocked">
+              <div className={container5}>
+                <React.Suspense fallback={null}>
+                  <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
+                </React.Suspense>
+              </div>
+            </SwipeTabsPanel>
+          </SwipeTabsPanels>
+        </SwipeTabs>
+      </div>
     </ScreenLayout>
   )
 }

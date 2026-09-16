@@ -1,13 +1,14 @@
-import { cn } from 'cn'
+import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
 import { useMemo, useState, type ReactElement } from 'react'
 
-import { Button } from '../../actions/button/button'
-import { CaretDownIcon } from '../../data-display/icons/caret-down'
 import { CheckIcon } from '../../data-display/icons/check'
 import { Separator } from '../../layout/separator/separator'
-import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from '../../overlays/drawer/drawer'
+import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle } from '../../overlays/drawer/drawer'
 import { Input } from '../input/input'
+import { SelectButton } from '../select/select.shared'
 import { type ComboboxImplProps, type ValueOptions } from './combobox'
+
+import { columnClassName, optionsClassName, emptyClassName, itemClassName, truncateClassName, iconClassName } from './combobox.drawer.css'
 
 const ComboboxDrawer = <TValue extends ValueOptions>({
   addNew,
@@ -22,45 +23,29 @@ const ComboboxDrawer = <TValue extends ValueOptions>({
 }: ComboboxImplProps<TValue>): ReactElement => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
-
-  const filteredOptions = useMemo(() => {
-    if (!search) {
-      return options
-    }
-    const lower = search.toLowerCase()
-    return options.filter((opt) => opt.label.toLowerCase().includes(lower))
-  }, [options, search])
-
+  const filteredOptions = useMemo(
+    () => (search ? options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())) : options),
+    [options, search]
+  )
   return (
     <Drawer onOpenChange={setOpen} open={open}>
-      <DrawerTrigger
+      <DrawerPrimitive.Trigger
+        data-slot="drawer-trigger"
         disabled={disabled}
-        render={
-          <Button
-            aria-invalid={isInvalid || undefined}
-            className={cn(
-              'w-full justify-between border-input font-normal text-ellipsis',
-              'not-disabled:not-focus-visible:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] aria-invalid:border-destructive/36 focus-visible:aria-invalid:border-destructive/64 focus-visible:aria-invalid:ring-destructive/16'
-            )}
-            variant="outline"
-          />
-        }
-      >
-        <span className="truncate">{selectedOption?.label ?? placeholder}</span>
-        <CaretDownIcon />
-      </DrawerTrigger>
+        render={<SelectButton aria-invalid={isInvalid || undefined}>{selectedOption?.label ?? placeholder}</SelectButton>}
+      />
       <DrawerPopup>
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
         </DrawerHeader>
         <DrawerPanel>
-          <div className="flex flex-col gap-2">
+          <div className={columnClassName}>
             <Input onChange={(event) => setSearch(event.target.value)} placeholder={searchPlaceholder} value={search} />
-            <div className="flex max-h-64 flex-col overflow-y-auto">
-              {filteredOptions.length === 0 && <p className="py-4 text-center text-sm text-muted-foreground">Aucun résultat</p>}
+            <div className={optionsClassName}>
+              {filteredOptions.length === 0 && <p className={emptyClassName}>Aucun résultat</p>}
               {filteredOptions.map((option) => (
                 <button
-                  className="flex min-h-10 w-full cursor-default items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-base outline-none active:bg-accent active:text-accent-foreground"
+                  className={itemClassName}
                   key={String(option.value)}
                   onClick={() => {
                     onChange(option)
@@ -69,8 +54,12 @@ const ComboboxDrawer = <TValue extends ValueOptions>({
                   }}
                   type="button"
                 >
-                  <span className="truncate">{option.label}</span>
-                  {selectedOption?.value === option.value && <CheckIcon className="size-4 shrink-0" />}
+                  <span className={truncateClassName}>{option.label}</span>
+                  {selectedOption?.value === option.value && (
+                    <span className={iconClassName}>
+                      <CheckIcon size="sm" />
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -86,5 +75,4 @@ const ComboboxDrawer = <TValue extends ValueOptions>({
     </Drawer>
   )
 }
-
 export default ComboboxDrawer

@@ -30,7 +30,8 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
     if (!element) {
       return
     }
-    element.style.transition = animated ? RELEASE_TRANSITION : 'none'
+    const reducedMotion = typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
+    element.style.transition = animated && !reducedMotion ? RELEASE_TRANSITION : 'none'
     element.style.transform = `translate3d(${value}px, 0, 0)`
   }, [])
 

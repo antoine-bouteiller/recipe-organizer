@@ -16,6 +16,8 @@ import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
 
+import { container } from './-new.css'
+
 const NewRecipePage = () => {
   const router = useRouter()
   const { mutateAsync: createRecipe } = useMutation(createRecipeOptions())
@@ -48,7 +50,7 @@ const NewRecipePage = () => {
         }}
       >
         <RecipeForm addNewIngredientOption={renderAddIngredientOption} fields={recipeFormFields} form={form} ingredientOptions={ingredientOptions} />
-        <div className="flex flex-col justify-end gap-4 pt-6 md:flex-row">
+        <div className={container}>
           <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>

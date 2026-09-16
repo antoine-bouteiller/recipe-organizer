@@ -13,11 +13,13 @@ import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@recipe-
 import { useSelector } from '@tanstack/react-store'
 import { Suspense, type ReactNode } from 'react'
 
-import { recipeDefaultValues } from '../utils/form'
+import { recipeDefaultValues, type recipeFormFields } from '../utils/form'
 import { recipeNodes } from './editor/extensions'
 import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
 import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
 import { IngredientGroupField } from './ingredient-group-field'
+
+import { container, container2, container3, container4, container5, container6, container7, container8, container9 } from './recipe-form.css'
 
 const cuisineTypeItems = CUISINE_TYPES.map((cuisineType) => ({
   label: CUISINE_TYPE_LABELS[cuisineType],
@@ -29,11 +31,12 @@ const mealItems = MEALS.map((meal) => ({
   value: meal,
 }))
 
-interface RecipeFormProps extends Record<string, unknown> {
+interface RecipeFormProps {
   initialImage?: FileMetadata
   initialVideo?: FileMetadata
   id?: number
   addNewIngredientOption: (inputValue: string) => ReactNode
+  fields?: typeof recipeFormFields
   ingredientOptions: Option<number>[]
 }
 
@@ -63,36 +66,41 @@ export const RecipeForm = withForm({
           {({ ToggleGroupField }) => <ToggleGroupField disabled={isSubmitting} items={cuisineTypeItems} label="Cuisines" />}
         </AppField>
 
-        <div className="flex flex-col gap-2">
+        <div className={container}>
           <Label>Sous-recettes liées</Label>
           <AppField mode="array" name="linkedRecipes">
             {(field) => (
               <>
                 {field.state.value?.map((linkedRecipe, index) => (
-                  <div className="flex gap-2" key={linkedRecipe.id}>
-                    <div className="flex flex-1 gap-2 overflow-hidden">
+                  <div className={container2} key={linkedRecipe.id}>
+                    <div className={container3}>
                       <AppField name={`linkedRecipes[${index}].id`}>
                         {({ ComboboxField }) => (
-                          <ComboboxField
-                            disabled={isSubmitting}
-                            options={recipeOptions}
-                            placeholder="Sélectionner une sous-recette"
-                            searchPlaceholder="Rechercher une sous-recette"
-                            className="flex-1 overflow-hidden"
-                          />
+                          <div className={container4}>
+                            <ComboboxField
+                              disabled={isSubmitting}
+                              options={recipeOptions}
+                              placeholder="Sélectionner une sous-recette"
+                              searchPlaceholder="Rechercher une sous-recette"
+                            />
+                          </div>
                         )}
                       </AppField>
                       <AppField name={`linkedRecipes[${index}].ratio`}>
-                        {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" className="w-28 shrink-0" />}
+                        {({ NumberField }) => (
+                          <div className={container5}>
+                            <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />
+                          </div>
+                        )}
                       </AppField>
                     </div>
                     <Button disabled={isSubmitting} onClick={() => field.removeValue(index)} size="icon" type="button" variant="destructive-outline">
-                      <TrashIcon className="h-4 w-4" />
+                      <TrashIcon size="sm" />
                     </Button>
                   </div>
                 ))}
                 <Button disabled={isSubmitting} onClick={() => field.pushValue({ id: -1, ratio: 1 })} size="sm" type="button" variant="outline">
-                  Ajouter une sous-recette <PlusIcon className="h-4 w-4" />
+                  Ajouter une sous-recette <PlusIcon size="sm" />
                 </Button>
               </>
             )}
@@ -107,7 +115,7 @@ export const RecipeForm = withForm({
           {({ VideoField }) => <VideoField disabled={isSubmitting} initialVideo={initialVideo} label="Vidéo (optionnel)" />}
         </AppField>
 
-        <div className="flex flex-col gap-2 pt-2">
+        <div className={container6}>
           <Label>Groupes d&apos;ingrédients</Label>
           <Field mode="array" name="ingredientGroups">
             {(field) => (
@@ -115,33 +123,40 @@ export const RecipeForm = withForm({
                 {field.state.value?.map((group, groupIndex) => (
                   <AppField key={group._key} name={`ingredientGroups[${groupIndex}]`}>
                     {({ Field: GroupField, FieldError }) => (
-                      <GroupField className="relative rounded-xl border p-4">
-                        {groupIndex !== 0 && (
-                          <>
-                            <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
-                              {({ TextField }) => <TextField className="pt-2" disabled={isSubmitting} label="Nom du groupe" />}
-                            </AppField>
-                            <Button
-                              className="absolute top-2 right-2"
-                              disabled={isSubmitting}
-                              onClick={() => field.removeValue(groupIndex)}
-                              size="icon"
-                              type="button"
-                              variant="destructive-outline"
-                            >
-                              <TrashIcon className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
+                      <div className={container7}>
+                        <GroupField>
+                          {groupIndex !== 0 && (
+                            <>
+                              <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
+                                {({ TextField }) => (
+                                  <div className={container8}>
+                                    <TextField disabled={isSubmitting} label="Nom du groupe" />
+                                  </div>
+                                )}
+                              </AppField>
+                              <div className={container9}>
+                                <Button
+                                  disabled={isSubmitting}
+                                  onClick={() => field.removeValue(groupIndex)}
+                                  size="icon"
+                                  type="button"
+                                  variant="destructive-outline"
+                                >
+                                  <TrashIcon size="sm" />
+                                </Button>
+                              </div>
+                            </>
+                          )}
 
-                        <IngredientGroupField
-                          addNewIngredientOption={addNewIngredientOption}
-                          form={form}
-                          groupIndex={groupIndex}
-                          ingredientOptions={ingredientOptions}
-                        />
-                        <FieldError />
-                      </GroupField>
+                          <IngredientGroupField
+                            addNewIngredientOption={addNewIngredientOption}
+                            form={form}
+                            groupIndex={groupIndex}
+                            ingredientOptions={ingredientOptions}
+                          />
+                          <FieldError />
+                        </GroupField>
+                      </div>
                     )}
                   </AppField>
                 ))}
@@ -158,7 +173,7 @@ export const RecipeForm = withForm({
                   type="button"
                   variant="outline"
                 >
-                  Ajouter un groupe <PlusIcon className="h-4 w-4" />
+                  Ajouter un groupe <PlusIcon size="sm" />
                 </Button>
               </>
             )}
@@ -168,7 +183,7 @@ export const RecipeForm = withForm({
         <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
           <AppField name="instructions">
             {({ EditorField }) => (
-              <Suspense fallback={<Skeleton className="h-64 w-full" />}>
+              <Suspense fallback={<Skeleton preset="recipe-form" />}>
                 <EditorField
                   disabled={isSubmitting}
                   nodes={recipeNodes}

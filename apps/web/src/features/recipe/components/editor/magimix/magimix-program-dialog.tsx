@@ -7,7 +7,7 @@ import { useSelector } from '@tanstack/react-store'
 import { useState, type ReactElement } from 'react'
 import * as z from 'zod'
 
-interface MagimixProgramDialogProps {
+export interface MagimixProgramDialogProps {
   initialData?: MagimixProgramFormInput
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string

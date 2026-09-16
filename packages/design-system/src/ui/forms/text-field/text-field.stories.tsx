@@ -6,6 +6,8 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { TextField } from './text-field'
 
+import { container } from './text-field.stories.css'
+
 const TextFieldExample = ({ disabled = false, initialValue = '' }: { disabled?: boolean; initialValue?: string }): ReactElement => {
   const form = useAppForm({ defaultValues: { title: initialValue }, onSubmit: async () => undefined })
 
@@ -29,7 +31,7 @@ export const Overview: Story = {
     await expect(input).toHaveValue('Tomato soup')
   },
   render: () => (
-    <div className="flex w-full min-w-0 flex-col gap-8">
+    <div className={container}>
       <StorySection title="Default">
         <TextFieldExample />
       </StorySection>

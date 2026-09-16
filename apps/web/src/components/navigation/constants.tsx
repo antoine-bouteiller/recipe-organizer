@@ -2,7 +2,6 @@ import { GearIcon } from '@recipe-organizer/design-system/icons/gear'
 import { HouseIcon } from '@recipe-organizer/design-system/icons/house'
 import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 import { ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons/shopping-cart-simple'
-import { type LinkProps } from '@tanstack/react-router'
 import type React from 'react'
 
 interface MenuItem {
@@ -10,38 +9,38 @@ interface MenuItem {
   display?: 'desktop' | 'mobile'
   icon: React.ReactNode
   label: string
-  linkProps: LinkProps
+  linkProps: { to: '/' | '/search' | '/shopping-list' | '/settings' }
 }
 
 export const menuItems: MenuItem[] = [
   {
-    activeIcon: <HouseIcon className="size-6" weight="fill" />,
-    icon: <HouseIcon className="size-6" />,
+    activeIcon: <HouseIcon weight="fill" />,
+    icon: <HouseIcon />,
     label: 'Accueil',
     linkProps: {
       to: '/',
     },
   },
   {
-    activeIcon: <MagnifyingGlassIcon className="size-6" weight="bold" />,
+    activeIcon: <MagnifyingGlassIcon weight="bold" />,
     display: 'mobile',
-    icon: <MagnifyingGlassIcon className="size-6" />,
+    icon: <MagnifyingGlassIcon />,
     label: 'Rechercher',
     linkProps: {
       to: '/search',
     },
   },
   {
-    activeIcon: <ShoppingCartSimpleIcon className="size-6" weight="fill" />,
-    icon: <ShoppingCartSimpleIcon className="size-6" />,
+    activeIcon: <ShoppingCartSimpleIcon weight="fill" />,
+    icon: <ShoppingCartSimpleIcon />,
     label: 'Courses',
     linkProps: {
       to: '/shopping-list',
     },
   },
   {
-    activeIcon: <GearIcon className="size-6" weight="fill" />,
-    icon: <GearIcon className="size-6" />,
+    activeIcon: <GearIcon weight="fill" />,
+    icon: <GearIcon />,
     label: 'Paramètres',
     linkProps: {
       to: '/settings',

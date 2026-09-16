@@ -13,8 +13,11 @@ export const userDefaultValues: UserFormInput = {
   role: 'user',
 }
 
+const userFormProps = {}
+
 export const UserForm = withForm({
   defaultValues: userDefaultValues,
+  props: userFormProps,
   render: ({ form }) => {
     const { AppField } = form
     const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
