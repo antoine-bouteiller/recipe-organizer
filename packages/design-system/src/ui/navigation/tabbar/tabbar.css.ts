@@ -3,7 +3,7 @@ import { style, globalStyle } from '@vanilla-extract/css'
 
 export const element = style({
   alignItems: 'center',
-  backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 4%, ${theme.colors.background})`,
+  backgroundColor: theme.colors.background,
   boxShadow: `0 -1px 3px color-mix(in srgb, ${theme.colors.shadow} 6%, transparent)`,
   bottom: theme.spacing(0),
   display: 'flex',
@@ -23,7 +23,7 @@ export const element = style({
 export const tabBarItemClassName = style({
   selectors: {
     '&[aria-current=page]': {
-      color: theme.colors['secondary-foreground'],
+      color: theme.colors['accent-foreground'],
       fontWeight: theme.fontWeights.semibold,
     },
     '&:is(:focus-visible, [data-focus-visible])': {
@@ -33,7 +33,7 @@ export const tabBarItemClassName = style({
   },
   alignItems: 'center',
   borderRadius: theme.radii.xl,
-  color: `color-mix(in srgb, ${theme.colors.foreground} 80%, ${theme.colors.background})`,
+  color: theme.colors['muted-foreground'],
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
@@ -85,7 +85,7 @@ export const iconSlotClassName = style({
 })
 
 export const activeIconSlotClassName = style({
-  backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 16%, ${theme.colors.background})`,
+  backgroundColor: theme.colors.accent,
   display: 'none',
 })
 

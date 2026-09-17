@@ -125,7 +125,7 @@ const tokenValues = {
     input: '#e2e8e7',
     'inverse-foreground': palette.white,
     muted: '#f3f4f1',
-    'muted-foreground': '#6e807e',
+    'muted-foreground': '#60716f',
     'neutral-subtle': palette.zinc[200],
     'neutral-subtle-foreground': palette.zinc[700],
     popover: palette.white,

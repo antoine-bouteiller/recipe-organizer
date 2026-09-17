@@ -55,7 +55,7 @@ export const buttonRecipe = recipe({
       '--owner-icon-size': '18px',
     },
     alignItems: 'center',
-    borderRadius: theme.radii.full,
+    borderRadius: theme.radii.lg,
     borderWidth: '1px',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -146,6 +146,7 @@ export const buttonRecipe = recipe({
         },
       },
       'icon-xs': {
+        borderRadius: theme.radii.md,
         vars: {
           '--owner-icon-size': '16px',
         },
@@ -222,14 +223,14 @@ export const buttonRecipe = recipe({
       'list-action': {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
-        borderRadius: theme.radii.xl,
+        borderRadius: theme.radii.md,
         color: theme.colors.foreground,
         justifyContent: 'flex-start',
         width: '100%',
       },
       outline: {
         backgroundColor: theme.colors.popover,
-        borderColor: theme.colors['muted-foreground'],
+        borderColor: theme.colors.input,
         color: theme.colors.foreground,
       },
       secondary: {

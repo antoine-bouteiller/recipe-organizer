@@ -8,14 +8,11 @@ export const listRecipe = recipe({
       '&[data-orientation=vertical]': {
         flexDirection: 'column',
       },
-      '.dark &': {
-        backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 4%, transparent)`,
-      },
     },
     alignItems: 'center',
-    backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 50%, transparent)`,
+    backgroundColor: theme.colors.muted,
     borderRadius: theme.radii.lg,
-    color: `color-mix(in srgb, ${theme.colors['muted-foreground']} 64%, transparent)`,
+    color: theme.colors['muted-foreground'],
     display: 'flex',
     gap: theme.spacing(0.5),
     justifyContent: 'center',
@@ -39,7 +36,7 @@ export const listRecipe = recipe({
 
 export const indicatorRecipe = recipe({
   base: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.card,
     borderRadius: theme.radii.md,
     bottom: theme.spacing(0),
     boxShadow: theme.shadows.sm,
@@ -57,11 +54,6 @@ export const indicatorRecipe = recipe({
     transitionTimingFunction: theme.easings.out,
     width: 'var(--active-tab-width)',
     zIndex: -1,
-    selectors: {
-      '.dark &': {
-        backgroundColor: theme.colors.accent,
-      },
-    },
   },
 })
 
@@ -69,7 +61,7 @@ export const tabRecipe = recipe({
   base: {
     selectors: {
       '&[data-active]': {
-        color: theme.colors.foreground,
+        color: theme.colors['card-foreground'],
       },
       '&[data-disabled]': {
         opacity: 0.64,

@@ -1,13 +1,15 @@
-import { Toggle } from '@base-ui/react/toggle'
+import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { PlusIcon } from '../../data-display/icons/plus'
 import { SearchInput } from '../../forms/search-input/search-input'
+import { Select } from '../../forms/select/select'
+import { Toggle } from '../toggle/toggle'
 import { Button } from './button'
 
-import { container, container2, container3, searchRow } from './button.stories.css'
+import { comparisonRow, container, container2, container3, popoverSurface, searchRow } from './button.stories.css'
 
 const meta = {
   component: Button,
@@ -32,7 +34,7 @@ export const InteractionStates: Story = {
   },
   render: () => (
     <div className={container2}>
-      <Toggle render={<Button variant="secondary" />}>Save recipe</Toggle>
+      <TogglePrimitive render={<Button variant="secondary" />}>Save recipe</TogglePrimitive>
       <Button disabled>Unavailable</Button>
     </div>
   ),
@@ -40,15 +42,61 @@ export const InteractionStates: Story = {
 
 export const SearchAction: Story = {
   play: async ({ canvasElement }) => {
-    const button = within(canvasElement).getByRole('button', { name: 'Add item' })
+    const canvas = within(canvasElement)
+    const button = canvas.getByRole('button', { name: 'Add item' })
+    const disabledButton = canvas.getByRole('button', { name: 'Unavailable add item' })
+    const toggle = canvas.getByRole('button', { name: 'Filter recipes' })
+    const searchInput = canvas.getByRole('group')
+    const popover = canvas.getByText('Popover surface')
+    const select = await canvas.findByText('Choose status')
+    const selectTrigger = select.closest('button')
+    if (!selectTrigger) {
+      throw new Error('SearchAction requires the Select trigger')
+    }
     const { width, height } = button.getBoundingClientRect()
+    const popoverColor = getComputedStyle(popover).backgroundColor
+
     await expect(width).toBe(height)
+    await expect(getComputedStyle(button).borderRadius).toBe(getComputedStyle(searchInput).borderRadius)
+    await expect(getComputedStyle(button).borderRadius).toBe(getComputedStyle(selectTrigger).borderRadius)
+    await expect(getComputedStyle(button).borderRadius).toBe(getComputedStyle(toggle).borderRadius)
+    await expect(getComputedStyle(button).borderColor).toBe(getComputedStyle(selectTrigger).borderColor)
+    await expect(getComputedStyle(button).borderColor).toBe(getComputedStyle(toggle).borderColor)
+    await expect(getComputedStyle(button).backgroundColor).toBe(popoverColor)
     await expect(getComputedStyle(button).backgroundColor).toMatch(/^rgb\(/)
+    await expect(getComputedStyle(disabledButton).backgroundColor).toBe(popoverColor)
+    await expect(getComputedStyle(disabledButton).backgroundColor).toMatch(/^rgb\(/)
+    await expect(getComputedStyle(disabledButton).opacity).toBe('0.38')
+
+    await userEvent.hover(button)
+    await expect(getComputedStyle(button).backgroundColor).toBe(popoverColor)
+    await expect(getComputedStyle(button, '::before').borderRadius).toBe(getComputedStyle(button).borderRadius)
+    await userEvent.click(canvas.getByRole('textbox'))
+    await userEvent.tab()
+    await expect(button).toHaveFocus()
+    await waitFor(() => expect(getComputedStyle(button, '::before').opacity).toBe('0.12'))
+    await expect(getComputedStyle(button).backgroundColor).toBe(popoverColor)
+    await userEvent.keyboard('{Space>}')
+    await waitFor(() => expect(getComputedStyle(button, '::before').opacity).toBe('0.12'))
+    await expect(getComputedStyle(button).backgroundColor).toBe(popoverColor)
+    await userEvent.keyboard('{/Space}')
   },
   render: () => (
-    <div className={searchRow}>
-      <SearchInput search="" setSearch={fn()} />
-      <Button aria-label="Add item" size="icon-lg" variant="outline">
+    <div className={comparisonRow}>
+      <span className={popoverSurface} data-slot="popover-surface">
+        Popover surface
+      </span>
+      <div className={searchRow}>
+        <SearchInput search="" setSearch={fn()} />
+        <Button aria-label="Add item" size="icon-lg" variant="outline">
+          <PlusIcon />
+        </Button>
+      </div>
+      <Select items={[{ label: 'Active', value: 'active' }]} onValueChange={fn()} placeholder="Choose status" value={null} />
+      <Toggle aria-label="Filter recipes" variant="outline">
+        Filter
+      </Toggle>
+      <Button aria-label="Unavailable add item" disabled size="icon-lg" variant="outline">
         <PlusIcon />
       </Button>
     </div>
