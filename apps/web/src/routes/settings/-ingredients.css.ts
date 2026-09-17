@@ -3,6 +3,7 @@ import { style } from '@vanilla-extract/css'
 
 export const container = style({
   alignItems: 'center',
+  background: theme.colors.muted,
   display: 'flex',
   flexShrink: 0,
   gap: theme.spacing(4),
@@ -12,7 +13,6 @@ export const container = style({
   zIndex: 10,
   '@media': {
     'screen and (min-width: 768px)': {
-      background: theme.colors.muted,
       top: theme.spacing(0),
     },
   },

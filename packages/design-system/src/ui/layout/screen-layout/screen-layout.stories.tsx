@@ -49,16 +49,18 @@ export const Overview: Story = {
     const section = canvas.getByRole('region', { name: 'Default' })
     const panel = section.querySelector<HTMLDivElement>('[data-scroll-restoration-id="story-content"]')
     await expect(panel).not.toBeNull()
-    // The collapsing header and back button are mobile-only.
+    // The sticky header and back button are mobile-only.
     if (globalThis.matchMedia('(max-width: 767px)').matches) {
       const header = within(section).getByRole('heading', { name: 'Library' })
+      const { fontSize } = getComputedStyle(header)
+      const headerTop = header.getBoundingClientRect().top
       panel?.scrollTo({ top: 50 })
-      await waitFor(() => expect(header).toHaveAttribute('data-scrolled', 'true'))
-      panel?.scrollTo({ top: 32 })
-      await waitFor(() => expect(panel?.scrollTop).toBe(32))
-      await expect(header).toHaveAttribute('data-scrolled', 'true')
-      panel?.scrollTo({ top: 24 })
-      await waitFor(() => expect(header).not.toHaveAttribute('data-scrolled'))
+      await waitFor(() => expect(panel?.scrollTop).toBe(50))
+      await expect(header).toBeVisible()
+      await expect(getComputedStyle(header).fontSize).toBe(fontSize)
+      await expect(header.getBoundingClientRect().top).toBe(headerTop)
+      await expect(header).not.toHaveAttribute('data-scrolled')
+      panel?.scrollTo({ top: 0 })
       const backSection = within(canvas.getByRole('region', { name: 'With back action' }))
       await userEvent.click(backSection.getByRole('button', { name: 'Retour' }))
       await expect(backSection.getByRole('status')).toHaveTextContent('Back action requested.')
@@ -82,6 +84,9 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="With header action">
         <LayoutExample {...args} headerEndItem={<Button size="sm">Add item</Button>} />
+      </StorySection>
+      <StorySection title="With long title">
+        <LayoutExample {...args} title="A long recipe collection title that should truncate" headerEndItem={<Button size="sm">Add item</Button>} />
       </StorySection>
       <StorySection title="With footer">
         <LayoutExample

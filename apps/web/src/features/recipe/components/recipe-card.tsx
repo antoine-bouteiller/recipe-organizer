@@ -27,7 +27,7 @@ export interface RecipeCardProps {
 }
 
 const Tag = ({ children }: { readonly children: React.ReactNode }) => (
-  <Badge size="sm" variant="overlay">
+  <Badge size="sm" variant="secondary">
     {children}
   </Badge>
 )

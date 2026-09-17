@@ -15,6 +15,13 @@ export const container2 = style({
   gap: theme.spacing(3),
 })
 
+export const searchRow = style({
+  alignItems: 'center',
+  display: 'flex',
+  gap: theme.spacing(4),
+  width: theme.spacing(60),
+})
+
 export const container3 = style({
   alignItems: 'center',
   display: 'flex',

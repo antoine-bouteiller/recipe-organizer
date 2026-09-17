@@ -1,6 +1,10 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
+import { inputSurface } from '../input/input-surface.css'
+
+export const root = style([inputSurface(), { alignItems: 'center', minWidth: theme.spacing(0) }])
+
 export const inputClassName = style({
   backgroundColor: 'transparent',
   borderRadius: 'inherit',

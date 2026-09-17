@@ -44,7 +44,7 @@ const SearchBar = () => {
   return (
     <CommandDialog onOpenChange={setOpen} open={open}>
       <div className={container}>
-        <CommandDialogTrigger render={<Button align="start" variant="search-trigger" width="full" />}>
+        <CommandDialogTrigger render={<Button align="start" variant="outline" width="full" />}>
           Recherche une recette...
           <span className={text}>
             <KbdGroup>

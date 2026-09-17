@@ -99,6 +99,7 @@ export const buttonRecipe = recipe({
         },
       },
       'icon-lg': {
+        flexShrink: 0,
         height: theme.spacing(10),
         width: theme.spacing(10),
         '@media': {
@@ -352,64 +353,11 @@ export const buttonRecipe = recipe({
           },
         },
       },
-      'media-overlay-card': {
-        backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 12%, transparent)`,
-        borderColor: 'transparent',
-        color: theme.colors['inverse-foreground'],
-        selectors: {
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 20%, transparent)`,
-              },
-            },
-          },
-        },
-      },
-      'media-overlay-header': {
-        selectors: {
-          '&[data-pressed]': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 25%, transparent)`,
-            boxShadow: 'none',
-          },
-          '&[data-pressed]::before': {
-            boxShadow: 'none',
-          },
-          '&::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
-          },
-          '.dark &::before': {
-            boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-          },
-          '&:is(:active, [data-active])::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])': {
-            boxShadow: 'none',
-          },
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 25%, transparent)`,
-              },
-            },
-          },
-        },
-        WebkitBackdropFilter: 'blur(12px)',
-        backdropFilter: 'blur(12px)',
-        backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 15%, transparent)`,
-        borderColor: `color-mix(in srgb, ${theme.colors.highlight} 20%, transparent)`,
-        boxShadow: theme.shadows.xs,
-        color: theme.colors['inverse-foreground'],
-      },
       outline: {
         selectors: {
           '&[data-pressed]': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.accent} 50%, transparent)`,
+            backgroundColor: theme.colors.accent,
             boxShadow: 'none',
-          },
-          '.dark &': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.input} 32%, transparent)`,
           },
           '&[data-disabled], &:disabled': {
             boxShadow: 'none',
@@ -435,17 +383,10 @@ export const buttonRecipe = recipe({
           '&:is(:active, [data-active])': {
             boxShadow: 'none',
           },
-          '.dark &:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.input} 64%, transparent)`,
-              },
-            },
-          },
           '&:hover': {
             '@media': {
               '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.accent} 50%, transparent)`,
+                backgroundColor: theme.colors.accent,
               },
             },
           },
@@ -456,19 +397,6 @@ export const buttonRecipe = recipe({
         borderColor: theme.colors.input,
         boxShadow: theme.shadows.xs,
         color: theme.colors.foreground,
-      },
-      'search-trigger': {
-        WebkitBackdropFilter: 'blur(24px)',
-        backdropFilter: 'blur(24px)',
-        backgroundColor: `color-mix(in srgb, ${theme.colors.background} 72%, transparent)`,
-        borderColor: theme.colors.input,
-        boxShadow: 'none',
-        color: theme.colors.foreground,
-        selectors: {
-          '.dark &': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.input} 48%, transparent)`,
-          },
-        },
       },
       secondary: {
         backgroundColor: theme.colors.secondary,

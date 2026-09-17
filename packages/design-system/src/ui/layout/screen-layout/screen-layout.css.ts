@@ -89,15 +89,15 @@ export const imageHeaderRecipe = recipe({
 export const headerRecipe = recipe({
   base: {
     alignItems: 'center',
+    backgroundColor: theme.colors.muted,
     color: theme.colors.foreground,
     display: 'flex',
     flexShrink: 0,
     gap: theme.spacing(2),
     height: 'var(--screen-header-height)',
     marginInline: `calc(${theme.spacing(4)} * -1)`,
-    paddingInline: theme.spacing(2),
+    paddingInline: theme.spacing(4),
     paddingTop: `calc(env(safe-area-inset-top) + ${theme.spacing(1)})`,
-    pointerEvents: 'none',
     position: 'sticky',
     top: theme.spacing(0),
     width: 'auto',
@@ -107,14 +107,6 @@ export const headerRecipe = recipe({
         display: 'none',
       },
     },
-  },
-})
-
-export const titlePillRecipe = recipe({
-  base: {
-    minWidth: theme.spacing(0),
-    paddingBlock: theme.spacing(1.5),
-    paddingInline: theme.spacing(4),
   },
 })
 
@@ -182,31 +174,12 @@ export const headerActionRecipe = recipe({
 export const titleRecipe = recipe({
   base: {
     fontFamily: theme.fonts.heading,
+    fontSize: theme.fontSizes['3xl'],
     fontWeight: theme.fontWeights.bold,
     letterSpacing: theme.letterSpacings.tight,
+    minWidth: theme.spacing(0),
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    vars: {
-      '--transition-duration': '200ms',
-      '--transition-prop': 'font-size, line-height',
-      '--transition-easing': theme.easings['out-snappy'],
-    },
-    transitionDuration: '200ms',
-    transitionProperty: 'font-size, line-height',
-    transitionTimingFunction: theme.easings['out-snappy'],
     whiteSpace: 'nowrap',
-  },
-  defaultVariants: {
-    scrolled: false,
-  },
-  variants: {
-    scrolled: {
-      false: {
-        fontSize: theme.fontSizes['3xl'],
-      },
-      true: {
-        fontSize: theme.fontSizes.base,
-      },
-    },
   },
 })

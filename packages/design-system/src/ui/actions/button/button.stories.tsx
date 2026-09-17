@@ -1,10 +1,12 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
+import { expect, fn, within } from 'storybook/test'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { PlusIcon } from '../../data-display/icons/plus'
+import { SearchInput } from '../../forms/search-input/search-input'
 import { Button } from './button'
 
-import { container, container2, container3 } from './button.stories.css'
+import { container, container2, container3, searchRow } from './button.stories.css'
 
 const meta = {
   component: Button,
@@ -13,6 +15,23 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const SearchAction: Story = {
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: 'Add item' })
+    const { width, height } = button.getBoundingClientRect()
+    await expect(width).toBe(height)
+    await expect(getComputedStyle(button).backgroundColor).toMatch(/^rgb\(/)
+  },
+  render: () => (
+    <div className={searchRow}>
+      <SearchInput search="" setSearch={fn()} />
+      <Button aria-label="Add item" size="icon-lg" variant="outline">
+        <PlusIcon />
+      </Button>
+    </div>
+  ),
+}
 
 export const Overview: Story = {
   args: { children: 'Save changes' },
@@ -30,9 +49,6 @@ export const Overview: Story = {
           <Button variant="destructive">Delete</Button>
           <Button variant="destructive-outline">Remove</Button>
           <Button variant="destructive-ghost">Delete quietly</Button>
-          <Button variant="media-overlay-card">Card overlay</Button>
-          <Button variant="media-overlay-header">Header overlay</Button>
-          <Button variant="search-trigger">Search</Button>
         </div>
       </StorySection>
       <StorySection title="Sizes">

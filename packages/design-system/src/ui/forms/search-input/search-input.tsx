@@ -1,7 +1,6 @@
 import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
 
-import { inputSurface } from '../input/input-surface.css'
-import { inputClassName, addonClassName, text } from './search-input.css'
+import { root, inputClassName, addonClassName, text } from './search-input.css'
 
 export interface SearchInputProps {
   autoFocus?: boolean
@@ -11,7 +10,7 @@ export interface SearchInputProps {
 }
 
 export const SearchInput = ({ autoFocus, placeholder = 'Rechercher…', search, setSearch }: SearchInputProps) => (
-  <div className={inputSurface({ surface: 'glass' })} data-slot="input-group" role="group">
+  <div className={root} data-slot="input-group" role="group">
     <input
       aria-label={placeholder}
       autoFocus={autoFocus}

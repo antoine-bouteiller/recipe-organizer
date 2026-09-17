@@ -3,9 +3,7 @@ import { style } from '@vanilla-extract/css'
 
 export const element = style({
   alignItems: 'center',
-  WebkitBackdropFilter: 'blur(24px)',
-  backdropFilter: 'blur(24px)',
-  background: `color-mix(in srgb, ${theme.colors.background} 72%, transparent)`,
+  background: theme.colors.popover,
   borderColor: theme.colors.input,
   borderRadius: theme.radii.lg,
   borderWidth: '1px',
@@ -20,9 +18,6 @@ export const element = style({
   transitionProperty: 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
   width: theme.spacing(10),
   selectors: {
-    '.dark &': {
-      background: `color-mix(in srgb, ${theme.colors.input} 48%, transparent)`,
-    },
     '&:is(:focus-visible, [data-focus-visible])': {
       outlineColor: theme.colors.ring,
       outlineOffset: '1px',
@@ -31,7 +26,7 @@ export const element = style({
     '&:hover': {
       '@media': {
         '(hover: hover) and (pointer: fine)': {
-          background: `color-mix(in srgb, ${theme.colors.accent} 50%, transparent)`,
+          background: theme.colors.accent,
         },
       },
     },

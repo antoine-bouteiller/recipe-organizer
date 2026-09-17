@@ -63,6 +63,7 @@ export const inputSurface = recipe({
       '--transition-prop': 'box-shadow',
       '--transition-easing': theme.easings['in-out'],
     },
+    backgroundColor: theme.colors.background,
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
     borderColor: theme.colors.input,
@@ -80,33 +81,6 @@ export const inputSurface = recipe({
     '@media': {
       'screen and (min-width: 640px)': {
         fontSize: theme.fontSizes.sm,
-      },
-    },
-  },
-  defaultVariants: {
-    surface: 'default',
-  },
-  variants: {
-    surface: {
-      default: {
-        backgroundColor: theme.colors.background,
-        selectors: {
-          '.dark &': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.input} 32%, transparent)`,
-          },
-        },
-      },
-      glass: {
-        alignItems: 'center',
-        WebkitBackdropFilter: 'blur(24px)',
-        backdropFilter: 'blur(24px)',
-        backgroundColor: `color-mix(in srgb, ${theme.colors.background} 72%, transparent)`,
-        minWidth: theme.spacing(0),
-        selectors: {
-          '.dark &': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.input} 48%, transparent)`,
-          },
-        },
       },
     },
   },

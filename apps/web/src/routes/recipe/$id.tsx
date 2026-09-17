@@ -102,7 +102,7 @@ const RecipePage = () => {
         authUser && (
           <Popover
             trigger={
-              <Button size="icon" variant="media-overlay-header">
+              <Button size="icon" variant="ghost">
                 <DotsThreeVerticalIcon weight="bold" />
               </Button>
             }

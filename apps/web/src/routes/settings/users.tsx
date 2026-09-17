@@ -67,7 +67,7 @@ const UsersManagement = () => {
       <div className={container}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddUser>
-          <Button size="icon-lg" variant="search-trigger">
+          <Button aria-label="Ajouter un utilisateur" size="icon-lg" variant="outline">
             <PlusIcon />
           </Button>
         </AddUser>

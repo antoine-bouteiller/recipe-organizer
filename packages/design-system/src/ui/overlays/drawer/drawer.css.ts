@@ -25,8 +25,6 @@ export const backdropClassName = recipe({
         position: 'absolute',
       },
     },
-    WebkitBackdropFilter: 'blur(4px)',
-    backdropFilter: 'blur(4px)',
     backgroundColor: `color-mix(in srgb, ${theme.colors.scrim} 32%, transparent)`,
     inset: theme.spacing(0),
     opacity: 'calc(1 - var(--drawer-swipe-progress))',

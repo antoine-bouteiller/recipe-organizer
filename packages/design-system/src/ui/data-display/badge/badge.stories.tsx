@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Badge } from './badge'
 
-import { container, container2, container3, overlayPreview } from './badge.stories.css'
+import { container, container2, container3 } from './badge.stories.css'
 
 const meta = {
   component: Badge,
@@ -25,17 +25,6 @@ export const Overview: Story = {
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="accent">Accent</Badge>
           <Badge variant="eyebrow">Featured</Badge>
-          <Badge variant="overlay">Overlay</Badge>
-        </div>
-      </StorySection>
-      <StorySection title="Overlay contrast · light and dark themes">
-        <div className={container2}>
-          <div className={overlayPreview}>
-            <Badge variant="overlay">On dark media</Badge>
-          </div>
-          <div className={`${overlayPreview} dark`}>
-            <Badge variant="overlay">On dark media · dark theme</Badge>
-          </div>
         </div>
       </StorySection>
       <StorySection title="Sizes">

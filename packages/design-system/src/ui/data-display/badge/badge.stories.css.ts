@@ -16,12 +16,6 @@ export const container2 = style({
   gap: theme.spacing(3),
 })
 
-export const overlayPreview = style({
-  backgroundColor: theme.colors.scrim,
-  borderRadius: theme.radii.lg,
-  padding: theme.spacing(6),
-})
-
 export const container3 = style({
   alignItems: 'center',
   display: 'flex',

@@ -1,15 +1,11 @@
-import { useState } from 'react'
-
 import { Button } from '../../actions/button/button'
 import { ArrowLeftIcon } from '../../data-display/icons/arrow-left'
-import { GlassPill } from '../glass-pill/glass-pill'
 
 import {
   screenRecipe,
   contentRecipe,
   imageHeaderRecipe,
   headerRecipe,
-  titlePillRecipe,
   imageRecipe,
   imageOverlayRecipe,
   imageBackRecipe,
@@ -28,12 +24,11 @@ const GoBackButton = ({ onBack }: { onBack: () => void }) => (
 interface ScreenHeaderProps {
   backgroundImage?: string
   headerEndItem?: React.ReactNode
-  scrolled: boolean
   title: string
   onBack?: () => void
 }
 
-const ScreenHeader = ({ backgroundImage, headerEndItem, scrolled, title, onBack }: ScreenHeaderProps): React.ReactElement => {
+const ScreenHeader = ({ backgroundImage, headerEndItem, title, onBack }: ScreenHeaderProps): React.ReactElement => {
   if (backgroundImage) {
     return (
       <div className={imageHeaderRecipe()}>
@@ -51,18 +46,8 @@ const ScreenHeader = ({ backgroundImage, headerEndItem, scrolled, title, onBack 
   }
   return (
     <div className={headerRecipe()}>
-      {onBack && (
-        <GlassPill on={scrolled}>
-          <GoBackButton onBack={onBack} />
-        </GlassPill>
-      )}
-      <GlassPill on={scrolled}>
-        <div className={titlePillRecipe()}>
-          <h1 className={titleRecipe({ scrolled })} data-scrolled={scrolled ? 'true' : undefined}>
-            {title}
-          </h1>
-        </div>
-      </GlassPill>
+      {onBack && <GoBackButton onBack={onBack} />}
+      <h1 className={titleRecipe()}>{title}</h1>
       {headerEndItem && <div className={headerActionRecipe()}>{headerEndItem}</div>}
     </div>
   )
@@ -88,8 +73,7 @@ export const ScreenLayout = ({
   outerScrollId,
   title,
 }: ScreenLayoutProps): React.ReactElement => {
-  const [scrolled, setScrolled] = useState(false)
-  const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} onBack={onBack} scrolled={scrolled} title={title} />
+  const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} onBack={onBack} title={title} />
   return (
     <div
       className={screenRecipe()}
@@ -102,10 +86,6 @@ export const ScreenLayout = ({
         className={contentRecipe({ hasBackground: Boolean(backgroundImage), hasFooter: Boolean(footer) })}
         data-scroll-restoration-id={innerScrollId}
         data-slot="screen-layout-content"
-        onScroll={(event) => {
-          const offset = event.currentTarget.scrollTop
-          setScrolled((wasScrolled) => (wasScrolled ? offset > 24 : offset > 40))
-        }}
       >
         {!backgroundImage && header}
         {children}

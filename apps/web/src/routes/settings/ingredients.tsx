@@ -31,7 +31,7 @@ const IngredientsManagement = () => {
       <div className={container}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddIngredient>
-          <Button size="icon-lg" variant="search-trigger">
+          <Button aria-label="Ajouter un ingrédient" size="icon-lg" variant="outline">
             <PlusIcon />
           </Button>
         </AddIngredient>

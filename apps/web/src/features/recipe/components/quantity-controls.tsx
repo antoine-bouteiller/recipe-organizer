@@ -31,14 +31,14 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default' }: Qu
 
     return (
       <div className={container}>
-        <Button onClick={decrementQuantity} disabled={quantity === 1} aria-label="Retirer un couvert" size="icon-xs" variant="media-overlay-card">
+        <Button onClick={decrementQuantity} disabled={quantity === 1} aria-label="Retirer un couvert" size="icon-xs" variant="secondary">
           <MinusIcon weight="bold" />
         </Button>
         <span className={text}>{quantity} couverts</span>
-        <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs">
+        <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs" variant="secondary">
           <PlusIcon weight="bold" />
         </Button>
-        <Button onClick={() => removeFromShoppingList(recipeId)} aria-label="Retirer de la liste" size="icon-xs" variant="media-overlay-card">
+        <Button onClick={() => removeFromShoppingList(recipeId)} aria-label="Retirer de la liste" size="icon-xs" variant="secondary">
           <TrashIcon />
         </Button>
       </div>

@@ -3,16 +3,14 @@ import { style } from '@vanilla-extract/css'
 
 export const container = style({
   alignItems: 'center',
-  WebkitBackdropFilter: 'blur(12px)',
-  backdropFilter: 'blur(12px)',
-  background: `color-mix(in srgb, ${theme.colors.highlight} 15%, transparent)`,
+  background: theme.colors.primary,
   borderRadius: theme.radii.xl,
   display: 'flex',
   gap: theme.spacing(2.5),
   justifyContent: 'center',
   padding: theme.spacing(1),
   outline: '1',
-  outlineColor: `color-mix(in srgb, ${theme.colors.highlight} 20%, transparent)`,
+  outlineColor: theme.colors.primary,
   width: '100%',
 })
 

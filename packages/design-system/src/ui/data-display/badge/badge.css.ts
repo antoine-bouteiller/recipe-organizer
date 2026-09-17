@@ -95,14 +95,6 @@ export const badgeRecipe = recipe({
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
       },
-      overlay: {
-        WebkitBackdropFilter: 'blur(4px)',
-        backdropFilter: 'blur(4px)',
-        backgroundColor: `color-mix(in srgb, ${theme.colors.highlight} 20%, transparent)`,
-        borderRadius: theme.radii.full,
-        color: theme.colors['inverse-foreground'],
-        fontWeight: theme.fontWeights.semibold,
-      },
       secondary: {
         backgroundColor: theme.colors.secondary,
         color: theme.colors['secondary-foreground'],

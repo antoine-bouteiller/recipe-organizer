@@ -44,6 +44,7 @@ export const Overview: Story = {
   play: async ({ canvasElement }) => {
     const section = within(canvasElement).getByRole('region', { name: 'Default' })
     const canvas = within(section)
+    await expect(getComputedStyle(canvas.getByRole('group')).backdropFilter).toBe('none')
     await userEvent.type(canvas.getByRole('textbox', { name: 'Rechercher…' }), 'tomato')
     await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
   },

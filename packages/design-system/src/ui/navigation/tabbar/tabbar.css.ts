@@ -3,10 +3,8 @@ import { style, globalStyle } from '@vanilla-extract/css'
 
 export const element = style({
   alignItems: 'center',
-  WebkitBackdropFilter: 'blur(24px)',
-  backdropFilter: 'blur(24px)',
-  backgroundColor: `color-mix(in srgb, ${theme.colors.background} 80%, transparent)`,
-  borderColor: `color-mix(in srgb, ${theme.colors.border} 60%, transparent)`,
+  backgroundColor: theme.colors.background,
+  borderColor: theme.colors.border,
   borderTopWidth: '1px',
   bottom: theme.spacing(0),
   display: 'flex',

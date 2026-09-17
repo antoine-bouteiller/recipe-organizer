@@ -2,6 +2,7 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
 export const container = style({
+  background: theme.colors.muted,
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(2),
@@ -11,7 +12,6 @@ export const container = style({
   zIndex: 10,
   '@media': {
     'screen and (min-width: 768px)': {
-      background: theme.colors.muted,
       top: theme.spacing(0),
     },
   },
