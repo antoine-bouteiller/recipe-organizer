@@ -1,4 +1,4 @@
-import { createGlobalTheme, createGlobalThemeContract, globalKeyframes, globalStyle } from '@vanilla-extract/css'
+import { createGlobalTheme, createThemeContract, globalKeyframes, globalStyle } from '@vanilla-extract/css'
 
 const palette = {
   black: '#000',
@@ -219,16 +219,7 @@ const tokenValues = {
   },
 } as const
 
-export const vars = createGlobalThemeContract(tokenValues, (_value, path) =>
-  path
-    .map((part) =>
-      part
-        .replaceAll(/(?<lower>[a-z0-9])(?<upper>[A-Z])/g, '$<lower>-$<upper>')
-        .toLowerCase()
-        .replaceAll('.', '-')
-    )
-    .join('-')
-)
+export const vars = createThemeContract(tokenValues)
 
 createGlobalTheme(':root', vars, tokenValues)
 

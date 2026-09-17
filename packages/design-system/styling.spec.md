@@ -33,10 +33,11 @@ application.
 | `[KD-2]` Component API                 | Each component uses a local minimal `Pick` of used native/Base UI props plus its own semantic options.                                  | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.   |
 | `[KD-3]` Styling ownership             | Recipes are colocated with their visual owner and remain private.                                                                       | Finite presentations are emitted independently of stories and cannot become caller override APIs.               |
 | `[KD-4]` Integration seams             | Base UI `render` composes existing components; router `Link` stays app-owned.                                                           | Library composition preserves navigation, handlers, refs, and primitive behavior without shared recipe exports. |
+| `[KD-5]` Theme variable names          | `tokens.css.ts` uses Vanilla Extract's `createThemeContract` variable generation.                                                       | Scoped generated names remain an internal implementation detail rather than a custom raw-CSS compatibility API. |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **One theme API** — `src/theme/index.ts` combines the internal Vanilla Extract variable contract with spacing and exports `theme` from `@recipe-organizer/design-system/theme`. Its camel-case categories and literal token keys retain the established CSS variable names; `tokens.css.ts` is internal.
+- `[PI-1]` **One theme API** — `src/theme/index.ts` combines the internal Vanilla Extract variable contract with spacing and exports `theme` from `@recipe-organizer/design-system/theme`. Its camel-case categories and literal token keys produce Vanilla Extract-generated scoped CSS variables; consumers use typed `theme` references and `tokens.css.ts` remains internal.
 - `[PI-2]` **Vite compiles local CSS** — web and Storybook load the Vanilla Extract Vite plugin. No scan, code-generation command, or PostCSS extraction step is required; importing an owner-local `*.css.ts` file emits its CSS and importing the public theme module emits global variables.
 - `[PI-3]` **Owners choose presentation** — a component owns color, typography, borders, radius, shadow, internal spacing, interaction state, and its finite recipe variants. A feature owns a genuinely feature-specific surface; its parent owns external margins, positioning, grid spans, and sibling gaps.
 - `[PI-4]` **Public props express intent** — content, behavior, accessibility, and demonstrated finite presentation or local-layout choices are allowed. Each presentation choice corresponds to actual callers and has a story.
@@ -55,9 +56,8 @@ application.
 `packages/design-system/src/theme/index.ts` is the sole public theme API, exported as
 `@recipe-organizer/design-system/theme`; the former `./tokens` and `./tokens/spacing` public subpaths
 are removed. It merges `theme.spacing` with the typed variables from the internal `tokens.css.ts`
-contract. Its camel-case categories map to established kebab-case CSS
-variables, such as `theme.fontSizes.sm` → `var(--font-sizes-sm)`. `theme.spacing` is an ordinary
-function that accepts one to four numbers and returns CSS shorthand values using `calc(4px * n)`, such
+contract. Its camel-case categories and literal token keys produce native Vanilla Extract scoped
+variables; their generated references and names are internal implementation details. `theme.spacing` is an ordinary function that accepts one to four numbers and returns CSS shorthand values using `calc(4px * n)`, such
 as `theme.spacing(1, 2.5)` → `'calc(4px * 1) calc(4px * 2.5)'`. Zero, fractional, and negative
 multipliers are supported. It replaces the fixed `sizes` and `spacing` scales; percentages and
 safe-area values remain native CSS. It is not a Vanilla Extract function serializer. Length tokens use
@@ -179,6 +179,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-17 | Generalize subtle color roles and source all dark overrides from primitives. | §6.1              | Remove badge-specific naming and reuse the private palette without visual changes.     |
 | 2026-09-17 | Move shared reset and base rules into global Vanilla Extract styles.         | §6.1              | Use typed theme references while preserving cascade and reduced-motion behavior.       |
 | 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`.                         | §6.1              | Keep shared global styles in one module and public entrypoint.                         |
+| 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.            | §3, §4, §6.1      | Keep generated raw variable names internal to the typed theme contract.                |
 
 ## 8. Open Questions
 
