@@ -3,13 +3,13 @@ import { style, globalStyle } from '@vanilla-extract/css'
 
 export const element = style({
   alignItems: 'center',
-  backgroundColor: theme.colors.background,
-  borderColor: theme.colors.border,
-  borderTopWidth: '1px',
+  backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 4%, ${theme.colors.background})`,
+  boxShadow: `0 -1px 3px color-mix(in srgb, ${theme.colors.shadow} 6%, transparent)`,
   bottom: theme.spacing(0),
   display: 'flex',
-  height: theme.spacing(14),
-  paddingInline: theme.spacing(4),
+  height: `calc(${theme.spacing(16)} + env(safe-area-inset-bottom, 0px))`,
+  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+  paddingInline: theme.spacing(2),
   position: 'fixed',
   width: '100%',
   zIndex: 10,
@@ -23,44 +23,74 @@ export const element = style({
 export const tabBarItemClassName = style({
   selectors: {
     '&[aria-current=page]': {
-      color: theme.colors.primary,
+      color: theme.colors['secondary-foreground'],
+      fontWeight: theme.fontWeights.semibold,
     },
-    '&:is(:active, [data-active])': {
-      transform: 'scale(0.97)',
+    '&:is(:focus-visible, [data-focus-visible])': {
+      outline: `2px solid ${theme.colors.ring}`,
+      outlineOffset: '-2px',
     },
   },
   alignItems: 'center',
-  color: theme.colors['muted-foreground'],
+  borderRadius: theme.radii.xl,
+  color: `color-mix(in srgb, ${theme.colors.foreground} 80%, ${theme.colors.background})`,
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
   fontSize: theme.fontSizes.xs,
-  fontWeight: theme.fontWeights.semibold,
+  fontWeight: theme.fontWeights.medium,
   gap: theme.spacing(1),
-  height: theme.spacing(12),
+  height: theme.spacing(14),
   justifyContent: 'center',
-  vars: {
-    '--transition-duration': '150ms',
-    '--transition-prop': 'color, transform',
-    '--transition-easing': theme.easings['out-snappy'],
-  },
-  transitionDuration: '150ms',
-  transitionProperty: 'color, transform',
-  transitionTimingFunction: theme.easings['out-snappy'],
+  lineHeight: theme.lineHeights.snug,
+  minWidth: 0,
+  transition: `color 150ms ${theme.easings['in-out']}`,
 })
 
 export const iconSlotClassName = style({
+  alignItems: 'center',
+  borderRadius: theme.radii.full,
+  display: 'flex',
+  flexShrink: 0,
+  height: theme.spacing(8),
+  justifyContent: 'center',
+  maxWidth: '100%',
+  position: 'relative',
+  width: theme.spacing(16),
+  selectors: {
+    '&::before': {
+      backgroundColor: 'currentColor',
+      borderRadius: 'inherit',
+      content: '""',
+      inset: 0,
+      opacity: 0,
+      pointerEvents: 'none',
+      position: 'absolute',
+      transition: `opacity 150ms ${theme.easings['in-out']}`,
+    },
+    [`${tabBarItemClassName}:hover &::before`]: {
+      '@media': {
+        '(hover: hover) and (pointer: fine)': {
+          opacity: 0.08,
+        },
+      },
+    },
+    [`${tabBarItemClassName}:is(:focus-visible, [data-focus-visible], :active, [data-active]) &::before`]: {
+      opacity: 0.12,
+    },
+  },
   vars: {
     '--owner-icon-size': '24px',
   },
 })
 
 export const activeIconSlotClassName = style({
+  backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 16%, ${theme.colors.background})`,
   display: 'none',
 })
 
 globalStyle(`.${tabBarItemClassName}[aria-current=page] [data-slot=tab-bar-item-icon-active]`, {
-  display: 'inline',
+  display: 'flex',
 })
 
 globalStyle(`.${tabBarItemClassName}[aria-current=page] [data-slot=tab-bar-item-icon-inactive]`, {

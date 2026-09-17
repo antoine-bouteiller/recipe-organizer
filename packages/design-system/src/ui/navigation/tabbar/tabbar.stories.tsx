@@ -1,7 +1,9 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
-import { expect, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 
+import { GearIcon } from '../../data-display/icons/gear'
 import { HouseIcon } from '../../data-display/icons/house'
+import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
 import { ShoppingCartSimpleIcon } from '../../data-display/icons/shopping-cart-simple'
 import { TabBar, TabBarItem } from './tabbar'
 
@@ -15,6 +17,12 @@ const TabBarExample = (): React.ReactElement => (
       </TabBarItem>
       <TabBarItem activeIcon={<ShoppingCartSimpleIcon weight="fill" />} href="/shopping-list" icon={<ShoppingCartSimpleIcon />}>
         Shopping
+      </TabBarItem>
+      <TabBarItem activeIcon={<MagnifyingGlassIcon weight="bold" />} href="/search" icon={<MagnifyingGlassIcon />}>
+        Search
+      </TabBarItem>
+      <TabBarItem activeIcon={<GearIcon weight="fill" />} href="/settings" icon={<GearIcon />}>
+        Settings
       </TabBarItem>
     </TabBar>
   </div>
@@ -34,6 +42,19 @@ export const Mobile: Story = {
 
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
     await expect(activeLink).toHaveAttribute('data-slot', 'tab-bar-item')
-    await expect(canvas.getByRole('link', { name: 'Shopping' }).getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
+    await expect(canvas.getByRole('link', { name: 'Settings' }).getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
+    await expect(activeLink.querySelector('[data-slot=tab-bar-item-icon-active]')).toBeVisible()
+    await expect(activeLink.querySelector('[data-slot=tab-bar-item-icon-inactive]')).not.toBeVisible()
+    const shoppingLink = canvas.getByRole('link', { name: 'Shopping' })
+    await expect(shoppingLink.querySelector('[data-slot=tab-bar-item-icon-active]')).not.toBeVisible()
+    await expect(shoppingLink.querySelector('[data-slot=tab-bar-item-icon-inactive]')).toBeVisible()
+    await userEvent.tab()
+    await expect(activeLink).toHaveFocus()
+    await expect(getComputedStyle(activeLink).outlineStyle).toBe('solid')
   },
+}
+
+export const MobileDark: Story = {
+  ...Mobile,
+  globals: { ...Mobile.globals, theme: 'dark' },
 }
