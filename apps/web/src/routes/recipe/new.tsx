@@ -16,7 +16,7 @@ import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
 
-import * as styles from './-new.css'
+import * as styles from './new.css'
 
 const NewRecipePage = () => {
   const router = useRouter()

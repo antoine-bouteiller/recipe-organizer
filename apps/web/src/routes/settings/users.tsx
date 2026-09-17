@@ -13,7 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
-import * as styles from './-users.css'
+import * as styles from './users.css'
 
 const USER_TABS = ['active', 'pending', 'blocked'] as const
 

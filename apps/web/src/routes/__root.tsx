@@ -6,7 +6,7 @@ import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useLayoutEffect } from 'react'
 
-import * as styles from './-root.css'
+import * as styles from './root.css'
 
 const SearchBar = lazy(() => import('@client/features/recipe/components/search-bar'))
 

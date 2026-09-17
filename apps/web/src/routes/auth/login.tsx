@@ -8,7 +8,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import * as z from 'zod'
 
-import * as styles from './-login.css'
+import * as styles from './login.css'
 
 const searchSchema = z.object({ error: z.string().optional() })
 

@@ -21,7 +21,7 @@ import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
 import * as z from 'zod'
 
-import * as styles from './-edit.$id.css'
+import * as styles from './edit.$id.css'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   _key: Math.random().toString(36).substring(7),

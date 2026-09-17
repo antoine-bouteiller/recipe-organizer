@@ -11,7 +11,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
-import * as styles from './-index.css'
+import * as styles from './index.css'
 
 const searchSchema = z.object({
   search: z.boolean().optional(),

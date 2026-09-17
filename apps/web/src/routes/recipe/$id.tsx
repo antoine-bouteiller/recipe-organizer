@@ -21,7 +21,7 @@ import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
-import * as styles from './-$id.css'
+import * as styles from './$id.css'
 
 const RecipeDetailsSkeleton = () => {
   const { id } = Route.useParams()

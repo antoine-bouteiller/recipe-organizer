@@ -10,7 +10,7 @@ import { UserIcon } from '@recipe-organizer/design-system/icons/user'
 import { UsersIcon } from '@recipe-organizer/design-system/icons/users'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-import * as styles from './-index.css'
+import * as styles from './index.css'
 
 interface SettingsSection {
   adminOnly?: boolean

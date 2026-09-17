@@ -27,6 +27,7 @@ const viteConfig = defineConfig({
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
+      routeFileIgnorePattern: '\\.css\\.ts$',
     }),
     react({ compiler: true }),
   ],

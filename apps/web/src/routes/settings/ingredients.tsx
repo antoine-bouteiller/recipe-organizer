@@ -13,7 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
-import * as styles from './-ingredients.css'
+import * as styles from './ingredients.css'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())

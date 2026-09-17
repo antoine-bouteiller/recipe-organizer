@@ -5,7 +5,7 @@ import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 
-import * as styles from './-account.css'
+import * as styles from './account.css'
 
 const RouteComponent = () => {
   const { authUser } = Route.useRouteContext()
