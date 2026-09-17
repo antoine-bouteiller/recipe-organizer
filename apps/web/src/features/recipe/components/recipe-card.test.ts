@@ -34,13 +34,15 @@ describe('recipe card image loading', () => {
     expect(markup).toMatch(/<img[^>]*decoding="async"[^>]*loading="eager"/)
   })
 
-  it('lazily loads the recipe grid image at index 6 with asynchronous decoding', () => {
+  it('renders a single article with separate navigation and controls and a lazy image at index 6', () => {
     const markup = renderToStaticMarkup(
       // oxlint-disable-next-line react/no-children-prop -- JSX is unavailable in .test.ts.
       createElement(TestRouterContextProvider, { children: createElement(RecipeCard, { index: 6, recipe }), router })
     )
 
     expect(markup).toMatch(/<img[^>]*decoding="async"[^>]*loading="lazy"/)
+    expect(markup).toMatch(/^<article[^>]*><img[^>]*\/><a[^>]*href="\/recipe\/1"/)
+    expect(markup).toMatch(/<\/a><button\b.*<\/button><\/article>$/)
   })
 
   it('eagerly loads the search image at index 5 with asynchronous decoding', () => {
