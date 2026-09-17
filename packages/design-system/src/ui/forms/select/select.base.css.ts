@@ -45,7 +45,7 @@ export const list = style({
   padding: theme.spacing(1),
 })
 
-export const arrow = style({
+const arrow = style({
   alignItems: 'center',
   cursor: 'default',
   display: 'flex',
@@ -56,37 +56,43 @@ export const arrow = style({
   zIndex: 50,
 })
 
-export const scrollUpArrow = style({
-  selectors: {
-    '&::before': {
-      backgroundImage: `linear-gradient(to bottom, ${theme.colors.popover} 50%, transparent)`,
-      borderStartEndRadius: `calc(${theme.radii.lg} - 1px)`,
-      borderStartStartRadius: `calc(${theme.radii.lg} - 1px)`,
-      content: '""',
-      height: '200%',
-      insetInline: '1px',
-      pointerEvents: 'none',
-      position: 'absolute',
-      top: '1px',
+export const scrollUpArrow = style([
+  arrow,
+  {
+    selectors: {
+      '&::before': {
+        backgroundImage: `linear-gradient(to bottom, ${theme.colors.popover} 50%, transparent)`,
+        borderStartEndRadius: `calc(${theme.radii.lg} - 1px)`,
+        borderStartStartRadius: `calc(${theme.radii.lg} - 1px)`,
+        content: '""',
+        height: '200%',
+        insetInline: '1px',
+        pointerEvents: 'none',
+        position: 'absolute',
+        top: '1px',
+      },
     },
   },
-})
+])
 
-export const scrollDownArrow = style({
-  selectors: {
-    '&::before': {
-      backgroundImage: `linear-gradient(to top, ${theme.colors.popover} 50%, transparent)`,
-      borderEndEndRadius: `calc(${theme.radii.lg} - 1px)`,
-      borderEndStartRadius: `calc(${theme.radii.lg} - 1px)`,
-      bottom: '1px',
-      content: '""',
-      height: '200%',
-      insetInline: '1px',
-      pointerEvents: 'none',
-      position: 'absolute',
+export const scrollDownArrow = style([
+  arrow,
+  {
+    selectors: {
+      '&::before': {
+        backgroundImage: `linear-gradient(to top, ${theme.colors.popover} 50%, transparent)`,
+        borderEndEndRadius: `calc(${theme.radii.lg} - 1px)`,
+        borderEndStartRadius: `calc(${theme.radii.lg} - 1px)`,
+        bottom: '1px',
+        content: '""',
+        height: '200%',
+        insetInline: '1px',
+        pointerEvents: 'none',
+        position: 'absolute',
+      },
     },
   },
-})
+])
 
 export const item = style({
   selectors: {

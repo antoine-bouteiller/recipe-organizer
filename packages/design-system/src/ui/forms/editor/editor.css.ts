@@ -1,11 +1,11 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { style, globalStyle } from '@vanilla-extract/css'
+import { style, styleVariants, globalStyle } from '@vanilla-extract/css'
 
 export const editorUnderline = style({
   textDecoration: 'underline',
 })
 
-export const editorContentBase = style({
+const editorContentBase = style({
   color: 'oklch(0.373 0.034 259.733)',
   fontFamily: theme.fonts.sans,
   fontSize: theme.fontSizes.sm,
@@ -28,16 +28,12 @@ export const editorCheckedListItem = style({
   textDecoration: 'line-through',
 })
 
-export const editorContentFull = style({
-  width: '100%',
+export const editorContent = styleVariants({
+  full: [editorContentBase, { width: '100%' }],
+  reading: [editorContentBase, { maxWidth: '65ch', width: '100%' }],
 })
 
-export const editorContentReading = style({
-  maxWidth: '65ch',
-  width: '100%',
-})
-
-export const editorContentEditable = style({
+const editable = style({
   selectors: {
     '&[aria-disabled=true]': {
       opacity: '64%',
@@ -62,6 +58,11 @@ export const editorContentEditable = style({
   padding: theme.spacing(4),
   boxShadow: theme.shadows.xs,
   transition: 'box-shadow 150ms',
+})
+
+export const editorContentEditable = styleVariants({
+  full: [editorContent.full, editable],
+  reading: [editorContent.reading, editable],
 })
 
 globalStyle(`.${editorContentBase} > :not([data-editor-decorator]) :where(a)`, {

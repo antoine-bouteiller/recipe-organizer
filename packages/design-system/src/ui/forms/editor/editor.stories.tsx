@@ -98,6 +98,14 @@ const ReadOnlyEditor = (): ReactElement => (
   </section>
 )
 
+const ReadingWidthEditor = (): ReactElement => (
+  <section aria-label="Recipe notes with reading width">
+    <Editor content={initialContent}>
+      <EditorContent width="reading" />
+    </Editor>
+  </section>
+)
+
 const NestedEditor = (): ReactElement => (
   <div data-editor-decorator="">
     <button type="button">Decorator action</button>
@@ -130,6 +138,9 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Read Only">
         <ReadOnlyEditor />
+      </StorySection>
+      <StorySection title="Reading Width">
+        <ReadingWidthEditor />
       </StorySection>
     </div>
   ),

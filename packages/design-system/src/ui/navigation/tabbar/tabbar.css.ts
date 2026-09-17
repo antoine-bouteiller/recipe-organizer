@@ -84,10 +84,13 @@ export const iconSlot = style({
   },
 })
 
-export const activeIconSlot = style({
-  backgroundColor: theme.colors.accent,
-  display: 'none',
-})
+export const activeIconSlot = style([
+  iconSlot,
+  {
+    backgroundColor: theme.colors.accent,
+    display: 'none',
+  },
+])
 
 globalStyle(`.${tabBarItem}[aria-current=page] [data-slot=tab-bar-item-icon-active]`, {
   display: 'flex',

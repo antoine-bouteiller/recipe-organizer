@@ -26,7 +26,7 @@ export const TabBarItem = ({ activeIcon, children, icon, render, ...props }: Tab
           <span aria-hidden="true" className={styles.iconSlot} data-slot="tab-bar-item-icon-inactive">
             {icon}
           </span>
-          <span aria-hidden="true" className={`${styles.iconSlot} ${styles.activeIconSlot}`} data-slot="tab-bar-item-icon-active">
+          <span aria-hidden="true" className={styles.activeIconSlot} data-slot="tab-bar-item-icon-active">
             {activeIcon}
           </span>
           {children}

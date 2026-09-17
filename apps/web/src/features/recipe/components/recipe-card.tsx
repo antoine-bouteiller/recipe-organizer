@@ -38,7 +38,7 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
   const animate = useEntranceAnimation()
 
   return (
-    <article className={[styles.card, animate && 'stagger-in-35'].filter(Boolean).join(' ')} style={animate ? staggerStyle(index, 6) : undefined}>
+    <article className={animate ? styles.animatedCard : styles.card} style={animate ? staggerStyle(index, 6) : undefined}>
       <img src={recipe.image} alt={recipe.name} className={styles.image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
       <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition className={styles.recipeLink}>
         <div className={styles.tags}>

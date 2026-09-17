@@ -31,7 +31,7 @@ const SelectPopup = ({ children, ...props }: SelectPrimitive.Popup.Props): React
       sideOffset={4}
     >
       <SelectPrimitive.Popup className={styles.popup} data-slot="select-popup" {...props}>
-        <SelectPrimitive.ScrollUpArrow className={`${styles.arrow} ${styles.scrollUpArrow}`} data-slot="select-scroll-up-arrow">
+        <SelectPrimitive.ScrollUpArrow className={styles.scrollUpArrow} data-slot="select-scroll-up-arrow">
           <span className={styles.icon}>
             <CaretUpIcon />
           </span>
@@ -41,7 +41,7 @@ const SelectPopup = ({ children, ...props }: SelectPrimitive.Popup.Props): React
             {children}
           </SelectPrimitive.List>
         </div>
-        <SelectPrimitive.ScrollDownArrow className={`${styles.arrow} ${styles.scrollDownArrow}`} data-slot="select-scroll-down-arrow">
+        <SelectPrimitive.ScrollDownArrow className={styles.scrollDownArrow} data-slot="select-scroll-down-arrow">
           <span className={styles.icon}>
             <CaretDownIcon />
           </span>

@@ -43,6 +43,8 @@ export const card = style({
   },
 })
 
+export const animatedCard = style([card, 'stagger-in-35'])
+
 export const image = style({
   ...cardCorners,
   height: '100%',

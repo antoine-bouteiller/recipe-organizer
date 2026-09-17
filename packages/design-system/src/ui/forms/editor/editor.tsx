@@ -157,13 +157,12 @@ const EditorContent = ({ disabled, width = 'full' }: EditorContentProps) => {
   useLayoutEffect(() => {
     editor.setEditable(!disabled && initiallyEditable)
   }, [disabled, editor, initiallyEditable])
-  const contentWidth = width === 'reading' ? styles.editorContentReading : styles.editorContentFull
-  const editable = initiallyEditable ? ` ${styles.editorContentEditable}` : ''
+  const contentStyle = initiallyEditable ? styles.editorContentEditable : styles.editorContent
   return (
     <ContentEditable
       aria-disabled={disabled || undefined}
       aria-readonly={disabled || !editor.isEditable() || undefined}
-      className={`${styles.editorContentBase} ${contentWidth}${editable}`}
+      className={contentStyle[width]}
       data-editor-content=""
     />
   )

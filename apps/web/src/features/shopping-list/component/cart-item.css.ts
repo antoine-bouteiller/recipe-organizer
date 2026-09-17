@@ -11,7 +11,7 @@ export const item = style({
   textAlign: 'left',
   width: '100%',
 })
-export const check = style({
+const checkBase = style({
   alignItems: 'center',
   borderColor: `color-mix(in srgb, ${theme.colors['muted-foreground']} 40%, transparent)`,
   borderRadius: theme.radii.full,
@@ -23,12 +23,15 @@ export const check = style({
   justifyContent: 'center',
   width: '22px',
 })
-export const checkState = styleVariants({
-  checked: { background: theme.colors.primary, borderColor: theme.colors.primary, color: theme.colors['primary-foreground'] },
-  unchecked: {},
+export const check = styleVariants({
+  checked: [checkBase, { background: theme.colors.primary, borderColor: theme.colors.primary, color: theme.colors['primary-foreground'] }],
+  unchecked: [checkBase],
 })
-export const details = style({ alignItems: 'center', display: 'flex', flex: '1', gap: '8px', justifyContent: 'space-between' })
-export const detailsState = styleVariants({ checked: { color: theme.colors['muted-foreground'], textDecoration: 'line-through' }, unchecked: {} })
+const detailsBase = style({ alignItems: 'center', display: 'flex', flex: '1', gap: '8px', justifyContent: 'space-between' })
+export const details = styleVariants({
+  checked: [detailsBase, { color: theme.colors['muted-foreground'], textDecoration: 'line-through' }],
+  unchecked: [detailsBase],
+})
 export const quantities = style({
   alignItems: 'flex-end',
   color: theme.colors['muted-foreground'],

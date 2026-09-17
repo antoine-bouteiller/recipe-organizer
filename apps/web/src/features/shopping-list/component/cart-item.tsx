@@ -23,10 +23,8 @@ export const CartItem = ({ ingredient }: CartItemProps) => {
 
   return (
     <button type="button" onClick={() => setIsChecked((checked) => !checked)} className={styles.item}>
-      <span className={`${styles.check} ${styles.checkState[isChecked ? 'checked' : 'unchecked']}`}>
-        {isChecked && <CheckIcon size="xs" weight="bold" />}
-      </span>
-      <span className={`${styles.details} ${styles.detailsState[isChecked ? 'checked' : 'unchecked']}`}>
+      <span className={styles.check[isChecked ? 'checked' : 'unchecked']}>{isChecked && <CheckIcon size="xs" weight="bold" />}</span>
+      <span className={styles.details[isChecked ? 'checked' : 'unchecked']}>
         <span>{ingredient.name}</span>
         <span className={styles.quantities}>
           <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>

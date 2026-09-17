@@ -15,9 +15,9 @@ export interface RecipeSearchCardProps {
 }
 
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
-  <div className={`${styles.container} stagger-in-45`} style={staggerStyle(index, 10)}>
+  <div className={styles.container} style={staggerStyle(index, 10)}>
     <Link
-      className={`${styles.card} ${styles.cardPadding[action ? 'withAction' : 'withoutAction']}`}
+      className={styles.card[action ? 'withAction' : 'withoutAction']}
       onClick={() => addRecentRecipe(recipe.id)}
       params={{ id: recipe.id.toString() }}
       to="/recipe/$id"
