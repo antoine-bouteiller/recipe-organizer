@@ -87,7 +87,8 @@ export const iconSlot = style({
 export const activeIconSlot = style([
   iconSlot,
   {
-    backgroundColor: theme.colors.accent,
+    backgroundColor: theme.colors.primary,
+    color: `color-mix(in srgb, ${theme.colors.primary} 15%, ${theme.colors['primary-foreground']})`,
     display: 'none',
   },
 ])
