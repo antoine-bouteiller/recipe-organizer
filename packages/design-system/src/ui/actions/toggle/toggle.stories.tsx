@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Toggle } from './toggle'
 
-import { container } from './toggle.stories.css'
+import * as styles from './toggle.stories.css'
 
 const meta = {
   args: { 'aria-label': 'Bold text', children: 'Bold' },
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <Toggle {...args} />
       </StorySection>

@@ -1,6 +1,6 @@
 import { recipe } from '@vanilla-extract/recipes'
 
-export const spinnerRecipe = recipe({
+export const spinner = recipe({
   base: {
     animation: 'spin 1s linear infinite',
   },

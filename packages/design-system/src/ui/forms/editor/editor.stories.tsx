@@ -12,7 +12,7 @@ import { TextItalicIcon } from '../../data-display/icons/text-italic'
 import { TextUnderlineIcon } from '../../data-display/icons/text-underline'
 import { Editor, EditorContent, EditorToolbarButton } from './editor'
 
-import { storyStack, storyOutput, storySections } from './editor.stories.css'
+import * as styles from './editor.stories.css'
 
 const initialContent = JSON.stringify({
   root: {
@@ -78,14 +78,14 @@ const ControlledEditor = (): ReactElement => {
   const [content, setContent] = useState(initialContent)
 
   return (
-    <div className={storyStack}>
+    <div className={styles.storyStack}>
       <section aria-label="Recipe notes editor">
         <Editor content={initialContent} onChange={setContent}>
           <EditorToolbar />
           <EditorContent />
         </Editor>
       </section>
-      <output className={storyOutput}>{content}</output>
+      <output className={styles.storyOutput}>{content}</output>
     </div>
   )
 }
@@ -124,7 +124,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={storySections}>
+    <div className={styles.storySections}>
       <StorySection title="Controlled">
         <ControlledEditor />
       </StorySection>

@@ -17,7 +17,7 @@ import {
   CommandPanel,
 } from './command'
 
-import { container } from './command.stories.css'
+import * as styles from './command.stories.css'
 
 const recipes = ['Apple tart', 'Mushroom risotto', 'Tomato soup']
 
@@ -61,7 +61,7 @@ export const Overview: Story = {
     await userEvent.keyboard('{Escape}')
   },
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <CommandExample />
       </StorySection>

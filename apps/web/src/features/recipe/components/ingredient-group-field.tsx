@@ -12,7 +12,7 @@ import { Fragment } from 'react/jsx-runtime'
 
 import { recipeDefaultValues } from '../utils/form'
 
-import { container, container2, container3, container4 } from './ingredient-group-field.css'
+import * as styles from './ingredient-group-field.css'
 
 interface IngredientFormProps {
   groupIndex: number
@@ -34,12 +34,12 @@ export const IngredientGroupField = withForm({
     return (
       <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
         {(field) => (
-          <div className={container}>
+          <div className={styles.container}>
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
               <Fragment key={ingredient._key}>
-                <div className={container2}>
-                  <div className={container3}>
+                <div className={styles.container2}>
+                  <div className={styles.container3}>
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
@@ -68,7 +68,7 @@ export const IngredientGroupField = withForm({
                     <TrashIcon size="sm" />
                   </Button>
                 </div>
-                <div className={container4}>
+                <div className={styles.container4}>
                   <Separator />
                 </div>
               </Fragment>

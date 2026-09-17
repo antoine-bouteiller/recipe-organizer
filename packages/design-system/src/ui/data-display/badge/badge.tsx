@@ -1,12 +1,12 @@
 import { type RecipeVariants } from '@vanilla-extract/recipes'
 import type React from 'react'
 
-import { badgeRecipe } from './badge.css'
+import * as styles from './badge.css'
 
-export type BadgeProps = Pick<React.ComponentProps<'span'>, 'children'> & RecipeVariants<typeof badgeRecipe>
+export type BadgeProps = Pick<React.ComponentProps<'span'>, 'children'> & RecipeVariants<typeof styles.badge>
 
 export const Badge = ({ children, size, variant }: BadgeProps): React.ReactElement => (
-  <span className={badgeRecipe({ size, variant })} data-slot="badge">
+  <span className={styles.badge({ size, variant })} data-slot="badge">
     {children}
   </span>
 )

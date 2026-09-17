@@ -1,16 +1,16 @@
 import type React from 'react'
 
-import { kbdRecipe, groupRecipe } from './kbd.css'
+import * as styles from './kbd.css'
 
 export type KbdProps = Pick<React.ComponentProps<'kbd'>, 'children'>
 
 export const Kbd = ({ children }: KbdProps): React.ReactElement => (
-  <kbd className={kbdRecipe()} data-slot="kbd">
+  <kbd className={styles.kbd()} data-slot="kbd">
     {children}
   </kbd>
 )
 export const KbdGroup = ({ children }: KbdProps): React.ReactElement => (
-  <kbd className={groupRecipe()} data-slot="kbd-group">
+  <kbd className={styles.group()} data-slot="kbd-group">
     {children}
   </kbd>
 )

@@ -1,5 +1,5 @@
 import { spacing } from './spacing'
 
-import { vars } from './tokens.css'
+import * as styles from './tokens.css'
 
-export const theme = { spacing, ...vars }
+export const theme = { spacing, ...styles.vars }

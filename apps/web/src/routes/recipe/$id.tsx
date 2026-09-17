@@ -21,25 +21,7 @@ import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
-import {
-  container,
-  container2,
-  container3,
-  container4,
-  heading,
-  container5,
-  container6,
-  container7,
-  container8,
-  container9,
-  container10,
-  container11,
-  section,
-  heading2,
-  section2,
-  heading3,
-  container12,
-} from './-$id.css'
+import * as styles from './-$id.css'
 
 const RecipeDetailsSkeleton = () => {
   const { id } = Route.useParams()
@@ -48,10 +30,10 @@ const RecipeDetailsSkeleton = () => {
 
   return (
     <ScreenLayout title={recipe?.name ?? ''} withGoBack backgroundImage={recipe?.image}>
-      <div className={container}>
+      <div className={styles.container}>
         <Skeleton preset="recipe-details-title" />
       </div>
-      <div className={container2}>
+      <div className={styles.container2}>
         {incrementalArray({ length: 6 }).map((index) => (
           <Skeleton preset="recipe-details-text" key={index} />
         ))}
@@ -67,7 +49,7 @@ const RecipePage = () => {
 
   if (isLoading) {
     return (
-      <div className={container3}>
+      <div className={styles.container3}>
         <Spinner />
       </div>
     )
@@ -107,7 +89,7 @@ const RecipePage = () => {
               </Button>
             }
           >
-            <div className={container4}>
+            <div className={styles.container4}>
               <Button
                 align="start"
                 render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
@@ -123,9 +105,9 @@ const RecipePage = () => {
         )
       }
     >
-      <h1 className={heading}>{recipe.name}</h1>
+      <h1 className={styles.heading}>{recipe.name}</h1>
       {metaTags.length > 0 && (
-        <div className={container5}>
+        <div className={styles.container5}>
           {metaTags.map((label) => (
             <Badge key={label} size="sm" variant="eyebrow">
               {label}
@@ -133,12 +115,12 @@ const RecipePage = () => {
           ))}
         </div>
       )}
-      <div className={container6}>
+      <div className={styles.container6}>
         <QuantityControls recipeId={id} servings={recipe.servings} />
       </div>
 
-      <div className={container7}>
-        <div className={container8}>
+      <div className={styles.container7}>
+        <div className={styles.container8}>
           <SwipeTabs defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
             <TabsList width="full">
               <TabsTab value="ingredients">Ingrédients</TabsTab>
@@ -146,7 +128,7 @@ const RecipePage = () => {
             </TabsList>
             <SwipeTabsPanels>
               <SwipeTabsPanel value="ingredients">
-                <div className={container9}>
+                <div className={styles.container9}>
                   <RecipeIngredientGroups
                     recipeId={recipe.id}
                     baseServings={recipe.servings}
@@ -156,7 +138,7 @@ const RecipePage = () => {
                 </div>
               </SwipeTabsPanel>
               <SwipeTabsPanel value="preparation">
-                <div className={container10}>
+                <div className={styles.container10}>
                   <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
                     <EditorContent width="reading" />
                   </Editor>
@@ -166,15 +148,15 @@ const RecipePage = () => {
           </SwipeTabs>
         </div>
 
-        <div className={container11}>
-          <section className={section}>
-            <h2 className={heading2}>Ingrédients</h2>
+        <div className={styles.container11}>
+          <section className={styles.section}>
+            <h2 className={styles.heading2}>Ingrédients</h2>
             <RecipeIngredientGroups recipeId={id} baseServings={recipe.servings} ingredientGroups={ingredientGroups} presentation="embedded" />
           </section>
 
-          <section className={section2}>
-            <h2 className={heading3}>Préparation</h2>
-            <div className={container12}>
+          <section className={styles.section2}>
+            <h2 className={styles.heading3}>Préparation</h2>
+            <div className={styles.container12}>
               <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
                 <EditorContent width="reading" />
               </Editor>

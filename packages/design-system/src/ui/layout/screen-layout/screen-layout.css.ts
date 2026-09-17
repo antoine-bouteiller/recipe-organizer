@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const screenRecipe = recipe({
+export const screen = recipe({
   base: {
     alignItems: 'center',
     backgroundColor: theme.colors.muted,
@@ -21,7 +21,7 @@ export const screenRecipe = recipe({
   },
 })
 
-export const contentRecipe = recipe({
+export const content = recipe({
   base: {
     backgroundColor: theme.colors.muted,
     display: 'flex',
@@ -64,7 +64,7 @@ export const contentRecipe = recipe({
   },
 })
 
-export const imageHeaderRecipe = recipe({
+export const imageHeader = recipe({
   base: {
     alignItems: 'center',
     background: `linear-gradient(to bottom, #0d3b42, ${theme.colors.primary})`,
@@ -86,7 +86,7 @@ export const imageHeaderRecipe = recipe({
   },
 })
 
-export const headerRecipe = recipe({
+export const header = recipe({
   base: {
     alignItems: 'center',
     backgroundColor: theme.colors.muted,
@@ -110,7 +110,7 @@ export const headerRecipe = recipe({
   },
 })
 
-export const imageRecipe = recipe({
+export const image = recipe({
   base: {
     height: '100%',
     inset: theme.spacing(0),
@@ -121,7 +121,7 @@ export const imageRecipe = recipe({
   },
 })
 
-export const imageOverlayRecipe = recipe({
+export const imageOverlay = recipe({
   base: {
     background: 'linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1))',
     inset: theme.spacing(0),
@@ -129,7 +129,7 @@ export const imageOverlayRecipe = recipe({
   },
 })
 
-export const imageBackRecipe = recipe({
+export const imageBack = recipe({
   base: {
     vars: {
       '--owner-icon-size': '16px',
@@ -141,7 +141,7 @@ export const imageBackRecipe = recipe({
   },
 })
 
-export const imageTitleRecipe = recipe({
+export const imageTitle = recipe({
   base: {
     flex: '1 1 0%',
     fontFamily: theme.fonts.heading,
@@ -157,21 +157,21 @@ export const imageTitleRecipe = recipe({
   },
 })
 
-export const imageActionRecipe = recipe({
+export const imageAction = recipe({
   base: {
     position: 'relative',
     zIndex: 10,
   },
 })
 
-export const headerActionRecipe = recipe({
+export const headerAction = recipe({
   base: {
     marginInlineStart: 'auto',
     pointerEvents: 'auto',
   },
 })
 
-export const titleRecipe = recipe({
+export const title = recipe({
   base: {
     fontFamily: theme.fonts.heading,
     fontSize: theme.fontSizes['3xl'],

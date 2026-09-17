@@ -7,7 +7,7 @@ import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 
-import { text, text2, container, container2, text3, container3, container4 } from './search-results.css'
+import * as styles from './search-results.css'
 
 export interface SearchResultsProps {
   recipes: ReducedRecipe[]
@@ -19,14 +19,14 @@ const ResultAddButton = ({ recipeId }: { recipeId: number }) => {
 
   if (isInShoppingList) {
     return (
-      <span aria-label="Déjà dans la liste" className={text}>
+      <span aria-label="Déjà dans la liste" className={styles.text}>
         <CheckIcon weight="bold" />
       </span>
     )
   }
 
   return (
-    <span className={text2}>
+    <span className={styles.text2}>
       <Button aria-label="Ajouter à la liste" onClick={() => addToShoppingList(recipeId)} size="icon">
         <PlusIcon weight="bold" />
       </Button>
@@ -37,11 +37,11 @@ const ResultAddButton = ({ recipeId }: { recipeId: number }) => {
 export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) => {
   if (recipes.length === 0) {
     return (
-      <div className={container}>
-        <div className={container2}>
+      <div className={styles.container}>
+        <div className={styles.container2}>
           <MagnifyingGlassIcon size="xl" />
         </div>
-        <p className={text3}>Aucune recette ne correspond à votre recherche.</p>
+        <p className={styles.text3}>Aucune recette ne correspond à votre recherche.</p>
         <Button onClick={onClearFilters} variant="outline">
           Effacer les filtres
         </Button>
@@ -50,8 +50,8 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   }
 
   return (
-    <div className={container3}>
-      <div className={container4}>
+    <div className={styles.container3}>
+      <div className={styles.container4}>
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>
       {recipes.map((recipe, index) => (

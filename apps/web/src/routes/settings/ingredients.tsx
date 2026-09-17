@@ -13,7 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
-import { container, text, text2, text3, text4 } from './-ingredients.css'
+import * as styles from './-ingredients.css'
 
 const IngredientsManagement = () => {
   const { data: ingredients } = useSuspenseQuery(getIngredientListOptions())
@@ -28,7 +28,7 @@ const IngredientsManagement = () => {
 
   return (
     <ScreenLayout title="Ingrédients" withGoBack>
-      <div className={container}>
+      <div className={styles.container}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddIngredient>
           <Button aria-label="Ajouter un ingrédient" size="icon-lg" variant="outline">
@@ -38,7 +38,9 @@ const IngredientsManagement = () => {
       </div>
 
       {filteredIngredients.length === 0 ? (
-        <p className={text}>{search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}</p>
+        <p className={styles.text}>
+          {search ? 'Aucun ingrédient trouvé pour cette recherche.' : 'Aucun ingrédient trouvé. Ajoutez-en un pour commencer.'}
+        </p>
       ) : (
         <ItemGroup>
           {filteredIngredients.map((ingredient, index) => (
@@ -55,11 +57,11 @@ const IngredientsManagement = () => {
                 }
                 title={
                   <>
-                    <span className={text2}>{ingredient.name}</span>
-                    <span className={text3}>
+                    <span className={styles.text2}>{ingredient.name}</span>
+                    <span className={styles.text3}>
                       <IngredientBadge category={ingredient.category}>
                         {ingredientCategoryIcons[ingredient.category]}
-                        <span className={text4}>{ingredientCategoryLabels[ingredient.category]}</span>
+                        <span className={styles.text4}>{ingredientCategoryLabels[ingredient.category]}</span>
                       </IngredientBadge>
                     </span>
                   </>

@@ -1,7 +1,7 @@
 import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 import type React from 'react'
 
-import { toggleRecipe } from './toggle.css'
+import * as styles from './toggle.css'
 
 export type ToggleProps = Pick<
   TogglePrimitive.Props,
@@ -12,5 +12,5 @@ export type ToggleProps = Pick<
 }
 
 export const Toggle = ({ presentation, variant, ...props }: ToggleProps): React.ReactElement => (
-  <TogglePrimitive {...props} className={toggleRecipe({ presentation, variant })} data-slot="toggle" />
+  <TogglePrimitive {...props} className={styles.toggle({ presentation, variant })} data-slot="toggle" />
 )

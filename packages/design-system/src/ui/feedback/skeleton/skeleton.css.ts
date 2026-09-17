@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const skeletonRecipe = recipe({
+export const skeleton = recipe({
   base: {
     vars: {
       '--skeleton-highlight': 'color-mix(in srgb, white 64%, transparent)',

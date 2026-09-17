@@ -13,7 +13,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import React, { useState } from 'react'
 
-import { text, text2, container, container2, container3, container4, container5 } from './-users.css'
+import * as styles from './-users.css'
 
 const USER_TABS = ['active', 'pending', 'blocked'] as const
 
@@ -28,7 +28,7 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
   const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
 
   if (filteredUsers.length === 0) {
-    return <p className={text}>{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
+    return <p className={styles.text}>{search ? 'Aucun utilisateur trouvé pour cette recherche.' : emptyLabel}</p>
   }
 
   const showBlockButton = status === 'active' || status === 'pending'
@@ -47,7 +47,7 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
             layout="row"
             title={
               <>
-                <span className={text2}>{userItem.email}</span>
+                <span className={styles.text2}>{userItem.email}</span>
                 <Badge variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels.get(userItem.role)}</Badge>
               </>
             }
@@ -64,7 +64,7 @@ const UsersManagement = () => {
 
   return (
     <ScreenLayout title="Utilisateurs" withGoBack>
-      <div className={container}>
+      <div className={styles.container}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <AddUser>
           <Button aria-label="Ajouter un utilisateur" size="icon-lg" variant="outline">
@@ -73,7 +73,7 @@ const UsersManagement = () => {
         </AddUser>
       </div>
 
-      <div className={container2}>
+      <div className={styles.container2}>
         <SwipeTabs defaultTab="active" tabs={USER_TABS}>
           <TabsList width="full">
             <TabsTab value="active">Actifs</TabsTab>
@@ -82,21 +82,21 @@ const UsersManagement = () => {
           </TabsList>
           <SwipeTabsPanels>
             <SwipeTabsPanel value="active">
-              <div className={container3}>
+              <div className={styles.container3}>
                 <React.Suspense fallback={null}>
                   <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
                 </React.Suspense>
               </div>
             </SwipeTabsPanel>
             <SwipeTabsPanel value="pending">
-              <div className={container4}>
+              <div className={styles.container4}>
                 <React.Suspense fallback={null}>
                   <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
                 </React.Suspense>
               </div>
             </SwipeTabsPanel>
             <SwipeTabsPanel value="blocked">
-              <div className={container5}>
+              <div className={styles.container5}>
                 <React.Suspense fallback={null}>
                   <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
                 </React.Suspense>

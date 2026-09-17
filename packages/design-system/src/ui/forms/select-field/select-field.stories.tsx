@@ -4,7 +4,7 @@ import { type ReactElement } from 'react'
 import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 
-import { container } from './select-field.stories.css'
+import * as styles from './select-field.stories.css'
 
 const items = [
   { label: 'Draft', value: 'draft' },
@@ -29,7 +29,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <SelectFieldExample />
       </StorySection>

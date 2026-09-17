@@ -1,7 +1,7 @@
 import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import type React from 'react'
 
-import { badge } from './ingredient-badge.css'
+import * as styles from './ingredient-badge.css'
 
 export interface IngredientBadgeProps {
   readonly category: IngredientCategory
@@ -10,7 +10,7 @@ export interface IngredientBadgeProps {
 
 /** Domain-owned ingredient category treatment; category colors never bypass the shared Badge contract. */
 export const IngredientBadge = ({ category, children }: IngredientBadgeProps): React.ReactElement => (
-  <span className={badge[category]} data-slot="ingredient-badge">
+  <span className={styles.badge[category]} data-slot="ingredient-badge">
     {children}
   </span>
 )

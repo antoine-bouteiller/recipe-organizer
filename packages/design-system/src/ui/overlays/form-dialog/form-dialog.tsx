@@ -7,7 +7,7 @@ import { formatFormErrors } from '../../../utils/format-form-errors'
 import { Dialog } from '../dialog/dialog'
 import { DialogFormProvider } from '../dialog/dialog-form.private'
 
-import { formClassName, fieldsClassName } from './form-dialog.css'
+import * as styles from './form-dialog.css'
 
 interface FormModalProps {
   children: ReactNode
@@ -32,7 +32,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
           value={{
             wrap: (content) => (
               <FormPrimitive
-                className={formClassName}
+                className={styles.form}
                 errors={errors}
                 onSubmit={async (event) => {
                   event.preventDefault()
@@ -58,7 +58,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
             title={title}
             trigger={trigger}
           >
-            <div className={fieldsClassName}>{children}</div>
+            <div className={styles.fields}>{children}</div>
           </Dialog>
         </DialogFormProvider>
       )

@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const labelClassName = style({
+export const label = style({
   alignItems: 'center',
   color: theme.colors.foreground,
   display: 'inline-flex',

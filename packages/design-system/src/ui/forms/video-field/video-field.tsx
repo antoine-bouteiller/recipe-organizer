@@ -6,23 +6,7 @@ import { XIcon } from '../../data-display/icons/x'
 import { Kbd, KbdGroup } from '../../data-display/kbd/kbd'
 import { Field, FieldError, FieldLabel } from '../field/field'
 
-import {
-  container,
-  container2,
-  container3,
-  text,
-  container4,
-  text2,
-  text3,
-  element,
-  container5,
-  container6,
-  text4,
-  text5,
-  text6,
-  container7,
-  element2,
-} from './video-field.css'
+import * as styles from './video-field.css'
 
 export interface VideoFieldProps {
   disabled?: boolean
@@ -53,21 +37,21 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
       <FieldLabel>{label}</FieldLabel>
       <FieldLabel presentation="dropzone-video">
         {videoFile ? (
-          <div className={container}>
-            <div className={container2}>
-              <div className={container3}>
-                <span className={text}>
+          <div className={styles.container}>
+            <div className={styles.container2}>
+              <div className={styles.container3}>
+                <span className={styles.text}>
                   <VideoIcon size="lg" />
                 </span>
               </div>
-              <div className={container4}>
-                <p className={text2}>{videoFile.file.name || 'Video'}</p>
-                {videoFile.file.size && <p className={text3}>{formatBytes(videoFile.file.size)}</p>}
+              <div className={styles.container4}>
+                <p className={styles.text2}>{videoFile.file.name || 'Video'}</p>
+                {videoFile.file.size && <p className={styles.text3}>{formatBytes(videoFile.file.size)}</p>}
               </div>
             </div>
             <button
               aria-label="Remove video"
-              className={element}
+              className={styles.element}
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -79,15 +63,15 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
             </button>
           </div>
         ) : (
-          <div className={container5}>
-            <div aria-hidden="true" className={container6}>
-              <span className={text4}>
+          <div className={styles.container5}>
+            <div aria-hidden="true" className={styles.container6}>
+              <span className={styles.text4}>
                 <VideoIcon size="sm" />
               </span>
             </div>
-            <p className={text5}>Déposez votre vidéo ou cliquez pour parcourir</p>
-            <p className={text6}>Formats supportés: MP4, WebM, MOV (max 100MB)</p>
-            <div className={container7}>
+            <p className={styles.text5}>Déposez votre vidéo ou cliquez pour parcourir</p>
+            <p className={styles.text6}>Formats supportés: MP4, WebM, MOV (max 100MB)</p>
+            <div className={styles.container7}>
               <KbdGroup>
                 <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
                 <Kbd>V</Kbd>
@@ -96,7 +80,7 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={element2} disabled={disabled} type="file" {...getInputProps()} />
+      <input className={styles.element2} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

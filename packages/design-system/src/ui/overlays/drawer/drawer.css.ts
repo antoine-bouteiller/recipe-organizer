@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const backdropClassName = recipe({
+export const backdrop = recipe({
   base: {
     selectors: {
       '&[data-ending-style]': {
@@ -34,7 +34,7 @@ export const backdropClassName = recipe({
   },
 })
 
-export const viewportClassName = recipe({
+export const viewport = recipe({
   base: {
     vars: {
       '--bleed': theme.spacing(12),
@@ -49,7 +49,7 @@ export const viewportClassName = recipe({
   },
 })
 
-export const popupClassName = recipe({
+export const popup = recipe({
   base: {
     selectors: {
       '&:has([data-slot=drawer-bar])': {
@@ -124,7 +124,7 @@ export const popupClassName = recipe({
   },
 })
 
-export const headerClassName = recipe({
+export const header = recipe({
   base: {
     selectors: {
       '&:has(+ [data-slot=drawer-panel])': {
@@ -144,7 +144,7 @@ export const headerClassName = recipe({
   },
 })
 
-export const footerClassName = recipe({
+export const footer = recipe({
   base: {
     backgroundColor: `color-mix(in srgb, ${theme.colors.muted} 72%, transparent)`,
     borderTopWidth: '1px',
@@ -163,7 +163,7 @@ export const footerClassName = recipe({
   },
 })
 
-export const titleClassName = recipe({
+export const title = recipe({
   base: {
     fontFamily: theme.fonts.heading,
     fontSize: theme.fontSizes.xl,
@@ -172,7 +172,7 @@ export const titleClassName = recipe({
   },
 })
 
-export const panelClassName = recipe({
+export const panel = recipe({
   base: {
     selectors: {
       '[data-slot=drawer-popup]:has([data-slot=drawer-header]) &': {
@@ -183,7 +183,7 @@ export const panelClassName = recipe({
   },
 })
 
-export const barClassName = recipe({
+export const bar = recipe({
   base: {
     selectors: {
       '&::before': {

@@ -6,7 +6,7 @@ import { Combobox } from './combobox'
 import ComboboxBase from './combobox.base'
 import ComboboxDrawer from './combobox.drawer'
 
-import { container } from './combobox.stories.css'
+import * as styles from './combobox.stories.css'
 
 const options = [
   { label: 'Apple', value: 'apple' },
@@ -62,7 +62,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Responsive">
         <ControlledCombobox />
       </StorySection>

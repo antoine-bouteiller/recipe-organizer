@@ -7,19 +7,7 @@ import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 import { type ComboboxImplProps, type ValueOptions } from './combobox'
 import { type Option } from './options'
 
-import {
-  inputGroupClassName,
-  inputClassName,
-  actionClassName,
-  positionerClassName,
-  frameClassName,
-  popupClassName,
-  itemClassName,
-  separatorClassName,
-  emptyClassName,
-  listClassName,
-  addClassName,
-} from './combobox.base.css'
+import * as styles from './combobox.base.css'
 
 const Context = React.createContext<{ chipsRef: React.RefObject<Element | null> | null }>({ chipsRef: null })
 const Root = <Value, Multiple extends boolean | undefined = false>(props: ComboboxPrimitive.Root.Props<Value, Multiple>): React.ReactElement => {
@@ -34,15 +22,15 @@ const Input = ({
   showClear = false,
   ...props
 }: Omit<ComboboxPrimitive.Input.Props, 'size'> & { showClear?: boolean; ref?: React.Ref<HTMLInputElement> }): React.ReactElement => (
-  <ComboboxPrimitive.InputGroup className={inputGroupClassName} data-slot="combobox-input-group">
-    <ComboboxPrimitive.Input className={inputClassName} data-slot="combobox-input" render={<input />} {...props} />
-    <ComboboxPrimitive.Trigger className={actionClassName} data-slot="combobox-trigger">
+  <ComboboxPrimitive.InputGroup className={styles.inputGroup} data-slot="combobox-input-group">
+    <ComboboxPrimitive.Input className={styles.input} data-slot="combobox-input" render={<input />} {...props} />
+    <ComboboxPrimitive.Trigger className={styles.action} data-slot="combobox-trigger">
       <ComboboxPrimitive.Icon>
         <CaretUpDownIcon />
       </ComboboxPrimitive.Icon>
     </ComboboxPrimitive.Trigger>
     {showClear && (
-      <ComboboxPrimitive.Clear className={actionClassName} data-slot="combobox-clear">
+      <ComboboxPrimitive.Clear className={styles.action} data-slot="combobox-clear">
         <XIcon />
       </ComboboxPrimitive.Clear>
     )}
@@ -70,14 +58,14 @@ const Base = <TValue extends ValueOptions>({
     >
       <Input placeholder={placeholder} showClear={Boolean(selectedOption)} />
       <ComboboxPrimitive.Portal>
-        <ComboboxPrimitive.Positioner align="start" anchor={anchor} className={positionerClassName} side="bottom" sideOffset={4}>
-          <span className={frameClassName}>
-            <ComboboxPrimitive.Popup className={popupClassName} data-slot="combobox-popup">
-              <ComboboxPrimitive.Empty className={emptyClassName}>Aucun résultat</ComboboxPrimitive.Empty>
+        <ComboboxPrimitive.Positioner align="start" anchor={anchor} className={styles.positioner} side="bottom" sideOffset={4}>
+          <span className={styles.frame}>
+            <ComboboxPrimitive.Popup className={styles.popup} data-slot="combobox-popup">
+              <ComboboxPrimitive.Empty className={styles.empty}>Aucun résultat</ComboboxPrimitive.Empty>
               <ScrollArea scrollbarGutter scrollFade>
-                <ComboboxPrimitive.List className={listClassName}>
+                <ComboboxPrimitive.List className={styles.list}>
                   {(item) => (
-                    <ComboboxPrimitive.Item className={itemClassName} key={String(item.value)} value={item}>
+                    <ComboboxPrimitive.Item className={styles.item} key={String(item.value)} value={item}>
                       <ComboboxPrimitive.ItemIndicator>
                         <svg
                           aria-hidden="true"
@@ -100,8 +88,8 @@ const Base = <TValue extends ValueOptions>({
               </ScrollArea>
               {addNew && (
                 <>
-                  <ComboboxPrimitive.Separator className={separatorClassName} />
-                  <div className={addClassName}>{addNew(inputValue)}</div>
+                  <ComboboxPrimitive.Separator className={styles.separator} />
+                  <div className={styles.add}>{addNew(inputValue)}</div>
                 </>
               )}
             </ComboboxPrimitive.Popup>

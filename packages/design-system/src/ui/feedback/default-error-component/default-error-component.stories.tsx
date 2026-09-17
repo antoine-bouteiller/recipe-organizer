@@ -5,7 +5,7 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { Button } from '../../actions/button/button'
 import { DefaultErrorComponent } from './default-error-component'
 
-import { container } from './default-error-component.stories.css'
+import * as styles from './default-error-component.stories.css'
 
 const meta = {
   args: { action: <Button render={<a href="#retry" />}>Try again</Button> },
@@ -26,7 +26,7 @@ export const Overview: Story = {
     await expect(detailsSection.getByText('A caller-provided diagnostic message.')).toBeVisible()
   },
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <DefaultErrorComponent {...args} />
       </StorySection>

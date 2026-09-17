@@ -6,7 +6,7 @@ import { XIcon } from '../../data-display/icons/x'
 import { Kbd, KbdGroup } from '../../data-display/kbd/kbd'
 import { Field, FieldError, FieldLabel } from '../field/field'
 
-import { container, image, container2, container3, text, text2, container4, container5, element, element2 } from './image-field.css'
+import * as styles from './image-field.css'
 
 export interface ImageFieldProps {
   disabled?: boolean
@@ -32,18 +32,18 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
       <FieldLabel>{label}</FieldLabel>
       <FieldLabel presentation="dropzone-image">
         {previewUrl ? (
-          <div className={container}>
-            <img alt="Aperçu" className={image} src={previewUrl} />
+          <div className={styles.container}>
+            <img alt="Aperçu" className={styles.image} src={previewUrl} />
           </div>
         ) : (
-          <div className={container2}>
-            <div aria-hidden="true" className={container3}>
-              <span className={text}>
+          <div className={styles.container2}>
+            <div aria-hidden="true" className={styles.container3}>
+              <span className={styles.text}>
                 <ImageIcon size="sm" />
               </span>
             </div>
-            <p className={text2}>Déposez votre image ou cliquez pour parcourir</p>
-            <div className={container4}>
+            <p className={styles.text2}>Déposez votre image ou cliquez pour parcourir</p>
+            <div className={styles.container4}>
               <KbdGroup>
                 <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
                 <Kbd>V</Kbd>
@@ -52,10 +52,10 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
           </div>
         )}
         {previewUrl && (
-          <div className={container5}>
+          <div className={styles.container5}>
             <button
               aria-label="Supprimer l'image"
-              className={element}
+              className={styles.element}
               onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -68,7 +68,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={element2} disabled={disabled} type="file" {...getInputProps()} />
+      <input className={styles.element2} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

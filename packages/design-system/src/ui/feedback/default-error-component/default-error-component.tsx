@@ -1,6 +1,6 @@
 import type React from 'react'
 
-import { rootRecipe, headingRecipe, bodyRecipe, subheadingRecipe, detailsRecipe } from './default-error-component.css'
+import * as styles from './default-error-component.css'
 
 export interface DefaultErrorComponentProps {
   action?: React.ReactNode
@@ -12,14 +12,14 @@ export const DefaultErrorComponent = ({
   description = 'Une erreur est survenue lors du chargement de la page.',
   details,
 }: DefaultErrorComponentProps): React.ReactElement => (
-  <div className={rootRecipe()} role="alert">
-    <h1 className={headingRecipe()}>Whoops!</h1>
-    <div className={bodyRecipe()}>
-      <h2 className={subheadingRecipe()}>Une erreur est survenue</h2>
+  <div className={styles.root()} role="alert">
+    <h1 className={styles.heading()}>Whoops!</h1>
+    <div className={styles.body()}>
+      <h2 className={styles.subheading()}>Une erreur est survenue</h2>
       <p>{description}</p>
     </div>
     {details && (
-      <div className={detailsRecipe()}>
+      <div className={styles.details()}>
         <code>{details}</code>
       </div>
     )}

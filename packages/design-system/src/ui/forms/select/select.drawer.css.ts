@@ -1,12 +1,12 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const listClassName = style({
+export const list = style({
   display: 'flex',
   flexDirection: 'column',
 })
 
-export const itemClassName = style({
+export const item = style({
   alignItems: 'center',
   borderRadius: theme.radii.sm,
   display: 'flex',
@@ -30,12 +30,12 @@ export const itemClassName = style({
   },
 })
 
-export const labelClassName = style({
+export const label = style({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 })
 
-export const iconClassName = style({
+export const icon = style({
   flexShrink: 0,
 })

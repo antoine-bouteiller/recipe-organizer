@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const kbdRecipe = recipe({
+export const kbd = recipe({
   base: {
     vars: {
       '--owner-icon-size': '12px',
@@ -25,7 +25,7 @@ export const kbdRecipe = recipe({
   },
 })
 
-export const groupRecipe = recipe({
+export const group = recipe({
   base: {
     alignItems: 'center',
     display: 'inline-flex',

@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const badgeRecipe = recipe({
+export const badge = recipe({
   base: {
     vars: {
       '--owner-icon-size': '14px',

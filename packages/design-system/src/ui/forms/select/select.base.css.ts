@@ -1,20 +1,20 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style, globalStyle } from '@vanilla-extract/css'
 
-export const positionerClassName = style({
+export const positioner = style({
   WebkitUserSelect: 'none',
   userSelect: 'none',
   zIndex: 50,
 })
 
-export const popupClassName = style({
+export const popup = style({
   color: theme.colors.foreground,
   outline: '2px solid transparent',
   outlineOffset: '2px',
   transformOrigin: 'var(--transform-origin)',
 })
 
-export const popupFrameClassName = style({
+export const popupFrame = style({
   selectors: {
     '&::before': {
       borderRadius: `calc(${theme.radii.lg} - 1px)`,
@@ -39,13 +39,13 @@ export const popupFrameClassName = style({
   position: 'relative',
 })
 
-export const listClassName = style({
+export const list = style({
   maxHeight: 'var(--available-height)',
   overflowY: 'auto',
   padding: theme.spacing(1),
 })
 
-export const arrowClassName = style({
+export const arrow = style({
   alignItems: 'center',
   cursor: 'default',
   display: 'flex',
@@ -56,7 +56,7 @@ export const arrowClassName = style({
   zIndex: 50,
 })
 
-export const scrollUpArrowClassName = style({
+export const scrollUpArrow = style({
   selectors: {
     '&::before': {
       backgroundImage: `linear-gradient(to bottom, ${theme.colors.popover} 50%, transparent)`,
@@ -72,7 +72,7 @@ export const scrollUpArrowClassName = style({
   },
 })
 
-export const scrollDownArrowClassName = style({
+export const scrollDownArrow = style({
   selectors: {
     '&::before': {
       backgroundImage: `linear-gradient(to top, ${theme.colors.popover} 50%, transparent)`,
@@ -88,7 +88,7 @@ export const scrollDownArrowClassName = style({
   },
 })
 
-export const itemClassName = style({
+export const item = style({
   selectors: {
     '&[data-disabled]': {
       opacity: 0.64,
@@ -129,7 +129,7 @@ export const itemClassName = style({
   },
 })
 
-export const iconClassName = style({
+export const icon = style({
   height: theme.spacing(4.5),
   position: 'relative',
   width: theme.spacing(4.5),
@@ -141,16 +141,16 @@ export const iconClassName = style({
   },
 })
 
-export const indicatorClassName = style({
+export const indicator = style({
   gridColumnStart: '1',
 })
 
-export const itemTextClassName = style({
+export const itemText = style({
   gridColumnStart: '2',
   minWidth: theme.spacing(0),
 })
 
-globalStyle(`.${itemClassName} svg`, {
+globalStyle(`.${item} svg`, {
   flexShrink: 0,
   pointerEvents: 'none',
 })

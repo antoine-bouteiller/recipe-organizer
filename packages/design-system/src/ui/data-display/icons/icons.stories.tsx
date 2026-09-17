@@ -49,7 +49,7 @@ import { VideoIcon } from './video'
 import { WarningCircleIcon } from './warning-circle'
 import { XIcon } from './x'
 
-import { gallery, iconCell, iconName } from './icons.stories.css'
+import * as styles from './icons.stories.css'
 
 const meta = {
   title: 'Data Display/Icons',
@@ -111,11 +111,11 @@ const icons = [
 
 export const Gallery: Story = {
   render: () => (
-    <div className={gallery}>
+    <div className={styles.gallery}>
       {icons.map(([name, Icon]) => (
-        <div className={iconCell} key={name}>
+        <div className={styles.iconCell} key={name}>
           <Icon size="xl" />
-          <span className={iconName}>{name}</span>
+          <span className={styles.iconName}>{name}</span>
         </div>
       ))}
     </div>

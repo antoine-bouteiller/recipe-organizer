@@ -2,7 +2,7 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { style, globalStyle } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const viewportRecipe = recipe({
+export const viewport = recipe({
   base: {
     vars: {
       '--toast-inset': theme.spacing(4),
@@ -25,7 +25,7 @@ export const viewportRecipe = recipe({
   },
 })
 
-export const rootRecipe = recipe({
+export const root = recipe({
   base: {
     selectors: {
       '&[data-ending-style]': {
@@ -109,7 +109,7 @@ export const rootRecipe = recipe({
   },
 })
 
-export const contentRecipe = recipe({
+export const content = recipe({
   base: {
     selectors: {
       '&[data-behind]': {
@@ -135,7 +135,7 @@ export const contentRecipe = recipe({
   },
 })
 
-export const iconRecipe = recipe({
+export const icon = recipe({
   base: {
     display: 'flex',
     flexShrink: 0,
@@ -143,7 +143,7 @@ export const iconRecipe = recipe({
   },
 })
 
-export const textRecipe = recipe({
+export const text = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
@@ -160,18 +160,18 @@ export const container = style({
   height: '1lh',
 })
 
-globalStyle(`.${rootRecipe.classNames.base}[data-type=error] [data-slot=toast-icon]`, {
+globalStyle(`.${root.classNames.base}[data-type=error] [data-slot=toast-icon]`, {
   color: theme.colors.destructive,
 })
 
-globalStyle(`.${rootRecipe.classNames.base}[data-type=success] [data-slot=toast-icon]`, {
+globalStyle(`.${root.classNames.base}[data-type=success] [data-slot=toast-icon]`, {
   color: theme.colors.success,
 })
 
-globalStyle(`.${textRecipe.classNames.base} [data-slot=toast-description]`, {
+globalStyle(`.${text.classNames.base} [data-slot=toast-description]`, {
   color: theme.colors['muted-foreground'],
 })
 
-globalStyle(`.${textRecipe.classNames.base} [data-slot=toast-title]`, {
+globalStyle(`.${text.classNames.base} [data-slot=toast-title]`, {
   fontWeight: theme.fontWeights.medium,
 })

@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const rootRecipe = recipe({
+export const root = recipe({
   base: {
     alignItems: 'center',
     backgroundColor: theme.colors.background,
@@ -11,7 +11,7 @@ export const rootRecipe = recipe({
   },
 })
 
-export const stackRecipe = recipe({
+export const stack = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
@@ -20,21 +20,21 @@ export const stackRecipe = recipe({
   },
 })
 
-export const centeredRecipe = recipe({
+export const centered = recipe({
   base: {
     display: 'flex',
     justifyContent: 'center',
   },
 })
 
-export const markRecipe = recipe({
+export const mark = recipe({
   base: {
     height: 'auto',
     width: theme.spacing(48),
   },
 })
 
-export const contentRecipe = recipe({
+export const content = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
@@ -42,7 +42,7 @@ export const contentRecipe = recipe({
   },
 })
 
-export const headingRecipe = recipe({
+export const heading = recipe({
   base: {
     color: theme.colors.foreground,
     fontSize: theme.fontSizes['2xl'],

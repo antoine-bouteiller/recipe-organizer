@@ -2,7 +2,7 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { globalStyle } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const positionerClassName = recipe({
+export const positioner = recipe({
   base: {
     selectors: {
       '&[data-instant]': {
@@ -25,7 +25,7 @@ export const positionerClassName = recipe({
   },
 })
 
-export const popupClassName = recipe({
+export const popup = recipe({
   base: {
     selectors: {
       '&:has([data-slot=calendar])': {
@@ -75,7 +75,7 @@ export const popupClassName = recipe({
   },
 })
 
-export const viewportClassName = recipe({
+export const viewport = recipe({
   base: {
     selectors: {
       '&:has([data-slot=calendar])': {
@@ -101,12 +101,12 @@ export const viewportClassName = recipe({
   },
 })
 
-globalStyle(`.${viewportClassName.classNames.base} :is([data-current], [data-previous])`, {
+globalStyle(`.${viewport.classNames.base} :is([data-current], [data-previous])`, {
   opacity: 1,
   transition: `opacity 150ms ${theme.easings['in-out']}`,
   width: 'calc(var(--popup-width) - 2 * var(--viewport-inline-padding) - 2px)',
 })
 
-globalStyle(`.${viewportClassName.classNames.base} :is([data-current], [data-previous]):is([data-ending-style], [data-starting-style])`, {
+globalStyle(`.${viewport.classNames.base} :is([data-current], [data-previous]):is([data-ending-style], [data-starting-style])`, {
   opacity: 0,
 })

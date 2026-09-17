@@ -6,20 +6,7 @@ import { Button } from '../../actions/button/button'
 import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
 import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 
-import {
-  inputGroupClassName,
-  inputClassName,
-  addonClassName,
-  itemClassName,
-  emptyClassName,
-  listClassName,
-  backdropClassName,
-  viewportClassName,
-  popupClassName,
-  panelClassName,
-  footerClassName,
-  container,
-} from './command.css'
+import * as styles from './command.css'
 
 type InputProps = Pick<AutocompletePrimitive.Input.Props, 'placeholder'>
 type ItemProps = Pick<AutocompletePrimitive.Item.Props, 'children' | 'onClick' | 'value'>
@@ -34,11 +21,11 @@ type PlainProps = Pick<React.ComponentProps<'div'>, 'children'>
 const defaultCommandDialogTriggerRender = <Button variant="outline" />
 
 const AutocompleteInput = ({ placeholder }: InputProps): React.ReactElement => (
-  <AutocompletePrimitive.InputGroup className={inputGroupClassName()} data-slot="autocomplete-input-group">
-    <div aria-hidden className={addonClassName()} data-slot="autocomplete-start-addon">
+  <AutocompletePrimitive.InputGroup className={styles.inputGroup()} data-slot="autocomplete-input-group">
+    <div aria-hidden className={styles.addon()} data-slot="autocomplete-start-addon">
       <MagnifyingGlassIcon />
     </div>
-    <AutocompletePrimitive.Input autoFocus className={inputClassName()} data-slot="autocomplete-input" placeholder={placeholder} />
+    <AutocompletePrimitive.Input autoFocus className={styles.input()} data-slot="autocomplete-input" placeholder={placeholder} />
   </AutocompletePrimitive.InputGroup>
 )
 
@@ -54,9 +41,9 @@ export const CommandDialogTrigger = ({ children, render = defaultCommandDialogTr
 )
 export const CommandDialogPopup = ({ children, 'aria-label': ariaLabel }: DialogPopupProps): React.ReactElement => (
   <CommandDialogPrimitive.Portal>
-    <CommandDialogPrimitive.Backdrop className={backdropClassName()} data-slot="command-dialog-backdrop" />
-    <CommandDialogPrimitive.Viewport className={viewportClassName()} data-slot="command-dialog-viewport">
-      <CommandDialogPrimitive.Popup aria-label={ariaLabel} className={popupClassName()} data-slot="command-dialog-popup">
+    <CommandDialogPrimitive.Backdrop className={styles.backdrop()} data-slot="command-dialog-backdrop" />
+    <CommandDialogPrimitive.Viewport className={styles.viewport()} data-slot="command-dialog-viewport">
+      <CommandDialogPrimitive.Popup aria-label={ariaLabel} className={styles.popup()} data-slot="command-dialog-popup">
         {children}
       </CommandDialogPrimitive.Popup>
     </CommandDialogPrimitive.Viewport>
@@ -68,34 +55,34 @@ export const Command = <ItemValue,>({ children, items }: CommandProps<ItemValue>
   </AutocompletePrimitive.Root>
 )
 export const CommandInput = (props: InputProps): React.ReactElement => (
-  <div className={container()}>
+  <div className={styles.container()}>
     <AutocompleteInput {...props} />
   </div>
 )
 export const CommandList = ({ children }: ListProps): React.ReactElement => (
   <ScrollArea scrollbarGutter="compact" scrollFade>
-    <AutocompletePrimitive.List className={listClassName()} data-slot="command-list">
+    <AutocompletePrimitive.List className={styles.list()} data-slot="command-list">
       {children}
     </AutocompletePrimitive.List>
   </ScrollArea>
 )
 export const CommandEmpty = ({ children }: EmptyProps): React.ReactElement => (
-  <AutocompletePrimitive.Empty className={emptyClassName()} data-slot="command-empty">
+  <AutocompletePrimitive.Empty className={styles.empty()} data-slot="command-empty">
     {children}
   </AutocompletePrimitive.Empty>
 )
 export const CommandPanel = ({ children }: PlainProps): React.ReactElement => (
-  <div className={panelClassName()} data-slot="command-panel">
+  <div className={styles.panel()} data-slot="command-panel">
     {children}
   </div>
 )
 export const CommandItem = ({ children, onClick, value }: ItemProps): React.ReactElement => (
-  <AutocompletePrimitive.Item className={itemClassName()} data-slot="command-item" onClick={onClick} value={value}>
+  <AutocompletePrimitive.Item className={styles.item()} data-slot="command-item" onClick={onClick} value={value}>
     {children}
   </AutocompletePrimitive.Item>
 )
 export const CommandFooter = ({ children }: PlainProps): React.ReactElement => (
-  <div className={footerClassName()} data-slot="command-footer">
+  <div className={styles.footer()} data-slot="command-footer">
     {children}
   </div>
 )

@@ -3,21 +3,21 @@ import React, { createContext, useContext } from 'react'
 
 import { useSwipeTabs } from '../../../hooks/use-swipe-tabs'
 
-import { listRecipe, indicatorRecipe, tabRecipe, rootRecipe, panelsRecipe, trackRecipe, panelRecipe } from './tabs.css'
+import * as styles from './tabs.css'
 
 export type TabsListProps = Pick<TabsPrimitive.List.Props, 'aria-label' | 'children'> & { width?: 'fit' | 'full' }
 export const TabsList = ({ 'aria-label': ariaLabel, children, width = 'fit' }: TabsListProps): React.ReactElement => (
-  <TabsPrimitive.List aria-label={ariaLabel} className={listRecipe({ width })} data-slot="tabs-list">
+  <TabsPrimitive.List aria-label={ariaLabel} className={styles.list({ width })} data-slot="tabs-list">
     <>
       {children}
-      <TabsPrimitive.Indicator className={indicatorRecipe()} data-slot="tab-indicator" />
+      <TabsPrimitive.Indicator className={styles.indicator()} data-slot="tab-indicator" />
     </>
   </TabsPrimitive.List>
 )
 
 export type TabsTabProps = Pick<TabsPrimitive.Tab.Props, 'children' | 'value'>
 export const TabsTab = ({ children, value }: TabsTabProps): React.ReactElement => (
-  <TabsPrimitive.Tab className={tabRecipe()} data-slot="tabs-tab" value={value}>
+  <TabsPrimitive.Tab className={styles.tab()} data-slot="tabs-tab" value={value}>
     {children}
   </TabsPrimitive.Tab>
 )
@@ -37,7 +37,7 @@ export const SwipeTabs = <TTab extends string>({ children, defaultTab, tabs }: S
   return (
     <SwipeTabsContext.Provider value={{ activeIndex, activeTab, containerRef, onTouchEnd, onTouchMove, onTouchStart, trackRef }}>
       <TabsPrimitive.Root
-        className={rootRecipe()}
+        className={styles.root()}
         data-slot="tabs"
         onValueChange={(value) => {
           const nextTab = tabs.find((tab) => tab === value)
@@ -61,8 +61,8 @@ export const SwipeTabsPanels = ({ children }: SwipeTabsPanelsProps): React.React
   }
   const { containerRef, trackRef, onTouchEnd, onTouchMove, onTouchStart } = context
   return (
-    <div className={panelsRecipe()} data-slot="swipe-tabs-panels" ref={containerRef}>
-      <div className={trackRecipe()} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={trackRef}>
+    <div className={styles.panels()} data-slot="swipe-tabs-panels" ref={containerRef}>
+      <div className={styles.track()} onTouchEnd={onTouchEnd} onTouchMove={onTouchMove} onTouchStart={onTouchStart} ref={trackRef}>
         {children}
       </div>
     </div>
@@ -77,7 +77,7 @@ export const SwipeTabsPanel = ({ children, value }: SwipeTabsPanelProps): React.
   }
   const inactive = context.activeTab !== value
   return (
-    <div className={panelRecipe()} data-slot="swipe-tabs-panel" inert={inactive} role="tabpanel">
+    <div className={styles.panel()} data-slot="swipe-tabs-panel" inert={inactive} role="tabpanel">
       {children}
     </div>
   )

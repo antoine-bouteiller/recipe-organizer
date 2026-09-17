@@ -7,34 +7,25 @@ import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 import { type DialogProps } from './dialog'
 import { useDialogFormFrame } from './dialog-form.private'
 
-import {
-  backdropClassName,
-  viewportClassName,
-  popupClassName,
-  headerClassName,
-  footerClassName,
-  panelClassName,
-  element,
-  container,
-} from './dialog.base.css'
+import * as styles from './dialog.base.css'
 
 const DialogBase = ({ title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
   const formFrame = useDialogFormFrame()
   const hasFooter = cancelLabel !== undefined || footer !== undefined
   const content: ReactNode = (
     <>
-      <div className={headerClassName()} data-slot="dialog-header">
-        <DialogPrimitive.Title className={element()} data-slot="dialog-title">
+      <div className={styles.header()} data-slot="dialog-header">
+        <DialogPrimitive.Title className={styles.element()} data-slot="dialog-title">
           {title}
         </DialogPrimitive.Title>
       </div>
       <ScrollArea scrollFade>
-        <div className={panelClassName()} data-slot="dialog-panel">
+        <div className={styles.panel()} data-slot="dialog-panel">
           {children}
         </div>
       </ScrollArea>
       {hasFooter && (
-        <div className={footerClassName()} data-slot="dialog-footer">
+        <div className={styles.footer()} data-slot="dialog-footer">
           {cancelLabel !== undefined && (
             <DialogPrimitive.Close render={<Button disabled={cancelDisabled} variant="outline" />}>{cancelLabel}</DialogPrimitive.Close>
           )}
@@ -47,11 +38,11 @@ const DialogBase = ({ title, trigger, children, cancelLabel, cancelDisabled, foo
     <DialogPrimitive.Root modal="trap-focus" onOpenChange={onOpenChange} open={open}>
       {trigger !== undefined && <DialogPrimitive.Trigger data-slot="dialog-trigger" render={trigger} />}
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Backdrop className={backdropClassName()} data-slot="dialog-backdrop" />
-        <DialogPrimitive.Viewport className={viewportClassName()} data-slot="dialog-viewport">
-          <DialogPrimitive.Popup className={popupClassName()} data-slot="dialog-popup">
+        <DialogPrimitive.Backdrop className={styles.backdrop()} data-slot="dialog-backdrop" />
+        <DialogPrimitive.Viewport className={styles.viewport()} data-slot="dialog-viewport">
+          <DialogPrimitive.Popup className={styles.popup()} data-slot="dialog-popup">
             {formFrame?.wrap(content) ?? content}
-            <div className={container()}>
+            <div className={styles.container()}>
               <DialogPrimitive.Close aria-label="Close" disabled={cancelDisabled} render={<Button size="icon" variant="ghost" />}>
                 <XIcon />
               </DialogPrimitive.Close>

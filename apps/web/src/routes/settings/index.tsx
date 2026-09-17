@@ -10,7 +10,7 @@ import { UserIcon } from '@recipe-organizer/design-system/icons/user'
 import { UsersIcon } from '@recipe-organizer/design-system/icons/users'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-import { container, container2, container3, container4, container5, container6, container7, heading, text, text2 } from './-index.css'
+import * as styles from './-index.css'
 
 interface SettingsSection {
   adminOnly?: boolean
@@ -54,30 +54,30 @@ const RouteComponent = () => {
 
   return (
     <ScreenLayout title="Paramètres" pageKey="/settings">
-      <div className={container}>
+      <div className={styles.container}>
         <Button onClick={toggleTheme} variant="outline" width="full" align="start">
           <ThemeIcon size="lg" />
           Changer le thème
         </Button>
       </div>
-      <div className={container2}>
+      <div className={styles.container2}>
         {visibleSections.map((section) => {
           const Icon = section.icon
           return (
             <Link key={section.id} to={section.path} viewTransition>
-              <div className={container3}>
+              <div className={styles.container3}>
                 <Card>
-                  <div className={container4}>
-                    <div className={container5}>
-                      <div className={container6}>
+                  <div className={styles.container4}>
+                    <div className={styles.container5}>
+                      <div className={styles.container6}>
                         <Icon size="lg" />
                       </div>
-                      <div className={container7}>
-                        <h3 className={heading}>{section.title}</h3>
-                        <p className={text}>{section.description}</p>
+                      <div className={styles.container7}>
+                        <h3 className={styles.heading}>{section.title}</h3>
+                        <p className={styles.text}>{section.description}</p>
                       </div>
                     </div>
-                    <span className={text2}>
+                    <span className={styles.text2}>
                       <CaretRightIcon size="lg" />
                     </span>
                   </div>

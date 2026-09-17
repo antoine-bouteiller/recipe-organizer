@@ -8,7 +8,7 @@ import { Input } from '../input/input'
 import { SelectButton } from '../select/select.shared'
 import { type ComboboxImplProps, type ValueOptions } from './combobox'
 
-import { columnClassName, optionsClassName, emptyClassName, itemClassName, truncateClassName, iconClassName } from './combobox.drawer.css'
+import * as styles from './combobox.drawer.css'
 
 const ComboboxDrawer = <TValue extends ValueOptions>({
   addNew,
@@ -39,13 +39,13 @@ const ComboboxDrawer = <TValue extends ValueOptions>({
           <DrawerTitle>{title}</DrawerTitle>
         </DrawerHeader>
         <DrawerPanel>
-          <div className={columnClassName}>
+          <div className={styles.column}>
             <Input onChange={(event) => setSearch(event.target.value)} placeholder={searchPlaceholder} value={search} />
-            <div className={optionsClassName}>
-              {filteredOptions.length === 0 && <p className={emptyClassName}>Aucun résultat</p>}
+            <div className={styles.options}>
+              {filteredOptions.length === 0 && <p className={styles.empty}>Aucun résultat</p>}
               {filteredOptions.map((option) => (
                 <button
-                  className={itemClassName}
+                  className={styles.item}
                   key={String(option.value)}
                   onClick={() => {
                     onChange(option)
@@ -54,9 +54,9 @@ const ComboboxDrawer = <TValue extends ValueOptions>({
                   }}
                   type="button"
                 >
-                  <span className={truncateClassName}>{option.label}</span>
+                  <span className={styles.truncate}>{option.label}</span>
                   {selectedOption?.value === option.value && (
-                    <span className={iconClassName}>
+                    <span className={styles.icon}>
                       <CheckIcon size="sm" />
                     </span>
                   )}

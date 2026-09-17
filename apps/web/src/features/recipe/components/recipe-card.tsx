@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 
 import { QuantityControls } from './quantity-controls'
 
-import { card, image, recipeLink, tags, heading } from './recipe-card.css'
+import * as styles from './recipe-card.css'
 
 export interface RecipeCardProps {
   readonly recipe: ReducedRecipe
@@ -38,10 +38,10 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
   const animate = useEntranceAnimation()
 
   return (
-    <article className={[card, animate && 'stagger-in-35'].filter(Boolean).join(' ')} style={animate ? staggerStyle(index, 6) : undefined}>
-      <img src={recipe.image} alt={recipe.name} className={image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
-      <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition className={recipeLink}>
-        <div className={tags}>
+    <article className={[styles.card, animate && 'stagger-in-35'].filter(Boolean).join(' ')} style={animate ? staggerStyle(index, 6) : undefined}>
+      <img src={recipe.image} alt={recipe.name} className={styles.image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
+      <Link params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition className={styles.recipeLink}>
+        <div className={styles.tags}>
           {recipe.isVegetarian && <Tag>{VEGETARIAN_LABEL}</Tag>}
           {recipe.isMagimix && <Tag>{MAGIMIX_LABEL}</Tag>}
           {recipe.isSpice && <Tag>{SPICE_LABEL}</Tag>}
@@ -52,7 +52,7 @@ export default function RecipeCard({ recipe, index = 0 }: Readonly<RecipeCardPro
             <Tag key={cuisineType}>{CUISINE_TYPE_LABELS[cuisineType]}</Tag>
           ))}
         </div>
-        <h2 className={heading}>{recipe.name}</h2>
+        <h2 className={styles.heading}>{recipe.name}</h2>
       </Link>
       <QuantityControls recipeId={recipe.id} servings={recipe.servings} variant="card" />
     </article>

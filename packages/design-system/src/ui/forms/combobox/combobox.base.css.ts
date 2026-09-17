@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style, globalStyle } from '@vanilla-extract/css'
 
-export const inputGroupClassName = style({
+export const inputGroup = style({
   selectors: {
     '&:has(:disabled)': {
       opacity: 0.64,
@@ -12,7 +12,7 @@ export const inputGroupClassName = style({
   width: '100%',
 })
 
-export const inputClassName = style({
+export const input = style({
   selectors: {
     '&:disabled': {
       opacity: 1,
@@ -38,7 +38,7 @@ export const inputClassName = style({
   },
 })
 
-export const actionClassName = style({
+export const action = style({
   selectors: {
     '&:has(+ [data-slot="combobox-clear"])': {
       display: 'none',
@@ -97,13 +97,13 @@ export const actionClassName = style({
   },
 })
 
-export const positionerClassName = style({
+export const positioner = style({
   WebkitUserSelect: 'none',
   userSelect: 'none',
   zIndex: 50,
 })
 
-export const frameClassName = style({
+export const frame = style({
   selectors: {
     '&::before': {
       borderRadius: `calc(${theme.radii.lg} - 1px)`,
@@ -139,7 +139,7 @@ export const frameClassName = style({
   transitionTimingFunction: theme.easings['in-out'],
 })
 
-export const popupClassName = style({
+export const popup = style({
   color: theme.colors.foreground,
   display: 'flex',
   flex: '1 1 0%',
@@ -147,7 +147,7 @@ export const popupClassName = style({
   maxHeight: 'min(var(--available-height), 368px)',
 })
 
-export const itemClassName = style({
+export const item = style({
   selectors: {
     '&[data-disabled]': {
       opacity: 0.64,
@@ -185,7 +185,7 @@ export const itemClassName = style({
   },
 })
 
-export const separatorClassName = style({
+export const separator = style({
   selectors: {
     '&:last-child': {
       display: 'none',
@@ -197,7 +197,7 @@ export const separatorClassName = style({
   marginInline: theme.spacing(2),
 })
 
-export const emptyClassName = style({
+export const empty = style({
   selectors: {
     '&:not(:empty)': {
       padding: theme.spacing(2),
@@ -213,7 +213,7 @@ export const emptyClassName = style({
   },
 })
 
-export const listClassName = style({
+export const list = style({
   selectors: {
     '&:not(:empty)': {
       padding: theme.spacing(1),
@@ -225,16 +225,16 @@ export const listClassName = style({
   scrollPaddingBlock: theme.spacing(1),
 })
 
-export const addClassName = style({
+export const add = style({
   padding: theme.spacing(1),
 })
 
-globalStyle(`.${actionClassName} svg`, {
+globalStyle(`.${action} svg`, {
   flexShrink: 0,
   pointerEvents: 'none',
 })
 
-globalStyle(`.${itemClassName} svg`, {
+globalStyle(`.${item} svg`, {
   flexShrink: 0,
   pointerEvents: 'none',
 })

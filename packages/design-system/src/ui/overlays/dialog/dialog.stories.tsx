@@ -7,7 +7,7 @@ import { Dialog } from './dialog'
 import DialogBase from './dialog.base'
 import DialogDrawer from './dialog.drawer'
 
-import { container } from './dialog.stories.css'
+import * as styles from './dialog.stories.css'
 
 const dialogProps = {
   cancelLabel: 'Cancel',
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>

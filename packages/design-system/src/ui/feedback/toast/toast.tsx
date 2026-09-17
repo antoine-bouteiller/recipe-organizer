@@ -4,13 +4,13 @@ import type React from 'react'
 import { CheckCircleIcon } from '../../data-display/icons/check-circle'
 import { WarningCircleIcon } from '../../data-display/icons/warning-circle'
 
-import { viewportRecipe, rootRecipe, contentRecipe, iconRecipe, textRecipe, container } from './toast.css'
+import * as styles from './toast.css'
 
 const Toasts = (): React.ReactElement => {
   const { toasts } = Toast.useToastManager()
   return (
     <Toast.Portal data-slot="toast-portal">
-      <Toast.Viewport className={viewportRecipe()} data-slot="toast-viewport">
+      <Toast.Viewport className={styles.viewport()} data-slot="toast-viewport">
         {toasts.map((toast) => {
           let Icon: React.ElementType | null = null
           if (toast.type === 'error') {
@@ -20,16 +20,16 @@ const Toasts = (): React.ReactElement => {
           }
 
           return (
-            <Toast.Root className={rootRecipe()} key={toast.id} swipeDirection={['right', 'down']} toast={toast}>
-              <Toast.Content className={contentRecipe()}>
-                <div className={iconRecipe()}>
+            <Toast.Root className={styles.root()} key={toast.id} swipeDirection={['right', 'down']} toast={toast}>
+              <Toast.Content className={styles.content()}>
+                <div className={styles.icon()}>
                   {Icon && (
-                    <div className={container} data-slot="toast-icon">
+                    <div className={styles.container} data-slot="toast-icon">
                       <Icon size="sm" />
                     </div>
                   )}
 
-                  <div className={textRecipe()}>
+                  <div className={styles.text()}>
                     <Toast.Title data-slot="toast-title" />
                     <Toast.Description data-slot="toast-description" />
                   </div>

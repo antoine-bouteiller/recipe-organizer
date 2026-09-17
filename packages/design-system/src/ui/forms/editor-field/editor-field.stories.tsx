@@ -5,7 +5,7 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import EditorField from './editor-field'
 
-import { storySections } from './editor-field.stories.css'
+import * as styles from './editor-field.stories.css'
 
 const EditorFieldExample = ({ disabled = false }: { disabled?: boolean }): ReactElement => {
   const form = useAppForm({ defaultValues: { instructions: '<p>Mix the ingredients until smooth.</p>' }, onSubmit: async () => undefined })
@@ -28,7 +28,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   render: () => (
-    <div className={storySections}>
+    <div className={styles.storySections}>
       <StorySection title="Default">
         <EditorFieldExample />
       </StorySection>

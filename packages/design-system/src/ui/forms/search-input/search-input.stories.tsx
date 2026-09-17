@@ -5,14 +5,14 @@ import { expect, userEvent, within } from 'storybook/test'
 import { StorySection } from '../../../../.storybook/story-section'
 import { SearchInput } from './search-input'
 
-import { container, label, label2, container2 } from './search-input.stories.css'
+import * as styles from './search-input.stories.css'
 
 const SearchInputExample = (): ReactElement => {
   const [search, setSearch] = useState('')
 
   return (
-    <div className={container}>
-      <label className={label}>
+    <div className={styles.container}>
+      <label className={styles.label}>
         <span>Search recipes</span>
         <SearchInput search={search} setSearch={setSearch} />
       </label>
@@ -25,7 +25,7 @@ const CustomPlaceholderExample = (): ReactElement => {
   const [search, setSearch] = useState('')
 
   return (
-    <label className={label2}>
+    <label className={styles.label2}>
       <span>Search ingredients</span>
       <SearchInput placeholder="Search ingredients…" search={search} setSearch={setSearch} />
     </label>
@@ -49,7 +49,7 @@ export const Overview: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
   },
   render: () => (
-    <div className={container2}>
+    <div className={styles.container2}>
       <StorySection title="Default">
         <SearchInputExample />
       </StorySection>

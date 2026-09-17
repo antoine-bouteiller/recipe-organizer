@@ -22,7 +22,7 @@ import { lazy, Suspense } from 'react'
 
 import { recipeNodes } from '../extensions'
 
-import { subrecipeContentInset, subrecipeLoading, subrecipeTrigger } from './subrecipe-node.css'
+import * as styles from './subrecipe-node.css'
 import '../editor.css'
 
 const SubrecipeDialog = lazy(async () => {
@@ -73,7 +73,7 @@ const SubrecipeInstructionsContent = ({
 
   return (
     <Editor content={filteredInstructions} nodes={recipeNodes} readOnly>
-      <div className={subrecipeContentInset}>
+      <div className={styles.subrecipeContentInset}>
         <EditorContent />
       </div>
     </Editor>
@@ -120,7 +120,7 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
         <strong>{recipe.name}</strong>
       </p>
       {isLoading ? (
-        <div className={subrecipeLoading}>
+        <div className={styles.subrecipeLoading}>
           <Spinner />
         </div>
       ) : (
@@ -129,7 +129,7 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
     </div>
   )
 
-  const trigger = <div className={subrecipeTrigger}>{content}</div>
+  const trigger = <div className={styles.subrecipeTrigger}>{content}</div>
 
   if (isEditable) {
     return (

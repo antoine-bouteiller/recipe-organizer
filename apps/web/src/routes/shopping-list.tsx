@@ -3,11 +3,11 @@ import { ResetCartButton } from '@client/features/shopping-list/component/reset-
 import { ShoppingList } from '@client/features/shopping-list/component/shopping-list'
 import { createFileRoute } from '@tanstack/react-router'
 
-import { container } from './-shopping-list.css'
+import * as styles from './-shopping-list.css'
 
 const ShoppingListPage = () => (
   <ScreenLayout pageKey="/shopping-list" headerEndItem={<ResetCartButton />} title="Liste de courses">
-    <div className={container}>
+    <div className={styles.container}>
       <ShoppingList />
     </div>
   </ScreenLayout>

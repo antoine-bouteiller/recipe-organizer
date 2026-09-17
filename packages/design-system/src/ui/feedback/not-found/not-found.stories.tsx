@@ -4,7 +4,7 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { Button } from '../../actions/button/button'
 import { NotFound } from './not-found'
 
-import { container } from './not-found.stories.css'
+import * as styles from './not-found.stories.css'
 
 const meta = {
   args: { action: <Button render={<a href="#home" />}>Return home</Button> },
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <NotFound {...args} />
       </StorySection>

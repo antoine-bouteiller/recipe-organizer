@@ -3,17 +3,17 @@ import { useRender } from '@base-ui/react/use-render'
 import { type RecipeVariants } from '@vanilla-extract/recipes'
 import type React from 'react'
 
-import { buttonRecipe } from './button.css'
+import * as styles from './button.css'
 
 export type ButtonProps = Pick<
   useRender.ComponentProps<'button'>,
   'aria-label' | 'aria-pressed' | 'children' | 'disabled' | 'onClick' | 'render' | 'type'
 > &
-  RecipeVariants<typeof buttonRecipe>
+  RecipeVariants<typeof styles.button>
 
 export const Button = ({ align, render, size, type, variant, width, ...props }: ButtonProps): React.ReactElement => {
   const mergedProps = mergeProps<'button'>(
-    { className: buttonRecipe({ align, size, variant, width }), type: type ?? (render ? undefined : 'button') },
+    { className: styles.button({ align, size, variant, width }), type: type ?? (render ? undefined : 'button') },
     props
   )
 

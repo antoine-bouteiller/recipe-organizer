@@ -4,11 +4,11 @@ import type React from 'react'
 import { Button } from '../../actions/button/button'
 import { toastManager, ToastProvider } from './toast'
 
-import { container } from './toast.stories.css'
+import * as styles from './toast.stories.css'
 
 const ToastExample = (): React.ReactElement => (
   <ToastProvider>
-    <div className={container}>
+    <div className={styles.container}>
       <Button onClick={() => toastManager.add({ description: 'Your recipe has been saved.', title: 'Saved', type: 'success' })}>Success toast</Button>
       <Button
         onClick={() => toastManager.add({ description: 'Check the required fields and try again.', title: 'Could not save', type: 'error' })}

@@ -15,7 +15,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 
-import { container, container2, container3, element, container4, container5, container6, container7 } from './-search.css'
+import * as styles from './-search.css'
 
 const cuisineItems = CUISINE_TYPES.map((cuisineType) => ({
   label: CUISINE_TYPE_LABELS[cuisineType],
@@ -39,10 +39,10 @@ const SearchPage = () => {
 
   return (
     <ScreenLayout title="Rechercher" pageKey="/search">
-      <div className={container}>
+      <div className={styles.container}>
         <CollapsiblePrimitive.Root>
-          <div className={container2}>
-            <div className={container3}>
+          <div className={styles.container2}>
+            <div className={styles.container3}>
               <SearchInput
                 placeholder="Rechercher une recette, un ingrédient…"
                 autoFocus
@@ -52,8 +52,8 @@ const SearchPage = () => {
             </div>
             <SearchFilterTrigger />
           </div>
-          <CollapsiblePrimitive.Panel className={element}>
-            <div className={container4}>
+          <CollapsiblePrimitive.Panel className={styles.element}>
+            <div className={styles.container4}>
               <Select
                 items={mealItems}
                 multiple
@@ -63,7 +63,7 @@ const SearchPage = () => {
                 value={filters.meals}
               />
             </div>
-            <div className={container5}>
+            <div className={styles.container5}>
               <Select
                 items={cuisineItems}
                 multiple
@@ -89,7 +89,7 @@ const SearchPage = () => {
             >
               Magimix
             </Toggle>
-            <div className={container6}>
+            <div className={styles.container6}>
               <Toggle
                 presentation="filter"
                 variant="outline"
@@ -110,7 +110,7 @@ const SearchPage = () => {
 const SearchSkeleton = () => (
   <ScreenLayout title="Rechercher" pageKey="/search">
     <Skeleton preset="search-input" />
-    <div className={container7}>
+    <div className={styles.container7}>
       {incrementalArray({ length: 5 }).map((index) => (
         <Skeleton preset="search-result" key={index} />
       ))}

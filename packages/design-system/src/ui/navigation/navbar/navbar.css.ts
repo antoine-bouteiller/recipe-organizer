@@ -23,7 +23,7 @@ export const container2 = style({
   justifyContent: 'flex-end',
 })
 
-export const navbarItemClassName = style({
+export const navbarItem = style({
   selectors: {
     '&[aria-current=page]': {
       color: theme.colors.foreground,

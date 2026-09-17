@@ -20,7 +20,7 @@ export const element = style({
   },
 })
 
-export const tabBarItemClassName = style({
+export const tabBarItem = style({
   selectors: {
     '&[aria-current=page]': {
       color: theme.colors.primary,
@@ -47,7 +47,7 @@ export const tabBarItemClassName = style({
   transition: `color 150ms ${theme.easings['in-out']}`,
 })
 
-export const iconSlotClassName = style({
+export const iconSlot = style({
   alignItems: 'center',
   borderRadius: theme.radii.full,
   display: 'flex',
@@ -68,14 +68,14 @@ export const iconSlotClassName = style({
       position: 'absolute',
       transition: `opacity 150ms ${theme.easings['in-out']}`,
     },
-    [`${tabBarItemClassName}:hover &::before`]: {
+    [`${tabBarItem}:hover &::before`]: {
       '@media': {
         '(hover: hover) and (pointer: fine)': {
           opacity: 0.08,
         },
       },
     },
-    [`${tabBarItemClassName}:is(:focus-visible, [data-focus-visible], :active, [data-active]) &::before`]: {
+    [`${tabBarItem}:is(:focus-visible, [data-focus-visible], :active, [data-active]) &::before`]: {
       opacity: 0.12,
     },
   },
@@ -84,15 +84,15 @@ export const iconSlotClassName = style({
   },
 })
 
-export const activeIconSlotClassName = style({
+export const activeIconSlot = style({
   backgroundColor: theme.colors.accent,
   display: 'none',
 })
 
-globalStyle(`.${tabBarItemClassName}[aria-current=page] [data-slot=tab-bar-item-icon-active]`, {
+globalStyle(`.${tabBarItem}[aria-current=page] [data-slot=tab-bar-item-icon-active]`, {
   display: 'flex',
 })
 
-globalStyle(`.${tabBarItemClassName}[aria-current=page] [data-slot=tab-bar-item-icon-inactive]`, {
+globalStyle(`.${tabBarItem}[aria-current=page] [data-slot=tab-bar-item-icon-inactive]`, {
   display: 'none',
 })

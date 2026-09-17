@@ -8,7 +8,7 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import * as z from 'zod'
 
-import { container, container2, container3, image, container4 } from './-login.css'
+import * as styles from './-login.css'
 
 const searchSchema = z.object({ error: z.string().optional() })
 
@@ -42,15 +42,15 @@ const LoginPage = () => {
   }, [error])
 
   return (
-    <div className={container}>
-      <div className={container2}>
+    <div className={styles.container}>
+      <div className={styles.container2}>
         <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
-          <div className={container3}>
+          <div className={styles.container3}>
             <Button onClick={() => signInWithGoogle()} variant="outline" width="full">
-              <img alt="Google" className={image} src="/google.svg" /> Connexion avec Google
+              <img alt="Google" className={styles.image} src="/google.svg" /> Connexion avec Google
             </Button>
           </div>
-          <div className={container4}>
+          <div className={styles.container4}>
             <Button render={<Link to="/" />} size="sm" variant="ghost">
               <ArrowLeftIcon size="sm" />
               Retour à l&apos;accueil

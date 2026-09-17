@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const toggleRecipe = recipe({
+export const toggle = recipe({
   base: {
     selectors: {
       '&[data-pressed]': {

@@ -7,7 +7,7 @@ import { revalidateLogic } from '@tanstack/react-form'
 import { useState, type ReactElement } from 'react'
 import * as z from 'zod'
 
-import { subrecipeFields } from './subrecipe-dialog.css'
+import * as styles from './subrecipe-dialog.css'
 
 const subrecipeSchema = z.object({
   hideFirstNodes: z.number().min(0),
@@ -60,7 +60,7 @@ export const SubrecipeDialog = ({ initialData, onSubmit, submitLabel, title, tri
   return (
     <FormDialog form={form} trigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
       <form.AppField name="recipeId">{({ ComboboxField }) => <ComboboxField label="Recette" options={recipesOptions} />}</form.AppField>
-      <div className={subrecipeFields}>
+      <div className={styles.subrecipeFields}>
         <form.AppField name="hideFirstNodes">{({ NumberField }) => <NumberField label="Masquer les N premières étapes" min={0} />}</form.AppField>
         <form.AppField name="hideLastNodes">{({ NumberField }) => <NumberField label="Masquer les N dernières étapes" min={0} />}</form.AppField>
       </div>

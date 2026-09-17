@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style, globalStyle } from '@vanilla-extract/css'
 
-export const rootClassName = style({
+export const root = style({
   alignItems: 'flex-start',
   display: 'flex',
   flexDirection: 'column',
@@ -9,7 +9,7 @@ export const rootClassName = style({
   width: '100%',
 })
 
-export const groupClassName = style({
+export const group = style({
   selectors: {
     '&:focus-within': {
       borderColor: theme.colors.ring,
@@ -84,7 +84,7 @@ export const groupClassName = style({
   },
 })
 
-export const decrementClassName = style({
+export const decrement = style({
   alignItems: 'center',
   borderEndStartRadius: `calc(${theme.radii.lg} - 1px)`,
   borderStartStartRadius: `calc(${theme.radii.lg} - 1px)`,
@@ -124,7 +124,7 @@ export const decrementClassName = style({
   },
 })
 
-export const incrementClassName = style({
+export const increment = style({
   alignItems: 'center',
   borderEndEndRadius: `calc(${theme.radii.lg} - 1px)`,
   borderStartEndRadius: `calc(${theme.radii.lg} - 1px)`,
@@ -164,7 +164,7 @@ export const incrementClassName = style({
   },
 })
 
-export const inputClassName = style({
+export const input = style({
   backgroundColor: 'transparent',
   flexGrow: 1,
   fontVariantNumeric: 'tabular-nums',
@@ -185,16 +185,16 @@ export const inputClassName = style({
   },
 })
 
-export const scrubAreaClassName = style({
+export const scrubArea = style({
   cursor: 'ew-resize',
   display: 'flex',
 })
 
-export const cursorClassName = style({
+export const cursor = style({
   filter: 'drop-shadow(0 1px 1px #0008)',
 })
 
-globalStyle(`.${groupClassName} svg`, {
+globalStyle(`.${group} svg`, {
   flexShrink: 0,
   pointerEvents: 'none',
 })

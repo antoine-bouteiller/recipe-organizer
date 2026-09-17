@@ -6,7 +6,7 @@ import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useLayoutEffect } from 'react'
 
-import { element, container, element2 } from './-root.css'
+import * as styles from './-root.css'
 
 const SearchBar = lazy(() => import('@client/features/recipe/components/search-bar'))
 
@@ -22,16 +22,16 @@ const RootComponent = () => {
 
   return (
     <ToastProvider>
-      <header className={element}>
+      <header className={styles.element}>
         <Navbar
           search={
-            <Suspense fallback={<div className={container} />}>
+            <Suspense fallback={<div className={styles.container} />}>
               <SearchBar />
             </Suspense>
           }
         />
       </header>
-      <main className={element2}>
+      <main className={styles.element2}>
         <Outlet />
       </main>
     </ToastProvider>

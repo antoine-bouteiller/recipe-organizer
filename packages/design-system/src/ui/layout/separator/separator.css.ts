@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const separatorRecipe = recipe({
+export const separator = recipe({
   base: {
     backgroundColor: theme.colors.border,
     flexShrink: 0,

@@ -1,6 +1,6 @@
 import type React from 'react'
 
-import { skeletonRecipe } from './skeleton.css'
+import * as styles from './skeleton.css'
 
 export interface SkeletonProps {
   preset?:
@@ -14,5 +14,5 @@ export interface SkeletonProps {
     | 'shopping-list-title'
 }
 export const Skeleton = ({ preset }: SkeletonProps): React.ReactElement => (
-  <div aria-hidden className={skeletonRecipe({ preset })} data-slot="skeleton" />
+  <div aria-hidden className={styles.skeleton({ preset })} data-slot="skeleton" />
 )

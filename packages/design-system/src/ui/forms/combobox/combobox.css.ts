@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const fallbackClassName = style({
+export const fallback = style({
   backgroundColor: theme.colors.background,
   borderColor: theme.colors.input,
   borderRadius: theme.radii.lg,

@@ -2,7 +2,7 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { globalStyle } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const listRecipe = recipe({
+export const list = recipe({
   base: {
     selectors: {
       '&[data-orientation=vertical]': {
@@ -34,7 +34,7 @@ export const listRecipe = recipe({
   },
 })
 
-export const indicatorRecipe = recipe({
+export const indicator = recipe({
   base: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.radii.md,
@@ -57,7 +57,7 @@ export const indicatorRecipe = recipe({
   },
 })
 
-export const tabRecipe = recipe({
+export const tab = recipe({
   base: {
     selectors: {
       '&[data-active]': {
@@ -121,7 +121,7 @@ export const tabRecipe = recipe({
   },
 })
 
-export const rootRecipe = recipe({
+export const root = recipe({
   base: {
     selectors: {
       '&[data-orientation=vertical]': {
@@ -136,7 +136,7 @@ export const rootRecipe = recipe({
   },
 })
 
-export const panelsRecipe = recipe({
+export const panels = recipe({
   base: {
     flex: '1 1 0%',
     minHeight: theme.spacing(0),
@@ -144,14 +144,14 @@ export const panelsRecipe = recipe({
   },
 })
 
-export const trackRecipe = recipe({
+export const track = recipe({
   base: {
     display: 'flex',
     height: '100%',
   },
 })
 
-export const panelRecipe = recipe({
+export const panel = recipe({
   base: {
     flexShrink: 0,
     minWidth: '100%',
@@ -159,7 +159,7 @@ export const panelRecipe = recipe({
   },
 })
 
-globalStyle(`.${tabRecipe.classNames.base} svg`, {
+globalStyle(`.${tab.classNames.base} svg`, {
   flexShrink: 0,
   pointerEvents: 'none',
 })

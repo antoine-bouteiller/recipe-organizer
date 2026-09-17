@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { NumberInput } from './number-input'
 
-import { container } from './number-input.stories.css'
+import * as styles from './number-input.stories.css'
 
 const meta = {
   args: { defaultValue: 2, label: 'Servings', max: 12, min: 0 },
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <NumberInput {...args} />
       </StorySection>

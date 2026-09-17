@@ -1,19 +1,7 @@
 import { Button } from '../../actions/button/button'
 import { ArrowLeftIcon } from '../../data-display/icons/arrow-left'
 
-import {
-  screenRecipe,
-  contentRecipe,
-  imageHeaderRecipe,
-  headerRecipe,
-  imageRecipe,
-  imageOverlayRecipe,
-  imageBackRecipe,
-  imageTitleRecipe,
-  imageActionRecipe,
-  headerActionRecipe,
-  titleRecipe,
-} from './screen-layout.css'
+import * as styles from './screen-layout.css'
 
 const GoBackButton = ({ onBack }: { onBack: () => void }) => (
   <Button aria-label="Retour" onClick={onBack} size="icon" variant="ghost">
@@ -31,24 +19,24 @@ interface ScreenHeaderProps {
 const ScreenHeader = ({ backgroundImage, headerEndItem, title, onBack }: ScreenHeaderProps): React.ReactElement => {
   if (backgroundImage) {
     return (
-      <div className={imageHeaderRecipe()}>
-        <img alt="" className={imageRecipe()} src={backgroundImage} />
-        <div className={imageOverlayRecipe()} />
+      <div className={styles.imageHeader()}>
+        <img alt="" className={styles.image()} src={backgroundImage} />
+        <div className={styles.imageOverlay()} />
         {onBack && (
-          <span className={imageBackRecipe()}>
+          <span className={styles.imageBack()}>
             <GoBackButton onBack={onBack} />
           </span>
         )}
-        <h1 className={imageTitleRecipe()}>{title}</h1>
-        {headerEndItem && <div className={imageActionRecipe()}>{headerEndItem}</div>}
+        <h1 className={styles.imageTitle()}>{title}</h1>
+        {headerEndItem && <div className={styles.imageAction()}>{headerEndItem}</div>}
       </div>
     )
   }
   return (
-    <div className={headerRecipe()}>
+    <div className={styles.header()}>
       {onBack && <GoBackButton onBack={onBack} />}
-      <h1 className={titleRecipe()}>{title}</h1>
-      {headerEndItem && <div className={headerActionRecipe()}>{headerEndItem}</div>}
+      <h1 className={styles.title()}>{title}</h1>
+      {headerEndItem && <div className={styles.headerAction()}>{headerEndItem}</div>}
     </div>
   )
 }
@@ -76,14 +64,14 @@ export const ScreenLayout = ({
   const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} onBack={onBack} title={title} />
   return (
     <div
-      className={screenRecipe()}
+      className={styles.screen()}
       data-footer-present={footer ? 'true' : undefined}
       data-scroll-restoration-id={outerScrollId}
       data-slot="screen-layout"
     >
       {backgroundImage && header}
       <div
-        className={contentRecipe({ hasBackground: Boolean(backgroundImage), hasFooter: Boolean(footer) })}
+        className={styles.content({ hasBackground: Boolean(backgroundImage), hasFooter: Boolean(footer) })}
         data-scroll-restoration-id={innerScrollId}
         data-slot="screen-layout-content"
       >

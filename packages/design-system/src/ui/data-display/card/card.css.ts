@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const cardRecipe = recipe({
+export const card = recipe({
   base: {
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
@@ -22,7 +22,7 @@ export const cardRecipe = recipe({
   },
 })
 
-export const headerRecipe = recipe({
+export const header = recipe({
   base: {
     alignItems: 'start',
     display: 'grid',
@@ -33,7 +33,7 @@ export const headerRecipe = recipe({
   },
 })
 
-export const titleRecipe = recipe({
+export const title = recipe({
   base: {
     fontSize: theme.fontSizes.lg,
     fontWeight: theme.fontWeights.semibold,
@@ -41,7 +41,7 @@ export const titleRecipe = recipe({
   },
 })
 
-export const descriptionRecipe = recipe({
+export const description = recipe({
   base: {
     color: theme.colors['muted-foreground'],
     fontSize: theme.fontSizes.sm,

@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Kbd, KbdGroup } from './kbd'
 
-import { container, text } from './kbd.stories.css'
+import * as styles from './kbd.stories.css'
 
 const meta = {
   component: Kbd,
@@ -15,12 +15,12 @@ type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   args: { children: '⌘' },
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <Kbd {...args} />
       </StorySection>
       <StorySection title="Shortcut">
-        <p className={text}>
+        <p className={styles.text}>
           Save changes with{' '}
           <KbdGroup>
             <Kbd>⌘</Kbd>

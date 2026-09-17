@@ -4,23 +4,23 @@ import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from './tabs'
 
-import { cardForeground, cardSurface, container, mutedForeground, mutedSurface, roleMap, section, section2 } from './tabs.stories.css'
+import * as styles from './tabs.stories.css'
 
 const tabs = ['ingredients', 'method'] as const
 
 const SwipeTabsExample = (): React.ReactElement => (
-  <div className={container}>
-    <div aria-label="Tab color roles" className={roleMap}>
-      <span className={mutedSurface} data-slot="muted-surface">
+  <div className={styles.container}>
+    <div aria-label="Tab color roles" className={styles.roleMap}>
+      <span className={styles.mutedSurface} data-slot="muted-surface">
         Muted surface
       </span>
-      <span className={mutedForeground} data-slot="muted-foreground">
+      <span className={styles.mutedForeground} data-slot="muted-foreground">
         Muted foreground
       </span>
-      <span className={cardSurface} data-slot="card-surface">
+      <span className={styles.cardSurface} data-slot="card-surface">
         Card surface
       </span>
-      <span className={cardForeground} data-slot="card-foreground">
+      <span className={styles.cardForeground} data-slot="card-foreground">
         Card foreground
       </span>
     </div>
@@ -31,13 +31,13 @@ const SwipeTabsExample = (): React.ReactElement => (
       </TabsList>
       <SwipeTabsPanels>
         <SwipeTabsPanel value="ingredients">
-          <section aria-label="Ingredients" className={section}>
+          <section aria-label="Ingredients" className={styles.section}>
             <h2>Ingredients</h2>
             <p>2 tomatoes and fresh basil.</p>
           </section>
         </SwipeTabsPanel>
         <SwipeTabsPanel value="method">
-          <section aria-label="Method" className={section2}>
+          <section aria-label="Method" className={styles.section2}>
             <h2>Method</h2>
             <p>Simmer for 20 minutes.</p>
           </section>

@@ -22,7 +22,7 @@ import { lazy, Suspense } from 'react'
 
 import { type MagimixProgramFormInput } from './magimix-program-dialog'
 
-import { magimixItemWidth, magimixImage, magimixTrigger } from './magimix-program-node.css'
+import * as styles from './magimix-program-node.css'
 import '../editor.css'
 
 const MagimixProgramDialog = lazy(async () => {
@@ -73,9 +73,9 @@ const toProgram = (value: string) => magimixProgram.find((item) => item === valu
 const toRotationSpeed = (value: string) => allowedRotationSpeed.find((item) => item === value) ?? 'auto'
 
 const MagimixItem = ({ program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'isEditable' | 'nodeKey'>) => (
-  <div className={magimixItemWidth} data-editor-decorator="">
+  <div className={styles.magimixItemWidth} data-editor-decorator="">
     <Item
-      media={<img alt="Magimix Program Icon" className={magimixImage} src={`/magimix/${program}.png`} />}
+      media={<img alt="Magimix Program Icon" className={styles.magimixImage} src={`/magimix/${program}.png`} />}
       title={magimixProgramLabels[toProgram(program)]}
       variant="outline"
     >
@@ -125,7 +125,7 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
           submitLabel="Enregistrer"
           title="Modifier le programme Magimix"
           triggerRender={
-            <button className={magimixTrigger} type="button">
+            <button className={styles.magimixTrigger} type="button">
               {item}
             </button>
           }

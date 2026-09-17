@@ -4,9 +4,9 @@ import { useState, type ReactElement } from 'react'
 import { CheckIcon } from '../../data-display/icons/check'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle } from '../../overlays/drawer/drawer'
 import { type SelectProps } from './select'
-import { getSelectDisplay, SelectButton, selectTextClassName } from './select.shared'
+import { getSelectDisplay, SelectButton, selectText } from './select.shared'
 
-import { listClassName, itemClassName, labelClassName, iconClassName } from './select.drawer.css'
+import * as styles from './select.drawer.css'
 
 const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
   const { items, placeholder = 'Sélectionner', title, disabled } = props
@@ -29,7 +29,7 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactE
         disabled={disabled}
         render={
           <SelectButton>
-            <span className={selectTextClassName(isEmpty)}>{displayLabel}</span>
+            <span className={selectText(isEmpty)}>{displayLabel}</span>
           </SelectButton>
         }
       />
@@ -38,12 +38,12 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactE
           <DrawerTitle>{title ?? placeholder}</DrawerTitle>
         </DrawerHeader>
         <DrawerPanel>
-          <div className={listClassName}>
+          <div className={styles.list}>
             {items.map((item) => (
-              <button className={itemClassName} key={item.value ?? 'none'} onClick={() => handleSelect(item.value)} type="button">
-                <span className={labelClassName}>{item.label}</span>
+              <button className={styles.item} key={item.value ?? 'none'} onClick={() => handleSelect(item.value)} type="button">
+                <span className={styles.label}>{item.label}</span>
                 {isSelected(item.value) && (
-                  <span className={iconClassName}>
+                  <span className={styles.icon}>
                     <CheckIcon size="sm" />
                   </span>
                 )}

@@ -4,17 +4,7 @@ import type React from 'react'
 import { Button } from '../../actions/button/button'
 import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 
-import {
-  backdropClassName,
-  viewportClassName,
-  popupClassName,
-  headerClassName,
-  footerClassName,
-  titleClassName,
-  panelClassName,
-  barClassName,
-  container,
-} from './drawer.css'
+import * as styles from './drawer.css'
 
 type DrawerRootProps = Pick<DrawerPrimitive.Root.Props, 'children' | 'onOpenChange' | 'open'>
 type DrawerTriggerProps = Pick<DrawerPrimitive.Trigger.Props, 'children' | 'render'>
@@ -43,34 +33,34 @@ export const DrawerClose = ({ children, disabled, render = defaultDrawerActionRe
 )
 export const DrawerPopup = ({ children }: DrawerPopupProps): React.ReactElement => (
   <DrawerPrimitive.Portal>
-    <DrawerPrimitive.Backdrop className={backdropClassName()} data-slot="drawer-backdrop" />
-    <DrawerPrimitive.Viewport className={viewportClassName()} data-slot="drawer-viewport">
-      <DrawerPrimitive.Popup className={popupClassName()} data-slot="drawer-popup">
+    <DrawerPrimitive.Backdrop className={styles.backdrop()} data-slot="drawer-backdrop" />
+    <DrawerPrimitive.Viewport className={styles.viewport()} data-slot="drawer-viewport">
+      <DrawerPrimitive.Popup className={styles.popup()} data-slot="drawer-popup">
         {children}
-        <div aria-hidden className={barClassName()} data-slot="drawer-bar" />
+        <div aria-hidden className={styles.bar()} data-slot="drawer-bar" />
       </DrawerPrimitive.Popup>
     </DrawerPrimitive.Viewport>
   </DrawerPrimitive.Portal>
 )
 export const DrawerHeader = ({ children }: DrawerHeaderProps): React.ReactElement => (
-  <div className={headerClassName()} data-slot="drawer-header">
+  <div className={styles.header()} data-slot="drawer-header">
     {children}
   </div>
 )
 export const DrawerFooter = ({ children }: DrawerContentProps): React.ReactElement => (
-  <DrawerPrimitive.Content className={footerClassName()} data-slot="drawer-footer">
+  <DrawerPrimitive.Content className={styles.footer()} data-slot="drawer-footer">
     {children}
   </DrawerPrimitive.Content>
 )
 export const DrawerTitle = ({ children }: DrawerTitleProps): React.ReactElement => (
-  <DrawerPrimitive.Title className={titleClassName()} data-slot="drawer-title">
+  <DrawerPrimitive.Title className={styles.title()} data-slot="drawer-title">
     {children}
   </DrawerPrimitive.Title>
 )
 export const DrawerPanel = ({ children }: DrawerContentProps): React.ReactElement => (
-  <div className={container()}>
+  <div className={styles.container()}>
     <ScrollArea scrollFade>
-      <DrawerPrimitive.Content className={panelClassName()} data-slot="drawer-panel">
+      <DrawerPrimitive.Content className={styles.panel()} data-slot="drawer-panel">
         {children}
       </DrawerPrimitive.Content>
     </ScrollArea>

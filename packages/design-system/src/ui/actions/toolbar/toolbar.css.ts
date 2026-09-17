@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const toolbarClassName = style({
+export const toolbar = style({
   vars: {
     '--owner-icon-margin-inline': '0',
     '--owner-icon-opacity': '1',
@@ -18,13 +18,13 @@ export const toolbarClassName = style({
   width: '100%',
 })
 
-export const toolbarGroupClassName = style({
+export const toolbarGroup = style({
   alignItems: 'center',
   display: 'flex',
   gap: theme.spacing(1),
 })
 
-export const toolbarButtonClassName = style({
+export const toolbarButton = style({
   vars: {
     '--owner-icon-margin-inline': '-2px',
     '--owner-icon-opacity': '0.8',
@@ -90,7 +90,7 @@ export const toolbarButtonClassName = style({
   },
 })
 
-export const toolbarSeparatorClassName = style({
+export const toolbarSeparator = style({
   selectors: {
     '&[data-orientation=horizontal]': {
       height: '1px',

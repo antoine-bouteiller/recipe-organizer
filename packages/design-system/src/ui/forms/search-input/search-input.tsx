@@ -1,6 +1,6 @@
 import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
 
-import { root, inputClassName, addonClassName, text } from './search-input.css'
+import * as styles from './search-input.css'
 
 export interface SearchInputProps {
   autoFocus?: boolean
@@ -10,25 +10,25 @@ export interface SearchInputProps {
 }
 
 export const SearchInput = ({ autoFocus, placeholder = 'Rechercher…', search, setSearch }: SearchInputProps) => (
-  <div className={root} data-slot="input-group" role="group">
+  <div className={styles.root} data-slot="input-group" role="group">
     <input
       aria-label={placeholder}
       autoFocus={autoFocus}
-      className={inputClassName}
+      className={styles.input}
       data-slot="input"
       onChange={(event) => setSearch(event.target.value)}
       placeholder={placeholder}
       value={search}
     />
     <div
-      className={addonClassName}
+      className={styles.addon}
       data-slot="input-group-addon"
       onMouseDown={(event) => {
         event.preventDefault()
         event.currentTarget.parentElement?.querySelector<HTMLInputElement>('input')?.focus()
       }}
     >
-      <span className={text}>
+      <span className={styles.text}>
         <MagnifyingGlassIcon />
       </span>
     </div>

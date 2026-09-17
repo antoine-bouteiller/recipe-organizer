@@ -4,7 +4,7 @@ import { expect, waitFor, within } from 'storybook/test'
 import { StorySection } from '../../../../.storybook/story-section'
 import { ScrollArea } from './scroll-area'
 
-import { container, container2, container3, container4, container5, container6, container7 } from './scroll-area.stories.css'
+import * as styles from './scroll-area.stories.css'
 
 const meta = {
   component: ScrollArea,
@@ -23,11 +23,11 @@ export const Overview: Story = {
     await waitFor(() => expect(viewport).toHaveAttribute('data-has-overflow-y'))
   },
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
-        <div className={container2}>
+        <div className={styles.container2}>
           <ScrollArea>
-            <div className={container3}>
+            <div className={styles.container3}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}
@@ -36,9 +36,9 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="With Fade and Gutter">
-        <div className={container4}>
+        <div className={styles.container4}>
           <ScrollArea scrollFade scrollbarGutter>
-            <div className={container5}>
+            <div className={styles.container5}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}
@@ -47,16 +47,16 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="Fade without overflow">
-        <div className={container4}>
+        <div className={styles.container4}>
           <ScrollArea scrollFade>
-            <div className={container5}>Short content stays visible without scrolling.</div>
+            <div className={styles.container5}>Short content stays visible without scrolling.</div>
           </ScrollArea>
         </div>
       </StorySection>
       <StorySection title="Compact Gutter">
-        <div className={container6}>
+        <div className={styles.container6}>
           <ScrollArea aria-label="Compact scrolling" scrollbarGutter="compact" scrollFade>
-            <div className={container7}>
+            <div className={styles.container7}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}

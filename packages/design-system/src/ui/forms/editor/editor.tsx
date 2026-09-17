@@ -25,15 +25,7 @@ import { useCallback, useEffect, useLayoutEffect, useState, type ReactNode } fro
 import { ToolbarToggle } from '../../actions/toolbar/toolbar'
 import { OnChangePlugin } from './plugins/on-change-plugin'
 
-import {
-  editorUnderline,
-  editorContentBase,
-  editorChecklist,
-  editorCheckedListItem,
-  editorContentFull,
-  editorContentReading,
-  editorContentEditable,
-} from './editor.css'
+import * as styles from './editor.css'
 
 type EditorCommand = 'bold' | 'bulletList' | 'italic' | 'redo' | 'underline' | 'undo'
 type EditorContentWidth = 'full' | 'reading'
@@ -140,7 +132,10 @@ const Editor = ({ children, content, nodes: extraNodes, onChange, readOnly }: Ed
       onError: (error: Error) => {
         throw error
       },
-      theme: { list: { checklist: editorChecklist, listitemChecked: editorCheckedListItem }, text: { underline: editorUnderline } },
+      theme: {
+        list: { checklist: styles.editorChecklist, listitemChecked: styles.editorCheckedListItem },
+        text: { underline: styles.editorUnderline },
+      },
     })
   )
   return (
@@ -162,13 +157,13 @@ const EditorContent = ({ disabled, width = 'full' }: EditorContentProps) => {
   useLayoutEffect(() => {
     editor.setEditable(!disabled && initiallyEditable)
   }, [disabled, editor, initiallyEditable])
-  const widthClassName = width === 'reading' ? editorContentReading : editorContentFull
-  const editableClassName = initiallyEditable ? ` ${editorContentEditable}` : ''
+  const contentWidth = width === 'reading' ? styles.editorContentReading : styles.editorContentFull
+  const editable = initiallyEditable ? ` ${styles.editorContentEditable}` : ''
   return (
     <ContentEditable
       aria-disabled={disabled || undefined}
       aria-readonly={disabled || !editor.isEditable() || undefined}
-      className={`${editorContentBase} ${widthClassName}${editableClassName}`}
+      className={`${styles.editorContentBase} ${contentWidth}${editable}`}
       data-editor-content=""
     />
   )

@@ -2,7 +2,7 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { globalStyle } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const inputGroupClassName = recipe({
+export const inputGroup = recipe({
   base: {
     selectors: {
       '&:has(:disabled)': {
@@ -18,7 +18,7 @@ export const inputGroupClassName = recipe({
   },
 })
 
-export const inputClassName = recipe({
+export const input = recipe({
   base: {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
@@ -50,7 +50,7 @@ export const inputClassName = recipe({
   },
 })
 
-export const addonClassName = recipe({
+export const addon = recipe({
   base: {
     alignItems: 'center',
     display: 'flex',
@@ -64,7 +64,7 @@ export const addonClassName = recipe({
   },
 })
 
-export const itemClassName = recipe({
+export const item = recipe({
   base: {
     selectors: {
       '&[data-disabled]': {
@@ -97,7 +97,7 @@ export const itemClassName = recipe({
   },
 })
 
-export const emptyClassName = recipe({
+export const empty = recipe({
   base: {
     selectors: {
       '&:not(:empty)': {
@@ -115,7 +115,7 @@ export const emptyClassName = recipe({
   },
 })
 
-export const listClassName = recipe({
+export const list = recipe({
   base: {
     selectors: {
       '&:not(:empty)': {
@@ -129,7 +129,7 @@ export const listClassName = recipe({
   },
 })
 
-export const backdropClassName = recipe({
+export const backdrop = recipe({
   base: {
     selectors: {
       '&[data-ending-style], &[data-starting-style]': {
@@ -144,7 +144,7 @@ export const backdropClassName = recipe({
   },
 })
 
-export const viewportClassName = recipe({
+export const viewport = recipe({
   base: {
     alignItems: 'center',
     display: 'flex',
@@ -162,7 +162,7 @@ export const viewportClassName = recipe({
   },
 })
 
-export const popupClassName = recipe({
+export const popup = recipe({
   base: {
     selectors: {
       '&[data-ending-style], &[data-starting-style]': {
@@ -219,7 +219,7 @@ export const popupClassName = recipe({
   },
 })
 
-export const panelClassName = recipe({
+export const panel = recipe({
   base: {
     selectors: {
       '&:not(:has(+ [data-slot=command-footer]))': {
@@ -254,7 +254,7 @@ export const panelClassName = recipe({
   },
 })
 
-export const footerClassName = recipe({
+export const footer = recipe({
   base: {
     alignItems: 'center',
     borderBottomLeftRadius: `calc(${theme.radii['2xl']} - 1px)`,
@@ -278,16 +278,16 @@ export const container = recipe({
   },
 })
 
-globalStyle(`.${addonClassName.classNames.base} svg:not([data-size])`, {
+globalStyle(`.${addon.classNames.base} svg:not([data-size])`, {
   height: '18px',
   width: '18px',
 })
 
-globalStyle(`.${addonClassName.classNames.base} svg`, {
+globalStyle(`.${addon.classNames.base} svg`, {
   marginInline: '-2px',
 })
 
-globalStyle(`.${addonClassName.classNames.base} svg:not([data-size])`, {
+globalStyle(`.${addon.classNames.base} svg:not([data-size])`, {
   '@media': {
     'screen and (min-width: 640px)': {
       height: '16px',

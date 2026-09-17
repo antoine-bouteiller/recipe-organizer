@@ -5,7 +5,7 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 import { NumberField } from './number-field'
 
-import { container } from './number-field.stories.css'
+import * as styles from './number-field.stories.css'
 
 const NumberFieldExample = ({ disabled = false, initialValue }: { disabled?: boolean; initialValue?: number }): ReactElement => {
   const form = useAppForm({ defaultValues: { servings: initialValue }, onSubmit: async () => undefined })
@@ -24,7 +24,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <NumberFieldExample />
       </StorySection>

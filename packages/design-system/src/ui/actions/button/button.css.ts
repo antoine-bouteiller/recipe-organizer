@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const buttonRecipe = recipe({
+export const button = recipe({
   base: {
     selectors: {
       '&[data-disabled], &:disabled': {

@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const rootRecipe = recipe({
+export const root = recipe({
   base: {
     alignItems: 'center',
     display: 'flex',
@@ -14,14 +14,14 @@ export const rootRecipe = recipe({
   },
 })
 
-export const headingRecipe = recipe({
+export const heading = recipe({
   base: {
     fontSize: theme.fontSizes['5xl'],
     fontWeight: theme.fontWeights.semibold,
   },
 })
 
-export const bodyRecipe = recipe({
+export const body = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
@@ -30,14 +30,14 @@ export const bodyRecipe = recipe({
   },
 })
 
-export const subheadingRecipe = recipe({
+export const subheading = recipe({
   base: {
     fontSize: theme.fontSizes['3xl'],
     fontWeight: theme.fontWeights.semibold,
   },
 })
 
-export const detailsRecipe = recipe({
+export const details = recipe({
   base: {
     borderColor: theme.colors.destructive,
     borderRadius: theme.radii.sm,

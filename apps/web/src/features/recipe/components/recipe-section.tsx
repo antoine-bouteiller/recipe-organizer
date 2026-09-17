@@ -4,16 +4,7 @@ import { formatNumber } from '@client/utils/number'
 import { UNITS } from '@recipe-organizer/shared/units'
 import { scaleQuantity } from '@recipe-organizer/shared/utils/scale-quantity'
 
-import {
-  bullet,
-  group as groupClassName,
-  groupName,
-  ingredient,
-  ingredientLine,
-  ingredientName,
-  ingredients,
-  quantity as quantityClassName,
-} from './recipe-section.css'
+import * as styles from './recipe-section.css'
 
 interface RecipeGroupIngredientsProps {
   baseServings: number
@@ -24,13 +15,13 @@ interface RecipeGroupIngredientsProps {
 
 const RecipeGroupIngredients = ({ baseServings, groupIngredients, presentation, servings }: RecipeGroupIngredientsProps) =>
   groupIngredients.length > 0 && (
-    <ul className={ingredients[presentation]}>
+    <ul className={styles.ingredients[presentation]}>
       {groupIngredients.map((groupIngredient) => (
-        <li className={ingredient} key={groupIngredient.id}>
-          <div className={ingredientLine}>
-            <span className={bullet} />
-            <div className={ingredientName}>{groupIngredient.ingredient.name}</div>
-            <div className={quantityClassName}>
+        <li className={styles.ingredient} key={groupIngredient.id}>
+          <div className={styles.ingredientLine}>
+            <span className={styles.bullet} />
+            <div className={styles.ingredientName}>{groupIngredient.ingredient.name}</div>
+            <div className={styles.quantity}>
               {formatNumber(scaleQuantity(groupIngredient.quantity, servings, baseServings))}
               {groupIngredient.unitSlug && ` ${UNITS[groupIngredient.unitSlug]?.name ?? ''}`}
             </div>
@@ -51,8 +42,8 @@ export const RecipeIngredientGroups = ({ recipeId, baseServings, ingredientGroup
   const { quantity } = useRecipeQuantities(recipeId, baseServings)
 
   return ingredientGroups.map((group) => (
-    <div className={groupClassName} key={group.id}>
-      {group.groupName && <div className={groupName}>{group.groupName}</div>}
+    <div className={styles.group} key={group.id}>
+      {group.groupName && <div className={styles.groupName}>{group.groupName}</div>}
 
       <RecipeGroupIngredients baseServings={baseServings} groupIngredients={group.groupIngredients} presentation={presentation} servings={quantity} />
     </div>

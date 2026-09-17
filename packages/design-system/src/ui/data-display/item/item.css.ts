@@ -2,14 +2,14 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { globalStyle } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const groupRecipe = recipe({
+export const group = recipe({
   base: {
     display: 'flex',
     flexDirection: 'column',
   },
 })
 
-export const separatorRecipe = recipe({
+export const separator = recipe({
   base: {
     backgroundColor: theme.colors.border,
     height: '1px',
@@ -17,7 +17,7 @@ export const separatorRecipe = recipe({
   },
 })
 
-export const itemRecipe = recipe({
+export const item = recipe({
   base: {
     alignItems: 'center',
     borderColor: 'transparent',
@@ -67,7 +67,7 @@ export const itemRecipe = recipe({
   },
 })
 
-export const mediaRecipe = recipe({
+export const media = recipe({
   base: {
     selectors: {
       '[data-slot=item]:has([data-slot=item-description]) &': {
@@ -83,7 +83,7 @@ export const mediaRecipe = recipe({
   },
 })
 
-export const contentRecipe = recipe({
+export const content = recipe({
   base: {
     display: 'flex',
     flex: '1 1 0%',
@@ -92,7 +92,7 @@ export const contentRecipe = recipe({
   },
 })
 
-export const titleRecipe = recipe({
+export const title = recipe({
   base: {
     alignItems: 'center',
     display: 'flex',
@@ -104,7 +104,7 @@ export const titleRecipe = recipe({
   },
 })
 
-export const descriptionRecipe = recipe({
+export const description = recipe({
   base: {
     alignItems: 'center',
     color: theme.colors['muted-foreground'],
@@ -117,7 +117,7 @@ export const descriptionRecipe = recipe({
   },
 })
 
-export const actionsRecipe = recipe({
+export const actions = recipe({
   base: {
     alignItems: 'center',
     display: 'flex',
@@ -125,12 +125,12 @@ export const actionsRecipe = recipe({
   },
 })
 
-globalStyle(`.${descriptionRecipe.classNames.base} > a`, {
+globalStyle(`.${description.classNames.base} > a`, {
   textDecoration: 'underline',
   textUnderlineOffset: '4px',
 })
 
-globalStyle(`.${descriptionRecipe.classNames.base} > a:hover`, {
+globalStyle(`.${description.classNames.base} > a:hover`, {
   '@media': {
     '(hover: hover) and (pointer: fine)': {
       color: theme.colors.primary,

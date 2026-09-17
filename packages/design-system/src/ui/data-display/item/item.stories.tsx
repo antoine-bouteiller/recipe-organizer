@@ -5,7 +5,7 @@ import { Button } from '../../actions/button/button'
 import { CheckCircleIcon } from '../icons/check-circle'
 import { Item, ItemGroup, ItemSeparator } from './item'
 
-import { container, container2 } from './item.stories.css'
+import * as styles from './item.stories.css'
 
 const meta = {
   component: Item,
@@ -21,12 +21,12 @@ export const Overview: Story = {
     title: 'Saved recipe',
   },
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <Item {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className={container2}>
+        <div className={styles.container2}>
           <Item media={<CheckCircleIcon />} title="Default">
             A standard item.
           </Item>

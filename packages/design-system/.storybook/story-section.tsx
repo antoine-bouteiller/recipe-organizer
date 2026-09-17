@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from 'react'
 
-import { section, heading } from './story-section.css'
+import * as styles from './story-section.css'
 
 export interface StorySectionProps {
   children: ReactNode
@@ -10,8 +10,8 @@ export interface StorySectionProps {
 export const StorySection = ({ title, children }: StorySectionProps) => {
   const id = useId()
   return (
-    <section aria-labelledby={id} className={section}>
-      <h2 className={heading} id={id}>
+    <section aria-labelledby={id} className={styles.section}>
+      <h2 className={styles.heading} id={id}>
         {title}
       </h2>
       {children}

@@ -1,11 +1,11 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-import { inputSurface } from '../input/input-surface.css'
+import * as styles from '../input/input-surface.css'
 
-export const root = style([inputSurface(), { alignItems: 'center', minWidth: theme.spacing(0) }])
+export const root = style([styles.inputSurface(), { alignItems: 'center', minWidth: theme.spacing(0) }])
 
-export const inputClassName = style({
+export const input = style({
   backgroundColor: 'transparent',
   borderRadius: 'inherit',
   height: theme.spacing(9.5),
@@ -30,7 +30,7 @@ export const inputClassName = style({
   },
 })
 
-export const addonClassName = style({
+export const addon = style({
   vars: {
     '--owner-icon-size': '18px',
   },

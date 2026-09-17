@@ -5,27 +5,16 @@ import { CaretDownIcon } from '../../data-display/icons/caret-down'
 import { CaretUpIcon } from '../../data-display/icons/caret-up'
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
-import { getSelectDisplay, selectTextClassName, selectTriggerClassName, selectTriggerIconClassName } from './select.shared'
+import { getSelectDisplay, selectText } from './select.shared'
 
-import {
-  positionerClassName,
-  popupClassName,
-  popupFrameClassName,
-  listClassName,
-  arrowClassName,
-  scrollUpArrowClassName,
-  scrollDownArrowClassName,
-  itemClassName,
-  iconClassName,
-  indicatorClassName,
-  itemTextClassName,
-} from './select.base.css'
+import * as styles from './select.base.css'
+import * as shared from './select.shared.css'
 
 const SelectTrigger = (props: SelectPrimitive.Trigger.Props): ReactElement => (
-  <SelectPrimitive.Trigger className={selectTriggerClassName} data-slot="select-trigger" {...props}>
+  <SelectPrimitive.Trigger className={shared.selectTrigger} data-slot="select-trigger" {...props}>
     <>
       {props.children}
-      <SelectPrimitive.Icon className={selectTriggerIconClassName} data-slot="select-icon">
+      <SelectPrimitive.Icon className={shared.selectTriggerIcon} data-slot="select-icon">
         <CaretUpDownIcon />
       </SelectPrimitive.Icon>
     </>
@@ -36,24 +25,24 @@ const SelectPopup = ({ children, ...props }: SelectPrimitive.Popup.Props): React
     <SelectPrimitive.Positioner
       align="start"
       alignItemWithTrigger
-      className={positionerClassName}
+      className={styles.positioner}
       data-slot="select-positioner"
       side="bottom"
       sideOffset={4}
     >
-      <SelectPrimitive.Popup className={popupClassName} data-slot="select-popup" {...props}>
-        <SelectPrimitive.ScrollUpArrow className={`${arrowClassName} ${scrollUpArrowClassName}`} data-slot="select-scroll-up-arrow">
-          <span className={iconClassName}>
+      <SelectPrimitive.Popup className={styles.popup} data-slot="select-popup" {...props}>
+        <SelectPrimitive.ScrollUpArrow className={`${styles.arrow} ${styles.scrollUpArrow}`} data-slot="select-scroll-up-arrow">
+          <span className={styles.icon}>
             <CaretUpIcon />
           </span>
         </SelectPrimitive.ScrollUpArrow>
-        <div className={popupFrameClassName}>
-          <SelectPrimitive.List className={listClassName} data-slot="select-list">
+        <div className={styles.popupFrame}>
+          <SelectPrimitive.List className={styles.list} data-slot="select-list">
             {children}
           </SelectPrimitive.List>
         </div>
-        <SelectPrimitive.ScrollDownArrow className={`${arrowClassName} ${scrollDownArrowClassName}`} data-slot="select-scroll-down-arrow">
-          <span className={iconClassName}>
+        <SelectPrimitive.ScrollDownArrow className={`${styles.arrow} ${styles.scrollDownArrow}`} data-slot="select-scroll-down-arrow">
+          <span className={styles.icon}>
             <CaretDownIcon />
           </span>
         </SelectPrimitive.ScrollDownArrow>
@@ -62,8 +51,8 @@ const SelectPopup = ({ children, ...props }: SelectPrimitive.Popup.Props): React
   </SelectPrimitive.Portal>
 )
 const SelectItem = (props: SelectPrimitive.Item.Props): ReactElement => (
-  <SelectPrimitive.Item className={itemClassName} data-slot="select-item" {...props}>
-    <SelectPrimitive.ItemIndicator className={indicatorClassName}>
+  <SelectPrimitive.Item className={styles.item} data-slot="select-item" {...props}>
+    <SelectPrimitive.ItemIndicator className={styles.indicator}>
       <svg
         aria-hidden="true"
         fill="none"
@@ -78,7 +67,7 @@ const SelectItem = (props: SelectPrimitive.Item.Props): ReactElement => (
         <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
       </svg>
     </SelectPrimitive.ItemIndicator>
-    <SelectPrimitive.ItemText className={itemTextClassName}>{props.children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText className={styles.itemText}>{props.children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 )
 const SelectBase = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
@@ -86,7 +75,7 @@ const SelectBase = <TValue extends string>(props: SelectProps<TValue>): ReactEle
   const { displayLabel, isEmpty } = getSelectDisplay(props)
   const trigger = (
     <SelectTrigger disabled={disabled}>
-      <span className={selectTextClassName(isEmpty)}>{displayLabel}</span>
+      <span className={selectText(isEmpty)}>{displayLabel}</span>
     </SelectTrigger>
   )
   const popup = (

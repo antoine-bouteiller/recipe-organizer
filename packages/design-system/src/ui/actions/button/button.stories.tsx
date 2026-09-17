@@ -9,7 +9,7 @@ import { Select } from '../../forms/select/select'
 import { Toggle } from '../toggle/toggle'
 import { Button } from './button'
 
-import { comparisonRow, container, container2, container3, popoverSurface, searchRow } from './button.stories.css'
+import * as styles from './button.stories.css'
 
 const meta = {
   component: Button,
@@ -33,7 +33,7 @@ export const InteractionStates: Story = {
     await expect(getComputedStyle(canvas.getByRole('button', { name: 'Unavailable' }), '::before').opacity).toBe('0')
   },
   render: () => (
-    <div className={container2}>
+    <div className={styles.container2}>
       <TogglePrimitive render={<Button variant="secondary" />}>Save recipe</TogglePrimitive>
       <Button disabled>Unavailable</Button>
     </div>
@@ -82,11 +82,11 @@ export const SearchAction: Story = {
     await userEvent.keyboard('{/Space}')
   },
   render: () => (
-    <div className={comparisonRow}>
-      <span className={popoverSurface} data-slot="popover-surface">
+    <div className={styles.comparisonRow}>
+      <span className={styles.popoverSurface} data-slot="popover-surface">
         Popover surface
       </span>
-      <div className={searchRow}>
+      <div className={styles.searchRow}>
         <SearchInput search="" setSearch={fn()} />
         <Button aria-label="Add item" size="icon-lg" variant="outline">
           <PlusIcon />
@@ -106,12 +106,12 @@ export const SearchAction: Story = {
 export const Overview: Story = {
   args: { children: 'Save changes' },
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <Button {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className={container2}>
+        <div className={styles.container2}>
           <Button>Default</Button>
           <Button variant="secondary">Secondary</Button>
           <Button variant="outline">Outline</Button>
@@ -122,7 +122,7 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="Sizes">
-        <div className={container3}>
+        <div className={styles.container3}>
           <Button size="sm">Small</Button>
           <Button>Default</Button>
           <Button size="lg">Large</Button>
@@ -137,7 +137,7 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="Disabled">
-        <div className={container2}>
+        <div className={styles.container2}>
           <Button disabled>Unavailable</Button>
           <Button disabled variant="secondary">
             Secondary

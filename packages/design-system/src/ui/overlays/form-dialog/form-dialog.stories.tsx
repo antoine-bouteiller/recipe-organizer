@@ -6,7 +6,7 @@ import { useAppForm } from '../../../hooks/use-app-form'
 import { Button } from '../../actions/button/button'
 import { getFormDialog } from './form-dialog'
 
-import { container } from './form-dialog.stories.css'
+import * as styles from './form-dialog.stories.css'
 
 const defaultValues = { title: 'Tomato soup' }
 const FormDialog = getFormDialog(defaultValues)
@@ -42,7 +42,7 @@ const RegressionExample = (): ReactElement => {
     <form.AppForm>
       <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Save recipe" title="Edit recipe" trigger={<Button>Edit recipe</Button>}>
         <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
-        <div className={container}>
+        <div className={styles.container}>
           {Array.from({ length: 20 }, (_item, index) => (
             <p key={index}>Long form content {index + 1}</p>
           ))}

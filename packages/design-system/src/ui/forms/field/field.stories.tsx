@@ -4,7 +4,7 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { Input } from '../input/input'
 import { Field, FieldError, FieldLabel } from './field'
 
-import { container } from './field.stories.css'
+import * as styles from './field.stories.css'
 
 const meta = {
   component: Field,
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <Field name="email">
           <FieldLabel>Email address</FieldLabel>

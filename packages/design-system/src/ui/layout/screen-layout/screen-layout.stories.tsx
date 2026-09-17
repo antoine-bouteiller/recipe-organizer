@@ -6,11 +6,11 @@ import { StorySection } from '../../../../.storybook/story-section'
 import { Button } from '../../actions/button/button'
 import { ScreenLayout } from './screen-layout'
 
-import { section as sectionClassName, heading, container, container2, text, element } from './screen-layout.stories.css'
+import * as styles from './screen-layout.stories.css'
 
 const content = (
-  <section className={sectionClassName}>
-    <h2 className={heading}>Content</h2>
+  <section className={styles.section}>
+    <h2 className={styles.heading}>Content</h2>
     {Array.from({ length: 40 }, (_item, index) => (
       <p key={index}>Item {index + 1}</p>
     ))}
@@ -28,7 +28,7 @@ const BackExample = () => {
 }
 
 const LayoutExample = (props: ComponentProps<typeof ScreenLayout>) => (
-  <div className={container}>
+  <div className={styles.container}>
     <ScreenLayout {...props} />
   </div>
 )
@@ -74,8 +74,8 @@ export const Overview: Story = {
     }
   },
   render: (args) => (
-    <div className={container2}>
-      <p className={text}>Use the viewport toolbar to compare mobile headers and desktop scrolling.</p>
+    <div className={styles.container2}>
+      <p className={styles.text}>Use the viewport toolbar to compare mobile headers and desktop scrolling.</p>
       <StorySection title="Default">
         <LayoutExample {...args} innerScrollId="story-content" outerScrollId="story-outer" />
       </StorySection>
@@ -92,7 +92,7 @@ export const Overview: Story = {
         <LayoutExample
           {...args}
           footer={
-            <nav aria-label="Example navigation" className={element}>
+            <nav aria-label="Example navigation" className={styles.element}>
               Navigation slot
             </nav>
           }

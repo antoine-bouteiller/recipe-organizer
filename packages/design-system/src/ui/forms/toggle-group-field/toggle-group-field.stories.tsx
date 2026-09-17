@@ -4,7 +4,7 @@ import { type ReactElement } from 'react'
 import { StorySection } from '../../../../.storybook/story-section'
 import { useAppForm } from '../../../hooks/use-app-form'
 
-import { container } from './toggle-group-field.stories.css'
+import * as styles from './toggle-group-field.stories.css'
 
 const emptyMeals: string[] = []
 
@@ -31,7 +31,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <ToggleGroupFieldExample />
       </StorySection>

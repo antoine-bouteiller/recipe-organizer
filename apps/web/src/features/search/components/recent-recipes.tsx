@@ -2,14 +2,14 @@ import { RecipeSearchCard } from '@client/features/search/components/recipe-sear
 import { clearRecentRecipes, useRecentRecipeIds } from '@client/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@client/types/recipe'
 
-import { container, container2, container3, heading, element } from './recent-recipes.css'
+import * as styles from './recent-recipes.css'
 
 export interface RecentRecipesProps {
   recipes: ReducedRecipe[]
 }
 
 const RecipeCardList = ({ recipes }: RecentRecipesProps) => (
-  <div className={container}>
+  <div className={styles.container}>
     {recipes.map((recipe) => (
       <RecipeSearchCard key={recipe.id} recipe={recipe} />
     ))}
@@ -28,10 +28,10 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
   }
 
   return (
-    <div className={container2}>
-      <div className={container3}>
-        <h2 className={heading}>Recherches récentes</h2>
-        <button className={element} onClick={clearRecentRecipes} type="button">
+    <div className={styles.container2}>
+      <div className={styles.container3}>
+        <h2 className={styles.heading}>Recherches récentes</h2>
+        <button className={styles.element} onClick={clearRecentRecipes} type="button">
           Effacer
         </button>
       </div>

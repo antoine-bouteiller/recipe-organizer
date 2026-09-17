@@ -4,7 +4,7 @@ import { useState, type ReactElement } from 'react'
 import { StorySection } from '../../../../.storybook/story-section'
 import { ToggleGroup } from './toggle-group'
 
-import { container } from './toggle-group.stories.css'
+import * as styles from './toggle-group.stories.css'
 
 const items = [
   { label: 'Breakfast', value: 'breakfast' },
@@ -28,7 +28,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: (args) => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <ControlledToggleGroup />
       </StorySection>

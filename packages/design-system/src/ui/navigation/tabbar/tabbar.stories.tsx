@@ -7,20 +7,20 @@ import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
 import { ShoppingCartSimpleIcon } from '../../data-display/icons/shopping-cart-simple'
 import { TabBar, TabBarItem } from './tabbar'
 
-import { accentForeground, accentSurface, appSurface, container, contentSurface, mutedForeground } from './tabbar.stories.css'
+import * as styles from './tabbar.stories.css'
 
 const TabBarExample = (): React.ReactElement => (
-  <div className={container}>
-    <main className={appSurface}>
+  <div className={styles.container}>
+    <main className={styles.appSurface}>
       <span>App surface</span>
-      <section className={contentSurface}>Content surface</section>
-      <span className={mutedForeground} data-slot="muted-foreground">
+      <section className={styles.contentSurface}>Content surface</section>
+      <span className={styles.mutedForeground} data-slot="muted-foreground">
         Muted foreground role
       </span>
-      <span className={accentForeground} data-slot="accent-foreground">
+      <span className={styles.accentForeground} data-slot="accent-foreground">
         Accent foreground role
       </span>
-      <span className={accentSurface} data-slot="accent-surface">
+      <span className={styles.accentSurface} data-slot="accent-surface">
         Accent surface role
       </span>
     </main>

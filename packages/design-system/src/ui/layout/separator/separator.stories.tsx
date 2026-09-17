@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Separator } from './separator'
 
-import { container, container2, text, container3, text2, container4 } from './separator.stories.css'
+import * as styles from './separator.stories.css'
 
 const meta = {
   component: Separator,
@@ -15,18 +15,18 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
-        <div className={container2}>
-          <p className={text}>Ingredients</p>
-          <div className={container3}>
+        <div className={styles.container2}>
+          <p className={styles.text}>Ingredients</p>
+          <div className={styles.container3}>
             <Separator />
           </div>
-          <p className={text2}>Serves four people.</p>
+          <p className={styles.text2}>Serves four people.</p>
         </div>
       </StorySection>
       <StorySection title="Vertical">
-        <div className={container4}>
+        <div className={styles.container4}>
           <span>Overview</span>
           <Separator orientation="vertical" />
           <span>Details</span>

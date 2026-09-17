@@ -2,14 +2,14 @@ import { Input as InputPrimitive } from '@base-ui/react/input'
 import { type RecipeVariants } from '@vanilla-extract/recipes'
 import type React from 'react'
 
-import { inputSurface } from './input-surface.css'
-import { inputRecipe } from './input.css'
+import * as surface from './input-surface.css'
+import * as styles from './input.css'
 
 export type InputProps = Pick<
   InputPrimitive.Props,
   'aria-invalid' | 'aria-label' | 'defaultValue' | 'disabled' | 'onChange' | 'placeholder' | 'type' | 'value'
 > &
-  RecipeVariants<typeof inputRecipe>
+  RecipeVariants<typeof styles.input>
 
 export const Input = ({
   'aria-invalid': ariaInvalid,
@@ -22,11 +22,11 @@ export const Input = ({
   type,
   value,
 }: InputProps): React.ReactElement => (
-  <span className={inputSurface()} data-slot="input-control">
+  <span className={surface.inputSurface()} data-slot="input-control">
     <InputPrimitive
       aria-invalid={ariaInvalid}
       aria-label={ariaLabel}
-      className={inputRecipe({ size })}
+      className={styles.input({ size })}
       data-slot="input"
       defaultValue={defaultValue}
       disabled={disabled}

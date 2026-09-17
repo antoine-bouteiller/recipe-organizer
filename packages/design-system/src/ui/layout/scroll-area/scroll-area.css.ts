@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const rootRecipe = recipe({
+export const root = recipe({
   base: {
     height: '100%',
     minHeight: theme.spacing(0),
@@ -9,7 +9,7 @@ export const rootRecipe = recipe({
   },
 })
 
-export const viewportRecipe = recipe({
+export const viewport = recipe({
   base: {
     selectors: {
       '&[data-has-overflow-x]': {
@@ -77,7 +77,7 @@ export const viewportRecipe = recipe({
   },
 })
 
-export const scrollbarRecipe = recipe({
+export const scrollbar = recipe({
   base: {
     selectors: {
       '&[data-hovering], &[data-scrolling]': {
@@ -116,7 +116,7 @@ export const scrollbarRecipe = recipe({
   },
 })
 
-export const thumbRecipe = recipe({
+export const thumb = recipe({
   base: {
     backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 20%, transparent)`,
     borderRadius: theme.radii.full,

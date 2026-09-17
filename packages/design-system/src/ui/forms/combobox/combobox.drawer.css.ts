@@ -1,27 +1,27 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const columnClassName = style({
+export const column = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(2),
 })
 
-export const optionsClassName = style({
+export const options = style({
   display: 'flex',
   flexDirection: 'column',
   maxHeight: theme.spacing(64),
   overflowY: 'auto',
 })
 
-export const emptyClassName = style({
+export const empty = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.sm,
   paddingBlock: theme.spacing(4),
   textAlign: 'center',
 })
 
-export const itemClassName = style({
+export const item = style({
   alignItems: 'center',
   borderRadius: theme.radii.sm,
   cursor: 'default',
@@ -43,12 +43,12 @@ export const itemClassName = style({
   },
 })
 
-export const truncateClassName = style({
+export const truncate = style({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 })
 
-export const iconClassName = style({
+export const icon = style({
   flexShrink: 0,
 })

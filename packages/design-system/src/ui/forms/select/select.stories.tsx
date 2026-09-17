@@ -6,7 +6,7 @@ import { Select } from './select'
 import SelectBase from './select.base'
 import SelectDrawer from './select.drawer'
 
-import { container } from './select.stories.css'
+import * as styles from './select.stories.css'
 
 const items = [
   { label: 'Draft', value: 'draft' },
@@ -47,7 +47,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Responsive">
         <ControlledSelect />
       </StorySection>

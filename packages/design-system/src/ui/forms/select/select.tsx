@@ -1,7 +1,7 @@
 import { lazy, Suspense, type ReactElement } from 'react'
 
 import { useIsMobile } from '../../../hooks/use-is-mobile'
-import { getSelectDisplay, SelectButton, selectTextClassName } from './select.shared'
+import { getSelectDisplay, SelectButton, selectText } from './select.shared'
 
 interface SelectOption<TValue extends string> {
   label: string
@@ -52,7 +52,7 @@ export const Select = <TValue extends string>(props: SelectProps<TValue>): React
     <Suspense
       fallback={
         <SelectButton disabled={props.disabled}>
-          <span className={selectTextClassName(isEmpty)}>{displayLabel}</span>
+          <span className={selectText(isEmpty)}>{displayLabel}</span>
         </SelectButton>
       }
     >

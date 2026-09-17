@@ -7,7 +7,7 @@ import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
 import { useIsInShoppingList } from '../hooks/use-is-in-shopping-list'
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 
-import { container, text, container2, container3, text2, container4, text3 } from './quantity-controls.css'
+import * as styles from './quantity-controls.css'
 
 export interface QuantityControlsProps {
   readonly recipeId: number
@@ -30,11 +30,11 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default' }: Qu
     }
 
     return (
-      <div className={container}>
+      <div className={styles.container}>
         <Button onClick={decrementQuantity} disabled={quantity === 1} aria-label="Retirer un couvert" size="icon-xs" variant="secondary">
           <MinusIcon weight="bold" />
         </Button>
-        <span className={text}>{quantity} couverts</span>
+        <span className={styles.text}>{quantity} couverts</span>
         <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs" variant="secondary">
           <PlusIcon weight="bold" />
         </Button>
@@ -46,14 +46,14 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default' }: Qu
   }
 
   return (
-    <div className={container2}>
-      <div className={container3}>
-        <span className={text2}>Couverts</span>
-        <div className={container4}>
+    <div className={styles.container2}>
+      <div className={styles.container3}>
+        <span className={styles.text2}>Couverts</span>
+        <div className={styles.container4}>
           <Button disabled={quantity === 1} onClick={decrementQuantity} aria-label="Retirer un couvert" size="icon-sm" variant="outline">
             <MinusIcon />
           </Button>
-          <span className={text3}>{quantity}</span>
+          <span className={styles.text3}>{quantity}</span>
           <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-sm">
             <PlusIcon />
           </Button>

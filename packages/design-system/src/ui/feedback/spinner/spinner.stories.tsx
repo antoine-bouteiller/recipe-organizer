@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Spinner } from './spinner'
 
-import { container, container2 } from './spinner.stories.css'
+import * as styles from './spinner.stories.css'
 
 const meta = {
   component: Spinner,
@@ -14,12 +14,12 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={container}>
+    <div className={styles.container}>
       <StorySection title="Default">
         <Spinner />
       </StorySection>
       <StorySection title="Sizes">
-        <div className={container2}>
+        <div className={styles.container2}>
           <Spinner size="sm" />
           <Spinner size="md" />
           <Spinner size="lg" />

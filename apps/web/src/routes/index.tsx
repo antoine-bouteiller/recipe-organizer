@@ -11,7 +11,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
-import { container, container2, container3, text, container4 } from './-index.css'
+import * as styles from './-index.css'
 
 const searchSchema = z.object({
   search: z.boolean().optional(),
@@ -19,7 +19,7 @@ const searchSchema = z.object({
 
 const RecipeListSkeleton = () => (
   <ScreenLayout title="Recettes" pageKey="/">
-    <div className={container}>
+    <div className={styles.container}>
       {incrementalArray({ length: 6 }).map((index) => (
         <Skeleton preset="recipe-card" key={index} />
       ))}
@@ -36,11 +36,11 @@ const RecipeList = () => {
   return (
     <ScreenLayout title="Recettes" pageKey="/">
       {visibleRecipes.length === 0 ? (
-        <div className={container2}>
-          <div className={container3}>
+        <div className={styles.container2}>
+          <div className={styles.container3}>
             <BookIcon size="xl" />
           </div>
-          <p className={text}>Aucune recette</p>
+          <p className={styles.text}>Aucune recette</p>
           {authUser && (
             <Button render={<Link to="/recipe/new" viewTransition />}>
               <PlusIcon size="sm" />
@@ -49,7 +49,7 @@ const RecipeList = () => {
           )}
         </div>
       ) : (
-        <div className={container4}>
+        <div className={styles.container4}>
           {visibleRecipes.map((recipe, index) => (
             <RecipeCard recipe={recipe} index={index} key={recipe.id} />
           ))}

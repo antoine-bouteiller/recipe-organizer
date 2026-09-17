@@ -20,7 +20,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
-import { container, text, text2, container2 } from './search-bar.css'
+import * as styles from './search-bar.css'
 
 const SearchBar = () => {
   const [open, setOpen] = useState(false)
@@ -43,13 +43,13 @@ const SearchBar = () => {
 
   return (
     <CommandDialog onOpenChange={setOpen} open={open}>
-      <div className={container}>
+      <div className={styles.container}>
         <CommandDialogTrigger render={<Button align="start" variant="outline" width="full" />}>
           Recherche une recette...
-          <span className={text}>
+          <span className={styles.text}>
             <KbdGroup>
               <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-              <span className={text2}>
+              <span className={styles.text2}>
                 <Kbd>K</Kbd>
               </span>
             </KbdGroup>
@@ -80,7 +80,7 @@ const SearchBar = () => {
             </CommandList>
           </CommandPanel>
           <CommandFooter>
-            <div className={container2}>
+            <div className={styles.container2}>
               <Kbd>
                 <ArrowElbowDownLeftIcon />
               </Kbd>

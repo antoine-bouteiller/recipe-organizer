@@ -6,7 +6,7 @@ import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIA
 import { Link } from '@tanstack/react-router'
 import { type ReactNode } from 'react'
 
-import { action as actionClassName, badges, card, cardPadding, container, content, image, name } from './recipe-search-card.css'
+import * as styles from './recipe-search-card.css'
 
 export interface RecipeSearchCardProps {
   recipe: ReducedRecipe
@@ -15,18 +15,18 @@ export interface RecipeSearchCardProps {
 }
 
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
-  <div className={`${container} stagger-in-45`} style={staggerStyle(index, 10)}>
+  <div className={`${styles.container} stagger-in-45`} style={staggerStyle(index, 10)}>
     <Link
-      className={`${card} ${cardPadding[action ? 'withAction' : 'withoutAction']}`}
+      className={`${styles.card} ${styles.cardPadding[action ? 'withAction' : 'withoutAction']}`}
       onClick={() => addRecentRecipe(recipe.id)}
       params={{ id: recipe.id.toString() }}
       to="/recipe/$id"
       viewTransition
     >
-      <img src={recipe.image} alt={recipe.name} className={image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
-      <div className={content}>
-        <span className={name}>{recipe.name}</span>
-        <div className={badges}>
+      <img src={recipe.image} alt={recipe.name} className={styles.image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
+      <div className={styles.content}>
+        <span className={styles.name}>{recipe.name}</span>
+        <div className={styles.badges}>
           {recipe.isVegetarian && (
             <Badge size="sm" variant="accent">
               {VEGETARIAN_LABEL}
@@ -55,6 +55,6 @@ export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCard
         </div>
       </div>
     </Link>
-    {action && <div className={actionClassName}>{action}</div>}
+    {action && <div className={styles.action}>{action}</div>}
   </div>
 )

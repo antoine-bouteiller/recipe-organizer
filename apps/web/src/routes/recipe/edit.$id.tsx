@@ -21,7 +21,7 @@ import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
 import * as z from 'zod'
 
-import { container, container2 } from './-edit.$id.css'
+import * as styles from './-edit.$id.css'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   _key: Math.random().toString(36).substring(7),
@@ -86,7 +86,7 @@ const EditRecipePage = () => {
 
   if (isLoading) {
     return (
-      <div className={container}>
+      <div className={styles.container}>
         <Spinner />
       </div>
     )
@@ -115,7 +115,7 @@ const EditRecipePage = () => {
           initialImage={{ id: recipe.image, url: recipe.image }}
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
-        <div className={container2}>
+        <div className={styles.container2}>
           <Button disabled={isLoading} onClick={() => router.history.back()} type="button" variant="outline">
             Annuler
           </Button>

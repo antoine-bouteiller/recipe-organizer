@@ -5,11 +5,9 @@ import { type ButtonHTMLAttributes, type ReactElement } from 'react'
 import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
 
-import { selectText, selectTextState, selectTrigger, selectTriggerIcon } from './select.shared.css'
+import * as styles from './select.shared.css'
 
-const selectTriggerClassName = selectTrigger
-const selectTriggerIconClassName = selectTriggerIcon
-const selectTextClassName = (empty: boolean): string => `${selectText} ${selectTextState[empty ? 'empty' : 'selected']}`
+const selectText = (empty: boolean): string => `${styles.selectText} ${styles.selectTextState[empty ? 'empty' : 'selected']}`
 
 export const SelectButton = ({ render, children, ...props }: useRender.ComponentProps<'button'>): ReactElement => {
   const type: ButtonHTMLAttributes<HTMLButtonElement>['type'] = render ? undefined : 'button'
@@ -17,13 +15,13 @@ export const SelectButton = ({ render, children, ...props }: useRender.Component
     {
       children: (
         <>
-          <span className={selectTextClassName(false)}>{children}</span>
-          <span className={selectTriggerIconClassName}>
+          <span className={selectText(false)}>{children}</span>
+          <span className={styles.selectTriggerIcon}>
             <CaretUpDownIcon />
           </span>
         </>
       ),
-      className: selectTriggerClassName,
+      className: styles.selectTrigger,
       type,
     },
     props
@@ -44,4 +42,4 @@ export const getSelectDisplay = <TValue extends string>(props: SelectProps<TValu
   }
 }
 
-export { selectTextClassName, selectTriggerClassName, selectTriggerIconClassName }
+export { selectText }

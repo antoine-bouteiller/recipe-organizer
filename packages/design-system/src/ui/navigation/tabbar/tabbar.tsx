@@ -2,13 +2,13 @@ import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
 import type React from 'react'
 
-import { element, tabBarItemClassName, iconSlotClassName, activeIconSlotClassName } from './tabbar.css'
+import * as styles from './tabbar.css'
 
 export interface TabBarProps {
   children: React.ReactNode
 }
 export const TabBar = ({ children }: TabBarProps): React.ReactElement => (
-  <nav className={element} data-slot="tab-bar">
+  <nav className={styles.element} data-slot="tab-bar">
     {children}
   </nav>
 )
@@ -23,16 +23,16 @@ export const TabBarItem = ({ activeIcon, children, icon, render, ...props }: Tab
     {
       children: (
         <>
-          <span aria-hidden="true" className={iconSlotClassName} data-slot="tab-bar-item-icon-inactive">
+          <span aria-hidden="true" className={styles.iconSlot} data-slot="tab-bar-item-icon-inactive">
             {icon}
           </span>
-          <span aria-hidden="true" className={`${iconSlotClassName} ${activeIconSlotClassName}`} data-slot="tab-bar-item-icon-active">
+          <span aria-hidden="true" className={`${styles.iconSlot} ${styles.activeIconSlot}`} data-slot="tab-bar-item-icon-active">
             {activeIcon}
           </span>
           {children}
         </>
       ),
-      className: tabBarItemClassName,
+      className: styles.tabBarItem,
     },
     props
   )

@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import { type IngredientCartItem } from '../types/ingredient-cart-item'
 
-import { check, checkState, details, detailsState, fallbackQuantity, item, quantities } from './cart-item.css'
+import * as styles from './cart-item.css'
 
 const formatUnitLabel = (slug: UnitSlug | null) => (slug ? (UNITS[slug]?.name ?? '') : '')
 
@@ -22,14 +22,16 @@ export const CartItem = ({ ingredient }: CartItemProps) => {
   const [isChecked, setIsChecked] = useState(false)
 
   return (
-    <button type="button" onClick={() => setIsChecked((checked) => !checked)} className={item}>
-      <span className={`${check} ${checkState[isChecked ? 'checked' : 'unchecked']}`}>{isChecked && <CheckIcon size="xs" weight="bold" />}</span>
-      <span className={`${details} ${detailsState[isChecked ? 'checked' : 'unchecked']}`}>
+    <button type="button" onClick={() => setIsChecked((checked) => !checked)} className={styles.item}>
+      <span className={`${styles.check} ${styles.checkState[isChecked ? 'checked' : 'unchecked']}`}>
+        {isChecked && <CheckIcon size="xs" weight="bold" />}
+      </span>
+      <span className={`${styles.details} ${styles.detailsState[isChecked ? 'checked' : 'unchecked']}`}>
         <span>{ingredient.name}</span>
-        <span className={quantities}>
+        <span className={styles.quantities}>
           <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>
           {ingredient.fallback.map((line) => (
-            <span className={fallbackQuantity} key={line.unitSlug ?? 'unitless'}>
+            <span className={styles.fallbackQuantity} key={line.unitSlug ?? 'unitless'}>
               + {formatQuantityWithUnit(line.quantity, line.unitSlug)}
             </span>
           ))}

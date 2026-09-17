@@ -19,7 +19,7 @@ import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
 import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
 import { IngredientGroupField } from './ingredient-group-field'
 
-import { container, container2, container3, container4, container5, container6, container7, container8, container9 } from './recipe-form.css'
+import * as styles from './recipe-form.css'
 
 const cuisineTypeItems = CUISINE_TYPES.map((cuisineType) => ({
   label: CUISINE_TYPE_LABELS[cuisineType],
@@ -66,17 +66,17 @@ export const RecipeForm = withForm({
           {({ ToggleGroupField }) => <ToggleGroupField disabled={isSubmitting} items={cuisineTypeItems} label="Cuisines" />}
         </AppField>
 
-        <div className={container}>
+        <div className={styles.container}>
           <Label>Sous-recettes liées</Label>
           <AppField mode="array" name="linkedRecipes">
             {(field) => (
               <>
                 {field.state.value?.map((linkedRecipe, index) => (
-                  <div className={container2} key={linkedRecipe.id}>
-                    <div className={container3}>
+                  <div className={styles.container2} key={linkedRecipe.id}>
+                    <div className={styles.container3}>
                       <AppField name={`linkedRecipes[${index}].id`}>
                         {({ ComboboxField }) => (
-                          <div className={container4}>
+                          <div className={styles.container4}>
                             <ComboboxField
                               disabled={isSubmitting}
                               options={recipeOptions}
@@ -88,7 +88,7 @@ export const RecipeForm = withForm({
                       </AppField>
                       <AppField name={`linkedRecipes[${index}].ratio`}>
                         {({ NumberField }) => (
-                          <div className={container5}>
+                          <div className={styles.container5}>
                             <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />
                           </div>
                         )}
@@ -115,7 +115,7 @@ export const RecipeForm = withForm({
           {({ VideoField }) => <VideoField disabled={isSubmitting} initialVideo={initialVideo} label="Vidéo (optionnel)" />}
         </AppField>
 
-        <div className={container6}>
+        <div className={styles.container6}>
           <Label>Groupes d&apos;ingrédients</Label>
           <Field mode="array" name="ingredientGroups">
             {(field) => (
@@ -123,18 +123,18 @@ export const RecipeForm = withForm({
                 {field.state.value?.map((group, groupIndex) => (
                   <AppField key={group._key} name={`ingredientGroups[${groupIndex}]`}>
                     {({ Field: GroupField, FieldError }) => (
-                      <div className={container7}>
+                      <div className={styles.container7}>
                         <GroupField>
                           {groupIndex !== 0 && (
                             <>
                               <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
                                 {({ TextField }) => (
-                                  <div className={container8}>
+                                  <div className={styles.container8}>
                                     <TextField disabled={isSubmitting} label="Nom du groupe" />
                                   </div>
                                 )}
                               </AppField>
-                              <div className={container9}>
+                              <div className={styles.container9}>
                                 <Button
                                   disabled={isSubmitting}
                                   onClick={() => field.removeValue(groupIndex)}
