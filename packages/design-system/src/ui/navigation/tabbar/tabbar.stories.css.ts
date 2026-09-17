@@ -21,7 +21,3 @@ export const contentSurface = style({
   borderRadius: theme.radii['2xl'],
   padding: theme.spacing(3),
 })
-
-export const mutedForeground = style({ color: theme.colors['muted-foreground'] })
-export const accentForeground = style({ color: theme.colors['accent-foreground'] })
-export const accentSurface = style({ backgroundColor: theme.colors.accent })

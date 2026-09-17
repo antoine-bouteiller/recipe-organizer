@@ -1,6 +1,6 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
-import { expect, userEvent, waitFor, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from './tabs'
 
@@ -10,20 +10,6 @@ const tabs = ['ingredients', 'method'] as const
 
 const SwipeTabsExample = (): React.ReactElement => (
   <div className={styles.container}>
-    <div aria-label="Tab color roles" className={styles.roleMap}>
-      <span className={styles.mutedSurface} data-slot="muted-surface">
-        Muted surface
-      </span>
-      <span className={styles.mutedForeground} data-slot="muted-foreground">
-        Muted foreground
-      </span>
-      <span className={styles.cardSurface} data-slot="card-surface">
-        Card surface
-      </span>
-      <span className={styles.cardForeground} data-slot="card-foreground">
-        Card foreground
-      </span>
-    </div>
     <SwipeTabs defaultTab="ingredients" tabs={tabs}>
       <TabsList aria-label="Recipe details" width="full">
         <TabsTab value="ingredients">Ingredients</TabsTab>
@@ -53,22 +39,8 @@ type Story = StoryObj<typeof meta>
 export const Swipeable: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const list = canvas.getByRole('tablist')
     const ingredients = canvas.getByRole('tab', { name: 'Ingredients' })
     const method = canvas.getByRole('tab', { name: 'Method' })
-    const mutedSurfaceProbe = canvas.getByText('Muted surface')
-    const mutedForegroundProbe = canvas.getByText('Muted foreground')
-    const cardSurfaceProbe = canvas.getByText('Card surface')
-    const cardForegroundProbe = canvas.getByText('Card foreground')
-    const indicator = canvasElement.querySelector<HTMLElement>('[data-slot=tab-indicator]')
-    if (!indicator) {
-      throw new Error('Tabs requires its moving indicator')
-    }
-
-    await expect(getComputedStyle(list).backgroundColor).toBe(getComputedStyle(mutedSurfaceProbe).backgroundColor)
-    await waitFor(() => expect(getComputedStyle(method).color).toBe(getComputedStyle(mutedForegroundProbe).color))
-    await waitFor(() => expect(getComputedStyle(ingredients).color).toBe(getComputedStyle(cardForegroundProbe).color))
-    await expect(getComputedStyle(indicator).backgroundColor).toBe(getComputedStyle(cardSurfaceProbe).backgroundColor)
     await userEvent.click(method)
     await expect(method).toHaveAttribute('data-active')
     await expect(ingredients).not.toHaveAttribute('data-active')

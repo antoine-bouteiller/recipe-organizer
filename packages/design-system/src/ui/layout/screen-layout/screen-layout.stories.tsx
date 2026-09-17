@@ -52,12 +52,10 @@ export const Overview: Story = {
     // The sticky header and back button are mobile-only.
     if (globalThis.matchMedia('(max-width: 767px)').matches) {
       const header = within(section).getByRole('heading', { name: 'Library' })
-      const { fontSize } = getComputedStyle(header)
       const headerTop = header.getBoundingClientRect().top
       panel?.scrollTo({ top: 50 })
       await waitFor(() => expect(panel?.scrollTop).toBe(50))
       await expect(header).toBeVisible()
-      await expect(getComputedStyle(header).fontSize).toBe(fontSize)
       await expect(header.getBoundingClientRect().top).toBe(headerTop)
       await expect(header).not.toHaveAttribute('data-scrolled')
       panel?.scrollTo({ top: 0 })

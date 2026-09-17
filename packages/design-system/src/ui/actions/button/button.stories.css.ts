@@ -15,8 +15,6 @@ export const container2 = style({
   gap: theme.spacing(3),
 })
 
-export const popoverSurface = style({ backgroundColor: theme.colors.popover })
-
 export const comparisonRow = style({
   alignItems: 'center',
   display: 'flex',
