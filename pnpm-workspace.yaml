@@ -44,7 +44,7 @@ catalog:
   drizzle-kit: 1.0.0-rc.3
   drizzle-orm: 1.0.0-rc.3
   hono: 4.13.8
-  knip: 6.35.1
+  knip: 6.36.0
   lefthook: 2.1.14
   lexical: 0.50.0
   oxc-transform-react: 0.150.0
