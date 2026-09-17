@@ -1,5 +1,6 @@
+import { Toggle } from '@base-ui/react/toggle'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
-import { expect, fn, within } from 'storybook/test'
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test'
 
 import { StorySection } from '../../../../.storybook/story-section'
 import { PlusIcon } from '../../data-display/icons/plus'
@@ -15,6 +16,27 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const InteractionStates: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const toggle = canvas.getByRole('button', { name: 'Save recipe' })
+    await userEvent.tab()
+    await expect(toggle).toHaveFocus()
+    await expect(getComputedStyle(toggle).outlineStyle).toBe('solid')
+    await userEvent.click(toggle)
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    await waitFor(() => expect(getComputedStyle(toggle, '::before').opacity).toBe('0.12'))
+    await expect(canvas.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
+    await expect(getComputedStyle(canvas.getByRole('button', { name: 'Unavailable' }), '::before').opacity).toBe('0')
+  },
+  render: () => (
+    <div className={container2}>
+      <Toggle render={<Button variant="secondary" />}>Save recipe</Toggle>
+      <Button disabled>Unavailable</Button>
+    </div>
+  ),
+}
 
 export const SearchAction: Story = {
   play: async ({ canvasElement }) => {
@@ -59,13 +81,29 @@ export const Overview: Story = {
           <Button align="start" variant="list-action" width="full">
             List action
           </Button>
-          <Button aria-label="Add item" size="icon">
-            <PlusIcon />
-          </Button>
+          {(['icon-xs', 'icon-sm', 'icon', 'icon-lg', 'icon-xl'] as const).map((size) => (
+            <Button aria-label={`Add item (${size})`} key={size} size={size}>
+              <PlusIcon />
+            </Button>
+          ))}
         </div>
       </StorySection>
       <StorySection title="Disabled">
-        <Button disabled>Unavailable</Button>
+        <div className={container2}>
+          <Button disabled>Unavailable</Button>
+          <Button disabled variant="secondary">
+            Secondary
+          </Button>
+          <Button disabled variant="outline">
+            Outline
+          </Button>
+          <Button disabled variant="ghost">
+            Ghost
+          </Button>
+          <Button disabled variant="destructive">
+            Delete
+          </Button>
+        </div>
       </StorySection>
     </div>
   ),

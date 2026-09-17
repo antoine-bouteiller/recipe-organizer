@@ -4,19 +4,32 @@ import { recipe } from '@vanilla-extract/recipes'
 export const buttonRecipe = recipe({
   base: {
     selectors: {
-      '&[data-pressed]': {
-        transform: 'scale(0.97)',
-      },
       '&[data-disabled], &:disabled': {
-        opacity: 0.64,
+        opacity: 0.38,
         pointerEvents: 'none',
       },
       '&::before': {
-        borderRadius: `calc(${theme.radii.lg} - 1px)`,
+        backgroundColor: 'currentColor',
+        borderRadius: 'inherit',
         content: '""',
         inset: theme.spacing(0),
+        opacity: 0,
         pointerEvents: 'none',
         position: 'absolute',
+        transition: `opacity 150ms ${theme.easings['in-out']}`,
+      },
+      '&:hover::before': {
+        '@media': {
+          '(hover: hover) and (pointer: fine)': {
+            opacity: 0.08,
+          },
+        },
+      },
+      '&:is(:focus-visible, [data-focus-visible], :active, [data-active], [data-pressed], [aria-pressed=true])::before': {
+        opacity: 0.12,
+      },
+      '&:is(:disabled, [data-disabled])::before': {
+        opacity: 0,
       },
       '&::after': {
         '@media': {
@@ -33,19 +46,16 @@ export const buttonRecipe = recipe({
       },
       '&:is(:focus-visible, [data-focus-visible])': {
         outline: `2px solid ${theme.colors.ring}`,
-        outlineOffset: '1px',
-      },
-      '&:is(:active, [data-active])': {
-        transform: 'scale(0.97)',
+        outlineOffset: '3px',
       },
     },
     vars: {
       '--owner-icon-margin-inline': '0',
-      '--owner-icon-opacity': '0.8',
+      '--owner-icon-opacity': '1',
       '--owner-icon-size': '18px',
     },
     alignItems: 'center',
-    borderRadius: theme.radii.lg,
+    borderRadius: theme.radii.full,
     borderWidth: '1px',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -54,7 +64,7 @@ export const buttonRecipe = recipe({
     gap: theme.spacing(2),
     justifyContent: 'center',
     position: 'relative',
-    transition: `box-shadow 150ms ${theme.easings['out-snappy']}, transform 150ms ${theme.easings['out-snappy']}`,
+    transition: `box-shadow 150ms ${theme.easings['in-out']}`,
     whiteSpace: 'nowrap',
     '@media': {
       'screen and (min-width: 640px)': {
@@ -139,14 +149,8 @@ export const buttonRecipe = recipe({
         vars: {
           '--owner-icon-size': '16px',
         },
-        borderRadius: theme.radii.md,
         height: theme.spacing(7),
         width: theme.spacing(7),
-        selectors: {
-          '&::before': {
-            borderRadius: `calc(${theme.radii.md} - 1px)`,
-          },
-        },
         '@media': {
           'screen and (min-width: 640px)': {
             vars: {
@@ -179,241 +183,59 @@ export const buttonRecipe = recipe({
     },
     variant: {
       default: {
+        backgroundColor: theme.colors.primary,
+        borderColor: 'transparent',
+        color: theme.colors['primary-foreground'],
         selectors: {
-          '&[data-pressed]': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 90%, transparent)`,
-            boxShadow: 'none',
-          },
-          '&[data-disabled], &:disabled': {
-            boxShadow: 'none',
-          },
-          '&[data-pressed]::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 8%, transparent) inset`,
-          },
-          '&::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.highlight} 16%, transparent) inset`,
-          },
-          '&[data-disabled]::before, &:disabled::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 8%, transparent) inset`,
-          },
-          '&:is(:active, [data-active])': {
-            boxShadow: 'none',
-          },
           '&:hover': {
             '@media': {
               '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 90%, transparent)`,
+                boxShadow: theme.shadows.sm,
               },
             },
           },
+          '&:is(:active, [data-active], [data-pressed], :disabled, [data-disabled])': {
+            boxShadow: 'none',
+          },
         },
-        backgroundColor: theme.colors.primary,
-        borderColor: theme.colors.primary,
-        boxShadow: `0 1px 2px 0 color-mix(in oklab, ${theme.colors.primary} 24%, transparent)`,
-        color: theme.colors['primary-foreground'],
       },
       destructive: {
-        selectors: {
-          '&[data-pressed]': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 90%, transparent)`,
-            boxShadow: 'none',
-          },
-          '&[data-disabled], &:disabled': {
-            boxShadow: 'none',
-          },
-          '&[data-pressed]::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 8%, transparent) inset`,
-          },
-          '&::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.highlight} 16%, transparent) inset`,
-          },
-          '&[data-disabled]::before, &:disabled::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 8%, transparent) inset`,
-          },
-          '&:is(:active, [data-active])': {
-            boxShadow: 'none',
-          },
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 90%, transparent)`,
-              },
-            },
-          },
-        },
-        backgroundColor: theme.colors.destructive,
-        borderColor: theme.colors.destructive,
-        boxShadow: `0 1px 2px 0 color-mix(in oklab, ${theme.colors.destructive} 24%, transparent)`,
+        backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 80%, ${theme.colors.shadow})`,
+        borderColor: 'transparent',
         color: theme.colors['inverse-foreground'],
       },
       'destructive-ghost': {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
         color: theme.colors['destructive-foreground'],
-        selectors: {
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 8%, transparent)`,
-              },
-            },
-          },
-        },
       },
       'destructive-outline': {
-        selectors: {
-          '&[data-pressed]': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 4%, transparent)`,
-            borderColor: `color-mix(in srgb, ${theme.colors.destructive} 32%, transparent)`,
-            boxShadow: 'none',
-          },
-          '.dark &': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.input} 32%, transparent)`,
-          },
-          '&[data-disabled], &:disabled': {
-            boxShadow: 'none',
-          },
-          '&[data-pressed]::before': {
-            boxShadow: 'none',
-          },
-          '&::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
-          },
-          '.dark &:not(:disabled):not(:active):not([data-pressed])::before': {
-            boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-          },
-          '.dark &::before': {
-            boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 2%, transparent)`,
-          },
-          '&[data-disabled]::before, &:disabled::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])': {
-            boxShadow: 'none',
-          },
-          '.dark &:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.input} 64%, transparent)`,
-              },
-            },
-          },
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 4%, transparent)`,
-                borderColor: `color-mix(in srgb, ${theme.colors.destructive} 32%, transparent)`,
-              },
-            },
-          },
-        },
-        backgroundClip: 'padding-box',
-        WebkitBackgroundClip: 'padding-box',
         backgroundColor: theme.colors.popover,
-        borderColor: theme.colors.input,
-        boxShadow: theme.shadows.xs,
+        borderColor: theme.colors['destructive-foreground'],
         color: theme.colors['destructive-foreground'],
       },
       ghost: {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
         color: theme.colors.foreground,
-        selectors: {
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: theme.colors.accent,
-              },
-            },
-          },
-        },
       },
       'list-action': {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
+        borderRadius: theme.radii.xl,
         color: theme.colors.foreground,
         justifyContent: 'flex-start',
         width: '100%',
-        selectors: {
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: theme.colors.accent,
-              },
-            },
-          },
-        },
       },
       outline: {
-        selectors: {
-          '&[data-pressed]': {
-            backgroundColor: theme.colors.accent,
-            boxShadow: 'none',
-          },
-          '&[data-disabled], &:disabled': {
-            boxShadow: 'none',
-          },
-          '&[data-pressed]::before': {
-            boxShadow: 'none',
-          },
-          '&::before': {
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
-          },
-          '.dark &:not(:disabled):not(:active):not([data-pressed])::before': {
-            boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-          },
-          '.dark &::before': {
-            boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 2%, transparent)`,
-          },
-          '&[data-disabled]::before, &:disabled::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])::before': {
-            boxShadow: 'none',
-          },
-          '&:is(:active, [data-active])': {
-            boxShadow: 'none',
-          },
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: theme.colors.accent,
-              },
-            },
-          },
-        },
-        backgroundClip: 'padding-box',
-        WebkitBackgroundClip: 'padding-box',
         backgroundColor: theme.colors.popover,
-        borderColor: theme.colors.input,
-        boxShadow: theme.shadows.xs,
+        borderColor: theme.colors['muted-foreground'],
         color: theme.colors.foreground,
       },
       secondary: {
         backgroundColor: theme.colors.secondary,
         borderColor: 'transparent',
         color: theme.colors['secondary-foreground'],
-        selectors: {
-          '&:is(:active, [data-active])': {
-            backgroundColor: `color-mix(in srgb, ${theme.colors.secondary} 80%, transparent)`,
-          },
-          '&:hover': {
-            '@media': {
-              '(hover: hover) and (pointer: fine)': {
-                backgroundColor: `color-mix(in srgb, ${theme.colors.secondary} 90%, transparent)`,
-              },
-            },
-          },
-        },
       },
     },
     width: {
