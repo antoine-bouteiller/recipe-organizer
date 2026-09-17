@@ -23,7 +23,7 @@ export const element = style({
 export const tabBarItemClassName = style({
   selectors: {
     '&[aria-current=page]': {
-      color: theme.colors['accent-foreground'],
+      color: theme.colors.primary,
       fontWeight: theme.fontWeights.semibold,
     },
     '&:is(:focus-visible, [data-focus-visible])': {
