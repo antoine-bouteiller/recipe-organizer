@@ -119,6 +119,7 @@ feature's private API. `apps/web/src/routes/` contains no `.css.ts` files, styli
 `className`/`style` props. Styled sections, containers, and pending content live with their features;
 shell markup and styles live in `apps/web/src/components/app-shell/`. Routes retain page construction,
 forms, and cross-feature coordination rather than delegating to intermediary page wrappers.
+Features must not import one another, even through public APIs.
 Route-derived IDs, search values, and access
 affordances cross that boundary as props, without components importing route modules.
 

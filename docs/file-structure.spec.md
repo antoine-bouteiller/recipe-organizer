@@ -38,7 +38,7 @@ module so feature ownership and import boundaries remain legible.
 - `[PI-1]` **Runtime first, then feature** — group product-domain code by feature within each runtime; share modules only when both runtimes need them.
 - `[PI-2]` **Runtime boundaries are visible** — code that requires React, the database or Worker bindings never presents as a pure utility.
 - `[PI-3]` **Generated artefacts are tool-owned** — route and Worker type outputs are consumed, not edited.
-- `[PI-4]` **Public seams are explicit** — a feature imports another feature through its public API rather than its implementation directories, refining architecture [PI-5].
+- `[PI-4]` **Public seams are explicit** — features never import other features; routes and app-owned components coordinate them, while genuinely shared hooks live outside features.
 
 ## 5. Non-Goals
 
@@ -188,7 +188,10 @@ remain at the repository root, separating deployment and build configuration fro
 
 All ordinary filenames use kebab-case (`vite.config.ts:120`). `.ts` identifies modules without JSX and
 `.tsx` identifies modules that contain JSX. Specs use the `.spec.md` suffix. Cross-directory
-application imports use `@client/*`, `@server/*`, and `@shared/*` for runtime paths, and `@schema` for database schema exports (`tsconfig.json:26-29`); same-directory dependencies use relative imports. Feature-to-feature imports use the owning feature's public API and do not reach into another feature's private implementation directories.
+application imports use `@client/*`, `@server/*`, and `@shared/*` for runtime paths, and `@schema` for database schema exports (`tsconfig.json:26-29`); same-directory dependencies use relative imports. Feature-to-feature imports are forbidden, including public APIs. Per-feature `no-restricted-imports`
+overrides in `vite.config.ts` enforce this for alias and relative imports. Cross-feature composition
+belongs in routes or app-owned components; shared browser hooks such as `useIsInShoppingList` live in
+`apps/web/src/hooks/`.
 
 ## 9. Open Questions
 

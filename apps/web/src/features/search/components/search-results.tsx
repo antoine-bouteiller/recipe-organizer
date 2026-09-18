@@ -1,5 +1,5 @@
-import { useIsInShoppingList } from '@client/features/recipe/hooks/use-is-in-shopping-list'
 import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'
+import { useIsInShoppingList } from '@client/hooks/use-is-in-shopping-list'
 import { addToShoppingList } from '@client/stores/shopping-list.store'
 import { type ReducedRecipe } from '@client/types/recipe'
 import { Button } from '@recipe-organizer/design-system/button'

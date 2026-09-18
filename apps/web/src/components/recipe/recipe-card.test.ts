@@ -1,11 +1,10 @@
+import RecipeCard from '@client/features/recipe/components/recipe-card'
+import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'
 import { type ReducedRecipe } from '@client/types/recipe'
 import { RouterContextProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vite-plus/test'
-
-import { RecipeSearchCard } from '../../search/components/recipe-search-card'
-import RecipeCard from './recipe-card'
 
 const recipe: ReducedRecipe = {
   cuisineTypes: [],

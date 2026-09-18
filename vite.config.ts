@@ -1,6 +1,8 @@
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { defineConfig } from 'vite-plus'
 
+const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
+
 const viteConfig = defineConfig({
   plugins: [vanillaExtractPlugin()],
   lint: {
@@ -22,6 +24,22 @@ const viteConfig = defineConfig({
     },
     ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
     overrides: [
+      ...features.map((feature) => ({
+        files: [`apps/web/src/features/${feature}/**/*.{ts,tsx}`],
+        rules: {
+          'no-restricted-imports': [
+            'error',
+            {
+              patterns: features
+                .filter((other) => other !== feature)
+                .map((other) => ({
+                  group: [`@client/features/${other}`, `@client/features/${other}/**`, `../**/${other}`, `../**/${other}/**`],
+                  message: 'Features must not import other features. Compose them in routes or app-owned components.',
+                })),
+            },
+          ],
+        },
+      })),
       {
         files: ['**/use-file-upload.ts'],
         rules: {
