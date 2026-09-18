@@ -10,7 +10,7 @@ export const button = recipe({
       },
       '&::before': {
         backgroundColor: 'currentColor',
-        borderRadius: 'inherit',
+        borderRadius: theme.radius.inherit,
         content: '""',
         inset: theme.spacing(0),
         opacity: 0,
@@ -55,7 +55,7 @@ export const button = recipe({
       '--owner-icon-size': '18px',
     },
     alignItems: 'center',
-    borderRadius: theme.radii.lg,
+    borderRadius: theme.radius.lg,
     borderWidth: '1px',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -91,7 +91,7 @@ export const button = recipe({
     size: {
       default: {
         height: theme.spacing(9),
-        paddingInline: `calc(${theme.spacing(3)} - 1px)`,
+        paddingInline: theme.spacing(2.75),
         '@media': {
           'screen and (min-width: 640px)': {
             height: theme.spacing(8),
@@ -146,7 +146,7 @@ export const button = recipe({
         },
       },
       'icon-xs': {
-        borderRadius: theme.radii.md,
+        borderRadius: theme.radius.md,
         vars: {
           '--owner-icon-size': '16px',
         },
@@ -164,7 +164,7 @@ export const button = recipe({
       },
       lg: {
         height: theme.spacing(10),
-        paddingInline: 'calc(14px - 1px)',
+        paddingInline: theme.spacing(3.25),
         '@media': {
           'screen and (min-width: 640px)': {
             height: theme.spacing(9),
@@ -174,7 +174,7 @@ export const button = recipe({
       sm: {
         gap: theme.spacing(1.5),
         height: theme.spacing(8),
-        paddingInline: 'calc(10px - 1px)',
+        paddingInline: theme.spacing(2.25),
         '@media': {
           'screen and (min-width: 640px)': {
             height: theme.spacing(7),
@@ -196,7 +196,7 @@ export const button = recipe({
             },
           },
           '&:is(:active, [data-active], [data-pressed], :disabled, [data-disabled])': {
-            boxShadow: 'none',
+            boxShadow: theme.shadows.none,
           },
         },
       },
@@ -223,7 +223,7 @@ export const button = recipe({
       'list-action': {
         backgroundColor: 'transparent',
         borderColor: 'transparent',
-        borderRadius: theme.radii.md,
+        borderRadius: theme.radius.md,
         color: theme.colors.foreground,
         justifyContent: 'flex-start',
         width: '100%',

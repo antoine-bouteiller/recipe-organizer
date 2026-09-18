@@ -22,7 +22,7 @@ export const input = recipe({
   base: {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
-    boxShadow: 'none',
+    boxShadow: theme.shadows.none,
     color: theme.colors.foreground,
     fontSize: theme.fontSizes.base,
     height: theme.spacing(9.5),
@@ -31,7 +31,7 @@ export const input = recipe({
     outline: '2px solid transparent',
     outlineOffset: '2px',
     paddingInlineEnd: theme.spacing(3),
-    paddingInlineStart: 'calc(34px - 1px)',
+    paddingInlineStart: theme.spacing(8.25),
     transition: 'background-color 5000000s ease-in-out 0s',
     width: '100%',
     selectors: {
@@ -44,7 +44,7 @@ export const input = recipe({
         fontSize: theme.fontSizes.sm,
         height: theme.spacing(8.5),
         lineHeight: '34px',
-        paddingInlineStart: `calc(${theme.spacing(8)} - 1px)`,
+        paddingInlineStart: theme.spacing(7.75),
       },
     },
   },
@@ -57,7 +57,7 @@ export const addon = recipe({
     insetBlock: theme.spacing(0),
     insetInlineStart: '1px',
     opacity: 0.8,
-    paddingInlineStart: `calc(${theme.spacing(3)} - 1px)`,
+    paddingInlineStart: theme.spacing(2.75),
     pointerEvents: 'none',
     position: 'absolute',
     zIndex: 10,
@@ -77,7 +77,7 @@ export const item = recipe({
       },
     },
     alignItems: 'center',
-    borderRadius: theme.radii.sm,
+    borderRadius: theme.radius.sm,
     cursor: 'default',
     display: 'flex',
     fontSize: theme.fontSizes.base,
@@ -150,15 +150,9 @@ export const viewport = recipe({
     display: 'flex',
     flexDirection: 'column',
     inset: theme.spacing(0),
-    paddingBlock: `max(${theme.spacing(4)}, 4vh)`,
-    paddingInline: theme.spacing(4),
+    padding: theme.spacing(4),
     position: 'fixed',
     zIndex: 50,
-    '@media': {
-      'screen and (min-width: 640px)': {
-        paddingBlock: '10vh',
-      },
-    },
   },
 })
 
@@ -177,21 +171,18 @@ export const popup = recipe({
       },
       '&::before': {
         backgroundColor: `color-mix(in srgb, ${theme.colors.muted} 72%, transparent)`,
-        borderRadius: `calc(${theme.radii['2xl']} - 1px)`,
-        boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+        borderRadius: theme.radius['2xl'],
+        boxShadow: theme.shadows.edge,
         content: '""',
         inset: theme.spacing(0),
         pointerEvents: 'none',
         position: 'absolute',
       },
-      '.dark &::before': {
-        boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-      },
     },
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
     backgroundColor: theme.colors.popover,
-    borderRadius: theme.radii['2xl'],
+    borderRadius: theme.radius['2xl'],
     borderWidth: '1px',
     boxShadow: theme.shadows.overlay,
     color: theme.colors['popover-foreground'],
@@ -206,11 +197,6 @@ export const popup = recipe({
     outlineOffset: '2px',
     position: 'relative',
     scale: 'calc(1 - 0.1 * var(--nested-dialogs))',
-    vars: {
-      '--transition-duration': '200ms',
-      '--transition-prop': 'scale, opacity, translate',
-      '--transition-easing': theme.easings['in-out'],
-    },
     transitionDuration: '200ms',
     transitionProperty: 'scale, opacity, translate',
     transitionTimingFunction: theme.easings['in-out'],
@@ -223,15 +209,15 @@ export const panel = recipe({
   base: {
     selectors: {
       '&:not(:has(+ [data-slot=command-footer]))': {
-        borderBottomLeftRadius: theme.radii['2xl'],
-        borderBottomRightRadius: theme.radii['2xl'],
-        clipPath: `inset(0 1px 1px 1px round 0 0 calc(${theme.radii['2xl']} - 1px) calc(${theme.radii['2xl']} - 1px))`,
-        WebkitClipPath: `inset(0 1px 1px 1px round 0 0 calc(${theme.radii['2xl']} - 1px) calc(${theme.radii['2xl']} - 1px))`,
-        marginBottom: '-1px',
+        borderBottomLeftRadius: theme.radius['2xl'],
+        borderBottomRightRadius: theme.radius['2xl'],
+        clipPath: `inset(0 1px 1px 1px round 0 0 ${theme.radius['2xl']} ${theme.radius['2xl']})`,
+        WebkitClipPath: `inset(0 1px 1px 1px round 0 0 ${theme.radius['2xl']} ${theme.radius['2xl']})`,
+        marginBottom: theme.spacing(-0.25),
       },
       '&::before': {
-        borderTopLeftRadius: `calc(${theme.radii.xl} - 1px)`,
-        borderTopRightRadius: `calc(${theme.radii.xl} - 1px)`,
+        borderTopLeftRadius: theme.radius.xl,
+        borderTopRightRadius: theme.radius.xl,
         content: '""',
         inset: theme.spacing(0),
         pointerEvents: 'none',
@@ -242,13 +228,13 @@ export const panel = recipe({
     WebkitBackgroundClip: 'padding-box',
     backgroundColor: theme.colors.popover,
     borderBottomWidth: '0',
-    borderTopLeftRadius: theme.radii.xl,
-    borderTopRightRadius: theme.radii.xl,
+    borderTopLeftRadius: theme.radius.xl,
+    borderTopRightRadius: theme.radius.xl,
     borderWidth: '1px',
     boxShadow: theme.shadows.xs,
     clipPath: 'inset(0 1px)',
     WebkitClipPath: 'inset(0 1px)',
-    marginInline: '-1px',
+    marginInline: theme.spacing(-0.25),
     minHeight: theme.spacing(0),
     position: 'relative',
   },
@@ -257,8 +243,8 @@ export const panel = recipe({
 export const footer = recipe({
   base: {
     alignItems: 'center',
-    borderBottomLeftRadius: `calc(${theme.radii['2xl']} - 1px)`,
-    borderBottomRightRadius: `calc(${theme.radii['2xl']} - 1px)`,
+    borderBottomLeftRadius: theme.radius['2xl'],
+    borderBottomRightRadius: theme.radius['2xl'],
     borderTopWidth: '1px',
     color: theme.colors['muted-foreground'],
     display: 'flex',
@@ -284,7 +270,7 @@ globalStyle(`.${addon.classNames.base} svg:not([data-size])`, {
 })
 
 globalStyle(`.${addon.classNames.base} svg`, {
-  marginInline: '-2px',
+  marginInline: theme.spacing(-0.5),
 })
 
 globalStyle(`.${addon.classNames.base} svg:not([data-size])`, {

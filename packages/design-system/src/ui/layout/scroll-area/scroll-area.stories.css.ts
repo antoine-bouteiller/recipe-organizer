@@ -11,7 +11,7 @@ export const container = style({
 
 export const container2 = style({
   borderColor: theme.colors.border,
-  borderRadius: theme.radii.md,
+  borderRadius: theme.radius.md,
   borderWidth: '1px',
   height: theme.spacing(56),
   padding: theme.spacing(4),
@@ -26,7 +26,7 @@ export const container3 = style({
 
 export const container4 = style({
   borderColor: theme.colors.border,
-  borderRadius: theme.radii.md,
+  borderRadius: theme.radius.md,
   borderWidth: '1px',
   height: theme.spacing(56),
   padding: theme.spacing(4),

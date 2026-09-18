@@ -12,7 +12,7 @@ export const heading = style({
 
 export const container = style({
   borderColor: theme.colors.border,
-  borderRadius: theme.radii.lg,
+  borderRadius: theme.radius.lg,
   borderWidth: '1px',
   display: 'flex',
   flexDirection: 'column',

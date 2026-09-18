@@ -17,7 +17,7 @@ export const gallery = style({
 
 export const iconCell = style({
   alignItems: 'center',
-  borderRadius: theme.radii.md,
+  borderRadius: theme.radius.md,
   borderWidth: '1px',
   display: 'flex',
   flexDirection: 'column',

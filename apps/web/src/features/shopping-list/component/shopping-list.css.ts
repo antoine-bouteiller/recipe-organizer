@@ -27,7 +27,7 @@ export const container3 = style({
 export const container4 = style({
   alignItems: 'center',
   background: theme.colors.accent,
-  borderRadius: theme.radii.full,
+  borderRadius: theme.radius.full,
   color: theme.colors.primary,
   display: 'flex',
   height: theme.spacing(16),
@@ -50,7 +50,7 @@ export const heading = style({
   alignItems: 'center',
   color: theme.colors.primary,
   display: 'flex',
-  fontSize: '11px',
+  fontSize: theme.fontSizes.xs,
   fontWeight: theme.fontWeights.semibold,
   gap: theme.spacing(1.5),
   letterSpacing: theme.letterSpacings.wider,
@@ -61,7 +61,7 @@ export const heading = style({
 
 export const container5 = style({
   background: theme.colors.card,
-  borderRadius: theme.radii['2xl'],
+  borderRadius: theme.radius['2xl'],
   borderWidth: '1px',
   overflow: 'hidden',
   paddingInline: theme.spacing(3.5),

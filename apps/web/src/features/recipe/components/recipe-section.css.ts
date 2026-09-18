@@ -2,40 +2,39 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { style, styleVariants } from '@vanilla-extract/css'
 
 export const ingredients = styleVariants({
-  embedded: { listStyle: 'none', margin: 0 },
+  embedded: { listStyle: 'none', margin: theme.spacing(0) },
   standalone: {
     background: theme.colors.card,
-    borderRadius: theme.radii['2xl'],
-    borderStyle: 'solid',
+    borderRadius: theme.radius['2xl'],
     borderWidth: '1px',
     listStyle: 'none',
-    margin: 0,
+    margin: theme.spacing(0),
     overflow: 'hidden',
-    paddingInline: '14px',
+    paddingInline: theme.spacing(3.5),
   },
 })
 export const ingredient = style({
   borderBottomWidth: '1px',
-  fontSize: '14px',
+  fontSize: theme.fontSizes.sm,
   lineHeight: '24px',
-  margin: 0,
-  paddingBlock: '12px',
+  margin: theme.spacing(0),
+  paddingBlock: theme.spacing(3),
   selectors: { '&:last-child': { borderBottomWidth: 0 } },
 })
 export const ingredientLine = style({
   alignItems: 'center',
   display: 'flex',
-  gap: '12px',
+  gap: theme.spacing(3),
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 })
-export const bullet = style({ background: theme.colors.primary, borderRadius: theme.radii.full, flexShrink: 0, height: '6px', width: '6px' })
+export const bullet = style({ background: theme.colors.primary, borderRadius: theme.radius.full, flexShrink: 0, height: '6px', width: '6px' })
 export const ingredientName = style({ flex: '1' })
 export const quantity = style({
   color: theme.colors['muted-foreground'],
   fontVariantNumeric: 'tabular-nums',
   fontWeight: theme.fontWeights.semibold,
 })
-export const group = style({ marginBottom: '16px', selectors: { '&:last-child': { marginBottom: 0 } } })
-export const groupName = style({ fontWeight: theme.fontWeights.semibold, marginBottom: '8px', paddingInline: '4px' })
+export const group = style({ marginBottom: theme.spacing(4), selectors: { '&:last-child': { marginBottom: theme.spacing(0) } } })
+export const groupName = style({ fontWeight: theme.fontWeights.semibold, marginBottom: theme.spacing(2), paddingInline: theme.spacing(1) })

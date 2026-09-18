@@ -37,7 +37,7 @@ export const container6 = style({
 })
 
 export const container7 = style({
-  borderRadius: theme.radii.xl,
+  borderRadius: theme.radius.xl,
   borderWidth: '1px',
   padding: theme.spacing(4),
   position: 'relative',

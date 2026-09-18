@@ -8,7 +8,7 @@ export const kbd = recipe({
     },
     alignItems: 'center',
     backgroundColor: theme.colors.secondary,
-    borderRadius: theme.radii.sm,
+    borderRadius: theme.radius.sm,
     color: theme.colors['secondary-foreground'],
     display: 'inline-flex',
     fontFamily: theme.fonts.sans,

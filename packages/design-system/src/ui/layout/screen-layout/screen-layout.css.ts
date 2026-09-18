@@ -47,9 +47,9 @@ export const content = recipe({
   variants: {
     hasBackground: {
       true: {
-        borderTopLeftRadius: theme.radii['3xl'],
-        borderTopRightRadius: theme.radii['3xl'],
-        marginTop: `calc(${theme.spacing(10)} * -1)`,
+        borderTopLeftRadius: theme.radius['3xl'],
+        borderTopRightRadius: theme.radius['3xl'],
+        marginTop: theme.spacing(-10),
         paddingTop: theme.spacing(1),
       },
     },
@@ -58,7 +58,7 @@ export const content = recipe({
         paddingBottom: theme.spacing(4),
       },
       true: {
-        paddingBottom: `calc(env(safe-area-inset-bottom) + ${theme.spacing(16)})`,
+        paddingBottom: `calc(${theme.safeArea.bottom} + ${theme.spacing(16)})`,
       },
     },
   },
@@ -75,7 +75,7 @@ export const imageHeader = recipe({
     overflow: 'hidden',
     paddingBottom: theme.spacing(12),
     paddingInline: theme.spacing(6),
-    paddingTop: `calc(env(safe-area-inset-top) + ${theme.spacing(4)})`,
+    paddingTop: `calc(${theme.safeArea.top} + ${theme.spacing(4)})`,
     position: 'relative',
     width: '100%',
     '@media': {
@@ -95,9 +95,9 @@ export const header = recipe({
     flexShrink: 0,
     gap: theme.spacing(2),
     height: 'var(--screen-header-height)',
-    marginInline: `calc(${theme.spacing(4)} * -1)`,
+    marginInline: theme.spacing(-4),
     paddingInline: theme.spacing(4),
-    paddingTop: `calc(env(safe-area-inset-top) + ${theme.spacing(1)})`,
+    paddingTop: `calc(${theme.safeArea.top} + ${theme.spacing(1)})`,
     position: 'sticky',
     top: theme.spacing(0),
     width: 'auto',
@@ -135,7 +135,7 @@ export const imageBack = recipe({
       '--owner-icon-size': '16px',
     },
     color: theme.colors['inverse-foreground'],
-    marginLeft: `calc(${theme.spacing(4)} * -1)`,
+    marginLeft: theme.spacing(-4),
     position: 'relative',
     zIndex: 10,
   },

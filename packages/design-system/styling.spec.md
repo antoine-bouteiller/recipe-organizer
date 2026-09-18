@@ -59,10 +59,16 @@ are removed. It merges `theme.spacing` with the typed variables from the interna
 contract. Its camel-case categories and literal token keys produce native Vanilla Extract scoped
 variables; their generated references and names are internal implementation details. `theme.spacing` is an ordinary function that accepts one to four numbers and returns CSS shorthand values using `calc(4px * n)`, such
 as `theme.spacing(1, 2.5)` → `'calc(4px * 1) calc(4px * 2.5)'`. Zero, fractional, and negative
-multipliers are supported. It replaces the fixed `sizes` and `spacing` scales; percentages and
-safe-area values remain native CSS. It is not a Vanilla Extract function serializer. Length tokens use
+multipliers are supported. It replaces the fixed `sizes` and `spacing` scales; percentages remain
+native CSS. `theme.safeArea.top` and `.bottom` wrap the corresponding `env()` inset with a zero fallback.
+The token lint rule accepts these values directly and in an additive `calc()` with one `theme.spacing(value)`
+call; it does not permit arbitrary CSS expressions. Spacing is not a Vanilla Extract function serializer. Length tokens use
 pixels (converted at 16px/rem). `tokens.css.ts` exports `vars` only for `theme/index.ts` and emits the
-light `:root` values, `.dark` semantic-color overrides, and global `skeleton` and `spin` keyframes.
+light `:root` values, `.dark` semantic-color/shadow overrides, and global `skeleton` and `spin` keyframes.
+`theme.radius.none` and `theme.shadows.none` provide zero-radius and no-shadow resets. The `inherit`
+entries in `theme.radius`, `theme.fontSizes`, and `theme.fontWeights` are literal values added by
+`theme/index.ts`: storing CSS-wide `inherit` in a custom property would inherit that variable rather
+than the styled property's value.
 
 The color `palette` stays private: neither numbered shades nor black/white primitives are exported or
 emitted as CSS variables. The custom `teal` scale retains the existing blue-green brand values.
@@ -77,10 +83,15 @@ high-contrast text colors without following the light/dark foreground swap.
 Web, Storybook, and root Vitest each enable the Vanilla Extract Vite plugin. Web and Storybook
 entrypoints import `@recipe-organizer/design-system/global.css` to activate the shared theme, reset, and
 base rules. `src/global.css.ts` defines both using `globalStyle` and named layers with typed theme
-references. Reset registration precedes base registration, preserving cascade order.
+references. Reset registration precedes base registration, preserving cascade order. Resets cover the elements
+actually used by the app and editor; native defaults handle unsupported controls and document elements.
+Keep shared box sizing, zero margins/padding, solid border defaults, font/link/form inheritance,
+list/media normalization, and keyboard-focus/hidden semantics. Specialized date/search/file-button,
+unused element, and browser-default restatements are not maintained.
 Base rules own default borders, body colors, font smoothing, and important reduced-motion overrides
-(including view transitions). Native `styles.css` retains only font faces, safe-area custom properties,
-and the full layer-order declaration. Components and app-owned visual
+(including view transitions). `global.css.ts` also derives the shared `--screen-header-height` from
+`theme.safeArea.top` and `theme.spacing(15)`. Native `styles.css` retains only font faces and the full
+layer-order declaration. Components and app-owned visual
 owners keep styles in owner-local `*.css.ts` modules and use typed `theme` references, including template
 interpolations, rather than shared raw `var(--…)` strings. Component and recipe CSS is intentionally
 unlayered. Native CSS variables remain appropriate for component-owned, Base UI, and runtime-owned
@@ -141,15 +152,20 @@ boundary without nesting forms.
 
 Coherence follows semantic roles, not a universal radius or border. Use existing typed tokens:
 
-| Role               | Treatment                                                                                                                                                                                                             | Intentional exceptions                                                                                                                                                                                                                       |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ordinary controls  | Buttons (including square icon buttons), inputs, selects, and toggles use `lg` (8px). Neutral outlines use 1px `input`, never a text color.                                                                           | Outline Buttons keep opaque `popover` backing in every state; disabled Buttons retain `0.38` opacity feedback.                                                                                                                               |
-| Compact controls   | Nested controls, menu/action rows, Button `icon-xs` and `list-action` use `md` (6px).                                                                                                                                 | Tiny badges/menu content retain `sm` (4px); toolbar hosts retain `xl` (12px), compact popovers `lg` (8px).                                                                                                                                   |
-| Containers         | Standard cards, dialogs, and standalone list panels use `2xl` (16px).                                                                                                                                                 | Existing large desktop recipe panels retain `3xl` (24px); embedded recipe sections stay borderless and without their own surface.                                                                                                            |
-| Capsules and media | `full` communicates a capsule/circle role, not merely equal width and height.                                                                                                                                         | TabBar selection, avatars, switches/handles, circular status illustrations, and semantic pill badges retain it. Recipe media keeps its matching borderless 50px squircle silhouette and rounded fallback.                                    |
-| Surfaces           | Page/chrome uses `background` / `foreground`, content uses `card` / `card-foreground`, floating overlays use `popover` / `popover-foreground`.                                                                        | Primary/secondary actions retain their corresponding semantic pairs; recipe-header ghost actions stay transparent.                                                                                                                           |
-| Navigation         | TabBar uses `background`, inactive `muted-foreground`, and an `accent` / `accent-foreground` selection capsule. Tabs use a `muted` track, `muted-foreground` text, and a moving `card` / `card-foreground` selection. | TabBar keeps its elevation, 64px plus safe-area footprint and mobile-only behavior. Desktop Navbar keeps its primary underline; swipe/indicator geometry remains unchanged.                                                                  |
-| Borders and state  | Structural card/menu borders and separators use 1px `border`; keyboard focus uses 2px `ring`.                                                                                                                         | Keep filled/ghost controls without decorative borders, destructive borders and checkbox/radio state outlines. Preserve translucent state overlays over opaque backing, disabled feedback, and intentional inset border/padding compensation. |
+| Role               | Treatment                                                                                                                                                                                                             | Intentional exceptions                                                                                                                                                                                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ordinary controls  | Buttons (including square icon buttons), inputs, selects, and toggles use `lg` (8px). Neutral outlines use 1px `input`, never a text color.                                                                           | Outline Buttons keep opaque `popover` backing in every state; disabled Buttons retain `0.38` opacity feedback.                                                                                                                                                            |
+| Compact controls   | Nested controls, menu/action rows, Button `icon-xs` and `list-action` use `md` (6px).                                                                                                                                 | Tiny badges/menu content retain `sm` (4px); toolbar hosts retain `xl` (12px), compact popovers `lg` (8px).                                                                                                                                                                |
+| Containers         | Standard cards, dialogs, and standalone list panels use `2xl` (16px).                                                                                                                                                 | Existing large desktop recipe panels retain `3xl` (24px); embedded recipe sections stay borderless and without their own surface.                                                                                                                                         |
+| Capsules and media | `full` communicates a capsule/circle role, not merely equal width and height.                                                                                                                                         | TabBar selection, avatars, switches/handles, circular status illustrations, and semantic pill badges retain it. Recipe media uses the matching borderless `4xl` (32px) squircle silhouette and rounded fallback.                                                          |
+| Surfaces           | Page/chrome uses `background` / `foreground`, content uses `card` / `card-foreground`, floating overlays use `popover` / `popover-foreground`.                                                                        | Primary/secondary actions retain their corresponding semantic pairs; recipe-header ghost actions stay transparent.                                                                                                                                                        |
+| Navigation         | TabBar uses `background`, inactive `muted-foreground`, and an `accent` / `accent-foreground` selection capsule. Tabs use a `muted` track, `muted-foreground` text, and a moving `card` / `card-foreground` selection. | TabBar keeps its elevation, 64px plus safe-area footprint and mobile-only behavior. Desktop Navbar keeps its primary underline; swipe/indicator geometry remains unchanged.                                                                                               |
+| Borders and state  | Structural card/menu borders and separators use 1px `border`; keyboard focus uses 2px `ring`.                                                                                                                         | Keep filled/ghost controls without decorative borders, destructive borders and checkbox/radio state outlines. Preserve translucent state overlays over opaque backing, disabled feedback, and border-compensated padding. Inset shapes reuse their parent's radius token. |
+
+Shared shadow roles stay minimal: `shadows.focus` and `.invalid` use solid semantic colors for 3px
+rings; `.edge` supplies the subtle light/dark surface edge. Components reuse these roles rather than
+creating opacity variants, and retain the existing elevation scale. Unmatched fixed font sizes and
+radii use the nearest existing token, rounding equal-distance choices upward.
 
 State overlays and image clipping follow the owner's shape. Global reset supplies solid border style;
 do not redeclare it solely because an owner specifies only border width. Required text contrast is
@@ -169,17 +185,18 @@ uses feature-owned DOM rather than a shared-component override.
 
 ## Changelog
 
-| Date       | Amendment                                                                    | Sections affected | Reason                                                                                 |
-| ---------- | ---------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------------------------------- |
-| 2026-09-17 | Add the semantic shape, surface, border, and contrast role map.              | §6.5              | Keep shared controls coherent while recording intentional navigation/media exceptions. |
-| 2026-09-17 | Replace Panda generation with Vanilla Extract.                               | §2–§6.1           | Remove generated styling infrastructure.                                               |
-| 2026-09-17 | Replace size/spacing scales with `theme.spacing`.                            | §6.1              | Support numeric CSS shorthand without enumerated tokens.                               |
-| 2026-09-17 | Publish the combined `theme` API and remove public token subpaths.           | §3, §4, §6.1      | Give `.css.ts` consumers one typed import while keeping token internals private.       |
-| 2026-09-17 | Keep the palette private; expose semantic badge and contrast colors.         | §6.1              | Preserve appearance without exposing primitive color scales.                           |
-| 2026-09-17 | Generalize subtle color roles and source all dark overrides from primitives. | §6.1              | Remove badge-specific naming and reuse the private palette without visual changes.     |
-| 2026-09-17 | Move shared reset and base rules into global Vanilla Extract styles.         | §6.1              | Use typed theme references while preserving cascade and reduced-motion behavior.       |
-| 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`.                         | §6.1              | Keep shared global styles in one module and public entrypoint.                         |
-| 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.            | §3, §4, §6.1      | Keep generated raw variable names internal to the typed theme contract.                |
+| Date       | Amendment                                                                                            | Sections affected | Reason                                                                                   |
+| ---------- | ---------------------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------- |
+| 2026-09-17 | Add the semantic shape, surface, border, and contrast role map.                                      | §6.5              | Keep shared controls coherent while recording intentional navigation/media exceptions.   |
+| 2026-09-17 | Replace Panda generation with Vanilla Extract.                                                       | §2–§6.1           | Remove generated styling infrastructure.                                                 |
+| 2026-09-17 | Replace size/spacing scales with `theme.spacing`.                                                    | §6.1              | Support numeric CSS shorthand without enumerated tokens.                                 |
+| 2026-09-17 | Publish the combined `theme` API and remove public token subpaths.                                   | §3, §4, §6.1      | Give `.css.ts` consumers one typed import while keeping token internals private.         |
+| 2026-09-17 | Keep the palette private; expose semantic badge and contrast colors.                                 | §6.1              | Preserve appearance without exposing primitive color scales.                             |
+| 2026-09-17 | Generalize subtle color roles and source all dark overrides from primitives.                         | §6.1              | Remove badge-specific naming and reuse the private palette without visual changes.       |
+| 2026-09-17 | Move shared reset and base rules into global Vanilla Extract styles.                                 | §6.1              | Use typed theme references while preserving cascade and reduced-motion behavior.         |
+| 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`.                                                 | §6.1              | Keep shared global styles in one module and public entrypoint.                           |
+| 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.                                    | §3, §4, §6.1      | Keep generated raw variable names internal to the typed theme contract.                  |
+| 2026-09-18 | Add safe-area/reset tokens, consolidate shadows, normalize unmatched sizes, and prune unused resets. | §6.1, §6.5        | Enforce a minimal token vocabulary while preserving native semantics and focus contrast. |
 
 ## 8. Open Questions
 

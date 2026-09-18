@@ -23,15 +23,10 @@ export const viewport = recipe({
         outlineOffset: '1px',
       },
     },
-    borderRadius: 'inherit',
+    borderRadius: theme.radius.inherit,
     height: '100%',
     outline: '2px solid transparent',
     outlineOffset: '2px',
-    vars: {
-      '--transition-duration': '150ms',
-      '--transition-prop': 'box-shadow',
-      '--transition-easing': theme.easings['in-out'],
-    },
     transitionDuration: '150ms',
     transitionProperty: 'box-shadow',
     transitionTimingFunction: theme.easings['in-out'],
@@ -83,9 +78,6 @@ export const scrollbar = recipe({
       '&[data-hovering], &[data-scrolling]': {
         opacity: 1,
         transitionDelay: '0ms',
-        vars: {
-          '--transition-duration': '100ms',
-        },
         transitionDuration: '100ms',
       },
     },
@@ -119,7 +111,7 @@ export const scrollbar = recipe({
 export const thumb = recipe({
   base: {
     backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 20%, transparent)`,
-    borderRadius: theme.radii.full,
+    borderRadius: theme.radius.full,
     flex: '1 1 0%',
     position: 'relative',
   },

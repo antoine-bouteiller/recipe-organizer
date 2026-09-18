@@ -21,7 +21,7 @@ export const item = recipe({
   base: {
     alignItems: 'center',
     borderColor: 'transparent',
-    borderRadius: theme.radii.md,
+    borderRadius: theme.radius.md,
     borderWidth: '1px',
     display: 'flex',
     flexWrap: 'wrap',
@@ -30,18 +30,13 @@ export const item = recipe({
     outline: '2px solid transparent',
     outlineOffset: '2px',
     padding: theme.spacing(4),
-    vars: {
-      '--transition-duration': '100ms',
-      '--transition-prop': 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
-      '--transition-easing': theme.easings['in-out'],
-    },
     transitionDuration: '100ms',
     transitionProperty: 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
     transitionTimingFunction: theme.easings['in-out'],
     selectors: {
       '&:is(:focus-visible, [data-focus-visible])': {
         borderColor: theme.colors.ring,
-        boxShadow: `0 0 0 3px color-mix(in oklab, ${theme.colors.ring} 50%, transparent)`,
+        boxShadow: theme.shadows.focus,
       },
     },
   },

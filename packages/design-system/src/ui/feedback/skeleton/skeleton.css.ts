@@ -8,7 +8,7 @@ export const skeleton = recipe({
     },
     animation: theme.animations.skeleton,
     background: `linear-gradient(120deg, transparent 40%, var(--skeleton-highlight), transparent 60%) ${theme.colors.muted} 0 0 / 200% 100% fixed`,
-    borderRadius: theme.radii.sm,
+    borderRadius: theme.radius.sm,
     selectors: {
       '.dark &': {
         vars: {
@@ -20,7 +20,7 @@ export const skeleton = recipe({
   variants: {
     preset: {
       'recipe-card': {
-        borderRadius: '28px',
+        borderRadius: theme.radius['4xl'],
         height: theme.spacing(60),
       },
       'recipe-details-text': {
@@ -28,7 +28,7 @@ export const skeleton = recipe({
         width: '100%',
       },
       'recipe-details-title': {
-        borderRadius: theme.radii.lg,
+        borderRadius: theme.radius.lg,
         height: theme.spacing(10),
         width: '100%',
       },
@@ -37,12 +37,12 @@ export const skeleton = recipe({
         width: '100%',
       },
       'search-input': {
-        borderRadius: theme.radii.xl,
+        borderRadius: theme.radius.xl,
         height: theme.spacing(11),
         width: '100%',
       },
       'search-result': {
-        borderRadius: theme.radii['2xl'],
+        borderRadius: theme.radius['2xl'],
         height: theme.spacing(20),
         width: '100%',
       },

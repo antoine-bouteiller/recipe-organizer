@@ -50,8 +50,8 @@ export const popup = recipe({
         },
       },
       '&::before': {
-        borderRadius: `calc(${theme.radii['2xl']} - 1px)`,
-        boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+        borderRadius: theme.radius['2xl'],
+        boxShadow: theme.shadows.edge,
         content: '""',
         inset: theme.spacing(0),
         pointerEvents: 'none',
@@ -62,14 +62,11 @@ export const popup = recipe({
           },
         },
       },
-      '.dark &::before': {
-        boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-      },
     },
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
     backgroundColor: theme.colors.popover,
-    borderRadius: theme.radii['2xl'],
+    borderRadius: theme.radius['2xl'],
     borderWidth: '1px',
     boxShadow: theme.shadows.overlay,
     color: theme.colors['popover-foreground'],
@@ -84,11 +81,6 @@ export const popup = recipe({
     outline: '2px solid transparent',
     outlineOffset: '2px',
     position: 'relative',
-    vars: {
-      '--transition-duration': '200ms',
-      '--transition-prop': 'scale, opacity, translate',
-      '--transition-easing': theme.easings['in-out'],
-    },
     transitionDuration: '200ms',
     transitionProperty: 'scale, opacity, translate',
     transitionTimingFunction: theme.easings['in-out'],
@@ -100,7 +92,7 @@ export const popup = recipe({
       'screen and (max-width: 639.96px)': {
         borderBottomWidth: '0',
         borderInlineWidth: '0',
-        borderRadius: '0',
+        borderRadius: theme.radius.none,
         maxWidth: 'none',
         transformOrigin: 'bottom',
       },
@@ -138,8 +130,8 @@ export const footer = recipe({
     paddingInline: theme.spacing(6),
     '@media': {
       'screen and (min-width: 640px)': {
-        borderBottomLeftRadius: `calc(${theme.radii['2xl']} - 1px)`,
-        borderBottomRightRadius: `calc(${theme.radii['2xl']} - 1px)`,
+        borderBottomLeftRadius: theme.radius['2xl'],
+        borderBottomRightRadius: theme.radius['2xl'],
         flexDirection: 'row',
         justifyContent: 'flex-end',
       },

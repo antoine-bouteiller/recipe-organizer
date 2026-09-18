@@ -23,7 +23,7 @@ export const empty = style({
 
 export const item = style({
   alignItems: 'center',
-  borderRadius: theme.radii.sm,
+  borderRadius: theme.radius.sm,
   cursor: 'default',
   display: 'flex',
   fontSize: theme.fontSizes.base,

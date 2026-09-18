@@ -13,11 +13,11 @@ export const group = style({
   selectors: {
     '&:focus-within': {
       borderColor: theme.colors.ring,
-      boxShadow: `0 0 0 3px color-mix(in oklab, ${theme.colors.ring} 24%, transparent)`,
+      boxShadow: theme.shadows.focus,
     },
     '&:focus-within:has([aria-invalid])': {
       borderColor: `color-mix(in srgb, ${theme.colors.destructive} 64%, transparent)`,
-      boxShadow: `0 0 0 3px color-mix(in oklab, ${theme.colors.destructive} 48%, transparent)`,
+      boxShadow: theme.shadows.invalid,
     },
     '&:has([aria-invalid])': {
       borderColor: `color-mix(in srgb, ${theme.colors.destructive} 36%, transparent)`,
@@ -26,26 +26,23 @@ export const group = style({
       backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 4%, transparent)`,
     },
     '&:not([data-disabled], :focus-within, [aria-invalid])::before': {
-      boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+      boxShadow: theme.shadows.edge,
     },
     '&[data-disabled]': {
       opacity: 0.64,
       pointerEvents: 'none',
     },
     '.dark &:focus-within:has([aria-invalid])': {
-      boxShadow: `0 0 0 3px color-mix(in oklab, ${theme.colors.destructive} 24%, transparent)`,
+      boxShadow: theme.shadows.invalid,
     },
     '.dark &:has(input:-webkit-autofill)': {
       backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 8%, transparent)`,
-    },
-    '.dark &:not([data-disabled], :focus-within, [aria-invalid])::before': {
-      boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
     },
     '.dark &': {
       backgroundColor: `color-mix(in srgb, ${theme.colors.input} 32%, transparent)`,
     },
     '&::before': {
-      borderRadius: `calc(${theme.radii.lg} - 1px)`,
+      borderRadius: theme.radius.lg,
       content: '""',
       inset: theme.spacing(0),
       pointerEvents: 'none',
@@ -54,15 +51,12 @@ export const group = style({
   },
   vars: {
     '--owner-icon-size': '18px',
-    '--transition-duration': '150ms',
-    '--transition-prop': 'box-shadow',
-    '--transition-easing': theme.easings['in-out'],
   },
   backgroundClip: 'padding-box',
   WebkitBackgroundClip: 'padding-box',
   backgroundColor: theme.colors.background,
   borderColor: theme.colors.input,
-  borderRadius: theme.radii.lg,
+  borderRadius: theme.radius.lg,
   borderWidth: '1px',
   color: theme.colors.foreground,
   display: 'flex',
@@ -86,19 +80,14 @@ export const group = style({
 
 export const decrement = style({
   alignItems: 'center',
-  borderEndStartRadius: `calc(${theme.radii.lg} - 1px)`,
-  borderStartStartRadius: `calc(${theme.radii.lg} - 1px)`,
+  borderEndStartRadius: theme.radius.lg,
+  borderStartStartRadius: theme.radius.lg,
   cursor: 'pointer',
   display: 'flex',
   flexShrink: 0,
   justifyContent: 'center',
-  paddingInline: `calc(${theme.spacing(3)} - 1px)`,
+  paddingInline: theme.spacing(2.75),
   position: 'relative',
-  vars: {
-    '--transition-duration': '150ms',
-    '--transition-prop': 'background-color',
-    '--transition-easing': theme.easings['in-out'],
-  },
   transitionDuration: '150ms',
   transitionProperty: 'background-color',
   transitionTimingFunction: theme.easings['in-out'],
@@ -126,19 +115,14 @@ export const decrement = style({
 
 export const increment = style({
   alignItems: 'center',
-  borderEndEndRadius: `calc(${theme.radii.lg} - 1px)`,
-  borderStartEndRadius: `calc(${theme.radii.lg} - 1px)`,
+  borderEndEndRadius: theme.radius.lg,
+  borderStartEndRadius: theme.radius.lg,
   cursor: 'pointer',
   display: 'flex',
   flexShrink: 0,
   justifyContent: 'center',
-  paddingInline: `calc(${theme.spacing(3)} - 1px)`,
+  paddingInline: theme.spacing(2.75),
   position: 'relative',
-  vars: {
-    '--transition-duration': '150ms',
-    '--transition-prop': 'background-color',
-    '--transition-easing': theme.easings['in-out'],
-  },
   transitionDuration: '150ms',
   transitionProperty: 'background-color',
   transitionTimingFunction: theme.easings['in-out'],
@@ -173,7 +157,7 @@ export const input = style({
   minWidth: theme.spacing(0),
   outline: '2px solid transparent',
   outlineOffset: '2px',
-  paddingInline: `calc(${theme.spacing(3)} - 1px)`,
+  paddingInline: theme.spacing(2.75),
   textAlign: 'center',
   transition: 'background-color 5000000s ease-in-out 0s',
   width: '100%',

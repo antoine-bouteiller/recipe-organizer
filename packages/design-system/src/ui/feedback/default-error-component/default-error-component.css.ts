@@ -40,7 +40,7 @@ export const subheading = recipe({
 export const details = recipe({
   base: {
     borderColor: theme.colors.destructive,
-    borderRadius: theme.radii.sm,
+    borderRadius: theme.radius.sm,
     borderWidth: '1px',
     color: theme.colors.destructive,
     fontSize: theme.fontSizes.sm,

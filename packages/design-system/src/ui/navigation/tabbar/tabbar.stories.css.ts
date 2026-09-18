@@ -18,6 +18,6 @@ export const appSurface = style({
 export const contentSurface = style({
   backgroundColor: theme.colors.card,
   color: theme.colors['card-foreground'],
-  borderRadius: theme.radii['2xl'],
+  borderRadius: theme.radius['2xl'],
   padding: theme.spacing(3),
 })

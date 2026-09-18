@@ -17,21 +17,18 @@ export const popup = style({
 export const popupFrame = style({
   selectors: {
     '&::before': {
-      borderRadius: `calc(${theme.radii.lg} - 1px)`,
-      boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+      borderRadius: theme.radius.lg,
+      boxShadow: theme.shadows.edge,
       content: '""',
       inset: theme.spacing(0),
       pointerEvents: 'none',
       position: 'absolute',
     },
-    '.dark &::before': {
-      boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-    },
   },
   backgroundClip: 'padding-box',
   WebkitBackgroundClip: 'padding-box',
   backgroundColor: theme.colors.popover,
-  borderRadius: theme.radii.lg,
+  borderRadius: theme.radius.lg,
   borderWidth: '1px',
   boxShadow: theme.shadows.overlay,
   height: '100%',
@@ -62,8 +59,8 @@ export const scrollUpArrow = style([
     selectors: {
       '&::before': {
         backgroundImage: `linear-gradient(to bottom, ${theme.colors.popover} 50%, transparent)`,
-        borderStartEndRadius: `calc(${theme.radii.lg} - 1px)`,
-        borderStartStartRadius: `calc(${theme.radii.lg} - 1px)`,
+        borderStartEndRadius: theme.radius.lg,
+        borderStartStartRadius: theme.radius.lg,
         content: '""',
         height: '200%',
         insetInline: '1px',
@@ -81,8 +78,8 @@ export const scrollDownArrow = style([
     selectors: {
       '&::before': {
         backgroundImage: `linear-gradient(to top, ${theme.colors.popover} 50%, transparent)`,
-        borderEndEndRadius: `calc(${theme.radii.lg} - 1px)`,
-        borderEndStartRadius: `calc(${theme.radii.lg} - 1px)`,
+        borderEndEndRadius: theme.radius.lg,
+        borderEndStartRadius: theme.radius.lg,
         bottom: '1px',
         content: '""',
         height: '200%',
@@ -112,7 +109,7 @@ export const item = style({
     '--owner-icon-size': '18px',
   },
   alignItems: 'center',
-  borderRadius: theme.radii.sm,
+  borderRadius: theme.radius.sm,
   cursor: 'default',
   display: 'grid',
   fontSize: theme.fontSizes.base,

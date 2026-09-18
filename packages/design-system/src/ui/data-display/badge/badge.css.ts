@@ -5,13 +5,10 @@ export const badge = recipe({
   base: {
     vars: {
       '--owner-icon-size': '14px',
-      '--transition-duration': '150ms',
-      '--transition-prop': 'box-shadow',
-      '--transition-easing': theme.easings['in-out'],
     },
     alignItems: 'center',
     borderColor: 'transparent',
-    borderRadius: theme.radii.sm,
+    borderRadius: theme.radius.sm,
     borderWidth: '1px',
     display: 'inline-flex',
     flexShrink: 0,
@@ -53,7 +50,7 @@ export const badge = recipe({
         fontSize: theme.fontSizes.sm,
         height: theme.spacing(5.5),
         minWidth: theme.spacing(5.5),
-        paddingInline: `calc(${theme.spacing(1)} - 1px)`,
+        paddingInline: theme.spacing(0.75),
         '@media': {
           'screen and (min-width: 640px)': {
             fontSize: theme.fontSizes.xs,
@@ -63,14 +60,14 @@ export const badge = recipe({
         },
       },
       sm: {
-        borderRadius: '4px',
+        borderRadius: theme.radius.sm,
         fontSize: theme.fontSizes.xs,
         height: theme.spacing(5),
         minWidth: theme.spacing(5),
-        paddingInline: `calc(${theme.spacing(1)} - 1px)`,
+        paddingInline: theme.spacing(0.75),
         '@media': {
           'screen and (min-width: 640px)': {
-            fontSize: '10px',
+            fontSize: theme.fontSizes.xs,
             height: theme.spacing(4),
             minWidth: theme.spacing(4),
           },
@@ -80,7 +77,7 @@ export const badge = recipe({
     variant: {
       accent: {
         backgroundColor: theme.colors.accent,
-        borderRadius: theme.radii.full,
+        borderRadius: theme.radius.full,
         color: theme.colors['accent-foreground'],
         fontWeight: theme.fontWeights.semibold,
       },

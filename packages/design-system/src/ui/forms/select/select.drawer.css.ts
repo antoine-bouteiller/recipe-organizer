@@ -8,7 +8,7 @@ export const list = style({
 
 export const item = style({
   alignItems: 'center',
-  borderRadius: theme.radii.sm,
+  borderRadius: theme.radius.sm,
   display: 'flex',
   fontSize: theme.fontSizes.base,
   gap: theme.spacing(2),

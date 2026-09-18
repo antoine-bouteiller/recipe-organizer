@@ -2,131 +2,53 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { type CSSProperties, globalKeyframes, globalLayer, globalStyle } from '@vanilla-extract/css'
 
 const resetLayer = globalLayer('reset')
-// Preserve the legacy Safari shorthand, which is absent from csstype.
-const reset = (selector: string, rules: CSSProperties & { WebkitTextDecoration?: 'inherit' }) =>
-  globalStyle(selector, { '@layer': { [resetLayer]: rules } })
+const reset = (selector: string, rules: CSSProperties) => globalStyle(selector, { '@layer': { [resetLayer]: rules } })
 
-reset('*, ::before, ::after, ::backdrop, ::file-selector-button', {
+reset('*, ::before, ::after', {
   boxSizing: 'border-box',
-  margin: '0',
-  padding: '0',
+  margin: theme.spacing(0),
+  padding: theme.spacing(0),
   border: '0 solid',
 })
 
-reset('html, :host', {
+reset('html', {
   lineHeight: '1.5',
   WebkitTextSizeAdjust: '100%',
   tabSize: '4',
   fontFamily: theme.fonts.sans,
-  fontFeatureSettings: 'normal',
-  fontVariationSettings: 'normal',
   WebkitTapHighlightColor: 'transparent',
-})
-
-reset('hr', {
-  height: '0',
-  color: 'inherit',
-  borderTopWidth: '1px',
-})
-
-reset('abbr:where([title])', {
-  textDecoration: 'underline dotted',
-})
-
-reset('h1, h2, h3, h4, h5, h6', {
-  fontSize: 'inherit',
-  fontWeight: 'inherit',
 })
 
 reset('a', {
   color: 'inherit',
-  WebkitTextDecoration: 'inherit',
   textDecoration: 'inherit',
-})
-
-reset('b, strong', {
-  fontWeight: 'bolder',
-})
-
-reset('code, kbd, samp, pre', {
-  fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  fontFeatureSettings: 'normal',
-  fontVariationSettings: 'normal',
-  fontSize: '1em',
-})
-
-reset('small', {
-  fontSize: '80%',
-})
-
-reset('sub, sup', {
-  fontSize: '75%',
-  lineHeight: '0',
-  position: 'relative',
-  verticalAlign: 'baseline',
-})
-
-reset('sub', {
-  bottom: '-0.25em',
-})
-
-reset('sup', {
-  top: '-0.5em',
-})
-
-reset('table', {
-  textIndent: '0',
-  borderColor: 'inherit',
-  borderCollapse: 'collapse',
 })
 
 reset(':-moz-focusring', {
   outline: 'auto',
 })
 
-reset('progress', {
-  verticalAlign: 'baseline',
-})
-
-reset('summary', {
-  display: 'list-item',
-})
-
-reset('ol, ul, menu', {
+reset('ol, ul', {
   listStyle: 'none',
 })
 
-reset('img, svg, video, canvas, audio, iframe, embed, object', {
+reset('img, svg', {
   display: 'block',
-  verticalAlign: 'middle',
 })
 
-reset('img, video', {
+reset('img', {
   maxWidth: '100%',
   height: 'auto',
 })
 
-reset('button, input, select, optgroup, textarea, ::file-selector-button', {
+reset('button, input', {
   font: 'inherit',
   fontFeatureSettings: 'inherit',
   fontVariationSettings: 'inherit',
   letterSpacing: 'inherit',
   color: 'inherit',
-  borderRadius: '0',
+  borderRadius: theme.radius.none,
   backgroundColor: 'transparent',
-  opacity: '1',
-})
-
-reset(':where(select:is([multiple], [size])) optgroup', {
-  fontWeight: 'bolder',
-})
-
-reset(':where(select:is([multiple], [size])) optgroup option', {
-  paddingInlineStart: '20px',
-})
-
-reset('::file-selector-button', {
-  marginInlineEnd: '4px',
 })
 
 reset('::placeholder', {
@@ -134,53 +56,20 @@ reset('::placeholder', {
   color: 'color-mix(in oklab, currentColor 50%, transparent)',
 })
 
-reset('textarea', {
-  resize: 'vertical',
-})
-
-reset('::-webkit-search-decoration', {
-  WebkitAppearance: 'none',
-})
-
-reset('::-webkit-date-and-time-value', {
-  minHeight: '1lh',
-  textAlign: 'inherit',
-})
-
-reset('::-webkit-datetime-edit', {
-  display: 'inline-flex',
-  paddingBlock: '0',
-})
-
-reset('::-webkit-datetime-edit-fields-wrapper', {
-  padding: '0',
-})
-
-reset(
-  '::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field',
-  {
-    paddingBlock: '0',
-  }
-)
-
-reset('::-webkit-calendar-picker-indicator', {
-  lineHeight: '1',
-})
-
 reset(':-moz-ui-invalid', {
-  boxShadow: 'none',
+  boxShadow: theme.shadows.none,
 })
 
-reset("button, input:where([type='button'], [type='reset'], [type='submit']), ::file-selector-button", {
+reset("button, input:where([type='button'], [type='reset'], [type='submit'])", {
   appearance: 'button',
-})
-
-reset('::-webkit-inner-spin-button, ::-webkit-outer-spin-button', {
-  height: 'auto',
 })
 
 reset("[hidden]:where(:not([hidden='until-found']))", {
   display: 'none !important',
+})
+
+globalStyle(':root', {
+  vars: { '--screen-header-height': `calc(${theme.safeArea.top} + ${theme.spacing(15)})` },
 })
 
 const base = globalLayer('base')

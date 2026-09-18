@@ -6,7 +6,7 @@ export const card = recipe({
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radii['2xl'],
+    borderRadius: theme.radius['2xl'],
     borderWidth: '1px',
     color: theme.colors['card-foreground'],
     display: 'flex',

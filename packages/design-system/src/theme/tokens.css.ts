@@ -160,10 +160,6 @@ const tokenValues = {
     '3xl': '30px',
     '4xl': '36px',
     '5xl': '48px',
-    '6xl': '60px',
-    '7xl': '72px',
-    '8xl': '96px',
-    '9xl': '128px',
   },
   fontWeights: {
     thin: '100',
@@ -196,7 +192,8 @@ const tokenValues = {
     relaxed: '1.625',
     loose: '2',
   },
-  radii: {
+  radius: {
+    none: '0',
     full: '9999px',
     '2xl': '16px',
     '3xl': '24px',
@@ -207,8 +204,17 @@ const tokenValues = {
     sm: '4px',
     xl: '12px',
     xs: '2px',
+    inherit: 'inherit',
+  },
+  safeArea: {
+    top: 'env(safe-area-inset-top, 0px)',
+    bottom: 'env(safe-area-inset-bottom, 0px)',
   },
   shadows: {
+    none: 'none',
+    focus: `0 0 0 3px ${palette.teal[700]}`,
+    invalid: `0 0 0 3px ${palette.red[500]}`,
+    edge: `0 1px color-mix(in oklab, ${palette.black} 4%, transparent)`,
     overlay: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
     '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
     xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -244,6 +250,8 @@ globalStyle('.dark', {
     [vars.colors['secondary-foreground']]: palette.zinc[100],
     [vars.colors['success-foreground']]: palette.emerald[400],
     [vars.colors['warning-foreground']]: palette.amber[400],
+    [vars.shadows.focus]: `0 0 0 3px ${palette.neutral[500]}`,
+    [vars.shadows.edge]: `0 -1px color-mix(in oklab, ${palette.white} 6%, transparent)`,
   },
 })
 

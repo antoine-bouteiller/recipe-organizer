@@ -15,7 +15,7 @@ export const subrecipeLoading = style({
 export const subrecipeTrigger = style({
   backgroundColor: `color-mix(in oklab, ${theme.colors.muted} 30%, transparent)`,
   borderColor: `color-mix(in oklab, ${theme.colors['muted-foreground']} 50%, transparent)`,
-  borderRadius: theme.radii.lg,
+  borderRadius: theme.radius.lg,
   borderStyle: 'dashed',
   borderWidth: '2px',
   cursor: 'pointer',

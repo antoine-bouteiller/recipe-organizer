@@ -2,16 +2,16 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { style, styleVariants } from '@vanilla-extract/css'
 
 const base = style({
-  '@media': { '(min-width: 640px)': { fontSize: '12px', height: '18px', minWidth: '18px' } },
+  '@media': { '(min-width: 640px)': { fontSize: theme.fontSizes.xs, height: '18px', minWidth: '18px' } },
   alignItems: 'center',
-  borderRadius: theme.radii.sm,
+  borderRadius: theme.radius.sm,
   display: 'inline-flex',
-  fontSize: '14px',
+  fontSize: theme.fontSizes.sm,
   fontWeight: theme.fontWeights.medium,
   height: '22px',
   justifyContent: 'center',
   minWidth: '22px',
-  paddingInline: `calc(${theme.spacing(1)} - 1px)`,
+  paddingInline: theme.spacing(0.75),
 })
 
 export const badge = styleVariants({

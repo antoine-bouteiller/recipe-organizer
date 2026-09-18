@@ -4,7 +4,7 @@ import { style } from '@vanilla-extract/css'
 export const container = style({
   alignItems: 'center',
   background: theme.colors.primary,
-  borderRadius: theme.radii.xl,
+  borderRadius: theme.radius.xl,
   display: 'flex',
   gap: theme.spacing(2.5),
   justifyContent: 'center',
@@ -16,7 +16,7 @@ export const container = style({
 
 export const text = style({
   color: theme.colors['inverse-foreground'],
-  fontSize: '13px',
+  fontSize: theme.fontSizes.sm,
   fontVariantNumeric: 'tabular-nums',
   fontWeight: theme.fontWeights.bold,
   minWidth: theme.spacing(18),
@@ -26,7 +26,7 @@ export const text = style({
 export const container2 = style({
   alignItems: 'center',
   background: theme.colors.card,
-  borderRadius: theme.radii['2xl'],
+  borderRadius: theme.radius['2xl'],
   borderWidth: '1px',
   display: 'flex',
   gap: theme.spacing(3),

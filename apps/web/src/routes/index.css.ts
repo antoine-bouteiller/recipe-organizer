@@ -30,7 +30,7 @@ export const container2 = style({
 export const container3 = style({
   alignItems: 'center',
   background: theme.colors.accent,
-  borderRadius: theme.radii.full,
+  borderRadius: theme.radius.full,
   color: theme.colors.primary,
   display: 'flex',
   height: theme.spacing(16),

@@ -44,7 +44,7 @@ export const toggle = recipe({
       '--owner-icon-size': '18px',
     },
     alignItems: 'center',
-    borderRadius: theme.radii.lg,
+    borderRadius: theme.radius.lg,
     borderWidth: '1px',
     cursor: 'pointer',
     display: 'inline-flex',
@@ -54,7 +54,7 @@ export const toggle = recipe({
     height: theme.spacing(9),
     justifyContent: 'center',
     minWidth: theme.spacing(9),
-    paddingInline: `calc(${theme.spacing(2)} - 1px)`,
+    paddingInline: theme.spacing(1.75),
     position: 'relative',
     WebkitUserSelect: 'none',
     userSelect: 'none',
@@ -103,21 +103,18 @@ export const toggle = recipe({
             backgroundColor: `color-mix(in srgb, ${theme.colors.input} 32%, transparent)`,
           },
           '&[data-disabled], &:disabled': {
-            boxShadow: 'none',
+            boxShadow: theme.shadows.none,
           },
           '&::before': {
-            borderRadius: `calc(${theme.radii.lg} - 1px)`,
-            boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+            borderRadius: theme.radius.lg,
+            boxShadow: theme.shadows.edge,
             content: '""',
             inset: theme.spacing(0),
             pointerEvents: 'none',
             position: 'absolute',
           },
-          '.dark &::before': {
-            boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-          },
           '&:is(:active, [data-active])': {
-            boxShadow: 'none',
+            boxShadow: theme.shadows.none,
           },
           '.dark &:hover': {
             '@media': {

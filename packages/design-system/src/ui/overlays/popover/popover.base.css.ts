@@ -1,5 +1,5 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { globalStyle } from '@vanilla-extract/css'
+import { fallbackVar, globalStyle } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
 export const positioner = recipe({
@@ -12,11 +12,6 @@ export const positioner = recipe({
     height: 'var(--positioner-height)',
     maxWidth: 'var(--available-width)',
     position: 'relative',
-    vars: {
-      '--transition-duration': '150ms',
-      '--transition-prop': 'top, left, right, bottom, transform',
-      '--transition-easing': theme.easings['in-out'],
-    },
     transitionDuration: '150ms',
     transitionProperty: 'top, left, right, bottom, transform',
     transitionTimingFunction: theme.easings['in-out'],
@@ -29,31 +24,28 @@ export const popup = recipe({
   base: {
     selectors: {
       '&:has([data-slot=calendar])': {
-        borderRadius: theme.radii.xl,
+        borderRadius: theme.radius.xl,
       },
       '&[data-starting-style]': {
         opacity: 0,
         scale: '0.98',
       },
       '&:has([data-slot=calendar])::before': {
-        borderRadius: `calc(${theme.radii.xl} - 1px)`,
+        borderRadius: theme.radius.xl,
       },
       '&::before': {
-        borderRadius: `calc(${theme.radii.lg} - 1px)`,
-        boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+        borderRadius: theme.radius.lg,
+        boxShadow: theme.shadows.edge,
         content: '""',
         inset: theme.spacing(0),
         pointerEvents: 'none',
         position: 'absolute',
       },
-      '.dark &::before': {
-        boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
-      },
     },
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
     backgroundColor: theme.colors.popover,
-    borderRadius: theme.radii.lg,
+    borderRadius: theme.radius.lg,
     borderWidth: '1px',
     boxShadow: theme.shadows.overlay,
     color: theme.colors['popover-foreground'],
@@ -63,11 +55,6 @@ export const popup = recipe({
     outlineOffset: '2px',
     position: 'relative',
     transformOrigin: 'var(--transform-origin)',
-    vars: {
-      '--transition-duration': '150ms',
-      '--transition-prop': 'width, height, scale, opacity',
-      '--transition-easing': theme.easings['in-out'],
-    },
     transitionDuration: '150ms',
     transitionProperty: 'width, height, scale, opacity',
     transitionTimingFunction: theme.easings['in-out'],
@@ -88,15 +75,12 @@ export const viewport = recipe({
         transition: 'none',
       },
     },
-    vars: {
-      '--viewport-inline-padding': theme.spacing(4),
-    },
-    borderRadius: 'inherit',
+    borderRadius: theme.radius.inherit,
     height: '100%',
     maxHeight: 'var(--available-height)',
     overflow: 'clip',
     paddingBlock: theme.spacing(4),
-    paddingInline: 'var(--viewport-inline-padding)',
+    paddingInline: fallbackVar('var(--viewport-inline-padding)', theme.spacing(4)),
     position: 'relative',
   },
 })
@@ -104,7 +88,7 @@ export const viewport = recipe({
 globalStyle(`.${viewport.classNames.base} :is([data-current], [data-previous])`, {
   opacity: 1,
   transition: `opacity 150ms ${theme.easings['in-out']}`,
-  width: 'calc(var(--popup-width) - 2 * var(--viewport-inline-padding) - 2px)',
+  width: `calc(var(--popup-width) - 2 * ${fallbackVar('var(--viewport-inline-padding)', theme.spacing(4))} - 2px)`,
 })
 
 globalStyle(`.${viewport.classNames.base} :is([data-current], [data-previous]):is([data-ending-style], [data-starting-style])`, {

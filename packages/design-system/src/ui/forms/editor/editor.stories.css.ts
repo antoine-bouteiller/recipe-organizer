@@ -9,7 +9,7 @@ export const storyStack = style({
 
 export const storyOutput = style({
   backgroundColor: theme.colors.muted,
-  borderRadius: theme.radii.md,
+  borderRadius: theme.radius.md,
   display: 'block',
   fontSize: theme.fontSizes.xs,
   padding: theme.spacing(3),

@@ -19,7 +19,7 @@ export const container2 = style({
 export const container3 = style({
   alignItems: 'center',
   backgroundColor: theme.colors.background,
-  borderRadius: theme.radii.full,
+  borderRadius: theme.radius.full,
   borderWidth: '1px',
   display: 'flex',
   flexShrink: 0,
@@ -50,7 +50,7 @@ export const text3 = style({
 export const element = style({
   alignItems: 'center',
   backgroundColor: `color-mix(in srgb, ${theme.colors.destructive} 10%, transparent)`,
-  borderRadius: theme.radii.full,
+  borderRadius: theme.radius.full,
   color: theme.colors.destructive,
   cursor: 'pointer',
   display: 'flex',
@@ -59,11 +59,6 @@ export const element = style({
   justifyContent: 'center',
   outline: '2px solid transparent',
   outlineOffset: '2px',
-  vars: {
-    '--transition-duration': '150ms',
-    '--transition-prop': 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
-    '--transition-easing': theme.easings['in-out'],
-  },
   transitionDuration: '150ms',
   transitionProperty: 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
   transitionTimingFunction: theme.easings['in-out'],
@@ -71,7 +66,7 @@ export const element = style({
   selectors: {
     '&:is(:focus-visible, [data-focus-visible])': {
       borderColor: theme.colors.ring,
-      boxShadow: `0 0 0 3px color-mix(in oklab, ${theme.colors.ring} 50%, transparent)`,
+      boxShadow: theme.shadows.focus,
     },
     '&:hover': {
       '@media': {
@@ -96,7 +91,7 @@ export const container5 = style({
 export const container6 = style({
   alignItems: 'center',
   backgroundColor: theme.colors.background,
-  borderRadius: theme.radii.full,
+  borderRadius: theme.radius.full,
   borderWidth: '1px',
   display: 'flex',
   flexShrink: 0,

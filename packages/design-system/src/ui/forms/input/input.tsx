@@ -22,7 +22,7 @@ export const Input = ({
   type,
   value,
 }: InputProps): React.ReactElement => (
-  <span className={surface.inputSurface()} data-slot="input-control">
+  <span className={surface.inputSurface} data-slot="input-control">
     <InputPrimitive
       aria-invalid={ariaInvalid}
       aria-label={ariaLabel}

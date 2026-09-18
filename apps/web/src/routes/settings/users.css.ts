@@ -26,7 +26,7 @@ export const container2 = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
-  marginBottom: `calc(${theme.spacing(4)} * -1)`,
+  marginBottom: theme.spacing(-4),
   minHeight: theme.spacing(0),
 })
 

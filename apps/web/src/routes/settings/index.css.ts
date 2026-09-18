@@ -43,7 +43,7 @@ export const container5 = style({
 
 export const container6 = style({
   background: `color-mix(in srgb, ${theme.colors.primary} 10%, transparent)`,
-  borderRadius: theme.radii.lg,
+  borderRadius: theme.radius.lg,
   color: theme.colors.primary,
   padding: theme.spacing(2),
 })

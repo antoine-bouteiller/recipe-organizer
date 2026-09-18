@@ -5,7 +5,7 @@ export const element = style({
   alignItems: 'center',
   background: theme.colors.popover,
   borderColor: theme.colors.input,
-  borderRadius: theme.radii.lg,
+  borderRadius: theme.radius.lg,
   borderWidth: '1px',
   boxShadow: theme.shadows.xs,
   color: theme.colors.foreground,

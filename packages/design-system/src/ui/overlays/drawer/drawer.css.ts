@@ -5,18 +5,12 @@ export const backdrop = recipe({
   base: {
     selectors: {
       '&[data-ending-style]': {
-        vars: {
-          '--transition-duration': 'calc(var(--drawer-swipe-strength) * 400ms)',
-        },
         transitionDuration: 'calc(var(--drawer-swipe-strength) * 400ms)',
       },
       '&[data-ending-style], &[data-starting-style]': {
         opacity: 0,
       },
       '&[data-swiping]': {
-        vars: {
-          '--transition-duration': '0ms',
-        },
         transitionDuration: '0ms',
       },
     },
@@ -56,31 +50,25 @@ export const popup = recipe({
         paddingTop: theme.spacing(2),
       },
       '&[data-ending-style]': {
-        vars: {
-          '--transition-duration': 'calc(var(--drawer-swipe-strength) * 400ms)',
-        },
         transitionDuration: 'calc(var(--drawer-swipe-strength) * 400ms)',
       },
       '&[data-ending-style], &[data-starting-style]': {
-        boxShadow: 'none',
+        boxShadow: theme.shadows.none,
         paddingBottom: theme.spacing(0),
-        translate: '0 calc(100% + env(safe-area-inset-bottom, 0px))',
+        translate: `0 calc(100% + ${theme.safeArea.bottom})`,
       },
       '&[data-swiping]': {
         WebkitUserSelect: 'none',
         userSelect: 'none',
       },
       '&::before': {
-        borderTopLeftRadius: `calc(${theme.radii['2xl']} - 1px)`,
-        borderTopRightRadius: `calc(${theme.radii['2xl']} - 1px)`,
-        boxShadow: `0 1px color-mix(in oklab, ${theme.colors.shadow} 4%, transparent)`,
+        borderTopLeftRadius: theme.radius['2xl'],
+        borderTopRightRadius: theme.radius['2xl'],
+        boxShadow: theme.shadows.edge,
         content: '""',
         inset: theme.spacing(0),
         pointerEvents: 'none',
         position: 'absolute',
-      },
-      '.dark &::before': {
-        boxShadow: `0 -1px color-mix(in oklab, ${theme.colors.highlight} 6%, transparent)`,
       },
       '&::after': {
         backgroundColor: theme.colors.popover,
@@ -95,8 +83,8 @@ export const popup = recipe({
     backgroundClip: 'padding-box',
     WebkitBackgroundClip: 'padding-box',
     backgroundColor: theme.colors.popover,
-    borderTopLeftRadius: theme.radii['2xl'],
-    borderTopRightRadius: theme.radii['2xl'],
+    borderTopLeftRadius: theme.radius['2xl'],
+    borderTopRightRadius: theme.radius['2xl'],
     borderTopWidth: '1px',
     boxShadow: theme.shadows.overlay,
     color: theme.colors['popover-foreground'],
@@ -108,14 +96,9 @@ export const popup = recipe({
     minWidth: theme.spacing(0),
     outline: '2px solid transparent',
     outlineOffset: '2px',
-    paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+    paddingBottom: theme.safeArea.bottom,
     position: 'relative',
     touchAction: 'none',
-    vars: {
-      '--transition-duration': '450ms',
-      '--transition-prop': 'translate, box-shadow, height, background-color',
-      '--transition-easing': theme.easings['out-snappy'],
-    },
     transitionDuration: '450ms',
     transitionProperty: 'translate, box-shadow, height, background-color',
     transitionTimingFunction: theme.easings['out-snappy'],
@@ -151,7 +134,7 @@ export const footer = recipe({
     display: 'flex',
     flexDirection: 'column-reverse',
     gap: theme.spacing(2),
-    paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + ${theme.spacing(4)})`,
+    paddingBottom: `calc(${theme.safeArea.bottom} + ${theme.spacing(4)})`,
     paddingInline: theme.spacing(6),
     paddingTop: theme.spacing(4),
     '@media': {
@@ -188,7 +171,7 @@ export const bar = recipe({
     selectors: {
       '&::before': {
         backgroundColor: theme.colors.input,
-        borderRadius: theme.radii.full,
+        borderRadius: theme.radius.full,
         content: '""',
         height: theme.spacing(1),
         width: theme.spacing(12),

@@ -11,7 +11,7 @@ export const container = style({
 
 export const container2 = style({
   borderColor: theme.colors.border,
-  borderRadius: theme.radii['2xl'],
+  borderRadius: theme.radius['2xl'],
   borderWidth: '1px',
   padding: theme.spacing(4),
   width: theme.spacing(80),

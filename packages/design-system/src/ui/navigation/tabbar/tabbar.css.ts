@@ -4,11 +4,11 @@ import { style, globalStyle } from '@vanilla-extract/css'
 export const element = style({
   alignItems: 'center',
   backgroundColor: theme.colors.background,
-  boxShadow: `0 -1px 3px color-mix(in srgb, ${theme.colors.shadow} 6%, transparent)`,
+  boxShadow: theme.shadows.xs,
   bottom: theme.spacing(0),
   display: 'flex',
-  height: `calc(${theme.spacing(16)} + env(safe-area-inset-bottom, 0px))`,
-  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+  height: `calc(${theme.spacing(16)} + ${theme.safeArea.bottom})`,
+  paddingBottom: theme.safeArea.bottom,
   paddingInline: theme.spacing(2),
   position: 'fixed',
   width: '100%',
@@ -32,7 +32,7 @@ export const tabBarItem = style({
     },
   },
   alignItems: 'center',
-  borderRadius: theme.radii.xl,
+  borderRadius: theme.radius.xl,
   color: theme.colors['muted-foreground'],
   display: 'flex',
   flex: '1 1 0%',
@@ -49,7 +49,7 @@ export const tabBarItem = style({
 
 export const iconSlot = style({
   alignItems: 'center',
-  borderRadius: theme.radii.full,
+  borderRadius: theme.radius.full,
   display: 'flex',
   flexShrink: 0,
   height: theme.spacing(8),
@@ -60,7 +60,7 @@ export const iconSlot = style({
   selectors: {
     '&::before': {
       backgroundColor: 'currentColor',
-      borderRadius: 'inherit',
+      borderRadius: theme.radius.inherit,
       content: '""',
       inset: 0,
       opacity: 0,

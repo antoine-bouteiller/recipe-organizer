@@ -71,7 +71,7 @@ export const container8 = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
-  marginBottom: `calc(${theme.spacing(4)} * -1)`,
+  marginBottom: theme.spacing(-4),
   minHeight: theme.spacing(0),
   '@media': {
     'screen and (min-width: 768px)': {
@@ -109,7 +109,7 @@ export const container11 = style({
 
 export const section = style({
   background: theme.colors.card,
-  borderRadius: theme.radii['3xl'],
+  borderRadius: theme.radius['3xl'],
   boxShadow: theme.shadows.lg,
   gridColumn: 'span 2 / span 2',
   paddingBottom: theme.spacing(8),
@@ -126,7 +126,7 @@ export const heading2 = style({
 
 export const section2 = style({
   background: theme.colors.card,
-  borderRadius: theme.radii['3xl'],
+  borderRadius: theme.radius['3xl'],
   boxShadow: theme.shadows.lg,
   gridColumn: 'span 3 / span 3',
   paddingBottom: theme.spacing(8),

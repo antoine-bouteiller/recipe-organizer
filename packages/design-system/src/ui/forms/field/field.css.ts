@@ -2,22 +2,22 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const field = style({ alignItems: 'flex-start', display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' })
+export const field = style({ alignItems: 'flex-start', display: 'flex', flexDirection: 'column', gap: theme.spacing(2), width: '100%' })
 
 const dropzone = {
   borderColor: theme.colors.input,
-  borderRadius: theme.radii.xl,
+  borderRadius: theme.radius.xl,
   borderStyle: 'dashed',
   borderWidth: '1px',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   overflow: 'hidden',
-  padding: '16px',
+  padding: theme.spacing(4),
   position: 'relative',
   selectors: {
     '&:has(input:disabled)': { opacity: 0.5, pointerEvents: 'none' },
-    '&:has(input:focus)': { borderColor: theme.colors.ring, boxShadow: `0 0 0 3px color-mix(in oklab, ${theme.colors.ring} 50%, transparent)` },
+    '&:has(input:focus)': { borderColor: theme.colors.ring, boxShadow: theme.shadows.focus },
     '&:hover': { backgroundColor: `color-mix(in srgb, ${theme.colors.accent} 50%, transparent)` },
     '&[data-invalid]': { borderColor: theme.colors.destructive },
   },
@@ -29,13 +29,13 @@ const dropzone = {
 
 export const label = recipe({
   base: {
-    '@media': { '(min-width: 640px)': { fontSize: '14px', lineHeight: '16px' } },
+    '@media': { '(min-width: 640px)': { fontSize: theme.fontSizes.sm, lineHeight: '16px' } },
     alignItems: 'center',
     color: theme.colors.foreground,
     display: 'inline-flex',
-    fontSize: '16px',
+    fontSize: theme.fontSizes.base,
     fontWeight: theme.fontWeights.medium,
-    gap: '8px',
+    gap: theme.spacing(2),
     lineHeight: '18px',
   },
   variants: {
@@ -45,4 +45,4 @@ export const label = recipe({
     },
   },
 })
-export const error = style({ color: theme.colors['destructive-foreground'], fontSize: '12px' })
+export const error = style({ color: theme.colors['destructive-foreground'], fontSize: theme.fontSizes.xs })
