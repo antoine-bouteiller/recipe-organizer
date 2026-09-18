@@ -109,7 +109,7 @@ const RecipePage = () => {
       {metaTags.length > 0 && (
         <div className={styles.container5}>
           {metaTags.map((label) => (
-            <Badge key={label} size="sm" variant="eyebrow">
+            <Badge key={label} size="sm" variant="secondary">
               {label}
             </Badge>
           ))}

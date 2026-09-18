@@ -24,7 +24,6 @@ export const Overview: Story = {
           <Badge>Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="accent">Accent</Badge>
-          <Badge variant="eyebrow">Featured</Badge>
         </div>
       </StorySection>
       <StorySection title="Sizes">

@@ -88,13 +88,6 @@ export const badge = recipe({
         backgroundColor: theme.colors.primary,
         color: theme.colors['primary-foreground'],
       },
-      eyebrow: {
-        backgroundColor: theme.colors.secondary,
-        borderRadius: theme.radii.full,
-        color: theme.colors['secondary-foreground'],
-        letterSpacing: '0.12em',
-        textTransform: 'uppercase',
-      },
       secondary: {
         backgroundColor: theme.colors.secondary,
         color: theme.colors['secondary-foreground'],
