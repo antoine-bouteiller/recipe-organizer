@@ -1,29 +1,30 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
+import { Link, type LinkOptions } from '@tanstack/react-router'
 import type React from 'react'
 
 import * as styles from './navbar.css'
 
 export interface NavbarProps {
   actions?: React.ReactNode
-  children: React.ReactNode
+  items: readonly { label: string; linkProps: LinkOptions }[]
 }
 
-export const Navbar = ({ actions, children }: NavbarProps): React.ReactElement => (
+export const Navbar = ({ actions, items }: NavbarProps): React.ReactElement => (
   <div className={styles.container} data-slot="navbar">
     <nav className={styles.element} data-slot="navbar-items">
-      {children}
+      {items.map((item) => (
+        <Link
+          {...item.linkProps}
+          activeOptions={item.linkProps.activeOptions ?? (item.linkProps.to === '/' ? { exact: true } : undefined)}
+          className={styles.navbarItem}
+          data-slot="navbar-item"
+          key={item.linkProps.to}
+        >
+          {item.label}
+        </Link>
+      ))}
     </nav>
     <div className={styles.container2} data-slot="navbar-actions">
       {actions}
     </div>
   </div>
 )
-
-export type NavbarItemProps = Pick<useRender.ComponentProps<'a'>, 'aria-current' | 'children' | 'href' | 'render'>
-
-export const NavbarItem = ({ render, ...props }: NavbarItemProps): React.ReactElement => {
-  const mergedProps = mergeProps<'a'>({ className: styles.navbarItem }, props)
-
-  return useRender({ defaultTagName: 'a', props: { ...mergedProps, 'data-slot': 'navbar-item' }, render })
-}

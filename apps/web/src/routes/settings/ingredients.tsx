@@ -1,5 +1,4 @@
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@client/components/ingredient-category'
-import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { getIngredientListOptions } from '@client/features/ingredients/api/get-all'
 import { AddIngredient } from '@client/features/ingredients/components/add-ingredient'
 import { DeleteIngredient } from '@client/features/ingredients/components/delete-ingredient'
@@ -8,6 +7,7 @@ import { IngredientBadge } from '@client/features/ingredients/components/ingredi
 import { Button } from '@recipe-organizer/design-system/button'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
+import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'

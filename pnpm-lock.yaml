@@ -452,6 +452,9 @@ importers:
       '@tanstack/react-form':
         specifier: 'catalog:'
         version: 1.33.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tanstack/react-router':
+        specifier: 'catalog:'
+        version: 1.170.38(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@tanstack/react-store':
         specifier: 'catalog:'
         version: 0.11.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)

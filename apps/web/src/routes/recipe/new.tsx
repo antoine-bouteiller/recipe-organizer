@@ -1,4 +1,3 @@
-import { ScreenLayout } from '@client/components/layout/screen-layout'
 import { getIngredientListOptions } from '@client/features/ingredients/api/get-all'
 import { renderAddIngredientOption } from '@client/features/ingredients/components/add-ingredient'
 import { useIngredientOptions } from '@client/features/ingredients/hooks/use-ingredient-options'
@@ -9,6 +8,7 @@ import { recipeDefaultValues, recipeFormFields } from '@client/features/recipe/u
 import { Button } from '@recipe-organizer/design-system/button'
 import { Form } from '@recipe-organizer/design-system/form'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
+import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
 import { formatFormErrors } from '@recipe-organizer/design-system/utils/format-form-errors'
 import { objectToFormData } from '@recipe-organizer/shared/utils/form-data'
 import { revalidateLogic } from '@tanstack/react-form'

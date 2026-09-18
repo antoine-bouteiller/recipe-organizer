@@ -1,5 +1,5 @@
-import { DefaultErrorComponent } from '@client/components/error/default-error-component'
-import { NotFound } from '@client/components/error/not-found'
+import { DefaultErrorComponent } from '@recipe-organizer/design-system/default-error-component'
+import { NotFound } from '@recipe-organizer/design-system/not-found'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, isRedirect } from '@tanstack/react-router'
 import * as z from 'zod'

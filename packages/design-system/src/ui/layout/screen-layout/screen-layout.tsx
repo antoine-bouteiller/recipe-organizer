@@ -1,3 +1,5 @@
+import { useRouter } from '@tanstack/react-router'
+
 import { Button } from '../../actions/button/button'
 import { ArrowLeftIcon } from '../../data-display/icons/arrow-left'
 
@@ -46,9 +48,9 @@ export type ScreenLayoutProps = Pick<React.ComponentProps<'div'>, 'children'> & 
   footer?: React.ReactNode
   headerEndItem?: React.ReactNode
   innerScrollId?: string
-  onBack?: () => void
   outerScrollId?: string
   title: string
+  withGoBack?: boolean
 }
 
 export const ScreenLayout = ({
@@ -56,11 +58,13 @@ export const ScreenLayout = ({
   children,
   footer,
   headerEndItem,
-  innerScrollId,
-  onBack,
-  outerScrollId,
+  innerScrollId = 'screen-inner',
+  outerScrollId = 'screen-outer',
   title,
+  withGoBack = false,
 }: ScreenLayoutProps): React.ReactElement => {
+  const router = useRouter()
+  const onBack = withGoBack ? () => router.history.back() : undefined
   const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} onBack={onBack} title={title} />
   return (
     <div

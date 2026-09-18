@@ -12,7 +12,7 @@ interface MenuItem {
   linkProps: { to: '/' | '/search' | '/shopping-list' | '/settings' }
 }
 
-export const menuItems: MenuItem[] = [
+const menuItems: MenuItem[] = [
   {
     activeIcon: <HouseIcon weight="fill" />,
     icon: <HouseIcon />,
@@ -47,3 +47,6 @@ export const menuItems: MenuItem[] = [
     },
   },
 ]
+
+export const desktopMenuItems = menuItems.filter((item) => item.display !== 'mobile')
+export const mobileMenuItems = menuItems.filter((item) => item.display !== 'desktop')

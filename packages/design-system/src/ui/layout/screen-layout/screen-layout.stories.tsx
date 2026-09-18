@@ -1,7 +1,9 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
-import { type ComponentProps, useState } from 'react'
+import { useLocation } from '@tanstack/react-router'
+import { type ComponentProps } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
+import { withRouter } from '../../../../.storybook/router'
 import { StorySection } from '../../../../.storybook/story-section'
 import { Button } from '../../actions/button/button'
 import { ScreenLayout } from './screen-layout'
@@ -18,10 +20,10 @@ const content = (
 )
 
 const BackExample = () => {
-  const [wentBack, setWentBack] = useState(false)
+  const pathname = useLocation({ select: (location) => location.pathname })
   return (
-    <LayoutExample onBack={() => setWentBack(true)} title="Details">
-      {wentBack && <p role="status">Back action requested.</p>}
+    <LayoutExample withGoBack title="Details">
+      {pathname === '/' && <p role="status">Back action requested.</p>}
       {content}
     </LayoutExample>
   )
@@ -36,7 +38,8 @@ const LayoutExample = (props: ComponentProps<typeof ScreenLayout>) => (
 const meta = {
   args: { children: content, title: 'Library' },
   component: ScreenLayout,
-  parameters: { layout: 'padded' },
+  decorators: [withRouter],
+  parameters: { layout: 'padded', router: { initialEntries: ['/', '/settings'] } },
   title: 'Layout/Screen Layout',
 } satisfies Meta<typeof ScreenLayout>
 

@@ -1,11 +1,23 @@
+import { Link, type NotFoundRouteProps } from '@tanstack/react-router'
 import type React from 'react'
+
+import { Button } from '../../actions/button/button'
+import { CaretLeftIcon } from '../../data-display/icons/caret-left'
 
 import * as styles from './not-found.css'
 
-export interface NotFoundProps {
+export interface NotFoundProps extends Partial<Pick<NotFoundRouteProps, 'data'>> {
   action?: React.ReactNode
 }
-export const NotFound = ({ action }: NotFoundProps): React.ReactElement => (
+
+const defaultAction = (
+  <Button render={<Link to="/" />} size="lg">
+    <CaretLeftIcon />
+    Retour à l'accueil
+  </Button>
+)
+
+export const NotFound = ({ action = defaultAction }: NotFoundProps): React.ReactElement => (
   <div className={styles.root()}>
     <div className={styles.stack()}>
       <div className={styles.centered()}>

@@ -37,8 +37,9 @@ without becoming a feature data layer.
   with Worker enforcement remaining authoritative under `../../architecture.spec.md` `[PI-3]`.
 - `[PI-3]` **URLs are typed input** — path parameters and search values parse before a screen uses
   them.
-- `[PI-4]` **Compose the actual router link** — app callers use Base UI `render` with TanStack
-  `Link`; design-system components remain router-independent.
+- `[PI-4]` **Use typed router links** — reusable design-system navigation may take TanStack Router
+  `LinkOptions` and render the actual `Link`; Base UI `render` composition remains available for
+  components such as Button, without `useLinkProps` adapters.
 
 ## 5. Non-Goals
 
@@ -109,10 +110,12 @@ return the typed identifier as loader data. URL strings therefore never become i
 ### 8.4 Screen and layout boundary
 
 The browser entry owns application mounting; the router provider owns the query context. The root
-route owns application chrome, desktop navigation, and the outlet. A page route
-owns screen selection, pending UI, and its route-specific layout inputs. Feature components own
-recipe cards, editors, settings controls, and all domain presentation. This division lets a layout
-consume route context without importing a feature's private API.
+route owns the outlet plus application-policy composition such as theme toggle and search. The design
+system owns reusable router-aware chrome, navigation, screen layout, and default error presentation;
+it does not import app or feature code. A page route owns screen selection, pending UI, route-specific
+layout inputs, and recipe/auth policy. Feature components own recipe cards, editors, settings controls,
+and all domain presentation. This division lets a layout consume router context without importing a
+feature's private API.
 
 A route may supply a pending component for its loader. Pending UI communicates that the screen is
 waiting for its query contract; it does not substitute a second cache or invoke a write. Error and
@@ -127,13 +130,22 @@ contract; browser page routes do not wrap it.
 
 Forward links request view transitions; the router determines back navigation from history indexes
 (`src/client/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
-transition support. App callers compose actions/navigation items with `render={<Link ... />}`.
-The actual TanStack `Link` retains typed route parameters, search, modified clicks, preloading,
-refs, and view-transition behavior; do not replace it with a native anchor or a filtered
-`useLinkProps` adapter. Design-system components remain router-independent and use the resulting
-`aria-current` for active presentation.
-Scroll restoration targets the screen containers configured by the router (`src/client/router.tsx:51-54`),
-so screen layouts identify their scrollable regions rather than managing history manually.
+transition support. `Navbar` and `TabBar` are DS router-aware components: items provide `label` and
+`linkProps` (`LinkOptions`), TabBar items provide inactive and active icons, and Navbar provides an actions slot.
+The actual TanStack `Link` retains typed route parameters, search, modified clicks, preloading, refs,
+and view-transition behavior; do not replace it with a native anchor or a filtered `useLinkProps`
+adapter. Navbar defaults exact matching only for `/`; pages render
+`<TabBar items={mobileMenuItems} />` rather than a `pageKey`. Base UI `render` composition remains
+for Button and similar primitives.
+
+`ScreenLayout` calls `router.history.back()` for `withGoBack`, defaults its scroll IDs to
+`screen-inner` and `screen-outer`, and receives an explicit footer. Scroll restoration targets those
+containers (`src/client/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic. DS default error
+and not-found surfaces provide home Links and French messages, with Error details only in development.
+Menus/filtering remain in `apps/web/src/components/navigation/constants.tsx`; `__root` composes the
+theme toggle and search. `FloatingAction` is generic (`label`, `linkProps`, `children`), while the
+index route owns recipe/auth policy. Router-dependent Storybook stories use a local memory-router
+decorator.
 
 ### 8.6 Route contract summary
 
@@ -168,9 +180,10 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                      | Sections affected | Reason                                                            |
-| ---------- | ------------------------------------------------------------------------------ | ----------------- | ----------------------------------------------------------------- |
-| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                        |
-| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.                    |
-| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.           |
-| 2026-09-16 | Document Base UI render composition with the actual router Link.               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters. |
+| Date       | Amendment                                                                      | Sections affected | Reason                                                                     |
+| ---------- | ------------------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------- |
+| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                                 |
+| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.                             |
+| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                    |
+| 2026-09-16 | Document Base UI render composition with the actual router Link.               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
+| 2026-09-18 | Move reusable router-only presentation into the design system.                 | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |

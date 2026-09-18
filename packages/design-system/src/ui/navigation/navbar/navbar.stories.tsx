@@ -1,9 +1,10 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
+import { withRouter } from '../../../../.storybook/router'
 import { Button } from '../../actions/button/button'
 import { ThemeIcon } from '../../data-display/icons/theme'
-import { Navbar, NavbarItem } from './navbar'
+import { Navbar } from './navbar'
 
 const NavbarExample = (): React.ReactElement => (
   <Navbar
@@ -12,15 +13,14 @@ const NavbarExample = (): React.ReactElement => (
         <ThemeIcon size="lg" />
       </Button>
     }
-  >
-    <NavbarItem href="/" aria-current="page">
-      Home
-    </NavbarItem>
-    <NavbarItem href="/shopping-list">Shopping list</NavbarItem>
-  </Navbar>
+    items={[
+      { label: 'Home', linkProps: { to: '/' } },
+      { label: 'Shopping list', linkProps: { to: '/shopping-list' } },
+    ]}
+  />
 )
 
-const meta = { component: NavbarExample, title: 'Navigation/Navbar' } satisfies Meta<typeof NavbarExample>
+const meta = { component: NavbarExample, decorators: [withRouter], title: 'Navigation/Navbar' } satisfies Meta<typeof NavbarExample>
 
 export default meta
 type Story = StoryObj<typeof meta>

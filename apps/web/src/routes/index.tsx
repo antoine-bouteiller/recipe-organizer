@@ -1,11 +1,13 @@
-import { FloatingCreateRecipeAction } from '@client/components/floating-create-recipe-action'
-import { ScreenLayout } from '@client/components/layout/screen-layout'
+import { mobileMenuItems } from '@client/components/navigation/constants'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import RecipeCard from '@client/features/recipe/components/recipe-card'
 import { Button } from '@recipe-organizer/design-system/button'
+import { FloatingAction } from '@recipe-organizer/design-system/floating-action'
 import { BookIcon } from '@recipe-organizer/design-system/icons/book'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
+import { TabBar } from '@recipe-organizer/design-system/tabbar'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
@@ -18,7 +20,7 @@ const searchSchema = z.object({
 })
 
 const RecipeListSkeleton = () => (
-  <ScreenLayout title="Recettes" pageKey="/">
+  <ScreenLayout title="Recettes" footer={<TabBar items={mobileMenuItems} />}>
     <div className={styles.container}>
       {incrementalArray({ length: 6 }).map((index) => (
         <Skeleton preset="recipe-card" key={index} />
@@ -34,7 +36,7 @@ const RecipeList = () => {
   const visibleRecipes = recipes.filter((recipe) => !recipe.isSpice)
 
   return (
-    <ScreenLayout title="Recettes" pageKey="/">
+    <ScreenLayout title="Recettes" footer={<TabBar items={mobileMenuItems} />}>
       {visibleRecipes.length === 0 ? (
         <div className={styles.container2}>
           <div className={styles.container3}>
@@ -55,7 +57,11 @@ const RecipeList = () => {
           ))}
         </div>
       )}
-      {authUser && <FloatingCreateRecipeAction />}
+      {authUser && (
+        <FloatingAction label="Ajouter une recette" linkProps={{ to: '/recipe/new', viewTransition: true }}>
+          <PlusIcon size="xl" />
+        </FloatingAction>
+      )}
     </ScreenLayout>
   )
 }

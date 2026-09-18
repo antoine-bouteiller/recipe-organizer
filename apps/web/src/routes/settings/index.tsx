@@ -1,4 +1,4 @@
-import { ScreenLayout } from '@client/components/layout/screen-layout'
+import { mobileMenuItems } from '@client/components/navigation/constants'
 import { useToggleTheme } from '@client/hooks/use-toggle-theme'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
@@ -8,6 +8,8 @@ import { ThemeIcon } from '@recipe-organizer/design-system/icons/theme'
 import { type IconProps } from '@recipe-organizer/design-system/icons/types'
 import { UserIcon } from '@recipe-organizer/design-system/icons/user'
 import { UsersIcon } from '@recipe-organizer/design-system/icons/users'
+import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
+import { TabBar } from '@recipe-organizer/design-system/tabbar'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import * as styles from './index.css'
@@ -53,7 +55,7 @@ const RouteComponent = () => {
   const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
 
   return (
-    <ScreenLayout title="Paramètres" pageKey="/settings">
+    <ScreenLayout title="Paramètres" footer={<TabBar items={mobileMenuItems} />}>
       <div className={styles.container}>
         <Button onClick={toggleTheme} variant="outline" width="full" align="start">
           <ThemeIcon size="lg" />

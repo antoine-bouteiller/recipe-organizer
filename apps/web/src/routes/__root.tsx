@@ -1,6 +1,10 @@
-import { Navbar } from '@client/components/navigation/navbar'
+import { desktopMenuItems } from '@client/components/navigation/constants'
+import { useToggleTheme } from '@client/hooks/use-toggle-theme'
 import { loadAuthUser, type getAuthUser } from '@client/lib/auth/get-auth-user'
 import { getTheme } from '@client/lib/theme'
+import { Button } from '@recipe-organizer/design-system/button'
+import { ThemeIcon } from '@recipe-organizer/design-system/icons/theme'
+import { Navbar } from '@recipe-organizer/design-system/navbar'
 import { ToastProvider } from '@recipe-organizer/design-system/toast'
 import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
@@ -15,6 +19,7 @@ type Theme = ReturnType<typeof getTheme>
 
 const RootComponent = () => {
   const { theme } = Route.useRouteContext()
+  const toggleTheme = useToggleTheme()
 
   useLayoutEffect(() => {
     document.documentElement.className = theme
@@ -24,10 +29,16 @@ const RootComponent = () => {
     <ToastProvider>
       <header className={styles.element}>
         <Navbar
-          search={
-            <Suspense fallback={<div className={styles.container} />}>
-              <SearchBar />
-            </Suspense>
+          items={desktopMenuItems}
+          actions={
+            <>
+              <Suspense fallback={<div className={styles.container} />}>
+                <SearchBar />
+              </Suspense>
+              <Button aria-label="Changer de thème" onClick={toggleTheme} size="icon" variant="ghost">
+                <ThemeIcon size="lg" />
+              </Button>
+            </>
           }
         />
       </header>

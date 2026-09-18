@@ -1,15 +1,15 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
+import { withRouter } from '../../../../.storybook/router'
 import { StorySection } from '../../../../.storybook/story-section'
-import { Button } from '../../actions/button/button'
 import { DefaultErrorComponent } from './default-error-component'
 
 import * as styles from './default-error-component.stories.css'
 
 const meta = {
-  args: { action: <Button render={<a href="#retry" />}>Try again</Button> },
   component: DefaultErrorComponent,
+  decorators: [withRouter],
   title: 'Feedback/Default Error Component',
 } satisfies Meta<typeof DefaultErrorComponent>
 
@@ -21,6 +21,7 @@ export const Overview: Story = {
     const canvas = within(canvasElement)
     const defaultSection = canvas.getByRole('region', { name: 'Default' })
     await expect(within(defaultSection).getByRole('alert')).toBeVisible()
+    await expect(within(defaultSection).getByRole('link', { name: "Retour à la page d'accueil" })).toHaveAttribute('href', '/')
     await expect(defaultSection.querySelector('code')).not.toBeInTheDocument()
     const detailsSection = within(canvas.getByRole('region', { name: 'With Details' }))
     await expect(detailsSection.getByText('A caller-provided diagnostic message.')).toBeVisible()

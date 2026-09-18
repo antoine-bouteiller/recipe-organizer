@@ -11,6 +11,7 @@
     "./default-error-component": "./src/ui/feedback/default-error-component/default-error-component.tsx",
     "./delete-dialog": "./src/ui/overlays/delete-dialog/delete-dialog.tsx",
     "./editor": "./src/ui/forms/editor/editor.tsx",
+    "./floating-action": "./src/ui/actions/floating-action/floating-action.tsx",
     "./form": "./src/ui/forms/form/form.tsx",
     "./form-dialog": "./src/ui/overlays/form-dialog/form-dialog.tsx",
     "./global.css": "./src/global.css.ts",
@@ -54,6 +55,7 @@
     "@lexical/rich-text": "catalog:",
     "@lexical/utils": "catalog:",
     "@tanstack/react-form": "catalog:",
+    "@tanstack/react-router": "catalog:",
     "@tanstack/react-store": "catalog:",
     "lexical": "catalog:"
   },

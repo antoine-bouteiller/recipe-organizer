@@ -1,41 +1,29 @@
-import { mergeProps } from '@base-ui/react/merge-props'
-import { useRender } from '@base-ui/react/use-render'
+import { Link } from '@tanstack/react-router'
 import type React from 'react'
+
+import { type NavbarProps } from '../navbar/navbar'
 
 import * as styles from './tabbar.css'
 
 export interface TabBarProps {
-  children: React.ReactNode
+  items: readonly (NavbarProps['items'][number] & {
+    activeIcon: React.ReactNode
+    icon: React.ReactNode
+  })[]
 }
-export const TabBar = ({ children }: TabBarProps): React.ReactElement => (
+
+export const TabBar = ({ items }: TabBarProps): React.ReactElement => (
   <nav className={styles.element} data-slot="tab-bar">
-    {children}
+    {items.map((item) => (
+      <Link {...item.linkProps} className={styles.tabBarItem} data-slot="tab-bar-item" key={item.linkProps.to}>
+        <span aria-hidden="true" className={styles.iconSlot} data-slot="tab-bar-item-icon-inactive">
+          {item.icon}
+        </span>
+        <span aria-hidden="true" className={styles.activeIconSlot} data-slot="tab-bar-item-icon-active">
+          {item.activeIcon}
+        </span>
+        {item.label}
+      </Link>
+    ))}
   </nav>
 )
-
-export type TabBarItemProps = Pick<useRender.ComponentProps<'a'>, 'aria-current' | 'children' | 'href' | 'render'> & {
-  activeIcon: React.ReactNode
-  icon: React.ReactNode
-}
-
-export const TabBarItem = ({ activeIcon, children, icon, render, ...props }: TabBarItemProps): React.ReactElement => {
-  const mergedProps = mergeProps<'a'>(
-    {
-      children: (
-        <>
-          <span aria-hidden="true" className={styles.iconSlot} data-slot="tab-bar-item-icon-inactive">
-            {icon}
-          </span>
-          <span aria-hidden="true" className={styles.activeIconSlot} data-slot="tab-bar-item-icon-active">
-            {activeIcon}
-          </span>
-          {children}
-        </>
-      ),
-      className: styles.tabBarItem,
-    },
-    props
-  )
-
-  return useRender({ defaultTagName: 'a', props: { ...mergedProps, 'data-slot': 'tab-bar-item' }, render })
-}

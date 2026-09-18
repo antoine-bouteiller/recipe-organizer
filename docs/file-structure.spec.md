@@ -155,14 +155,18 @@ activation, safe-area, scrolling, transitions, and runtime-only behavior. Catego
 matching category as its title prefix. Physical categorization does not change package subpath imports.
 `packages/design-system/styling.spec.md` owns the styling and component-ownership guidance.
 
-`apps/web/src/components/` retains thin `layout/`, `navigation/`, and `error/` adapters,
-plus domain-specific ingredient-category presentation. Typed form adapters and their context/registry,
-file-input support, rich-text editing, generic dialogs, search input, and all icons live in the design
-system, along with screen layout, navigation, and error presentation. App adapters own menus, routing
-and exact matching, theme/back actions, footer selection, scroll-restoration IDs, and DEV-only error
-detail disclosure. Shared presentation receives slots and callbacks and does not depend on TanStack
-Router or application environment policy. Feature schemas, query-backed options, API calls, and
-persisted app state do not move.
+`apps/web/src/components/` retains domain-specific ingredient-category presentation and app-owned
+navigation constants: menus and filtering stay in `navigation/constants.tsx`. Typed form adapters and
+their context/registry, file-input support, rich-text editing, generic dialogs, search input, icons,
+router-aware screen layout/navigation/error presentation, and generic `FloatingAction` live in the
+design system. The DS may depend on catalogued TanStack Router but never imports app or feature code:
+`Navbar`/`TabBar` use item `label`/`linkProps` (`LinkOptions`), with TabBar icons and a Navbar actions
+slot, and actual Links retain navigation semantics. Navbar defaults exact matching to `/` only;
+`ScreenLayout` calls `router.history.back()` when `withGoBack`, defaults scroll IDs to `screen-inner`/
+`screen-outer`, and takes an explicit footer. Its error/not-found defaults provide home Links, French
+messages, and development-only Error details. Pages pass `mobileMenuItems` to TabBar; `__root`
+composes theme toggle and search. Recipe/auth policy remains in the index route. Feature schemas,
+query-backed options, API calls, and persisted app state do not move.
 App-specific React hooks and persisted stores live in `apps/web/src/hooks/` and
 `apps/web/src/stores/`. `src/client/lib/` and `src/client/utils/` contain browser application services
 and browser-only helpers. `src/server/lib/` contains Worker-bound auth, database, R2, and cache
@@ -203,3 +207,4 @@ N/A.
 | 2026-09-17 | Replace public token exports with the combined typed `theme` API. | 3, 8.1 | Keep token variables internal while standardizing `.css.ts` consumers. |
 | 2026-09-17 | Move shared reset/base rules into global Vanilla Extract styles. | 8.1 | Keep layered global rules typed and activate them from both entrypoints. |
 | 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`. | 8.1 | Use one module and public entrypoint for shared global styles. |
+| 2026-09-18 | Move router-only reusable web presentation into the design system. | 8.1 | Permit typed DS navigation without moving application policy or feature code. |

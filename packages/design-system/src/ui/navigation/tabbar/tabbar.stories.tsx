@@ -1,11 +1,12 @@
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
+import { withRouter } from '../../../../.storybook/router'
 import { GearIcon } from '../../data-display/icons/gear'
 import { HouseIcon } from '../../data-display/icons/house'
 import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
 import { ShoppingCartSimpleIcon } from '../../data-display/icons/shopping-cart-simple'
-import { TabBar, TabBarItem } from './tabbar'
+import { TabBar } from './tabbar'
 
 import * as styles from './tabbar.stories.css'
 
@@ -15,24 +16,23 @@ const TabBarExample = (): React.ReactElement => (
       <span>App surface</span>
       <section className={styles.contentSurface}>Content surface</section>
     </main>
-    <TabBar>
-      <TabBarItem activeIcon={<HouseIcon weight="fill" />} aria-current="page" href="/" icon={<HouseIcon />}>
-        Home
-      </TabBarItem>
-      <TabBarItem activeIcon={<ShoppingCartSimpleIcon weight="fill" />} href="/shopping-list" icon={<ShoppingCartSimpleIcon />}>
-        Shopping
-      </TabBarItem>
-      <TabBarItem activeIcon={<MagnifyingGlassIcon weight="bold" />} href="/search" icon={<MagnifyingGlassIcon />}>
-        Search
-      </TabBarItem>
-      <TabBarItem activeIcon={<GearIcon weight="fill" />} href="/settings" icon={<GearIcon />}>
-        Settings
-      </TabBarItem>
-    </TabBar>
+    <TabBar
+      items={[
+        { activeIcon: <HouseIcon weight="fill" />, icon: <HouseIcon />, label: 'Home', linkProps: { to: '/' } },
+        {
+          activeIcon: <ShoppingCartSimpleIcon weight="fill" />,
+          icon: <ShoppingCartSimpleIcon />,
+          label: 'Shopping',
+          linkProps: { to: '/shopping-list' },
+        },
+        { activeIcon: <MagnifyingGlassIcon weight="bold" />, icon: <MagnifyingGlassIcon />, label: 'Search', linkProps: { to: '/search' } },
+        { activeIcon: <GearIcon weight="fill" />, icon: <GearIcon />, label: 'Settings', linkProps: { to: '/settings' } },
+      ]}
+    />
   </div>
 )
 
-const meta = { component: TabBarExample, title: 'Navigation/TabBar' } satisfies Meta<typeof TabBarExample>
+const meta = { component: TabBarExample, decorators: [withRouter], title: 'Navigation/TabBar' } satisfies Meta<typeof TabBarExample>
 
 export default meta
 type Story = StoryObj<typeof meta>

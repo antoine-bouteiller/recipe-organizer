@@ -23,17 +23,17 @@ application.
 
 - `[G-1]` Components expose semantic, accessible intent rather than caller-controlled CSS.
 - `[G-2]` Web, the design system, and Storybook compile owner-local Vanilla Extract styles against one shared token contract.
-- `[G-3]` Existing router, form, Base UI, Lexical, and application dependency boundaries remain intact.
+- `[G-3]` Existing form, Base UI, Lexical, and application dependency boundaries remain intact; router-aware shared navigation may depend on TanStack Router without depending on app or feature code.
 
 ## 3. Key Design Decisions
 
-| Decision                               | Choice                                                                                                                                  | Rationale                                                                                                       |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Shared styling infrastructure | `src/theme/index.ts` exports the public `theme` API; internal `src/theme/tokens.css.ts` owns the Vanilla Extract global token contract. | Consumers share typed theme references without generated infrastructure or a public token module.               |
-| `[KD-2]` Component API                 | Each component uses a local minimal `Pick` of used native/Base UI props plus its own semantic options.                                  | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.   |
-| `[KD-3]` Styling ownership             | Recipes are colocated with their visual owner and remain private.                                                                       | Finite presentations are emitted independently of stories and cannot become caller override APIs.               |
-| `[KD-4]` Integration seams             | Base UI `render` composes existing components; router `Link` stays app-owned.                                                           | Library composition preserves navigation, handlers, refs, and primitive behavior without shared recipe exports. |
-| `[KD-5]` Theme variable names          | `tokens.css.ts` uses Vanilla Extract's `createThemeContract` variable generation.                                                       | Scoped generated names remain an internal implementation detail rather than a custom raw-CSS compatibility API. |
+| Decision                               | Choice                                                                                                                                  | Rationale                                                                                                                                        |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Shared styling infrastructure | `src/theme/index.ts` exports the public `theme` API; internal `src/theme/tokens.css.ts` owns the Vanilla Extract global token contract. | Consumers share typed theme references without generated infrastructure or a public token module.                                                |
+| `[KD-2]` Component API                 | Each component uses a local minimal `Pick` of used native/Base UI props plus its own semantic options.                                  | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.                                    |
+| `[KD-3]` Styling ownership             | Recipes are colocated with their visual owner and remain private.                                                                       | Finite presentations are emitted independently of stories and cannot become caller override APIs.                                                |
+| `[KD-4]` Integration seams             | Base UI `render` composes existing components; router-aware DS navigation uses TanStack Router `LinkOptions`.                           | Typed links preserve router navigation while Base UI composition preserves handlers, refs, and primitive behavior without shared recipe exports. |
+| `[KD-5]` Theme variable names          | `tokens.css.ts` uses Vanilla Extract's `createThemeContract` variable generation.                                                       | Scoped generated names remain an internal implementation detail rather than a custom raw-CSS compatibility API.                                  |
 
 ## 4. Principles & Intents
 
@@ -136,11 +136,25 @@ scoped to editor-generated DOM and excludes interactive decorators.
 
 ### 6.4 Navigation and form integrations
 
-The design system does not import TanStack Router. App callers compose the actual `Link`, for
-example `<Button render={<Link to="/recipe/new" />} />`. Link owns typed route parameters, search,
-preloading, modified clicks, view transitions, and navigation state. Do not replace it with a native
-anchor or recreate its props through a `useLinkProps` adapter. Navigation presentation can derive
-from the `aria-current` supplied by Link.
+The design system may depend on catalogued `@tanstack/react-router` for reusable router-aware
+navigation, but never imports app or feature code. `Navbar` and `TabBar` receive items with a
+`label` and typed `linkProps` (`LinkOptions`); `TabBar` items include inactive and active icons, and `Navbar`
+provides an actions slot. Their actual TanStack `Link` owns typed route parameters, search,
+preloading, modified clicks, view transitions, navigation state, and semantics. `Navbar` uses exact
+matching only for the `/` item by default. Do not replace Link with a native anchor or recreate its
+props through a `useLinkProps` adapter.
+
+Keep Base UI `render` composition for components such as Button, for example
+`<Button render={<Link to="/recipe/new" />} />`, so primitive-injected handlers, ARIA attributes,
+state, and refs remain intact. Router-aware Storybook stories use a local memory-router decorator.
+`ScreenLayout`'s `withGoBack` calls `router.history.back()`; its scroll IDs default to
+`screen-inner` and `screen-outer`, and its footer is explicit. Default error and not-found surfaces
+provide actual home Links, default French messages, and development-only Error details.
+
+`FloatingAction` is generic (`label`, `linkProps`, and `children`) rather than a recipe-create
+wrapper. Recipe/auth policy belongs in the index route. Menus and filtering remain app-owned in
+`apps/web/src/components/navigation/constants.tsx`; theme-toggle and search composition remain in
+`__root`. Pages pass `<TabBar items={mobileMenuItems} />`, not a `pageKey`.
 
 Form dialogs keep a private form-aware dialog composition so dialog body and submit footer share the
 same form lifecycle. Public dialogs do not expose `contentRender` or panel styling props, and public
@@ -174,9 +188,10 @@ role at the token owner and review its consumers rather than introducing local c
 
 ## 7. Compatibility and Review Criteria
 
-Existing dependency direction remains: the design system does not import web/router policy, the
-router adapter stays app-owned, and feature schemas, queries, mutations, and domain presentation
-stay app-owned. Keep native anchors for navigation; do not substitute click-driven buttons.
+Existing dependency direction remains: the design system does not import web, app, feature, or
+router-policy code, while its reusable navigation may use TanStack Router. Feature schemas, queries,
+mutations, domain presentation, menus/filtering, and recipe/auth policy stay app-owned. Use actual
+Links for navigation; do not substitute click-driven buttons.
 
 When changing a reusable component, review all named/compound exports and forwarding paths, actual
 callers, and typed spreads. Add or update a colocated story for every supported presentation. Verify
@@ -197,6 +212,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`.                                                 | §6.1              | Keep shared global styles in one module and public entrypoint.                           |
 | 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.                                    | §3, §4, §6.1      | Keep generated raw variable names internal to the typed theme contract.                  |
 | 2026-09-18 | Add safe-area/reset tokens, consolidate shadows, normalize unmatched sizes, and prune unused resets. | §6.1, §6.5        | Enforce a minimal token vocabulary while preserving native semantics and focus contrast. |
+| 2026-09-18 | Allow typed TanStack Router navigation in reusable DS components.                                    | §3, §6.4, §7      | Move router-only navigation/layout/error components into DS without moving app policy.   |
 
 ## 8. Open Questions
 
