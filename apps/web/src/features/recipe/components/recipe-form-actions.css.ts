@@ -1,14 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const container = style({
-  alignItems: 'center',
-  display: 'flex',
-  height: '100vh',
-  justifyContent: 'center',
-})
-
-export const container2 = style({
+export const actions = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(4),

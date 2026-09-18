@@ -110,12 +110,17 @@ return the typed identifier as loader data. URL strings therefore never become i
 ### 8.4 Screen and layout boundary
 
 The browser entry owns application mounting; the router provider owns the query context. The root
-route owns the outlet plus application-policy composition such as theme toggle and search. The design
+route owns the outlet and composes navigation, search, and the theme toggle inside styled app-shell containers. The design
 system owns reusable router-aware chrome, navigation, screen layout, and default error presentation;
 it does not import app or feature code. A page route owns screen selection, pending UI, route-specific
 layout inputs, and recipe/auth policy. Feature components own recipe cards, editors, settings controls,
 and all domain presentation. This division lets a layout consume router context without importing a
-feature's private API.
+feature's private API. `apps/web/src/routes/` contains no `.css.ts` files, styling imports, or JSX
+`className`/`style` props. Styled sections, containers, and pending content live with their features;
+shell markup and styles live in `apps/web/src/components/app-shell/`. Routes retain page construction,
+forms, and cross-feature coordination rather than delegating to intermediary page wrappers.
+Route-derived IDs, search values, and access
+affordances cross that boundary as props, without components importing route modules.
 
 A route may supply a pending component for its loader. Pending UI communicates that the screen is
 waiting for its query contract; it does not substitute a second cache or invoke a write. Error and
@@ -143,7 +148,7 @@ for Button and similar primitives.
 containers (`src/client/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic. DS default error
 and not-found surfaces provide home Links and French messages, with Error details only in development.
 Menus/filtering remain in `apps/web/src/components/navigation/constants.tsx`; `__root` composes the
-theme toggle and search. `FloatingAction` is generic (`label`, `linkProps`, `children`), while the
+theme control and search inside styled app-shell containers. `FloatingAction` is generic (`label`, `linkProps`, `children`), while the
 index route owns recipe/auth policy. Router-dependent Storybook stories use a local memory-router
 decorator.
 
@@ -187,3 +192,4 @@ N/A
 | 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                    |
 | 2026-09-16 | Document Base UI render composition with the actual router Link.               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
 | 2026-09-18 | Move reusable router-only presentation into the design system.                 | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
+| 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.     | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |

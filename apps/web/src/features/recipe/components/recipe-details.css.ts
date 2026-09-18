@@ -12,13 +12,6 @@ export const container2 = style({
   paddingTop: theme.spacing(5),
 })
 
-export const container3 = style({
-  alignItems: 'center',
-  display: 'flex',
-  height: '100vh',
-  justifyContent: 'center',
-})
-
 export const container4 = style({
   alignItems: 'flex-start',
   display: 'flex',

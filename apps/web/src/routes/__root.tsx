@@ -1,3 +1,4 @@
+import { AppHeader, AppMain, NavbarSearchPlaceholder } from '@client/components/app-shell/app-shell'
 import { desktopMenuItems } from '@client/components/navigation/constants'
 import { useToggleTheme } from '@client/hooks/use-toggle-theme'
 import { loadAuthUser, type getAuthUser } from '@client/lib/auth/get-auth-user'
@@ -9,8 +10,6 @@ import { ToastProvider } from '@recipe-organizer/design-system/toast'
 import { type QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useLayoutEffect } from 'react'
-
-import * as styles from './root.css'
 
 const SearchBar = lazy(() => import('@client/features/recipe/components/search-bar'))
 
@@ -27,12 +26,12 @@ const RootComponent = () => {
 
   return (
     <ToastProvider>
-      <header className={styles.element}>
+      <AppHeader>
         <Navbar
           items={desktopMenuItems}
           actions={
             <>
-              <Suspense fallback={<div className={styles.container} />}>
+              <Suspense fallback={<NavbarSearchPlaceholder />}>
                 <SearchBar />
               </Suspense>
               <Button aria-label="Changer de thème" onClick={toggleTheme} size="icon" variant="ghost">
@@ -41,10 +40,10 @@ const RootComponent = () => {
             </>
           }
         />
-      </header>
-      <main className={styles.element2}>
+      </AppHeader>
+      <AppMain>
         <Outlet />
-      </main>
+      </AppMain>
     </ToastProvider>
   )
 }

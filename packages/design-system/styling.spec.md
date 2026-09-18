@@ -153,8 +153,11 @@ provide actual home Links, default French messages, and development-only Error d
 
 `FloatingAction` is generic (`label`, `linkProps`, and `children`) rather than a recipe-create
 wrapper. Recipe/auth policy belongs in the index route. Menus and filtering remain app-owned in
-`apps/web/src/components/navigation/constants.tsx`; theme-toggle and search composition remain in
-`__root`. Pages pass `<TabBar items={mobileMenuItems} />`, not a `pageKey`.
+`apps/web/src/components/navigation/constants.tsx`; `__root` composes the theme control and search
+inside styled app-shell containers. Pages pass `<TabBar items={mobileMenuItems} />`, not a `pageKey`.
+Route files compose styled components without `.css.ts` files, styling imports, or JSX styling props;
+feature sections, containers, and app-shell components own that markup and its colocated styles.
+Routes retain page construction and cross-feature coordination; do not replace them with intermediary page wrappers.
 
 Form dialogs keep a private form-aware dialog composition so dialog body and submit footer share the
 same form lifecycle. Public dialogs do not expose `contentRender` or panel styling props, and public
@@ -213,6 +216,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.                                    | §3, §4, §6.1      | Keep generated raw variable names internal to the typed theme contract.                  |
 | 2026-09-18 | Add safe-area/reset tokens, consolidate shadows, normalize unmatched sizes, and prune unused resets. | §6.1, §6.5        | Enforce a minimal token vocabulary while preserving native semantics and focus contrast. |
 | 2026-09-18 | Allow typed TanStack Router navigation in reusable DS components.                                    | §3, §6.4, §7      | Move router-only navigation/layout/error components into DS without moving app policy.   |
+| 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4              | Routes compose styled components rather than owning styles.                              |
 
 ## 8. Open Questions
 

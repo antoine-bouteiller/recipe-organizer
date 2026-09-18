@@ -3,13 +3,8 @@ import { style } from '@vanilla-extract/css'
 
 export const container = style({
   display: 'flex',
+  flex: '1 1 0%',
   flexDirection: 'column',
-  gap: theme.spacing(4),
-  justifyContent: 'flex-end',
-  paddingTop: theme.spacing(6),
-  '@media': {
-    'screen and (min-width: 768px)': {
-      flexDirection: 'row',
-    },
-  },
+  gap: theme.spacing(2.5),
+  paddingTop: theme.spacing(2),
 })

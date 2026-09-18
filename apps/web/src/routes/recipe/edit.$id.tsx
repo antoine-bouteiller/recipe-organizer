@@ -5,6 +5,8 @@ import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@client/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@client/features/recipe/api/update'
 import { RecipeForm } from '@client/features/recipe/components/recipe-form'
+import { RecipeFormActions } from '@client/features/recipe/components/recipe-form-actions'
+import { RecipeLoadingSurface } from '@client/features/recipe/components/recipe-loading-surface'
 import { recipeFormFields } from '@client/features/recipe/utils/form'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Form } from '@recipe-organizer/design-system/form'
@@ -20,8 +22,6 @@ import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
 import * as z from 'zod'
-
-import * as styles from './edit.$id.css'
 
 const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   _key: Math.random().toString(36).substring(7),
@@ -86,9 +86,9 @@ const EditRecipePage = () => {
 
   if (isLoading) {
     return (
-      <div className={styles.container}>
+      <RecipeLoadingSurface>
         <Spinner />
-      </div>
+      </RecipeLoadingSurface>
     )
   }
 
@@ -115,14 +115,14 @@ const EditRecipePage = () => {
           initialImage={{ id: recipe.image, url: recipe.image }}
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
-        <div className={styles.container2}>
+        <RecipeFormActions>
           <Button disabled={isLoading} onClick={() => router.history.back()} type="button" variant="outline">
             Annuler
           </Button>
           <form.AppForm>
             <form.FormSubmit label="Modifier la recette" />
           </form.AppForm>
-        </div>
+        </RecipeFormActions>
       </Form>
     </ScreenLayout>
   )

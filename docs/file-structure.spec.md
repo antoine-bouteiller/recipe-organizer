@@ -148,8 +148,11 @@ CSS shorthand. The internal token module exports variables only to the public th
 emitting global theme CSS. `.css.ts` consumers use typed `theme` references, including template
 interpolations, instead of shared raw `var(--…)` strings. Native CSS variables remain appropriate for
 component-owned, Base UI, and runtime-owned behavior. No separate generation step or generated utility
-directory is required. Component recipes remain colocated with their owners. Route style files use a leading `-` so
-TanStack Router excludes them from route generation. Native global CSS remains for owned fonts, theme
+directory is required. Component recipes remain colocated with their owners. `apps/web/src/routes/`
+contains route declarations and composition only: no `.css.ts` files or styling imports. Feature sections and containers
+own their markup and colocated styles; `apps/web/src/components/app-shell/` owns shell presentation.
+Routes construct pages from those styled components and retain cross-feature coordination, such as
+recipe create/edit and search, rather than delegating to intermediary page wrappers. Native global CSS remains for owned fonts, theme
 activation, safe-area, scrolling, transitions, and runtime-only behavior. Categories are `actions`,
 `data-display`, `feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the
 matching category as its title prefix. Physical categorization does not change package subpath imports.
@@ -165,7 +168,7 @@ slot, and actual Links retain navigation semantics. Navbar defaults exact matchi
 `ScreenLayout` calls `router.history.back()` when `withGoBack`, defaults scroll IDs to `screen-inner`/
 `screen-outer`, and takes an explicit footer. Its error/not-found defaults provide home Links, French
 messages, and development-only Error details. Pages pass `mobileMenuItems` to TabBar; `__root`
-composes theme toggle and search. Recipe/auth policy remains in the index route. Feature schemas,
+composes theme toggle and search inside styled app-shell containers. Recipe/auth policy remains in the index route. Feature schemas,
 query-backed options, API calls, and persisted app state do not move.
 App-specific React hooks and persisted stores live in `apps/web/src/hooks/` and
 `apps/web/src/stores/`. `src/client/lib/` and `src/client/utils/` contain browser application services
@@ -208,3 +211,4 @@ N/A.
 | 2026-09-17 | Move shared reset/base rules into global Vanilla Extract styles. | 8.1 | Keep layered global rules typed and activate them from both entrypoints. |
 | 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`. | 8.1 | Use one module and public entrypoint for shared global styles. |
 | 2026-09-18 | Move router-only reusable web presentation into the design system. | 8.1 | Permit typed DS navigation without moving application policy or feature code. |
+| 2026-09-18 | Extract styled sections and containers while retaining route composition. | 8.1 | Keep routes unstyled and component styles colocated with their owners. |

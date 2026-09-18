@@ -1,14 +1,11 @@
+import { GoogleSignInButton, LoginBackLink, LoginLayout } from '@client/features/auth/components/login-layout'
 import { authClient } from '@client/lib/auth/auth-client'
 import { loadAuthUser, resetAuthUserCache } from '@client/lib/auth/get-auth-user'
-import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
-import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons/arrow-left'
 import { toastManager } from '@recipe-organizer/design-system/toast'
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import * as z from 'zod'
-
-import * as styles from './login.css'
 
 const searchSchema = z.object({ error: z.string().optional() })
 
@@ -42,23 +39,12 @@ const LoginPage = () => {
   }, [error])
 
   return (
-    <div className={styles.container}>
-      <div className={styles.container2}>
-        <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
-          <div className={styles.container3}>
-            <Button onClick={() => signInWithGoogle()} variant="outline" width="full">
-              <img alt="Google" className={styles.image} src="/google.svg" /> Connexion avec Google
-            </Button>
-          </div>
-          <div className={styles.container4}>
-            <Button render={<Link to="/" />} size="sm" variant="ghost">
-              <ArrowLeftIcon size="sm" />
-              Retour à l&apos;accueil
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </div>
+    <LoginLayout>
+      <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
+        <GoogleSignInButton onSignIn={() => signInWithGoogle()} />
+        <LoginBackLink />
+      </Card>
+    </LoginLayout>
   )
 }
 

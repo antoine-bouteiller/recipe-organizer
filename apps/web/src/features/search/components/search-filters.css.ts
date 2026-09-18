@@ -61,11 +61,3 @@ export const container5 = style({
 export const container6 = style({
   gridColumn: 'span 2 / span 2',
 })
-
-export const container7 = style({
-  display: 'flex',
-  flex: '1 1 0%',
-  flexDirection: 'column',
-  gap: theme.spacing(2.5),
-  paddingTop: theme.spacing(2),
-})

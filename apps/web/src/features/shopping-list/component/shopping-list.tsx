@@ -3,11 +3,14 @@ import { BasketIcon } from '@recipe-organizer/design-system/icons/basket'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { ingredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
+import { type ReactNode } from 'react'
 
 import { useShoppingList } from '../hooks/use-shopping-list'
 import { CartItem } from './cart-item'
 
 import * as styles from './shopping-list.css'
+
+export const ShoppingListContainer = ({ children }: { children: ReactNode }) => <div className={styles.list}>{children}</div>
 
 export const ShoppingList = () => {
   const { shoppingListIngredients, isLoading } = useShoppingList()

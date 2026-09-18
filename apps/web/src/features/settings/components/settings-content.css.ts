@@ -1,7 +1,7 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const container = style({
+export const themeToggle = style({
   display: 'block',
   marginBottom: theme.spacing(4),
   width: '100%',
@@ -12,7 +12,7 @@ export const container = style({
   },
 })
 
-export const container2 = style({
+export const sections = style({
   display: 'grid',
   gap: theme.spacing(4),
   '@media': {
@@ -22,47 +22,47 @@ export const container2 = style({
   },
 })
 
-export const container3 = style({
+export const sectionLink = style({
   cursor: 'pointer',
   height: '100%',
 })
 
-export const container4 = style({
+export const sectionCard = style({
   alignItems: 'flex-start',
   display: 'flex',
   justifyContent: 'space-between',
   padding: theme.spacing(4),
 })
 
-export const container5 = style({
+export const sectionContent = style({
   alignItems: 'flex-start',
   display: 'flex',
   flex: '1 1 0%',
   gap: theme.spacing(3),
 })
 
-export const container6 = style({
+export const sectionIcon = style({
   background: `color-mix(in srgb, ${theme.colors.primary} 10%, transparent)`,
   borderRadius: theme.radius.lg,
   color: theme.colors.primary,
   padding: theme.spacing(2),
 })
 
-export const container7 = style({
+export const sectionDetails = style({
   flex: '1 1 0%',
 })
 
-export const heading = style({
+export const sectionTitle = style({
   fontWeight: theme.fontWeights.semibold,
 })
 
-export const text = style({
+export const sectionDescription = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.sm,
   marginTop: theme.spacing(1),
 })
 
-export const text2 = style({
+export const sectionCaret = style({
   color: theme.colors['muted-foreground'],
   flexShrink: 0,
 })

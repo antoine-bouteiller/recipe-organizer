@@ -4,6 +4,7 @@ import { useIngredientOptions } from '@client/features/ingredients/hooks/use-ing
 import { createRecipeOptions, recipeSchema } from '@client/features/recipe/api/create'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import { RecipeForm } from '@client/features/recipe/components/recipe-form'
+import { RecipeFormActions } from '@client/features/recipe/components/recipe-form-actions'
 import { recipeDefaultValues, recipeFormFields } from '@client/features/recipe/utils/form'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Form } from '@recipe-organizer/design-system/form'
@@ -15,8 +16,6 @@ import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { useSelector } from '@tanstack/react-store'
-
-import * as styles from './new.css'
 
 const NewRecipePage = () => {
   const router = useRouter()
@@ -50,14 +49,14 @@ const NewRecipePage = () => {
         }}
       >
         <RecipeForm addNewIngredientOption={renderAddIngredientOption} fields={recipeFormFields} form={form} ingredientOptions={ingredientOptions} />
-        <div className={styles.container}>
+        <RecipeFormActions>
           <Button disabled={form.state.isSubmitting} onClick={() => router.navigate({ to: '/' })} type="button" variant="outline">
             Annuler
           </Button>
           <form.AppForm>
             <form.FormSubmit label="Créer la recette" />
           </form.AppForm>
-        </div>
+        </RecipeFormActions>
       </Form>
     </ScreenLayout>
   )
