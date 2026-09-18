@@ -1,9 +1,9 @@
+import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { StorySection } from '../../../../.storybook/story-section'
-import { useAppForm } from '../../../hooks/use-app-form'
 import { TextField } from './text-field'
 
 import * as styles from './text-field.stories.css'

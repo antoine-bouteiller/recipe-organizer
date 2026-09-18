@@ -1,5 +1,6 @@
-import { useFieldContext } from '../../../hooks/use-form-context'
-import { ToggleGroup } from '../../actions/toggle-group/toggle-group'
+import { useFieldContext } from '@design-system/hooks/use-form-context'
+import { ToggleGroup } from '@design-system/ui/actions/toggle-group/toggle-group'
+
 import { Field, FieldError, FieldLabel } from '../field/field'
 
 export interface ToggleGroupFieldProps {

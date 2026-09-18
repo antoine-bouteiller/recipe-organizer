@@ -1,9 +1,9 @@
+import { Button } from '@recipe-organizer/design-system/button'
+import { ThemeIcon } from '@recipe-organizer/design-system/icons/theme'
+import { withRouter } from '@storybook-helpers/router'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
-import { withRouter } from '../../../../.storybook/router'
-import { Button } from '../../actions/button/button'
-import { ThemeIcon } from '../../data-display/icons/theme'
 import { Navbar } from './navbar'
 
 const NavbarExample = (): React.ReactElement => (

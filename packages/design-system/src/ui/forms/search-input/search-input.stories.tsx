@@ -1,8 +1,8 @@
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { StorySection } from '../../../../.storybook/story-section'
 import { SearchInput } from './search-input'
 
 import * as styles from './search-input.stories.css'

@@ -1,7 +1,6 @@
+import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
-
-import { useAppForm } from '../../../hooks/use-app-form'
 
 const FormSubmitExample = (): ReactElement => {
   const [submitted, setSubmitted] = useState(false)

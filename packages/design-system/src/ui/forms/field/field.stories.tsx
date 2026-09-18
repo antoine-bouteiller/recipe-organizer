@@ -1,6 +1,6 @@
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
-import { StorySection } from '../../../../.storybook/story-section'
 import { Input } from '../input/input'
 import { Field, FieldError, FieldLabel } from './field'
 

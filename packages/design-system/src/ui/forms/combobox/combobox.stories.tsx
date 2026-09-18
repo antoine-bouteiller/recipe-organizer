@@ -1,7 +1,7 @@
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
-import { StorySection } from '../../../../.storybook/story-section'
 import { Combobox } from './combobox'
 import ComboboxBase from './combobox.base'
 import ComboboxDrawer from './combobox.drawer'

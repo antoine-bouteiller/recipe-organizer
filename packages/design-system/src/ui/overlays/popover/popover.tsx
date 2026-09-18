@@ -1,6 +1,5 @@
+import { useIsMobile } from '@design-system/hooks/use-is-mobile'
 import { lazy, Suspense, type ReactElement, type ReactNode } from 'react'
-
-import { useIsMobile } from '../../../hooks/use-is-mobile'
 
 export interface PopoverProps {
   children: ReactNode

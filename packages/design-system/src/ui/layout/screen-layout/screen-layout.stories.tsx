@@ -1,11 +1,11 @@
+import { Button } from '@recipe-organizer/design-system/button'
+import { withRouter } from '@storybook-helpers/router'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useLocation } from '@tanstack/react-router'
 import { type ComponentProps } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
-import { withRouter } from '../../../../.storybook/router'
-import { StorySection } from '../../../../.storybook/story-section'
-import { Button } from '../../actions/button/button'
 import { ScreenLayout } from './screen-layout'
 
 import * as styles from './screen-layout.stories.css'

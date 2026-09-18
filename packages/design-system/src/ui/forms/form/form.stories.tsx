@@ -1,8 +1,8 @@
+import { Button } from '@recipe-organizer/design-system/button'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type SubmitEvent, type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { Button } from '../../actions/button/button'
 import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
 import { Form } from './form'
 

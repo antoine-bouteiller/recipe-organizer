@@ -1,6 +1,6 @@
+import { useIsMobile } from '@design-system/hooks/use-is-mobile'
 import { lazy, Suspense, useMemo, type ReactElement, type ReactNode } from 'react'
 
-import { useIsMobile } from '../../../hooks/use-is-mobile'
 import { type Option } from './options'
 
 import * as styles from './combobox.css'

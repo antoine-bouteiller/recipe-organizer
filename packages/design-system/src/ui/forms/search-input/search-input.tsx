@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
+import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 
 import * as styles from './search-input.css'
 

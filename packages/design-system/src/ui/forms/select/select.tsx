@@ -1,6 +1,6 @@
+import { useIsMobile } from '@design-system/hooks/use-is-mobile'
 import { lazy, Suspense, type ReactElement } from 'react'
 
-import { useIsMobile } from '../../../hooks/use-is-mobile'
 import { getSelectDisplay, SelectButton, selectText } from './select.shared'
 
 interface SelectOption<TValue extends string> {

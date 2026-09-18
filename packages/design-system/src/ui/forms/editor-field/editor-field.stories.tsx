@@ -1,8 +1,8 @@
+import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { Suspense, type ReactElement } from 'react'
 
-import { StorySection } from '../../../../.storybook/story-section'
-import { useAppForm } from '../../../hooks/use-app-form'
 import EditorField from './editor-field'
 
 import * as styles from './editor-field.stories.css'

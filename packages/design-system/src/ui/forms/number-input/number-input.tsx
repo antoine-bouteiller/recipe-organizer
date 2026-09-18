@@ -1,8 +1,8 @@
 import { NumberField as NumberFieldPrimitive } from '@base-ui/react/number-field'
+import { MinusIcon } from '@recipe-organizer/design-system/icons/minus'
+import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import React from 'react'
 
-import { MinusIcon } from '../../data-display/icons/minus'
-import { PlusIcon } from '../../data-display/icons/plus'
 import { Label } from '../label/label'
 
 import * as styles from './number-input.css'

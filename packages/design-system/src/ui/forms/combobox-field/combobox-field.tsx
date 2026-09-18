@@ -1,6 +1,6 @@
+import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { type ReactNode } from 'react'
 
-import { useFieldContext } from '../../../hooks/use-form-context'
 import { Combobox } from '../combobox/combobox'
 import { type Option } from '../combobox/options'
 import { Field, FieldError, FieldLabel } from '../field/field'

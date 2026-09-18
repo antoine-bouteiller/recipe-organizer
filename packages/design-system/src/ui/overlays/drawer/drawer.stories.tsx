@@ -1,7 +1,7 @@
+import { Button } from '@recipe-organizer/design-system/button'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 
-import { Button } from '../../actions/button/button'
 import { Drawer, DrawerClose, DrawerFooter, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle, DrawerTrigger } from './drawer'
 
 const DrawerExample = (): React.ReactElement => (

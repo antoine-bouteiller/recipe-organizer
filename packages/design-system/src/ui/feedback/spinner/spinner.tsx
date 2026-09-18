@@ -1,6 +1,5 @@
+import { CircleNotchIcon } from '@recipe-organizer/design-system/icons/circle-notch'
 import type React from 'react'
-
-import { CircleNotchIcon } from '../../data-display/icons/circle-notch'
 
 import * as styles from './spinner.css'
 

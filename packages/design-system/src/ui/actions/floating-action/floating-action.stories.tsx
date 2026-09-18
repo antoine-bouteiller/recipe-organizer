@@ -1,8 +1,8 @@
+import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { withRouter } from '@storybook-helpers/router'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
-import { withRouter } from '../../../../.storybook/router'
-import { PlusIcon } from '../../data-display/icons/plus'
 import { FloatingAction } from './floating-action'
 
 const meta = {

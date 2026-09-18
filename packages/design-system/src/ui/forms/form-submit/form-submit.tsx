@@ -1,6 +1,6 @@
-import { useFormContext } from '../../../hooks/use-form-context'
-import { Button } from '../../actions/button/button'
-import { Spinner } from '../../feedback/spinner/spinner'
+import { useFormContext } from '@design-system/hooks/use-form-context'
+import { Button } from '@recipe-organizer/design-system/button'
+import { Spinner } from '@recipe-organizer/design-system/spinner'
 
 export interface FormSubmitProps {
   label: string

@@ -1,11 +1,11 @@
 import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
+import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { SearchInput } from '@recipe-organizer/design-system/search-input'
+import { Select } from '@recipe-organizer/design-system/select'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 
-import { StorySection } from '../../../../.storybook/story-section'
-import { PlusIcon } from '../../data-display/icons/plus'
-import { SearchInput } from '../../forms/search-input/search-input'
-import { Select } from '../../forms/select/select'
 import { Toggle } from '../toggle/toggle'
 import { Button } from './button'
 

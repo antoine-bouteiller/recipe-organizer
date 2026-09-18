@@ -1,11 +1,11 @@
+import { GearIcon } from '@recipe-organizer/design-system/icons/gear'
+import { HouseIcon } from '@recipe-organizer/design-system/icons/house'
+import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
+import { ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons/shopping-cart-simple'
+import { withRouter } from '@storybook-helpers/router'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { withRouter } from '../../../../.storybook/router'
-import { GearIcon } from '../../data-display/icons/gear'
-import { HouseIcon } from '../../data-display/icons/house'
-import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
-import { ShoppingCartSimpleIcon } from '../../data-display/icons/shopping-cart-simple'
 import { TabBar } from './tabbar'
 
 import * as styles from './tabbar.stories.css'

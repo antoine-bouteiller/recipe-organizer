@@ -1,8 +1,7 @@
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
+import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
+import { Button } from '@recipe-organizer/design-system/button'
 import type React from 'react'
-
-import { Button } from '../../actions/button/button'
-import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 
 import * as styles from './drawer.css'
 

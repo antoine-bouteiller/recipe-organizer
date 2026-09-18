@@ -1,7 +1,7 @@
+import { Button } from '@recipe-organizer/design-system/button'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
-import { Button } from '../../actions/button/button'
 import { DeleteDialog } from './delete-dialog'
 
 import * as styles from './delete-dialog.stories.css'

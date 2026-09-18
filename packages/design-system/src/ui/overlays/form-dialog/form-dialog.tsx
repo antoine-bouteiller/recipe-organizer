@@ -1,9 +1,9 @@
 import { Form as FormPrimitive } from '@base-ui/react/form'
+import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
+import { formatFormErrors } from '@recipe-organizer/design-system/utils/format-form-errors'
 import { useSelector } from '@tanstack/react-store'
 import { type ReactElement, type ReactNode } from 'react'
 
-import { withForm } from '../../../hooks/use-app-form'
-import { formatFormErrors } from '../../../utils/format-form-errors'
 import { Dialog } from '../dialog/dialog'
 import { DialogFormProvider } from '../dialog/dialog-form.private'
 

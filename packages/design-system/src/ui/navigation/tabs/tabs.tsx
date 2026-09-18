@@ -1,7 +1,6 @@
 import { Tabs as TabsPrimitive } from '@base-ui/react/tabs'
+import { useSwipeTabs } from '@design-system/hooks/use-swipe-tabs'
 import React, { createContext, useContext } from 'react'
-
-import { useSwipeTabs } from '../../../hooks/use-swipe-tabs'
 
 import * as styles from './tabs.css'
 

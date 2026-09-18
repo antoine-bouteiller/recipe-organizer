@@ -1,9 +1,9 @@
 import { Select as SelectPrimitive } from '@base-ui/react/select'
+import { CaretDownIcon } from '@recipe-organizer/design-system/icons/caret-down'
+import { CaretUpIcon } from '@recipe-organizer/design-system/icons/caret-up'
+import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
 import { type ReactElement } from 'react'
 
-import { CaretDownIcon } from '../../data-display/icons/caret-down'
-import { CaretUpIcon } from '../../data-display/icons/caret-up'
-import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
 import { getSelectDisplay, selectText } from './select.shared'
 

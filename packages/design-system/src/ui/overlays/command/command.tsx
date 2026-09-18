@@ -1,10 +1,9 @@
 import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomplete'
 import { Dialog as CommandDialogPrimitive } from '@base-ui/react/dialog'
+import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
+import { Button } from '@recipe-organizer/design-system/button'
+import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 import type React from 'react'
-
-import { Button } from '../../actions/button/button'
-import { MagnifyingGlassIcon } from '../../data-display/icons/magnifying-glass'
-import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 
 import * as styles from './command.css'
 

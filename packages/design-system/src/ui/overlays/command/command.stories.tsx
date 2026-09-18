@@ -1,9 +1,9 @@
+import { Button } from '@recipe-organizer/design-system/button'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { StorySection } from '../../../../.storybook/story-section'
-import { Button } from '../../actions/button/button'
 import {
   Command,
   CommandDialog,

@@ -1,7 +1,7 @@
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
-import { StorySection } from '../../../../.storybook/story-section'
 import { Select } from './select'
 import SelectBase from './select.base'
 import SelectDrawer from './select.drawer'

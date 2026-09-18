@@ -1,4 +1,5 @@
-import { useFieldContext } from '../../../hooks/use-form-context'
+import { useFieldContext } from '@design-system/hooks/use-form-context'
+
 import { Field, FieldError } from '../field/field'
 import { NumberInput } from '../number-input/number-input'
 

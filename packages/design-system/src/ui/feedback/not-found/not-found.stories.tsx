@@ -1,8 +1,8 @@
+import { withRouter } from '@storybook-helpers/router'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
-import { withRouter } from '../../../../.storybook/router'
-import { StorySection } from '../../../../.storybook/story-section'
 import { NotFound } from './not-found'
 
 import * as styles from './not-found.stories.css'

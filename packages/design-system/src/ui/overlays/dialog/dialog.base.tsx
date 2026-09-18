@@ -1,9 +1,9 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
+import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
+import { Button } from '@recipe-organizer/design-system/button'
+import { XIcon } from '@recipe-organizer/design-system/icons/x'
 import { type ReactElement, type ReactNode } from 'react'
 
-import { Button } from '../../actions/button/button'
-import { XIcon } from '../../data-display/icons/x'
-import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 import { type DialogProps } from './dialog'
 import { useDialogFormFrame } from './dialog-form.private'
 

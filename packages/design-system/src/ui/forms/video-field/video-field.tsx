@@ -1,9 +1,10 @@
-import { useFileUpload, type FileMetadata } from '../../../hooks/use-file-upload'
-import { useFieldContext } from '../../../hooks/use-form-context'
-import { usePlatform } from '../../../hooks/use-platform'
-import { VideoIcon } from '../../data-display/icons/video'
-import { XIcon } from '../../data-display/icons/x'
-import { Kbd, KbdGroup } from '../../data-display/kbd/kbd'
+import { useFieldContext } from '@design-system/hooks/use-form-context'
+import { useFileUpload, type FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
+import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
+import { VideoIcon } from '@recipe-organizer/design-system/icons/video'
+import { XIcon } from '@recipe-organizer/design-system/icons/x'
+import { Kbd, KbdGroup } from '@recipe-organizer/design-system/kbd'
+
 import { Field, FieldError, FieldLabel } from '../field/field'
 
 import * as styles from './video-field.css'

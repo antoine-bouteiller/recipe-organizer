@@ -1,7 +1,7 @@
+import { Button } from '@recipe-organizer/design-system/button'
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
-import { StorySection } from '../../../../.storybook/story-section'
-import { Button } from '../../actions/button/button'
 import { CheckCircleIcon } from '../icons/check-circle'
 import { Item, ItemGroup, ItemSeparator } from './item'
 

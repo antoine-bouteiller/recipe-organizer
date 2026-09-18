@@ -6,6 +6,7 @@ import { LexicalExtensionComposer } from '@lexical/react/LexicalExtensionCompose
 import { useExtensionSignalValue } from '@lexical/react/useExtensionSignalValue'
 import { RichTextExtension } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
+import { ToolbarToggle } from '@recipe-organizer/design-system/toolbar'
 import {
   $getSelection,
   $isRangeSelection,
@@ -22,7 +23,6 @@ import {
 } from 'lexical'
 import { useCallback, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
 
-import { ToolbarToggle } from '../../actions/toolbar/toolbar'
 import { OnChangePlugin } from './plugins/on-change-plugin'
 
 import * as styles from './editor.css'

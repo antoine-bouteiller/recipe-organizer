@@ -8,6 +8,10 @@ const config: StorybookConfig = {
   viteFinal: (viteConfig) => ({
     ...viteConfig,
     plugins: [...(viteConfig.plugins ?? []), vanillaExtractPlugin()],
+    resolve: {
+      ...viteConfig.resolve,
+      tsconfigPaths: true,
+    },
   }),
 }
 

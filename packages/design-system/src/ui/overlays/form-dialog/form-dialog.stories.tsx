@@ -1,9 +1,9 @@
+import { Button } from '@recipe-organizer/design-system/button'
+import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useRef, useState, type ReactElement } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
-import { useAppForm } from '../../../hooks/use-app-form'
-import { Button } from '../../actions/button/button'
 import { getFormDialog } from './form-dialog'
 
 import * as styles from './form-dialog.stories.css'

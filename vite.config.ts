@@ -30,12 +30,18 @@ const viteConfig = defineConfig({
           'no-restricted-imports': [
             'error',
             {
-              patterns: features
-                .filter((other) => other !== feature)
-                .map((other) => ({
-                  group: [`@client/features/${other}`, `@client/features/${other}/**`, `../**/${other}`, `../**/${other}/**`],
-                  message: 'Features must not import other features. Compose them in routes or app-owned components.',
-                })),
+              patterns: [
+                {
+                  regex: '^\\.\\./\\.\\.(/|$)',
+                  message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
+                },
+                ...features
+                  .filter((other) => other !== feature)
+                  .map((other) => ({
+                    group: [`@client/features/${other}`, `@client/features/${other}/**`, `../**/${other}`, `../**/${other}/**`],
+                    message: 'Features must not import other features. Compose them in routes or app-owned components.',
+                  })),
+              ],
             },
           ],
         },
@@ -63,6 +69,17 @@ const viteConfig = defineConfig({
     ],
     rules: {
       // Restriction
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^\\.\\./\\.\\.(/|$)',
+              message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
+            },
+          ],
+        },
+      ],
       'default-case': 'error',
       'no-empty': 'error',
       'no-empty-function': 'error',

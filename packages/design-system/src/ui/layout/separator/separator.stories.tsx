@@ -1,6 +1,6 @@
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
-import { StorySection } from '../../../../.storybook/story-section'
 import { Separator } from './separator'
 
 import * as styles from './separator.stories.css'

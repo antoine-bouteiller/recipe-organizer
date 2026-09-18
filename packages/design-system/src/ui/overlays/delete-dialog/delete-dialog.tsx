@@ -1,8 +1,8 @@
+import { Button } from '@recipe-organizer/design-system/button'
+import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
+import { Spinner } from '@recipe-organizer/design-system/spinner'
 import { cloneElement, useState, useTransition, type ElementType, type ReactElement } from 'react'
 
-import { Button } from '../../actions/button/button'
-import { TrashIcon } from '../../data-display/icons/trash'
-import { Spinner } from '../../feedback/spinner/spinner'
 import { Dialog } from '../dialog/dialog'
 
 export interface DeleteDialogProps {

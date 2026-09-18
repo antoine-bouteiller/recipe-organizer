@@ -1,8 +1,7 @@
 import { Toast } from '@base-ui/react/toast'
+import { CheckCircleIcon } from '@recipe-organizer/design-system/icons/check-circle'
+import { WarningCircleIcon } from '@recipe-organizer/design-system/icons/warning-circle'
 import type React from 'react'
-
-import { CheckCircleIcon } from '../../data-display/icons/check-circle'
-import { WarningCircleIcon } from '../../data-display/icons/warning-circle'
 
 import * as styles from './toast.css'
 

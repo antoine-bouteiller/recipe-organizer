@@ -1,8 +1,8 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
+import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
 import { type ButtonHTMLAttributes, type ReactElement } from 'react'
 
-import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
 import { type SelectProps } from './select'
 
 import * as styles from './select.shared.css'

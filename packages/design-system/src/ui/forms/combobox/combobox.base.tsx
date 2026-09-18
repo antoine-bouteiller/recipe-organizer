@@ -1,9 +1,9 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
+import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
+import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
+import { XIcon } from '@recipe-organizer/design-system/icons/x'
 import React, { useState, type ReactElement } from 'react'
 
-import { CaretUpDownIcon } from '../../data-display/icons/caret-up-down'
-import { XIcon } from '../../data-display/icons/x'
-import { ScrollArea } from '../../layout/scroll-area/scroll-area'
 import { type ComboboxImplProps, type ValueOptions } from './combobox'
 import { type Option } from './options'
 

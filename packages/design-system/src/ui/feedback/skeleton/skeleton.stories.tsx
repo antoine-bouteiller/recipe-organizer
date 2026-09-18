@@ -1,6 +1,6 @@
+import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 
-import { StorySection } from '../../../../.storybook/story-section'
 import { Skeleton } from './skeleton'
 
 import * as styles from './skeleton.stories.css'

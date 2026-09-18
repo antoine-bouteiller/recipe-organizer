@@ -1,7 +1,6 @@
+import { Button } from '@recipe-organizer/design-system/button'
 import { Link, type ErrorComponentProps } from '@tanstack/react-router'
 import type React from 'react'
-
-import { Button } from '../../actions/button/button'
 
 import * as styles from './default-error-component.css'
 
