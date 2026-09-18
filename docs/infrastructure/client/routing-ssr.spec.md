@@ -84,15 +84,17 @@ callback, preserving login redirects for expired sessions and blocked or pending
 ### 8.2 Page-route contract
 
 A page route declares its file-route path, optional `beforeLoad` gate, optional Zod
-`validateSearch`, and a loader that awaits `context.queryClient.ensureQueryData(options)`. The home
-route demonstrates validated search input and list prefetch (`src/client/routes/index.tsx:70-83`); dynamic
-routes parse their segment and return typed loader data for the component. A settings route redirects
-unauthenticated navigation before screen render (`src/client/routes/settings.tsx:3-9`).
+`validateSearch`, and an optional loader. Loaders that prefetch data call
+`context.queryClient.query({ ...options, staleTime: 'static' })`; recipe creation/editing and settings
+routes retain this pattern. Dynamic routes parse their segment and return typed loader data for the
+component. Authentication redirects remain in `beforeLoad`, before screen render.
 
-Routes render screens and select layouts; feature components own the content. A route consumes
-`useSuspenseQuery(options)` only after its loader has populated the matching options. Public routes
-remain readable where the feature permits it, and UI affordances derive from route context rather
-than replacing Worker checks.
+Routes render screens and select layouts; feature components own the content. Home, search, and
+recipe details use `useQuery(options)` without blocking query loaders. They render skeletons directly
+inside `ScreenLayout` while the query's `isLoading` is true; details reuse cached list metadata for
+the title and image. Routes that use `useSuspenseQuery(options)` retain loader prefetch with the same
+feature query options. Public routes remain readable where the feature permits it, and UI affordances
+derive from route context rather than replacing Worker checks.
 
 ### 8.3 Access and URL parsing
 
@@ -104,8 +106,8 @@ decision under [`../server/auth.spec.md`](../server/auth.spec.md).
 
 Search state is parsed through a route-local Zod schema. Invalid input fails before the screen
 receives it; valid output is the sole search-state surface for that screen. Dynamic segments follow
-the same rule: parse the path parameter in the loader, prefetch with the parsed identifier, and
-return the typed identifier as loader data. URL strings therefore never become implicit feature IDs.
+the same rule: parse the path parameter in the loader and return the typed identifier as loader data.
+Queries use that parsed identifier, whether they run in a loader or inside the page. URL strings therefore never become implicit feature IDs.
 
 ### 8.4 Screen and layout boundary
 
@@ -123,9 +125,10 @@ Features must not import one another, even through public APIs.
 Route-derived IDs, search values, and access
 affordances cross that boundary as props, without components importing route modules.
 
-A route may supply a pending component for its loader. Pending UI communicates that the screen is
-waiting for its query contract; it does not substitute a second cache or invoke a write. Error and
-not-found rendering remain router-level surfaces so a failed match has one consistent recovery UI.
+Loading feedback belongs directly inside the page layout: render feature skeletons from TanStack
+Query's `isLoading`, not a route-level pending/loading component. This keeps the destination layout
+visible while its content loads, without a second cache or a write. Error and not-found rendering
+remain shared router-level surfaces so a failed match has one consistent recovery UI.
 
 ### 8.5 Errors, HTTP, and navigation
 
@@ -155,14 +158,15 @@ decorator.
 
 ### 8.6 Route contract summary
 
-| Concern        | Route-owned shape                           | Consumer                        |
-| -------------- | ------------------------------------------- | ------------------------------- |
-| Context        | `{ authUser, queryClient, theme, isAdmin }` | `Route.useRouteContext()`       |
-| Search         | `validateSearch(input) -> typed output`     | `Route.useSearch()`             |
-| Dynamic path   | loader parses segment and returns data      | `Route.useLoaderData()`         |
-| Data readiness | `ensureQueryData(options)`                  | matching feature query hook     |
-| Access         | `beforeLoad` redirect                       | router navigation lifecycle     |
-| HTTP endpoint  | Worker `fetch` → Hono `/api/*`              | browser or external HTTP client |
+| Concern        | Route-owned shape                                                          | Consumer                        |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------- |
+| Context        | `{ authUser, queryClient, theme, isAdmin }`                                | `Route.useRouteContext()`       |
+| Search         | `validateSearch(input) -> typed output`                                    | `Route.useSearch()`             |
+| Dynamic path   | loader parses segment and returns data                                     | `Route.useLoaderData()`         |
+| Data readiness | Optional `queryClient.query({ ...options, staleTime: 'static' })` prefetch | matching feature query hook     |
+| Page loading   | `useQuery(options).isLoading`                                              | skeleton inside the page layout |
+| Access         | `beforeLoad` redirect                                                      | router navigation lifecycle     |
+| HTTP endpoint  | Worker `fetch` → Hono `/api/*`                                             | browser or external HTTP client |
 
 ### 8.7 Render-boundary rules
 
@@ -175,7 +179,7 @@ write browser persistence, or perform a mutation. A component may render from lo
 query cache, then delegates writes to the form and Hono RPC contracts. These boundaries make
 intent preloading safe: visiting a link intent can populate a cache without causing a side effect.
 
-A route's pending UI represents the same screen shape as its resolved UI where practical. It does
+A page's loading UI represents the same screen shape as its resolved UI where practical. It does
 not disclose data that the route gate would withhold. Redirects abort the route path before its
 loader and component become the active screen, so a protected feature does not need a separate
 render-time access fallback.
@@ -194,3 +198,4 @@ N/A
 | 2026-09-16 | Document Base UI render composition with the actual router Link.               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
 | 2026-09-18 | Move reusable router-only presentation into the design system.                 | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
 | 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.     | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
+| 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.               | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |

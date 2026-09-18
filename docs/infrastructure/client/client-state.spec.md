@@ -80,8 +80,11 @@ value uses feature context.
 ### 8.2 Query cache and routing
 
 `getRouter()` creates the QueryClient and explicitly wraps the Router in `QueryClientProvider`
-(`src/client/router.tsx`). A loader awaits `ensureQueryData(options)` and its screen consumes the same
-options through `useSuspenseQuery` or `useQuery`; the home route is the reference prefetch shape.
+(`apps/web/src/router.tsx`). Loaders that prefetch await
+`context.queryClient.query({ ...options, staleTime: 'static' })`, and their screens consume the same
+feature options through `useSuspenseQuery` or `useQuery`. Recipe creation/editing and settings routes
+retain prefetch. Home, search, and recipe details instead query inside the page with `useQuery` and
+render skeletons from `isLoading` within the page layout, without route-level pending components.
 Mutations invalidate the affected `queryKeys` family so subsequent readers obtain Worker-owned state.
 
 ### 8.3 Persisted selection and derived data
@@ -168,3 +171,4 @@ N/A
 | ---------- | ---------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------- |
 | 2026-09-13 | Specify Hono RPC clients as TanStack Query's server-data source. | 3, 8.5            | Reflect the migrated query and mutation wrappers.                |
 | 2026-09-13 | Use an explicit browser Query provider.                          | 3, 7, 8.1–8.2     | Replace the SSR-query bridge and isomorphic preference boundary. |
+| 2026-09-18 | Describe current query prefetch and page-owned loading.          | 8.2               | Match the query API and inline isLoading skeletons.              |

@@ -141,11 +141,13 @@ than implying that both runtime implementations share one directory.
 
 ### 8.1 Request lifecycle
 
-Cloudflare assets serve `index.html` for browser routes, and `src/client/main.tsx` starts the Router and
-an explicit React Query provider. The matched route's loader prefetches through
-`queryClient.ensureQueryData(...)`, which calls the feature's same-origin Hono API client. The API
-runs its guard, parses its input, reads D1, and returns JSON data. Store-backed UI state is read
-directly from `localStorage`; no server render or server action participates in page navigation.
+Cloudflare assets serve `index.html` for browser routes, and `apps/web/src/main.tsx` starts the Router
+and an explicit React Query provider. Pages consume feature query options through TanStack Query.
+Routes that prefetch use `queryClient.query({ ...options, staleTime: 'static' })` in their loaders;
+home, search, and recipe details instead use `useQuery` with inline `isLoading` skeletons so their
+layouts render before data is ready. Query functions call the feature's same-origin Hono API client.
+The API runs its guard, parses its input, reads D1, and returns JSON data. Store-backed UI state is
+read directly from `localStorage`; no server render or server action participates in page navigation.
 
 ### 8.2 Write lifecycle
 
@@ -177,3 +179,4 @@ possession of a URL is never a capability derived from guessing.
 | 2026-09-13 | Split feature ownership across client, server, and shared directories. | 2, 3, 4, 7, 8       | Separate runtime code while preserving one package and Cloudflare deployment. |
 | 2026-09-13 | Rename the server feature directory to `routes`.                       | 3                   | Match the server route layout.                                                |
 | 2026-09-14 | Register a network-only PWA worker while retaining offline removal.    | 2–3, 5, 7           | Meet the Samsung installation requirement without restoring offline behavior. |
+| 2026-09-18 | Align query loading with optional prefetch and inline skeletons.       | 8.1                 | Reflect the current TanStack Query API and page-owned loading.                |

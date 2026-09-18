@@ -3,7 +3,7 @@ import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
 import { RecipeListContent, RecipeListSkeleton } from '@client/features/recipe/components/recipe-list'
 import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
 import { TabBar } from '@recipe-organizer/design-system/tabbar'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import * as z from 'zod'
 
@@ -11,29 +11,19 @@ const searchSchema = z.object({
   search: z.boolean().optional(),
 })
 
-const RecipeListPending = () => (
-  <ScreenLayout title="Recettes" footer={<TabBar items={mobileMenuItems} />}>
-    <RecipeListSkeleton />
-  </ScreenLayout>
-)
-
 const RecipeListPage = () => {
   const { authUser } = Route.useRouteContext()
-  const { data: recipes } = useSuspenseQuery(getRecipeListOptions())
+  const { data: recipes, isLoading } = useQuery({ ...getRecipeListOptions(), throwOnError: true })
 
   return (
     <ScreenLayout title="Recettes" footer={<TabBar items={mobileMenuItems} />}>
-      <RecipeListContent canCreate={Boolean(authUser)} recipes={recipes} />
+      {isLoading ? <RecipeListSkeleton /> : recipes && <RecipeListContent canCreate={Boolean(authUser)} recipes={recipes} />}
     </ScreenLayout>
   )
 }
 
 export const Route = createFileRoute('/')({
   component: RecipeListPage,
-  loader: async ({ context }) => {
-    await context.queryClient.query({ ...getRecipeListOptions(), staleTime: 'static' })
-  },
-  pendingComponent: RecipeListPending,
   validateSearch: (search) => {
     const result = searchSchema.safeParse(search)
     if (!result.success) {
