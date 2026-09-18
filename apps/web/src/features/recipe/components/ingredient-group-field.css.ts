@@ -9,12 +9,12 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const ingredientRow = style({
   display: 'flex',
   gap: theme.spacing(2),
 })
 
-export const container3 = style({
+export const ingredientFields = style({
   alignItems: 'flex-start',
   display: 'flex',
   flex: '1 1 0%',
@@ -29,7 +29,7 @@ export const container3 = style({
   },
 })
 
-export const container4 = style({
+export const mobileSeparator = style({
   '@media': {
     'screen and (min-width: 768px)': {
       display: 'none',

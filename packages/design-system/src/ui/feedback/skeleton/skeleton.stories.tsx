@@ -20,7 +20,7 @@ export const Overview: Story = {
         <Skeleton {...args} />
       </StorySection>
       <StorySection title="Recipe Card">
-        <div className={styles.container2}>
+        <div className={styles.recipeCardPreview}>
           <Skeleton preset="recipe-card" />
           <Skeleton preset="recipe-details-title" />
           <Skeleton preset="recipe-details-text" />

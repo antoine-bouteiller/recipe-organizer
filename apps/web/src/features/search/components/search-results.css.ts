@@ -13,7 +13,7 @@ export const text = style({
   width: theme.spacing(9),
 })
 
-export const text2 = style({
+export const addAction = style({
   vars: {
     '--owner-icon-size': '16px',
   },
@@ -31,7 +31,7 @@ export const container = style({
   textAlign: 'center',
 })
 
-export const container2 = style({
+export const emptyStateIcon = style({
   alignItems: 'center',
   background: theme.colors.accent,
   borderRadius: theme.radius.full,
@@ -42,19 +42,19 @@ export const container2 = style({
   width: theme.spacing(16),
 })
 
-export const text3 = style({
+export const emptyStateDescription = style({
   color: theme.colors['muted-foreground'],
   textWrap: 'balance',
 })
 
-export const container3 = style({
+export const resultsList = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
   gap: theme.spacing(2.5),
 })
 
-export const container4 = style({
+export const resultCount = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.xs,
   fontWeight: theme.fontWeights.semibold,

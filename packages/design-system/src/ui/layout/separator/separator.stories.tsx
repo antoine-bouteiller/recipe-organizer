@@ -17,16 +17,16 @@ export const Overview: Story = {
   render: () => (
     <div className={styles.container}>
       <StorySection title="Default">
-        <div className={styles.container2}>
+        <div className={styles.contentColumn}>
           <p className={styles.text}>Ingredients</p>
-          <div className={styles.container3}>
+          <div className={styles.separatorMargin}>
             <Separator />
           </div>
-          <p className={styles.text2}>Serves four people.</p>
+          <p className={styles.description}>Serves four people.</p>
         </div>
       </StorySection>
       <StorySection title="Vertical">
-        <div className={styles.container4}>
+        <div className={styles.verticalExample}>
           <span>Overview</span>
           <Separator orientation="vertical" />
           <span>Details</span>

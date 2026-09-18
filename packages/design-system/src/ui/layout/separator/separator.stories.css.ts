@@ -9,7 +9,7 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const contentColumn = style({
   width: theme.spacing(80),
 })
 
@@ -18,16 +18,16 @@ export const text = style({
   fontWeight: theme.fontWeights.medium,
 })
 
-export const container3 = style({
+export const separatorMargin = style({
   marginBlock: theme.spacing(3),
 })
 
-export const text2 = style({
+export const description = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.sm,
 })
 
-export const container4 = style({
+export const verticalExample = style({
   alignItems: 'center',
   display: 'flex',
   fontSize: theme.fontSizes.sm,

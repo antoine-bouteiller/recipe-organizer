@@ -26,8 +26,8 @@ export interface SearchFiltersProps {
 export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) => (
   <div className={styles.container}>
     <CollapsiblePrimitive.Root>
-      <div className={styles.container2}>
-        <div className={styles.container3}>
+      <div className={styles.searchInputRow}>
+        <div className={styles.queryField}>
           <SearchInput
             placeholder="Rechercher une recette, un ingrédient…"
             autoFocus
@@ -38,7 +38,7 @@ export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) 
         <SearchFilterTrigger />
       </div>
       <CollapsiblePrimitive.Panel className={styles.element}>
-        <div className={styles.container4}>
+        <div className={styles.mealFilter}>
           <Select
             items={mealItems}
             multiple
@@ -48,7 +48,7 @@ export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) 
             value={filters.meals}
           />
         </div>
-        <div className={styles.container5}>
+        <div className={styles.cuisineFilter}>
           <Select
             items={cuisineItems}
             multiple
@@ -74,7 +74,7 @@ export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) 
         >
           Magimix
         </Toggle>
-        <div className={styles.container6}>
+        <div className={styles.spiceFilter}>
           <Toggle
             presentation="filter"
             variant="outline"

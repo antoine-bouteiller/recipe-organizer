@@ -20,14 +20,14 @@ export const Overview: Story = {
         <Badge {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className={styles.container2}>
+        <div className={styles.variantOptions}>
           <Badge>Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="accent">Accent</Badge>
         </div>
       </StorySection>
       <StorySection title="Sizes">
-        <div className={styles.container3}>
+        <div className={styles.sizeOptions}>
           <Badge size="sm">Small</Badge>
           <Badge>Default</Badge>
         </div>

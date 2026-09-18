@@ -23,7 +23,7 @@ export const text = style({
   textAlign: 'center',
 })
 
-export const container2 = style({
+export const controlsContainer = style({
   alignItems: 'center',
   background: theme.colors.card,
   borderRadius: theme.radius['2xl'],
@@ -35,24 +35,24 @@ export const container2 = style({
   paddingLeft: theme.spacing(4),
 })
 
-export const container3 = style({
+export const labelGroup = style({
   alignItems: 'center',
   display: 'flex',
   gap: theme.spacing(3),
 })
 
-export const text2 = style({
+export const controlsLabel = style({
   fontSize: theme.fontSizes.sm,
   fontWeight: theme.fontWeights.bold,
 })
 
-export const container4 = style({
+export const adjustmentControls = style({
   alignItems: 'center',
   display: 'flex',
   gap: theme.spacing(2),
 })
 
-export const text3 = style({
+export const quantityDisplay = style({
   fontVariantNumeric: 'tabular-nums',
   fontWeight: theme.fontWeights.bold,
   minWidth: theme.spacing(5),

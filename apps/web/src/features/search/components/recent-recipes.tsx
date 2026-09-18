@@ -28,8 +28,8 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
   }
 
   return (
-    <div className={styles.container2}>
-      <div className={styles.container3}>
+    <div className={styles.recentRecipes}>
+      <div className={styles.recentRecipesHeader}>
         <h2 className={styles.heading}>Recherches récentes</h2>
         <button className={styles.element} onClick={clearRecentRecipes} type="button">
           Effacer

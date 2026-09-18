@@ -7,47 +7,47 @@ export const container = style({
   gap: theme.spacing(2),
 })
 
-export const container2 = style({
+export const linkedRecipeRow = style({
   display: 'flex',
   gap: theme.spacing(2),
 })
 
-export const container3 = style({
+export const linkedRecipeFields = style({
   display: 'flex',
   flex: '1 1 0%',
   gap: theme.spacing(2),
   overflow: 'hidden',
 })
 
-export const container4 = style({
+export const linkedRecipeSelect = style({
   flex: '1 1 0%',
   overflow: 'hidden',
 })
 
-export const container5 = style({
+export const linkedRecipeRatio = style({
   flexShrink: 0,
   width: theme.spacing(28),
 })
 
-export const container6 = style({
+export const ingredientGroupsSection = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(2),
   paddingTop: theme.spacing(2),
 })
 
-export const container7 = style({
+export const ingredientGroupCard = style({
   borderRadius: theme.radius.xl,
   borderWidth: '1px',
   padding: theme.spacing(4),
   position: 'relative',
 })
 
-export const container8 = style({
+export const groupNameField = style({
   paddingTop: theme.spacing(2),
 })
 
-export const container9 = style({
+export const groupRemoveButton = style({
   position: 'absolute',
   right: theme.spacing(2),
   top: theme.spacing(2),

@@ -13,13 +13,13 @@ export const container = style({
   gap: theme.spacing(2),
 })
 
-export const container2 = style({
+export const loadingRows = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(2),
 })
 
-export const container3 = style({
+export const emptyState = style({
   alignItems: 'center',
   display: 'flex',
   flex: '1 1 0%',
@@ -30,7 +30,7 @@ export const container3 = style({
   textAlign: 'center',
 })
 
-export const container4 = style({
+export const emptyStateIcon = style({
   alignItems: 'center',
   background: theme.colors.accent,
   borderRadius: theme.radius.full,
@@ -46,7 +46,7 @@ export const text = style({
   textWrap: 'balance',
 })
 
-export const text2 = style({
+export const emptyStateDescription = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.sm,
   textWrap: 'balance',
@@ -65,7 +65,7 @@ export const heading = style({
   textTransform: 'uppercase',
 })
 
-export const container5 = style({
+export const categoryCard = style({
   background: theme.colors.card,
   borderRadius: theme.radius['2xl'],
   borderWidth: '1px',

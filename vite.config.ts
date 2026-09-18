@@ -160,9 +160,9 @@ const viteConfig = defineConfig({
 
       'recipe-oranizer/no-conditional-empty-object-spread': 'error',
       'recipe-oranizer/no-known-value-widening': 'error',
+      'recipe-oranizer/no-low-signal-symbol-names': 'error',
       'recipe-oranizer/no-module-mocking': 'error',
       'recipe-oranizer/no-object-parameters': 'error',
-      'recipe-oranizer/no-shape-in-symbol-names': 'error',
       'recipe-oranizer/no-unknown-type-aliases': 'error',
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
       'recipe-oranizer/vanilla-extract-theme-tokens': 'error',

@@ -17,13 +17,13 @@ export const container = style({
   },
 })
 
-export const container2 = style({
+export const searchInputRow = style({
   alignItems: 'center',
   display: 'flex',
   gap: theme.spacing(2),
 })
 
-export const container3 = style({
+export const queryField = style({
   flex: '1 1 0%',
 })
 
@@ -50,14 +50,14 @@ export const element = style({
   transitionProperty: 'height',
 })
 
-export const container4 = style({
+export const mealFilter = style({
   width: '100%',
 })
 
-export const container5 = style({
+export const cuisineFilter = style({
   width: '100%',
 })
 
-export const container6 = style({
+export const spiceFilter = style({
   gridColumn: 'span 2 / span 2',
 })

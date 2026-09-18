@@ -75,7 +75,7 @@ export const Overview: Story = {
     }
   },
   render: (args) => (
-    <div className={styles.container2}>
+    <div className={styles.storyLayout}>
       <p className={styles.text}>Use the viewport toolbar to compare mobile headers and desktop scrolling.</p>
       <StorySection title="Default">
         <LayoutExample {...args} innerScrollId="story-content" outerScrollId="story-outer" />

@@ -11,11 +11,11 @@ export const text = style({
   top: theme.spacing(1.5),
 })
 
-export const text2 = style({
+export const shortcutKey = style({
   aspectRatio: '1 / 1',
 })
 
-export const container2 = style({
+export const footerShortcut = style({
   alignItems: 'center',
   color: theme.colors.foreground,
   display: 'flex',

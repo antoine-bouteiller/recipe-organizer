@@ -25,9 +25,9 @@ export const Overview: Story = {
   render: () => (
     <div className={styles.container}>
       <StorySection title="Default">
-        <div className={styles.container2}>
+        <div className={styles.standardScrollFrame}>
           <ScrollArea>
-            <div className={styles.container3}>
+            <div className={styles.standardScrollContent}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}
@@ -36,9 +36,9 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="With Fade and Gutter">
-        <div className={styles.container4}>
+        <div className={styles.fadeScrollFrame}>
           <ScrollArea scrollFade scrollbarGutter>
-            <div className={styles.container5}>
+            <div className={styles.fadeScrollContent}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}
@@ -47,16 +47,16 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="Fade without overflow">
-        <div className={styles.container4}>
+        <div className={styles.fadeScrollFrame}>
           <ScrollArea scrollFade>
-            <div className={styles.container5}>Short content stays visible without scrolling.</div>
+            <div className={styles.fadeScrollContent}>Short content stays visible without scrolling.</div>
           </ScrollArea>
         </div>
       </StorySection>
       <StorySection title="Compact Gutter">
-        <div className={styles.container6}>
+        <div className={styles.compactScrollFrame}>
           <ScrollArea aria-label="Compact scrolling" scrollbarGutter="compact" scrollFade>
-            <div className={styles.container7}>
+            <div className={styles.compactScrollContent}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}

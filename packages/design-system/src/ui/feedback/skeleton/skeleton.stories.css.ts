@@ -9,7 +9,7 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const recipeCardPreview = style({
   borderColor: theme.colors.border,
   borderRadius: theme.radius['2xl'],
   borderWidth: '1px',
@@ -17,6 +17,6 @@ export const container2 = style({
   width: theme.spacing(80),
 })
 
-globalStyle(`.${container2} > * + *`, {
+globalStyle(`.${recipeCardPreview} > * + *`, {
   marginTop: theme.spacing(3),
 })

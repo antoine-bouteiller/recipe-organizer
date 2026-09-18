@@ -22,7 +22,7 @@ export const container = style({
   transform: 'translateZ(0)',
 })
 
-export const container2 = style({
+export const storyLayout = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(8),

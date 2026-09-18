@@ -26,7 +26,7 @@ const ResultAddButton = ({ recipeId }: { recipeId: number }) => {
   }
 
   return (
-    <span className={styles.text2}>
+    <span className={styles.addAction}>
       <Button aria-label="Ajouter à la liste" onClick={() => addToShoppingList(recipeId)} size="icon">
         <PlusIcon weight="bold" />
       </Button>
@@ -38,10 +38,10 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   if (recipes.length === 0) {
     return (
       <div className={styles.container}>
-        <div className={styles.container2}>
+        <div className={styles.emptyStateIcon}>
           <MagnifyingGlassIcon size="xl" />
         </div>
-        <p className={styles.text3}>Aucune recette ne correspond à votre recherche.</p>
+        <p className={styles.emptyStateDescription}>Aucune recette ne correspond à votre recherche.</p>
         <Button onClick={onClearFilters} variant="outline">
           Effacer les filtres
         </Button>
@@ -50,8 +50,8 @@ export const SearchResults = ({ recipes, onClearFilters }: SearchResultsProps) =
   }
 
   return (
-    <div className={styles.container3}>
-      <div className={styles.container4}>
+    <div className={styles.resultsList}>
+      <div className={styles.resultCount}>
         {recipes.length} résultat{recipes.length > 1 ? 's' : ''}
       </div>
       {recipes.map((recipe, index) => (

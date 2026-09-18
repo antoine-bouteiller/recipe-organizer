@@ -8,13 +8,13 @@ export const container = style({
   gap: theme.spacing(2.5),
 })
 
-export const container2 = style({
+export const recentRecipes = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
 })
 
-export const container3 = style({
+export const recentRecipesHeader = style({
   alignItems: 'center',
   display: 'flex',
   justifyContent: 'space-between',

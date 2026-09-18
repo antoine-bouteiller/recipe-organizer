@@ -18,15 +18,15 @@ export const Overview: Story = {
   render: (args) => (
     <div className={styles.container}>
       <StorySection title="Default">
-        <div className={styles.container2}>
+        <div className={styles.inputExample}>
           <Label {...args} />
           <input className={styles.element} id="email" placeholder="name@example.com" type="email" />
         </div>
       </StorySection>
       <StorySection title="Disabled">
-        <div className={styles.container3}>
+        <div className={styles.disabledInputExample}>
           <Label htmlFor="disabled-email">Email address</Label>
-          <input className={styles.element2} disabled id="disabled-email" value="name@example.com" />
+          <input className={styles.disabledInput} disabled id="disabled-email" value="name@example.com" />
         </div>
       </StorySection>
     </div>

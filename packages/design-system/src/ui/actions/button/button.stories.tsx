@@ -30,7 +30,7 @@ export const InteractionStates: Story = {
     await expect(canvas.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
   },
   render: () => (
-    <div className={styles.container2}>
+    <div className={styles.buttonGroup}>
       <TogglePrimitive render={<Button variant="secondary" />}>Save recipe</TogglePrimitive>
       <Button disabled>Unavailable</Button>
     </div>
@@ -75,7 +75,7 @@ export const Overview: Story = {
         <Button {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className={styles.container2}>
+        <div className={styles.buttonGroup}>
           <Button>Default</Button>
           <Button variant="secondary">Secondary</Button>
           <Button variant="outline">Outline</Button>
@@ -86,7 +86,7 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="Sizes">
-        <div className={styles.container3}>
+        <div className={styles.sizeOptions}>
           <Button size="sm">Small</Button>
           <Button>Default</Button>
           <Button size="lg">Large</Button>
@@ -101,7 +101,7 @@ export const Overview: Story = {
         </div>
       </StorySection>
       <StorySection title="Disabled">
-        <div className={styles.container2}>
+        <div className={styles.buttonGroup}>
           <Button disabled>Unavailable</Button>
           <Button disabled variant="secondary">
             Secondary

@@ -9,7 +9,7 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const buttonGroup = style({
   display: 'flex',
   flexWrap: 'wrap',
   gap: theme.spacing(3),
@@ -29,7 +29,7 @@ export const searchRow = style({
   width: theme.spacing(60),
 })
 
-export const container3 = style({
+export const sizeOptions = style({
   alignItems: 'center',
   display: 'flex',
   flexWrap: 'wrap',

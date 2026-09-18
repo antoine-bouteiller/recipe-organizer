@@ -22,7 +22,7 @@ export const RecipeDetailsSkeleton = () => (
     <div className={styles.container}>
       <Skeleton preset="recipe-details-title" />
     </div>
-    <div className={styles.container2}>
+    <div className={styles.skeletonDetails}>
       {incrementalArray({ length: 6 }).map((index) => (
         <Skeleton preset="recipe-details-text" key={index} />
       ))}
@@ -38,7 +38,7 @@ export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe })
       </Button>
     }
   >
-    <div className={styles.container4}>
+    <div className={styles.managementActions}>
       <Button
         align="start"
         render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
@@ -69,7 +69,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
     <>
       <h1 className={styles.heading}>{recipe.name}</h1>
       {metaTags.length > 0 && (
-        <div className={styles.container5}>
+        <div className={styles.metadataTags}>
           {metaTags.map((label) => (
             <Badge key={label} size="sm" variant="secondary">
               {label}
@@ -77,11 +77,11 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
           ))}
         </div>
       )}
-      <div className={styles.container6}>
+      <div className={styles.quantityControls}>
         <QuantityControls recipeId={recipeId} servings={recipe.servings} />
       </div>
-      <div className={styles.container7}>
-        <div className={styles.container8}>
+      <div className={styles.detailsContent}>
+        <div className={styles.mobileTabs}>
           <SwipeTabs defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
             <TabsList width="full">
               <TabsTab value="ingredients">Ingrédients</TabsTab>
@@ -89,7 +89,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
             </TabsList>
             <SwipeTabsPanels>
               <SwipeTabsPanel value="ingredients">
-                <div className={styles.container9}>
+                <div className={styles.ingredientsPanel}>
                   <RecipeIngredientGroups
                     recipeId={recipe.id}
                     baseServings={recipe.servings}
@@ -99,7 +99,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
                 </div>
               </SwipeTabsPanel>
               <SwipeTabsPanel value="preparation">
-                <div className={styles.container10}>
+                <div className={styles.instructionsPanel}>
                   <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
                     <EditorContent width="reading" />
                   </Editor>
@@ -108,14 +108,14 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
             </SwipeTabsPanels>
           </SwipeTabs>
         </div>
-        <div className={styles.container11}>
+        <div className={styles.desktopLayout}>
           <section className={styles.section}>
-            <h2 className={styles.heading2}>Ingrédients</h2>
+            <h2 className={styles.ingredientsHeading}>Ingrédients</h2>
             <RecipeIngredientGroups recipeId={recipeId} baseServings={recipe.servings} ingredientGroups={ingredientGroups} presentation="embedded" />
           </section>
-          <section className={styles.section2}>
-            <h2 className={styles.heading3}>Préparation</h2>
-            <div className={styles.container12}>
+          <section className={styles.instructionsSection}>
+            <h2 className={styles.instructionsHeading}>Préparation</h2>
+            <div className={styles.instructionsContent}>
               <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
                 <EditorContent width="reading" />
               </Editor>

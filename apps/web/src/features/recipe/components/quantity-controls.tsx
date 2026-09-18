@@ -46,14 +46,14 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default' }: Qu
   }
 
   return (
-    <div className={styles.container2}>
-      <div className={styles.container3}>
-        <span className={styles.text2}>Couverts</span>
-        <div className={styles.container4}>
+    <div className={styles.controlsContainer}>
+      <div className={styles.labelGroup}>
+        <span className={styles.controlsLabel}>Couverts</span>
+        <div className={styles.adjustmentControls}>
           <Button disabled={quantity === 1} onClick={decrementQuantity} aria-label="Retirer un couvert" size="icon-sm" variant="outline">
             <MinusIcon />
           </Button>
-          <span className={styles.text3}>{quantity}</span>
+          <span className={styles.quantityDisplay}>{quantity}</span>
           <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-sm">
             <PlusIcon />
           </Button>

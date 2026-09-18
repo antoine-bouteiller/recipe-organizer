@@ -9,7 +9,7 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const standardScrollFrame = style({
   borderColor: theme.colors.border,
   borderRadius: theme.radius.md,
   borderWidth: '1px',
@@ -18,13 +18,13 @@ export const container2 = style({
   width: theme.spacing(80),
 })
 
-export const container3 = style({
+export const standardScrollContent = style({
   display: 'grid',
   fontSize: theme.fontSizes.sm,
   gap: theme.spacing(3),
 })
 
-export const container4 = style({
+export const fadeScrollFrame = style({
   borderColor: theme.colors.border,
   borderRadius: theme.radius.md,
   borderWidth: '1px',
@@ -33,18 +33,18 @@ export const container4 = style({
   width: theme.spacing(80),
 })
 
-export const container5 = style({
+export const fadeScrollContent = style({
   display: 'grid',
   fontSize: theme.fontSizes.sm,
   gap: theme.spacing(3),
 })
 
-export const container6 = style({
+export const compactScrollFrame = style({
   height: theme.spacing(56),
   width: theme.spacing(80),
 })
 
-export const container7 = style({
+export const compactScrollContent = style({
   display: 'grid',
   fontSize: theme.fontSizes.sm,
   gap: theme.spacing(3),

@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
   render: () => (
-    <div className={styles.container2}>
+    <div className={styles.storyLayout}>
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>

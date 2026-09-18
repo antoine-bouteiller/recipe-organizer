@@ -10,6 +10,6 @@ export const section = style({
   padding: theme.spacing(4),
 })
 
-export const section2 = style({
+export const methodPanel = style({
   padding: theme.spacing(4),
 })

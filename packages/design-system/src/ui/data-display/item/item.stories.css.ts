@@ -9,7 +9,7 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const variantList = style({
   display: 'grid',
   gap: theme.spacing(3),
 })

@@ -16,7 +16,7 @@ export const container = style({
   },
 })
 
-export const container2 = style({
+export const emptyState = style({
   alignItems: 'center',
   display: 'flex',
   flex: '1 1 0%',
@@ -27,7 +27,7 @@ export const container2 = style({
   textAlign: 'center',
 })
 
-export const container3 = style({
+export const emptyStateIcon = style({
   alignItems: 'center',
   background: theme.colors.accent,
   borderRadius: theme.radius.full,
@@ -43,7 +43,7 @@ export const text = style({
   textWrap: 'balance',
 })
 
-export const container4 = style({
+export const recipeGrid = style({
   display: 'grid',
   gap: theme.spacing(4),
   gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',

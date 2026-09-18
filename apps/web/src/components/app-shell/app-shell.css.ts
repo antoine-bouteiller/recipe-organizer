@@ -20,7 +20,7 @@ export const container = style({
   width: theme.spacing(56),
 })
 
-export const element2 = style({
+export const mainContent = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',

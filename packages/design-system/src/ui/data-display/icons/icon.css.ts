@@ -10,7 +10,7 @@ export const element = style({
   width: 'var(--owner-icon-size, 1em)',
 })
 
-export const element2 = style({
+export const large = style({
   color: 'currentColor',
   flexShrink: 0,
   height: 'var(--owner-icon-size, 20px)',
@@ -19,7 +19,7 @@ export const element2 = style({
   width: 'var(--owner-icon-size, 20px)',
 })
 
-export const element3 = style({
+export const medium = style({
   color: 'currentColor',
   flexShrink: 0,
   height: 'var(--owner-icon-size, 18px)',
@@ -28,7 +28,7 @@ export const element3 = style({
   width: 'var(--owner-icon-size, 18px)',
 })
 
-export const element4 = style({
+export const small = style({
   color: 'currentColor',
   flexShrink: 0,
   height: 'var(--owner-icon-size, 16px)',
@@ -37,7 +37,7 @@ export const element4 = style({
   width: 'var(--owner-icon-size, 16px)',
 })
 
-export const element5 = style({
+export const extraLarge = style({
   color: 'currentColor',
   flexShrink: 0,
   height: 'var(--owner-icon-size, 28px)',
@@ -46,7 +46,7 @@ export const element5 = style({
   width: 'var(--owner-icon-size, 28px)',
 })
 
-export const element6 = style({
+export const extraSmall = style({
   color: 'currentColor',
   flexShrink: 0,
   height: 'var(--owner-icon-size, 12px)',

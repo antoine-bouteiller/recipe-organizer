@@ -7,7 +7,7 @@ export const container = style({
   paddingTop: theme.spacing(0),
 })
 
-export const container2 = style({
+export const storyLayout = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(8),
@@ -15,7 +15,7 @@ export const container2 = style({
   width: '100%',
 })
 
-export const container3 = style({
+export const actionRow = style({
   alignItems: 'center',
   display: 'flex',
   gap: theme.spacing(3),
@@ -24,7 +24,7 @@ export const container3 = style({
   paddingTop: theme.spacing(0),
 })
 
-export const container4 = style({
+export const contentPadding = style({
   fontSize: theme.fontSizes.sm,
   padding: theme.spacing(6),
 })

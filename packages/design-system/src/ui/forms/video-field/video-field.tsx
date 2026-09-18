@@ -39,15 +39,15 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
       <FieldLabel presentation="dropzone-video">
         {videoFile ? (
           <div className={styles.container}>
-            <div className={styles.container2}>
-              <div className={styles.container3}>
+            <div className={styles.videoDetails}>
+              <div className={styles.videoIcon}>
                 <span className={styles.text}>
                   <VideoIcon size="lg" />
                 </span>
               </div>
-              <div className={styles.container4}>
-                <p className={styles.text2}>{videoFile.file.name || 'Video'}</p>
-                {videoFile.file.size && <p className={styles.text3}>{formatBytes(videoFile.file.size)}</p>}
+              <div className={styles.videoMetadata}>
+                <p className={styles.fileName}>{videoFile.file.name || 'Video'}</p>
+                {videoFile.file.size && <p className={styles.fileSize}>{formatBytes(videoFile.file.size)}</p>}
               </div>
             </div>
             <button
@@ -64,15 +64,15 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
             </button>
           </div>
         ) : (
-          <div className={styles.container5}>
-            <div aria-hidden="true" className={styles.container6}>
-              <span className={styles.text4}>
+          <div className={styles.uploadPrompt}>
+            <div aria-hidden="true" className={styles.uploadPromptIcon}>
+              <span className={styles.uploadPromptIconGraphic}>
                 <VideoIcon size="sm" />
               </span>
             </div>
-            <p className={styles.text5}>Déposez votre vidéo ou cliquez pour parcourir</p>
-            <p className={styles.text6}>Formats supportés: MP4, WebM, MOV (max 100MB)</p>
-            <div className={styles.container7}>
+            <p className={styles.uploadPromptText}>Déposez votre vidéo ou cliquez pour parcourir</p>
+            <p className={styles.formatHint}>Formats supportés: MP4, WebM, MOV (max 100MB)</p>
+            <div className={styles.keyboardShortcut}>
               <KbdGroup>
                 <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
                 <Kbd>V</Kbd>
@@ -81,7 +81,7 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={styles.element2} disabled={disabled} type="file" {...getInputProps()} />
+      <input className={styles.fileInput} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

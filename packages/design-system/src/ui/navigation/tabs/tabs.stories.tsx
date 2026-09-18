@@ -23,7 +23,7 @@ const SwipeTabsExample = (): React.ReactElement => (
           </section>
         </SwipeTabsPanel>
         <SwipeTabsPanel value="method">
-          <section aria-label="Method" className={styles.section2}>
+          <section aria-label="Method" className={styles.methodPanel}>
             <h2>Method</h2>
             <p>Simmer for 20 minutes.</p>
           </section>

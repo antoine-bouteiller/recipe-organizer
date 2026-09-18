@@ -13,13 +13,13 @@ export const label = style({
   gap: theme.spacing(2),
 })
 
-export const label2 = style({
+export const customPlaceholderField = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(2),
 })
 
-export const container2 = style({
+export const storyLayout = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(8),

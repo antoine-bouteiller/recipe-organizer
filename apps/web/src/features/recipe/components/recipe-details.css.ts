@@ -5,14 +5,14 @@ export const container = style({
   marginTop: theme.spacing(3),
 })
 
-export const container2 = style({
+export const skeletonDetails = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(3),
   paddingTop: theme.spacing(5),
 })
 
-export const container4 = style({
+export const managementActions = style({
   alignItems: 'flex-start',
   display: 'flex',
   flexDirection: 'column',
@@ -41,7 +41,7 @@ export const heading = style({
   },
 })
 
-export const container5 = style({
+export const metadataTags = style({
   display: 'flex',
   flexWrap: 'wrap',
   gap: theme.spacing(1.5),
@@ -49,18 +49,18 @@ export const container5 = style({
   paddingTop: theme.spacing(1),
 })
 
-export const container6 = style({
+export const quantityControls = style({
   marginBlock: theme.spacing(2),
 })
 
-export const container7 = style({
+export const detailsContent = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
   minHeight: theme.spacing(0),
 })
 
-export const container8 = style({
+export const mobileTabs = style({
   display: 'flex',
   flex: '1 1 0%',
   flexDirection: 'column',
@@ -73,21 +73,21 @@ export const container8 = style({
   },
 })
 
-export const container9 = style({
+export const ingredientsPanel = style({
   height: '100%',
   overflowY: 'auto',
   paddingBottom: theme.spacing(4),
   paddingInline: theme.spacing(2),
 })
 
-export const container10 = style({
+export const instructionsPanel = style({
   height: '100%',
   overflowY: 'auto',
   padding: theme.spacing(2),
   paddingBottom: theme.spacing(4),
 })
 
-export const container11 = style({
+export const desktopLayout = style({
   alignItems: 'stretch',
   display: 'none',
   gap: theme.spacing(8),
@@ -109,7 +109,7 @@ export const section = style({
   paddingInline: theme.spacing(8),
 })
 
-export const heading2 = style({
+export const ingredientsHeading = style({
   fontSize: theme.fontSizes.xl,
   fontWeight: theme.fontWeights.bold,
   lineHeight: '28px',
@@ -117,7 +117,7 @@ export const heading2 = style({
   marginTop: theme.spacing(8),
 })
 
-export const section2 = style({
+export const instructionsSection = style({
   background: theme.colors.card,
   borderRadius: theme.radius['3xl'],
   boxShadow: theme.shadows.lg,
@@ -126,7 +126,7 @@ export const section2 = style({
   paddingInline: theme.spacing(8),
 })
 
-export const heading3 = style({
+export const instructionsHeading = style({
   fontSize: theme.fontSizes.xl,
   fontWeight: theme.fontWeights.bold,
   lineHeight: '28px',
@@ -134,6 +134,6 @@ export const heading3 = style({
   marginTop: theme.spacing(8),
 })
 
-export const container12 = style({
+export const instructionsContent = style({
   paddingBottom: theme.spacing(4),
 })

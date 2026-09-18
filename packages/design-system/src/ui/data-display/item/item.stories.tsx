@@ -26,7 +26,7 @@ export const Overview: Story = {
         <Item {...args} />
       </StorySection>
       <StorySection title="Variants">
-        <div className={styles.container2}>
+        <div className={styles.variantList}>
           <Item media={<CheckCircleIcon />} title="Default">
             A standard item.
           </Item>

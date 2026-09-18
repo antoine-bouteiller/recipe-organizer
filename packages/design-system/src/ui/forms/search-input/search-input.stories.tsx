@@ -25,7 +25,7 @@ const CustomPlaceholderExample = (): ReactElement => {
   const [search, setSearch] = useState('')
 
   return (
-    <label className={styles.label2}>
+    <label className={styles.customPlaceholderField}>
       <span>Search ingredients</span>
       <SearchInput placeholder="Search ingredients…" search={search} setSearch={setSearch} />
     </label>
@@ -48,7 +48,7 @@ export const Overview: Story = {
     await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
   },
   render: () => (
-    <div className={styles.container2}>
+    <div className={styles.storyLayout}>
       <StorySection title="Default">
         <SearchInputExample />
       </StorySection>

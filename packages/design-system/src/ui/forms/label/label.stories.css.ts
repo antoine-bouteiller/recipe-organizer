@@ -9,7 +9,7 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const inputExample = style({
   display: 'grid',
   gap: theme.spacing(2),
   width: theme.spacing(80),
@@ -25,13 +25,13 @@ export const element = style({
   paddingInline: theme.spacing(3),
 })
 
-export const container3 = style({
+export const disabledInputExample = style({
   display: 'grid',
   gap: theme.spacing(2),
   width: theme.spacing(80),
 })
 
-export const element2 = style({
+export const disabledInput = style({
   backgroundColor: theme.colors.background,
   border: '1px solid',
   borderColor: theme.colors.input,

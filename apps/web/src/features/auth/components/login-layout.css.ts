@@ -8,12 +8,12 @@ export const container = style({
   placeItems: 'center',
 })
 
-export const container2 = style({
+export const formContainer = style({
   maxWidth: theme.spacing(96),
   width: '100%',
 })
 
-export const container3 = style({
+export const signInButtonContainer = style({
   paddingBottom: theme.spacing(6),
   paddingInline: theme.spacing(6),
 })
@@ -22,7 +22,7 @@ export const image = style({
   height: theme.spacing(4),
 })
 
-export const container4 = style({
+export const backLinkContainer = style({
   alignItems: 'center',
   display: 'flex',
   justifyContent: 'center',

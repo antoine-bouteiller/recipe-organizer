@@ -23,7 +23,7 @@ export const Navbar = ({ actions, items }: NavbarProps): React.ReactElement => (
         </Link>
       ))}
     </nav>
-    <div className={styles.container2} data-slot="navbar-actions">
+    <div className={styles.actions} data-slot="navbar-actions">
       {actions}
     </div>
   </div>

@@ -7,12 +7,12 @@ import * as styles from './login-layout.css'
 
 export const LoginLayout = ({ children }: { children: ReactNode }) => (
   <div className={styles.container}>
-    <div className={styles.container2}>{children}</div>
+    <div className={styles.formContainer}>{children}</div>
   </div>
 )
 
 export const GoogleSignInButton = ({ onSignIn }: { onSignIn: () => void }) => (
-  <div className={styles.container3}>
+  <div className={styles.signInButtonContainer}>
     <Button onClick={onSignIn} variant="outline" width="full">
       <img alt="Google" className={styles.image} src="/google.svg" /> Connexion avec Google
     </Button>
@@ -20,7 +20,7 @@ export const GoogleSignInButton = ({ onSignIn }: { onSignIn: () => void }) => (
 )
 
 export const LoginBackLink = () => (
-  <div className={styles.container4}>
+  <div className={styles.backLinkContainer}>
     <Button render={<Link to="/" />} size="sm" variant="ghost">
       <ArrowLeftIcon size="sm" />
       Retour à l&apos;accueil

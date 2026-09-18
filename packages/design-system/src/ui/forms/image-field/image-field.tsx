@@ -37,14 +37,14 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
             <img alt="Aperçu" className={styles.image} src={previewUrl} />
           </div>
         ) : (
-          <div className={styles.container2}>
-            <div aria-hidden="true" className={styles.container3}>
+          <div className={styles.uploadPrompt}>
+            <div aria-hidden="true" className={styles.uploadPromptIcon}>
               <span className={styles.text}>
                 <ImageIcon size="sm" />
               </span>
             </div>
-            <p className={styles.text2}>Déposez votre image ou cliquez pour parcourir</p>
-            <div className={styles.container4}>
+            <p className={styles.uploadPromptText}>Déposez votre image ou cliquez pour parcourir</p>
+            <div className={styles.keyboardShortcut}>
               <KbdGroup>
                 <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
                 <Kbd>V</Kbd>
@@ -53,7 +53,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
           </div>
         )}
         {previewUrl && (
-          <div className={styles.container5}>
+          <div className={styles.removeButton}>
             <button
               aria-label="Supprimer l'image"
               className={styles.element}
@@ -69,7 +69,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={styles.element2} disabled={disabled} type="file" {...getInputProps()} />
+      <input className={styles.fileInput} disabled={disabled} type="file" {...getInputProps()} />
       <FieldError />
     </Field>
   )

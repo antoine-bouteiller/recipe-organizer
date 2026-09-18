@@ -38,8 +38,8 @@ export const IngredientGroupField = withForm({
             <Label>Ingrédients</Label>
             {field.state.value?.map((ingredient, ingredientIndex) => (
               <Fragment key={ingredient._key}>
-                <div className={styles.container2}>
-                  <div className={styles.container3}>
+                <div className={styles.ingredientRow}>
+                  <div className={styles.ingredientFields}>
                     <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
                       {({ ComboboxField }) => (
                         <ComboboxField
@@ -68,7 +68,7 @@ export const IngredientGroupField = withForm({
                     <TrashIcon size="sm" />
                   </Button>
                 </div>
-                <div className={styles.container4}>
+                <div className={styles.mobileSeparator}>
                   <Separator />
                 </div>
               </Fragment>

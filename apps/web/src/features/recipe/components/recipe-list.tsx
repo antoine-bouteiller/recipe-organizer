@@ -24,8 +24,8 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
   return (
     <>
       {visibleRecipes.length === 0 ? (
-        <div className={styles.container2}>
-          <div className={styles.container3}>
+        <div className={styles.emptyState}>
+          <div className={styles.emptyStateIcon}>
             <BookIcon size="xl" />
           </div>
           <p className={styles.text}>Aucune recette</p>
@@ -37,7 +37,7 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
           )}
         </div>
       ) : (
-        <div className={styles.container4}>
+        <div className={styles.recipeGrid}>
           {visibleRecipes.map((recipe, index) => (
             <RecipeCard recipe={recipe} index={index} key={recipe.id} />
           ))}

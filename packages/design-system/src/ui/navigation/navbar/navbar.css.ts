@@ -15,7 +15,7 @@ export const element = style({
   gap: theme.spacing(1),
 })
 
-export const container2 = style({
+export const actions = style({
   alignItems: 'center',
   display: 'flex',
   flex: '1 1 0%',

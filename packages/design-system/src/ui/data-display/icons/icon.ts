@@ -6,11 +6,11 @@ import * as styles from './icon.css'
 
 const iconRecipes = {
   inherit: styles.element,
-  lg: styles.element2,
-  md: styles.element3,
-  sm: styles.element4,
-  xl: styles.element5,
-  xs: styles.element6,
+  lg: styles.large,
+  md: styles.medium,
+  sm: styles.small,
+  xl: styles.extraLarge,
+  xs: styles.extraSmall,
 } satisfies Record<IconSize, string>
 
 /** Private SVG root. It deliberately forwards only the closed public icon contract. */

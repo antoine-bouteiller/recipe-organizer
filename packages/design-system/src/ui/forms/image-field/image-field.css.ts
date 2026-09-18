@@ -12,7 +12,7 @@ export const image = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const uploadPrompt = style({
   alignItems: 'center',
   display: 'flex',
   flexDirection: 'column',
@@ -22,7 +22,7 @@ export const container2 = style({
   textAlign: 'center',
 })
 
-export const container3 = style({
+export const uploadPromptIcon = style({
   alignItems: 'center',
   backgroundColor: theme.colors.background,
   borderRadius: theme.radius.full,
@@ -39,13 +39,13 @@ export const text = style({
   opacity: 0.6,
 })
 
-export const text2 = style({
+export const uploadPromptText = style({
   fontSize: theme.fontSizes.sm,
   fontWeight: theme.fontWeights.medium,
   marginBottom: theme.spacing(1.5),
 })
 
-export const container4 = style({
+export const keyboardShortcut = style({
   display: 'none',
   '@media': {
     'screen and (min-width: 768px)': {
@@ -54,7 +54,7 @@ export const container4 = style({
   },
 })
 
-export const container5 = style({
+export const removeButton = style({
   position: 'absolute',
   right: theme.spacing(4),
   top: theme.spacing(4),
@@ -91,6 +91,6 @@ export const element = style({
   },
 })
 
-export const element2 = style({
+export const fileInput = style({
   display: 'none',
 })

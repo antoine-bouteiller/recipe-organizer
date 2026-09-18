@@ -2,7 +2,6 @@ import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
 // Separate object until csstype includes cornerShape; unsupported browsers keep rounded corners.
-// oxlint-disable-next-line recipe-oranizer/no-shape-in-symbol-names -- cornerShape is a native CSS property.
 const cardCorners = { borderRadius: theme.radius['4xl'], cornerShape: 'squircle' }
 
 export const card = style({

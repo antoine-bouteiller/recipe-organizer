@@ -12,7 +12,7 @@ export const heading = style({
   fontWeight: theme.fontWeights.medium,
 })
 
-export const container2 = style({
+export const storyLayout = style({
   display: 'flex',
   flexDirection: 'column',
   gap: theme.spacing(8),

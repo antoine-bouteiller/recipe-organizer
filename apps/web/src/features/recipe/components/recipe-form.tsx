@@ -72,11 +72,11 @@ export const RecipeForm = withForm({
             {(field) => (
               <>
                 {field.state.value?.map((linkedRecipe, index) => (
-                  <div className={styles.container2} key={linkedRecipe.id}>
-                    <div className={styles.container3}>
+                  <div className={styles.linkedRecipeRow} key={linkedRecipe.id}>
+                    <div className={styles.linkedRecipeFields}>
                       <AppField name={`linkedRecipes[${index}].id`}>
                         {({ ComboboxField }) => (
-                          <div className={styles.container4}>
+                          <div className={styles.linkedRecipeSelect}>
                             <ComboboxField
                               disabled={isSubmitting}
                               options={recipeOptions}
@@ -88,7 +88,7 @@ export const RecipeForm = withForm({
                       </AppField>
                       <AppField name={`linkedRecipes[${index}].ratio`}>
                         {({ NumberField }) => (
-                          <div className={styles.container5}>
+                          <div className={styles.linkedRecipeRatio}>
                             <NumberField disabled={isSubmitting} min={0} placeholder="Ratio" />
                           </div>
                         )}
@@ -115,7 +115,7 @@ export const RecipeForm = withForm({
           {({ VideoField }) => <VideoField disabled={isSubmitting} initialVideo={initialVideo} label="Vidéo (optionnel)" />}
         </AppField>
 
-        <div className={styles.container6}>
+        <div className={styles.ingredientGroupsSection}>
           <Label>Groupes d&apos;ingrédients</Label>
           <Field mode="array" name="ingredientGroups">
             {(field) => (
@@ -123,18 +123,18 @@ export const RecipeForm = withForm({
                 {field.state.value?.map((group, groupIndex) => (
                   <AppField key={group._key} name={`ingredientGroups[${groupIndex}]`}>
                     {({ Field: GroupField, FieldError }) => (
-                      <div className={styles.container7}>
+                      <div className={styles.ingredientGroupCard}>
                         <GroupField>
                           {groupIndex !== 0 && (
                             <>
                               <AppField name={`ingredientGroups[${groupIndex}].groupName`}>
                                 {({ TextField }) => (
-                                  <div className={styles.container8}>
+                                  <div className={styles.groupNameField}>
                                     <TextField disabled={isSubmitting} label="Nom du groupe" />
                                   </div>
                                 )}
                               </AppField>
-                              <div className={styles.container9}>
+                              <div className={styles.groupRemoveButton}>
                                 <Button
                                   disabled={isSubmitting}
                                   onClick={() => field.removeValue(groupIndex)}

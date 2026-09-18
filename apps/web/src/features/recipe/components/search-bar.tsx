@@ -49,7 +49,7 @@ const SearchBar = () => {
           <span className={styles.text}>
             <KbdGroup>
               <Kbd>{platform === 'macOS' ? '⌘' : 'Ctrl'}</Kbd>
-              <span className={styles.text2}>
+              <span className={styles.shortcutKey}>
                 <Kbd>K</Kbd>
               </span>
             </KbdGroup>
@@ -80,7 +80,7 @@ const SearchBar = () => {
             </CommandList>
           </CommandPanel>
           <CommandFooter>
-            <div className={styles.container2}>
+            <div className={styles.footerShortcut}>
               <Kbd>
                 <ArrowElbowDownLeftIcon />
               </Kbd>

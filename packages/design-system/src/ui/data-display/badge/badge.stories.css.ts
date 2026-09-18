@@ -9,14 +9,14 @@ export const container = style({
   width: '100%',
 })
 
-export const container2 = style({
+export const variantOptions = style({
   alignItems: 'center',
   display: 'flex',
   flexWrap: 'wrap',
   gap: theme.spacing(3),
 })
 
-export const container3 = style({
+export const sizeOptions = style({
   alignItems: 'center',
   display: 'flex',
   gap: theme.spacing(3),

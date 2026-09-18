@@ -20,13 +20,13 @@ export const Overview: Story = {
     title: 'Recipe details',
   },
   render: (args) => (
-    <div className={styles.container2}>
+    <div className={styles.storyLayout}>
       <StorySection title="Default">
         <Card {...args} />
       </StorySection>
       <StorySection title="With Actions">
         <Card description="Changes are saved automatically." title="Profile settings">
-          <div className={styles.container3}>
+          <div className={styles.actionRow}>
             <Button variant="outline">Cancel</Button>
             <Button>Save changes</Button>
           </div>
@@ -34,7 +34,7 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Content Only">
         <Card>
-          <div className={styles.container4}>A card can be used without a header.</div>
+          <div className={styles.contentPadding}>A card can be used without a header.</div>
         </Card>
       </StorySection>
     </div>
