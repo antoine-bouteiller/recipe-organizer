@@ -130,6 +130,7 @@ const viteConfig = defineConfig({
       'recipe-oranizer/no-shape-in-symbol-names': 'error',
       'recipe-oranizer/no-unknown-type-aliases': 'error',
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
+      'recipe-oranizer/vanilla-extract-theme-tokens': 'error',
     },
   },
   fmt: {
