@@ -68,13 +68,6 @@ export const iconSlot = style({
       position: 'absolute',
       transition: `opacity 150ms ${theme.easings['in-out']}`,
     },
-    [`${tabBarItem}:hover &::before`]: {
-      '@media': {
-        '(hover: hover) and (pointer: fine)': {
-          opacity: 0.08,
-        },
-      },
-    },
     [`${tabBarItem}:is(:focus-visible, [data-focus-visible], :active, [data-active]) &::before`]: {
       opacity: 0.12,
     },
