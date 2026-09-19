@@ -135,3 +135,63 @@ globalStyle(`.dark .${editorContentBase} > :not([data-editor-decorator]) :where(
 globalStyle(`.dark .${editorContentBase} > :where(h1, h2, h3, h4)`, {
   color: theme.colors['inverse-foreground'],
 })
+
+const readOnlyBlock = `.${editorContentBase}:not(.${editable}) > :not([data-editor-decorator], [data-editor-decorator-root])`
+
+globalStyle(`${readOnlyBlock}:where(p, ol, ul)`, {
+  marginTop: theme.spacing(4),
+  marginBottom: theme.spacing(4),
+})
+
+globalStyle(`${readOnlyBlock}:where(ul):not(.${editorChecklist}), ${readOnlyBlock} :where(ul):not(.${editorChecklist})`, {
+  listStyleType: 'disc',
+})
+
+globalStyle(`${readOnlyBlock}:where(ol), ${readOnlyBlock} :where(ol)`, {
+  listStyleType: 'decimal',
+})
+
+globalStyle(`${readOnlyBlock} :where(ol, ul):not(.${editorChecklist})`, {
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  paddingInlineStart: theme.spacing(5.5),
+})
+
+globalStyle(`${readOnlyBlock} :where(li):has(> :is(ol, ul):only-child)`, {
+  listStyleType: 'none',
+})
+
+globalStyle(`${readOnlyBlock}:where(ol) li::marker`, {
+  color: theme.colors['muted-foreground'],
+  fontWeight: theme.fontWeights.normal,
+})
+
+globalStyle(`${readOnlyBlock}:where(ul) li::marker`, {
+  color: theme.colors['muted-foreground'],
+})
+
+globalStyle(`${readOnlyBlock}:where(blockquote)`, {
+  color: theme.colors.foreground,
+  fontWeight: theme.fontWeights.medium,
+  fontStyle: 'italic',
+  borderInlineStartWidth: '3px',
+  borderInlineStartColor: theme.colors.border,
+  paddingInlineStart: theme.spacing(5),
+  marginTop: theme.spacing(6),
+  marginBottom: theme.spacing(6),
+})
+
+globalStyle(`${readOnlyBlock} :where(code)`, {
+  color: theme.colors.foreground,
+  fontFamily: 'monospace',
+  fontSize: theme.fontSizes.xs,
+  fontWeight: theme.fontWeights.semibold,
+})
+
+globalStyle(`${readOnlyBlock}:first-child`, {
+  marginTop: theme.spacing(0),
+})
+
+globalStyle(`${readOnlyBlock}:last-child`, {
+  marginBottom: theme.spacing(0),
+})

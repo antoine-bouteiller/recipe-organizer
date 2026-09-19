@@ -1,3 +1,5 @@
+import { $createListItemNode, $createListNode, ListItemNode, ListNode } from '@lexical/list'
+import { $createHeadingNode, $createQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ArrowCounterClockwiseIcon } from '@recipe-organizer/design-system/icons/arrow-counter-clockwise'
 import { ArrowUUpRightIcon } from '@recipe-organizer/design-system/icons/arrow-u-up-right'
 import { ListBulletsIcon } from '@recipe-organizer/design-system/icons/list-bullets'
@@ -7,6 +9,7 @@ import { TextUnderlineIcon } from '@recipe-organizer/design-system/icons/text-un
 import { Toolbar, ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
 import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
+import { $createParagraphNode, $createTextNode, $getRoot, createEditor } from 'lexical'
 import { useState, type ReactElement } from 'react'
 import { expect, within } from 'storybook/test'
 
@@ -45,6 +48,33 @@ const initialContent = JSON.stringify({
     version: 1,
   },
 })
+
+const proseEditor = createEditor({ nodes: [HeadingNode, QuoteNode, ListNode, ListItemNode] })
+proseEditor.update(
+  () => {
+    $getRoot().append(
+      $createHeadingNode('h2').append($createTextNode('Preparation')),
+      $createParagraphNode().append($createTextNode('Wash the vegetables before starting.')),
+      $createParagraphNode().append($createTextNode('Chop finely').toggleFormat('bold'), $createTextNode(' and cook gently.').toggleFormat('italic')),
+      $createListNode('bullet').append(
+        $createListItemNode().append($createTextNode('Carrots')),
+        $createListItemNode().append($createListNode('bullet').append($createListItemNode().append($createTextNode('Peeled and diced')))),
+        $createListItemNode().append($createTextNode('Onions'))
+      ),
+      $createHeadingNode('h3').append($createTextNode('Cooking')),
+      $createListNode('number', 3).append(
+        $createListItemNode().append($createTextNode('Heat the pan.')),
+        $createListItemNode().append($createTextNode('Add the vegetables.'))
+      ),
+      $createQuoteNode().append($createTextNode('Keep the heat low for a sweeter flavor.')),
+      $createListNode('check').append($createListItemNode(true).append($createTextNode('Ready to serve'))),
+      $createParagraphNode().append($createTextNode('Temperature: '), $createTextNode('180°C').toggleFormat('code')),
+      $createParagraphNode().append($createTextNode('Serve warm.'))
+    )
+  },
+  { discrete: true }
+)
+const proseContent = JSON.stringify(proseEditor.getEditorState().toJSON())
 
 const EditorToolbar = (): ReactElement => (
   <Toolbar aria-label="Text formatting tools">
@@ -143,6 +173,31 @@ export const Overview: Story = {
         <ReadingWidthEditor />
       </StorySection>
     </div>
+  ),
+}
+
+export const ReadOnlyProse: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const editor = canvas.getByRole('textbox')
+    await expect(editor).toHaveAttribute('contenteditable', 'false')
+    await expect(canvas.getByText('Wash the vegetables before starting.').closest('p')).toHaveStyle('margin-bottom: 16px')
+    await expect(canvas.getByText('Carrots').closest('ul')).toHaveStyle({ listStyleType: 'disc' })
+    const nestedList = canvas.getByText('Peeled and diced').closest('ul')
+    await expect(nestedList).toHaveStyle('list-style-type: disc; padding-inline-start: 22px')
+    await expect(nestedList?.parentElement).toHaveStyle({ listStyleType: 'none' })
+    await expect(canvas.getByText('Heat the pan.').closest('ol')).toHaveStyle({ listStyleType: 'decimal' })
+    await expect(canvas.getByText('Heat the pan.').closest('ol')).toHaveAttribute('start', '3')
+    await expect(canvas.getByText('Ready to serve').closest('ul')).toHaveStyle({ listStyleType: 'none' })
+    await expect(canvas.getByText('Keep the heat low for a sweeter flavor.').closest('blockquote')).toHaveStyle({ borderInlineStartWidth: '3px' })
+    await expect(canvas.getByText('180°C')).toHaveStyle({ fontFamily: 'monospace' })
+    await expect(canvas.getByRole('heading', { name: 'Preparation' })).toHaveStyle('margin-top: 0px')
+    await expect(canvas.getByText('Serve warm.').closest('p')).toHaveStyle('margin-bottom: 0px')
+  },
+  render: () => (
+    <Editor content={proseContent} readOnly>
+      <EditorContent width="reading" />
+    </Editor>
   ),
 }
 
