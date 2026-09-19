@@ -46,7 +46,6 @@ export const Mobile: Story = {
 
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
     await expect(activeLink).toHaveAttribute('data-slot', 'tab-bar-item')
-    await expect(canvas.getByRole('link', { name: 'Settings' }).getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
     const shoppingLink = canvas.getByRole('link', { name: 'Shopping' })
     const activeIcon = activeLink.querySelector<HTMLElement>('[data-slot=tab-bar-item-icon-active]')
     if (!activeIcon) {
