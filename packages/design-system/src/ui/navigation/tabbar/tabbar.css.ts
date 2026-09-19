@@ -26,6 +26,9 @@ export const tabBarItem = style({
       color: theme.colors.primary,
       fontWeight: theme.fontWeights.semibold,
     },
+    '&:is(:active, [data-active])': {
+      vars: { '--owner-icon-opacity': '0.8' },
+    },
     '&:is(:focus-visible, [data-focus-visible])': {
       outline: `2px solid ${theme.colors.ring}`,
       outlineOffset: '-2px',
@@ -68,7 +71,7 @@ export const iconSlot = style({
       position: 'absolute',
       transition: `opacity 150ms ${theme.easings['in-out']}`,
     },
-    [`${tabBarItem}:is(:focus-visible, [data-focus-visible], :active, [data-active]) &::before`]: {
+    [`${tabBarItem}:is(:focus-visible, [data-focus-visible]) &::before`]: {
       opacity: 0.12,
     },
   },
