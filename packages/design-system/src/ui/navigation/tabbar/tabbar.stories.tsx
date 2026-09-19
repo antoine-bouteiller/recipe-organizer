@@ -58,6 +58,20 @@ export const Mobile: Story = {
     await expect(shoppingLink.querySelector('[data-slot=tab-bar-item-icon-inactive]')).toBeVisible()
     await userEvent.tab()
     await expect(activeLink).toHaveFocus()
+
+    await userEvent.click(shoppingLink)
+    await expect(shoppingLink).toHaveAttribute('aria-current', 'page')
+    await expect(activeIcon).not.toBeVisible()
+    const selectedIcon = shoppingLink.querySelector<HTMLElement>('[data-slot=tab-bar-item-icon-active]')
+    if (!selectedIcon) {
+      throw new Error('TabBar requires an active icon slot')
+    }
+    await expect(selectedIcon).toBeVisible()
+
+    await userEvent.click(activeLink)
+    await expect(activeLink).toHaveAttribute('aria-current', 'page')
+    await expect(activeIcon).toBeVisible()
+    await expect(selectedIcon).not.toBeVisible()
   },
 }
 

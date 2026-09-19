@@ -1,5 +1,5 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { style, globalStyle } from '@vanilla-extract/css'
+import { style, globalStyle, keyframes } from '@vanilla-extract/css'
 
 export const element = style({
   alignItems: 'center',
@@ -84,12 +84,29 @@ export const iconSlot = style({
   },
 })
 
+const indicatorEnter = keyframes({
+  from: { opacity: 0, transform: 'scaleX(0.4)' },
+  to: { opacity: 1, transform: 'scaleX(1)' },
+})
+
 export const activeIconSlot = style([
   iconSlot,
   {
-    backgroundColor: theme.colors.primary,
     color: `color-mix(in srgb, ${theme.colors.primary} 15%, ${theme.colors['primary-foreground']})`,
     display: 'none',
+    isolation: 'isolate',
+    selectors: {
+      '&::after': {
+        animation: `${indicatorEnter} 200ms cubic-bezier(0.4, 0, 0.2, 1)`,
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.radius.full,
+        content: '""',
+        inset: 0,
+        pointerEvents: 'none',
+        position: 'absolute',
+        zIndex: -1,
+      },
+    },
   },
 ])
 
