@@ -13,7 +13,7 @@ export const group = style({
   selectors: {
     '&:focus-within': {
       borderColor: theme.colors.ring,
-      boxShadow: theme.shadows.focus,
+      boxShadow: theme.shadows.ring,
     },
     '&:focus-within:has([aria-invalid])': {
       borderColor: `color-mix(in srgb, ${theme.colors.destructive} 64%, transparent)`,

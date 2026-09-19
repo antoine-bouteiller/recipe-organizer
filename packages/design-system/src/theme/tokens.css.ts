@@ -212,8 +212,9 @@ const tokenValues = {
   },
   shadows: {
     none: 'none',
-    focus: `0 0 0 3px ${palette.teal[700]}`,
+    ring: `0 0 0 1px color-mix(in srgb, ${palette.teal[700]} 24%, transparent)`,
     invalid: `0 0 0 3px ${palette.red[500]}`,
+    ringInvalid: `0 0 0 1px color-mix(in srgb, ${palette.red[500]} 24%, transparent)`,
     edge: `0 1px color-mix(in oklab, ${palette.black} 4%, transparent)`,
     overlay: '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
     '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
@@ -250,7 +251,6 @@ globalStyle('.dark', {
     [vars.colors['secondary-foreground']]: palette.zinc[100],
     [vars.colors['success-foreground']]: palette.emerald[400],
     [vars.colors['warning-foreground']]: palette.amber[400],
-    [vars.shadows.focus]: `0 0 0 3px ${palette.neutral[500]}`,
     [vars.shadows.edge]: `0 -1px color-mix(in oklab, ${palette.white} 6%, transparent)`,
   },
 })

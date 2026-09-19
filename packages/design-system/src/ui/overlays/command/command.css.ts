@@ -8,10 +8,9 @@ export const inputGroup = recipe({
       '&:has(:disabled)': {
         opacity: 0.64,
       },
-      '&:not(:has(> [data-width=full]))': {
-        width: 'fit-content',
-      },
     },
+    backgroundColor: 'transparent',
+    borderRadius: theme.radius.lg,
     color: theme.colors.foreground,
     position: 'relative',
     width: '100%',

@@ -14,11 +14,12 @@ export const inputSurface = style({
     },
     '&:has(:focus-visible)': {
       borderColor: theme.colors.ring,
-      boxShadow: theme.shadows.focus,
+      boxShadow: theme.shadows.ring,
+      borderWidth: '1px',
     },
     '&:has(:focus-visible):has([aria-invalid=true])': {
       borderColor: `color-mix(in srgb, ${theme.colors.destructive} 64%, transparent)`,
-      boxShadow: theme.shadows.invalid,
+      boxShadow: theme.shadows.ringInvalid,
     },
     '&:has([aria-invalid=true])': {
       borderColor: `color-mix(in srgb, ${theme.colors.destructive} 36%, transparent)`,

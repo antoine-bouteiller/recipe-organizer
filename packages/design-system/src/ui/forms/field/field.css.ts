@@ -17,7 +17,7 @@ const dropzone = {
   position: 'relative',
   selectors: {
     '&:has(input:disabled)': { opacity: 0.5, pointerEvents: 'none' },
-    '&:has(input:focus)': { borderColor: theme.colors.ring, boxShadow: theme.shadows.focus },
+    '&:has(input:focus)': { borderColor: theme.colors.ring, boxShadow: theme.shadows.ring },
     '&:hover': { backgroundColor: `color-mix(in srgb, ${theme.colors.accent} 50%, transparent)` },
     '&[data-invalid]': { borderColor: theme.colors.destructive },
   },

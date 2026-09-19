@@ -26,7 +26,7 @@ export const selectTrigger = style({
   position: 'relative',
   selectors: {
     '&::before': { borderRadius: theme.radius.lg, content: '', inset: 0, pointerEvents: 'none', position: 'absolute' },
-    '&:focus-visible': { borderColor: theme.colors.ring, boxShadow: theme.shadows.focus },
+    '&:focus-visible': { borderColor: theme.colors.ring, boxShadow: theme.shadows.ring },
     '&:focus-visible[aria-invalid]': {
       borderColor: `color-mix(in srgb, ${theme.colors.destructive} 64%, transparent)`,
       boxShadow: theme.shadows.invalid,

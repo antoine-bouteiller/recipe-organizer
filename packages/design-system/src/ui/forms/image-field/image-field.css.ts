@@ -79,7 +79,7 @@ export const element = style({
   selectors: {
     '&:is(:focus-visible, [data-focus-visible])': {
       borderColor: theme.colors.ring,
-      boxShadow: theme.shadows.focus,
+      boxShadow: theme.shadows.ring,
     },
     '&:hover': {
       '@media': {

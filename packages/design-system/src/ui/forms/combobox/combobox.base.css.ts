@@ -1,16 +1,9 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style, globalStyle } from '@vanilla-extract/css'
 
-export const inputGroup = style({
-  selectors: {
-    '&:has(:disabled)': {
-      opacity: 0.64,
-    },
-  },
-  color: theme.colors.foreground,
-  position: 'relative',
-  width: '100%',
-})
+import { inputSurface } from '../input/input-surface.css'
+
+export const inputGroup = style([inputSurface])
 
 export const input = style({
   selectors: {
@@ -18,10 +11,14 @@ export const input = style({
       opacity: 1,
     },
     '&:has(+ [data-slot="combobox-trigger"], + [data-slot="combobox-clear"])': {
-      paddingInlineEnd: theme.spacing(7),
+      paddingInlineEnd: theme.spacing(9),
+    },
+    '&::placeholder, &[data-placeholder]': {
+      color: `color-mix(in srgb, ${theme.colors['muted-foreground']} 72%, transparent)`,
     },
   },
   backgroundColor: 'transparent',
+  borderRadius: theme.radius.inherit,
   height: theme.spacing(8.5),
   lineHeight: '34px',
   minWidth: theme.spacing(0),
@@ -76,7 +73,7 @@ export const action = style({
   outline: '2px solid transparent',
   outlineOffset: '2px',
   position: 'absolute',
-  right: '.5',
+  insetInlineEnd: theme.spacing(0.5),
   top: '50%',
   transform: 'translateY(-50%)',
   transitionDuration: '150ms',

@@ -179,8 +179,9 @@ Coherence follows semantic roles, not a universal radius or border. Use existing
 | Navigation         | TabBar uses `background`, inactive `muted-foreground`, and an `accent` / `accent-foreground` selection capsule. Tabs use a `muted` track, `muted-foreground` text, and a moving `card` / `card-foreground` selection. | TabBar keeps its elevation, 64px plus safe-area footprint and mobile-only behavior. Desktop Navbar keeps its primary underline; swipe/indicator geometry remains unchanged.                                                                                               |
 | Borders and state  | Structural card/menu borders and separators use 1px `border`; keyboard focus uses 2px `ring`.                                                                                                                         | Keep filled/ghost controls without decorative borders, destructive borders and checkbox/radio state outlines. Preserve translucent state overlays over opaque backing, disabled feedback, and border-compensated padding. Inset shapes reuse their parent's radius token. |
 
-Shared shadow roles stay minimal: `shadows.focus` and `.invalid` use solid semantic colors for 3px
-rings; `.edge` supplies the subtle light/dark surface edge. Components reuse these roles rather than
+Shared shadow roles stay minimal: `shadows.ring` supplies the 1px translucent focus ring, while
+`.ringInvalid` supplies its invalid counterpart and `.invalid` retains the solid 3px invalid ring;
+`.edge` supplies the subtle light/dark surface edge. Components reuse these roles rather than
 creating opacity variants, and retain the existing elevation scale. Unmatched fixed font sizes and
 radii use the nearest existing token, rounding equal-distance choices upward.
 
@@ -217,6 +218,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-18 | Add safe-area/reset tokens, consolidate shadows, normalize unmatched sizes, and prune unused resets. | §6.1, §6.5        | Enforce a minimal token vocabulary while preserving native semantics and focus contrast. |
 | 2026-09-18 | Allow typed TanStack Router navigation in reusable DS components.                                    | §3, §6.4, §7      | Move router-only navigation/layout/error components into DS without moving app policy.   |
 | 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4              | Routes compose styled components rather than owning styles.                              |
+| 2026-09-18 | Consolidate focus shadows on `shadows.ring`.                                                         | §6.5              | Remove the redundant focus token and use the same ring across controls.                  |
 
 ## 8. Open Questions
 
