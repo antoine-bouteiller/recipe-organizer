@@ -18,6 +18,6 @@ export const badge = styleVariants({
   fish: [base, { backgroundColor: theme.colors['info-subtle'], color: theme.colors['info-subtle-foreground'] }],
   meat: [base, { backgroundColor: theme.colors['destructive-subtle'], color: theme.colors['destructive-subtle-foreground'] }],
   other: [base, { backgroundColor: theme.colors['neutral-subtle'], color: theme.colors['neutral-subtle-foreground'] }],
-  spices: [base],
+  spices: [base, { backgroundColor: theme.colors['warning-subtle'], color: theme.colors['warning-subtle-foreground'] }],
   vegetables: [base, { backgroundColor: theme.colors['success-subtle'], color: theme.colors['success-subtle-foreground'] }],
 })

@@ -74,9 +74,9 @@ The color `palette` stays private: neither numbered shades nor black/white primi
 emitted as CSS variables. The custom `teal` scale retains the existing blue-green brand values.
 Dark overrides use palette primitives, with white opacity derived via `color-mix`; the sparse custom
 shades preserve existing surface and text colors rather than substituting standard shades.
-Generic background/foreground pairs (`info-subtle`, `destructive-subtle`, `neutral-subtle`, and
-`success-subtle`) are reusable across components. Ingredient badges map categories to those roles;
-spices retain their inherited appearance. Color roles never include badge or category names.
+Generic background/foreground pairs (`info-subtle`, `destructive-subtle`, `neutral-subtle`,
+`success-subtle`, and `warning-subtle`) are reusable across components. Ingredient badges map categories
+to those roles; spices use the amber `warning-subtle` pair. Color roles never include badge or category names.
 `shadow`, `highlight`, `scrim`, and `inverse-foreground` supply fixed depth, lighting, dimming, and
 high-contrast text colors without following the light/dark foreground swap.
 
@@ -219,6 +219,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-18 | Allow typed TanStack Router navigation in reusable DS components.                                    | §3, §6.4, §7      | Move router-only navigation/layout/error components into DS without moving app policy.   |
 | 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4              | Routes compose styled components rather than owning styles.                              |
 | 2026-09-18 | Consolidate focus shadows on `shadows.ring`.                                                         | §6.5              | Remove the redundant focus token and use the same ring across controls.                  |
+| 2026-09-19 | Add the warning-subtle color pair for spice badges.                                                  | §6.1              | Give spices a readable amber category treatment.                                         |
 
 ## 8. Open Questions
 

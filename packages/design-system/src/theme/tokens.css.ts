@@ -143,6 +143,8 @@ const tokenValues = {
     'success-subtle-foreground': palette.emerald[600],
     warning: palette.amber[500],
     'warning-foreground': palette.amber[700],
+    'warning-subtle': palette.amber[100],
+    'warning-subtle-foreground': palette.amber[800],
   },
   easings: {
     in: 'cubic-bezier(0.4, 0, 1, 1)',
