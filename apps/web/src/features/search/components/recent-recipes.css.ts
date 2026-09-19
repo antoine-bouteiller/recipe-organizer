@@ -29,9 +29,3 @@ export const heading = style({
   letterSpacing: theme.letterSpacings.wider,
   textTransform: 'uppercase',
 })
-
-export const element = style({
-  color: theme.colors.primary,
-  fontSize: theme.fontSizes.sm,
-  fontWeight: theme.fontWeights.semibold,
-})

@@ -1,19 +1,32 @@
+import { createUserOptions, userSchema, type UserFormInput } from '@client/features/users/api/create'
 import { getUserListOptions } from '@client/features/users/api/get-all'
-import { AddUser } from '@client/features/users/components/add-user'
 import { ApproveUser } from '@client/features/users/components/approve-user'
 import { BlockUser } from '@client/features/users/components/block-user'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
+import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
+import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { revalidateLogic } from '@tanstack/react-form'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useSelector } from '@tanstack/react-store'
 import React, { useState } from 'react'
 
 import * as styles from './users-management.css'
 
 const USER_TABS = ['active', 'pending', 'blocked'] as const
+const userDefaultValues: UserFormInput = {
+  email: '',
+  role: 'user',
+}
+const roleOptions = [
+  { label: 'Utilisateur', value: 'user' },
+  { label: 'Administrateur', value: 'admin' },
+]
+const FormDialog = getFormDialog(userDefaultValues)
 const roleLabels = new Map([
   ['admin', 'Admin'],
   ['user', 'Utilisateur'],
@@ -55,20 +68,57 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
 }
 
 export const UsersManagement = () => {
+  const createMutation = useMutation(createUserOptions())
+  const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const form = useAppForm({
+    defaultValues: userDefaultValues,
+    onSubmit: async ({ value }) => {
+      await createMutation.mutateAsync(
+        {
+          data: userSchema.parse(value),
+        },
+        {
+          onSuccess: () => {
+            form.reset()
+            setOpen(false)
+          },
+        }
+      )
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: userSchema,
+    },
+  })
+  const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
+  const { AppField } = form
+
   return (
     <>
       <div className={styles.searchBar}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
-        <AddUser>
-          <Button aria-label="Ajouter un utilisateur" size="icon-lg" variant="outline">
-            <PlusIcon />
-          </Button>
-        </AddUser>
+        <FormDialog
+          form={form}
+          open={open}
+          setOpen={setOpen}
+          submitLabel="Ajouter"
+          title="Ajouter un utilisateur"
+          trigger={
+            <Button aria-label="Ajouter un utilisateur" size="icon-lg" variant="outline">
+              <PlusIcon />
+            </Button>
+          }
+        >
+          <AppField name="email">
+            {({ TextField }) => <TextField disabled={isSubmitting} label="Email" placeholder="Ex: user@example.com" />}
+          </AppField>
+          <AppField name="role">{({ SelectField }) => <SelectField disabled={isSubmitting} items={roleOptions} label="Rôle" />}</AppField>
+        </FormDialog>
       </div>
       <div className={styles.tabs}>
         <SwipeTabs defaultTab="active" tabs={USER_TABS}>
-          <TabsList width="full">
+          <TabsList>
             <TabsTab value="active">Actifs</TabsTab>
             <TabsTab value="pending">En attente</TabsTab>
             <TabsTab value="blocked">Bloqués</TabsTab>

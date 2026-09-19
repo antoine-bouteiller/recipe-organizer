@@ -113,7 +113,7 @@ Queries use that parsed identifier, whether they run in a loader or inside the p
 
 The browser entry owns application mounting; the router provider owns the query context. The root
 route owns the outlet and composes navigation, search, and the theme toggle inside styled app-shell containers. The design
-system owns reusable router-aware chrome, navigation, screen layout, and default error presentation;
+system owns reusable router-aware navigation and screen layout; the app shell owns the single-use desktop navbar and the router owns its default error renderer;
 it does not import app or feature code. A page route owns screen selection, pending UI, route-specific
 layout inputs, and recipe/auth policy. Feature components own recipe cards, editors, settings controls,
 and all domain presentation. This division lets a layout consume router context without importing a
@@ -139,18 +139,20 @@ contract; browser page routes do not wrap it.
 
 Forward links request view transitions; the router determines back navigation from history indexes
 (`src/client/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
-transition support. `Navbar` and `TabBar` are DS router-aware components: items provide `label` and
-`linkProps` (`LinkOptions`), TabBar items provide inactive and active icons, and Navbar provides an actions slot.
+transition support. `TabBar` is a DS router-aware component: items provide `label`, `linkProps`
+(`LinkOptions`), and inactive/active icons. The desktop navbar is inlined into `AppHeader`, whose children
+supply search and theme actions.
 The actual TanStack `Link` retains typed route parameters, search, modified clicks, preloading, refs,
 and view-transition behavior; do not replace it with a native anchor or a filtered `useLinkProps`
-adapter. Navbar defaults exact matching only for `/`; pages render
+adapter. The desktop navbar uses exact matching only for `/`; pages render
 `<TabBar items={mobileMenuItems} />` rather than a `pageKey`. Base UI `render` composition remains
 for Button and similar primitives.
 
 `ScreenLayout` calls `router.history.back()` for `withGoBack`, defaults its scroll IDs to
 `screen-inner` and `screen-outer`, and receives an explicit footer. Scroll restoration targets those
-containers (`src/client/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic. DS default error
-and not-found surfaces provide home Links and French messages, with Error details only in development.
+containers (`src/client/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic.
+The default error callback in `apps/web/src/router.tsx` and shared DS `NotFound` provide home Links and
+French messages, with Error details only in development.
 Menus/filtering remain in `apps/web/src/components/navigation/constants.tsx`; `__root` composes the
 theme control and search inside styled app-shell containers. `FloatingAction` is generic (`label`, `linkProps`, `children`), while the
 index route owns recipe/auth policy. Router-dependent Storybook stories use a local memory-router
@@ -199,3 +201,4 @@ N/A
 | 2026-09-18 | Move reusable router-only presentation into the design system.                 | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
 | 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.     | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
 | 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.               | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |
+| 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.  | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |

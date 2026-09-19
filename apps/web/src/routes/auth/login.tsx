@@ -1,7 +1,6 @@
-import { GoogleSignInButton, LoginBackLink, LoginLayout } from '@client/features/auth/components/login-layout'
+import { LoginLayout } from '@client/features/auth/components/login-layout'
 import { authClient } from '@client/lib/auth/auth-client'
 import { loadAuthUser, resetAuthUserCache } from '@client/lib/auth/get-auth-user'
-import { Card } from '@recipe-organizer/design-system/card'
 import { toastManager } from '@recipe-organizer/design-system/toast'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useEffect } from 'react'
@@ -38,14 +37,7 @@ const LoginPage = () => {
     }
   }, [error])
 
-  return (
-    <LoginLayout>
-      <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
-        <GoogleSignInButton onSignIn={() => signInWithGoogle()} />
-        <LoginBackLink />
-      </Card>
-    </LoginLayout>
-  )
+  return <LoginLayout onSignIn={() => signInWithGoogle()} />
 }
 
 export const Route = createFileRoute('/auth/login')({

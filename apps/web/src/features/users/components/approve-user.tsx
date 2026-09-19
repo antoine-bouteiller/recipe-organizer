@@ -19,7 +19,7 @@ export const ApproveUser = ({ userId }: ApproveUserProps) => {
   }
 
   return (
-    <Button disabled={isPending} onClick={handleApprove} size="icon" variant="default">
+    <Button aria-label="Approuver l'utilisateur" disabled={isPending} onClick={handleApprove} size="icon" variant="default">
       <CheckIcon />
     </Button>
   )

@@ -8,9 +8,3 @@ export const container = style({
   minWidth: theme.spacing(0),
   width: '100%',
 })
-
-export const sizeOptions = style({
-  alignItems: 'center',
-  display: 'flex',
-  gap: theme.spacing(4),
-})

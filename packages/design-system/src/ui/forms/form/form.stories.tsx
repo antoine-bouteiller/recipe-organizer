@@ -1,9 +1,10 @@
+import { Field as FieldPrimitive } from '@base-ui/react/field'
 import { Button } from '@recipe-organizer/design-system/button'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type SubmitEvent, type ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { Field, FieldControl, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel } from '../field/field'
 import { Form } from './form'
 
 const RecipeForm = (): ReactElement => {
@@ -17,7 +18,7 @@ const RecipeForm = (): ReactElement => {
     <Form onSubmit={handleSubmit}>
       <Field name="recipeName">
         <FieldLabel>Recipe name</FieldLabel>
-        <FieldControl required />
+        <FieldPrimitive.Control data-slot="field-control" required />
         <FieldError match="valueMissing">A recipe name is required.</FieldError>
       </Field>
       <Button type="submit">Save recipe</Button>

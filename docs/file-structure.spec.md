@@ -161,13 +161,15 @@ matching category as its title prefix. Physical categorization does not change p
 `apps/web/src/components/` retains domain-specific ingredient-category presentation and app-owned
 navigation constants: menus and filtering stay in `navigation/constants.tsx`. Typed form adapters and
 their context/registry, file-input support, rich-text editing, generic dialogs, search input, icons,
-router-aware screen layout/navigation/error presentation, and generic `FloatingAction` live in the
-design system. The DS may depend on catalogued TanStack Router but never imports app or feature code:
-`Navbar`/`TabBar` use item `label`/`linkProps` (`LinkOptions`), with TabBar icons and a Navbar actions
-slot, and actual Links retain navigation semantics. Navbar defaults exact matching to `/` only;
+router-aware screen layout/navigation and not-found presentation live in the design system. Single-use
+desktop navigation is inlined into `AppHeader`, and the default error callback is inlined into
+`apps/web/src/router.tsx` with colocated `router.css.ts`. The command palette lives in the feature's
+`SearchBar`, reusing DS `ScrollArea`. The DS may depend on catalogued TanStack Router but never imports
+app or feature code. `TabBar` uses item `label`/`linkProps` (`LinkOptions`) and icons; actual Links retain
+navigation semantics. The desktop navbar uses exact matching to `/` only;
 `ScreenLayout` calls `router.history.back()` when `withGoBack`, defaults scroll IDs to `screen-inner`/
-`screen-outer`, and takes an explicit footer. Its error/not-found defaults provide home Links, French
-messages, and development-only Error details. Pages pass `mobileMenuItems` to TabBar; `__root`
+`screen-outer`, and takes an explicit footer. The router's error renderer and DS not-found component
+provide home Links and French messages, with Error details only in development. Pages pass `mobileMenuItems` to TabBar; `__root`
 composes theme toggle and search inside styled app-shell containers. Recipe/auth policy remains in the index route. Feature schemas,
 query-backed options, API calls, and persisted app state do not move.
 App-specific React hooks and persisted stores live in `apps/web/src/hooks/` and
@@ -215,3 +217,4 @@ N/A.
 | 2026-09-17 | Consolidate reset/base rules in `src/global.css.ts`. | 8.1 | Use one module and public entrypoint for shared global styles. |
 | 2026-09-18 | Move router-only reusable web presentation into the design system. | 8.1 | Permit typed DS navigation without moving application policy or feature code. |
 | 2026-09-18 | Extract styled sections and containers while retaining route composition. | 8.1 | Keep routes unstyled and component styles colocated with their owners. |
+| 2026-09-19 | Inline single-use navbar, error, and command components into app owners. | 8.1 | Keep the DS surface backed by production reuse. |

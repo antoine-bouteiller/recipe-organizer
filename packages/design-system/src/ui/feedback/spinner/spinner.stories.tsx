@@ -18,13 +18,6 @@ export const Overview: Story = {
       <StorySection title="Default">
         <Spinner />
       </StorySection>
-      <StorySection title="Sizes">
-        <div className={styles.sizeOptions}>
-          <Spinner size="sm" />
-          <Spinner size="md" />
-          <Spinner size="lg" />
-        </div>
-      </StorySection>
     </div>
   ),
 }

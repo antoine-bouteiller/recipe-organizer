@@ -1,10 +1,12 @@
-import { DefaultErrorComponent } from '@recipe-organizer/design-system/default-error-component'
+import { Button } from '@recipe-organizer/design-system/button'
 import { NotFound } from '@recipe-organizer/design-system/not-found'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRouter, isRedirect } from '@tanstack/react-router'
+import { createRouter, isRedirect, Link } from '@tanstack/react-router'
 import * as z from 'zod'
 
 import { routeTree } from './routeTree.gen'
+
+import * as styles from './router.css'
 
 declare module '@tanstack/react-router' {
   interface Register {
@@ -33,7 +35,27 @@ export const getRouter = () => {
       queryClient,
       theme: 'light' as const,
     },
-    defaultErrorComponent: DefaultErrorComponent,
+    defaultErrorComponent: ({ error }) => {
+      const details = import.meta.env.DEV && error instanceof Error ? error.message : undefined
+
+      return (
+        <div className={styles.root} role="alert">
+          <h1 className={styles.heading}>Whoops!</h1>
+          <div className={styles.body}>
+            <h2 className={styles.subheading}>Une erreur est survenue</h2>
+            <p>Une erreur est survenue lors du chargement de la page, nous vous suggérons de revenir à la page d'accueil.</p>
+          </div>
+          {details && (
+            <div className={styles.details}>
+              <code>{details}</code>
+            </div>
+          )}
+          <Button render={<Link to="/" />} size="lg">
+            Retour à la page d'accueil
+          </Button>
+        </div>
+      )
+    },
     defaultNotFoundComponent: NotFound,
     defaultPendingMs: 100,
     defaultPreload: 'intent',

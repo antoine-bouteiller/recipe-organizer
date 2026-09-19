@@ -5,13 +5,11 @@ import { ProhibitIcon } from '@recipe-organizer/design-system/icons/prohibit'
 import { useMutation } from '@tanstack/react-query'
 
 interface BlockUserProps {
-  onOpenChange?: (open: boolean) => void
-  open?: boolean
   userEmail: string
   userId: string
 }
 
-export const BlockUser = ({ onOpenChange, open, userEmail, userId }: BlockUserProps) => {
+export const BlockUser = ({ userEmail, userId }: BlockUserProps) => {
   const blockMutation = useMutation(blockUserOptions())
 
   const handleBlock = () => blockMutation.mutate({ data: { id: userId } })
@@ -22,10 +20,8 @@ export const BlockUser = ({ onOpenChange, open, userEmail, userId }: BlockUserPr
       description={`Êtes-vous sûr de vouloir bloquer l'utilisateur ${userEmail} ?`}
       icon={ProhibitIcon}
       onDelete={handleBlock}
-      onOpenChange={onOpenChange}
-      open={open}
       title="Bloquer l'utilisateur"
-      trigger={<Button size="icon" variant="destructive-outline" />}
+      trigger={<Button aria-label="Bloquer l'utilisateur" size="icon" variant="destructive-outline" />}
     />
   )
 }

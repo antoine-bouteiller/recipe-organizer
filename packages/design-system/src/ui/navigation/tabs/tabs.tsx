@@ -4,9 +4,9 @@ import React, { createContext, useContext } from 'react'
 
 import * as styles from './tabs.css'
 
-export type TabsListProps = Pick<TabsPrimitive.List.Props, 'aria-label' | 'children'> & { width?: 'fit' | 'full' }
-export const TabsList = ({ 'aria-label': ariaLabel, children, width = 'fit' }: TabsListProps): React.ReactElement => (
-  <TabsPrimitive.List aria-label={ariaLabel} className={styles.list({ width })} data-slot="tabs-list">
+export type TabsListProps = Pick<TabsPrimitive.List.Props, 'aria-label' | 'children'>
+export const TabsList = ({ 'aria-label': ariaLabel, children }: TabsListProps): React.ReactElement => (
+  <TabsPrimitive.List aria-label={ariaLabel} className={styles.list()} data-slot="tabs-list">
     <>
       {children}
       <TabsPrimitive.Indicator className={styles.indicator()} data-slot="tab-indicator" />

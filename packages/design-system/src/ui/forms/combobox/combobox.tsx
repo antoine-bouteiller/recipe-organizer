@@ -34,8 +34,6 @@ interface ComboboxProps<TValue extends ValueOptions> {
 const ComboboxBase = lazy(() => import('./combobox.base'))
 const ComboboxDrawer = lazy(() => import('./combobox.drawer'))
 
-const ComboboxFallback = (): ReactElement => <div aria-hidden="true" className={styles.fallback} />
-
 const Combobox = <TValue extends ValueOptions>({
   addNew,
   disabled,
@@ -63,7 +61,11 @@ const Combobox = <TValue extends ValueOptions>({
     title: title ?? placeholder,
   }
 
-  return <Suspense fallback={<ComboboxFallback />}>{isMobile ? <ComboboxDrawer {...implProps} /> : <ComboboxBase {...implProps} />}</Suspense>
+  return (
+    <Suspense fallback={<div aria-hidden="true" className={styles.fallback} />}>
+      {isMobile ? <ComboboxDrawer {...implProps} /> : <ComboboxBase {...implProps} />}
+    </Suspense>
+  )
 }
 
 export { Combobox }

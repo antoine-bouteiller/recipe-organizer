@@ -1,20 +1,13 @@
 import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'
 import { clearRecentRecipes, useRecentRecipeIds } from '@client/stores/recent-recipes.store'
 import { type ReducedRecipe } from '@client/types/recipe'
+import { Button } from '@recipe-organizer/design-system/button'
 
 import * as styles from './recent-recipes.css'
 
 export interface RecentRecipesProps {
   recipes: ReducedRecipe[]
 }
-
-const RecipeCardList = ({ recipes }: RecentRecipesProps) => (
-  <div className={styles.container}>
-    {recipes.map((recipe) => (
-      <RecipeSearchCard key={recipe.id} recipe={recipe} />
-    ))}
-  </div>
-)
 
 export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
   const recentRecipeIds = useRecentRecipeIds()
@@ -24,18 +17,28 @@ export const RecentRecipes = ({ recipes }: RecentRecipesProps) => {
     .filter((recipe): recipe is ReducedRecipe => recipe !== undefined)
 
   if (recentRecipes.length === 0) {
-    return <RecipeCardList recipes={recipes} />
+    return (
+      <div className={styles.container}>
+        {recipes.map((recipe) => (
+          <RecipeSearchCard key={recipe.id} recipe={recipe} />
+        ))}
+      </div>
+    )
   }
 
   return (
     <div className={styles.recentRecipes}>
       <div className={styles.recentRecipesHeader}>
         <h2 className={styles.heading}>Recherches récentes</h2>
-        <button className={styles.element} onClick={clearRecentRecipes} type="button">
+        <Button onClick={clearRecentRecipes} size="sm" variant="ghost">
           Effacer
-        </button>
+        </Button>
       </div>
-      <RecipeCardList recipes={recentRecipes} />
+      <div className={styles.container}>
+        {recentRecipes.map((recipe) => (
+          <RecipeSearchCard key={recipe.id} recipe={recipe} />
+        ))}
+      </div>
     </div>
   )
 }

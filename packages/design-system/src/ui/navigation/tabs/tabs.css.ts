@@ -18,19 +18,8 @@ export const list = recipe({
     justifyContent: 'center',
     padding: theme.spacing(0.5),
     position: 'relative',
-    width: 'fit-content',
+    width: '100%',
     zIndex: 0,
-  },
-  defaultVariants: {
-    width: 'fit',
-  },
-  variants: {
-    width: {
-      fit: {},
-      full: {
-        width: '100%',
-      },
-    },
   },
 })
 

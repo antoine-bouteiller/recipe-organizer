@@ -26,11 +26,3 @@ export const description = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.sm,
 })
-
-export const verticalExample = style({
-  alignItems: 'center',
-  display: 'flex',
-  fontSize: theme.fontSizes.sm,
-  gap: theme.spacing(3),
-  height: theme.spacing(8),
-})

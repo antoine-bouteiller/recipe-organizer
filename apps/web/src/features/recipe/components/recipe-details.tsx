@@ -1,19 +1,22 @@
+import { deleteRecipeOptions } from '@client/features/recipe/api/delete'
 import { type Recipe } from '@client/features/recipe/api/get-one'
-import DeleteRecipe from '@client/features/recipe/components/delete-recipe'
 import { recipeNodes } from '@client/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
+import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
 import { Editor, EditorContent } from '@recipe-organizer/design-system/editor'
 import { DotsThreeVerticalIcon } from '@recipe-organizer/design-system/icons/dots-three-vertical'
 import { PencilSimpleIcon } from '@recipe-organizer/design-system/icons/pencil-simple'
 import { Popover } from '@recipe-organizer/design-system/popover'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
+import { toastManager } from '@recipe-organizer/design-system/toast'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
-import { Link } from '@tanstack/react-router'
+import { useMutation } from '@tanstack/react-query'
+import { Link, useRouter } from '@tanstack/react-router'
 
 import * as styles from './recipe-details.css'
 
@@ -30,28 +33,58 @@ export const RecipeDetailsSkeleton = () => (
   </>
 )
 
-export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe }) => (
-  <Popover
-    trigger={
-      <Button size="icon" variant="ghost">
-        <DotsThreeVerticalIcon weight="bold" />
-      </Button>
-    }
-  >
-    <div className={styles.managementActions}>
-      <Button
-        align="start"
-        render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
-        variant="list-action"
-        width="full"
-      >
-        <PencilSimpleIcon size="sm" />
-        Modifier la recette
-      </Button>
-      <DeleteRecipe recipeId={recipe.id} recipeName={recipe.name} />
-    </div>
-  </Popover>
-)
+export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe }) => {
+  const { mutateAsync: deleteRecipe } = useMutation(deleteRecipeOptions())
+  const router = useRouter()
+
+  const handleDelete = () =>
+    deleteRecipe(
+      { data: recipe.id },
+      {
+        onError: () =>
+          toastManager.add({
+            description: 'Une erreur est survenue lors de la suppression de la recette',
+            type: 'error',
+          }),
+        onSuccess: () => {
+          toastManager.add({
+            title: 'Recette supprimée avec succès',
+            type: 'success',
+          })
+          void router.navigate({ to: '/' })
+        },
+      }
+    )
+
+  return (
+    <Popover
+      trigger={
+        <Button size="icon" variant="ghost">
+          <DotsThreeVerticalIcon weight="bold" />
+        </Button>
+      }
+    >
+      <div className={styles.managementActions}>
+        <Button
+          align="start"
+          render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
+          variant="list-action"
+          width="full"
+        >
+          <PencilSimpleIcon size="sm" />
+          Modifier la recette
+        </Button>
+        <DeleteDialog
+          deleteButtonLabel="Supprimer la recette"
+          description={`Êtes-vous sûr de vouloir supprimer la recette ${recipe.name}?`}
+          onDelete={handleDelete}
+          title="Supprimer la recette"
+          trigger={<Button variant="destructive-ghost" />}
+        />
+      </div>
+    </Popover>
+  )
+}
 
 export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Recipe; readonly recipeId: number }) => {
   const ingredientGroups = [
@@ -83,7 +116,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
       <div className={styles.detailsContent}>
         <div className={styles.mobileTabs}>
           <SwipeTabs defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
-            <TabsList width="full">
+            <TabsList>
               <TabsTab value="ingredients">Ingrédients</TabsTab>
               <TabsTab value="preparation">Préparation</TabsTab>
             </TabsList>

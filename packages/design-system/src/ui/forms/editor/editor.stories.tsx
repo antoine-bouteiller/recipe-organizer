@@ -1,3 +1,4 @@
+import { Toolbar as ToolbarPrimitive } from '@base-ui/react/toolbar'
 import { $createListItemNode, $createListNode, ListItemNode, ListNode } from '@lexical/list'
 import { $createHeadingNode, $createQuoteNode, HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { ArrowCounterClockwiseIcon } from '@recipe-organizer/design-system/icons/arrow-counter-clockwise'
@@ -6,7 +7,7 @@ import { ListBulletsIcon } from '@recipe-organizer/design-system/icons/list-bull
 import { TextBolderIcon } from '@recipe-organizer/design-system/icons/text-bolder'
 import { TextItalicIcon } from '@recipe-organizer/design-system/icons/text-italic'
 import { TextUnderlineIcon } from '@recipe-organizer/design-system/icons/text-underline'
-import { Toolbar, ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
+import { ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
 import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { $createParagraphNode, $createTextNode, $getRoot, createEditor } from 'lexical'
@@ -15,6 +16,7 @@ import { expect, within } from 'storybook/test'
 
 import { Editor, EditorContent, EditorToolbarButton } from './editor'
 
+import * as fieldStyles from '../editor-field/editor-field.css'
 import * as styles from './editor.stories.css'
 
 const initialContent = JSON.stringify({
@@ -77,7 +79,7 @@ proseEditor.update(
 const proseContent = JSON.stringify(proseEditor.getEditorState().toJSON())
 
 const EditorToolbar = (): ReactElement => (
-  <Toolbar aria-label="Text formatting tools">
+  <ToolbarPrimitive.Root aria-label="Text formatting tools" className={fieldStyles.toolbar}>
     <ToolbarGroup aria-label="History">
       <EditorToolbarButton command="undo">
         <ArrowCounterClockwiseIcon aria-hidden="true" />
@@ -101,7 +103,7 @@ const EditorToolbar = (): ReactElement => (
         <ListBulletsIcon aria-hidden="true" />
       </EditorToolbarButton>
     </ToolbarGroup>
-  </Toolbar>
+  </ToolbarPrimitive.Root>
 )
 
 const ControlledEditor = (): ReactElement => {

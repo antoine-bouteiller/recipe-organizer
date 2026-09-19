@@ -10,38 +10,6 @@ const GoBackButton = ({ onBack }: { onBack: () => void }) => (
   </Button>
 )
 
-interface ScreenHeaderProps {
-  backgroundImage?: string
-  headerEndItem?: React.ReactNode
-  title: string
-  onBack?: () => void
-}
-
-const ScreenHeader = ({ backgroundImage, headerEndItem, title, onBack }: ScreenHeaderProps): React.ReactElement => {
-  if (backgroundImage) {
-    return (
-      <div className={styles.imageHeader()}>
-        <img alt="" className={styles.image()} src={backgroundImage} />
-        <div className={styles.imageOverlay()} />
-        {onBack && (
-          <span className={styles.imageBack()}>
-            <GoBackButton onBack={onBack} />
-          </span>
-        )}
-        <h1 className={styles.imageTitle()}>{title}</h1>
-        {headerEndItem && <div className={styles.imageAction()}>{headerEndItem}</div>}
-      </div>
-    )
-  }
-  return (
-    <div className={styles.header()}>
-      {onBack && <GoBackButton onBack={onBack} />}
-      <h1 className={styles.title()}>{title}</h1>
-      {headerEndItem && <div className={styles.headerAction()}>{headerEndItem}</div>}
-    </div>
-  )
-}
-
 export type ScreenLayoutProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   backgroundImage?: string
   footer?: React.ReactNode
@@ -64,7 +32,25 @@ export const ScreenLayout = ({
 }: ScreenLayoutProps): React.ReactElement => {
   const router = useRouter()
   const onBack = withGoBack ? () => router.history.back() : undefined
-  const header = <ScreenHeader backgroundImage={backgroundImage} headerEndItem={headerEndItem} onBack={onBack} title={title} />
+  const header = backgroundImage ? (
+    <div className={styles.imageHeader()}>
+      <img alt="" className={styles.image()} src={backgroundImage} />
+      <div className={styles.imageOverlay()} />
+      {onBack && (
+        <span className={styles.imageBack()}>
+          <GoBackButton onBack={onBack} />
+        </span>
+      )}
+      <h1 className={styles.imageTitle()}>{title}</h1>
+      {headerEndItem && <div className={styles.imageAction()}>{headerEndItem}</div>}
+    </div>
+  ) : (
+    <div className={styles.header()}>
+      {onBack && <GoBackButton onBack={onBack} />}
+      <h1 className={styles.title()}>{title}</h1>
+      {headerEndItem && <div className={styles.headerAction()}>{headerEndItem}</div>}
+    </div>
+  )
   return (
     <div
       className={styles.screen()}

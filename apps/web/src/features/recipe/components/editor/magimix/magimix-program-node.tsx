@@ -72,24 +72,6 @@ interface MagimixProgramComponentProps {
 const toProgram = (value: string) => magimixProgram.find((item) => item === value) ?? 'expert'
 const toRotationSpeed = (value: string) => allowedRotationSpeed.find((item) => item === value) ?? 'auto'
 
-const MagimixItem = ({ program, rotationSpeed, temperature, time }: Omit<MagimixProgramComponentProps, 'isEditable' | 'nodeKey'>) => (
-  <div className={styles.magimixItemWidth} data-editor-decorator="">
-    <Item
-      media={<img alt="Magimix Program Icon" className={styles.magimixImage} src={`/magimix/${program}.png`} />}
-      title={magimixProgramLabels[toProgram(program)]}
-      variant="outline"
-    >
-      <TimerIcon size="sm" />
-      <span>{formatTime(time)}</span>/
-      <SpinnerGapIcon size="sm" />
-      <span>{capitalize(rotationSpeed)}</span>
-      /
-      <ThermometerIcon size="sm" />
-      <span>{temperature ?? '__'}°C</span>
-    </Item>
-  </div>
-)
-
 const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, temperature, time }: MagimixProgramComponentProps) => {
   const [editor] = useLexicalComposerContext()
 
@@ -114,7 +96,23 @@ const MagimixProgramComponent = ({ isEditable, nodeKey, program, rotationSpeed, 
     })
   }
 
-  const item = <MagimixItem program={program} rotationSpeed={rotationSpeed} time={time} temperature={temperature} />
+  const item = (
+    <div className={styles.magimixItemWidth} data-editor-decorator="">
+      <Item
+        media={<img alt="Magimix Program Icon" className={styles.magimixImage} src={`/magimix/${program}.png`} />}
+        title={magimixProgramLabels[toProgram(program)]}
+        variant="outline"
+      >
+        <TimerIcon size="sm" />
+        <span>{formatTime(time)}</span>/
+        <SpinnerGapIcon size="sm" />
+        <span>{capitalize(rotationSpeed)}</span>
+        /
+        <ThermometerIcon size="sm" />
+        <span>{temperature ?? '__'}°C</span>
+      </Item>
+    </div>
+  )
 
   if (isEditable) {
     return (

@@ -8,7 +8,6 @@ type FieldLabelProps = Pick<FieldPrimitive.Label.Props, 'children'> & {
   presentation?: 'dropzone-image' | 'dropzone-video'
 }
 type FieldErrorProps = Pick<FieldPrimitive.Error.Props, 'children' | 'match'>
-type FieldControlProps = Pick<FieldPrimitive.Control.Props, 'required'>
 
 export const Field = ({ children, dirty, disabled, invalid, name, touched }: FieldProps): React.ReactElement => (
   <FieldPrimitive.Root className={styles.field} data-slot="field" dirty={dirty} disabled={disabled} invalid={invalid} name={name} touched={touched}>
@@ -24,7 +23,4 @@ export const FieldError = ({ children, match }: FieldErrorProps): React.ReactEle
   <FieldPrimitive.Error className={styles.error} data-slot="field-error" match={match}>
     {children}
   </FieldPrimitive.Error>
-)
-export const FieldControl = ({ required }: FieldControlProps): React.ReactElement => (
-  <FieldPrimitive.Control data-slot="field-control" required={required} />
 )

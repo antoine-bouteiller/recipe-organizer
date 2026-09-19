@@ -1,29 +1,8 @@
-import { recipe } from '@vanilla-extract/recipes'
+import { style } from '@vanilla-extract/css'
 
-export const spinner = recipe({
-  base: {
-    animation: 'spin 1s linear infinite reverse',
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-  variants: {
-    size: {
-      lg: {
-        vars: {
-          '--owner-icon-size': '32px',
-        },
-      },
-      md: {
-        vars: {
-          '--owner-icon-size': '18px',
-        },
-      },
-      sm: {
-        vars: {
-          '--owner-icon-size': '16px',
-        },
-      },
-    },
+export const spinner = style({
+  animation: 'spin 1s linear infinite reverse',
+  vars: {
+    '--owner-icon-size': '18px',
   },
 })

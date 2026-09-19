@@ -3,8 +3,4 @@ import type React from 'react'
 
 import * as styles from './separator.css'
 
-export type SeparatorProps = Pick<SeparatorPrimitive.Props, 'orientation'>
-
-export const Separator = ({ orientation = 'horizontal' }: SeparatorProps): React.ReactElement => (
-  <SeparatorPrimitive className={styles.separator({ orientation })} data-slot="separator" orientation={orientation} />
-)
+export const Separator = (): React.ReactElement => <SeparatorPrimitive className={styles.separator} data-slot="separator" />

@@ -60,26 +60,6 @@ const filterNodes = (state: string, hideFirstNodes: number, hideLastNodes: numbe
   return JSON.stringify({ root: { ...parsedState.root, children: children.slice(startIndex, endIndex) } })
 }
 
-const SubrecipeInstructionsContent = ({
-  hideFirstNodes,
-  hideLastNodes,
-  instructions,
-}: {
-  hideFirstNodes: number
-  hideLastNodes: number
-  instructions: string
-}) => {
-  const filteredInstructions = filterNodes(instructions, hideFirstNodes, hideLastNodes)
-
-  return (
-    <Editor content={filteredInstructions} nodes={recipeNodes} readOnly>
-      <div className={styles.subrecipeContentInset}>
-        <EditorContent />
-      </div>
-    </Editor>
-  )
-}
-
 interface SubrecipeComponentProps {
   hideFirstNodes: number
   hideLastNodes: number
@@ -124,7 +104,11 @@ const SubrecipeComponent = ({ hideFirstNodes, hideLastNodes, isEditable, nodeKey
           <Spinner />
         </div>
       ) : (
-        <SubrecipeInstructionsContent hideFirstNodes={hideFirstNodes} hideLastNodes={hideLastNodes} instructions={recipe.instructions} />
+        <Editor content={filterNodes(recipe.instructions, hideFirstNodes, hideLastNodes)} nodes={recipeNodes} readOnly>
+          <div className={styles.subrecipeContentInset}>
+            <EditorContent />
+          </div>
+        </Editor>
       )}
     </div>
   )

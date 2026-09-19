@@ -25,13 +25,6 @@ export const Overview: Story = {
           <p className={styles.description}>Serves four people.</p>
         </div>
       </StorySection>
-      <StorySection title="Vertical">
-        <div className={styles.verticalExample}>
-          <span>Overview</span>
-          <Separator orientation="vertical" />
-          <span>Details</span>
-        </div>
-      </StorySection>
     </div>
   ),
 }

@@ -7,46 +7,12 @@ import { Label } from '../label/label'
 
 import * as styles from './number-input.css'
 
-const NumberInputContext = React.createContext<{ fieldId: string } | null>(null)
-const NumberInputRoot = ({ id, ...props }: NumberFieldPrimitive.Root.Props): React.ReactElement => {
-  const generatedId = React.useId()
-  const fieldId = id ?? generatedId
-  return (
-    <NumberInputContext.Provider value={{ fieldId }}>
-      <NumberFieldPrimitive.Root {...props} className={styles.root} data-slot="number-field" id={fieldId} />
-    </NumberInputContext.Provider>
-  )
-}
-const NumberInputGroup = ({ placeholder }: { placeholder?: string }): React.ReactElement => (
-  <NumberFieldPrimitive.Group className={styles.group} data-slot="number-field-group">
-    <NumberFieldPrimitive.Decrement className={styles.decrement} data-slot="number-field-decrement">
-      <MinusIcon />
-    </NumberFieldPrimitive.Decrement>
-    <NumberFieldPrimitive.Input className={styles.input} data-slot="number-field-input" placeholder={placeholder} />
-    <NumberFieldPrimitive.Increment className={styles.increment} data-slot="number-field-increment">
-      <PlusIcon />
-    </NumberFieldPrimitive.Increment>
-  </NumberFieldPrimitive.Group>
-)
-const NumberInputScrubArea = ({ label }: { label: string }): React.ReactElement => {
-  const context = React.useContext(NumberInputContext)
-  if (!context) {
-    throw new Error('NumberFieldScrubArea must be used within a NumberField component for accessibility.')
-  }
-  return (
-    <NumberFieldPrimitive.ScrubArea className={styles.scrubArea} data-slot="number-field-scrub-area">
-      <Label htmlFor={context.fieldId}>{label}</Label>
-      <NumberFieldPrimitive.ScrubAreaCursor className={styles.cursor}>
-        <CursorGrowIcon />
-      </NumberFieldPrimitive.ScrubAreaCursor>
-    </NumberFieldPrimitive.ScrubArea>
-  )
-}
-const CursorGrowIcon = (props: React.ComponentProps<'svg'>): React.ReactElement => (
-  <svg aria-hidden="true" fill="black" height="14" stroke="white" viewBox="0 0 24 14" width="26" xmlns="http://www.w3.org/2000/svg" {...props}>
+const CursorGrowIcon = (): React.ReactElement => (
+  <svg aria-hidden="true" fill="black" height="14" stroke="white" viewBox="0 0 24 14" width="26" xmlns="http://www.w3.org/2000/svg">
     <path d="M19.5 5.5L6.49737 5.51844V2L1 6.9999L6.5 12L6.49737 8.5L19.5 8.5V12L25 6.9999L19.5 2V5.5Z" />
   </svg>
 )
+
 export interface NumberInputProps {
   'aria-invalid'?: boolean
   defaultValue?: number
@@ -72,19 +38,41 @@ export const NumberInput = ({
   placeholder,
   step,
   value,
-}: NumberInputProps): React.ReactElement => (
-  <NumberInputRoot
-    aria-invalid={ariaInvalid}
-    defaultValue={defaultValue}
-    disabled={disabled}
-    id={id}
-    max={max}
-    min={min}
-    onValueChange={onValueChange}
-    step={step}
-    value={value}
-  >
-    {label && <NumberInputScrubArea label={label} />}
-    <NumberInputGroup placeholder={placeholder} />
-  </NumberInputRoot>
-)
+}: NumberInputProps): React.ReactElement => {
+  const generatedId = React.useId()
+  const fieldId = id ?? generatedId
+
+  return (
+    <NumberFieldPrimitive.Root
+      aria-invalid={ariaInvalid}
+      className={styles.root}
+      data-slot="number-field"
+      defaultValue={defaultValue}
+      disabled={disabled}
+      id={fieldId}
+      max={max}
+      min={min}
+      onValueChange={onValueChange}
+      step={step}
+      value={value}
+    >
+      {label && (
+        <NumberFieldPrimitive.ScrubArea className={styles.scrubArea} data-slot="number-field-scrub-area">
+          <Label htmlFor={fieldId}>{label}</Label>
+          <NumberFieldPrimitive.ScrubAreaCursor className={styles.cursor}>
+            <CursorGrowIcon />
+          </NumberFieldPrimitive.ScrubAreaCursor>
+        </NumberFieldPrimitive.ScrubArea>
+      )}
+      <NumberFieldPrimitive.Group className={styles.group} data-slot="number-field-group">
+        <NumberFieldPrimitive.Decrement className={styles.decrement} data-slot="number-field-decrement">
+          <MinusIcon />
+        </NumberFieldPrimitive.Decrement>
+        <NumberFieldPrimitive.Input className={styles.input} data-slot="number-field-input" placeholder={placeholder} />
+        <NumberFieldPrimitive.Increment className={styles.increment} data-slot="number-field-increment">
+          <PlusIcon />
+        </NumberFieldPrimitive.Increment>
+      </NumberFieldPrimitive.Group>
+    </NumberFieldPrimitive.Root>
+  )
+}

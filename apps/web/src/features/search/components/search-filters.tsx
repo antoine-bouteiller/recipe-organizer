@@ -1,6 +1,7 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
-import { SearchFilterTrigger } from '@client/features/search/components/search-filter-trigger'
 import { type SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
+import { Button } from '@recipe-organizer/design-system/button'
+import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons/funnel-simple'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
 import { Toggle } from '@recipe-organizer/design-system/toggle'
@@ -35,7 +36,9 @@ export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) 
             setSearch={(query) => onFiltersChange({ ...filters, query })}
           />
         </div>
-        <SearchFilterTrigger />
+        <CollapsiblePrimitive.Trigger aria-label="Filtrer par catégorie" render={<Button size="icon-lg" variant="outline" />}>
+          <FunnelSimpleIcon />
+        </CollapsiblePrimitive.Trigger>
       </div>
       <CollapsiblePrimitive.Panel className={styles.element}>
         <div className={styles.mealFilter}>

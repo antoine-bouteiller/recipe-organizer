@@ -7,19 +7,23 @@ import { type FileMetadata } from '@recipe-organizer/design-system/hooks/use-fil
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
 import { Label } from '@recipe-organizer/design-system/label'
+import { Separator } from '@recipe-organizer/design-system/separator'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@recipe-organizer/shared/recipe/constants'
+import { unitOptions } from '@recipe-organizer/shared/units'
 import { useSelector } from '@tanstack/react-store'
-import { Suspense, type ReactNode } from 'react'
+import { Fragment, Suspense, type ReactNode } from 'react'
 
 import { recipeDefaultValues, type recipeFormFields } from '../utils/form'
 import { recipeNodes } from './editor/extensions'
 import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
 import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
-import { IngredientGroupField } from './ingredient-group-field'
 
+import * as ingredientGroupStyles from './ingredient-group-field.css'
 import * as styles from './recipe-form.css'
+
+const unitPickerItems = [{ label: 'Aucune', value: null }, ...unitOptions]
 
 const cuisineTypeItems = CUISINE_TYPES.map((cuisineType) => ({
   label: CUISINE_TYPE_LABELS[cuisineType],
@@ -148,12 +152,66 @@ export const RecipeForm = withForm({
                             </>
                           )}
 
-                          <IngredientGroupField
-                            addNewIngredientOption={addNewIngredientOption}
-                            form={form}
-                            groupIndex={groupIndex}
-                            ingredientOptions={ingredientOptions}
-                          />
+                          <AppField mode="array" name={`ingredientGroups[${groupIndex}].ingredients`}>
+                            {(ingredientField) => (
+                              <div className={ingredientGroupStyles.container}>
+                                <Label>Ingrédients</Label>
+                                {ingredientField.state.value?.map((ingredient, ingredientIndex) => (
+                                  <Fragment key={ingredient._key}>
+                                    <div className={ingredientGroupStyles.ingredientRow}>
+                                      <div className={ingredientGroupStyles.ingredientFields}>
+                                        <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].id`}>
+                                          {({ ComboboxField }) => (
+                                            <ComboboxField
+                                              addNew={addNewIngredientOption}
+                                              disabled={isSubmitting}
+                                              options={ingredientOptions}
+                                              placeholder="Sélectionner un ingrédient"
+                                              searchPlaceholder="Rechercher un ingrédient"
+                                            />
+                                          )}
+                                        </AppField>
+                                        <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].quantity`}>
+                                          {({ NumberField }) => <NumberField disabled={isSubmitting} min={0} placeholder="Quantité" />}
+                                        </AppField>
+                                        <AppField name={`ingredientGroups[${groupIndex}].ingredients[${ingredientIndex}].unitSlug`}>
+                                          {({ SelectField }) => <SelectField disabled={isSubmitting} items={unitPickerItems} />}
+                                        </AppField>
+                                      </div>
+                                      <Button
+                                        disabled={isSubmitting}
+                                        onClick={() => ingredientField.removeValue(ingredientIndex)}
+                                        size="icon"
+                                        type="button"
+                                        variant="destructive-outline"
+                                      >
+                                        <TrashIcon size="sm" />
+                                      </Button>
+                                    </div>
+                                    <div className={ingredientGroupStyles.mobileSeparator}>
+                                      <Separator />
+                                    </div>
+                                  </Fragment>
+                                ))}
+                                <ingredientField.FieldError />
+                                <Button
+                                  disabled={isSubmitting}
+                                  onClick={() => {
+                                    ingredientField.pushValue({
+                                      _key: Math.random().toString(36).substring(7),
+                                      id: -1,
+                                      quantity: 0,
+                                    })
+                                  }}
+                                  size="sm"
+                                  type="button"
+                                  variant="outline"
+                                >
+                                  <PlusIcon size="sm" />
+                                </Button>
+                              </div>
+                            )}
+                          </AppField>
                           <FieldError />
                         </GroupField>
                       </div>

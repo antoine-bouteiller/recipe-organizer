@@ -57,7 +57,7 @@ and adjustable experience.
 | ------------------- | --------------------------------- | ------------------------------------------- | -------------------------------------------- |
 | Recipe list query   | Server function and query options | Provide name-ordered card data              | `getRecipeListOptions`, `ReducedRecipe`      |
 | Recipe detail query | Server function and query options | Provide cooking document data               | `getRecipeDetailsOptions`, `Recipe`          |
-| Cards and search    | Components and routes             | Browse and navigate recipes                 | `RecipeCard`, `SearchBar`                    |
+| Cards and search    | Components and routes             | Browse and navigate recipes                 | `RecipeListContent`, `SearchBar`             |
 | Cooking view        | Route and components              | Show ingredients, instructions, and actions | ingredient groups, controls                  |
 | Quantity hooks      | Client hooks                      | Scale servings and toggle list membership   | `useRecipeQuantities`, `useIsInShoppingList` |
 | Media handlers      | Route handlers                    | Stream image/video objects                  | image GET, video GET/HEAD                    |
@@ -72,7 +72,7 @@ recipes. A missing detail recipe is a not-found response. Search opens from the 
 filters the shared list, and navigates to the selected recipe.
 
 ```text
-list query ──► RecipeCard ──► /recipe/$id ──► detail query
+list query ──► card grid ──► /recipe/$id ──► detail query
      │              │                                  │
      └──────────────┴──────────── search ──────────────┘
 ```
@@ -151,6 +151,7 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                               | Sections affected |
-| ---------- | --------------------------------------- | ----------------- |
-| 2026-09-12 | Define image and video cache lifetimes. | 8                 |
+| Date       | Amendment                                              | Sections affected |
+| ---------- | ------------------------------------------------------ | ----------------- |
+| 2026-09-12 | Define image and video cache lifetimes.                | 8                 |
+| 2026-09-19 | Inline the single-use recipe card into its list owner. | 7–8.1             |

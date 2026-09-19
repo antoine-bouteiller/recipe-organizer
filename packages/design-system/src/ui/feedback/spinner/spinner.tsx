@@ -3,11 +3,8 @@ import type React from 'react'
 
 import * as styles from './spinner.css'
 
-export interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg'
-}
-export const Spinner = ({ size }: SpinnerProps): React.ReactElement => (
-  <span className={styles.spinner({ size })}>
+export const Spinner = (): React.ReactElement => (
+  <span className={styles.spinner}>
     <CircleNotchIcon aria-label="Loading" />
   </span>
 )

@@ -11,7 +11,7 @@ const tabs = ['ingredients', 'method'] as const
 const SwipeTabsExample = (): React.ReactElement => (
   <div className={styles.container}>
     <SwipeTabs defaultTab="ingredients" tabs={tabs}>
-      <TabsList aria-label="Recipe details" width="full">
+      <TabsList aria-label="Recipe details">
         <TabsTab value="ingredients">Ingredients</TabsTab>
         <TabsTab value="method">Method</TabsTab>
       </TabsList>
@@ -49,19 +49,4 @@ export const Interaction: Story = {
     await expect(ingredients).toHaveAttribute('aria-selected', 'false')
   },
   tags: ['!dev'],
-}
-
-export const FitList: Story = {
-  render: () => (
-    <SwipeTabs defaultTab="ingredients" tabs={tabs}>
-      <TabsList aria-label="Compact recipe details" width="fit">
-        <TabsTab value="ingredients">Ingredients</TabsTab>
-        <TabsTab value="method">Method</TabsTab>
-      </TabsList>
-      <SwipeTabsPanels>
-        <SwipeTabsPanel value="ingredients">Ingredients</SwipeTabsPanel>
-        <SwipeTabsPanel value="method">Method</SwipeTabsPanel>
-      </SwipeTabsPanels>
-    </SwipeTabs>
-  ),
 }

@@ -1,3 +1,4 @@
+import { Toolbar as ToolbarPrimitive } from '@base-ui/react/toolbar'
 import { HistoryExtension } from '@lexical/history'
 import { $isListNode, CheckListExtension, INSERT_UNORDERED_LIST_COMMAND, ListNode, REMOVE_LIST_COMMAND } from '@lexical/list'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
@@ -6,7 +7,7 @@ import { LexicalExtensionComposer } from '@lexical/react/LexicalExtensionCompose
 import { useExtensionSignalValue } from '@lexical/react/useExtensionSignalValue'
 import { RichTextExtension } from '@lexical/rich-text'
 import { $getNearestNodeOfType } from '@lexical/utils'
-import { ToolbarToggle } from '@recipe-organizer/design-system/toolbar'
+import { Toggle } from '@recipe-organizer/design-system/toggle'
 import {
   $getSelection,
   $isRangeSelection,
@@ -106,9 +107,9 @@ const EditorToolbarButton = ({ children, command }: EditorToolbarButtonProps) =>
   }, [editor, command, isActive])
 
   return (
-    <ToolbarToggle aria-label={command} disabled={!canExecute} onClick={toggle} pressed={isActive} value={command}>
+    <ToolbarPrimitive.Button render={<Toggle aria-label={command} disabled={!canExecute} onClick={toggle} pressed={isActive} value={command} />}>
       {children}
-    </ToolbarToggle>
+    </ToolbarPrimitive.Button>
   )
 }
 

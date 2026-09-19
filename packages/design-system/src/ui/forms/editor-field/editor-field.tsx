@@ -1,3 +1,4 @@
+import { Toolbar as ToolbarPrimitive } from '@base-ui/react/toolbar'
 import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { ArrowUUpLeftIcon } from '@recipe-organizer/design-system/icons/arrow-u-up-left'
 import { ArrowUUpRightIcon } from '@recipe-organizer/design-system/icons/arrow-u-up-right'
@@ -5,12 +6,14 @@ import { ListBulletsIcon } from '@recipe-organizer/design-system/icons/list-bull
 import { TextBolderIcon } from '@recipe-organizer/design-system/icons/text-bolder'
 import { TextItalicIcon } from '@recipe-organizer/design-system/icons/text-italic'
 import { TextUnderlineIcon } from '@recipe-organizer/design-system/icons/text-underline'
-import { Toolbar, ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
+import { ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
 import { type Klass, type LexicalNode } from 'lexical'
 import { type ReactNode } from 'react'
 
 import { Editor, EditorContent, EditorToolbarButton } from '../editor/editor'
 import { Field, FieldError, FieldLabel } from '../field/field'
+
+import * as styles from './editor-field.css'
 
 interface EditorFieldProps {
   disabled?: boolean
@@ -26,7 +29,7 @@ const EditorField = ({ disabled, extraToolbar, label, nodes }: EditorFieldProps)
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       <FieldLabel>{label}</FieldLabel>
       <Editor content={field.state.value} nodes={nodes} onChange={field.handleChange}>
-        <Toolbar>
+        <ToolbarPrimitive.Root className={styles.toolbar} data-slot="toolbar">
           <ToolbarGroup>
             <EditorToolbarButton command="undo">
               <ArrowUUpLeftIcon />
@@ -51,7 +54,7 @@ const EditorField = ({ disabled, extraToolbar, label, nodes }: EditorFieldProps)
             </EditorToolbarButton>
           </ToolbarGroup>
           {extraToolbar}
-        </Toolbar>
+        </ToolbarPrimitive.Root>
         <EditorContent disabled={disabled} />
       </Editor>
       <FieldError />

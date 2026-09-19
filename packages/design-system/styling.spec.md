@@ -105,6 +105,11 @@ Each component declares a local `Pick` of the native or Base UI props its caller
 plus explicit domain or semantic props. Do not add props for hypothetical callers. This guidance does
 not require compile-only prop contracts, shared allowlist helpers, or global `never`-prop blacklists.
 
+Retain variants only when production callers exercise them; Storybook demonstrates supported APIs rather
+than preserving unused ones. Inline single-use components into their owners, except icons and required
+route styling, hook lifecycle, provider, registry, or lazy-loading boundaries. Count actual call sites,
+including internal composition, rather than importing files.
+
 Component styling remains owner-local rather than a public `className`, `style`, or CSS-bag API.
 Where composition is needed, retain Base UI's existing `render` prop and `useRender`/`mergeProps`
 behavior. This lets a Button render an actual router Link and lets Toolbar compose Toggle without
@@ -137,19 +142,21 @@ scoped to editor-generated DOM and excludes interactive decorators.
 ### 6.4 Navigation and form integrations
 
 The design system may depend on catalogued `@tanstack/react-router` for reusable router-aware
-navigation, but never imports app or feature code. `Navbar` and `TabBar` receive items with a
-`label` and typed `linkProps` (`LinkOptions`); `TabBar` items include inactive and active icons, and `Navbar`
-provides an actions slot. Their actual TanStack `Link` owns typed route parameters, search,
-preloading, modified clicks, view transitions, navigation state, and semantics. `Navbar` uses exact
-matching only for the `/` item by default. Do not replace Link with a native anchor or recreate its
+navigation, but never imports app or feature code. `TabBar` receives items with a `label`, typed
+`linkProps` (`LinkOptions`), and inactive/active icons. The single-use desktop navbar is inlined into
+`apps/web/src/components/app-shell/app-shell.tsx`'s `AppHeader`, with children supplying its actions.
+Their actual TanStack `Link` owns typed route parameters, search, preloading, modified clicks, view
+transitions, navigation state, and semantics. The desktop navbar uses exact matching only for `/`. Do not replace Link with a native anchor or recreate its
 props through a `useLinkProps` adapter.
 
 Keep Base UI `render` composition for components such as Button, for example
 `<Button render={<Link to="/recipe/new" />} />`, so primitive-injected handlers, ARIA attributes,
 state, and refs remain intact. Router-aware Storybook stories use a local memory-router decorator.
 `ScreenLayout`'s `withGoBack` calls `router.history.back()`; its scroll IDs default to
-`screen-inner` and `screen-outer`, and its footer is explicit. Default error and not-found surfaces
-provide actual home Links, default French messages, and development-only Error details.
+`screen-inner` and `screen-outer`, and its footer is explicit. The default error renderer is inlined into `apps/web/src/router.tsx`;
+`NotFound` remains shared. Both provide actual home Links and French messages; Error details appear
+only in development. The single-use command palette is inlined into the feature's `SearchBar`, retaining
+Base UI autocomplete/dialog behavior and the shared `ScrollArea`.
 
 `FloatingAction` is generic (`label`, `linkProps`, and `children`) rather than a recipe-create
 wrapper. Recipe/auth policy belongs in the index route. Menus and filtering remain app-owned in
@@ -224,6 +231,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4              | Routes compose styled components rather than owning styles.                              |
 | 2026-09-18 | Consolidate focus shadows on `shadows.ring`.                                                         | §6.5              | Remove the redundant focus token and use the same ring across controls.                  |
 | 2026-09-19 | Add the warning-subtle color pair for spice badges.                                                  | §6.1              | Give spices a readable amber category treatment.                                         |
+| 2026-09-19 | Retain production-backed APIs and inline single-use navigation, errors, and command UI.              | §6.2, §6.4        | Reduce ownership without breaking framework or route-styling boundaries.                 |
 | 2026-09-19 | Share subtle badges and check-row toggles instead of feature-local controls.                         | §6.5              | Keep semantic styling and accessible control state in the design system.                 |
 
 ## 8. Open Questions

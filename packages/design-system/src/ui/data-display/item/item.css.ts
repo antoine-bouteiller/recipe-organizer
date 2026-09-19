@@ -40,21 +40,13 @@ export const item = recipe({
       },
     },
   },
-  defaultVariants: {
-    layout: 'wrap',
-    variant: 'default',
-  },
   variants: {
     layout: {
       row: {
         flexWrap: 'nowrap',
       },
-      wrap: {},
     },
     variant: {
-      default: {
-        backgroundColor: 'transparent',
-      },
       outline: {
         borderColor: theme.colors.border,
       },

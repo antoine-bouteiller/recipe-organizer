@@ -1,15 +1,15 @@
-import { Link } from '@tanstack/react-router'
+import { Link, type LinkOptions } from '@tanstack/react-router'
 import type React from 'react'
-
-import { type NavbarProps } from '../navbar/navbar'
 
 import * as styles from './tabbar.css'
 
 export interface TabBarProps {
-  items: readonly (NavbarProps['items'][number] & {
+  items: readonly {
+    label: string
+    linkProps: LinkOptions
     activeIcon: React.ReactNode
     icon: React.ReactNode
-  })[]
+  }[]
 }
 
 export const TabBar = ({ items }: TabBarProps): React.ReactElement => (
