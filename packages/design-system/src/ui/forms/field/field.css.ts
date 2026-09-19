@@ -5,6 +5,7 @@ import { recipe } from '@vanilla-extract/recipes'
 export const field = style({ alignItems: 'flex-start', display: 'flex', flexDirection: 'column', gap: theme.spacing(2), width: '100%' })
 
 const dropzone = {
+  backgroundColor: theme.colors.background,
   borderColor: theme.colors.input,
   borderRadius: theme.radius.xl,
   borderStyle: 'dashed',
