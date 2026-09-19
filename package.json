@@ -33,7 +33,7 @@
     "wrangler": "catalog:"
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.2"
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.3"
   },
   "commitlint": {
     "extends": [
