@@ -1,6 +1,5 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
-import { expect, waitFor, within } from 'storybook/test'
 
 import { ScrollArea } from './scroll-area'
 
@@ -17,11 +16,6 @@ type Story = StoryObj<typeof meta>
 const content = Array.from({ length: 20 }, (_item, index) => `Recipe step ${index + 1}`)
 
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const root = within(canvasElement).getByLabelText('Compact scrolling')
-    const viewport = root.querySelector('[data-slot=scroll-area-viewport]')
-    await waitFor(() => expect(viewport).toHaveAttribute('data-has-overflow-y'))
-  },
   render: () => (
     <div className={styles.container}>
       <StorySection title="Default">

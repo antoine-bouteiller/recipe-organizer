@@ -3,8 +3,6 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
 import { Select } from './select'
-import SelectBase from './select.base'
-import SelectDrawer from './select.drawer'
 
 import * as styles from './select.stories.css'
 
@@ -19,16 +17,6 @@ type Status = (typeof items)[number]['value']
 const ControlledSelect = (): ReactElement => {
   const [value, setValue] = useState<Status | null>(null)
   return <Select items={[...items]} onValueChange={setValue} placeholder="Choose a status" title="Status" value={value} />
-}
-
-const ControlledBase = (): ReactElement => {
-  const [value, setValue] = useState<Status | null>(null)
-  return <SelectBase items={[...items]} onValueChange={setValue} placeholder="Choose a status" title="Status" value={value} />
-}
-
-const ControlledDrawer = (): ReactElement => {
-  const [value, setValue] = useState<Status | null>(null)
-  return <SelectDrawer items={[...items]} onValueChange={setValue} placeholder="Choose a status" title="Status" value={value} />
 }
 
 const ControlledMultiple = (): ReactElement => {
@@ -51,12 +39,6 @@ export const Overview: Story = {
       <StorySection title="Responsive">
         <ControlledSelect />
       </StorySection>
-      <StorySection title="Desktop">
-        <ControlledBase />
-      </StorySection>
-      <StorySection title="Drawer">
-        <ControlledDrawer />
-      </StorySection>
       <StorySection title="Multiple">
         <ControlledMultiple />
       </StorySection>
@@ -68,4 +50,9 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Mobile: Story = {
+  ...Overview,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
 }

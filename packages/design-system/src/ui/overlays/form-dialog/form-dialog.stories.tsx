@@ -58,10 +58,18 @@ const RegressionExample = (): ReactElement => {
 const meta = { component: FormDialogExample, title: 'Overlays/FormDialog' } satisfies Meta<typeof FormDialogExample>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Default: Story = {
+export const Default: Story = { render: () => <FormDialogExample /> }
+
+export const Mobile: Story = {
+  ...Default,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
+}
+
+export const SubmitOnEnter: Story = {
+  ...Default,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit recipe' }))
+    await userEvent.click(await canvas.findByRole('button', { expanded: false, name: 'Edit recipe' }))
     const dialog = within(document.body)
     const field = await dialog.findByLabelText('Recipe title')
     await expect(field).toBeVisible()
@@ -70,15 +78,15 @@ export const Default: Story = {
     await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
     await expect(canvas.getByRole('button', { name: 'Edit recipe' })).toHaveFocus()
   },
-  render: () => <FormDialogExample />,
+  tags: ['!dev'],
 }
 export const PendingDismissalRegression: Story = {
-  parameters: { viewport: { defaultViewport: 'mobile1' } },
+  globals: { viewport: { isRotated: false, value: 'mobile1' } },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: 'Edit recipe' }))
+    await userEvent.click(await canvas.findByRole('button', { expanded: false, name: 'Edit recipe' }))
     const dialog = within(document.body)
-    await userEvent.click(dialog.getByRole('button', { name: 'Save recipe' }))
+    await userEvent.click(await dialog.findByRole('button', { name: 'Save recipe' }))
     await waitFor(() => expect(dialog.getByRole('button', { name: 'Annuler' })).toBeDisabled())
     await userEvent.keyboard('{Escape}')
     await expect(dialog.getByRole('dialog')).toBeVisible()
@@ -96,4 +104,5 @@ export const PendingDismissalRegression: Story = {
     await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
   },
   render: () => <RegressionExample />,
+  tags: ['!dev'],
 }

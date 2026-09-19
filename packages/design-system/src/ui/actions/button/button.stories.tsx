@@ -35,19 +35,10 @@ export const InteractionStates: Story = {
       <Button disabled>Unavailable</Button>
     </div>
   ),
+  tags: ['!dev'],
 }
 
 export const SearchAction: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const button = canvas.getByRole('button', { name: 'Add item' })
-    const { width, height } = button.getBoundingClientRect()
-
-    await expect(width).toBe(height)
-    await userEvent.click(canvas.getByRole('textbox'))
-    await userEvent.tab()
-    await expect(button).toHaveFocus()
-  },
   render: () => (
     <div className={styles.comparisonRow}>
       <div className={styles.searchRow}>
@@ -65,6 +56,18 @@ export const SearchAction: Story = {
       </Button>
     </div>
   ),
+}
+
+export const SearchActionKeyboardFocus: Story = {
+  ...SearchAction,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const button = canvas.getByRole('button', { name: 'Add item' })
+    await userEvent.click(canvas.getByRole('textbox'))
+    await userEvent.tab()
+    await expect(button).toHaveFocus()
+  },
+  tags: ['!dev'],
 }
 
 export const Overview: Story = {

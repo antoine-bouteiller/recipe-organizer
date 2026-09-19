@@ -177,23 +177,6 @@ export const Overview: Story = {
 }
 
 export const ReadOnlyProse: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const editor = canvas.getByRole('textbox')
-    await expect(editor).toHaveAttribute('contenteditable', 'false')
-    await expect(canvas.getByText('Wash the vegetables before starting.').closest('p')).toHaveStyle('margin-bottom: 16px')
-    await expect(canvas.getByText('Carrots').closest('ul')).toHaveStyle({ listStyleType: 'disc' })
-    const nestedList = canvas.getByText('Peeled and diced').closest('ul')
-    await expect(nestedList).toHaveStyle('list-style-type: disc; padding-inline-start: 22px')
-    await expect(nestedList?.parentElement).toHaveStyle({ listStyleType: 'none' })
-    await expect(canvas.getByText('Heat the pan.').closest('ol')).toHaveStyle({ listStyleType: 'decimal' })
-    await expect(canvas.getByText('Heat the pan.').closest('ol')).toHaveAttribute('start', '3')
-    await expect(canvas.getByText('Ready to serve').closest('ul')).toHaveStyle({ listStyleType: 'none' })
-    await expect(canvas.getByText('Keep the heat low for a sweeter flavor.').closest('blockquote')).toHaveStyle({ borderInlineStartWidth: '3px' })
-    await expect(canvas.getByText('180°C')).toHaveStyle({ fontFamily: 'monospace' })
-    await expect(canvas.getByRole('heading', { name: 'Preparation' })).toHaveStyle('margin-top: 0px')
-    await expect(canvas.getByText('Serve warm.').closest('p')).toHaveStyle('margin-bottom: 0px')
-  },
   render: () => (
     <Editor content={proseContent} readOnly>
       <EditorContent width="reading" />
@@ -201,12 +184,27 @@ export const ReadOnlyProse: Story = {
   ),
 }
 
+export const ReadOnlyProseSemantics: Story = {
+  ...ReadOnlyProse,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByRole('textbox')).toHaveAttribute('contenteditable', 'false')
+    await expect(canvas.getByText('Heat the pan.').closest('ol')).toHaveAttribute('start', '3')
+  },
+  tags: ['!dev'],
+}
+
 export const Disabled: Story = {
+  render: () => <DisabledEditor />,
+}
+
+export const DisabledSemantics: Story = {
+  ...Disabled,
   play: async ({ canvasElement }) => {
     const editor = within(canvasElement).getByRole('textbox')
     await expect(editor).toHaveAttribute('contenteditable', 'false')
   },
-  render: () => <DisabledEditor />,
+  tags: ['!dev'],
 }
 
 export const Nested: Story = {

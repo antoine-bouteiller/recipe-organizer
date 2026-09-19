@@ -36,15 +36,19 @@ const SwipeTabsExample = (): React.ReactElement => (
 const meta = { component: SwipeTabsExample, title: 'Navigation/Tabs' } satisfies Meta<typeof SwipeTabsExample>
 export default meta
 type Story = StoryObj<typeof meta>
-export const Swipeable: Story = {
+export const Swipeable: Story = {}
+
+export const Interaction: Story = {
+  ...Swipeable,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const ingredients = canvas.getByRole('tab', { name: 'Ingredients' })
     const method = canvas.getByRole('tab', { name: 'Method' })
     await userEvent.click(method)
-    await expect(method).toHaveAttribute('data-active')
-    await expect(ingredients).not.toHaveAttribute('data-active')
+    await expect(method).toHaveAttribute('aria-selected', 'true')
+    await expect(ingredients).toHaveAttribute('aria-selected', 'false')
   },
+  tags: ['!dev'],
 }
 
 export const FitList: Story = {

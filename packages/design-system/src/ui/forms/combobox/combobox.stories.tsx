@@ -3,8 +3,6 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useState, type ReactElement } from 'react'
 
 import { Combobox } from './combobox'
-import ComboboxBase from './combobox.base'
-import ComboboxDrawer from './combobox.drawer'
 
 import * as styles from './combobox.stories.css'
 
@@ -17,38 +15,6 @@ const options = [
 const ControlledCombobox = (): ReactElement => {
   const [value, setValue] = useState<string | undefined>()
   return <Combobox onChange={(option) => setValue(option?.value)} options={options} value={value} />
-}
-
-const ControlledBase = (): ReactElement => {
-  const [value, setValue] = useState<string | undefined>()
-  const selectedOption = options.find((option) => option.value === value)
-  return (
-    <ComboboxBase
-      isInvalid={false}
-      onChange={(option) => setValue(option?.value)}
-      options={options}
-      placeholder="Choose a fruit"
-      searchPlaceholder="Search fruits"
-      selectedOption={selectedOption}
-      title="Choose a fruit"
-    />
-  )
-}
-
-const ControlledDrawer = (): ReactElement => {
-  const [value, setValue] = useState<string | undefined>()
-  const selectedOption = options.find((option) => option.value === value)
-  return (
-    <ComboboxDrawer
-      isInvalid={false}
-      onChange={(option) => setValue(option?.value)}
-      options={options}
-      placeholder="Choose a fruit"
-      searchPlaceholder="Search fruits"
-      selectedOption={selectedOption}
-      title="Choose a fruit"
-    />
-  )
 }
 
 const meta = {
@@ -66,12 +32,6 @@ export const Overview: Story = {
       <StorySection title="Responsive">
         <ControlledCombobox />
       </StorySection>
-      <StorySection title="Desktop">
-        <ControlledBase />
-      </StorySection>
-      <StorySection title="Drawer">
-        <ControlledDrawer />
-      </StorySection>
       <StorySection title="Invalid">
         <Combobox isInvalid onChange={() => undefined} options={options} placeholder="Choose a fruit" value={undefined} />
       </StorySection>
@@ -83,4 +43,9 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Mobile: Story = {
+  ...Overview,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
 }

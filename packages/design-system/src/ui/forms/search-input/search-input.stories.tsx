@@ -41,12 +41,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const section = within(canvasElement).getByRole('region', { name: 'Default' })
-    const canvas = within(section)
-    await userEvent.type(canvas.getByRole('textbox', { name: 'Rechercher…' }), 'tomato')
-    await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
-  },
   render: () => (
     <div className={styles.storyLayout}>
       <StorySection title="Default">
@@ -57,4 +51,15 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Interaction: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const canvas = within(section)
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Rechercher…' }), 'tomato')
+    await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
+  },
+  tags: ['!dev'],
 }

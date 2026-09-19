@@ -4,8 +4,6 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 
 import { Popover } from './popover'
-import PopoverBase from './popover.base'
-import PopoverDrawer from './popover.drawer'
 
 import * as styles from './popover.stories.css'
 
@@ -21,8 +19,6 @@ const popoverProps = {
 }
 
 const ResponsiveExample = (): React.ReactElement => <Popover {...popoverProps} />
-const DesktopExample = (): React.ReactElement => <PopoverBase {...popoverProps} />
-const DrawerExample = (): React.ReactElement => <PopoverDrawer {...popoverProps} />
 
 const meta = { component: ResponsiveExample, title: 'Overlays/Popover' } satisfies Meta<typeof ResponsiveExample>
 export default meta
@@ -34,12 +30,11 @@ export const Overview: Story = {
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>
-      <StorySection title="Desktop Implementation">
-        <DesktopExample />
-      </StorySection>
-      <StorySection title="Drawer Implementation">
-        <DrawerExample />
-      </StorySection>
     </div>
   ),
+}
+
+export const Mobile: Story = {
+  ...Overview,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
 }

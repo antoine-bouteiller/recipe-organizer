@@ -4,8 +4,6 @@ import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 
 import { Dialog } from './dialog'
-import DialogBase from './dialog.base'
-import DialogDrawer from './dialog.drawer'
 
 import * as styles from './dialog.stories.css'
 
@@ -18,8 +16,6 @@ const dialogProps = {
 }
 
 const ResponsiveExample = (): React.ReactElement => <Dialog {...dialogProps} />
-const DesktopExample = (): React.ReactElement => <DialogBase {...dialogProps} />
-const DrawerExample = (): React.ReactElement => <DialogDrawer {...dialogProps} />
 
 const meta = { component: ResponsiveExample, title: 'Overlays/Dialog' } satisfies Meta<typeof ResponsiveExample>
 export default meta
@@ -31,12 +27,11 @@ export const Overview: Story = {
       <StorySection title="Responsive">
         <ResponsiveExample />
       </StorySection>
-      <StorySection title="Desktop Implementation">
-        <DesktopExample />
-      </StorySection>
-      <StorySection title="Drawer Implementation">
-        <DrawerExample />
-      </StorySection>
     </div>
   ),
+}
+
+export const Mobile: Story = {
+  ...Overview,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
 }

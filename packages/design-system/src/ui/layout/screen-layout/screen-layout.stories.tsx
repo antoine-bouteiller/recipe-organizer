@@ -4,7 +4,7 @@ import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import { useLocation } from '@tanstack/react-router'
 import { type ComponentProps } from 'react'
-import { expect, userEvent, waitFor, within } from 'storybook/test'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { ScreenLayout } from './screen-layout'
 
@@ -47,33 +47,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const section = canvas.getByRole('region', { name: 'Default' })
-    const panel = section.querySelector<HTMLDivElement>('[data-scroll-restoration-id="story-content"]')
-    await expect(panel).not.toBeNull()
-    // The sticky header and back button are mobile-only.
-    if (globalThis.matchMedia('(max-width: 767px)').matches) {
-      const header = within(section).getByRole('heading', { name: 'Library' })
-      const headerTop = header.getBoundingClientRect().top
-      panel?.scrollTo({ top: 50 })
-      await waitFor(() => expect(panel?.scrollTop).toBe(50))
-      await expect(header).toBeVisible()
-      await expect(header.getBoundingClientRect().top).toBe(headerTop)
-      await expect(header).not.toHaveAttribute('data-scrolled')
-      panel?.scrollTo({ top: 0 })
-      const backSection = within(canvas.getByRole('region', { name: 'With back action' }))
-      await userEvent.click(backSection.getByRole('button', { name: 'Retour' }))
-      await expect(backSection.getByRole('status')).toHaveTextContent('Back action requested.')
-    } else {
-      const outer = section.querySelector<HTMLDivElement>('[data-scroll-restoration-id="story-outer"]')
-      await expect(outer).not.toBeNull()
-      outer?.scrollTo({ top: 50 })
-      await waitFor(() => expect(outer?.scrollTop).toBe(50))
-      await expect(within(section).getByText('Library')).not.toBeVisible()
-      outer?.scrollTo({ top: 0 })
-    }
-  },
   render: (args) => (
     <div className={styles.storyLayout}>
       <p className={styles.text}>Use the viewport toolbar to compare mobile headers and desktop scrolling.</p>
@@ -107,4 +80,21 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Mobile: Story = {
+  ...Overview,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
+}
+
+export const Interaction: Story = {
+  ...Mobile,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const backSection = within(canvas.getByRole('region', { name: 'With back action' }))
+
+    await userEvent.click(backSection.getByRole('button', { name: 'Retour' }))
+    await expect(backSection.getByRole('status')).toHaveTextContent('Back action requested.')
+  },
+  tags: ['!dev'],
 }

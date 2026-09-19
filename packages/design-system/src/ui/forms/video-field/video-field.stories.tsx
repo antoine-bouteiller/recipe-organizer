@@ -25,19 +25,6 @@ const meta = { component: VideoFieldExample, title: 'Forms/VideoField' } satisfi
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const empty = within(within(canvasElement).getByRole('region', { name: 'Empty' }))
-    const input = empty.getByLabelText('Recipe video')
-    await userEvent.upload(input, new File(['video'], 'recipe.mp4', { type: 'video/mp4' }))
-    await expect(empty.getByText('recipe.mp4')).toBeVisible()
-    await userEvent.click(empty.getByRole('button', { name: 'Remove video' }))
-    await expect(empty.queryByText('recipe.mp4')).not.toBeInTheDocument()
-
-    const oversized = new File(['video'], 'oversized.mp4', { type: 'video/mp4' })
-    Object.defineProperty(oversized, 'size', { value: 100 * 1024 * 1024 + 1 })
-    await userEvent.upload(input, oversized)
-    await expect(empty.queryByText('oversized.mp4')).not.toBeInTheDocument()
-  },
   render: () => (
     <div className={styles.container}>
       <StorySection title="Empty">
@@ -51,4 +38,22 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Interaction: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const empty = within(within(canvasElement).getByRole('region', { name: 'Empty' }))
+    const input = empty.getByLabelText('Recipe video')
+    await userEvent.upload(input, new File(['video'], 'recipe.mp4', { type: 'video/mp4' }))
+    await expect(empty.getByText('recipe.mp4')).toBeVisible()
+    await userEvent.click(empty.getByRole('button', { name: 'Remove video' }))
+    await expect(empty.queryByText('recipe.mp4')).not.toBeInTheDocument()
+
+    const oversized = new File(['video'], 'oversized.mp4', { type: 'video/mp4' })
+    Object.defineProperty(oversized, 'size', { value: 100 * 1024 * 1024 + 1 })
+    await userEvent.upload(input, oversized)
+    await expect(empty.queryByText('oversized.mp4')).not.toBeInTheDocument()
+  },
+  tags: ['!dev'],
 }

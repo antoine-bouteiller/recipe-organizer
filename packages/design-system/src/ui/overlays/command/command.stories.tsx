@@ -2,7 +2,7 @@ import { Button } from '@recipe-organizer/design-system/button'
 import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
 import type React from 'react'
-import { expect, userEvent, within } from 'storybook/test'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import {
   Command,
@@ -51,15 +51,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const searchSection = canvas.getByRole('region', { name: 'Search' })
-    await userEvent.click(within(searchSection).getByRole('button', { name: 'Search recipes' }))
-    const dialog = await within(document.body).findByRole('dialog', { name: 'Search recipes' })
-    await userEvent.type(within(dialog).getByPlaceholderText('Search recipes'), 'tomato')
-    await expect(within(dialog).getByText('Tomato soup')).toBeVisible()
-    await userEvent.keyboard('{Escape}')
-  },
   render: () => (
     <div className={styles.container}>
       <StorySection title="Default">
@@ -67,4 +58,19 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const SearchAndDismiss: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(canvas.getByRole('button', { name: 'Search recipes' }))
+    const body = within(document.body)
+    const dialog = await body.findByRole('dialog', { name: 'Search recipes' })
+    await userEvent.type(within(dialog).getByPlaceholderText('Search recipes'), 'tomato')
+    await expect(within(dialog).getByText('Tomato soup')).toBeVisible()
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(body.queryByRole('dialog')).not.toBeInTheDocument())
+  },
+  tags: ['!dev'],
 }

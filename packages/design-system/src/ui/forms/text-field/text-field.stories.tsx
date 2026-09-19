@@ -24,12 +24,6 @@ const meta = { component: TextField, title: 'Forms/TextField' } satisfies Meta<t
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const section = within(canvasElement).getByRole('region', { name: 'Default' })
-    const input = within(section).getByRole('textbox', { name: 'Recipe title' })
-    await userEvent.type(input, 'Tomato soup')
-    await expect(input).toHaveValue('Tomato soup')
-  },
   render: () => (
     <div className={styles.container}>
       <StorySection title="Default">
@@ -43,4 +37,15 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Interaction: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const input = within(section).getByRole('textbox', { name: 'Recipe title' })
+    await userEvent.type(input, 'Tomato soup')
+    await expect(input).toHaveValue('Tomato soup')
+  },
+  tags: ['!dev'],
 }

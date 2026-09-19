@@ -34,7 +34,12 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+export const Default: Story = {
+  render: () => <RecipeForm />,
+}
+
 export const ValidationAndSubmission: Story = {
+  ...Default,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Save recipe' }))
@@ -44,5 +49,5 @@ export const ValidationAndSubmission: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Save recipe' }))
     await expect(canvas.getByRole('status')).toHaveTextContent('Recipe saved.')
   },
-  render: () => <RecipeForm />,
+  tags: ['!dev'],
 }

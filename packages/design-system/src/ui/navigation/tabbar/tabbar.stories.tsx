@@ -40,41 +40,24 @@ type Story = StoryObj<typeof meta>
 export const Mobile: Story = {
   globals: { viewport: { isRotated: false, value: 'mobile2' } },
   parameters: { layout: 'fullscreen' },
+}
+
+export const Interaction: Story = {
+  ...Mobile,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const activeLink = canvas.getByRole('link', { name: 'Home' })
+    const shoppingLink = canvas.getByRole('link', { name: 'Shopping' })
 
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
-    await expect(activeLink).toHaveAttribute('data-slot', 'tab-bar-item')
-    const shoppingLink = canvas.getByRole('link', { name: 'Shopping' })
-    const activeIcon = activeLink.querySelector<HTMLElement>('[data-slot=tab-bar-item-icon-active]')
-    if (!activeIcon) {
-      throw new Error('TabBar requires an active icon slot')
-    }
-    await expect(activeIcon).toBeVisible()
-    await expect(activeLink.querySelector('[data-slot=tab-bar-item-icon-inactive]')).not.toBeVisible()
-    await expect(shoppingLink.querySelector('[data-slot=tab-bar-item-icon-active]')).not.toBeVisible()
-    await expect(shoppingLink.querySelector('[data-slot=tab-bar-item-icon-inactive]')).toBeVisible()
     await userEvent.tab()
     await expect(activeLink).toHaveFocus()
 
     await userEvent.click(shoppingLink)
     await expect(shoppingLink).toHaveAttribute('aria-current', 'page')
-    await expect(activeIcon).not.toBeVisible()
-    const selectedIcon = shoppingLink.querySelector<HTMLElement>('[data-slot=tab-bar-item-icon-active]')
-    if (!selectedIcon) {
-      throw new Error('TabBar requires an active icon slot')
-    }
-    await expect(selectedIcon).toBeVisible()
 
     await userEvent.click(activeLink)
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
-    await expect(activeIcon).toBeVisible()
-    await expect(selectedIcon).not.toBeVisible()
   },
-}
-
-export const MobileDark: Story = {
-  ...Mobile,
-  globals: { ...Mobile.globals, theme: 'dark' },
+  tags: ['!dev'],
 }

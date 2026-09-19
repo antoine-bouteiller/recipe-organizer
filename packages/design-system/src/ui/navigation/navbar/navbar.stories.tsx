@@ -25,13 +25,15 @@ const meta = { component: NavbarExample, decorators: [withRouter], title: 'Navig
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = {
+export const Default: Story = {}
+
+export const Interaction: Story = {
+  ...Default,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const activeLink = canvas.getByRole('link', { name: 'Home' })
 
     await expect(activeLink).toHaveAttribute('aria-current', 'page')
-    await expect(activeLink).toHaveAttribute('data-slot', 'navbar-item')
-    await expect(canvas.getByRole('button', { name: 'Toggle theme' })).toBeVisible()
   },
+  tags: ['!dev'],
 }

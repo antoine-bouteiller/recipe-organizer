@@ -16,12 +16,6 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    const defaultSection = within(canvas.getByRole('region', { name: 'Default' }))
-    await expect(defaultSection.getByRole('link', { name: "Retour à l'accueil" })).toHaveAttribute('href', '/')
-    await expect(within(canvas.getByRole('region', { name: 'Without Action' })).queryByRole('link')).not.toBeInTheDocument()
-  },
   render: (args) => (
     <div className={styles.container}>
       <StorySection title="Default">
@@ -32,4 +26,15 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const HomeAction: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const defaultSection = within(canvas.getByRole('region', { name: 'Default' }))
+    await expect(defaultSection.getByRole('link', { name: "Retour à l'accueil" })).toHaveAttribute('href', '/')
+    await expect(within(canvas.getByRole('region', { name: 'Without Action' })).queryByRole('link')).not.toBeInTheDocument()
+  },
+  tags: ['!dev'],
 }
