@@ -1,4 +1,3 @@
-import { FloatingAction } from '@recipe-organizer/design-system/floating-action'
 import { Navbar } from '@recipe-organizer/design-system/navbar'
 import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
 import { TabBar } from '@recipe-organizer/design-system/tabbar'
@@ -18,16 +17,6 @@ const renderAt = async (pathname: string, content: ReactNode) => {
 }
 
 describe('navigation composition', () => {
-  it('preserves accessible router link composition in the floating action', async () => {
-    const action = (
-      <FloatingAction label="Ajouter une recette" linkProps={{ to: '/recipe/new', viewTransition: true }}>
-        +
-      </FloatingAction>
-    )
-    const markup = await renderAt('/', action)
-    expect(markup).toMatch(/<a(?=[^>]*href="\/recipe\/new")(?=[^>]*aria-label="Ajouter une recette")[^>]*>/)
-  })
-
   it('preserves router link active state and exact home matching in the navbar', async () => {
     const markup = await renderAt('/settings/users', createElement(Navbar, { items: desktopMenuItems }))
     expect(markup).toMatch(/<a(?=[^>]*href="\/settings")(?=[^>]*aria-current="page")[^>]*>/)

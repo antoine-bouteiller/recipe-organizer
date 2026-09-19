@@ -16,6 +16,17 @@ export const container = style({
   },
 })
 
+export const floatingAction = style({
+  bottom: theme.spacing(16),
+  position: 'fixed',
+  right: theme.spacing(2),
+  '@media': {
+    'screen and (min-width: 768px)': {
+      display: 'none',
+    },
+  },
+})
+
 export const emptyState = style({
   alignItems: 'center',
   display: 'flex',

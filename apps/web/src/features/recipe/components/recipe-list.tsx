@@ -1,7 +1,6 @@
 import RecipeCard from '@client/features/recipe/components/recipe-card'
 import { type ReducedRecipe } from '@client/types/recipe'
 import { Button } from '@recipe-organizer/design-system/button'
-import { FloatingAction } from '@recipe-organizer/design-system/floating-action'
 import { BookIcon } from '@recipe-organizer/design-system/icons/book'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
@@ -44,9 +43,11 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
         </div>
       )}
       {canCreate && (
-        <FloatingAction label="Ajouter une recette" linkProps={{ to: '/recipe/new', viewTransition: true }}>
-          <PlusIcon size="xl" />
-        </FloatingAction>
+        <div className={styles.floatingAction}>
+          <Button aria-label="Ajouter une recette" render={<Link to="/recipe/new" viewTransition />} size="icon-xl">
+            <PlusIcon size="xl" />
+          </Button>
+        </div>
       )}
     </>
   )
