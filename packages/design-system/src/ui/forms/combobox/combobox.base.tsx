@@ -1,6 +1,7 @@
 import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
 import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
 import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
+import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { XIcon } from '@recipe-organizer/design-system/icons/x'
 import React, { useState, type ReactElement } from 'react'
 
@@ -67,19 +68,7 @@ const Base = <TValue extends ValueOptions>({
                   {(item) => (
                     <ComboboxPrimitive.Item className={styles.item} key={String(item.value)} value={item}>
                       <ComboboxPrimitive.ItemIndicator>
-                        <svg
-                          aria-hidden="true"
-                          fill="none"
-                          height="24"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          width="24"
-                        >
-                          <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
-                        </svg>
+                        <CheckIcon size="sm" />
                       </ComboboxPrimitive.ItemIndicator>
                       <div>{item.label}</div>
                     </ComboboxPrimitive.Item>

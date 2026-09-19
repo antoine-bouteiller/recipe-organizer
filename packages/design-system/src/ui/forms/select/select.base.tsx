@@ -2,6 +2,7 @@ import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CaretDownIcon } from '@recipe-organizer/design-system/icons/caret-down'
 import { CaretUpIcon } from '@recipe-organizer/design-system/icons/caret-up'
 import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
+import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { type ReactElement } from 'react'
 
 import { type SelectProps } from './select'
@@ -53,19 +54,7 @@ const SelectPopup = ({ children, ...props }: SelectPrimitive.Popup.Props): React
 const SelectItem = (props: SelectPrimitive.Item.Props): ReactElement => (
   <SelectPrimitive.Item className={styles.item} data-slot="select-item" {...props}>
     <SelectPrimitive.ItemIndicator className={styles.indicator}>
-      <svg
-        aria-hidden="true"
-        fill="none"
-        height="24"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-        width="24"
-      >
-        <path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
-      </svg>
+      <CheckIcon size="sm" />
     </SelectPrimitive.ItemIndicator>
     <SelectPrimitive.ItemText className={styles.itemText}>{props.children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
