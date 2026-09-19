@@ -2,7 +2,7 @@ import { recipe } from '@vanilla-extract/recipes'
 
 export const spinner = recipe({
   base: {
-    animation: 'spin 1s linear infinite',
+    animation: 'spin 1s linear infinite reverse',
   },
   defaultVariants: {
     size: 'md',
