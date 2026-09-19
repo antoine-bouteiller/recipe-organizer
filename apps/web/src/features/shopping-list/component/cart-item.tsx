@@ -1,5 +1,5 @@
 import { formatNumber } from '@client/utils/number'
-import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { Toggle } from '@recipe-organizer/design-system/toggle'
 import { UNITS, type UnitSlug } from '@recipe-organizer/shared/units'
 import { useState } from 'react'
 
@@ -22,9 +22,8 @@ export const CartItem = ({ ingredient }: CartItemProps) => {
   const [isChecked, setIsChecked] = useState(false)
 
   return (
-    <button type="button" onClick={() => setIsChecked((checked) => !checked)} className={styles.item}>
-      <span className={styles.check[isChecked ? 'checked' : 'unchecked']}>{isChecked && <CheckIcon size="xs" weight="bold" />}</span>
-      <span className={styles.details[isChecked ? 'checked' : 'unchecked']}>
+    <Toggle onPressedChange={setIsChecked} presentation="check-row" pressed={isChecked}>
+      <span className={styles.details}>
         <span>{ingredient.name}</span>
         <span className={styles.quantities}>
           <span>{formatQuantityWithUnit(ingredient.primary.quantity, ingredient.primary.unitSlug)}</span>
@@ -35,6 +34,6 @@ export const CartItem = ({ ingredient }: CartItemProps) => {
           ))}
         </span>
       </span>
-    </button>
+    </Toggle>
   )
 }

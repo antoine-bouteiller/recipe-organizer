@@ -1,5 +1,6 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import { type Meta, type StoryObj } from '@storybook/react-vite'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { Toggle } from './toggle'
 
@@ -13,6 +14,32 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const CheckRow: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const row = canvas.getByRole('button', { name: 'Tomatoes' })
+    const disabledRow = canvas.getByRole('button', { name: 'Unavailable item' })
+
+    await userEvent.tab()
+    await expect(row).toHaveFocus()
+    await userEvent.keyboard(' ')
+    await expect(row).toHaveAttribute('aria-pressed', 'true')
+    await userEvent.click(row)
+    await expect(row).toHaveAttribute('aria-pressed', 'false')
+    await expect(disabledRow).toBeDisabled()
+    await expect(disabledRow).toHaveAttribute('aria-pressed', 'false')
+  },
+  render: () => (
+    <div className={styles.container}>
+      <Toggle presentation="check-row">Tomatoes</Toggle>
+      <Toggle disabled presentation="check-row">
+        Unavailable item
+      </Toggle>
+    </div>
+  ),
+  tags: ['!dev'],
+}
 
 export const Overview: Story = {
   render: (args) => (

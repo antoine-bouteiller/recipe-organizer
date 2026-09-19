@@ -24,6 +24,11 @@ export const Overview: Story = {
           <Badge>Default</Badge>
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="accent">Accent</Badge>
+          <Badge variant="info-subtle">Info subtle</Badge>
+          <Badge variant="destructive-subtle">Destructive subtle</Badge>
+          <Badge variant="neutral-subtle">Neutral subtle</Badge>
+          <Badge variant="success-subtle">Success subtle</Badge>
+          <Badge variant="warning-subtle">Warning subtle</Badge>
         </div>
       </StorySection>
       <StorySection title="Sizes">

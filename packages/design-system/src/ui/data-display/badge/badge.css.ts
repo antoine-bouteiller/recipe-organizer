@@ -89,6 +89,26 @@ export const badge = recipe({
         backgroundColor: theme.colors.secondary,
         color: theme.colors['secondary-foreground'],
       },
+      'info-subtle': {
+        backgroundColor: theme.colors['info-subtle'],
+        color: theme.colors['info-subtle-foreground'],
+      },
+      'destructive-subtle': {
+        backgroundColor: theme.colors['destructive-subtle'],
+        color: theme.colors['destructive-subtle-foreground'],
+      },
+      'neutral-subtle': {
+        backgroundColor: theme.colors['neutral-subtle'],
+        color: theme.colors['neutral-subtle-foreground'],
+      },
+      'success-subtle': {
+        backgroundColor: theme.colors['success-subtle'],
+        color: theme.colors['success-subtle-foreground'],
+      },
+      'warning-subtle': {
+        backgroundColor: theme.colors['warning-subtle'],
+        color: theme.colors['warning-subtle-foreground'],
+      },
     },
   },
 })

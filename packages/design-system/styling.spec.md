@@ -185,6 +185,10 @@ Shared shadow roles stay minimal: `shadows.ring` supplies the 1px translucent fo
 creating opacity variants, and retain the existing elevation scale. Unmatched fixed font sizes and
 radii use the nearest existing token, rounding equal-distance choices upward.
 
+Ingredient-category badges use `Badge`'s semantic `*-subtle` variants; category-to-variant mapping stays
+in the ingredient feature. Shopping rows use `Toggle`'s `check-row` presentation, which owns the pressed
+indicator and text treatment; the feature retains per-row checked state and quantity content.
+
 State overlays and image clipping follow the owner's shape. Global reset supplies solid border style;
 do not redeclare it solely because an owner specifies only border width. Required text contrast is
 4.5:1 and non-text indicators/focus 3:1 against resolved backgrounds. Correct an insufficient shared
@@ -220,6 +224,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4              | Routes compose styled components rather than owning styles.                              |
 | 2026-09-18 | Consolidate focus shadows on `shadows.ring`.                                                         | §6.5              | Remove the redundant focus token and use the same ring across controls.                  |
 | 2026-09-19 | Add the warning-subtle color pair for spice badges.                                                  | §6.1              | Give spices a readable amber category treatment.                                         |
+| 2026-09-19 | Share subtle badges and check-row toggles instead of feature-local controls.                         | §6.5              | Keep semantic styling and accessible control state in the design system.                 |
 
 ## 8. Open Questions
 
