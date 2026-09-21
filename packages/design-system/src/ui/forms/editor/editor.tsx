@@ -22,7 +22,7 @@ import {
   type LexicalNode,
   type TextFormatType,
 } from 'lexical'
-import { useCallback, useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
 
 import { OnChangePlugin } from './plugins/on-change-plugin'
 
@@ -77,7 +77,7 @@ const EditorToolbarButton = ({ children, command }: EditorToolbarButtonProps) =>
     }
   }, [editor, command])
 
-  const toggle = useCallback(() => {
+  const toggle = () => {
     if (!editor.isEditable()) {
       return
     }
@@ -104,7 +104,7 @@ const EditorToolbarButton = ({ children, command }: EditorToolbarButtonProps) =>
         break
       }
     }
-  }, [editor, command, isActive])
+  }
 
   return (
     <ToolbarPrimitive.Button render={<Toggle aria-label={command} disabled={!canExecute} onClick={toggle} pressed={isActive} value={command} />}>

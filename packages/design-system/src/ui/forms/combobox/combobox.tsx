@@ -1,5 +1,5 @@
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { lazy, Suspense, useMemo, type ReactElement, type ReactNode } from 'react'
+import { lazy, Suspense, type ReactElement, type ReactNode } from 'react'
 
 import { type Option } from './options'
 
@@ -46,7 +46,7 @@ const Combobox = <TValue extends ValueOptions>({
   value,
 }: ComboboxProps<TValue>): ReactElement => {
   const isMobile = useIsMobile()
-  const selectedOption = useMemo(() => options.find((opt) => opt.value === value), [options, value])
+  const selectedOption = options.find((opt) => opt.value === value)
 
   // Lazy boundaries erase the generic, so impls emit widened options: look the original typed option back up.
   const implProps: ComboboxImplProps<ValueOptions> = {

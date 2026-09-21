@@ -2,7 +2,7 @@ import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle } from '@design-system/ui/overlays/drawer/drawer'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { Separator } from '@recipe-organizer/design-system/separator'
-import { useMemo, useState, type ReactElement } from 'react'
+import { useState, type ReactElement } from 'react'
 
 import { Input } from '../input/input'
 import { SelectButton } from '../select/select.shared'
@@ -23,10 +23,8 @@ const ComboboxDrawer = <TValue extends ValueOptions>({
 }: ComboboxImplProps<TValue>): ReactElement => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const filteredOptions = useMemo(
-    () => (search ? options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())) : options),
-    [options, search]
-  )
+  const filteredOptions = search ? options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())) : options
+
   return (
     <Drawer onOpenChange={setOpen} open={open}>
       <DrawerPrimitive.Trigger

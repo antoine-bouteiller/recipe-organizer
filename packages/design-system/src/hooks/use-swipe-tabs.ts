@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type TouchEvent } from 'react'
+import { useRef, useState, type TouchEvent } from 'react'
 
 const SWIPE_THRESHOLD = 50
 const VELOCITY_THRESHOLD = 500
@@ -24,7 +24,7 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
     startY: 0,
   })
 
-  const setOffset = useCallback((value: number, animated: boolean) => {
+  const setOffset = (value: number, animated: boolean) => {
     offsetRef.current = value
     const element = trackRef.current
     if (!element) {
@@ -33,51 +33,42 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
     const reducedMotion = typeof globalThis.matchMedia === 'function' && globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
     element.style.transition = animated && !reducedMotion ? RELEASE_TRANSITION : 'none'
     element.style.transform = `translate3d(${value}px, 0, 0)`
-  }, [])
+  }
 
-  const containerRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (!node) {
-        return undefined
-      }
-      const syncWidth = () => {
-        widthRef.current = node.offsetWidth
-        setOffset(-activeIndexRef.current * node.offsetWidth, false)
-      }
-      syncWidth()
-      // A resize changes panel width without remounting, so a cached width would leave every panel past the first misaligned.
-      const observer = new ResizeObserver(syncWidth)
-      observer.observe(node)
-      return () => observer.disconnect()
-    },
-    [setOffset]
-  )
+  const containerRef = (node: HTMLDivElement | null) => {
+    if (!node) {
+      return undefined
+    }
+    const syncWidth = () => {
+      widthRef.current = node.offsetWidth
+      setOffset(-activeIndexRef.current * node.offsetWidth, false)
+    }
+    syncWidth()
+    // A resize changes panel width without remounting, so a cached width would leave every panel past the first misaligned.
+    const observer = new ResizeObserver(syncWidth)
+    observer.observe(node)
+    return () => observer.disconnect()
+  }
 
-  const goTo = useCallback(
-    (tab: TTab) => {
-      setActiveTab(tab)
-      activeIndexRef.current = tabs.indexOf(tab)
-      setOffset(-tabs.indexOf(tab) * widthRef.current, true)
-    },
-    [setOffset, tabs]
-  )
+  const goTo = (tab: TTab) => {
+    setActiveTab(tab)
+    activeIndexRef.current = tabs.indexOf(tab)
+    setOffset(-tabs.indexOf(tab) * widthRef.current, true)
+  }
 
-  const clampOffset = useCallback(
-    (value: number) => {
-      const min = -(tabs.length - 1) * widthRef.current
-      const max = 0
-      if (value > max) {
-        return max + (value - max) * ELASTIC_FACTOR
-      }
-      if (value < min) {
-        return min + (value - min) * ELASTIC_FACTOR
-      }
-      return value
-    },
-    [tabs.length]
-  )
+  const clampOffset = (value: number) => {
+    const min = -(tabs.length - 1) * widthRef.current
+    const max = 0
+    if (value > max) {
+      return max + (value - max) * ELASTIC_FACTOR
+    }
+    if (value < min) {
+      return min + (value - min) * ELASTIC_FACTOR
+    }
+    return value
+  }
 
-  const onTouchStart = useCallback((event: TouchEvent) => {
+  const onTouchStart = (event: TouchEvent) => {
     const touch = event.touches.item(0)
     if (!touch) {
       return
@@ -89,64 +80,58 @@ export const useSwipeTabs = <TTab extends string>(tabs: readonly TTab[], default
       startX: touch.clientX,
       startY: touch.clientY,
     }
-  }, [])
+  }
 
-  const onTouchMove = useCallback(
-    (event: TouchEvent) => {
-      const touch = event.touches.item(0)
-      if (!touch) {
-        return
+  const onTouchMove = (event: TouchEvent) => {
+    const touch = event.touches.item(0)
+    if (!touch) {
+      return
+    }
+    const state = touchState.current
+    const dx = touch.clientX - state.startX
+    const dy = touch.clientY - state.startY
+
+    if (!state.direction) {
+      if (Math.abs(dx) > DIRECTION_LOCK_THRESHOLD || Math.abs(dy) > DIRECTION_LOCK_THRESHOLD) {
+        state.direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
       }
-      const state = touchState.current
-      const dx = touch.clientX - state.startX
-      const dy = touch.clientY - state.startY
+      return
+    }
 
-      if (!state.direction) {
-        if (Math.abs(dx) > DIRECTION_LOCK_THRESHOLD || Math.abs(dy) > DIRECTION_LOCK_THRESHOLD) {
-          state.direction = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical'
-        }
-        return
-      }
+    if (state.direction === 'horizontal') {
+      event.preventDefault()
+      setOffset(clampOffset(state.baseOffset + dx), false)
+    }
+  }
 
-      if (state.direction === 'horizontal') {
-        event.preventDefault()
-        setOffset(clampOffset(state.baseOffset + dx), false)
-      }
-    },
-    [setOffset, clampOffset]
-  )
+  const onTouchEnd = (event: TouchEvent) => {
+    const state = touchState.current
 
-  const onTouchEnd = useCallback(
-    (event: TouchEvent) => {
-      const state = touchState.current
+    if (state.direction !== 'horizontal') {
+      return
+    }
 
-      if (state.direction !== 'horizontal') {
-        return
-      }
+    const touch = event.changedTouches.item(0)
+    if (!touch) {
+      return
+    }
+    const dx = touch.clientX - state.startX
+    const dt = (Date.now() - state.startTime) / 1000
+    const velocity = dx / dt
 
-      const touch = event.changedTouches.item(0)
-      if (!touch) {
-        return
-      }
-      const dx = touch.clientX - state.startX
-      const dt = (Date.now() - state.startTime) / 1000
-      const velocity = dx / dt
+    const currentIndex = tabs.indexOf(activeTab)
+    let newIndex = currentIndex
 
-      const currentIndex = tabs.indexOf(activeTab)
-      let newIndex = currentIndex
+    if (dx < -SWIPE_THRESHOLD || velocity < -VELOCITY_THRESHOLD) {
+      newIndex = Math.min(currentIndex + 1, tabs.length - 1)
+    } else if (dx > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
+      newIndex = Math.max(currentIndex - 1, 0)
+    }
 
-      if (dx < -SWIPE_THRESHOLD || velocity < -VELOCITY_THRESHOLD) {
-        newIndex = Math.min(currentIndex + 1, tabs.length - 1)
-      } else if (dx > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-        newIndex = Math.max(currentIndex - 1, 0)
-      }
-
-      setActiveTab(tabs[newIndex])
-      activeIndexRef.current = newIndex
-      setOffset(-newIndex * widthRef.current, true)
-    },
-    [activeTab, tabs, setOffset]
-  )
+    setActiveTab(tabs[newIndex])
+    activeIndexRef.current = newIndex
+    setOffset(-newIndex * widthRef.current, true)
+  }
 
   return { activeIndex, activeTab, containerRef, goTo, onTouchEnd, onTouchMove, onTouchStart, trackRef }
 }

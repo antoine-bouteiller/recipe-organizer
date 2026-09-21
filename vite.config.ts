@@ -2,6 +2,11 @@ import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { defineConfig } from 'vite-plus'
 
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
+const restrictedReactImports = {
+  name: 'react',
+  importNames: ['useMemo', 'useCallback'],
+  message: 'Rely on React Compiler instead of manual memoization with useMemo or useCallback.',
+}
 
 const viteConfig = defineConfig({
   plugins: [vanillaExtractPlugin()],
@@ -30,6 +35,7 @@ const viteConfig = defineConfig({
           'no-restricted-imports': [
             'error',
             {
+              paths: [restrictedReactImports],
               patterns: [
                 {
                   regex: '^\\.\\./\\.\\.(/|$)',
@@ -72,6 +78,7 @@ const viteConfig = defineConfig({
       'no-restricted-imports': [
         'error',
         {
+          paths: [restrictedReactImports],
           patterns: [
             {
               regex: '^\\.\\./\\.\\.(/|$)',
