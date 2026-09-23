@@ -48,7 +48,7 @@ catalog:
   lefthook: 2.1.14
   lexical: 0.51.0
   oxc-transform-react: 0.151.0
-  oxlint: 1.83.0
+  oxlint: 1.85.0
   react: 19.3.0
   react-dom: 19.3.0
   typescript: 7.0.2
