@@ -53,5 +53,5 @@ catalog:
   react-dom: 19.3.0
   typescript: 7.0.2
   vite-plus: 0.3.3
-  wrangler: 4.136.3
+  wrangler: 4.137.0
   zod: 4.6.5
