@@ -43,7 +43,7 @@ catalog:
   better-auth: 1.7.5
   drizzle-kit: 1.0.0-rc.3
   drizzle-orm: 1.0.0-rc.3
-  hono: 4.13.8
+  hono: 4.13.9
   knip: 6.38.0
   lefthook: 2.1.14
   lexical: 0.51.0
