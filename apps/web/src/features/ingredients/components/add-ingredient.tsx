@@ -6,7 +6,8 @@ import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation } from '@tanstack/react-query'
-import { useState, type JSX } from 'react'
+import { useState } from 'react'
+import type { JSX } from 'react'
 
 interface AddIngredientProps {
   children: JSX.Element

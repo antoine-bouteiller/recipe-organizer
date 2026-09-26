@@ -138,7 +138,7 @@ const viteConfig = defineConfig({
       'no-nodejs-modules': 'off',
       'no-named-export': 'off',
       'group-exports': 'off',
-      'consistent-type-specifier-style': ['error', 'prefer-inline'],
+      'no-duplicate-imports': ['error', { allowSeparateTypeImports: true }],
       'exports-last': 'off',
       'no-underscore-dangle': 'off',
       'max-nested-calls': 'off',

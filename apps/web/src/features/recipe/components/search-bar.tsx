@@ -1,7 +1,7 @@
 import { Autocomplete as AutocompletePrimitive } from '@base-ui/react/autocomplete'
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
-import { type ReducedRecipe } from '@client/types/recipe'
+import type { ReducedRecipe } from '@client/types/recipe'
 import { Button } from '@recipe-organizer/design-system/button'
 import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
 import { ArrowElbowDownLeftIcon } from '@recipe-organizer/design-system/icons/arrow-elbow-down-left'

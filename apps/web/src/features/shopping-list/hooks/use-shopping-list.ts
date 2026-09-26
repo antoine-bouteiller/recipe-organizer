@@ -1,8 +1,8 @@
 import { getRecipeByIdsOptions } from '@client/features/shopping-list/api/get-recipe-by-ids'
-import { type IngredientCartItem } from '@client/features/shopping-list/types/ingredient-cart-item'
+import type { IngredientCartItem } from '@client/features/shopping-list/types/ingredient-cart-item'
 import { useRecipeQuantitiesState } from '@client/stores/recipe-quantities.store'
 import { useShoppingListIds } from '@client/stores/shopping-list.store'
-import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
+import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import { useQuery } from '@tanstack/react-query'
 
 import { aggregateShoppingList } from '../utils/aggregate-shopping-list'

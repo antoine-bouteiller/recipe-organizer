@@ -1,5 +1,5 @@
-import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
-import { type UnitSlug } from '@recipe-organizer/shared/units'
+import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
+import type { UnitSlug } from '@recipe-organizer/shared/units'
 
 export interface AggregatedIngredient {
   readonly category: IngredientCategory

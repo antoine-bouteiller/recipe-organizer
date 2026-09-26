@@ -1,5 +1,5 @@
-import { type ReducedRecipe } from '@client/types/recipe'
-import { type CuisineType, type Meal } from '@recipe-organizer/shared/recipe/constants'
+import type { ReducedRecipe } from '@client/types/recipe'
+import type { CuisineType, Meal } from '@recipe-organizer/shared/recipe/constants'
 
 import { normalize } from './normalize'
 

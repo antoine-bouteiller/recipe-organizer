@@ -1,5 +1,6 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { type CSSProperties, globalKeyframes, globalLayer, globalStyle } from '@vanilla-extract/css'
+import { globalKeyframes, globalLayer, globalStyle } from '@vanilla-extract/css'
+import type { CSSProperties } from '@vanilla-extract/css'
 
 const resetLayer = globalLayer('reset')
 const reset = (selector: string, rules: CSSProperties) => globalStyle(selector, { '@layer': { [resetLayer]: rules } })

@@ -3,10 +3,11 @@ import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
 import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { XIcon } from '@recipe-organizer/design-system/icons/x'
-import React, { useState, type ReactElement } from 'react'
+import React, { useState } from 'react'
+import type { ReactElement } from 'react'
 
-import { type ComboboxImplProps, type ValueOptions } from './combobox'
-import { type Option } from './options'
+import type { ComboboxImplProps, ValueOptions } from './combobox'
+import type { Option } from './options'
 
 import * as styles from './combobox.base.css'
 

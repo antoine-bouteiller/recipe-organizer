@@ -2,11 +2,12 @@ import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle } from '@design-system/ui/overlays/drawer/drawer'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
 import { Separator } from '@recipe-organizer/design-system/separator'
-import { useState, type ReactElement } from 'react'
+import { useState } from 'react'
+import type { ReactElement } from 'react'
 
 import { Input } from '../input/input'
 import { SelectButton } from '../select/select.shared'
-import { type ComboboxImplProps, type ValueOptions } from './combobox'
+import type { ComboboxImplProps, ValueOptions } from './combobox'
 
 import * as styles from './combobox.drawer.css'
 

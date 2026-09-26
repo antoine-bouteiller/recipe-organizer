@@ -3,8 +3,8 @@ import { CowIcon } from '@recipe-organizer/design-system/icons/cow'
 import { FishIcon } from '@recipe-organizer/design-system/icons/fish'
 import { PackageIcon } from '@recipe-organizer/design-system/icons/package'
 import { PepperIcon } from '@recipe-organizer/design-system/icons/pepper'
-import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
-import { type ReactNode } from 'react'
+import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
+import type { ReactNode } from 'react'
 
 export const ingredientCategoryLabels = {
   fish: 'Poissons',

@@ -1,5 +1,6 @@
 import { useFieldContext } from '@design-system/hooks/use-form-context'
-import { useFileUpload, type FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
+import { useFileUpload } from '@recipe-organizer/design-system/hooks/use-file-upload'
+import type { FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
 import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
 import { VideoIcon } from '@recipe-organizer/design-system/icons/video'
 import { XIcon } from '@recipe-organizer/design-system/icons/x'

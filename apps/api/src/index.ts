@@ -1,5 +1,5 @@
 import { api } from '@recipe-organizer/api/api'
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
 import { getAuth } from '@recipe-organizer/api/lib/auth/auth-server'
 import { getDb } from '@recipe-organizer/api/lib/db'
 import { createR2GetHandler, createR2HeadHandler, deleteFile, uploadFile, uploadVideo } from '@recipe-organizer/api/lib/r2'

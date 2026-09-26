@@ -1,9 +1,10 @@
 import { formatNumber } from '@client/utils/number'
 import { Toggle } from '@recipe-organizer/design-system/toggle'
-import { UNITS, type UnitSlug } from '@recipe-organizer/shared/units'
+import { UNITS } from '@recipe-organizer/shared/units'
+import type { UnitSlug } from '@recipe-organizer/shared/units'
 import { useState } from 'react'
 
-import { type IngredientCartItem } from '../types/ingredient-cart-item'
+import type { IngredientCartItem } from '../types/ingredient-cart-item'
 
 import * as styles from './cart-item.css'
 

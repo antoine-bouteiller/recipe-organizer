@@ -1,7 +1,7 @@
 import type React from 'react'
 
 import { Icon } from './icon'
-import { type IconProps } from './types'
+import type { IconProps } from './types'
 
 export const TextBolderIcon = (props: IconProps): React.ReactElement => (
   <Icon {...props}>

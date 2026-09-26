@@ -1,6 +1,6 @@
 import { mergeProps } from '@base-ui/react/merge-props'
 import { useRender } from '@base-ui/react/use-render'
-import { type RecipeVariants } from '@vanilla-extract/recipes'
+import type { RecipeVariants } from '@vanilla-extract/recipes'
 import type React from 'react'
 
 import * as styles from './button.css'

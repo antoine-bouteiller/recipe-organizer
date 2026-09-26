@@ -1,4 +1,5 @@
-import { Link, type LinkOptions } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
+import type { LinkOptions } from '@tanstack/react-router'
 import type React from 'react'
 
 import * as styles from './tabbar.css'

@@ -4,7 +4,7 @@ import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { unitOptions } from '@recipe-organizer/shared/units'
 import { useSelector } from '@tanstack/react-store'
 
-import { type IngredientFormInput } from '../api/create'
+import type { IngredientFormInput } from '../api/create'
 
 export const getIngredientDefaultValues = (defaultName?: string): IngredientFormInput => ({
   category: undefined,

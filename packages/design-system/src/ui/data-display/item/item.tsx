@@ -1,4 +1,4 @@
-import { type RecipeVariants } from '@vanilla-extract/recipes'
+import type { RecipeVariants } from '@vanilla-extract/recipes'
 import type React from 'react'
 
 import * as styles from './item.css'

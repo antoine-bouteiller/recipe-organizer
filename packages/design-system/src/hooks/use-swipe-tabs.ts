@@ -1,4 +1,5 @@
-import { useRef, useState, type TouchEvent } from 'react'
+import { useRef, useState } from 'react'
+import type { TouchEvent } from 'react'
 
 const SWIPE_THRESHOLD = 50
 const VELOCITY_THRESHOLD = 500

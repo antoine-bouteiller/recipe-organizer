@@ -1,6 +1,6 @@
 import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'
 import { clearRecentRecipes, useRecentRecipeIds } from '@client/stores/recent-recipes.store'
-import { type ReducedRecipe } from '@client/types/recipe'
+import type { ReducedRecipe } from '@client/types/recipe'
 import { Button } from '@recipe-organizer/design-system/button'
 
 import * as styles from './recent-recipes.css'

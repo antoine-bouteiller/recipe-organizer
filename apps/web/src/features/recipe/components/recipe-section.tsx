@@ -1,4 +1,4 @@
-import { type Recipe } from '@client/features/recipe/api/get-one'
+import type { Recipe } from '@client/features/recipe/api/get-one'
 import { useRecipeQuantities } from '@client/features/recipe/hooks/use-recipe-quantities'
 import { formatNumber } from '@client/utils/number'
 import { UNITS } from '@recipe-organizer/shared/units'

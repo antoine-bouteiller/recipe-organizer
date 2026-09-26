@@ -1,4 +1,4 @@
-import { type StorybookConfig } from '@storybook/react-vite'
+import type { StorybookConfig } from '@storybook/react-vite'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 
 const config: StorybookConfig = {

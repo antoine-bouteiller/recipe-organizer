@@ -1,9 +1,10 @@
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
 import { Drawer, DrawerHeader, DrawerPanel, DrawerPopup, DrawerTitle } from '@design-system/ui/overlays/drawer/drawer'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
-import { useState, type ReactElement } from 'react'
+import { useState } from 'react'
+import type { ReactElement } from 'react'
 
-import { type SelectProps } from './select'
+import type { SelectProps } from './select'
 import { getSelectDisplay, SelectButton, selectText } from './select.shared'
 
 import * as styles from './select.drawer.css'

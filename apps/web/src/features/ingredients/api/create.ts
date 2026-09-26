@@ -2,7 +2,7 @@ import { apiClient, readResponse } from '@client/lib/api-client'
 import { queryKeys } from '@client/lib/query-keys'
 import { toastError } from '@client/lib/toast-helpers'
 import { toastManager } from '@recipe-organizer/design-system/toast'
-import { type IngredientFormValues } from '@recipe-organizer/shared/ingredients/schemas'
+import type { IngredientFormValues } from '@recipe-organizer/shared/ingredients/schemas'
 import { mutationOptions } from '@tanstack/react-query'
 
 export { ingredientSchema, type IngredientFormInput } from '@recipe-organizer/shared/ingredients/schemas'

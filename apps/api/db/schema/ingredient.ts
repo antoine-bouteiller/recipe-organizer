@@ -1,5 +1,5 @@
 import { ingredientCategory } from '@recipe-organizer/shared/ingredients/categories'
-import { type UnitSlug } from '@recipe-organizer/shared/units'
+import type { UnitSlug } from '@recipe-organizer/shared/units'
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const ingredient = sqliteTable(

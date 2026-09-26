@@ -1,5 +1,5 @@
 import { deleteRecipeOptions } from '@client/features/recipe/api/delete'
-import { type Recipe } from '@client/features/recipe/api/get-one'
+import type { Recipe } from '@client/features/recipe/api/get-one'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
 import { RecipeStepGroups } from '@client/features/recipe/components/steps/recipe-steps'

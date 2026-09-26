@@ -1,4 +1,4 @@
-import { type RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
+import type { RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
 import { describe, expect, it } from 'vite-plus/test'
 
 import { assertSubrecipeGroups, flattenSteps, rowsToStepGroups } from './recipe-steps'

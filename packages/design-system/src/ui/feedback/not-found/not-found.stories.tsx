@@ -1,6 +1,6 @@
 import { withRouter } from '@storybook-helpers/router'
 import { StorySection } from '@storybook-helpers/story-section'
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
 
 import { NotFound } from './not-found'

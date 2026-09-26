@@ -1,5 +1,6 @@
-import { type Option } from '@recipe-organizer/design-system/combobox/options'
-import { useQuery, type QueryKey, type UseQueryOptions } from '@tanstack/react-query'
+import type { Option } from '@recipe-organizer/design-system/combobox/options'
+import { useQuery } from '@tanstack/react-query'
+import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 export type { Option } from '@recipe-organizer/design-system/combobox/options'
 

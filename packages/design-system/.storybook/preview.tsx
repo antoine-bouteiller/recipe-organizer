@@ -1,4 +1,4 @@
-import { type Preview } from '@storybook/react-vite'
+import type { Preview } from '@storybook/react-vite'
 import { useEffect } from 'react'
 import { MINIMAL_VIEWPORTS } from 'storybook/viewport'
 

@@ -3,7 +3,7 @@ import { HouseIcon } from '@recipe-organizer/design-system/icons/house'
 import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
 import { ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons/shopping-cart-simple'
 import { withRouter } from '@storybook-helpers/router'
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 
 import { TabBar } from './tabbar'

@@ -1,7 +1,7 @@
 import type React from 'react'
 
 import { Icon } from './icon'
-import { type IconProps } from './types'
+import type { IconProps } from './types'
 
 export const DotsThreeVerticalIcon = ({ weight, ...props }: IconProps & { weight?: 'bold' }): React.ReactElement => (
   <Icon {...props}>

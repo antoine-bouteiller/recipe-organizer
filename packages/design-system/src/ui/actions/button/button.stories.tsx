@@ -3,7 +3,7 @@ import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
 import { StorySection } from '@storybook-helpers/story-section'
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, userEvent, within } from 'storybook/test'
 
 import { Toggle } from '../toggle/toggle'

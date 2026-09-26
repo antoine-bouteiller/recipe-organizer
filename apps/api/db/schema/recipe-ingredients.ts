@@ -1,4 +1,4 @@
-import { type UnitSlug } from '@recipe-organizer/shared/units'
+import type { UnitSlug } from '@recipe-organizer/shared/units'
 import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 import { ingredient } from './ingredient'

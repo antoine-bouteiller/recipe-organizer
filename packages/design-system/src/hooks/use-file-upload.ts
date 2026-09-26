@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type ChangeEvent, type InputHTMLAttributes } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { ChangeEvent, InputHTMLAttributes } from 'react'
 
 export interface FileMetadata {
   id: string

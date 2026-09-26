@@ -1,5 +1,4 @@
 import { allowedRotationSpeed, magimixProgram } from '@recipe-organizer/shared/recipe/magimix'
-// oxlint-disable-next-line import/consistent-type-specifier-style -- Node runs this script; an inline type import would load schemas.ts, whose extensionless imports Node cannot resolve.
 import type { RecipeStep, RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
 import * as z from 'zod'
 

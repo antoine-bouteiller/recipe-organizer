@@ -1,6 +1,7 @@
 import type * as server from '@recipe-organizer/api'
 import { notFound, redirect } from '@tanstack/react-router'
-import { hc, parseResponse, type ClientResponse } from 'hono/client'
+import { hc, parseResponse } from 'hono/client'
+import type { ClientResponse } from 'hono/client'
 import * as z from 'zod'
 
 export const apiClient = hc<typeof server.api>('/', { init: { credentials: 'same-origin' } }).api

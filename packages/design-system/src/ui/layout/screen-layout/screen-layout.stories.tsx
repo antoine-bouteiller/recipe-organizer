@@ -1,9 +1,9 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { withRouter } from '@storybook-helpers/router'
 import { StorySection } from '@storybook-helpers/story-section'
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useLocation } from '@tanstack/react-router'
-import { type ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
 import { ScreenLayout } from './screen-layout'

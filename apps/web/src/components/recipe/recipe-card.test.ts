@@ -1,6 +1,6 @@
 import { RecipeListContent } from '@client/features/recipe/components/recipe-list'
 import { RecipeSearchCard } from '@client/features/search/components/recipe-search-card'
-import { type ReducedRecipe } from '@client/types/recipe'
+import type { ReducedRecipe } from '@client/types/recipe'
 import { RouterContextProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'

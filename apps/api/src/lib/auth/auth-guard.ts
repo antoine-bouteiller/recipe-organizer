@@ -1,4 +1,4 @@
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
 import { createMiddleware } from 'hono/factory'
 import { HTTPException } from 'hono/http-exception'
 

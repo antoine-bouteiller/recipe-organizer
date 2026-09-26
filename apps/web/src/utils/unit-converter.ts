@@ -1,4 +1,5 @@
-import { UNITS, type Dimension, type Unit, type UnitSlug } from '@recipe-organizer/shared/units'
+import { UNITS } from '@recipe-organizer/shared/units'
+import type { Dimension, Unit, UnitSlug } from '@recipe-organizer/shared/units'
 
 interface IngredientConversionMeta {
   readonly densityGPerMl: number | null

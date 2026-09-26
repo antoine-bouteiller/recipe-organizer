@@ -1,4 +1,4 @@
-import { type CuisineType, type Meal } from '@recipe-organizer/shared/recipe/constants'
+import type { CuisineType, Meal } from '@recipe-organizer/shared/recipe/constants'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 import { user } from './user'

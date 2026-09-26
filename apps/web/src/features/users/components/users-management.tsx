@@ -1,4 +1,5 @@
-import { createUserOptions, userSchema, type UserFormInput } from '@client/features/users/api/create'
+import { createUserOptions, userSchema } from '@client/features/users/api/create'
+import type { UserFormInput } from '@client/features/users/api/create'
 import { getUserListOptions } from '@client/features/users/api/get-all'
 import { ApproveUser } from '@client/features/users/components/approve-user'
 import { BlockUser } from '@client/features/users/components/block-user'

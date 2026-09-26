@@ -1,4 +1,5 @@
-import { defineRule, type ESTree } from '@oxlint/plugins'
+import { defineRule } from '@oxlint/plugins'
+import type { ESTree } from '@oxlint/plugins'
 
 // oxlint-disable-next-line complexity -- Each AST declaration form needs its own ownership check.
 const isLocalDefinition = (node: ESTree.Node): boolean => {

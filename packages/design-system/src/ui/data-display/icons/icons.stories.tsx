@@ -1,4 +1,4 @@
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ArrowCounterClockwiseIcon } from './arrow-counter-clockwise'
 import { ArrowElbowDownLeftIcon } from './arrow-elbow-down-left'

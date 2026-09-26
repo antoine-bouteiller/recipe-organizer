@@ -1,4 +1,4 @@
-import { type ESTree } from '@oxlint/plugins'
+import type { ESTree } from '@oxlint/plugins'
 
 type VisitorKeys = Readonly<Record<string, readonly string[]>>
 

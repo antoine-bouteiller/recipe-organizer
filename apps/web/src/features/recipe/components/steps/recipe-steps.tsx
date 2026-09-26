@@ -1,7 +1,7 @@
 import { getRecipeInstructionsOptions } from '@client/features/recipe/api/get-instructions'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
 import { parseBoldText } from '@recipe-organizer/shared/recipe/bold-text'
-import { type RecipeStep, type RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
+import type { RecipeStep, RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
 import { useQuery } from '@tanstack/react-query'
 
 import { MagimixStepItem } from './magimix-step-item'

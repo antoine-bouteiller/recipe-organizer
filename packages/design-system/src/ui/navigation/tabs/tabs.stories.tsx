@@ -1,4 +1,4 @@
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 

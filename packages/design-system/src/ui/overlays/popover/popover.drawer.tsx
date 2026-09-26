@@ -1,8 +1,8 @@
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer'
-import { type ReactElement } from 'react'
+import type { ReactElement } from 'react'
 
 import { Drawer as DrawerRoot, DrawerPopup } from '../drawer/drawer'
-import { type PopoverProps } from './popover'
+import type { PopoverProps } from './popover'
 
 const PopoverDrawer = ({ trigger, children }: PopoverProps): ReactElement => (
   <DrawerRoot>

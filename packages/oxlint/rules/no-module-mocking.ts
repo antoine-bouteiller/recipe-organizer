@@ -1,4 +1,5 @@
-import { defineRule, type ESTree, type Scope, type SourceCode, type Variable } from '@oxlint/plugins'
+import { defineRule } from '@oxlint/plugins'
+import type { ESTree, Scope, SourceCode, Variable } from '@oxlint/plugins'
 
 const moduleMockMethods = new Set(['doMock', 'mock', 'unstable_mockModule'])
 

@@ -1,4 +1,4 @@
-import { type ReducedRecipe } from '@client/types/recipe'
+import type { ReducedRecipe } from '@client/types/recipe'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { BookIcon } from '@recipe-organizer/design-system/icons/book'

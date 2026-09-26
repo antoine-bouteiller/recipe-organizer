@@ -1,5 +1,5 @@
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
-import { type Context } from 'hono'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { Context } from 'hono'
 
 export const getApiUser = async (context: Context<ApiEnvironment>): Promise<ApiEnvironment['Variables']['user'] | undefined> => {
   // Preserve the existing local-development identity; production always resolves a session.

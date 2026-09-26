@@ -1,6 +1,6 @@
 import { desktopMenuItems } from '@client/components/navigation/constants'
 import { Link } from '@tanstack/react-router'
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import * as styles from './app-shell.css'
 

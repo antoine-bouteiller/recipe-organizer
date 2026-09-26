@@ -1,4 +1,4 @@
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
 import { getApiUser } from '@recipe-organizer/api/lib/auth/api-user'
 import { ingredientRoutes } from '@recipe-organizer/api/routes/ingredients/routes'
 import { recipeRoutes } from '@recipe-organizer/api/routes/recipe/routes'

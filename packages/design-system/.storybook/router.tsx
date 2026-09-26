@@ -1,4 +1,4 @@
-import { type Decorator } from '@storybook/react-vite'
+import type { Decorator } from '@storybook/react-vite'
 import { RouterProvider, createMemoryHistory, createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 
 export const withRouter: Decorator = (Story, context) => {

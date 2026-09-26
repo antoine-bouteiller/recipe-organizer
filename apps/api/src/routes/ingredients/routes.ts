@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
 import { authGuard } from '@recipe-organizer/api/lib/auth/auth-guard'
 import { ingredient } from '@recipe-organizer/api/schema'
 import { deleteIngredientSchema, ingredientSchema, updateIngredientSchema } from '@recipe-organizer/shared/ingredients/schemas'

@@ -1,4 +1,5 @@
-import { defineRule, type ESTree } from '@oxlint/plugins'
+import { defineRule } from '@oxlint/plugins'
+import type { ESTree } from '@oxlint/plugins'
 
 const isIdentifier = (node: ESTree.Node, name: string): boolean => node.type === 'Identifier' && node.name === name
 

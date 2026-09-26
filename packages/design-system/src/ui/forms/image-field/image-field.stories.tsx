@@ -1,8 +1,8 @@
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
-import { type FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
+import type { FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
 import { StorySection } from '@storybook-helpers/story-section'
-import { type Meta, type StoryObj } from '@storybook/react-vite'
-import { type ReactElement } from 'react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import type { ReactElement } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import * as styles from './image-field.stories.css'

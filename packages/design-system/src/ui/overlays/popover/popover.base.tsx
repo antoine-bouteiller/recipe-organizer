@@ -1,7 +1,7 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
-import { type ReactElement } from 'react'
+import type { ReactElement } from 'react'
 
-import { type PopoverProps } from './popover'
+import type { PopoverProps } from './popover'
 
 import * as styles from './popover.base.css'
 

@@ -1,6 +1,6 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { StorySection } from '@storybook-helpers/story-section'
-import { type Meta, type StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 
 import { Dialog } from './dialog'

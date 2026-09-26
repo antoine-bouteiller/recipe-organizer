@@ -1,4 +1,5 @@
-import { defineRule, type ESTree, type SourceCode } from '@oxlint/plugins'
+import { defineRule } from '@oxlint/plugins'
+import type { ESTree, SourceCode } from '@oxlint/plugins'
 
 import { lexicalTypeParameterNames } from '../shared/lexical-type-parameters.ts'
 

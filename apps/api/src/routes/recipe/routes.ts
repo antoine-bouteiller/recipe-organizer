@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
 import { authGuard } from '@recipe-organizer/api/lib/auth/auth-guard'
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@recipe-organizer/api/schema'
 import { assertOwnerOrAdmin } from '@recipe-organizer/api/utils/assert-owner-or-admin'

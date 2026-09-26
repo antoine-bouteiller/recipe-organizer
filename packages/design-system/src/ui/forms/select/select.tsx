@@ -1,5 +1,6 @@
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { lazy, Suspense, type ReactElement } from 'react'
+import { lazy, Suspense } from 'react'
+import type { ReactElement } from 'react'
 
 import { getSelectDisplay, SelectButton, selectText } from './select.shared'
 

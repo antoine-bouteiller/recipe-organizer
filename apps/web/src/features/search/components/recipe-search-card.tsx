@@ -1,10 +1,10 @@
 import { addRecentRecipe } from '@client/stores/recent-recipes.store'
-import { type ReducedRecipe } from '@client/types/recipe'
+import type { ReducedRecipe } from '@client/types/recipe'
 import { staggerStyle } from '@client/utils/stagger'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { Link } from '@tanstack/react-router'
-import { type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import * as styles from './recipe-search-card.css'
 

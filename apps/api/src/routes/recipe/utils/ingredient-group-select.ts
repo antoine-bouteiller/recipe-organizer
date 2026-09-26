@@ -1,4 +1,4 @@
-import { type getDb } from '@recipe-organizer/api/lib/db'
+import type { getDb } from '@recipe-organizer/api/lib/db'
 
 export const ingredientGroupSelect = {
   columns: {

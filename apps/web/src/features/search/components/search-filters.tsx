@@ -1,5 +1,5 @@
 import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
-import { type SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
+import type { SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
 import { Button } from '@recipe-organizer/design-system/button'
 import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons/funnel-simple'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'

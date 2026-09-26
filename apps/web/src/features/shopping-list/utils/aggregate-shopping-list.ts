@@ -1,10 +1,10 @@
 import { isNullOrUndefined } from '@client/utils/is-null-or-undefined'
 import { convert } from '@client/utils/unit-converter'
-import { type IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
-import { type UnitSlug } from '@recipe-organizer/shared/units'
+import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
+import type { UnitSlug } from '@recipe-organizer/shared/units'
 import { scaleQuantity } from '@recipe-organizer/shared/utils/scale-quantity'
 
-import { type AggregatedIngredient, type IngredientCartItem } from '../types/ingredient-cart-item'
+import type { AggregatedIngredient, IngredientCartItem } from '../types/ingredient-cart-item'
 
 export interface ShoppingListIngredient {
   readonly category: IngredientCategory

@@ -1,4 +1,5 @@
-import { defineRule, type ESTree } from '@oxlint/plugins'
+import { defineRule } from '@oxlint/plugins'
+import type { ESTree } from '@oxlint/plugins'
 
 const unwrapParentheses = (node: ESTree.Expression): ESTree.Expression => {
   let current = node

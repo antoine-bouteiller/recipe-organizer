@@ -1,7 +1,6 @@
-// oxlint-disable-next-line import/consistent-type-specifier-style -- an inline type import keeps a runtime import of `cloudflare:workers`, which unit tests cannot load.
 import type { getDb } from '@recipe-organizer/api/lib/db'
 import { magimixSteps, recipeStep, recipeStepGroup, textSteps } from '@recipe-organizer/api/schema'
-import { type RecipeStep, type RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
+import type { RecipeStep, RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
 import { eq, sql } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 

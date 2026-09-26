@@ -3,7 +3,8 @@ import { SpinnerGapIcon } from '@recipe-organizer/design-system/icons/spinner-ga
 import { ThermometerIcon } from '@recipe-organizer/design-system/icons/thermometer'
 import { TimerIcon } from '@recipe-organizer/design-system/icons/timer'
 import { Item } from '@recipe-organizer/design-system/item'
-import { magimixProgramLabels, type MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix'
+import { magimixProgramLabels } from '@recipe-organizer/shared/recipe/magimix'
+import type { MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix'
 
 import * as styles from './magimix-step-item.css'
 

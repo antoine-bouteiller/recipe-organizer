@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator'
-import { type ApiEnvironment } from '@recipe-organizer/api/api-context'
+import type { ApiEnvironment } from '@recipe-organizer/api/api-context'
 import { scaleQuantity } from '@recipe-organizer/shared/utils/scale-quantity'
 import { Hono } from 'hono'
 import * as z from 'zod'

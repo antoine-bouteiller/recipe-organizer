@@ -1,6 +1,7 @@
-import { createElement, type ReactElement, type ReactNode } from 'react'
+import { createElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 
-import { type IconProps, type IconSize } from './types'
+import type { IconProps, IconSize } from './types'
 
 import * as styles from './icon.css'
 

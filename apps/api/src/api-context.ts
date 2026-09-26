@@ -1,6 +1,6 @@
-import { type getAuth } from '@recipe-organizer/api/lib/auth/auth-server'
-import { type getDb } from '@recipe-organizer/api/lib/db'
-import { type createR2GetHandler, type createR2HeadHandler, type deleteFile, type uploadFile, type uploadVideo } from '@recipe-organizer/api/lib/r2'
+import type { getAuth } from '@recipe-organizer/api/lib/auth/auth-server'
+import type { getDb } from '@recipe-organizer/api/lib/db'
+import type { createR2GetHandler, createR2HeadHandler, deleteFile, uploadFile, uploadVideo } from '@recipe-organizer/api/lib/r2'
 
 interface ApiUser {
   id: string

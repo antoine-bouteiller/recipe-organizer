@@ -1,7 +1,8 @@
-import { type ReducedRecipe } from '@client/types/recipe'
+import type { ReducedRecipe } from '@client/types/recipe'
 import { describe, expect, it } from 'vite-plus/test'
 
-import { EMPTY_FILTERS, filterRecipes, hasActiveFilters, type SearchFilters } from './filter'
+import { EMPTY_FILTERS, filterRecipes, hasActiveFilters } from './filter'
+import type { SearchFilters } from './filter'
 
 const recipes: ReducedRecipe[] = [
   {

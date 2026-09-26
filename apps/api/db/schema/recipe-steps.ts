@@ -1,4 +1,4 @@
-import { type MagimixProgram, type RotationSpeed } from '@recipe-organizer/shared/recipe/magimix'
+import type { MagimixProgram, RotationSpeed } from '@recipe-organizer/shared/recipe/magimix'
 import { sql } from 'drizzle-orm'
 import { check, index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core'
 

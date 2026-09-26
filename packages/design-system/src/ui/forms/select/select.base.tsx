@@ -3,9 +3,9 @@ import { CaretDownIcon } from '@recipe-organizer/design-system/icons/caret-down'
 import { CaretUpIcon } from '@recipe-organizer/design-system/icons/caret-up'
 import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
-import { type ReactElement } from 'react'
+import type { ReactElement } from 'react'
 
-import { type SelectProps } from './select'
+import type { SelectProps } from './select'
 import { getSelectDisplay, selectText } from './select.shared'
 
 import * as styles from './select.base.css'
