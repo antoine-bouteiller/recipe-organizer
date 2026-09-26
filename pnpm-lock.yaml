@@ -273,8 +273,8 @@ catalogs:
       specifier: 0.3.3
       version: 0.3.3
     wrangler:
-      specifier: 4.139.0
-      version: 4.139.0
+      specifier: 4.140.0
+      version: 4.140.0
     zod:
       specifier: 4.6.5
       version: 4.6.5
@@ -321,7 +321,7 @@ importers:
         version: 0.3.3(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1)
       wrangler:
         specifier: 'catalog:'
-        version: 4.139.0(@types/node@25.9.8)
+        version: 4.140.0(@types/node@25.9.8)
 
   apps/api:
     dependencies:
@@ -349,7 +349,7 @@ importers:
         version: link:../../packages/config
       wrangler:
         specifier: 'catalog:'
-        version: 4.139.0(@types/node@25.9.8)
+        version: 4.140.0(@types/node@25.9.8)
 
   apps/web:
     dependencies:
@@ -509,7 +509,7 @@ importers:
     dependencies:
       wrangler:
         specifier: 'catalog:'
-        version: 4.139.0(@types/node@25.9.8)
+        version: 4.140.0(@types/node@25.9.8)
     devDependencies:
       '@recipe-organizer/api':
         specifier: workspace:*
@@ -4859,8 +4859,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@4.139.0:
-    resolution: {integrity: sha512-9RtaWkIkxqntg58bGwNVRfGVSgf+cAq/45YzC87LN5YniCt4DDNrFM2gXK5SHMj3iG5YnDHhRVvh63FWnmJnaA==}
+  wrangler@4.140.0:
+    resolution: {integrity: sha512-XeKeC33B4Nglg0RAJ8F8ecGHOW+cPFeE5+fp4WBzn1c0u+H/96cVQYjto3/0ahilfPurnnGcUslJ1xaZXy+NGQ==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -8490,7 +8490,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260923.1
       '@cloudflare/workerd-windows-64': 1.20260923.1
 
-  wrangler@4.139.0(@types/node@25.9.8):
+  wrangler@4.140.0(@types/node@25.9.8):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20260923.1)
