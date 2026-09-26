@@ -17,11 +17,11 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
       ],
     },
   ],
-  instructions: undefined,
   linkedRecipes: [],
   meals: [],
   name: '',
   servings: 4,
+  steps: [],
   video: undefined,
 }
 

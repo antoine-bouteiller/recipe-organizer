@@ -10,18 +10,6 @@ const viteConfig = defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  build: {
-    rolldownOptions: {
-      onLog(level, log, defaultHandler) {
-        // Supress Lexical Warning
-        if (log.code === 'INVALID_ANNOTATION') {
-          return
-        }
-        // Handle all other logs normally
-        defaultHandler(level, log)
-      },
-    },
-  },
   plugins: [
     vanillaExtractPlugin(),
     tanstackRouter({

@@ -18,6 +18,7 @@ import { HTTPException } from 'hono/http-exception'
 import * as z from 'zod'
 
 import { ingredientGroupSelect } from './utils/ingredient-group-select'
+import { assertSubrecipeSteps, deleteRecipeSteps, selectRecipeSteps } from './utils/recipe-steps'
 import { resolveAutoFlags, writeRecipeIngredientGraph } from './utils/recipe-write'
 
 const idParamSchema = z.object({ id: z.coerce.number() })
@@ -93,42 +94,48 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
     if (!result) {
       throw new HTTPException(404)
     }
+    const steps = await selectRecipeSteps(context.env.db, id)
     return context.json({
       cuisineTypes: result.cuisineTypes,
       id: result.id,
       image: getImageUrl(result.image),
       ingredientGroups: result.ingredientGroups,
-      instructions: result.instructions,
       isMagimix: result.isMagimix,
       isVegetarian: result.isVegetarian,
       linkedRecipes: result.linkedRecipes,
       meals: result.meals,
       name: result.name,
       servings: result.servings,
+      steps,
       video: result.video,
     })
   })
   .get('/:id/instructions', zValidator('param', idParamSchema), async (context) => {
     const { id } = context.req.valid('param')
-    const result = await context.env.db.query.recipe.findFirst({ columns: { id: true, instructions: true, name: true }, where: { id } })
-    return context.json(result ?? null)
+    const result = await context.env.db.query.recipe.findFirst({ columns: { id: true, name: true }, where: { id } })
+    if (!result) {
+      return context.json(null)
+    }
+    return context.json({ ...result, steps: await selectRecipeSteps(context.env.db, id) })
   })
   .post('/', authGuard(), zValidator('form', recipeFormWireSchema), async (context) => {
     const data = recipeSchema.parse(parseFormData(await context.req.formData()))
-    const { cuisineTypes, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data
+    const { cuisineTypes, image, ingredientGroups, linkedRecipes, meals, name, servings, steps, video } = data
     const { db } = context.env
+    const linkedRecipeIds = linkedRecipes?.map((linkedRecipe) => linkedRecipe.id) ?? []
+    assertSubrecipeSteps(steps, linkedRecipeIds)
     const imageKey = image instanceof File ? await context.env.media.uploadFile(image) : image.id
     const videoKey = video instanceof File ? await context.env.media.uploadVideo(video) : video?.id
     const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((item) => item.id))
-    const linkedRecipeIds = linkedRecipes?.map((linkedRecipe) => linkedRecipe.id) ?? []
-    const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags(db, { allIngredientIds, instructions, linkedRecipeIds, meals })
+    const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags(db, { allIngredientIds, linkedRecipeIds, meals, steps })
     const [createdRecipe] = await db
       .insert(recipe)
       .values({
         createdBy: context.get('user').id,
         cuisineTypes,
         image: imageKey,
-        instructions,
+        // Legacy Lexical column: still NOT NULL until it is dropped; steps are the source of truth.
+        instructions: '',
         isMagimix,
         isSpice,
         isVegetarian,
@@ -139,7 +146,7 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
       })
       .returning({ id: recipe.id })
     try {
-      await writeRecipeIngredientGraph(db, createdRecipe.id, ingredientGroups, linkedRecipes)
+      await writeRecipeIngredientGraph(db, createdRecipe.id, ingredientGroups, linkedRecipes, steps)
     } catch (error) {
       await db.delete(recipe).where(eq(recipe.id, createdRecipe.id))
       throw error
@@ -148,8 +155,10 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
   })
   .post('/update', authGuard(), zValidator('form', updateRecipeFormWireSchema), async (context) => {
     const data = updateRecipeSchema.parse(parseFormData(await context.req.formData()))
-    const { cuisineTypes, id, image, ingredientGroups, instructions, linkedRecipes, meals, name, servings, video } = data
+    const { cuisineTypes, id, image, ingredientGroups, linkedRecipes, meals, name, servings, steps, video } = data
     const { db } = context.env
+    const linkedRecipeIds = linkedRecipes?.map((linkedRecipe) => linkedRecipe.id) ?? []
+    assertSubrecipeSteps(steps, linkedRecipeIds, id)
     const currentRecipe = await db.query.recipe.findFirst({ where: { id }, with: { ingredientGroups: { columns: { id: true } } } })
     if (!currentRecipe) {
       throw new HTTPException(404)
@@ -158,12 +167,11 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
     const { key: imageKey, staleKey: imageStale } = await resolveImageKey(context.env.media, image, currentRecipe.image)
     const { key: videoKey, staleKey: videoStale } = await resolveVideoKey(context.env.media, video, currentRecipe.video)
     const allIngredientIds = ingredientGroups.flatMap((group) => group.ingredients.map((item) => item.id))
-    const linkedRecipeIds = linkedRecipes?.map((linkedRecipe) => linkedRecipe.id) ?? []
-    const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags(db, { allIngredientIds, instructions, linkedRecipeIds, meals })
+    const { isMagimix, isSpice, isVegetarian } = await resolveAutoFlags(db, { allIngredientIds, linkedRecipeIds, meals, steps })
     await db.batch([
       db
         .update(recipe)
-        .set({ cuisineTypes, image: imageKey, instructions, isMagimix, isSpice, isVegetarian, meals, name, servings, video: videoKey })
+        .set({ cuisineTypes, image: imageKey, isMagimix, isSpice, isVegetarian, meals, name, servings, video: videoKey })
         .where(eq(recipe.id, id))
         .returning({ id: recipe.id }),
       db.delete(groupIngredient).where(
@@ -174,8 +182,9 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
       ),
       db.delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
       db.delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
+      ...deleteRecipeSteps(db, id),
     ])
-    await writeRecipeIngredientGraph(db, currentRecipe.id, ingredientGroups, linkedRecipes)
+    await writeRecipeIngredientGraph(db, currentRecipe.id, ingredientGroups, linkedRecipes, steps)
     await Promise.allSettled([imageStale, videoStale].filter((key): key is string => Boolean(key)).map((key) => context.env.media.deleteFile(key)))
     return context.json(id)
   })
@@ -200,6 +209,7 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
       ),
       db.delete(recipeIngredientGroup).where(eq(recipeIngredientGroup.recipeId, id)),
       db.delete(recipeLinkedRecipes).where(eq(recipeLinkedRecipes.recipeId, id)),
+      ...deleteRecipeSteps(db, id),
       db.delete(recipe).where(eq(recipe.id, id)),
     ])
     await context.env.media.deleteFile(currentRecipe.image)

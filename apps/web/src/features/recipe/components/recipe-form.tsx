@@ -8,17 +8,13 @@ import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
 import { Label } from '@recipe-organizer/design-system/label'
 import { Separator } from '@recipe-organizer/design-system/separator'
-import { Skeleton } from '@recipe-organizer/design-system/skeleton'
-import { ToolbarGroup, ToolbarSeparator } from '@recipe-organizer/design-system/toolbar'
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@recipe-organizer/shared/recipe/constants'
 import { unitOptions } from '@recipe-organizer/shared/units'
 import { useSelector } from '@tanstack/react-store'
-import { Fragment, Suspense, type ReactNode } from 'react'
+import { Fragment, type ReactNode } from 'react'
 
 import { recipeDefaultValues, type recipeFormFields } from '../utils/form'
-import { recipeNodes } from './editor/extensions'
-import { MagimixProgramButton } from './editor/magimix/magimix-program-button'
-import { SubrecipeButton } from './editor/subrecipe/subrecipe-button'
+import { StepsField } from './steps/steps-field'
 
 import * as ingredientGroupStyles from './ingredient-group-field.css'
 import * as styles from './recipe-form.css'
@@ -239,26 +235,7 @@ export const RecipeForm = withForm({
         </div>
 
         <LinkedRecipesProvider linkedRecipeIds={linkedRecipeIds}>
-          <AppField name="instructions">
-            {({ EditorField }) => (
-              <Suspense fallback={<Skeleton preset="recipe-form" />}>
-                <EditorField
-                  disabled={isSubmitting}
-                  nodes={recipeNodes}
-                  extraToolbar={
-                    <>
-                      <ToolbarSeparator />
-                      <ToolbarGroup>
-                        <MagimixProgramButton />
-                        <SubrecipeButton />
-                      </ToolbarGroup>
-                    </>
-                  }
-                  label="Instructions"
-                />
-              </Suspense>
-            )}
-          </AppField>
+          <StepsField disabled={isSubmitting} form={form} />
         </LinkedRecipesProvider>
       </>
     )

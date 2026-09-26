@@ -7,8 +7,8 @@ import { useSelector } from '@tanstack/react-store'
 import { useState, type ReactElement } from 'react'
 import * as z from 'zod'
 
-export interface MagimixProgramDialogProps {
-  initialData?: MagimixProgramFormInput
+interface MagimixStepDialogProps {
+  initialData?: MagimixProgramData
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
@@ -23,7 +23,7 @@ const magimixProgramSchema = z.object({
   timeSeconds: z.number().min(0).max(60),
 })
 
-export type MagimixProgramFormInput = z.infer<typeof magimixProgramSchema>
+type MagimixProgramFormInput = z.infer<typeof magimixProgramSchema>
 
 const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
@@ -40,11 +40,19 @@ const programItems = Object.entries(magimixProgramLabels).map(([value, label]) =
 
 const FormDialog = getFormDialog(magimixProgramDefaultValues)
 
-export const MagimixProgramDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: MagimixProgramDialogProps) => {
+export const MagimixStepDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: MagimixStepDialogProps) => {
   const [open, setOpen] = useState(false)
 
   const form = useAppForm({
-    defaultValues: initialData ?? magimixProgramDefaultValues,
+    defaultValues: initialData
+      ? {
+          program: initialData.program,
+          rotationSpeed: initialData.rotationSpeed,
+          temperature: initialData.temperature,
+          timeMinutes: Math.floor(initialData.time / 60),
+          timeSeconds: initialData.time % 60,
+        }
+      : magimixProgramDefaultValues,
     onSubmit: async ({ value }) => {
       const validated = magimixProgramSchema.parse(value)
 

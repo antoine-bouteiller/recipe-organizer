@@ -1,12 +1,11 @@
 import { deleteRecipeOptions } from '@client/features/recipe/api/delete'
 import { type Recipe } from '@client/features/recipe/api/get-one'
-import { recipeNodes } from '@client/features/recipe/components/editor/extensions'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
+import { RecipeSteps } from '@client/features/recipe/components/steps/recipe-steps'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
-import { Editor, EditorContent } from '@recipe-organizer/design-system/editor'
 import { DotsThreeVerticalIcon } from '@recipe-organizer/design-system/icons/dots-three-vertical'
 import { PencilSimpleIcon } from '@recipe-organizer/design-system/icons/pencil-simple'
 import { Popover } from '@recipe-organizer/design-system/popover'
@@ -133,9 +132,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
               </SwipeTabsPanel>
               <SwipeTabsPanel value="preparation">
                 <div className={styles.instructionsPanel}>
-                  <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                    <EditorContent width="reading" />
-                  </Editor>
+                  <RecipeSteps steps={recipe.steps} visited={[recipe.id]} />
                 </div>
               </SwipeTabsPanel>
             </SwipeTabsPanels>
@@ -149,9 +146,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
           <section className={styles.instructionsSection}>
             <h2 className={styles.instructionsHeading}>Préparation</h2>
             <div className={styles.instructionsContent}>
-              <Editor content={recipe.instructions} nodes={recipeNodes} readOnly>
-                <EditorContent width="reading" />
-              </Editor>
+              <RecipeSteps steps={recipe.steps} visited={[recipe.id]} />
             </div>
           </section>
         </div>

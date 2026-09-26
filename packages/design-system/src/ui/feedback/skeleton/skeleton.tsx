@@ -7,7 +7,6 @@ export interface SkeletonProps {
     | 'recipe-card'
     | 'recipe-details-text'
     | 'recipe-details-title'
-    | 'recipe-form'
     | 'search-input'
     | 'search-result'
     | 'shopping-list-row'

@@ -8,7 +8,6 @@
     "./card": "./src/ui/data-display/card/card.tsx",
     "./combobox/options": "./src/ui/forms/combobox/options.ts",
     "./delete-dialog": "./src/ui/overlays/delete-dialog/delete-dialog.tsx",
-    "./editor": "./src/ui/forms/editor/editor.tsx",
     "./form": "./src/ui/forms/form/form.tsx",
     "./form-dialog": "./src/ui/overlays/form-dialog/form-dialog.tsx",
     "./global.css": "./src/global.css.ts",
@@ -37,7 +36,6 @@
     "./theme": "./src/theme/index.ts",
     "./toast": "./src/ui/feedback/toast/toast.tsx",
     "./toggle": "./src/ui/actions/toggle/toggle.tsx",
-    "./toolbar": "./src/ui/actions/toolbar/toolbar.tsx",
     "./utils/format-form-errors": "./src/utils/format-form-errors.ts"
   },
   "scripts": {
@@ -46,15 +44,9 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
-    "@lexical/history": "catalog:",
-    "@lexical/list": "catalog:",
-    "@lexical/react": "catalog:",
-    "@lexical/rich-text": "catalog:",
-    "@lexical/utils": "catalog:",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-router": "catalog:",
-    "@tanstack/react-store": "catalog:",
-    "lexical": "catalog:"
+    "@tanstack/react-store": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",

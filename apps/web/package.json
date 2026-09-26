@@ -8,8 +8,6 @@
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
-    "@lexical/react": "catalog:",
-    "@lexical/utils": "catalog:",
     "@recipe-organizer/design-system": "workspace:*",
     "@recipe-organizer/shared": "workspace:*",
     "@tanstack/react-form": "catalog:",
@@ -18,7 +16,6 @@
     "@tanstack/react-store": "catalog:",
     "better-auth": "catalog:",
     "hono": "catalog:",
-    "lexical": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "zod": "catalog:"

@@ -32,10 +32,6 @@ export const skeleton = recipe({
         height: theme.spacing(10),
         width: '100%',
       },
-      'recipe-form': {
-        height: theme.spacing(64),
-        width: '100%',
-      },
       'search-input': {
         borderRadius: theme.radius.xl,
         height: theme.spacing(11),

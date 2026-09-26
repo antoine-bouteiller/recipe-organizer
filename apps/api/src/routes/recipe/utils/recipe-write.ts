@@ -1,8 +1,12 @@
-import { type getDb } from '@recipe-organizer/api/lib/db'
+// oxlint-disable-next-line import/consistent-type-specifier-style -- an inline type import keeps a runtime import of `cloudflare:workers`, which unit tests cannot load.
+import type { getDb } from '@recipe-organizer/api/lib/db'
 import { groupIngredient, ingredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@recipe-organizer/api/schema'
+import { type RecipeStep } from '@recipe-organizer/shared/recipe/schemas'
 import { type UnitSlug } from '@recipe-organizer/shared/units'
 import { isNotEmpty } from '@recipe-organizer/shared/utils/array'
 import { inArray } from 'drizzle-orm'
+
+import { writeRecipeSteps } from './recipe-steps'
 
 interface IngredientGroupWrite {
   readonly groupName?: string
@@ -17,8 +21,8 @@ interface LinkedRecipeWrite {
 interface ResolveAutoFlagsInput {
   readonly allIngredientIds: number[]
   readonly linkedRecipeIds: number[]
-  readonly instructions: string
   readonly meals: string[]
+  readonly steps: readonly RecipeStep[]
 }
 
 interface AutoFlags {
@@ -27,16 +31,16 @@ interface AutoFlags {
   readonly isVegetarian: boolean
 }
 
-const computeAutoFlags = (
+export const computeAutoFlags = (
   ingredientCategories: { category: string | null }[],
   linkedRecipesData: { isVegetarian: boolean }[],
-  instructions: string,
+  steps: readonly RecipeStep[],
   meals: string[]
 ): AutoFlags => {
   const ownVegetarian = ingredientCategories.every((item) => item.category !== 'meat' && item.category !== 'fish')
   const linkedVegetarian = linkedRecipesData.every((item) => item.isVegetarian)
   return {
-    isMagimix: instructions.includes('"type":"magimixProgram"'),
+    isMagimix: steps.some((step) => step.kind === 'magimix'),
     isSpice: ingredientCategories.length > 0 && ingredientCategories.every((item) => item.category === 'spices'),
     isVegetarian: ownVegetarian && linkedVegetarian && !meals.includes('dessert'),
   }
@@ -44,21 +48,22 @@ const computeAutoFlags = (
 
 export const resolveAutoFlags = async (
   db: ReturnType<typeof getDb>,
-  { allIngredientIds, linkedRecipeIds, instructions, meals }: ResolveAutoFlagsInput
+  { allIngredientIds, linkedRecipeIds, meals, steps }: ResolveAutoFlagsInput
 ): Promise<AutoFlags> => {
   const [ingredientCategories, linkedRecipesData] = await db.batch([
     db.select({ category: ingredient.category }).from(ingredient).where(inArray(ingredient.id, allIngredientIds)),
     db.select({ isVegetarian: recipe.isVegetarian }).from(recipe).where(inArray(recipe.id, linkedRecipeIds)),
   ])
 
-  return computeAutoFlags(ingredientCategories, linkedRecipesData, instructions, meals)
+  return computeAutoFlags(ingredientCategories, linkedRecipesData, steps, meals)
 }
 
 export const writeRecipeIngredientGraph = async (
   db: ReturnType<typeof getDb>,
   recipeId: number,
   ingredientGroups: readonly IngredientGroupWrite[],
-  linkedRecipes: LinkedRecipeWrite[] | undefined
+  linkedRecipes: LinkedRecipeWrite[] | undefined,
+  steps: readonly RecipeStep[]
 ): Promise<void> => {
   await Promise.all(
     ingredientGroups.map(async (group, index) => {
@@ -93,4 +98,6 @@ export const writeRecipeIngredientGraph = async (
       }))
     )
   }
+
+  await writeRecipeSteps(db, recipeId, steps)
 }

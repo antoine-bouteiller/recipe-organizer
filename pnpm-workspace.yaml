@@ -23,14 +23,9 @@ catalog:
   '@commitlint/cli': 21.2.3
   '@commitlint/config-conventional': 21.2.3
   '@hono/zod-validator': 0.9.1
-  '@lexical/history': 0.51.0
   '@vanilla-extract/css': 1.21.2
   '@vanilla-extract/recipes': 0.5.7
   '@vanilla-extract/vite-plugin': 5.2.6
-  '@lexical/list': 0.51.0
-  '@lexical/react': 0.51.0
-  '@lexical/rich-text': 0.51.0
-  '@lexical/utils': 0.51.0
   '@tanstack/react-form': 1.33.5
   '@tanstack/react-query': 5.103.2
   '@tanstack/react-router': 1.170.39
@@ -46,7 +41,6 @@ catalog:
   hono: 4.13.9
   knip: 6.38.0
   lefthook: 2.1.14
-  lexical: 0.51.0
   oxc-transform-react: 0.151.0
   oxlint: 1.85.0
   react: 19.3.0

@@ -2,7 +2,7 @@ import { getIngredientListOptions } from '@client/features/ingredients/api/get-a
 import { renderAddIngredientOption } from '@client/features/ingredients/components/add-ingredient'
 import { useIngredientOptions } from '@client/features/ingredients/hooks/use-ingredient-options'
 import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
-import { getRecipeDetailsOptions, type RecipeIngredientGroup } from '@client/features/recipe/api/get-one'
+import { getRecipeDetailsOptions, type Recipe, type RecipeIngredientGroup } from '@client/features/recipe/api/get-one'
 import { updateRecipeOptions, updateRecipeSchema, type UpdateRecipeFormInput } from '@client/features/recipe/api/update'
 import { RecipeForm } from '@client/features/recipe/components/recipe-form'
 import { RecipeFormActions } from '@client/features/recipe/components/recipe-form-actions'
@@ -34,6 +34,8 @@ const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   })),
 })
 
+const withStepKey = (step: Recipe['steps'][number]) => ({ ...step, _key: Math.random().toString(36).substring(7) })
+
 const EditRecipePage = () => {
   const { id } = Route.useLoaderData()
   const { data: recipe, isLoading } = useSuspenseQuery(getRecipeDetailsOptions(id))
@@ -50,7 +52,6 @@ const EditRecipePage = () => {
           url: recipe.image,
         },
         ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
-        instructions: recipe.instructions,
         linkedRecipes: recipe.linkedRecipes.map((linkedRecipe) => ({
           id: linkedRecipe.linkedRecipe.id,
           ratio: linkedRecipe.ratio,
@@ -58,6 +59,7 @@ const EditRecipePage = () => {
         meals: recipe.meals,
         name: recipe.name,
         servings: recipe.servings,
+        steps: recipe.steps.map(withStepKey),
         video: recipe.video
           ? {
               id: recipe.video,

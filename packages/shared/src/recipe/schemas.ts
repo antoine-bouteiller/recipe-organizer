@@ -46,11 +46,11 @@ export const recipeSchema = z.object({
       ),
     })
   ),
-  instructions: z.string(),
   linkedRecipes: z.array(z.object({ _key: z.string().optional(), id: z.number().min(0), ratio: z.number().min(0) })).optional(),
   meals: z.array(z.enum(MEALS)),
   name: z.string().min(2),
   servings: z.number().min(0),
+  steps: z.array(recipeStepSchema.and(z.object({ _key: z.string() }))),
   video: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]).optional(),
 })
 
@@ -64,11 +64,11 @@ export const recipeFormWireSchema = z.object({
   cuisineTypes: wireEntrySchema,
   image: wireEntrySchema,
   ingredientGroups: wireEntrySchema,
-  instructions: wireEntrySchema,
   linkedRecipes: wireEntrySchema.optional(),
   meals: wireEntrySchema,
   name: wireEntrySchema,
   servings: wireEntrySchema,
+  steps: wireEntrySchema,
   video: wireEntrySchema.optional(),
 })
 
