@@ -10,7 +10,8 @@ allowBuilds:
   workerd: false
 
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@0.3.3
+  vite@*: 'catalog:'
+  vitest@*: 'catalog:'
 
 publicHoistPattern:
   - oxlint
@@ -22,6 +23,7 @@ catalog:
   '@base-ui/react': 1.8.0
   '@commitlint/cli': 21.2.3
   '@commitlint/config-conventional': 21.2.3
+  '@vitest/coverage-v8': 5.0.1
   '@hono/zod-validator': 0.9.1
   '@vanilla-extract/css': 1.21.2
   '@vanilla-extract/recipes': 0.5.7
@@ -42,10 +44,19 @@ catalog:
   knip: 6.38.0
   lefthook: 2.1.14
   oxc-transform-react: 0.151.0
-  oxlint: 1.85.0
   react: 19.3.0
   react-dom: 19.3.0
   typescript: 7.0.2
-  vite-plus: 0.3.3
+  vite-plus: 1.0.0-rc.0
   wrangler: 4.140.0
   zod: 4.6.5
+  vite: npm:@voidzero-dev/vite-plus-core@1.0.0-rc.0
+  vitest: 5.0.1
+
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: '*'
+    vitest: '*'

@@ -11,7 +11,6 @@
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",
-    "oxlint": "catalog:",
     "vite-plus": "catalog:"
   }
 }

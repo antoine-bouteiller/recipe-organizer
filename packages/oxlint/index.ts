@@ -1,4 +1,4 @@
-import { eslintCompatPlugin } from '@oxlint/plugins'
+import { eslintCompatPlugin } from 'vite-plus/lint/plugins'
 
 import { noConditionalEmptyObjectSpreadRule } from './rules/no-conditional-empty-object-spread.ts'
 import { noKnownValueWideningRule } from './rules/no-known-value-widening.ts'

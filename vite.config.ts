@@ -188,6 +188,12 @@ const viteConfig = defineConfig({
   },
   test: {
     globals: true,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      include: ['apps/*/src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
+      exclude: ['**/*.stories.tsx', '**/*.css.ts', '**/routeTree.gen.ts'],
+    },
   },
 })
 

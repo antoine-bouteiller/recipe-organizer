@@ -1,4 +1,4 @@
-import type { ESTree } from '@oxlint/plugins'
+import type { ESTree } from 'vite-plus/lint/plugins'
 
 const BUILT_INS = new Set(['Record', 'Readonly', 'Partial', 'Required', 'Pick', 'Omit', 'PropertyKey', 'NonNullable'])
 const TRANSPARENT_WRAPPERS = new Set(['Readonly', 'Partial', 'Required', 'NonNullable'])

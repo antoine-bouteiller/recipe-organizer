@@ -1,5 +1,5 @@
-import { defineRule } from '@oxlint/plugins'
-import type { ESTree } from '@oxlint/plugins'
+import { defineRule } from 'vite-plus/lint/plugins'
+import type { ESTree } from 'vite-plus/lint/plugins'
 
 const isIdentifier = (node: ESTree.Node, name: string): boolean => node.type === 'Identifier' && node.name === name
 

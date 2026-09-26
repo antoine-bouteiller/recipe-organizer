@@ -37,5 +37,11 @@
       groupName: 'tanstack',
       matchPackageNames: ['@tanstack/**'],
     },
+    {
+      // vite-plus bundles an exact Vitest; `vp migrate` realigns vite, vitest and @vitest/* together.
+      description: 'Vite+ toolchain (updated via vp migrate)',
+      enabled: false,
+      matchPackageNames: ['vite-plus', 'vite', '@voidzero-dev/vite-plus-core', 'vitest', '@vitest/**'],
+    },
   ],
 }

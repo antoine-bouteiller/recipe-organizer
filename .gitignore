@@ -1,6 +1,7 @@
 # node
 node_modules
 dist
+coverage
 
 # Cloudflare
 .wrangler
@@ -17,3 +18,4 @@ scheduled_tasks.lock
 # Skills
 skills-lock.json
 skills
+.vitest/

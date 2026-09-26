@@ -6,6 +6,7 @@
     "build": "vpr @recipe-organizer/web#build && vpr @recipe-organizer/api#build",
     "dev": "vpr --parallel --filter './apps/*' dev",
     "check": "vp check --fix",
+    "test:coverage": "vp test run --coverage",
     "serve": "vpr @recipe-organizer/api#serve",
     "analyze": "ANALYZE=1 vp -C apps/web build",
     "cf-typegen": "vpr @recipe-organizer/api#cf-typegen",
@@ -25,11 +26,13 @@
     "@recipe-organizer/oxlint": "workspace:*",
     "@types/node": "catalog:",
     "@vanilla-extract/vite-plugin": "catalog:",
+    "@vitest/coverage-v8": "catalog:",
     "drizzle-kit": "catalog:",
     "knip": "catalog:",
     "lefthook": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
+    "vitest": "catalog:",
     "wrangler": "catalog:"
   },
   "overrides": {

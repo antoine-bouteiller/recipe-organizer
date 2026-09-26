@@ -1,4 +1,4 @@
-import { RuleTester } from 'oxlint/plugins-dev'
+import { RuleTester } from 'vite-plus/lint/plugins-dev'
 
 import { vanillaExtractThemeTokensRule } from './vanilla-extract-theme-tokens.ts'
 
