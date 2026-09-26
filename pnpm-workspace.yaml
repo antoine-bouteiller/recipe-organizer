@@ -51,7 +51,7 @@ catalog:
   react-dom: 19.3.0
   typescript: 7.0.2
   vite-plus: 1.0.0-rc.0
-  wrangler: 4.140.0
+  wrangler: 4.141.0
   zod: 4.6.5
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0-rc.0
   vitest: 5.0.1
