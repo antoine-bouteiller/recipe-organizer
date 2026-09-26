@@ -35,6 +35,7 @@ export const content = recipe({
     zIndex: 10,
     '@media': {
       'screen and (min-width: 768px)': {
+        flex: '1 0 auto',
         maxWidth: theme.spacing(256),
         overflowY: 'visible',
       },
@@ -51,6 +52,11 @@ export const content = recipe({
         borderTopRightRadius: theme.radius['3xl'],
         marginTop: theme.spacing(-10),
         paddingTop: theme.spacing(1),
+        '@media': {
+          'screen and (min-width: 768px)': {
+            marginTop: theme.spacing(0),
+          },
+        },
       },
     },
     hasFooter: {
