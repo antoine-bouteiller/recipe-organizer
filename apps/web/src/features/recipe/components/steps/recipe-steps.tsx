@@ -37,7 +37,7 @@ const SubrecipeGroup = ({ recipeId }: { readonly recipeId: number }) => {
   if (isLoading) {
     return <Spinner />
   }
-  if (!source) {
+  if (!source || source.steps.length === 0) {
     return null
   }
   return (
@@ -52,12 +52,14 @@ export const RecipeStepGroups = ({ stepGroups }: { readonly stepGroups: readonly
   <div className={styles.groups}>
     {stepGroups.map((group, index) =>
       group.kind === 'steps' ? (
-        // Groups have no persisted identity; position is their identity in a read-only list.
-        // oxlint-disable-next-line react/no-array-index-key
-        <div key={index}>
-          {group.groupName && <strong className={styles.groupName}>{group.groupName}</strong>}
-          <StepList steps={group.steps} />
-        </div>
+        group.steps.length > 0 && (
+          // Groups have no persisted identity; position is their identity in a read-only list.
+          // oxlint-disable-next-line react/no-array-index-key
+          <div key={index}>
+            {group.groupName && <strong className={styles.groupName}>{group.groupName}</strong>}
+            <StepList steps={group.steps} />
+          </div>
+        )
       ) : (
         // oxlint-disable-next-line react/no-array-index-key
         <SubrecipeGroup key={index} recipeId={group.recipeId} />
