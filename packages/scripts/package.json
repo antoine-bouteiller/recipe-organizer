@@ -5,7 +5,6 @@
   "scripts": {
     "check": "vp -C ../.. check packages/scripts",
     "db:migrate:local": "node apply-migration-local.ts",
-    "db:dump": "node dump-db.ts",
     "db:migrate-steps": "node migrate-recipe-steps.ts"
   },
   "dependencies": {

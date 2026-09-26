@@ -12,7 +12,7 @@
     "db:migrate:local": "vpr @recipe-organizer/scripts#db:migrate:local",
     "db:migrate:remote": "drizzle-kit migrate",
     "db:migrate-steps": "vpr @recipe-organizer/scripts#db:migrate-steps",
-    "db:dump": "vpr @recipe-organizer/scripts#db:dump",
+    "db:dump": "wrangler d1 export recipe-organizer --config apps/api/wrangler.jsonc --remote --no-schema --output ./database.sql",
     "db:import": "wrangler d1 execute recipe-organizer --config apps/api/wrangler.jsonc --local --persist-to .wrangler/state --file ./database.sql",
     "knip": "knip",
     "deploy": "vpr @recipe-organizer/api#deploy",
