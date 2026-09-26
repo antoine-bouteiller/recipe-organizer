@@ -6,9 +6,11 @@ export const container = style({
 })
 
 export const text = style({
+  display: 'flex',
   position: 'absolute',
   right: theme.spacing(1.5),
-  top: theme.spacing(1.5),
+  top: '50%',
+  translate: '0 -50%',
 })
 
 export const shortcutKey = style({
