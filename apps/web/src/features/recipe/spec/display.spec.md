@@ -113,7 +113,7 @@ the file-url helper.
   list. — demonstrates `[SO-1]`
 - `[VC-2]` Given a recipe with servings 4 and an ingredient of 200 g, when the quantity is set to 6,
   then 300 g renders, and decrementing stops at 1. — demonstrates `[SO-2]`
-- `[VC-3]` Given a recipe with a text and a Magimix step, a sub-recipe group, and a named group, when
+- `[VC-3]` Given a recipe with a step linking a Magimix program, a sub-recipe group, and a named group, when
   its detail page opens on phone and desktop widths, then all render in order in the preparation tab or pane. —
   demonstrates `[SO-2]`
 - `[VC-4]` Given stored image and video keys, when requested, then responses carry the listed

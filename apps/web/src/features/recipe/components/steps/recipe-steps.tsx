@@ -15,15 +15,17 @@ const StepList = ({ steps }: { readonly steps: readonly RecipeStep[] }) =>
         // Steps have no persisted identity; position is their identity in a read-only list.
         // oxlint-disable-next-line react/no-array-index-key
         <li className={styles.step} key={index}>
-          {step.kind === 'text' && (
-            <p className={styles.text}>
-              {parseBoldText(step.text).map((segment, segmentIndex) =>
-                // oxlint-disable-next-line react/no-array-index-key
-                segment.bold ? <strong key={segmentIndex}>{segment.text}</strong> : segment.text
-              )}
-            </p>
+          <p className={styles.text}>
+            {parseBoldText(step.text).map((segment, segmentIndex) =>
+              // oxlint-disable-next-line react/no-array-index-key
+              segment.bold ? <strong key={segmentIndex}>{segment.text}</strong> : segment.text
+            )}
+          </p>
+          {step.magimix && (
+            <div className={styles.magimix}>
+              <MagimixStepItem {...step.magimix} />
+            </div>
           )}
-          {step.kind === 'magimix' && <MagimixStepItem {...step} />}
         </li>
       ))}
     </ol>

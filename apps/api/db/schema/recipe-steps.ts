@@ -34,21 +34,18 @@ export const recipeStep = sqliteTable(
     id: integer('id').primaryKey(),
     // 1-based, contiguous per group
     position: integer('position').notNull(),
+    text: text('text').notNull(),
   },
   (table) => [uniqueIndex('uq_recipe_steps_group_position').on(table.groupId, table.position)]
 )
 
-const stepId = () =>
-  integer('step_id')
-    .primaryKey()
-    .references(() => recipeStep.id, { onDelete: 'cascade' })
-
-export const textSteps = sqliteTable('text_steps', { stepId: stepId(), text: text('text').notNull() })
-
+// A step optionally links one Magimix program.
 export const magimixSteps = sqliteTable('magimix_steps', {
   program: text('program').$type<MagimixProgram>().notNull(),
   rotationSpeed: text('rotation_speed').$type<RotationSpeed>().notNull(),
-  stepId: stepId(),
+  stepId: integer('step_id')
+    .primaryKey()
+    .references(() => recipeStep.id, { onDelete: 'cascade' }),
   temperature: integer('temperature'),
   time: integer('time').notNull(),
 })

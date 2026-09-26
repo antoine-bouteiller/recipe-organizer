@@ -7,29 +7,26 @@ import { computeAutoFlags } from './recipe-write'
 const stepGroups: RecipeStepGroup[] = [
   {
     kind: 'steps',
-    steps: [
-      { kind: 'text', text: 'Mélanger **vivement**.' },
-      { kind: 'magimix', program: 'expert', rotationSpeed: '4', temperature: 95, time: 180 },
-    ],
+    steps: [{ text: 'Mélanger **vivement**.' }, { magimix: { program: 'expert', rotationSpeed: '4', temperature: 95, time: 180 }, text: 'Lancer.' }],
   },
   { kind: 'subrecipe', recipeId: 7 },
-  { groupName: 'Finition', kind: 'steps', steps: [{ kind: 'text', text: 'Servir.' }] },
+  { groupName: 'Finition', kind: 'steps', steps: [{ text: 'Servir.' }] },
 ]
 
 describe('rowsToStepGroups', () => {
-  it('maps group and kind rows to step groups', () => {
+  it('maps group, step, and Magimix rows to step groups', () => {
     expect(
       rowsToStepGroups([
         {
           groupName: null,
           steps: [
-            { magimix: null, text: { text: 'Mélanger **vivement**.' } },
-            { magimix: { program: 'expert', rotationSpeed: '4', temperature: 95, time: 180 }, text: null },
+            { magimix: null, text: 'Mélanger **vivement**.' },
+            { magimix: { program: 'expert', rotationSpeed: '4', temperature: 95, time: 180 }, text: 'Lancer.' },
           ],
           subrecipeId: null,
         },
         { groupName: null, steps: [], subrecipeId: 7 },
-        { groupName: 'Finition', steps: [{ magimix: null, text: { text: 'Servir.' } }], subrecipeId: null },
+        { groupName: 'Finition', steps: [{ magimix: null, text: 'Servir.' }], subrecipeId: null },
       ])
     ).toEqual(stepGroups)
   })
@@ -49,8 +46,8 @@ describe('assertSubrecipeGroups', () => {
 })
 
 describe('computeAutoFlags', () => {
-  it('derives isMagimix from a magimix step', () => {
+  it('derives isMagimix from a linked Magimix program', () => {
     expect(computeAutoFlags([], [], flattenSteps(stepGroups), []).isMagimix).toBe(true)
-    expect(computeAutoFlags([], [], [{ kind: 'text', text: 'magimixProgram' }], []).isMagimix).toBe(false)
+    expect(computeAutoFlags([], [], [{ text: 'magimixProgram' }], []).isMagimix).toBe(false)
   })
 })

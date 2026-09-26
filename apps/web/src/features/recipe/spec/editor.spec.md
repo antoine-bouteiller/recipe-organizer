@@ -30,18 +30,19 @@ model, the bold-only text format, the form field that edits steps, and the read-
 - `[PI-4]` **Data, not markup** — every step field is structured data; bold is the only inline
   formatting; labels, icons, and numbering are renderer choices.
 
-| Decision                           | Choice                                                                                                                          | Rationale                                                                                                       |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Domain-node registration  | _Superseded by [KD-5]._                                                                                                         | —                                                                                                               |
-| `[KD-2]` Node representation       | _Superseded by [KD-5]._                                                                                                         | —                                                                                                               |
-| `[KD-3]` Sub-recipe selection      | A sub-recipe group offers only recipe ids selected in the form's linked-recipe rows; CRUD re-checks it (`crud.spec.md` [KD-5]). | Embedded references stay aligned with the declared recipe relationship, now enforced at the trust boundary.     |
-| `[KD-4]` Magimix flag signal       | _Superseded by `crud.spec.md` [KD-3]:_ the flag derives from step kinds; no serialized marker exists.                           | —                                                                                                               |
-| `[KD-5]` Polymorphic step model    | A step is a `RecipeStep`, a Zod discriminated union on `kind`: `text`, `magimix` (`subrecipe` moved to [KD-10]).                | Each kind carries exactly its own data; validation, rendering, and flag derivation switch on one discriminator. |
-| `[KD-6]` Bold-only markdown text   | A text step stores a plain string where `**…**` marks bold; nothing else is interpreted.                                        | Readable storage for the one formatting need; a tiny pure parser replaces a document model.                     |
-| `[KD-7]` Textarea editing          | A text step is a textarea with a bold toggle (and `⌘B`/`Ctrl+B`) that wraps or unwraps the selection in `**`.                   | Raw markdown stays visible and predictable; recipe editing drops Lexical.                                       |
-| `[KD-8]` Sub-recipe step range     | _Superseded by [KD-10]._                                                                                                        | —                                                                                                               |
-| `[KD-9]` Step list as a form field | Step groups and their steps are nested `useAppForm` array fields keyed by `_key`; the cook adds, edits, reorders, or removes.   | Follows the ingredient-group field-array pattern of `docs/infrastructure/client/forms.spec.md`.                 |
-| `[KD-10]` Step groups              | Preparation is an ordered `RecipeStepGroup[]`: own groups (`steps`, optional name) or sub-recipe groups (`recipeId`).           | Groups mirror ingredient groups: an unnamed default first, and a linked recipe contributes its default group.   |
+| Decision                           | Choice                                                                                                                          | Rationale                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Domain-node registration  | _Superseded by [KD-5]._                                                                                                         | —                                                                                                             |
+| `[KD-2]` Node representation       | _Superseded by [KD-5]._                                                                                                         | —                                                                                                             |
+| `[KD-3]` Sub-recipe selection      | A sub-recipe group offers only recipe ids selected in the form's linked-recipe rows; CRUD re-checks it (`crud.spec.md` [KD-5]). | Embedded references stay aligned with the declared recipe relationship, now enforced at the trust boundary.   |
+| `[KD-4]` Magimix flag signal       | _Superseded by `crud.spec.md` [KD-3]:_ the flag derives from linked Magimix programs; no serialized marker exists.              | —                                                                                                             |
+| `[KD-5]` Polymorphic step model    | _Superseded by [KD-11]._                                                                                                        | —                                                                                                             |
+| `[KD-6]` Bold-only markdown text   | A text step stores a plain string where `**…**` marks bold; nothing else is interpreted.                                        | Readable storage for the one formatting need; a tiny pure parser replaces a document model.                   |
+| `[KD-7]` Textarea editing          | A text step is a textarea with a bold toggle (and `⌘B`/`Ctrl+B`) that wraps or unwraps the selection in `**`.                   | Raw markdown stays visible and predictable; recipe editing drops Lexical.                                     |
+| `[KD-8]` Sub-recipe step range     | _Superseded by [KD-10]._                                                                                                        | —                                                                                                             |
+| `[KD-9]` Step list as a form field | Step groups and their steps are nested `useAppForm` array fields keyed by `_key`; the cook adds, edits, reorders, or removes.   | Follows the ingredient-group field-array pattern of `docs/infrastructure/client/forms.spec.md`.               |
+| `[KD-10]` Step groups              | Preparation is an ordered `RecipeStepGroup[]`: own groups (`steps`, optional name) or sub-recipe groups (`recipeId`).           | Groups mirror ingredient groups: an unnamed default first, and a linked recipe contributes its default group. |
+| `[KD-11]` Text step with Magimix   | Every step is text; it optionally links one Magimix program, shown inside the same step.                                        | A program always accompanies the instruction that launches it; one step shape removes the kind switch.        |
 
 The Magimix constants move from `apps/web/src/features/recipe/types/magimix.ts` to
 `packages/shared/src/recipe/` because the server now validates them. The recipe Lexical extensions
@@ -50,7 +51,7 @@ The Magimix constants move from `apps/web/src/features/recipe/types/magimix.ts` 
 
 ## Outcome
 
-- `[SO-1]` Recipe instructions are ordered groups — own groups of text and Magimix steps, or
+- `[SO-1]` Recipe instructions are ordered groups — own groups of text steps with optional Magimix programs, or
   sub-recipe groups — edited through one form field. — demonstrated by `[VC-1]`, `[VC-2]`
 - `[SO-2]` Text steps support bold and nothing else, stored as readable markdown. — demonstrated by
   `[VC-3]`, `[VC-4]`
@@ -64,20 +65,17 @@ The Magimix constants move from `apps/web/src/features/recipe/types/magimix.ts` 
 
 ```ts
 // packages/shared/src/recipe/schemas.ts
-const textStepSchema = z.object({
-  kind: z.literal('text'),
-  text: z.string().trim().min(1), // bold-only markdown, [CT-2]
-})
-
-const magimixStepSchema = z.object({
-  kind: z.literal('magimix'),
+const magimixSchema = z.object({
   program: z.enum(magimixProgram),
   rotationSpeed: z.enum(allowedRotationSpeed),
   time: z.number().int().min(1).max(3660), // total seconds; dialog caps minutes and seconds at 60 each
   temperature: z.number().int().min(0).max(200).optional(),
 })
 
-export const recipeStepSchema = z.discriminatedUnion('kind', [textStepSchema, magimixStepSchema])
+export const recipeStepSchema = z.object({
+  magimix: magimixSchema.optional(),
+  text: z.string().trim().min(1), // bold-only markdown, [CT-2]
+})
 export type RecipeStep = z.infer<typeof recipeStepSchema>
 
 const ownStepGroupSchema = z.object({ kind: z.literal('steps'), groupName: z.string().optional(), steps: z.array(recipeStepSchema) })
@@ -123,10 +121,10 @@ StepsField (withForm, array field `stepGroups`)
 ├── default group (index 0): its steps only
 ├── later groups: name field or linked-recipe picker · move up · move down · remove
 │   └── own group steps (array field `stepGroups[i].steps`)
-│       ├── per step: kind-specific editor · move up · move down · remove
-│       │   ├── text     → textarea + bold toggle            [CT-2]
-│       │   └── magimix  → program item opening the dialog
-│       └── add: « Texte » · « Magimix »
+│       ├── per step: textarea + bold toggle [CT-2] · move up · move down · remove
+│       │   └── magimix? → program item opening the dialog · remove program
+│       │                  or « Magimix » opening the dialog to link one
+│       └── add: « Étape »
 └── add: « Groupe » · « Sous-recette »
 ```
 
@@ -142,8 +140,8 @@ StepsField (withForm, array field `stepGroups`)
 ```text
 RecipeStepGroups(stepGroups)
 ├── own group       → group name? · numbered steps
-│   ├── text        → parseBoldText segments (bold → <strong>)
-│   └── magimix     → program image, French label, duration, speed, temperature?
+│   └── step        → parseBoldText segments (bold → <strong>)
+│       └── magimix? → program image, French label, duration, speed, temperature?
 └── subrecipe group → section titled with the source name · the source's default group steps
 ```
 
@@ -155,13 +153,13 @@ RecipeStepGroups(stepGroups)
 
 ## Acceptance
 
-- `[VC-1]` Given the recipe form, when the cook adds a text and a Magimix step, moves the last one
-  up, removes the first, then adds a named group and a sub-recipe group and moves the latter up, then
-  the submitted `stepGroups` has exactly that order and those kinds (recipe-form story play
-  function). — demonstrates `[SO-1]`
-- `[VC-2]` Given step payloads with a missing field, an unknown `kind`, or an out-of-range
-  temperature, when parsed with `recipeStepSchema`, then parsing fails; a valid payload of each kind
-  parses unchanged; `stepGroups` starting with a sub-recipe group fails (`*.test.ts`). — demonstrates `[SO-1]`
+- `[VC-1]` Given the recipe form, when the cook adds two steps, links a Magimix program to the
+  second, moves it up, removes the other, then adds a named group and a sub-recipe group and moves the
+  latter up, then the submitted `stepGroups` has exactly that order and program (recipe-form story
+  play function). — demonstrates `[SO-1]`
+- `[VC-2]` Given step payloads with missing or blank text, a Magimix program missing a field, or an
+  out-of-range temperature, when parsed with `recipeStepSchema`, then parsing fails; valid steps with
+  and without a program parse unchanged; `stepGroups` starting with a sub-recipe group fails (`*.test.ts`). — demonstrates `[SO-1]`
 - `[VC-3]` Given the inputs in [CT-2], when passed to `parseBoldText`, then it returns the listed
   segments, and `<b>` in input stays literal text (`*.test.ts`). — demonstrates `[SO-2]`
 - `[VC-4]` Given a textarea selection, when the cook presses the bold toggle or `⌘B` twice, then the

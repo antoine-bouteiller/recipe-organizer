@@ -4,20 +4,18 @@ import * as z from 'zod'
 import { CUISINE_TYPES, MEALS } from './constants'
 import { allowedRotationSpeed, magimixProgram } from './magimix'
 
-const textStepSchema = z.object({
-  kind: z.literal('text'),
-  text: z.string().trim().min(1),
-})
-
-const magimixStepSchema = z.object({
-  kind: z.literal('magimix'),
+const magimixSchema = z.object({
   program: z.enum(magimixProgram),
   rotationSpeed: z.enum(allowedRotationSpeed),
   temperature: z.number().int().min(0).max(200).optional(),
   time: z.number().int().min(1).max(3660),
 })
 
-export const recipeStepSchema = z.discriminatedUnion('kind', [textStepSchema, magimixStepSchema])
+// A step is text with an optional linked Magimix program.
+export const recipeStepSchema = z.object({
+  magimix: magimixSchema.optional(),
+  text: z.string().trim().min(1),
+})
 export type RecipeStep = z.infer<typeof recipeStepSchema>
 
 const ownStepGroupSchema = z.object({

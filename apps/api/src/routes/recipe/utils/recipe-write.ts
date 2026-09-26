@@ -39,7 +39,7 @@ export const computeAutoFlags = (
   const ownVegetarian = ingredientCategories.every((item) => item.category !== 'meat' && item.category !== 'fish')
   const linkedVegetarian = linkedRecipesData.every((item) => item.isVegetarian)
   return {
-    isMagimix: steps.some((step) => step.kind === 'magimix'),
+    isMagimix: steps.some((step) => step.magimix),
     isSpice: ingredientCategories.length > 0 && ingredientCategories.every((item) => item.category === 'spices'),
     isVegetarian: ownVegetarian && linkedVegetarian && !meals.includes('dessert'),
   }

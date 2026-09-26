@@ -53,56 +53,84 @@ const GroupSteps = withForm({
                   <li className={styles.step} key={step._key}>
                     <span className={styles.number}>{index + 1}.</span>
                     <div className={styles.editor}>
-                      {step.kind === 'text' && (
-                        <AppField name={`stepGroups[${groupIndex}].steps[${index}].text`}>
-                          {(textField) => {
-                            const applyBold = () => {
-                              const element = textareaRefs.current.get(step._key)
-                              if (!element) {
-                                return
-                              }
-                              const next = toggleBold({ end: element.selectionEnd, start: element.selectionStart, value: element.value })
-                              textField.handleChange(next.value)
-                              requestAnimationFrame(() => {
-                                element.focus()
-                                element.setSelectionRange(next.start, next.end)
-                              })
+                      <AppField name={`stepGroups[${groupIndex}].steps[${index}].text`}>
+                        {(textField) => {
+                          const applyBold = () => {
+                            const element = textareaRefs.current.get(step._key)
+                            if (!element) {
+                              return
                             }
-                            return (
-                              <div className={styles.textStep}>
-                                <textField.TextareaField
-                                  aria-label={`Texte de l'étape ${index + 1}`}
-                                  disabled={disabled}
-                                  onKeyDown={(event) => handleBoldShortcut(event, applyBold)}
-                                  placeholder="Décrivez l'étape"
-                                  ref={(element) => {
-                                    textareaRefs.current.set(step._key, element)
-                                    return () => {
-                                      textareaRefs.current.delete(step._key)
-                                    }
-                                  }}
-                                />
-                                <Button aria-label="Gras" disabled={disabled} onClick={applyBold} size="icon-sm" type="button" variant="ghost">
-                                  <TextBolderIcon size="sm" />
-                                </Button>
-                              </div>
-                            )
-                          }}
-                        </AppField>
-                      )}
-                      {step.kind === 'magimix' && (
-                        <MagimixStepDialog
-                          initialData={step}
-                          onSubmit={(data) => field.replaceValue(index, { ...data, _key: step._key, kind: 'magimix' })}
-                          submitLabel="Enregistrer"
-                          title="Modifier le programme Magimix"
-                          triggerRender={
-                            <button className={styles.magimixTrigger} disabled={disabled} type="button">
-                              <MagimixStepItem {...step} />
-                            </button>
+                            const next = toggleBold({ end: element.selectionEnd, start: element.selectionStart, value: element.value })
+                            textField.handleChange(next.value)
+                            requestAnimationFrame(() => {
+                              element.focus()
+                              element.setSelectionRange(next.start, next.end)
+                            })
                           }
-                        />
-                      )}
+                          return (
+                            <div className={styles.textStep}>
+                              <textField.TextareaField
+                                aria-label={`Texte de l'étape ${index + 1}`}
+                                disabled={disabled}
+                                onKeyDown={(event) => handleBoldShortcut(event, applyBold)}
+                                placeholder="Décrivez l'étape"
+                                ref={(element) => {
+                                  textareaRefs.current.set(step._key, element)
+                                  return () => {
+                                    textareaRefs.current.delete(step._key)
+                                  }
+                                }}
+                              />
+                              <Button aria-label="Gras" disabled={disabled} onClick={applyBold} size="icon-sm" type="button" variant="ghost">
+                                <TextBolderIcon size="sm" />
+                              </Button>
+                            </div>
+                          )
+                        }}
+                      </AppField>
+                      <AppField name={`stepGroups[${groupIndex}].steps[${index}].magimix`}>
+                        {(magimixField) => {
+                          const magimix = magimixField.state.value
+                          return magimix ? (
+                            <div className={styles.magimixStep}>
+                              <MagimixStepDialog
+                                initialData={magimix}
+                                onSubmit={magimixField.handleChange}
+                                submitLabel="Enregistrer"
+                                title="Modifier le programme Magimix"
+                                triggerRender={
+                                  <button className={styles.magimixTrigger} disabled={disabled} type="button">
+                                    <MagimixStepItem {...magimix} />
+                                  </button>
+                                }
+                              />
+                              <Button
+                                aria-label="Retirer le programme Magimix"
+                                disabled={disabled}
+                                onClick={() => magimixField.handleChange(undefined)}
+                                size="icon-sm"
+                                type="button"
+                                variant="destructive-ghost"
+                              >
+                                <TrashIcon size="sm" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className={styles.addMagimix}>
+                              <MagimixStepDialog
+                                onSubmit={magimixField.handleChange}
+                                submitLabel="Ajouter"
+                                title="Ajouter un programme Magimix"
+                                triggerRender={
+                                  <Button disabled={disabled} size="sm" type="button" variant="ghost">
+                                    Magimix <PlusIcon size="sm" />
+                                  </Button>
+                                }
+                              />
+                            </div>
+                          )
+                        }}
+                      </AppField>
                     </div>
                     <div className={styles.controls}>
                       <Button
@@ -140,25 +168,9 @@ const GroupSteps = withForm({
                 ))}
               </ol>
               <div className={styles.addActions}>
-                <Button
-                  disabled={disabled}
-                  onClick={() => field.pushValue({ _key: newKey(), kind: 'text', text: '' })}
-                  size="sm"
-                  type="button"
-                  variant="outline"
-                >
-                  Texte <PlusIcon size="sm" />
+                <Button disabled={disabled} onClick={() => field.pushValue({ _key: newKey(), text: '' })} size="sm" type="button" variant="outline">
+                  Étape <PlusIcon size="sm" />
                 </Button>
-                <MagimixStepDialog
-                  onSubmit={(data) => field.pushValue({ ...data, _key: newKey(), kind: 'magimix' })}
-                  submitLabel="Ajouter"
-                  title="Ajouter un programme Magimix"
-                  triggerRender={
-                    <Button disabled={disabled} size="sm" type="button" variant="outline">
-                      Magimix <PlusIcon size="sm" />
-                    </Button>
-                  }
-                />
               </div>
             </>
           )

@@ -33,6 +33,10 @@ export const text = style({
   whiteSpace: 'pre-line',
 })
 
+export const magimix = style({
+  marginTop: theme.spacing(2),
+})
+
 export const groupName = style({
   display: 'block',
   marginBottom: theme.spacing(2),

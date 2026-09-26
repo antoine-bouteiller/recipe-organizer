@@ -4,13 +4,10 @@
   "type": "module",
   "scripts": {
     "check": "vp -C ../.. check packages/scripts",
-    "db:migrate:local": "node apply-migration-local.ts",
-    "db:migrate-steps": "node migrate-recipe-steps.ts"
+    "db:migrate:local": "node apply-migration-local.ts"
   },
   "dependencies": {
-    "@recipe-organizer/shared": "workspace:*",
-    "wrangler": "catalog:",
-    "zod": "catalog:"
+    "wrangler": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/api": "workspace:*",

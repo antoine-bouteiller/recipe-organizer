@@ -10,7 +10,6 @@ export const recipe = sqliteTable('recipes', {
   cuisineTypes: text('cuisine_types', { mode: 'json' }).$type<CuisineType[]>().notNull().default([]),
   id: integer('id').primaryKey(),
   image: text('image', { length: 255 }).notNull(),
-  instructions: text('instructions').notNull(),
   isMagimix: integer('is_magimix', { mode: 'boolean' }).notNull().default(false),
   isSpice: integer('is_spice', { mode: 'boolean' }).notNull().default(false),
   isVegetarian: integer('is_vegetarian', { mode: 'boolean' }).notNull().default(false),

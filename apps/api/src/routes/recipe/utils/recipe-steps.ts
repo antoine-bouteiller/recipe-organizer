@@ -1,16 +1,15 @@
 import type { getDb } from '@recipe-organizer/api/lib/db'
-import { magimixSteps, recipeStep, recipeStepGroup, textSteps } from '@recipe-organizer/api/schema'
+import { magimixSteps, recipeStep, recipeStepGroup } from '@recipe-organizer/api/schema'
 import type { RecipeStep, RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
 import { eq, sql } from 'drizzle-orm'
 import { HTTPException } from 'hono/http-exception'
 
 type Db = ReturnType<typeof getDb>
-type TextStepRow = Pick<typeof textSteps.$inferSelect, 'text'>
 type MagimixStepRow = Pick<typeof magimixSteps.$inferSelect, 'program' | 'rotationSpeed' | 'temperature' | 'time'>
 
 interface StepRow {
   readonly magimix: MagimixStepRow | null
-  readonly text: TextStepRow | null
+  readonly text: string
 }
 
 interface StepGroupRow {
@@ -19,21 +18,12 @@ interface StepGroupRow {
   readonly subrecipeId: number | null
 }
 
-const rowToStep = ({ magimix, text }: StepRow): RecipeStep => {
-  if (text) {
-    return { kind: 'text', text: text.text }
-  }
-  if (!magimix) {
-    throw new Error('Step has no kind row')
-  }
-  return {
-    kind: 'magimix',
-    program: magimix.program,
-    rotationSpeed: magimix.rotationSpeed,
-    temperature: magimix.temperature ?? undefined,
-    time: magimix.time,
-  }
-}
+const rowToStep = ({ magimix, text }: StepRow): RecipeStep => ({
+  magimix: magimix
+    ? { program: magimix.program, rotationSpeed: magimix.rotationSpeed, temperature: magimix.temperature ?? undefined, time: magimix.time }
+    : undefined,
+  text,
+})
 
 export const rowsToStepGroups = (groups: readonly StepGroupRow[]): RecipeStepGroup[] =>
   groups.map((group) =>
@@ -53,7 +43,7 @@ export const assertSubrecipeGroups = (groups: readonly RecipeStepGroup[], linked
   }
 }
 
-const stepsWith = { orderBy: { position: 'asc' }, with: { magimix: true, text: true } } as const
+const stepsWith = { orderBy: { position: 'asc' }, with: { magimix: true } } as const
 
 export const selectRecipeStepGroups = async (db: Db, recipeId: number): Promise<RecipeStepGroup[]> =>
   rowsToStepGroups(await db.query.recipeStepGroup.findMany({ orderBy: { position: 'asc' }, where: { recipeId }, with: { steps: stepsWith } }))
@@ -64,7 +54,7 @@ export const selectDefaultSteps = async (db: Db, recipeId: number): Promise<Reci
   return group?.steps.map(rowToStep) ?? []
 }
 
-// Steps and kind rows cascade from their group.
+// Steps and their Magimix rows cascade from their group.
 export const deleteRecipeSteps = (db: Db, recipeId: number) => db.delete(recipeStepGroup).where(eq(recipeStepGroup.recipeId, recipeId))
 
 // Rows reference their parent through its unique position, so one transactional batch writes the whole graph.
@@ -86,18 +76,20 @@ export const writeRecipeSteps = async (db: Db, recipeId: number, groups: readonl
         .values({ groupName: groupIndex === 0 ? null : group.groupName || null, isDefault: groupIndex === 0, position: groupPosition, recipeId }),
       ...group.steps.flatMap((step, index) => {
         const position = index + 1
-        const id = stepId(groupPosition, position)
+        const { magimix } = step
         return [
-          db.insert(recipeStep).values({ groupId: groupId(groupPosition), position }),
-          step.kind === 'text'
-            ? db.insert(textSteps).values({ stepId: id, text: step.text })
-            : db.insert(magimixSteps).values({
-                program: step.program,
-                rotationSpeed: step.rotationSpeed,
-                stepId: id,
-                temperature: step.temperature ?? null,
-                time: step.time,
-              }),
+          db.insert(recipeStep).values({ groupId: groupId(groupPosition), position, text: step.text }),
+          ...(magimix
+            ? [
+                db.insert(magimixSteps).values({
+                  program: magimix.program,
+                  rotationSpeed: magimix.rotationSpeed,
+                  stepId: stepId(groupPosition, position),
+                  temperature: magimix.temperature ?? null,
+                  time: magimix.time,
+                }),
+              ]
+            : []),
         ]
       }),
     ]

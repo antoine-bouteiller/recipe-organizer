@@ -47,6 +47,16 @@ export const textStep = style({
   gap: theme.spacing(1),
 })
 
+export const magimixStep = style({
+  alignItems: 'center',
+  display: 'flex',
+  gap: theme.spacing(1),
+})
+
+export const addMagimix = style({
+  alignSelf: 'flex-start',
+})
+
 export const magimixTrigger = style({
   cursor: 'pointer',
   textAlign: 'start',

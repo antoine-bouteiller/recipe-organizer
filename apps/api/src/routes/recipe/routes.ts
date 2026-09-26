@@ -139,8 +139,6 @@ export const recipeRoutes = new Hono<ApiEnvironment>()
         createdBy: context.get('user').id,
         cuisineTypes,
         image: imageKey,
-        // Legacy Lexical column: still NOT NULL until it is dropped; steps are the source of truth.
-        instructions: '',
         isMagimix,
         isSpice,
         isVegetarian,
