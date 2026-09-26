@@ -11,7 +11,7 @@ const restrictedReactImports = {
 const viteConfig = defineConfig({
   plugins: [vanillaExtractPlugin()],
   lint: {
-    options: { typeAware: true, typeCheck: true },
+    options: { typeAware: true, typeCheck: true, reportUnusedDisableDirectives: 'error' },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
     jsPlugins: [{ name: 'recipe-oranizer', specifier: '@recipe-organizer/oxlint' }],
     categories: {
@@ -27,7 +27,7 @@ const viteConfig = defineConfig({
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
+    ignorePatterns: ['**/routeTree.gen.ts', 'apps/api/worker-configuration.d.ts', 'vite.config.ts'],
     overrides: [
       ...features.map((feature) => ({
         files: [`apps/web/src/features/${feature}/**/*.{ts,tsx}`],
