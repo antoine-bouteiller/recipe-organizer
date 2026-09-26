@@ -1,10 +1,10 @@
-import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@client/features/recipe/types/magimix'
 import { capitalize } from '@client/utils/string'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { SpinnerGapIcon } from '@recipe-organizer/design-system/icons/spinner-gap'
 import { ThermometerIcon } from '@recipe-organizer/design-system/icons/thermometer'
 import { TimerIcon } from '@recipe-organizer/design-system/icons/timer'
 import { Item } from '@recipe-organizer/design-system/item'
+import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix'
 import {
   $getNodeByKey,
   DecoratorNode,

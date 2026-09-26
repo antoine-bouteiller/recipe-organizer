@@ -507,9 +507,15 @@ importers:
 
   packages/scripts:
     dependencies:
+      '@recipe-organizer/shared':
+        specifier: workspace:*
+        version: link:../shared
       wrangler:
         specifier: 'catalog:'
         version: 4.140.0(@types/node@25.9.8)
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.5
     devDependencies:
       '@recipe-organizer/api':
         specifier: workspace:*

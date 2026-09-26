@@ -11,6 +11,7 @@
     "cf-typegen": "vp run @recipe-organizer/api#cf-typegen",
     "db:migrate:local": "pnpm --filter @recipe-organizer/scripts db:migrate:local",
     "db:migrate:remote": "drizzle-kit migrate",
+    "db:migrate-steps": "pnpm --filter @recipe-organizer/scripts db:migrate-steps",
     "db:dump": "vp run @recipe-organizer/scripts#db:dump",
     "db:import": "wrangler d1 execute recipe-organizer --config apps/api/wrangler.jsonc --local --persist-to .wrangler/state --file ./database.sql",
     "knip": "knip",

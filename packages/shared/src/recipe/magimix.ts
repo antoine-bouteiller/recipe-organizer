@@ -20,9 +20,11 @@ export type MagimixProgram = (typeof magimixProgram)[number]
 
 export const allowedRotationSpeed = ['1A', '2A', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', 'auto'] as const
 
+export type RotationSpeed = (typeof allowedRotationSpeed)[number]
+
 export interface MagimixProgramData {
   program: MagimixProgram
-  rotationSpeed: (typeof allowedRotationSpeed)[number]
+  rotationSpeed: RotationSpeed
   temperature?: number
   time: number
 }

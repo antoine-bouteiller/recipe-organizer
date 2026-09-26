@@ -1,6 +1,7 @@
-import { user } from '@recipe-organizer/api/schema'
 import { type CuisineType, type Meal } from '@recipe-organizer/shared/recipe/constants'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+
+import { user } from './user'
 
 export const recipe = sqliteTable('recipes', {
   createdBy: text('created_by')

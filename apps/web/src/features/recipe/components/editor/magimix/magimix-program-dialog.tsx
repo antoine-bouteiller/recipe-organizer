@@ -1,7 +1,7 @@
-import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@client/features/recipe/types/magimix'
 import { capitalize } from '@client/utils/string'
 import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
+import { allowedRotationSpeed, magimixProgram, magimixProgramLabels, type MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useSelector } from '@tanstack/react-store'
 import { useState, type ReactElement } from 'react'

@@ -1,8 +1,8 @@
-import { type MagimixProgramData } from '@client/features/recipe/types/magimix'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $insertNodeToNearestRoot } from '@lexical/utils'
 import { CookingPotIcon } from '@recipe-organizer/design-system/icons/cooking-pot'
 import { Toggle } from '@recipe-organizer/design-system/toggle'
+import { type MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix'
 
 import { MagimixProgramDialog } from './magimix-program-dialog'
 import { $createMagimixProgramNode } from './magimix-program-node'

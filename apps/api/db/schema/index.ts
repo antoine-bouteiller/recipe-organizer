@@ -12,6 +12,7 @@ export * from './ingredient'
 export * from './recipe'
 export * from './recipe-ingredients'
 export * from './recipe-linked-recipes'
+export * from './recipe-steps'
 export * from './user'
 
 export const relations = defineRelations(
