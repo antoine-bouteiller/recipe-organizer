@@ -1,3 +1,4 @@
+import { Field as FieldPrimitive } from '@base-ui/react/field'
 import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { useFileUpload } from '@recipe-organizer/design-system/hooks/use-file-upload'
 import type { FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
@@ -21,6 +22,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
   const field = useFieldContext<File | FileMetadata>()
 
   const [{ files }, { getInputProps, removeFile }] = useFileUpload({
+    accept: 'image/*',
     initialFiles: initialImage ? [initialImage] : [],
     onFilesChange: (newFiles) => {
       field.setValue(newFiles[0]?.file)
@@ -70,7 +72,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={styles.fileInput} disabled={disabled} type="file" {...getInputProps()} />
+      <FieldPrimitive.Control className={styles.fileInput} disabled={disabled} {...getInputProps()} />
       <FieldError />
     </Field>
   )

@@ -1,3 +1,4 @@
+import { Field as FieldPrimitive } from '@base-ui/react/field'
 import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { useFileUpload } from '@recipe-organizer/design-system/hooks/use-file-upload'
 import type { FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
@@ -82,7 +83,7 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={styles.fileInput} disabled={disabled} type="file" {...getInputProps()} />
+      <FieldPrimitive.Control className={styles.fileInput} disabled={disabled} {...getInputProps()} />
       <FieldError />
     </Field>
   )

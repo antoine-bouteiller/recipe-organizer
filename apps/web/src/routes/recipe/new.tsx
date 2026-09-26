@@ -42,7 +42,6 @@ const NewRecipePage = () => {
     <ScreenLayout title="Nouvelle Recette" withGoBack>
       <Form
         errors={errors}
-        noValidate
         onSubmit={(event) => {
           event.preventDefault()
           void form.handleSubmit()

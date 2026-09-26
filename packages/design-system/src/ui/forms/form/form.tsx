@@ -3,10 +3,10 @@ import type React from 'react'
 
 import * as styles from './form.css'
 
-export type FormProps = Pick<FormPrimitive.Props, 'children' | 'errors' | 'noValidate' | 'onSubmit'>
+export type FormProps = Pick<FormPrimitive.Props, 'children' | 'errors' | 'onSubmit'>
 
-export const Form = ({ children, errors, noValidate, onSubmit }: FormProps): React.ReactElement => (
-  <FormPrimitive className={styles.form} data-slot="form" errors={errors} noValidate={noValidate} onSubmit={onSubmit}>
+export const Form = ({ children, errors, onSubmit }: FormProps): React.ReactElement => (
+  <FormPrimitive className={styles.form} data-slot="form" errors={errors} onSubmit={onSubmit}>
     {children}
   </FormPrimitive>
 )
