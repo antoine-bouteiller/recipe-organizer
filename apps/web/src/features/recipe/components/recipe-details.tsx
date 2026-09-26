@@ -2,7 +2,7 @@ import { deleteRecipeOptions } from '@client/features/recipe/api/delete'
 import { type Recipe } from '@client/features/recipe/api/get-one'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
-import { RecipeSteps } from '@client/features/recipe/components/steps/recipe-steps'
+import { RecipeStepGroups } from '@client/features/recipe/components/steps/recipe-steps'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
@@ -132,7 +132,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
               </SwipeTabsPanel>
               <SwipeTabsPanel value="preparation">
                 <div className={styles.instructionsPanel}>
-                  <RecipeSteps steps={recipe.steps} visited={[recipe.id]} />
+                  <RecipeStepGroups stepGroups={recipe.stepGroups} />
                 </div>
               </SwipeTabsPanel>
             </SwipeTabsPanels>
@@ -146,7 +146,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
           <section className={styles.instructionsSection}>
             <h2 className={styles.instructionsHeading}>Préparation</h2>
             <div className={styles.instructionsContent}>
-              <RecipeSteps steps={recipe.steps} visited={[recipe.id]} />
+              <RecipeStepGroups stepGroups={recipe.stepGroups} />
             </div>
           </section>
         </div>

@@ -32,6 +32,141 @@ interface StepsFieldProps {
 
 const stepsFieldProps: StepsFieldProps = { disabled: false }
 
+const groupStepsProps: StepsFieldProps & { groupIndex: number } = { disabled: false, groupIndex: 0 }
+
+const GroupSteps = withForm({
+  defaultValues: recipeDefaultValues,
+  props: groupStepsProps,
+  render: ({ disabled, form, groupIndex }) => {
+    const { AppField } = form
+    const textareaRefs = useRef(new Map<string, HTMLTextAreaElement | null>())
+
+    return (
+      <AppField mode="array" name={`stepGroups[${groupIndex}].steps`}>
+        {(field) => {
+          const steps = field.state.value ?? []
+          return (
+            <>
+              <ol className={styles.list}>
+                {steps.map((step, index) => (
+                  <li className={styles.step} key={step._key}>
+                    <span className={styles.number}>{index + 1}.</span>
+                    <div className={styles.editor}>
+                      {step.kind === 'text' && (
+                        <AppField name={`stepGroups[${groupIndex}].steps[${index}].text`}>
+                          {(textField) => {
+                            const applyBold = () => {
+                              const element = textareaRefs.current.get(step._key)
+                              if (!element) {
+                                return
+                              }
+                              const next = toggleBold({ end: element.selectionEnd, start: element.selectionStart, value: element.value })
+                              textField.handleChange(next.value)
+                              requestAnimationFrame(() => {
+                                element.focus()
+                                element.setSelectionRange(next.start, next.end)
+                              })
+                            }
+                            return (
+                              <div className={styles.textStep}>
+                                <textField.TextareaField
+                                  aria-label={`Texte de l'étape ${index + 1}`}
+                                  disabled={disabled}
+                                  onKeyDown={(event) => handleBoldShortcut(event, applyBold)}
+                                  placeholder="Décrivez l'étape"
+                                  ref={(element) => {
+                                    textareaRefs.current.set(step._key, element)
+                                    return () => {
+                                      textareaRefs.current.delete(step._key)
+                                    }
+                                  }}
+                                />
+                                <Button aria-label="Gras" disabled={disabled} onClick={applyBold} size="icon-sm" type="button" variant="ghost">
+                                  <TextBolderIcon size="sm" />
+                                </Button>
+                              </div>
+                            )
+                          }}
+                        </AppField>
+                      )}
+                      {step.kind === 'magimix' && (
+                        <MagimixStepDialog
+                          initialData={step}
+                          onSubmit={(data) => field.replaceValue(index, { ...data, _key: step._key, kind: 'magimix' })}
+                          submitLabel="Enregistrer"
+                          title="Modifier le programme Magimix"
+                          triggerRender={
+                            <button className={styles.magimixTrigger} disabled={disabled} type="button">
+                              <MagimixStepItem {...step} />
+                            </button>
+                          }
+                        />
+                      )}
+                    </div>
+                    <div className={styles.controls}>
+                      <Button
+                        aria-label="Monter l'étape"
+                        disabled={disabled || index === 0}
+                        onClick={() => field.moveValue(index, index - 1)}
+                        size="icon-sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        <CaretUpIcon size="sm" />
+                      </Button>
+                      <Button
+                        aria-label="Descendre l'étape"
+                        disabled={disabled || index === steps.length - 1}
+                        onClick={() => field.moveValue(index, index + 1)}
+                        size="icon-sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        <CaretDownIcon size="sm" />
+                      </Button>
+                      <Button
+                        aria-label="Supprimer l'étape"
+                        disabled={disabled}
+                        onClick={() => field.removeValue(index)}
+                        size="icon-sm"
+                        type="button"
+                        variant="destructive-ghost"
+                      >
+                        <TrashIcon size="sm" />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <div className={styles.addActions}>
+                <Button
+                  disabled={disabled}
+                  onClick={() => field.pushValue({ _key: newKey(), kind: 'text', text: '' })}
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                >
+                  Texte <PlusIcon size="sm" />
+                </Button>
+                <MagimixStepDialog
+                  onSubmit={(data) => field.pushValue({ ...data, _key: newKey(), kind: 'magimix' })}
+                  submitLabel="Ajouter"
+                  title="Ajouter un programme Magimix"
+                  triggerRender={
+                    <Button disabled={disabled} size="sm" type="button" variant="outline">
+                      Magimix <PlusIcon size="sm" />
+                    </Button>
+                  }
+                />
+              </div>
+            </>
+          )
+        }}
+      </AppField>
+    )
+  },
+})
+
 export const StepsField = withForm({
   defaultValues: recipeDefaultValues,
   props: stepsFieldProps,
@@ -39,74 +174,27 @@ export const StepsField = withForm({
     const { AppField } = form
     const linkedRecipeIds = useLinkedRecipes()
     const subrecipeOptions = useRecipeOptions({ filter: (recipe) => linkedRecipeIds.includes(recipe.id) })
-    const textareaRefs = useRef(new Map<string, HTMLTextAreaElement | null>())
 
     return (
       <div className={styles.container}>
         <Label>Étapes</Label>
-        <AppField mode="array" name="steps">
+        <AppField mode="array" name="stepGroups">
           {(field) => {
-            const steps = field.state.value ?? []
+            const groups = field.state.value ?? []
             return (
               <>
-                <ol className={styles.list}>
-                  {steps.map((step, index) => (
-                    <li className={styles.step} key={step._key}>
-                      <span className={styles.number}>{index + 1}.</span>
-                      <div className={styles.editor}>
-                        {step.kind === 'text' && (
-                          <AppField name={`steps[${index}].text`}>
-                            {(textField) => {
-                              const applyBold = () => {
-                                const element = textareaRefs.current.get(step._key)
-                                if (!element) {
-                                  return
-                                }
-                                const next = toggleBold({ end: element.selectionEnd, start: element.selectionStart, value: element.value })
-                                textField.handleChange(next.value)
-                                requestAnimationFrame(() => {
-                                  element.focus()
-                                  element.setSelectionRange(next.start, next.end)
-                                })
-                              }
-                              return (
-                                <div className={styles.textStep}>
-                                  <textField.TextareaField
-                                    aria-label={`Texte de l'étape ${index + 1}`}
-                                    disabled={disabled}
-                                    onKeyDown={(event) => handleBoldShortcut(event, applyBold)}
-                                    placeholder="Décrivez l'étape"
-                                    ref={(element) => {
-                                      textareaRefs.current.set(step._key, element)
-                                      return () => {
-                                        textareaRefs.current.delete(step._key)
-                                      }
-                                    }}
-                                  />
-                                  <Button aria-label="Gras" disabled={disabled} onClick={applyBold} size="icon-sm" type="button" variant="ghost">
-                                    <TextBolderIcon size="sm" />
-                                  </Button>
-                                </div>
-                              )
-                            }}
-                          </AppField>
-                        )}
-                        {step.kind === 'magimix' && (
-                          <MagimixStepDialog
-                            initialData={step}
-                            onSubmit={(data) => field.replaceValue(index, { ...data, _key: step._key, kind: 'magimix' })}
-                            submitLabel="Enregistrer"
-                            title="Modifier le programme Magimix"
-                            triggerRender={
-                              <button className={styles.magimixTrigger} disabled={disabled} type="button">
-                                <MagimixStepItem {...step} />
-                              </button>
-                            }
-                          />
-                        )}
-                        {step.kind === 'subrecipe' && (
-                          <div className={styles.subrecipeStep}>
-                            <AppField name={`steps[${index}].recipeId`}>
+                {groups.map((group, groupIndex) => (
+                  <div className={styles.group} key={group._key}>
+                    {/* The first group is the default one: unnamed, fixed, and always present. */}
+                    {groupIndex > 0 && (
+                      <div className={styles.groupHeader}>
+                        <div className={styles.editor}>
+                          {group.kind === 'steps' ? (
+                            <AppField name={`stepGroups[${groupIndex}].groupName`}>
+                              {({ TextField }) => <TextField disabled={disabled} label="Nom du groupe" />}
+                            </AppField>
+                          ) : (
+                            <AppField name={`stepGroups[${groupIndex}].recipeId`}>
                               {({ ComboboxField }) => (
                                 <ComboboxField
                                   disabled={disabled}
@@ -116,72 +204,55 @@ export const StepsField = withForm({
                                 />
                               )}
                             </AppField>
-                            <div className={styles.subrecipeRange}>
-                              <AppField name={`steps[${index}].fromStep`}>
-                                {({ NumberField }) => <NumberField disabled={disabled} label="De l'étape" min={1} placeholder="Première" />}
-                              </AppField>
-                              <AppField name={`steps[${index}].toStep`}>
-                                {({ NumberField }) => <NumberField disabled={disabled} label="À l'étape" min={1} placeholder="Dernière" />}
-                              </AppField>
-                            </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
+                        <div className={styles.controls}>
+                          <Button
+                            aria-label="Monter le groupe"
+                            disabled={disabled || groupIndex === 1}
+                            onClick={() => field.moveValue(groupIndex, groupIndex - 1)}
+                            size="icon-sm"
+                            type="button"
+                            variant="ghost"
+                          >
+                            <CaretUpIcon size="sm" />
+                          </Button>
+                          <Button
+                            aria-label="Descendre le groupe"
+                            disabled={disabled || groupIndex === groups.length - 1}
+                            onClick={() => field.moveValue(groupIndex, groupIndex + 1)}
+                            size="icon-sm"
+                            type="button"
+                            variant="ghost"
+                          >
+                            <CaretDownIcon size="sm" />
+                          </Button>
+                          <Button
+                            aria-label="Supprimer le groupe"
+                            disabled={disabled}
+                            onClick={() => field.removeValue(groupIndex)}
+                            size="icon-sm"
+                            type="button"
+                            variant="destructive-ghost"
+                          >
+                            <TrashIcon size="sm" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className={styles.controls}>
-                        <Button
-                          aria-label="Monter l'étape"
-                          disabled={disabled || index === 0}
-                          onClick={() => field.moveValue(index, index - 1)}
-                          size="icon-sm"
-                          type="button"
-                          variant="ghost"
-                        >
-                          <CaretUpIcon size="sm" />
-                        </Button>
-                        <Button
-                          aria-label="Descendre l'étape"
-                          disabled={disabled || index === steps.length - 1}
-                          onClick={() => field.moveValue(index, index + 1)}
-                          size="icon-sm"
-                          type="button"
-                          variant="ghost"
-                        >
-                          <CaretDownIcon size="sm" />
-                        </Button>
-                        <Button
-                          aria-label="Supprimer l'étape"
-                          disabled={disabled}
-                          onClick={() => field.removeValue(index)}
-                          size="icon-sm"
-                          type="button"
-                          variant="destructive-ghost"
-                        >
-                          <TrashIcon size="sm" />
-                        </Button>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
+                    )}
+                    {group.kind === 'steps' && <GroupSteps disabled={disabled} form={form} groupIndex={groupIndex} />}
+                  </div>
+                ))}
                 <div className={styles.addActions}>
                   <Button
                     disabled={disabled}
-                    onClick={() => field.pushValue({ _key: newKey(), kind: 'text', text: '' })}
+                    onClick={() => field.pushValue({ _key: newKey(), kind: 'steps', steps: [] })}
                     size="sm"
                     type="button"
                     variant="outline"
                   >
-                    Texte <PlusIcon size="sm" />
+                    Groupe <PlusIcon size="sm" />
                   </Button>
-                  <MagimixStepDialog
-                    onSubmit={(data) => field.pushValue({ ...data, _key: newKey(), kind: 'magimix' })}
-                    submitLabel="Ajouter"
-                    title="Ajouter un programme Magimix"
-                    triggerRender={
-                      <Button disabled={disabled} size="sm" type="button" variant="outline">
-                        Magimix <PlusIcon size="sm" />
-                      </Button>
-                    }
-                  />
                   <Button
                     disabled={disabled}
                     onClick={() => field.pushValue({ _key: newKey(), kind: 'subrecipe', recipeId: linkedRecipeIds[0] ?? -1 })}

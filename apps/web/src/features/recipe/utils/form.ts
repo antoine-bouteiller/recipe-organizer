@@ -21,7 +21,7 @@ export const recipeDefaultValues: Partial<RecipeFormInput> = {
   meals: [],
   name: '',
   servings: 4,
-  steps: [],
+  stepGroups: [{ _key: Math.random().toString(36).substring(7), kind: 'steps', steps: [] }],
   video: undefined,
 }
 

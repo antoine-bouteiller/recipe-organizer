@@ -53,16 +53,19 @@ export const magimixTrigger = style({
   width: '100%',
 })
 
-export const subrecipeStep = style({
+export const group = style({
+  borderRadius: theme.radius.xl,
+  borderWidth: '1px',
   display: 'flex',
   flexDirection: 'column',
-  gap: theme.spacing(2),
+  gap: theme.spacing(3),
+  padding: theme.spacing(4),
 })
 
-export const subrecipeRange = style({
-  display: 'grid',
+export const groupHeader = style({
+  alignItems: 'flex-end',
+  display: 'flex',
   gap: theme.spacing(2),
-  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
 })
 
 export const addActions = style({

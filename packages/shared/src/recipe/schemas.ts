@@ -17,17 +17,25 @@ const magimixStepSchema = z.object({
   time: z.number().int().min(1).max(3660),
 })
 
-const subrecipeStepSchema = z
-  .object({
-    fromStep: z.number().int().min(1).optional(),
-    kind: z.literal('subrecipe'),
-    recipeId: z.number().int().positive(),
-    toStep: z.number().int().min(1).optional(),
-  })
-  .refine((step) => step.fromStep === undefined || step.toStep === undefined || step.fromStep <= step.toStep)
-
-export const recipeStepSchema = z.discriminatedUnion('kind', [textStepSchema, magimixStepSchema, subrecipeStepSchema])
+export const recipeStepSchema = z.discriminatedUnion('kind', [textStepSchema, magimixStepSchema])
 export type RecipeStep = z.infer<typeof recipeStepSchema>
+
+const ownStepGroupSchema = z.object({
+  groupName: z.string().optional(),
+  kind: z.literal('steps'),
+  steps: z.array(recipeStepSchema),
+})
+
+// A sub-recipe group shows the linked recipe's default step group.
+const subrecipeStepGroupSchema = z.object({
+  kind: z.literal('subrecipe'),
+  recipeId: z.number().int().positive(),
+})
+
+const recipeStepGroupSchema = z.discriminatedUnion('kind', [ownStepGroupSchema, subrecipeStepGroupSchema])
+export type RecipeStepGroup = z.infer<typeof recipeStepGroupSchema>
+
+const keyed = { _key: z.string() }
 
 export const recipeSchema = z.object({
   cuisineTypes: z.array(z.enum(CUISINE_TYPES)),
@@ -50,7 +58,15 @@ export const recipeSchema = z.object({
   meals: z.array(z.enum(MEALS)),
   name: z.string().min(2),
   servings: z.number().min(0),
-  steps: z.array(recipeStepSchema.and(z.object({ _key: z.string() }))),
+  // The first group is the recipe's default, unnamed own-steps group.
+  stepGroups: z
+    .array(
+      z.discriminatedUnion('kind', [
+        ownStepGroupSchema.extend({ ...keyed, steps: z.array(recipeStepSchema.and(z.object(keyed))) }),
+        subrecipeStepGroupSchema.extend(keyed),
+      ])
+    )
+    .refine((groups) => groups[0]?.kind === 'steps'),
   video: z.union([z.instanceof(File), z.object({ id: z.string(), url: z.string() })]).optional(),
 })
 
@@ -68,7 +84,7 @@ export const recipeFormWireSchema = z.object({
   meals: wireEntrySchema,
   name: wireEntrySchema,
   servings: wireEntrySchema,
-  steps: wireEntrySchema,
+  stepGroups: wireEntrySchema,
   video: wireEntrySchema.optional(),
 })
 

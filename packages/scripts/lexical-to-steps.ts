@@ -1,6 +1,6 @@
 import { allowedRotationSpeed, magimixProgram } from '@recipe-organizer/shared/recipe/magimix'
 // oxlint-disable-next-line import/consistent-type-specifier-style -- Node runs this script; an inline type import would load schemas.ts, whose extensionless imports Node cannot resolve.
-import type { RecipeStep } from '@recipe-organizer/shared/recipe/schemas'
+import type { RecipeStep, RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
 import * as z from 'zod'
 
 interface LexicalNode {
@@ -39,7 +39,7 @@ interface ReportEntry {
   recipeId: number
 }
 
-// A sub-recipe step before its source's node→step mapping is known.
+// A sub-recipe node before its source is known to exist.
 interface PendingSubrecipe {
   hideFirstNodes: number
   hideLastNodes: number
@@ -51,8 +51,6 @@ interface ConvertedRecipe {
   // Steps produced by each root node, in document order.
   nodeSteps: (RecipeStep | PendingSubrecipe)[][]
 }
-
-type SubrecipeStep = Extract<RecipeStep, { kind: 'subrecipe' }>
 
 const BOLD = 1
 const TEXT_BLOCKS = new Set(['heading', 'paragraph', 'quote'])
@@ -151,38 +149,6 @@ const convertRecipe = (instructions: string, report: (issue: string) => void): C
   return { nodeSteps }
 }
 
-/**
- * Maps legacy hide counts over the source's root nodes to an inclusive 1-based step range.
- * Mirrors the legacy renderer, which showed root nodes `[hideFirst, length - 1 - hideLast)`.
- */
-const resolveRange = (source: ConvertedRecipe, pending: PendingSubrecipe, report: (issue: string) => void): SubrecipeStep => {
-  const counts = source.nodeSteps.map((steps) => steps.length)
-  const total = counts.reduce((sum, count) => sum + count, 0)
-  const stepsBefore = (nodeIndex: number) => counts.slice(0, Math.max(0, nodeIndex)).reduce((sum, count) => sum + count, 0)
-  const from = stepsBefore(pending.hideFirstNodes) + 1
-  const to = stepsBefore(counts.length - 1 - pending.hideLastNodes)
-  const step: SubrecipeStep = { kind: 'subrecipe', recipeId: pending.recipeId }
-
-  if ((counts.at(-1) ?? 0) > 0) {
-    report(`sub-recipe ${pending.recipeId}: legacy renderer also hid the source's last node; kept hidden`)
-  }
-  if (from > to) {
-    if (total > 0) {
-      report(`sub-recipe ${pending.recipeId}: empty range; points past the source's last step`)
-      step.fromStep = total + 1
-      step.toStep = total + 1
-    }
-    return step
-  }
-  if (from !== 1) {
-    step.fromStep = from
-  }
-  if (to !== total) {
-    step.toStep = to
-  }
-  return step
-}
-
 export const convertRecipes = (rows: { id: number; instructions: string }[]) => {
   const report: ReportEntry[] = []
   const seen = new Set<string>()
@@ -195,25 +161,31 @@ export const convertRecipes = (rows: { id: number; instructions: string }[]) => 
   }
 
   const converted = new Map(rows.map((row) => [row.id, convertRecipe(row.instructions, reporter(row.id))]))
-  const steps = new Map<number, RecipeStep[]>()
+  const stepGroups = new Map<number, RecipeStepGroup[]>()
 
+  // Own steps fill the default group; each sub-recipe node becomes a sub-recipe group and later steps start a new unnamed group.
   for (const [id, recipe] of converted) {
     const recipeReport = reporter(id)
-    steps.set(
-      id,
-      recipe.nodeSteps.flat().flatMap((step) => {
-        if (step.kind !== 'pending-subrecipe') {
-          return [step]
+    const groups: RecipeStepGroup[] = [{ kind: 'steps', steps: [] }]
+    for (const step of recipe.nodeSteps.flat()) {
+      if (step.kind !== 'pending-subrecipe') {
+        const last = groups.at(-1)
+        if (last?.kind === 'steps') {
+          last.steps.push(step)
+        } else {
+          groups.push({ kind: 'steps', steps: [step] })
         }
-        const source = converted.get(step.recipeId)
-        if (!source) {
-          recipeReport(`sub-recipe ${step.recipeId} does not exist; step dropped`)
-          return []
+      } else if (converted.has(step.recipeId)) {
+        if (step.hideFirstNodes > 0 || step.hideLastNodes > 0) {
+          recipeReport(`sub-recipe ${step.recipeId}: legacy hidden range dropped; group shows the source's default group`)
         }
-        return [resolveRange(source, step, recipeReport)]
-      })
-    )
+        groups.push({ kind: 'subrecipe', recipeId: step.recipeId })
+      } else {
+        recipeReport(`sub-recipe ${step.recipeId} does not exist; step dropped`)
+      }
+    }
+    stepGroups.set(id, groups)
   }
 
-  return { report, steps }
+  return { report, stepGroups }
 }

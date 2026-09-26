@@ -25,21 +25,22 @@ the relational ingredient, link, and step graph — serving `index.spec.md` [G-1
 - `[PI-3]` **Graph writes are cohesive** — ingredient groups, ingredients, recipe links, and steps
   describe one submitted recipe.
 
-| Decision                       | Choice                                                                                                                                       | Rationale                                                                                                                                          |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Validation boundary   | Create and update accept `FormData`, parse it into typed values, and validate it inside guarded API routes.                                  | Multipart files and structured fields reach one trust boundary that gates storage effects.                                                         |
-| `[KD-2]` Aggregate replacement | Update removes the recipe's outgoing graph rows — ingredient groups, ingredients, links, and steps — and writes the submitted graph.         | The submitted form is the complete aggregate, avoiding an error-prone row-level diff.                                                              |
-| `[KD-3]` Derived flags         | The write path derives `isVegetarian`, `isSpice`, and `isMagimix`; `isMagimix` is true when any submitted step has `kind: 'magimix'`.        | Durable flags stay consistent with the graph; a typed step replaces the former `"type":"magimixProgram"` string marker.                            |
-| `[KD-4]` Media lifecycle       | Images pass through a transform into R2; videos retain uploaded bytes; stale keys use best-effort deletion.                                  | Images have a bounded delivery format while media-cleanup failure does not invalidate a committed recipe.                                          |
-| `[KD-5]` Sub-recipe integrity  | A `subrecipe` step's `recipeId` must be one of the submitted linked-recipe ids and differ from the recipe's own id; otherwise 400.           | The step reference stays a view onto a declared relation, and the server no longer trusts the picker.                                              |
-| `[KD-6]` Table per step kind   | Steps persist in `text_steps`, `magimix_steps`, and `subrecipe_steps`, each sharing `recipe_id` and `position` with only its kind's columns. | Required fields are `NOT NULL` instead of nullable columns guarded by CHECKs; a new kind adds a table, and `subrecipe_id` gets a real foreign key. |
+| Decision                       | Choice                                                                                                                                                 | Rationale                                                                                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Validation boundary   | Create and update accept `FormData`, parse it into typed values, and validate it inside guarded API routes.                                            | Multipart files and structured fields reach one trust boundary that gates storage effects.                                                    |
+| `[KD-2]` Aggregate replacement | Update removes the recipe's outgoing graph rows — ingredient groups, ingredients, links, and steps — and writes the submitted graph.                   | The submitted form is the complete aggregate, avoiding an error-prone row-level diff.                                                         |
+| `[KD-3]` Derived flags         | The write path derives `isVegetarian`, `isSpice`, and `isMagimix`; `isMagimix` is true when any own-group step has `kind: 'magimix'`.                  | Durable flags stay consistent with the graph; a typed step replaces the former `"type":"magimixProgram"` string marker.                       |
+| `[KD-4]` Media lifecycle       | Images pass through a transform into R2; videos retain uploaded bytes; stale keys use best-effort deletion.                                            | Images have a bounded delivery format while media-cleanup failure does not invalidate a committed recipe.                                     |
+| `[KD-5]` Sub-recipe integrity  | A `subrecipe` step group's `recipeId` must be one of the submitted linked-recipe ids and differ from the recipe's own id; otherwise 400.               | The step reference stays a view onto a declared relation, and the server no longer trusts the picker.                                         |
+| `[KD-6]` Table per step kind   | _Superseded by [KD-7]._                                                                                                                                | —                                                                                                                                             |
+| `[KD-7]` Step groups and spine | `recipe_step_groups` orders groups per recipe; `recipe_steps` orders steps per group; `text_steps` and `magimix_steps` hold kind columns by `step_id`. | Ordering lives in one table, so unique indexes validate it; groups mirror ingredient groups, and a sub-recipe group keeps a real foreign key. |
 
 ## Outcome
 
-- `[SO-1]` Create and update persist a recipe's ordered steps as typed rows in the three step tables
+- `[SO-1]` Create and update persist a recipe's ordered step groups and their ordered, typed steps
   inside the same aggregate write as its ingredients and links. — demonstrated by `[VC-1]`, `[VC-2]`
 - `[SO-2]` The database and the write boundary reject inconsistent steps: a missing required field
-  for a kind, or a sub-recipe outside the recipe's linked recipes. — demonstrated by `[VC-3]`, `[VC-4]`
+  for a kind, a duplicate position, or a sub-recipe group outside the recipe's linked recipes. — demonstrated by `[VC-3]`, `[VC-4]`
 - `[SO-3]` `isMagimix` follows the presence of a Magimix step. — demonstrated by `[VC-5]`
 - `[SO-4]` Mutations stay owner-or-admin guarded, and malformed input causes no storage effect. —
   demonstrated by `[VC-6]`
@@ -48,54 +49,26 @@ the relational ingredient, link, and step graph — serving `index.spec.md` [G-1
 
 ### `[CT-1]` Step persistence
 
-```ts
-// apps/api/db/schema/recipe-steps.ts
-const stepBase = () => ({
-  id: integer('id').primaryKey(),
-  recipeId: integer('recipe_id')
-    .notNull()
-    .references(() => recipe.id, { onDelete: 'restrict' }),
-  position: integer('position').notNull(), // 1-based, contiguous per recipe across all step tables
-})
-
-export const textSteps = sqliteTable('text_steps', { ...stepBase(), text: text('text').notNull() }, (t) => [
-  uniqueIndex('uq_text_steps_recipe_position').on(t.recipeId, t.position),
-])
-
-export const magimixSteps = sqliteTable(
-  'magimix_steps',
-  {
-    ...stepBase(),
-    program: text('program').$type<MagimixProgram>().notNull(),
-    rotationSpeed: text('rotation_speed').$type<RotationSpeed>().notNull(),
-    time: integer('time').notNull(),
-    temperature: integer('temperature'),
-  },
-  (t) => [uniqueIndex('uq_magimix_steps_recipe_position').on(t.recipeId, t.position)]
-)
-
-export const subrecipeSteps = sqliteTable(
-  'subrecipe_steps',
-  {
-    ...stepBase(),
-    subrecipeId: integer('subrecipe_id')
-      .notNull()
-      .references(() => recipe.id, { onDelete: 'restrict' }),
-    fromStep: integer('from_step'),
-    toStep: integer('to_step'),
-  },
-  (t) => [uniqueIndex('uq_subrecipe_steps_recipe_position').on(t.recipeId, t.position), index('idx_subrecipe_steps_subrecipe_id').on(t.subrecipeId)]
-)
+```text
+recipe_step_groups  id · recipe_id · position · is_default · group_name? · subrecipe_id?
+  unique (recipe_id, position) · CHECK subrecipe_id IS NULL OR (group_name IS NULL AND NOT is_default)
+└── recipe_steps     id · group_id (cascade) · position        unique (group_id, position)
+    ├── text_steps     step_id (PK, cascade) · text
+    └── magimix_steps  step_id (PK, cascade) · program · rotation_speed · time · temperature?
 ```
 
-- The table is the kind: no discriminator column, and `NOT NULL` replaces CHECK constraints.
-- Row ↔ `RecipeStep` (`editor.spec.md` [CT-1]) mapping is one pure pair of functions per table,
-  shared by the write path and the read projections.
-- **Write:** the submitted array is split by `kind`; each step keeps its 1-based array index as
-  `position`, so positions are unique and contiguous across the three tables by construction.
-- **Read:** the three tables are queried by `recipe_id` in one D1 batch and merged by `position`.
-- Optional fields (`temperature`, `fromStep`, `toStep`) are `NULL` when absent. Program and speed
-  enums are validated by Zod, not by the database.
+- Positions are 1-based array indexes: groups per recipe, steps per group.
+- The first group is the default own-steps group: `is_default`, never named, never a sub-recipe
+  group. Later own groups carry an optional name, like ingredient groups.
+- A sub-recipe group sets `subrecipe_id` (restrict FK) and owns no steps.
+- The kind table is the kind: no discriminator column, and `NOT NULL` replaces CHECK constraints.
+- **Write:** one D1 batch inserts groups, steps, and kind rows; each child resolves its parent id
+  through the parent's unique position, so the batch needs no returned ids.
+- **Read:** one relational query loads groups ordered by position with their ordered steps and kind
+  rows; one pure mapper turns rows into `RecipeStepGroup[]` (`editor.spec.md` [CT-1]).
+- **Delete:** removing a recipe's groups cascades to their steps and kind rows.
+- Optional fields (`temperature`, `group_name`) are `NULL` when absent. Program and speed enums are
+  validated by Zod, not by the database.
 
 ### `[CT-2]` Aggregate shape and write flow
 
@@ -103,7 +76,7 @@ export const subrecipeSteps = sqliteTable(
 recipe
 ├── ingredientGroups[] └── ingredients[] { ingredientId, quantity, unitSlug? }
 ├── linkedRecipes[] { recipeId, ratio }
-├── steps[] RecipeStep                 ← replaces `instructions: Lexical JSON`
+├── stepGroups[] RecipeStepGroup       ← replaces `instructions: Lexical JSON`
 ├── image key
 └── video key?
 
@@ -112,19 +85,20 @@ FormData → guarded validator ([KD-5] check) → ownership lookup → media key
 ```
 
 - **Input:** the parser preserves `File` values for media and decodes JSON fields, including
-  `steps`. A valid image is a file or an already-held media reference; video is optional likewise.
+  `stepGroups`. A valid image is a file or an already-held media reference; video is optional likewise.
   Ingredient entries pair a non-negative ingredient id and quantity with an optional unit; linked
-  recipes pair a non-negative target id with a non-negative ratio; steps satisfy `recipeStepSchema`.
+  recipes pair a non-negative target id with a non-negative ratio; step groups satisfy
+  `recipeSchema.stepGroups`, whose first group owns steps.
 - **Create** binds `createdBy` to the authenticated user, writes the recipe row, then the graph; a
   graph error compensates by deleting the new recipe (and any rows written under it).
 - **Update** loads the recipe and requires owner or admin, then batches removal of group ingredients,
-  ingredient groups, outgoing links, and steps before writing the submitted graph.
+  ingredient groups, outgoing links, and step groups before writing the submitted graph.
 - **Delete** requires owner or admin, batches child removal (steps included) ahead of the recipe row,
   then attempts image deletion.
 - **Failure:** a missing target is not-found; an unauthorized target or a schema / [KD-5] violation
   produces no media or database effect. Mutation options map failures to French feedback.
 - **Referential guard:** a recipe referenced by another recipe's link or `subrecipe_id` cannot be
-  deleted (restrict FKs); since [KD-5] requires a link for every sub-recipe step, the link is the
+  deleted (restrict FKs); since [KD-5] requires a link for every sub-recipe group, the link is the
   user-visible reason.
 
 ### `[CT-3]` Derived flags
@@ -132,11 +106,11 @@ FormData → guarded validator ([KD-5] check) → ownership lookup → media key
 ```ts
 isVegetarian = noMeatOrFish(ownIngredients) && linked.every((r) => r.isVegetarian) && !meals.includes('dessert')
 isSpice = ownIngredients.length > 0 && ownIngredients.every((i) => i.category === 'spices')
-isMagimix = steps.some((s) => s.kind === 'magimix')
+isMagimix = ownGroupSteps.some((s) => s.kind === 'magimix')
 ```
 
-`resolveAutoFlags` receives `steps: RecipeStep[]` instead of `instructions: string`. A Magimix step
-inside an embedded sub-recipe does not make the parent Magimix, matching the previous behavior.
+`resolveAutoFlags` receives the flattened steps of own groups. A Magimix step inside an embedded
+sub-recipe group does not make the parent Magimix, matching the previous behavior.
 
 ### `[CT-4]` Media and invalidation
 
@@ -148,14 +122,17 @@ invalidate the all-recipes key family.
 
 ## Acceptance
 
-- `[VC-1]` Given a create request with one step of each kind, when it succeeds, then the detail
-  projection returns the same steps in order with positions 1–3. — demonstrates `[SO-1]`
+- `[VC-1]` Given a create request with a default group of one text and one Magimix step, a
+  sub-recipe group, and a named group, when it succeeds, then the detail projection returns the same
+  groups and steps in order, without a name on the default group. — demonstrates `[SO-1]`
 - `[VC-2]` Given an existing recipe with 3 steps, when updated with 2 different steps, then exactly
-  the 2 new steps remain for that recipe and other recipes' steps are untouched. — demonstrates `[SO-1]`
-- `[VC-3]` Given a direct insert of a `magimix_steps` row with a null `program`, or a `subrecipe_steps`
-  row with a null `subrecipe_id`, when executed against D1, then a `NOT NULL` constraint rejects it. —
+  the 2 new steps remain for that recipe, no orphan `recipe_steps` row remains, and other recipes'
+  steps are untouched. — demonstrates `[SO-1]`
+- `[VC-3]` Given a direct insert of a `magimix_steps` row with a null `program`, a second step at an
+  existing `(group_id, position)`, or a named sub-recipe group, when executed against D1, then a
+  `NOT NULL`, unique, or CHECK constraint rejects it. —
   demonstrates `[SO-2]`
-- `[VC-4]` Given a submission whose sub-recipe step references a recipe absent from `linkedRecipes`,
+- `[VC-4]` Given a submission whose sub-recipe group references a recipe absent from `linkedRecipes`,
   or the recipe's own id, when submitted, then the API returns 400 and nothing is written. —
   demonstrates `[SO-2]`
 - `[VC-5]` Given steps with and without a `magimix` step, when flags are computed, then `isMagimix`
@@ -168,11 +145,11 @@ invalidate the all-recipes key family.
 - `[C-1]` Foreign-key constraints require child rows (ingredients, groups, links, steps) to disappear
   ahead of their parent.
 - `[C-2]` A linked recipe prevents deleting its target until the referencing recipe removes the link
-  and any sub-recipe step pointing to it.
+  and any sub-recipe group pointing to it.
 - `[C-3]` _Superseded by [KD-6]:_ a sub-recipe step now has a relational foreign key.
 - `[C-4]` A graph-write failure triggers compensation that avoids exposing a partial aggregate.
-- `[C-5]` `(recipe_id, position)` uniqueness holds per table only; cross-table uniqueness relies on
-  the write path deriving positions from the submitted array index.
+- `[C-5]` _Superseded by [KD-7]:_ step positions live in `recipe_steps`, whose unique index covers
+  every kind.
 
 ## Open Questions
 

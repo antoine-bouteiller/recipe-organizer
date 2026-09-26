@@ -34,7 +34,12 @@ const formatIngredientGroup = (group: RecipeIngredientGroup) => ({
   })),
 })
 
-const withStepKey = (step: Recipe['steps'][number]) => ({ ...step, _key: Math.random().toString(36).substring(7) })
+const newKey = () => Math.random().toString(36).substring(7)
+
+const formatStepGroup = (group: Recipe['stepGroups'][number]) =>
+  group.kind === 'steps'
+    ? { ...group, _key: newKey(), steps: group.steps.map((step) => ({ ...step, _key: newKey() })) }
+    : { ...group, _key: newKey() }
 
 const EditRecipePage = () => {
   const { id } = Route.useLoaderData()
@@ -59,7 +64,7 @@ const EditRecipePage = () => {
         meals: recipe.meals,
         name: recipe.name,
         servings: recipe.servings,
-        steps: recipe.steps.map(withStepKey),
+        stepGroups: recipe.stepGroups.map(formatStepGroup),
         video: recipe.video
           ? {
               id: recipe.video,

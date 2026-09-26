@@ -1,4 +1,4 @@
-import { recipeStepSchema } from '@recipe-organizer/shared/recipe/schemas'
+import { recipeSchema } from '@recipe-organizer/shared/recipe/schemas'
 import { describe, expect, it } from 'vite-plus/test'
 
 import { convertRecipes } from './lexical-to-steps'
@@ -33,7 +33,11 @@ const subrecipe = (recipeId: number, hideFirstNodes: number, hideLastNodes: numb
 })
 const doc = (...children: object[]) => JSON.stringify({ root: { children, direction: 'ltr', format: '', indent: 0, type: 'root', version: 1 } })
 
-const convertOne = (instructions: string) => convertRecipes([{ id: 1, instructions }])
+const convertOne = (instructions: string) => {
+  const { report, stepGroups } = convertRecipes([{ id: 1, instructions }])
+  const [group] = stepGroups.get(1) ?? []
+  return { report, steps: new Map([[1, group?.kind === 'steps' ? group.steps : undefined]]) }
+}
 
 describe('convertRecipes', () => {
   it('converts bold text to ** and merges adjacent bold runs', () => {
@@ -71,38 +75,20 @@ describe('convertRecipes', () => {
     expect(report).toHaveLength(1)
   })
 
-  it('maps hide counts to a step range across a split list', () => {
-    // Source nodes → steps: [0] 1 · [1] 2,3,4 · [2] 5 · [3] trailing empty paragraph.
-    const source = doc(
-      paragraph(text('Un')),
-      list(listItem(text('Deux')), listItem(text('Trois')), listItem(text('Quatre'))),
-      paragraph(text('Cinq')),
-      paragraph()
-    )
-    const { report, steps } = convertRecipes([
-      { id: 1, instructions: doc(subrecipe(2, 1, 1)) },
-      { id: 2, instructions: source },
-      { id: 3, instructions: doc(subrecipe(2, 0, 0)) },
-      { id: 4, instructions: doc(subrecipe(2, 0, 2)) },
+  it('splits steps around sub-recipe groups and drops missing sources', () => {
+    const { report, stepGroups } = convertRecipes([
+      { id: 1, instructions: doc(subrecipe(2, 0, 0), paragraph(text('Un')), subrecipe(2, 1, 0), subrecipe(9, 0, 0), paragraph(text('Deux'))) },
+      { id: 2, instructions: doc(paragraph(text('Source'))) },
     ])
-    expect(steps.get(1)).toEqual([{ fromStep: 2, kind: 'subrecipe', recipeId: 2, toStep: 4 }])
-    expect(steps.get(3)).toEqual([{ kind: 'subrecipe', recipeId: 2 }])
-    expect(steps.get(4)).toEqual([{ kind: 'subrecipe', recipeId: 2, toStep: 1 }])
-    expect(report).toEqual([])
-  })
-
-  it('keeps the legacy hidden last node, empty ranges, and drops missing sources', () => {
-    const { report, steps } = convertRecipes([
-      { id: 1, instructions: doc(subrecipe(2, 0, 0), subrecipe(2, 2, 0), subrecipe(9, 0, 0)) },
-      { id: 2, instructions: doc(paragraph(text('Un')), paragraph(text('Deux'))) },
-    ])
-    expect(steps.get(1)).toEqual([
-      { kind: 'subrecipe', recipeId: 2, toStep: 1 },
-      { fromStep: 3, kind: 'subrecipe', recipeId: 2, toStep: 3 },
+    expect(stepGroups.get(1)).toEqual([
+      { kind: 'steps', steps: [] },
+      { kind: 'subrecipe', recipeId: 2 },
+      { kind: 'steps', steps: [{ kind: 'text', text: 'Un' }] },
+      { kind: 'subrecipe', recipeId: 2 },
+      { kind: 'steps', steps: [{ kind: 'text', text: 'Deux' }] },
     ])
     expect(report.map((entry) => entry.issue)).toEqual([
-      "sub-recipe 2: legacy renderer also hid the source's last node; kept hidden",
-      "sub-recipe 2: empty range; points past the source's last step",
+      "sub-recipe 2: legacy hidden range dropped; group shows the source's default group",
       'sub-recipe 9 does not exist; step dropped',
     ])
   })
@@ -118,8 +104,8 @@ describe('convertRecipes', () => {
     expect(report.map((entry) => entry.issue)).toEqual(['unknown node "code" converted to text', 'unknown inline node "link" converted to text'])
   })
 
-  it('produces steps that satisfy recipeStepSchema', () => {
-    const { steps } = convertRecipes([
+  it('produces step groups that satisfy the recipe schema', () => {
+    const { stepGroups } = convertRecipes([
       {
         id: 1,
         instructions: doc(
@@ -131,8 +117,11 @@ describe('convertRecipes', () => {
       { id: 2, instructions: doc(paragraph(text('a')), paragraph(text('b')), paragraph(text('c'))) },
       { id: 3, instructions: 'pas du JSON' },
     ])
-    for (const step of [...steps.values()].flat()) {
-      expect(recipeStepSchema.parse(step)).toEqual(step)
+    for (const groups of stepGroups.values()) {
+      const input = groups.map((group) =>
+        group.kind === 'steps' ? { ...group, _key: 'k', steps: group.steps.map((step) => ({ ...step, _key: 'k' })) } : { ...group, _key: 'k' }
+      )
+      expect(recipeSchema.shape.stepGroups.parse(input)).toEqual(input)
     }
   })
 })

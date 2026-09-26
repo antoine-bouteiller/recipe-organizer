@@ -38,17 +38,17 @@ shopping-list features.
 - `[PI-4]` **Derived facts stay derived** — flags such as vegetarian and Magimix come from the
   submitted aggregate rather than editable client state.
 
-| Decision                    | Choice                                                                                                                                                                                          | Rationale                                                                                                                                   |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Recipe aggregate   | A recipe owns its ingredient groups, ingredient rows, linked-recipe ratios, ordered steps, and media keys.                                                                                      | The cooking document stays coherent when it is read, replaced, or deleted.                                                                  |
-| `[KD-2]` Write authority    | Guarded API routes validate form data, decide ownership, derive flags, and persist the aggregate.                                                                                               | Browser state cannot be trusted to authorize writes or derive durable recipe facts.                                                         |
-| `[KD-3]` Read model         | List queries return card-sized recipes; detail queries return ingredients, links, and steps.                                                                                                    | Each surface receives enough data without making routine browsing carry the full document.                                                  |
-| `[KD-4]` Preparation format | Preparation is an ordered list of polymorphic steps — `text` (bold-only markdown), `magimix`, `subrecipe` — stored as rows in one table per kind. Supersedes Lexical JSON with decorator nodes. | The server can validate, query, and derive flags from typed steps; sub-recipe references get a real foreign key; recipe code drops Lexical. |
-| `[KD-5]` Client selections  | Shopping-list membership and serving quantities stay in client stores keyed by recipe id.                                                                                                       | These choices are personal, immediate UI state rather than recipe data.                                                                     |
+| Decision                    | Choice                                                                                                                                                                                 | Rationale                                                                                                                                   |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Recipe aggregate   | A recipe owns its ingredient groups, ingredient rows, linked-recipe ratios, ordered steps, and media keys.                                                                             | The cooking document stays coherent when it is read, replaced, or deleted.                                                                  |
+| `[KD-2]` Write authority    | Guarded API routes validate form data, decide ownership, derive flags, and persist the aggregate.                                                                                      | Browser state cannot be trusted to authorize writes or derive durable recipe facts.                                                         |
+| `[KD-3]` Read model         | List queries return card-sized recipes; detail queries return ingredients, links, and steps.                                                                                           | Each surface receives enough data without making routine browsing carry the full document.                                                  |
+| `[KD-4]` Preparation format | Preparation is ordered step groups, like ingredient groups: own groups of polymorphic steps — `text` (bold-only markdown), `magimix` — or `subrecipe` groups. Supersedes Lexical JSON. | The server can validate, query, and derive flags from typed steps; sub-recipe references get a real foreign key; recipe code drops Lexical. |
+| `[KD-5]` Client selections  | Shopping-list membership and serving quantities stay in client stores keyed by recipe id.                                                                                              | These choices are personal, immediate UI state rather than recipe data.                                                                     |
 
 Recipes reuse other recipes in two deliberately different ways: a linked recipe contributes its
-default ingredient group and a ratio to the ingredient graph, while a sub-recipe step shows a range of
-that linked recipe's steps at a point in the preparation. A sub-recipe step always points to a linked
+default ingredient group and a ratio to the ingredient graph, while a sub-recipe step group shows that
+linked recipe's default step group at a point in the preparation. A sub-recipe group always points to a linked
 recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
 
 ```text
@@ -56,7 +56,7 @@ recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
                      │ FormData
                      ▼
  ┌────────────── recipe write boundary ──────────────┐
- │ validation · ownership · flags · media · aggregate │──► D1 (recipes, groups, links, *_steps)   / R2
+ │ validation · ownership · flags · media · aggregate │──► D1 (recipes, groups, links, steps)   / R2
  └───────────────────────────────────────────────────┘
                      │
                      ▼
@@ -67,7 +67,7 @@ recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
 
 - `[SO-1]` An approved user creates, edits, and deletes recipes, guarded by owner-or-admin
   authorization. — demonstrated by `[VC-1]`
-- `[SO-2]` A recipe's preparation is an ordered list of text, Magimix, and sub-recipe steps, edited
+- `[SO-2]` A recipe's preparation is ordered groups of text and Magimix steps plus sub-recipe groups, edited
   in the form and rendered on the cooking view. — demonstrated by `[VC-2]`
 - `[SO-3]` Cards, search, and the cooking view read shared projections, and quantities and
   shopping-list membership stay client state. — demonstrated by `[VC-3]`
@@ -94,7 +94,7 @@ returns it; `display.spec.md` [CT-3] renders it through `editor.spec.md` [CT-4].
 | Quantity and shopping-list selection              | Client stores             | Quantity controls     |
 
 The feature exposes query-option factories (list, detail, instructions), mutation-option factories
-(create, update, delete), the shared `recipeStepSchema`, and its components. Ingredients contribute
+(create, update, delete), the shared `recipeStepSchema` and `RecipeStepGroup`, and its components. Ingredients contribute
 catalogue ids and units; search consumes the list projection; shopping-list state consumes recipe
 ids; none reach into recipe internals.
 
@@ -102,8 +102,8 @@ ids; none reach into recipe internals.
 
 - `[VC-1]` Given an owner, another user, and an admin, when each updates or deletes the same recipe,
   then only the owner and admin succeed (`crud.spec.md` [VC-6]). — demonstrates `[SO-1]`
-- `[VC-2]` Given a recipe saved with one step of each kind, when its detail page opens, then the
-  steps render in order with bold text, the Magimix item, and the sub-recipe section, and the card
+- `[VC-2]` Given a recipe saved with a text and a Magimix step and a sub-recipe group, when its detail
+  page opens, then they render in order with bold text, the Magimix item, and the sub-recipe section, and the card
   shows the Magimix flag (`editor.spec.md` [VC-1], [VC-5]; `crud.spec.md` [VC-1], [VC-5]). —
   demonstrates `[SO-2]`
 - `[VC-3]` Given the home grid and a detail page, when the cook changes quantity and shopping-list
@@ -111,7 +111,7 @@ ids; none reach into recipe internals.
 
 ## Caveats
 
-- `[C-1]` A recipe cannot be deleted while another recipe links to it or embeds its steps.
+- `[C-1]` A recipe cannot be deleted while another recipe links to it or embeds its step group.
 - `[C-2]` Media objects live outside D1; stale-object cleanup is best effort after a successful write.
 - `[C-3]` A sub-recipe section fetches its source steps independently and can lag according to query
   freshness.

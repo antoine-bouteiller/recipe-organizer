@@ -37,27 +37,41 @@ const insert = (table: string, values: Record<string, string | number | undefine
 
 const rowsSchema = z.tuple([z.object({ results: z.array(z.object({ id: z.number(), instructions: z.string() })) })])
 const [{ results }] = rowsSchema.parse(JSON.parse(executeSql(['--json', '--command', 'SELECT id, instructions FROM recipes ORDER BY id'])))
-const { report, steps } = convertRecipes(results)
+const { report, stepGroups } = convertRecipes(results)
 
-// Rewrites every step on each run so a re-run captures edits made since the last one.
-const statements = ['DELETE FROM text_steps;', 'DELETE FROM magimix_steps;', 'DELETE FROM subrecipe_steps;']
-for (const [recipeId, recipeSteps] of steps) {
-  for (const [index, step] of recipeSteps.entries()) {
-    const base = { position: index + 1, recipe_id: recipeId }
-    if (step.kind === 'text') {
-      statements.push(insert('text_steps', { ...base, text: step.text }))
-    } else if (step.kind === 'magimix') {
+const groupId = (recipeId: number, position: number) => `(SELECT id FROM recipe_step_groups WHERE recipe_id = ${recipeId} AND position = ${position})`
+const stepId = (recipeId: number, groupPosition: number, position: number) =>
+  `(SELECT id FROM recipe_steps WHERE group_id = ${groupId(recipeId, groupPosition)} AND position = ${position})`
+const insertStep = (table: string, id: string, values: Record<string, string | number | undefined>) =>
+  `INSERT INTO ${table} (step_id, ${Object.keys(values).join(', ')}) VALUES (${id}, ${Object.values(values).map(sqlValue).join(', ')});`
+
+// Rewrites every step on each run so a re-run captures edits made since the last one; deleting groups cascades to steps.
+const statements = ['DELETE FROM recipe_step_groups;']
+let stepCount = 0
+for (const [recipeId, groups] of stepGroups) {
+  for (const [groupIndex, group] of groups.entries()) {
+    const groupPosition = groupIndex + 1
+    statements.push(
+      group.kind === 'subrecipe'
+        ? insert('recipe_step_groups', { position: groupPosition, recipe_id: recipeId, subrecipe_id: group.recipeId })
+        : insert('recipe_step_groups', { is_default: groupIndex === 0 ? 1 : 0, position: groupPosition, recipe_id: recipeId })
+    )
+    const steps = group.kind === 'steps' ? group.steps : []
+    for (const [index, step] of steps.entries()) {
+      const position = index + 1
+      const id = stepId(recipeId, groupPosition, position)
+      stepCount += 1
+      statements.push(`INSERT INTO recipe_steps (group_id, position) VALUES (${groupId(recipeId, groupPosition)}, ${position});`)
       statements.push(
-        insert('magimix_steps', {
-          ...base,
-          program: step.program,
-          rotation_speed: step.rotationSpeed,
-          temperature: step.temperature,
-          time: step.time,
-        })
+        step.kind === 'text'
+          ? insertStep('text_steps', id, { text: step.text })
+          : insertStep('magimix_steps', id, {
+              program: step.program,
+              rotation_speed: step.rotationSpeed,
+              temperature: step.temperature,
+              time: step.time,
+            })
       )
-    } else {
-      statements.push(insert('subrecipe_steps', { ...base, from_step: step.fromStep, subrecipe_id: step.recipeId, to_step: step.toStep }))
     }
   }
 }
@@ -71,7 +85,7 @@ try {
   rmSync(dir, { force: true, recursive: true })
 }
 
-process.stdout.write(`Converted ${results.length} recipes into ${statements.length - 3} steps.\n`)
+process.stdout.write(`Converted ${results.length} recipes into ${stepCount} steps.\n`)
 for (const { recipeId, issue } of report) {
   process.stdout.write(`recipe ${recipeId}: ${issue}\n`)
 }

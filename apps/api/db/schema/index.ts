@@ -5,6 +5,7 @@ import { ingredient } from './ingredient'
 import { recipe } from './recipe'
 import { groupIngredient, recipeIngredientGroup } from './recipe-ingredients'
 import { recipeLinkedRecipes } from './recipe-linked-recipes'
+import { magimixSteps, recipeStep, recipeStepGroup, textSteps } from './recipe-steps'
 import { user } from './user'
 
 export * from './auth'
@@ -16,7 +17,19 @@ export * from './recipe-steps'
 export * from './user'
 
 export const relations = defineRelations(
-  { groupIngredient, ingredient, ingredientCategory, recipe, recipeIngredientGroup, recipeLinkedRecipes, user },
+  {
+    groupIngredient,
+    ingredient,
+    ingredientCategory,
+    magimixSteps,
+    recipe,
+    recipeIngredientGroup,
+    recipeLinkedRecipes,
+    recipeStep,
+    recipeStepGroup,
+    textSteps,
+    user,
+  },
   (relation) => ({
     groupIngredient: {
       group: relation.one.recipeIngredientGroup({
@@ -69,6 +82,13 @@ export const relations = defineRelations(
         optional: false,
         to: relation.recipe.id,
       }),
+    },
+    recipeStep: {
+      magimix: relation.one.magimixSteps({ from: relation.recipeStep.id, to: relation.magimixSteps.stepId }),
+      text: relation.one.textSteps({ from: relation.recipeStep.id, to: relation.textSteps.stepId }),
+    },
+    recipeStepGroup: {
+      steps: relation.many.recipeStep({ from: relation.recipeStepGroup.id, to: relation.recipeStep.groupId }),
     },
     user: {
       recipes: relation.many.recipe(),

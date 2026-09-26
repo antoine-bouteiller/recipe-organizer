@@ -1,6 +1,12 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
+export const groups = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(6),
+})
+
 export const list = style({
   display: 'flex',
   flexDirection: 'column',
@@ -27,7 +33,7 @@ export const text = style({
   whiteSpace: 'pre-line',
 })
 
-export const subrecipeTitle = style({
+export const groupName = style({
   display: 'block',
   marginBottom: theme.spacing(2),
 })

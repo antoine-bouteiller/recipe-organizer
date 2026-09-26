@@ -41,7 +41,7 @@ reset('img', {
   height: 'auto',
 })
 
-reset('button, input', {
+reset('button, input, textarea', {
   font: 'inherit',
   fontFeatureSettings: 'inherit',
   fontVariationSettings: 'inherit',

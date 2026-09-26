@@ -19,9 +19,3 @@ export const toggleBold = ({ end, start, value }: TextSelection): TextSelection 
   }
   return { end: end + 2, start: start + 2, value: `${before}${BOLD}${selected}${BOLD}${after}` }
 }
-
-// Clamps an inclusive 1-based range to the source's current step count.
-export const clampStepRange = (count: number, fromStep?: number, toStep?: number) => ({
-  first: Math.max(1, fromStep ?? 1),
-  last: Math.min(count, toStep ?? count),
-})

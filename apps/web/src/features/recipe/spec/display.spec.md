@@ -31,15 +31,15 @@ serving `index.spec.md` [G-2] and [G-4].
 - `[PI-3]` **Amounts explain themselves** — ingredient quantities scale relative to base servings and
   retain their unit labels.
 
-| Decision                         | Choice                                                                                                                                                        | Rationale                                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `[KD-1]` Query projections       | Cards receive reduced recipes; detail receives the ingredient graph, links, and ordered steps; the instructions projection returns a recipe's name and steps. | Browsing stays compact while the cooking view and sub-recipe sections get their full context. |
-| `[KD-2]` Responsive cooking view | Phones use swipeable ingredient and preparation tabs; desktop shows adjacent panes.                                                                           | Each device gives the cook a legible view of the content it can fit.                          |
-| `[KD-3]` Quantity state          | A recipe-id keyed client store holds the selected quantity and scales ingredients from servings.                                                              | A cook can adjust portions immediately without mutating the shared recipe.                    |
-| `[KD-4]` Asset delivery          | Image and video route handlers stream R2 objects through the shared cache boundary.                                                                           | Media remains private to application routing while retaining cacheable delivery.              |
+| Decision                         | Choice                                                                                                                                                                            | Rationale                                                                                     |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `[KD-1]` Query projections       | Cards receive reduced recipes; detail receives the ingredient graph, links, and ordered step groups; the instructions projection returns a recipe's name and default-group steps. | Browsing stays compact while the cooking view and sub-recipe sections get their full context. |
+| `[KD-2]` Responsive cooking view | Phones use swipeable ingredient and preparation tabs; desktop shows adjacent panes.                                                                                               | Each device gives the cook a legible view of the content it can fit.                          |
+| `[KD-3]` Quantity state          | A recipe-id keyed client store holds the selected quantity and scales ingredients from servings.                                                                                  | A cook can adjust portions immediately without mutating the shared recipe.                    |
+| `[KD-4]` Asset delivery          | Image and video route handlers stream R2 objects through the shared cache boundary.                                                                                               | Media remains private to application routing while retaining cacheable delivery.              |
 
-The instruction renderer receives steps and delegates to `RecipeSteps` (`editor.spec.md` [CT-4]); it
-does not interpret Magimix data, bold markdown, or sub-recipe ranges itself. Display uses mutation
+The instruction renderer receives step groups and delegates to `RecipeStepGroups` (`editor.spec.md`
+[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. Display uses mutation
 options for deletion while CRUD retains authorization and graph removal.
 
 ## Outcome
@@ -55,14 +55,15 @@ options for deletion while CRUD retains authorization and graph removal.
 
 ### `[CT-1]` Query projections
 
-| Projection     | Fields                                              | Surface              | Endpoint                            |
-| -------------- | --------------------------------------------------- | -------------------- | ----------------------------------- |
-| Reduced recipe | id, name, image URL, servings, derived flags        | Card grid and search | `getRecipeListOptions`              |
-| Detail recipe  | reduced fields plus groups, links, `steps`, video   | Cooking view         | `getRecipeDetailsOptions`           |
-| Instructions   | id, name, `steps: RecipeStep[]` ordered by position | Sub-recipe section   | `GET /api/recipes/:id/instructions` |
+| Projection     | Fields                                                 | Surface              | Endpoint                            |
+| -------------- | ------------------------------------------------------ | -------------------- | ----------------------------------- |
+| Reduced recipe | id, name, image URL, servings, derived flags           | Card grid and search | `getRecipeListOptions`              |
+| Detail recipe  | reduced fields plus groups, links, `stepGroups`, video | Cooking view         | `getRecipeDetailsOptions`           |
+| Instructions   | id, name, default-group `steps: RecipeStep[]`          | Sub-recipe section   | `GET /api/recipes/:id/instructions` |
 
-- `steps` uses `RecipeStep` (`editor.spec.md` [CT-1]), mapped from rows by the shared mapper
-  (`crud.spec.md` [CT-1]); it replaces the serialized `instructions` string in both projections.
+- `stepGroups` and `steps` use `RecipeStepGroup` and `RecipeStep` (`editor.spec.md` [CT-1]), mapped
+  from rows by the shared mapper (`crud.spec.md` [CT-1]); they replace the serialized `instructions`
+  string.
 - The list maps image keys to display URLs and represents absent flag collections as empty.
 - Detail orders default ingredient groups first and includes each linked recipe's default group.
 - A missing recipe is not-found for detail; the instructions projection's not-found renders as an
@@ -83,7 +84,7 @@ link.
 ### `[CT-3]` Cooking view and quantities
 
 - Ingredients: own groups plus each linked recipe's default group, labelled with its name.
-- Preparation: `RecipeSteps(detail.steps)`.
+- Preparation: `RecipeStepGroups(detail.stepGroups)`.
 - Amount for base quantity `q`, selected quantity `s`, servings `b`: `q × s / b`. Quantity defaults
   to `b`; decrement stops at 1.
 - Controls: without shopping-list membership a card shows an add action; a selected card and the
@@ -112,8 +113,8 @@ the file-url helper.
   list. — demonstrates `[SO-1]`
 - `[VC-2]` Given a recipe with servings 4 and an ingredient of 200 g, when the quantity is set to 6,
   then 300 g renders, and decrementing stops at 1. — demonstrates `[SO-2]`
-- `[VC-3]` Given a recipe with a text, a Magimix, and a sub-recipe step, when its detail page opens
-  on phone and desktop widths, then all three render in order in the preparation tab or pane. —
+- `[VC-3]` Given a recipe with a text and a Magimix step, a sub-recipe group, and a named group, when
+  its detail page opens on phone and desktop widths, then all render in order in the preparation tab or pane. —
   demonstrates `[SO-2]`
 - `[VC-4]` Given stored image and video keys, when requested, then responses carry the listed
   `Cache-Control` values and video HEAD reports byte-range metadata; an unknown key is 404. —
@@ -125,7 +126,7 @@ the file-url helper.
   host from deployed recipe media.
 - `[C-2]` A linked recipe without a default ingredient group contributes no usable ingredient list to
   the composite cooking view.
-- `[C-3]` The preparation renderer depends on `RecipeSteps` owned by the editor leaf.
+- `[C-3]` The preparation renderer depends on `RecipeStepGroups` owned by the editor leaf.
 
 ## Open Questions
 
