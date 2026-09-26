@@ -1,5 +1,7 @@
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { defineConfig } from 'vite-plus'
+import { playwright } from 'vite-plus/test/browser-playwright'
 
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
 const restrictedReactImports = {
@@ -188,6 +190,17 @@ const viteConfig = defineConfig({
   },
   test: {
     globals: true,
+    projects: [
+      { extends: true, test: { name: 'unit' } },
+      {
+        extends: true,
+        plugins: [storybookTest({ configDir: 'packages/design-system/.storybook' })],
+        test: {
+          name: 'storybook',
+          browser: { enabled: true, headless: true, provider: playwright(), instances: [{ browser: 'chromium' }] },
+        },
+      },
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
