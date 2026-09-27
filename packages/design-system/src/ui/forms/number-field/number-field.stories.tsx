@@ -7,12 +7,20 @@ import { NumberField } from './number-field'
 
 import * as styles from './number-field.stories.css'
 
-const NumberFieldExample = ({ disabled = false, initialValue }: { disabled?: boolean; initialValue?: number }): ReactElement => {
+const NumberFieldExample = ({
+  disabled = false,
+  invalid = false,
+  initialValue,
+}: {
+  disabled?: boolean
+  invalid?: boolean
+  initialValue?: number
+}): ReactElement => {
   const form = useAppForm({ defaultValues: { servings: initialValue }, onSubmit: async () => undefined })
 
   return (
     <form.AppForm>
-      <form.AppField name="servings">
+      <form.AppField name="servings" validators={invalid ? { onMount: () => 'Invalid' } : undefined}>
         {({ NumberField: AppNumberField }) => <AppNumberField disabled={disabled} label="Servings" min={1} placeholder="4" />}
       </form.AppField>
     </form.AppForm>
@@ -30,6 +38,9 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Initial Value">
         <NumberFieldExample initialValue={4} />
+      </StorySection>
+      <StorySection title="Invalid">
+        <NumberFieldExample initialValue={20} invalid />
       </StorySection>
       <StorySection title="Disabled">
         <NumberFieldExample disabled initialValue={4} />

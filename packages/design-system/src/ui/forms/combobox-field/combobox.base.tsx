@@ -6,7 +6,7 @@ import { XIcon } from '@recipe-organizer/design-system/icons/x'
 import React, { useState } from 'react'
 import type { ReactElement } from 'react'
 
-import type { ComboboxImplProps, ValueOptions } from './combobox'
+import type { ComboboxImplProps, ValueOptions } from './combobox-field'
 import type { Option } from './options'
 
 import * as styles from './combobox.base.css'

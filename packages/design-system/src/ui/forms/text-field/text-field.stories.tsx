@@ -8,12 +8,20 @@ import { TextField } from './text-field'
 
 import * as styles from './text-field.stories.css'
 
-const TextFieldExample = ({ disabled = false, initialValue = '' }: { disabled?: boolean; initialValue?: string }): ReactElement => {
+const TextFieldExample = ({
+  disabled = false,
+  invalid = false,
+  initialValue = '',
+}: {
+  disabled?: boolean
+  invalid?: boolean
+  initialValue?: string
+}): ReactElement => {
   const form = useAppForm({ defaultValues: { title: initialValue }, onSubmit: async () => undefined })
 
   return (
     <form.AppForm>
-      <form.AppField name="title">
+      <form.AppField name="title" validators={invalid ? { onMount: () => 'Invalid' } : undefined}>
         {({ TextField: AppTextField }) => <AppTextField disabled={disabled} label="Recipe title" placeholder="Tomato soup" />}
       </form.AppField>
     </form.AppForm>
@@ -31,6 +39,9 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Initial Value">
         <TextFieldExample initialValue="Tomato soup" />
+      </StorySection>
+      <StorySection title="Invalid">
+        <TextFieldExample initialValue="Tomato soup" invalid />
       </StorySection>
       <StorySection title="Disabled">
         <TextFieldExample disabled initialValue="Tomato soup" />

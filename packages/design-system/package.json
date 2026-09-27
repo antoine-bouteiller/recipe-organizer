@@ -6,7 +6,7 @@
     "./badge": "./src/ui/data-display/badge/badge.tsx",
     "./button": "./src/ui/actions/button/button.tsx",
     "./card": "./src/ui/data-display/card/card.tsx",
-    "./combobox/options": "./src/ui/forms/combobox/options.ts",
+    "./combobox-field/options": "./src/ui/forms/combobox-field/options.ts",
     "./delete-dialog": "./src/ui/overlays/delete-dialog/delete-dialog.tsx",
     "./form": "./src/ui/forms/form/form.tsx",
     "./form-dialog": "./src/ui/overlays/form-dialog/form-dialog.tsx",

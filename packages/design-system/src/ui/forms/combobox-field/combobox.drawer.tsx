@@ -7,7 +7,7 @@ import type { ReactElement } from 'react'
 
 import { Input } from '../input/input'
 import { SelectButton } from '../select/select.shared'
-import type { ComboboxImplProps, ValueOptions } from './combobox'
+import type { ComboboxImplProps, ValueOptions } from './combobox-field'
 
 import * as styles from './combobox.drawer.css'
 
