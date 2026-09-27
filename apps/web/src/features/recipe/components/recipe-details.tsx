@@ -10,7 +10,7 @@ import { DotsThreeVerticalIcon } from '@recipe-organizer/design-system/icons/dot
 import { PencilSimpleIcon } from '@recipe-organizer/design-system/icons/pencil-simple'
 import { Popover } from '@recipe-organizer/design-system/popover'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
-import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
+import { Tabs } from '@recipe-organizer/design-system/tabs'
 import { toastManager } from '@recipe-organizer/design-system/toast'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
@@ -114,29 +114,33 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
       </div>
       <div className={styles.detailsContent}>
         <div className={styles.mobileTabs}>
-          <SwipeTabs>
-            <TabsList>
-              <TabsTab value="ingredients">Ingrédients</TabsTab>
-              <TabsTab value="preparation">Préparation</TabsTab>
-            </TabsList>
-            <SwipeTabsPanels>
-              <SwipeTabsPanel value="ingredients">
-                <div className={styles.ingredientsPanel}>
-                  <RecipeIngredientGroups
-                    recipeId={recipe.id}
-                    baseServings={recipe.servings}
-                    ingredientGroups={ingredientGroups}
-                    presentation="standalone"
-                  />
-                </div>
-              </SwipeTabsPanel>
-              <SwipeTabsPanel value="preparation">
-                <div className={styles.instructionsPanel}>
-                  <RecipeStepGroups stepGroups={recipe.stepGroups} />
-                </div>
-              </SwipeTabsPanel>
-            </SwipeTabsPanels>
-          </SwipeTabs>
+          <Tabs
+            items={[
+              {
+                content: (
+                  <div className={styles.ingredientsPanel}>
+                    <RecipeIngredientGroups
+                      recipeId={recipe.id}
+                      baseServings={recipe.servings}
+                      ingredientGroups={ingredientGroups}
+                      presentation="standalone"
+                    />
+                  </div>
+                ),
+                label: 'Ingrédients',
+                value: 'ingredients',
+              },
+              {
+                content: (
+                  <div className={styles.instructionsPanel}>
+                    <RecipeStepGroups stepGroups={recipe.stepGroups} />
+                  </div>
+                ),
+                label: 'Préparation',
+                value: 'preparation',
+              },
+            ]}
+          />
         </div>
         <div className={styles.desktopLayout}>
           <section className={styles.section}>

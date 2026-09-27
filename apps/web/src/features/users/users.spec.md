@@ -123,7 +123,7 @@ order (`src/client/routes/settings/users.tsx:86-98`). Each panel observes its ow
 `useSuspenseQuery`, while a shared case-insensitive search matches email or role
 (`src/client/routes/settings/users.tsx:22-31`). The tab labels are `Actifs`, `En attente`, and `Bloqués`.
 
-`SwipeTabs` makes the panels available in one screen. Active rows expose blocking; pending rows
+`Tabs` makes the panels available in one screen. Active rows expose blocking; pending rows
 expose approval and blocking; blocked rows expose approval. Empty results distinguish an empty
 status from a search with no match (`src/client/routes/settings/users.tsx:27-56`).
 

@@ -10,7 +10,7 @@ import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
-import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from '@recipe-organizer/design-system/tabs'
+import { Tabs } from '@recipe-organizer/design-system/tabs'
 import { revalidateLogic } from '@tanstack/react-form'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from '@tanstack/react-store'
@@ -33,6 +33,11 @@ const roleLabels = new Map([
   ['user', 'Utilisateur'],
 ])
 type UserStatus = (typeof USER_TABS)[number]
+const USER_TAB_LABELS = {
+  active: { empty: 'Aucun utilisateur actif.', label: 'Actifs' },
+  blocked: { empty: 'Aucun utilisateur bloqué.', label: 'Bloqués' },
+  pending: { empty: 'Aucun utilisateur en attente.', label: 'En attente' },
+} satisfies Record<UserStatus, { empty: string; label: string }>
 
 const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: string; status: UserStatus }) => {
   const { data: users } = useSuspenseQuery(getUserListOptions(status))
@@ -118,36 +123,19 @@ export const UsersManagement = () => {
         </FormDialog>
       </div>
       <div className={styles.tabs}>
-        <SwipeTabs>
-          <TabsList>
-            <TabsTab value="active">Actifs</TabsTab>
-            <TabsTab value="pending">En attente</TabsTab>
-            <TabsTab value="blocked">Bloqués</TabsTab>
-          </TabsList>
-          <SwipeTabsPanels>
-            <SwipeTabsPanel value="active">
+        <Tabs
+          items={USER_TABS.map((status) => ({
+            content: (
               <div className={styles.panel}>
                 <React.Suspense fallback={null}>
-                  <UserList emptyLabel="Aucun utilisateur actif." search={search} status="active" />
+                  <UserList emptyLabel={USER_TAB_LABELS[status].empty} search={search} status={status} />
                 </React.Suspense>
               </div>
-            </SwipeTabsPanel>
-            <SwipeTabsPanel value="pending">
-              <div className={styles.panel}>
-                <React.Suspense fallback={null}>
-                  <UserList emptyLabel="Aucun utilisateur en attente." search={search} status="pending" />
-                </React.Suspense>
-              </div>
-            </SwipeTabsPanel>
-            <SwipeTabsPanel value="blocked">
-              <div className={styles.panel}>
-                <React.Suspense fallback={null}>
-                  <UserList emptyLabel="Aucun utilisateur bloqué." search={search} status="blocked" />
-                </React.Suspense>
-              </div>
-            </SwipeTabsPanel>
-          </SwipeTabsPanels>
-        </SwipeTabs>
+            ),
+            label: USER_TAB_LABELS[status].label,
+            value: status,
+          }))}
+        />
       </div>
     </>
   )

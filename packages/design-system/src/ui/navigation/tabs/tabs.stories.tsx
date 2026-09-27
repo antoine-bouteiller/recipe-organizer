@@ -3,36 +3,41 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
-import { SwipeTabs, SwipeTabsPanel, SwipeTabsPanels, TabsList, TabsTab } from './tabs'
+import { Tabs } from './tabs'
 
 import * as styles from './tabs.stories.css'
 
-const SwipeTabsExample = (): React.ReactElement => (
+const TabsExample = (): React.ReactElement => (
   <div className={styles.container}>
-    <SwipeTabs>
-      <TabsList aria-label="Recipe details">
-        <TabsTab value="ingredients">Ingredients</TabsTab>
-        <TabsTab value="method">Method</TabsTab>
-      </TabsList>
-      <SwipeTabsPanels>
-        <SwipeTabsPanel value="ingredients">
-          <section aria-label="Ingredients" className={styles.section}>
-            <h2>Ingredients</h2>
-            <p>2 tomatoes and fresh basil.</p>
-          </section>
-        </SwipeTabsPanel>
-        <SwipeTabsPanel value="method">
-          <section aria-label="Method" className={styles.methodPanel}>
-            <h2>Method</h2>
-            <p>Simmer for 20 minutes.</p>
-          </section>
-        </SwipeTabsPanel>
-      </SwipeTabsPanels>
-    </SwipeTabs>
+    <Tabs
+      aria-label="Recipe details"
+      items={[
+        {
+          content: (
+            <section aria-label="Ingredients" className={styles.section}>
+              <h2>Ingredients</h2>
+              <p>2 tomatoes and fresh basil.</p>
+            </section>
+          ),
+          label: 'Ingredients',
+          value: 'ingredients',
+        },
+        {
+          content: (
+            <section aria-label="Method" className={styles.section}>
+              <h2>Method</h2>
+              <p>Simmer for 20 minutes.</p>
+            </section>
+          ),
+          label: 'Method',
+          value: 'method',
+        },
+      ]}
+    />
   </div>
 )
 
-const meta = { component: SwipeTabsExample, decorators: [withRouter], title: 'Navigation/Tabs' } satisfies Meta<typeof SwipeTabsExample>
+const meta = { component: TabsExample, decorators: [withRouter], title: 'Navigation/Tabs' } satisfies Meta<typeof TabsExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Swipeable: Story = {}
