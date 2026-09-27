@@ -1,4 +1,5 @@
 import { theme } from '@recipe-organizer/design-system/theme'
+import { style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
 export const backdrop = recipe({
@@ -77,7 +78,6 @@ export const popup = recipe({
     maxWidth: theme.spacing(128),
     minHeight: theme.spacing(0),
     minWidth: theme.spacing(0),
-    opacity: 'calc(1 - var(--nested-dialogs))',
     outline: '2px solid transparent',
     outlineOffset: '2px',
     position: 'relative',
@@ -86,9 +86,6 @@ export const popup = recipe({
     transitionTimingFunction: theme.easings['in-out'],
     width: '100%',
     '@media': {
-      'screen and (min-width: 640px)': {
-        scale: 'calc(1 - 0.1 * var(--nested-dialogs))',
-      },
       'screen and (max-width: 639.96px)': {
         borderBottomWidth: '0',
         borderInlineWidth: '0',
@@ -169,3 +166,5 @@ export const container = recipe({
     top: theme.spacing(2),
   },
 })
+
+export const trigger = style({ display: 'contents' })

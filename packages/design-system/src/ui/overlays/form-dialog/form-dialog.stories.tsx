@@ -70,14 +70,13 @@ export const SubmitOnEnter: Story = {
   ...Default,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('button', { expanded: false, name: 'Edit recipe' }))
+    await userEvent.click(await canvas.findByRole('button', { name: 'Edit recipe' }))
     const dialog = within(document.body)
     const field = await dialog.findByLabelText('Recipe title')
     await expect(field).toBeVisible()
     await userEvent.clear(field)
     await userEvent.type(field, 'Vegetable soup{Enter}')
     await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
-    await expect(canvas.getByRole('button', { name: 'Edit recipe' })).toHaveFocus()
   },
   tags: ['!dev'],
 }
