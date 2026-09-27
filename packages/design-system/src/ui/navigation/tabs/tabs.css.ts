@@ -1,20 +1,19 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { globalStyle, keyframes } from '@vanilla-extract/css'
+import { createVar, globalStyle, keyframes } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
 // Named on the panels scroller and hoisted to the root so the tab list can read it.
 const timeline = '--swipe-tabs'
 const listPadding = theme.spacing(0.5)
 const listGap = theme.spacing(0.5)
-// The indicator is the list's last child, so it is excluded from the tab count.
-const tabCount = 'calc(sibling-count() - 1)'
+// Registered so sibling-count() resolves on the indicator (the list's last child, excluded from the count), not on the pill that inherits it.
+const tabCount = createVar({ inherits: true, initialValue: '1', syntax: '<integer>' })
 
+const tabWidth = `calc((100% - 2 * ${listPadding} - (${tabCount} - 1) * ${listGap}) / ${tabCount})`
+// Clipping a full-width copy of the labels keeps the active label color exactly within the sliding pill.
 const slide = keyframes({
-  to: { translate: `calc((${tabCount} - 1) * (100% + ${listGap}))` },
-})
-
-const activeLabel = keyframes({
-  'from, to': { color: theme.colors['card-foreground'] },
+  from: { clipPath: `inset(${listPadding} calc(100% - ${listPadding} - ${tabWidth}) ${listPadding} ${listPadding} round ${theme.radius.md})` },
+  to: { clipPath: `inset(${listPadding} ${listPadding} ${listPadding} calc(100% - ${listPadding} - ${tabWidth}) round ${theme.radius.md})` },
 })
 
 export const list = recipe({
@@ -30,26 +29,43 @@ export const list = recipe({
     padding: theme.spacing(0.5),
     position: 'relative',
     width: '100%',
-    zIndex: 0,
   },
 })
 
+// The shadow lives on an unclipped wrapper because clip-path would cut it off.
 export const indicator = recipe({
   base: {
+    vars: {
+      [tabCount]: 'calc(sibling-count() - 1)',
+    },
+    filter: 'drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))',
+    inset: theme.spacing(0),
+    pointerEvents: 'none',
+    position: 'absolute',
+  },
+})
+
+export const indicatorPill = recipe({
+  base: {
+    selectors: {
+      '.dark &': {
+        backgroundColor: theme.colors.secondary,
+        color: theme.colors['secondary-foreground'],
+      },
+    },
+    alignItems: 'center',
     animationDuration: 'auto',
     animationFillMode: 'both',
     animationName: slide,
     animationTimeline: timeline,
     animationTimingFunction: 'linear',
     backgroundColor: theme.colors.card,
-    borderRadius: theme.radius.md,
-    bottom: listPadding,
-    boxShadow: theme.shadows.sm,
-    left: listPadding,
-    position: 'absolute',
-    top: listPadding,
-    width: `calc((100% - 2 * ${listPadding} - (${tabCount} - 1) * ${listGap}) / ${tabCount})`,
-    zIndex: -1,
+    color: theme.colors['card-foreground'],
+    display: 'flex',
+    gap: theme.spacing(0.5),
+    height: '100%',
+    justifyContent: 'center',
+    padding: theme.spacing(0.5),
   },
 })
 
@@ -65,11 +81,6 @@ export const tab = recipe({
       '--owner-icon-margin-inline': '-2px',
       '--owner-icon-size': '18px',
     },
-    // Active while the scroll position is within half a panel of this tab's panel.
-    animationDuration: 'auto',
-    animationName: activeLabel,
-    animationRange: `calc((sibling-index() - 1.5) / (${tabCount} - 1) * 100%) calc((sibling-index() - 0.5) / (${tabCount} - 1) * 100%)`,
-    animationTimeline: timeline,
     alignItems: 'center',
     borderColor: 'transparent',
     borderRadius: theme.radius.md,
