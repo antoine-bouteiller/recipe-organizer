@@ -1,7 +1,6 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
 import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons/arrow-left'
-import { Link } from '@tanstack/react-router'
 
 import * as styles from './login-layout.css'
 
@@ -16,7 +15,7 @@ export const LoginLayout = ({ error, onSignIn }: { error?: string; onSignIn: () 
           </Button>
         </div>
         <div className={styles.backLinkContainer}>
-          <Button render={<Link to="/" />} size="sm" variant="ghost">
+          <Button asLink to="/" size="sm" variant="ghost">
             <ArrowLeftIcon size="sm" />
             Retour à l&apos;accueil
           </Button>

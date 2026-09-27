@@ -150,7 +150,7 @@ transitions, navigation state, and semantics. The desktop navbar uses exact matc
 props through a `useLinkProps` adapter.
 
 Keep Base UI `render` composition for components such as Button, for example
-`<Button render={<Link to="/recipe/new" />} />`, so primitive-injected handlers, ARIA attributes,
+`<Button asLink to="/recipe/new" />`, so primitive-injected handlers, ARIA attributes,
 state, and refs remain intact. Router-aware Storybook stories use a local memory-router decorator.
 `ScreenLayout`'s `withGoBack` calls `router.history.back()`; its scroll IDs default to
 `screen-inner` and `screen-outer`, and its footer is explicit. The default error renderer is inlined into `apps/web/src/router.tsx`;

@@ -1,7 +1,7 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { NotFound } from '@recipe-organizer/design-system/not-found'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRouter, isRedirect, Link } from '@tanstack/react-router'
+import { createRouter, isRedirect } from '@tanstack/react-router'
 import * as z from 'zod'
 
 import { routeTree } from './routeTree.gen'
@@ -50,7 +50,7 @@ export const getRouter = () => {
               <code>{details}</code>
             </div>
           )}
-          <Button render={<Link to="/" />} size="lg">
+          <Button asLink to="/" size="lg">
             Retour à la page d'accueil
           </Button>
         </div>

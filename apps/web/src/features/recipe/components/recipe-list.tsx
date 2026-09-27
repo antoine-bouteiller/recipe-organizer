@@ -33,7 +33,7 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
           </div>
           <p className={styles.text}>Aucune recette</p>
           {canCreate && (
-            <Button render={<Link to="/recipe/new" viewTransition />}>
+            <Button to="/recipe/new" viewTransition asLink>
               <PlusIcon size="sm" />
               Ajouter une recette
             </Button>
@@ -81,7 +81,7 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
       )}
       {canCreate && (
         <div className={styles.floatingAction}>
-          <Button aria-label="Ajouter une recette" render={<Link to="/recipe/new" viewTransition />} size="icon-xl">
+          <Button aria-label="Ajouter une recette" asLink to="/recipe/new" viewTransition size="icon-xl">
             <PlusIcon size="xl" />
           </Button>
         </div>

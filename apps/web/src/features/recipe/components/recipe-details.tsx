@@ -15,7 +15,7 @@ import { Tabs } from '@recipe-organizer/design-system/tabs'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useMutation } from '@tanstack/react-query'
-import { Link, useRouter } from '@tanstack/react-router'
+import { useRouter } from '@tanstack/react-router'
 
 import * as styles from './recipe-details.css'
 
@@ -54,12 +54,7 @@ export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe })
       }
     >
       <div className={styles.managementActions}>
-        <Button
-          align="start"
-          render={<Link params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition />}
-          variant="list-action"
-          width="full"
-        >
+        <Button align="start" asLink params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition variant="list-action" width="full">
           <PencilSimpleIcon size="sm" />
           Modifier la recette
         </Button>
