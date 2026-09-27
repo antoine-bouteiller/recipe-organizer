@@ -195,9 +195,15 @@ const viteConfig = defineConfig({
       {
         extends: true,
         plugins: [storybookTest({ configDir: 'packages/design-system/.storybook' })],
+        optimizeDeps: { include: ['@vanilla-extract/recipes/createRuntimeFn'] },
         test: {
           name: 'storybook',
-          browser: { enabled: true, headless: true, provider: playwright(), instances: [{ browser: 'chromium' }] },
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({ contextOptions: { reducedMotion: 'reduce' } }),
+            instances: [{ browser: 'chromium' }],
+          },
         },
       },
     ],

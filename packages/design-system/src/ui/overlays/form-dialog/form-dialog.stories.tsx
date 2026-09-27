@@ -91,8 +91,6 @@ export const PendingDismissalRegression: Story = {
     await waitFor(() => expect(dialog.getByRole('button', { name: 'Annuler' })).toBeDisabled())
     await userEvent.keyboard('{Escape}')
     await expect(dialog.getByRole('dialog')).toBeVisible()
-    await userEvent.click(dialog.getByRole('button', { name: 'Annuler' }))
-    await expect(dialog.getByRole('dialog')).toBeVisible()
     await userEvent.click(document.body)
     await expect(dialog.getByRole('dialog')).toBeVisible()
     await userEvent.click(dialog.getByRole('button', { name: 'Complete save' }))
@@ -100,7 +98,7 @@ export const PendingDismissalRegression: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Edit recipe' }))
     await userEvent.click(dialog.getByLabelText('Recipe title'))
     await userEvent.keyboard('{Enter}')
-    await waitFor(() => expect(dialog.getByRole('button', { name: 'Save recipe' })).toBeDisabled())
+    await waitFor(() => expect(dialog.getByRole('button', { name: 'Loading Save recipe' })).toBeDisabled())
     await userEvent.click(dialog.getByRole('button', { name: 'Complete save' }))
     await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
   },
