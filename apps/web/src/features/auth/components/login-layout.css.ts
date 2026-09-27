@@ -29,3 +29,9 @@ export const backLinkContainer = style({
   paddingBottom: theme.spacing(6),
   paddingInline: theme.spacing(6),
 })
+
+export const error = style({
+  color: theme.colors['destructive-foreground'],
+  fontSize: theme.fontSizes.sm,
+  paddingBottom: theme.spacing(4),
+})

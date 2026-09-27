@@ -153,8 +153,8 @@ read directly from `localStorage`; no server render or server action participate
 
 A form submission serialises to JSON or `FormData`, a mutation invokes the feature's Hono RPC
 client, and the route runs guard → validator → blob write → row writes, in that order, so a rejected
-input never reaches storage. On success the mutation invalidates the affected query keys, raises a toast and lets
-the router navigate; on failure the error surfaces as a single French message and the form maps field
+input never reaches storage. On success the mutation invalidates the affected query keys and lets
+the router navigate; on failure the error surfaces as a single French `alert()` message and the form maps field
 errors back onto their inputs.
 
 ### 8.3 Trust boundary

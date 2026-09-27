@@ -5,11 +5,12 @@ import { Link } from '@tanstack/react-router'
 
 import * as styles from './login-layout.css'
 
-export const LoginLayout = ({ onSignIn }: { onSignIn: () => void }) => (
+export const LoginLayout = ({ error, onSignIn }: { error?: string; onSignIn: () => void }) => (
   <div className={styles.container}>
     <div className={styles.formContainer}>
       <Card description="Connectez-vous pour accéder à vos recettes" title="Connexion">
         <div className={styles.signInButtonContainer}>
+          {error && <p className={styles.error}>{error}</p>}
           <Button onClick={onSignIn} variant="outline" width="full">
             <img alt="Google" className={styles.image} src="/google.svg" /> Connexion avec Google
           </Button>

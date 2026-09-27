@@ -5,7 +5,6 @@ import type { getAuthUser } from '@client/lib/auth/get-auth-user'
 import { getTheme } from '@client/lib/theme'
 import { Button } from '@recipe-organizer/design-system/button'
 import { ThemeIcon } from '@recipe-organizer/design-system/icons/theme'
-import { ToastProvider } from '@recipe-organizer/design-system/toast'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { lazy, Suspense, useLayoutEffect } from 'react'
@@ -24,7 +23,7 @@ const RootComponent = () => {
   }, [theme])
 
   return (
-    <ToastProvider>
+    <>
       <AppHeader>
         <Suspense fallback={<NavbarSearchPlaceholder />}>
           <SearchBar />
@@ -36,7 +35,7 @@ const RootComponent = () => {
       <AppMain>
         <Outlet />
       </AppMain>
-    </ToastProvider>
+    </>
   )
 }
 

@@ -140,7 +140,7 @@ where needed: the session and recipe-instructions wrappers expose `undefined`
 ### 8.9 Mutation contract
 
 A mutation option passes variables to the typed Hono client and invalidates a key only after a
-successful response. Toast feedback describes the operation in French, while field-level parsing
+successful response. Failures raise a French `alert()` describing the operation, while field-level parsing
 errors remain attributable to their form input where the client can present them.
 
 Mutation payloads name domain values, not database implementation details. A recipe form carries

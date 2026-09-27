@@ -3,6 +3,7 @@ import type { Recipe } from '@client/features/recipe/api/get-one'
 import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
 import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
 import { RecipeStepGroups } from '@client/features/recipe/components/steps/recipe-steps'
+import { alertError } from '@client/lib/alert-error'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
@@ -11,7 +12,6 @@ import { PencilSimpleIcon } from '@recipe-organizer/design-system/icons/pencil-s
 import { Popover } from '@recipe-organizer/design-system/popover'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { Tabs } from '@recipe-organizer/design-system/tabs'
-import { toastManager } from '@recipe-organizer/design-system/toast'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'
 import { useMutation } from '@tanstack/react-query'
@@ -40,18 +40,8 @@ export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe })
     deleteRecipe(
       { data: recipe.id },
       {
-        onError: () =>
-          toastManager.add({
-            description: 'Une erreur est survenue lors de la suppression de la recette',
-            type: 'error',
-          }),
-        onSuccess: () => {
-          toastManager.add({
-            title: 'Recette supprimée avec succès',
-            type: 'success',
-          })
-          void router.navigate({ to: '/' })
-        },
+        onError: (error) => alertError('Une erreur est survenue lors de la suppression de la recette', error),
+        onSuccess: () => router.navigate({ to: '/' }),
       }
     )
 

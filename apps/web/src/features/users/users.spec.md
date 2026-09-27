@@ -68,7 +68,7 @@ Administrator
 route guard ──> status tabs + search ──> query options ──> admin server functions
                                                           │ guard → validate → D1
                                                           v
-                                           invalidate users query family + French toast
+                                           invalidate users query family
 ```
 
 | Component          | Module type              | Responsibility                                     | Public API surface                                   |

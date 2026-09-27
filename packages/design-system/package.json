@@ -34,7 +34,6 @@
     "./tabbar": "./src/ui/navigation/tabbar/tabbar.tsx",
     "./tabs": "./src/ui/navigation/tabs/tabs.tsx",
     "./theme": "./src/theme/index.ts",
-    "./toast": "./src/ui/feedback/toast/toast.tsx",
     "./toggle": "./src/ui/actions/toggle/toggle.tsx",
     "./utils/format-form-errors": "./src/utils/format-form-errors.ts"
   },

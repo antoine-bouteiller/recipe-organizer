@@ -1,9 +1,7 @@
 import { LoginLayout } from '@client/features/auth/components/login-layout'
 import { authClient } from '@client/lib/auth/auth-client'
 import { loadAuthUser, resetAuthUserCache } from '@client/lib/auth/get-auth-user'
-import { toastManager } from '@recipe-organizer/design-system/toast'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useEffect } from 'react'
 import * as z from 'zod'
 
 const searchSchema = z.object({ error: z.string().optional() })
@@ -31,13 +29,7 @@ const getErrorMessage = (error: string) => {
 const LoginPage = () => {
   const { error } = Route.useSearch()
 
-  useEffect(() => {
-    if (error) {
-      toastManager.add({ description: getErrorMessage(error), type: 'error' })
-    }
-  }, [error])
-
-  return <LoginLayout onSignIn={() => signInWithGoogle()} />
+  return <LoginLayout error={error && getErrorMessage(error)} onSignIn={() => signInWithGoogle()} />
 }
 
 export const Route = createFileRoute('/auth/login')({
