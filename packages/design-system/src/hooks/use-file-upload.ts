@@ -179,21 +179,14 @@ export const useFileUpload = (options: FileUploadOptions = {}): [FileUploadState
   }
 
   const removeFile = (id: string) => {
-    setState((prev) => {
-      const fileToRemove = prev.files.find((file) => file.id === id)
-      if (fileToRemove?.file?.type?.startsWith('image/') && fileToRemove?.preview) {
-        URL.revokeObjectURL(fileToRemove.preview)
-      }
+    const fileToRemove = state.files.find((file) => file.id === id)
+    if (fileToRemove?.file?.type?.startsWith('image/') && fileToRemove?.preview) {
+      URL.revokeObjectURL(fileToRemove.preview)
+    }
 
-      const newFiles = prev.files.filter((file) => file.id !== id)
-      onFilesChange?.(newFiles)
-
-      return {
-        ...prev,
-        errors: [],
-        files: newFiles,
-      }
-    })
+    const newFiles = state.files.filter((file) => file.id !== id)
+    setState((prev) => ({ ...prev, errors: [], files: newFiles }))
+    onFilesChange?.(newFiles)
   }
 
   const fetchImageFromUrl = async (url: string) => {
