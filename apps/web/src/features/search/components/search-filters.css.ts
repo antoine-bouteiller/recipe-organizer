@@ -28,26 +28,10 @@ export const queryField = style({
 })
 
 export const element = style({
-  selectors: {
-    '&[data-ending-style]': {
-      height: theme.spacing(0),
-    },
-    '&[data-starting-style]': {
-      height: theme.spacing(0),
-    },
-  },
   display: 'grid',
   gap: theme.spacing(2.5),
   gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-  height: 'var(--collapsible-panel-height)',
-  overflow: 'hidden',
   paddingTop: theme.spacing(2),
-  vars: {
-    '--transition-duration': '200ms',
-    '--transition-prop': 'height',
-  },
-  transitionDuration: '200ms',
-  transitionProperty: 'height',
 })
 
 export const mealFilter = style({

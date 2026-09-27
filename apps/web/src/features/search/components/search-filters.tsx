@@ -1,4 +1,3 @@
-import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
 import type { SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
 import { Button } from '@recipe-organizer/design-system/button'
 import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons/funnel-simple'
@@ -6,6 +5,7 @@ import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
 import { Toggle } from '@recipe-organizer/design-system/toggle'
 import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@recipe-organizer/shared/recipe/constants'
+import { useState } from 'react'
 
 import * as styles from './search-filters.css'
 
@@ -24,9 +24,10 @@ export interface SearchFiltersProps {
   onFiltersChange: (filters: SearchFiltersValue) => void
 }
 
-export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) => (
-  <div className={styles.container}>
-    <CollapsiblePrimitive.Root>
+export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) => {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className={styles.container}>
       <div className={styles.searchInputRow}>
         <div className={styles.queryField}>
           <SearchInput
@@ -36,58 +37,58 @@ export const SearchFilters = ({ filters, onFiltersChange }: SearchFiltersProps) 
             setSearch={(query) => onFiltersChange({ ...filters, query })}
           />
         </div>
-        <CollapsiblePrimitive.Trigger aria-label="Filtrer par catégorie" render={<Button size="icon-lg" variant="outline" />}>
+        <Button aria-label="Filtrer par catégorie" onClick={() => setOpen(!open)} size="icon-lg" variant="outline">
           <FunnelSimpleIcon />
-        </CollapsiblePrimitive.Trigger>
+        </Button>
       </div>
-      <CollapsiblePrimitive.Panel className={styles.element}>
-        <div className={styles.mealFilter}>
-          <Select
-            items={mealItems}
-            multiple
-            onValueChange={(meals) => onFiltersChange({ ...filters, meals })}
-            placeholder="Repas"
-            title="Repas"
-            value={filters.meals}
-          />
-        </div>
-        <div className={styles.cuisineFilter}>
-          <Select
-            items={cuisineItems}
-            multiple
-            onValueChange={(cuisineTypes) => onFiltersChange({ ...filters, cuisineTypes })}
-            placeholder="Cuisines"
-            title="Cuisines"
-            value={filters.cuisineTypes}
-          />
-        </div>
-        <Toggle
-          presentation="filter"
-          variant="outline"
-          pressed={filters.isVegetarian}
-          onPressedChange={(isVegetarian) => onFiltersChange({ ...filters, isVegetarian })}
-        >
-          Végétarien
-        </Toggle>
-        <Toggle
-          presentation="filter"
-          variant="outline"
-          pressed={filters.isMagimix}
-          onPressedChange={(isMagimix) => onFiltersChange({ ...filters, isMagimix })}
-        >
-          Magimix
-        </Toggle>
-        <div className={styles.spiceFilter}>
+      {open && (
+        <div className={styles.element}>
+          <div className={styles.mealFilter}>
+            <Select
+              items={mealItems}
+              onValueChange={(meal) => onFiltersChange({ ...filters, meals: meal ? [meal] : [] })}
+              placeholder="Repas"
+              title="Repas"
+              value={filters.meals[0]}
+            />
+          </div>
+          <div className={styles.cuisineFilter}>
+            <Select
+              items={cuisineItems}
+              onValueChange={(cuisineType) => onFiltersChange({ ...filters, cuisineTypes: cuisineType ? [cuisineType] : [] })}
+              placeholder="Cuisines"
+              title="Cuisines"
+              value={filters.cuisineTypes[0]}
+            />
+          </div>
           <Toggle
             presentation="filter"
             variant="outline"
-            pressed={filters.isSpice}
-            onPressedChange={(isSpice) => onFiltersChange({ ...filters, isSpice })}
+            pressed={filters.isVegetarian}
+            onPressedChange={(isVegetarian) => onFiltersChange({ ...filters, isVegetarian })}
           >
-            Épices
+            Végétarien
           </Toggle>
+          <Toggle
+            presentation="filter"
+            variant="outline"
+            pressed={filters.isMagimix}
+            onPressedChange={(isMagimix) => onFiltersChange({ ...filters, isMagimix })}
+          >
+            Magimix
+          </Toggle>
+          <div className={styles.spiceFilter}>
+            <Toggle
+              presentation="filter"
+              variant="outline"
+              pressed={filters.isSpice}
+              onPressedChange={(isSpice) => onFiltersChange({ ...filters, isSpice })}
+            >
+              Épices
+            </Toggle>
+          </div>
         </div>
-      </CollapsiblePrimitive.Panel>
-    </CollapsiblePrimitive.Root>
-  </div>
-)
+      )}
+    </div>
+  )
+}

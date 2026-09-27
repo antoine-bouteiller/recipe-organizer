@@ -20,11 +20,6 @@ const ControlledSelect = (): ReactElement => {
   return <Select items={[...items]} onValueChange={setValue} placeholder="Choose a status" title="Status" value={value} />
 }
 
-const ControlledMultiple = (): ReactElement => {
-  const [value, setValue] = useState<Status[]>(['draft'])
-  return <Select items={[...items]} multiple onValueChange={setValue} placeholder="Choose statuses" title="Statuses" value={value} />
-}
-
 const meta = {
   args: { items: [...items], onValueChange: () => undefined, value: null },
   component: Select,
@@ -37,11 +32,8 @@ type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   render: () => (
     <div className={styles.container}>
-      <StorySection title="Responsive">
+      <StorySection title="Default">
         <ControlledSelect />
-      </StorySection>
-      <StorySection title="Multiple">
-        <ControlledMultiple />
       </StorySection>
       <StorySection title="Disabled">
         <Select disabled items={[...items]} onValueChange={() => undefined} value="draft" />

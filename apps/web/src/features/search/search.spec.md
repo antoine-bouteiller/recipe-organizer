@@ -80,7 +80,7 @@ The `/search` loader prefetches `getRecipeListOptions()` and the component reads
 The page maintains one `SearchFilters` value containing `query`, arrays of `cuisineTypes` and
 `meals`, plus `isVegetarian`, `isMagimix`, and `isSpice` flags
 (`src/client/routes/search.tsx:32-36`; `src/client/features/search/utils/filter.ts:5-15`). A collapsible panel
-holds multi-select meal and cuisine controls and the three boolean toggles
+holds single-select meal and cuisine controls (each stored as an array of at most one value) and the three boolean toggles
 (`src/client/routes/search.tsx:42-92`).
 
 `EMPTY_FILTERS` supplies an empty query, empty arrays, and disabled booleans. The clear action

@@ -5,32 +5,30 @@ import { useState } from 'react'
 import type { ReactElement } from 'react'
 
 import type { SelectProps } from './select'
-import { getSelectDisplay, SelectButton, selectText } from './select.shared'
+import { SelectButton } from './select.shared'
 
 import * as styles from './select.drawer.css'
+import * as shared from './select.shared.css'
 
-const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
-  const { items, placeholder = 'Sélectionner', title, disabled } = props
+const SelectDrawer = ({
+  'aria-invalid': ariaInvalid,
+  disabled,
+  items,
+  onValueChange,
+  placeholder = 'Sélectionner',
+  title,
+  value,
+}: SelectProps<string>): ReactElement => {
   const [open, setOpen] = useState(false)
-  const { displayLabel, isEmpty, isSelected } = getSelectDisplay(props)
-  const handleSelect = (value: TValue | null) => {
-    if (props.multiple) {
-      if (value !== null) {
-        props.onValueChange(props.value.includes(value) ? props.value.filter((item) => item !== value) : [...props.value, value])
-      }
-    } else {
-      props.onValueChange(value)
-      setOpen(false)
-    }
-  }
+  const selected = items.find((item) => item.value === (value ?? null))
   return (
     <Drawer onOpenChange={setOpen} open={open}>
       <DrawerPrimitive.Trigger
         data-slot="drawer-trigger"
         disabled={disabled}
         render={
-          <SelectButton>
-            <span className={selectText(isEmpty)}>{displayLabel}</span>
+          <SelectButton aria-invalid={ariaInvalid || undefined}>
+            <span className={shared.selectTextState[selected ? 'selected' : 'empty']}>{selected?.label ?? placeholder}</span>
           </SelectButton>
         }
       />
@@ -41,9 +39,17 @@ const SelectDrawer = <TValue extends string>(props: SelectProps<TValue>): ReactE
         <DrawerPanel>
           <div className={styles.list}>
             {items.map((item) => (
-              <button className={styles.item} key={item.value ?? 'none'} onClick={() => handleSelect(item.value)} type="button">
+              <button
+                className={styles.item}
+                key={item.value ?? 'none'}
+                onClick={() => {
+                  onValueChange(item.value)
+                  setOpen(false)
+                }}
+                type="button"
+              >
                 <span className={styles.label}>{item.label}</span>
-                {isSelected(item.value) && (
+                {item === selected && (
                   <span className={styles.icon}>
                     <CheckIcon size="sm" />
                   </span>
