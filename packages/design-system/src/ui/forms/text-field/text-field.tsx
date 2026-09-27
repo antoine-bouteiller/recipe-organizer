@@ -1,4 +1,5 @@
 import { useFieldContext } from '@design-system/hooks/use-form-context'
+import { useId } from 'react'
 
 import { Field, FieldError, FieldLabel } from '../field/field'
 import { Input } from '../input/input'
@@ -11,11 +12,19 @@ export interface TextFieldProps {
 
 export const TextField = ({ disabled, label, placeholder }: TextFieldProps) => {
   const field = useFieldContext<string>()
+  const id = useId()
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
-      {label && <FieldLabel>{label}</FieldLabel>}
-      <Input disabled={disabled} onChange={(event) => field.handleChange(event.target.value)} placeholder={placeholder} value={field.state.value} />
+      {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
+      <Input
+        aria-invalid={!field.state.meta.isValid || undefined}
+        disabled={disabled}
+        id={id}
+        onChange={(event) => field.handleChange(event.target.value)}
+        placeholder={placeholder}
+        value={field.state.value}
+      />
       <FieldError />
     </Field>
   )

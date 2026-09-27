@@ -14,7 +14,7 @@ export const check = style({
   justifyContent: 'center',
   width: '22px',
   selectors: {
-    '[data-slot="toggle"][data-pressed] > &': {
+    '[data-slot="toggle"][aria-pressed="true"] > &': {
       vars: { '--owner-icon-opacity': '1' },
       backgroundColor: theme.colors.primary,
       borderColor: theme.colors.primary,
@@ -26,7 +26,7 @@ export const check = style({
 export const checkRowContent = style({
   flex: 1,
   selectors: {
-    '[data-slot="toggle"][data-pressed] > &': {
+    '[data-slot="toggle"][aria-pressed="true"] > &': {
       color: theme.colors['muted-foreground'],
       textDecoration: 'line-through',
     },
@@ -36,7 +36,7 @@ export const checkRowContent = style({
 export const toggle = recipe({
   base: {
     selectors: {
-      '&[data-pressed]': {
+      '&[aria-pressed="true"]': {
         backgroundColor: `color-mix(in srgb, ${theme.colors.input} 64%, transparent)`,
         color: theme.colors['accent-foreground'],
       },
@@ -111,7 +111,7 @@ export const toggle = recipe({
       default: {},
       filter: {
         selectors: {
-          '&[data-pressed]': {
+          '&[aria-pressed="true"]': {
             backgroundColor: `color-mix(in srgb, ${theme.colors.primary} 12%, transparent)`,
             borderColor: theme.colors.primary,
             color: theme.colors.primary,
@@ -120,7 +120,7 @@ export const toggle = recipe({
       },
       'check-row': {
         selectors: {
-          '&[data-pressed]': {
+          '&[aria-pressed="true"]': {
             backgroundColor: 'transparent',
             color: 'inherit',
           },
@@ -165,10 +165,10 @@ export const toggle = recipe({
       },
       outline: {
         selectors: {
-          '&[data-pressed]': {
+          '&[aria-pressed="true"]': {
             backgroundColor: `color-mix(in srgb, ${theme.colors.input} 64%, transparent)`,
           },
-          '.dark &[data-pressed]': {
+          '.dark &[aria-pressed="true"]': {
             backgroundColor: theme.colors.input,
           },
           '.dark &': {

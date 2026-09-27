@@ -4,7 +4,7 @@ import type React from 'react'
 import * as styles from './field.css'
 
 type FieldProps = Pick<FieldPrimitive.Root.Props, 'children' | 'dirty' | 'disabled' | 'invalid' | 'name' | 'touched'>
-type FieldLabelProps = Pick<FieldPrimitive.Label.Props, 'children'> & {
+type FieldLabelProps = Pick<FieldPrimitive.Label.Props, 'children' | 'htmlFor'> & {
   presentation?: 'dropzone-image' | 'dropzone-video'
 }
 type FieldErrorProps = Pick<FieldPrimitive.Error.Props, 'children' | 'match'>
@@ -14,8 +14,8 @@ export const Field = ({ children, dirty, disabled, invalid, name, touched }: Fie
     {children}
   </FieldPrimitive.Root>
 )
-export const FieldLabel = ({ children, presentation }: FieldLabelProps): React.ReactElement => (
-  <FieldPrimitive.Label className={styles.label({ presentation })} data-slot="field-label">
+export const FieldLabel = ({ children, htmlFor, presentation }: FieldLabelProps): React.ReactElement => (
+  <FieldPrimitive.Label className={styles.label({ presentation })} data-slot="field-label" htmlFor={htmlFor}>
     {children}
   </FieldPrimitive.Label>
 )

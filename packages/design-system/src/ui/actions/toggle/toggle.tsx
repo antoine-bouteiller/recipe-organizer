@@ -1,24 +1,46 @@
-import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { useState } from 'react'
 import type React from 'react'
 
 import * as styles from './toggle.css'
 
-export type ToggleProps = Pick<
-  TogglePrimitive.Props,
-  'aria-label' | 'children' | 'defaultPressed' | 'disabled' | 'onClick' | 'onPressedChange' | 'pressed' | 'value'
-> & {
+export type ToggleProps = Pick<React.ComponentProps<'button'>, 'aria-label' | 'children' | 'disabled'> & {
+  defaultPressed?: boolean
+  onPressedChange?: (pressed: boolean) => void
   presentation?: 'check-row' | 'default' | 'filter'
+  pressed?: boolean
   variant?: 'default' | 'outline'
 }
 
-export const Toggle = ({ children, presentation, variant, ...props }: ToggleProps): React.ReactElement => (
-  <TogglePrimitive {...props} className={styles.toggle({ presentation, variant })} data-slot="toggle">
-    {presentation === 'check-row' && (
-      <span aria-hidden="true" className={styles.check} data-slot="toggle-check">
-        <CheckIcon size="xs" weight="bold" />
-      </span>
-    )}
-    {presentation === 'check-row' ? <span className={styles.checkRowContent}>{children}</span> : children}
-  </TogglePrimitive>
-)
+export const Toggle = ({
+  children,
+  defaultPressed = false,
+  onPressedChange,
+  presentation,
+  pressed: controlledPressed,
+  variant,
+  ...props
+}: ToggleProps): React.ReactElement => {
+  const [localPressed, setLocalPressed] = useState(defaultPressed)
+  const pressed = controlledPressed ?? localPressed
+  return (
+    <button
+      {...props}
+      aria-pressed={pressed}
+      className={styles.toggle({ presentation, variant })}
+      data-slot="toggle"
+      onClick={() => {
+        setLocalPressed(!pressed)
+        onPressedChange?.(!pressed)
+      }}
+      type="button"
+    >
+      {presentation === 'check-row' && (
+        <span aria-hidden="true" className={styles.check} data-slot="toggle-check">
+          <CheckIcon size="xs" weight="bold" />
+        </span>
+      )}
+      {presentation === 'check-row' ? <span className={styles.checkRowContent}>{children}</span> : children}
+    </button>
+  )
+}

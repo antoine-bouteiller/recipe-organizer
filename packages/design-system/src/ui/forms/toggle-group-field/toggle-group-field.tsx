@@ -1,4 +1,3 @@
-import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui/react/toggle-group'
 import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { Toggle } from '@recipe-organizer/design-system/toggle'
 
@@ -14,25 +13,25 @@ export interface ToggleGroupFieldProps {
 
 export const ToggleGroupField = ({ disabled, items, label }: ToggleGroupFieldProps) => {
   const field = useFieldContext<string[]>()
+  const selected = field.state.value ?? []
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       {label && <FieldLabel>{label}</FieldLabel>}
       <div className={styles.wrapper}>
-        <ToggleGroupPrimitive
-          className={styles.group}
-          data-slot="toggle-group"
-          disabled={disabled}
-          multiple
-          onValueChange={(value) => field.handleChange(value)}
-          value={field.state.value ?? []}
-        >
+        <div className={styles.group} data-slot="toggle-group">
           {items.map(({ label: itemLabel, value }) => (
             <span className={styles.item} key={value}>
-              <Toggle value={value}>{itemLabel}</Toggle>
+              <Toggle
+                disabled={disabled}
+                onPressedChange={(pressed) => field.handleChange(pressed ? [...selected, value] : selected.filter((item) => item !== value))}
+                pressed={selected.includes(value)}
+              >
+                {itemLabel}
+              </Toggle>
             </span>
           ))}
-        </ToggleGroupPrimitive>
+        </div>
       </div>
       <FieldError />
     </Field>
