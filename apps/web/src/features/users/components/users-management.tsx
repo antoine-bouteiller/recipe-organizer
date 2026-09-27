@@ -118,7 +118,7 @@ export const UsersManagement = () => {
         </FormDialog>
       </div>
       <div className={styles.tabs}>
-        <SwipeTabs defaultTab="active" tabs={USER_TABS}>
+        <SwipeTabs>
           <TabsList>
             <TabsTab value="active">Actifs</TabsTab>
             <TabsTab value="pending">En attente</TabsTab>

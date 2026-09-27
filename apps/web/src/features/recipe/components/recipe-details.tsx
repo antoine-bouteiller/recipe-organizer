@@ -114,7 +114,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
       </div>
       <div className={styles.detailsContent}>
         <div className={styles.mobileTabs}>
-          <SwipeTabs defaultTab="ingredients" tabs={['ingredients', 'preparation'] as const}>
+          <SwipeTabs>
             <TabsList>
               <TabsTab value="ingredients">Ingrédients</TabsTab>
               <TabsTab value="preparation">Préparation</TabsTab>
