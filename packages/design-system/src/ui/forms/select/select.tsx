@@ -25,7 +25,7 @@ export interface SelectProps<TValue extends string> {
   value: TValue | null | undefined
 }
 
-export const Select = ({
+export const Select = <TValue extends string>({
   'aria-invalid': ariaInvalid,
   disabled,
   items,
@@ -33,7 +33,7 @@ export const Select = ({
   placeholder = 'Sélectionner',
   title,
   value,
-}: SelectProps<string>): ReactElement => {
+}: SelectProps<TValue>): ReactElement => {
   const isMobile = useIsMobile()
   const [open, setOpen] = useState(false)
   const selected = items.find((item) => item.value === (value ?? null))
