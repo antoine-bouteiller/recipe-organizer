@@ -206,7 +206,6 @@ const tokenValues = {
     sm: '4px',
     xl: '12px',
     xs: '2px',
-    inherit: 'inherit',
   },
   safeArea: {
     top: 'env(safe-area-inset-top, 0px)',
