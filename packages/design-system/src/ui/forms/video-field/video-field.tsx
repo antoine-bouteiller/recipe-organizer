@@ -1,4 +1,3 @@
-import { Field as FieldPrimitive } from '@base-ui/react/field'
 import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { useFileUpload } from '@recipe-organizer/design-system/hooks/use-file-upload'
 import type { FileMetadata } from '@recipe-organizer/design-system/hooks/use-file-upload'
@@ -6,6 +5,7 @@ import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
 import { VideoIcon } from '@recipe-organizer/design-system/icons/video'
 import { XIcon } from '@recipe-organizer/design-system/icons/x'
 import { Kbd, KbdGroup } from '@recipe-organizer/design-system/kbd'
+import { useId } from 'react'
 
 import { Field, FieldError, FieldLabel } from '../field/field'
 
@@ -20,6 +20,7 @@ export interface VideoFieldProps {
 export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) => {
   const platform = usePlatform()
   const field = useFieldContext<File | FileMetadata>()
+  const id = useId()
 
   const MAX_VIDEO_SIZE_MB = 100
   const maxVideoSizeBytes = MAX_VIDEO_SIZE_MB * 1024 * 1024
@@ -36,9 +37,9 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
   const [videoFile] = files
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
-      <FieldLabel>{label}</FieldLabel>
-      <FieldLabel presentation="dropzone-video">
+    <Field invalid={!field.state.meta.isValid} name={field.name}>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel htmlFor={id} presentation="dropzone-video">
         {videoFile ? (
           <div className={styles.container}>
             <div className={styles.videoDetails}>
@@ -83,7 +84,7 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <FieldPrimitive.Control className={styles.fileInput} disabled={disabled} {...getInputProps()} />
+      <input className={styles.fileInput} disabled={disabled} id={id} {...getInputProps()} />
       <FieldError />
     </Field>
   )

@@ -16,7 +16,7 @@ export const TextareaField = ({ disabled, label, onKeyDown, placeholder, ref, 'a
   const id = useId()
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
+    <Field invalid={!field.state.meta.isValid} name={field.name}>
       {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
       <span className={surface.inputSurface} data-slot="textarea-control">
         <textarea

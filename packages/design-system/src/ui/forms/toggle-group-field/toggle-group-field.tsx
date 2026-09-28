@@ -16,7 +16,7 @@ export const ToggleGroupField = ({ disabled, items, label }: ToggleGroupFieldPro
   const selected = field.state.value ?? []
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
+    <Field invalid={!field.state.meta.isValid} name={field.name}>
       {label && <FieldLabel>{label}</FieldLabel>}
       <div className={styles.wrapper}>
         <div className={styles.group} data-slot="toggle-group">

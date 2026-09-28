@@ -1,4 +1,3 @@
-import { Field as FieldPrimitive } from '@base-ui/react/field'
 import { Button } from '@recipe-organizer/design-system/button'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
@@ -6,21 +5,25 @@ import type { SubmitEvent, ReactElement } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
 import { Field, FieldError, FieldLabel } from '../field/field'
+import { Input } from '../input/input'
 import { Form } from './form'
 
 const RecipeForm = (): ReactElement => {
   const [submitted, setSubmitted] = useState(false)
+  const [recipeName, setRecipeName] = useState('')
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>): void => {
     event.preventDefault()
-    setSubmitted(true)
+    setErrors(recipeName ? {} : { recipeName: 'A recipe name is required.' })
+    setSubmitted(Boolean(recipeName))
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form errors={errors} onSubmit={handleSubmit}>
       <Field name="recipeName">
-        <FieldLabel>Recipe name</FieldLabel>
-        <FieldPrimitive.Control data-slot="field-control" required />
-        <FieldError match="valueMissing">A recipe name is required.</FieldError>
+        <FieldLabel htmlFor="recipeName">Recipe name</FieldLabel>
+        <Input id="recipeName" onChange={(event) => setRecipeName(event.target.value)} value={recipeName} />
+        <FieldError />
       </Field>
       <Button type="submit">Save recipe</Button>
       {submitted && <p role="status">Recipe saved.</p>}

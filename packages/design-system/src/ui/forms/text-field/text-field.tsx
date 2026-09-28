@@ -15,7 +15,7 @@ export const TextField = ({ disabled, label, placeholder }: TextFieldProps) => {
   const id = useId()
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
+    <Field invalid={!field.state.meta.isValid} name={field.name}>
       {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
       <Input
         aria-invalid={!field.state.meta.isValid || undefined}

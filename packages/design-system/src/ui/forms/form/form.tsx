@@ -1,12 +1,15 @@
-import { Form as FormPrimitive } from '@base-ui/react/form'
+import { createContext } from 'react'
 import type React from 'react'
 
 import * as styles from './form.css'
 
-export type FormProps = Pick<FormPrimitive.Props, 'children' | 'errors' | 'onSubmit'>
+const noErrors: Record<string, string> = {}
+export const FormErrorsContext = createContext(noErrors)
+
+export type FormProps = Pick<React.ComponentProps<'form'>, 'children' | 'onSubmit'> & { errors?: Record<string, string> }
 
 export const Form = ({ children, errors, onSubmit }: FormProps): React.ReactElement => (
-  <FormPrimitive className={styles.form} data-slot="form" errors={errors} onSubmit={onSubmit}>
-    {children}
-  </FormPrimitive>
+  <form className={styles.form} data-slot="form" noValidate onSubmit={onSubmit}>
+    <FormErrorsContext value={errors ?? noErrors}>{children}</FormErrorsContext>
+  </form>
 )

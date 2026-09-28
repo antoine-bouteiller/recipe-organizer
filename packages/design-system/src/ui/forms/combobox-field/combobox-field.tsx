@@ -51,7 +51,7 @@ const ComboboxField = <TValue extends ValueOptions>({
   }
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
+    <Field invalid={!field.state.meta.isValid} name={field.name}>
       {label && <FieldLabel>{label}</FieldLabel>}
       <Popover
         onOpenChange={handleOpenChange}

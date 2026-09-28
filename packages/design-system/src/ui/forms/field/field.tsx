@@ -1,26 +1,40 @@
-import { Field as FieldPrimitive } from '@base-ui/react/field'
+import { createContext, use } from 'react'
 import type React from 'react'
+
+import { FormErrorsContext } from '../form/form'
 
 import * as styles from './field.css'
 
-type FieldProps = Pick<FieldPrimitive.Root.Props, 'children' | 'dirty' | 'disabled' | 'invalid' | 'name' | 'touched'>
-type FieldLabelProps = Pick<FieldPrimitive.Label.Props, 'children' | 'htmlFor'> & {
+type FieldProps = Pick<React.ComponentProps<'div'>, 'children'> & { invalid?: boolean; name?: string }
+type FieldLabelProps = Pick<React.ComponentProps<'label'>, 'children' | 'htmlFor'> & {
   presentation?: 'dropzone-image' | 'dropzone-video'
 }
-type FieldErrorProps = Pick<FieldPrimitive.Error.Props, 'children' | 'match'>
+type FieldErrorProps = Pick<React.ComponentProps<'div'>, 'children'>
 
-export const Field = ({ children, dirty, disabled, invalid, name, touched }: FieldProps): React.ReactElement => (
-  <FieldPrimitive.Root className={styles.field} data-slot="field" dirty={dirty} disabled={disabled} invalid={invalid} name={name} touched={touched}>
-    {children}
-  </FieldPrimitive.Root>
-)
+const FieldContext = createContext<{ error?: string; invalid: boolean }>({ invalid: false })
+
+export const Field = ({ children, invalid, name }: FieldProps): React.ReactElement => {
+  const error = name ? use(FormErrorsContext)[name] : undefined
+  const isInvalid = Boolean(invalid || error)
+
+  return (
+    <div className={styles.field} data-invalid={isInvalid || undefined} data-slot="field">
+      <FieldContext value={{ error, invalid: isInvalid }}>{children}</FieldContext>
+    </div>
+  )
+}
 export const FieldLabel = ({ children, htmlFor, presentation }: FieldLabelProps): React.ReactElement => (
-  <FieldPrimitive.Label className={styles.label({ presentation })} data-slot="field-label" htmlFor={htmlFor}>
+  <label className={styles.label({ presentation })} data-invalid={use(FieldContext).invalid || undefined} data-slot="field-label" htmlFor={htmlFor}>
     {children}
-  </FieldPrimitive.Label>
+  </label>
 )
-export const FieldError = ({ children, match }: FieldErrorProps): React.ReactElement => (
-  <FieldPrimitive.Error className={styles.error} data-slot="field-error" match={match}>
-    {children}
-  </FieldPrimitive.Error>
-)
+export const FieldError = ({ children }: FieldErrorProps): React.ReactElement | null => {
+  const { error, invalid } = use(FieldContext)
+  const message = children ?? error
+
+  return invalid && message ? (
+    <div className={styles.error} data-slot="field-error">
+      {message}
+    </div>
+  ) : null
+}

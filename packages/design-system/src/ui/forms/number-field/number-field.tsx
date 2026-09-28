@@ -28,7 +28,7 @@ export const NumberField = ({ disabled, label, max, min, placeholder }: NumberFi
   const id = React.useId()
 
   return (
-    <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
+    <Field invalid={!field.state.meta.isValid} name={field.name}>
       <NumberFieldPrimitive.Root
         className={styles.root}
         data-slot="number-field"
@@ -52,7 +52,12 @@ export const NumberField = ({ disabled, label, max, min, placeholder }: NumberFi
           <NumberFieldPrimitive.Decrement className={styles.decrement} data-slot="number-field-decrement">
             <MinusIcon />
           </NumberFieldPrimitive.Decrement>
-          <NumberFieldPrimitive.Input className={styles.input} data-slot="number-field-input" placeholder={placeholder} />
+          <NumberFieldPrimitive.Input
+            aria-invalid={!field.state.meta.isValid || undefined}
+            className={styles.input}
+            data-slot="number-field-input"
+            placeholder={placeholder}
+          />
           <NumberFieldPrimitive.Increment className={styles.increment} data-slot="number-field-increment">
             <PlusIcon />
           </NumberFieldPrimitive.Increment>

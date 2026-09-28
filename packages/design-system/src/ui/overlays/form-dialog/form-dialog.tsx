@@ -1,4 +1,4 @@
-import { Form as FormPrimitive } from '@base-ui/react/form'
+import { FormErrorsContext } from '@recipe-organizer/design-system/form'
 import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { formatFormErrors } from '@recipe-organizer/design-system/utils/format-form-errors'
 import { useSelector } from '@tanstack/react-store'
@@ -32,17 +32,17 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
         <DialogFormProvider
           value={{
             wrap: (content) => (
-              <FormPrimitive
+              <form
                 className={styles.form}
-                errors={errors}
+                noValidate
                 onSubmit={async (event) => {
                   event.preventDefault()
                   event.stopPropagation()
                   await form.handleSubmit()
                 }}
               >
-                {content}
-              </FormPrimitive>
+                <FormErrorsContext value={errors}>{content}</FormErrorsContext>
+              </form>
             ),
           }}
         >
