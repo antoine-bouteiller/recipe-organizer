@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom'
 
 import { useDialogFormFrame } from './dialog-form.private'
 
-import * as drawerStyles from '../drawer/drawer.css'
+import * as drawerStyles from '../drawer.css'
 import * as styles from './dialog.css'
 
 export interface DialogProps {

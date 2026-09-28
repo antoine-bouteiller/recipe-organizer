@@ -24,7 +24,7 @@ export const options = style({
 export const empty = style({
   color: theme.colors['muted-foreground'],
   fontSize: theme.fontSizes.sm,
-  paddingBlock: theme.spacing(4),
+  padding: theme.spacing(4),
   textAlign: 'center',
 })
 
@@ -36,11 +36,7 @@ export const item = style({
   fontSize: theme.fontSizes.base,
   gap: theme.spacing(2),
   justifyContent: 'space-between',
-  minHeight: theme.spacing(10),
-  outline: '2px solid transparent',
-  outlineOffset: '2px',
-  paddingBlock: theme.spacing(1.5),
-  paddingInline: theme.spacing(2),
+  padding: theme.spacing(1),
   width: '100%',
   selectors: {
     '&:hover': {

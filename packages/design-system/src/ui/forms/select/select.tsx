@@ -1,8 +1,10 @@
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
+import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { Popover } from '@recipe-organizer/design-system/popover'
+import { useState } from 'react'
 import type { ReactElement } from 'react'
 
-import SelectDrawer from './select.drawer'
+import { SelectButton } from './select.shared'
 
 import * as styles from './select.css'
 import * as shared from './select.shared.css'
@@ -23,42 +25,51 @@ export interface SelectProps<TValue extends string> {
   value: TValue | null | undefined
 }
 
-const NativeSelect = <TValue extends string>({
+export const Select = ({
   'aria-invalid': ariaInvalid,
   disabled,
-  id,
   items,
   onValueChange,
   placeholder = 'Sélectionner',
+  title,
   value,
-}: SelectProps<TValue>): ReactElement => (
-  <span className={styles.wrapper}>
-    <select
-      aria-invalid={ariaInvalid || undefined}
-      className={`${shared.selectTrigger} ${styles.select} ${shared.selectTextState[value ? 'selected' : 'empty']}`}
-      data-slot="select"
-      disabled={disabled}
-      id={id}
-      onChange={(event) => onValueChange(items.find((item) => (item.value ?? '') === event.target.value)?.value ?? null)}
-      value={value ?? ''}
-    >
-      {!items.some((item) => item.value === null) && <option value="">{placeholder}</option>}
-      {items.map((item) => (
-        <option key={item.value ?? ''} value={item.value ?? ''}>
-          {item.label}
-        </option>
-      ))}
-    </select>
-    <span className={styles.icon}>
-      <CaretUpDownIcon />
-    </span>
-  </span>
-)
-
-export const Select = <TValue extends string>(props: SelectProps<TValue>): ReactElement => {
+}: SelectProps<string>): ReactElement => {
   const isMobile = useIsMobile()
-  if (!isMobile) {
-    return <NativeSelect {...props} />
-  }
-  return <SelectDrawer {...props} onValueChange={(value) => props.onValueChange(props.items.find((item) => item.value === value)?.value ?? null)} />
+  const [open, setOpen] = useState(false)
+  const selected = items.find((item) => item.value === (value ?? null))
+  return (
+    <Popover
+      onOpenChange={setOpen}
+      open={open}
+      trigger={
+        <SelectButton aria-invalid={ariaInvalid || undefined} disabled={disabled}>
+          <span className={shared.selectTextState[selected ? 'selected' : 'empty']}>{selected?.label ?? placeholder}</span>
+        </SelectButton>
+      }
+    >
+      <div className={styles.content}>
+        {isMobile && <h2 className={styles.title}>{title ?? placeholder}</h2>}
+        <div className={styles.list}>
+          {items.map((item) => (
+            <button
+              className={styles.item}
+              key={item.value ?? 'none'}
+              onClick={() => {
+                onValueChange(item.value)
+                setOpen(false)
+              }}
+              type="button"
+            >
+              <span className={styles.label}>{item.label}</span>
+              {item === selected && (
+                <span className={styles.icon}>
+                  <CheckIcon size="sm" />
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    </Popover>
+  )
 }

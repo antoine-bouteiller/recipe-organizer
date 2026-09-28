@@ -1,24 +1,55 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { globalStyle, style } from '@vanilla-extract/css'
+import { style } from '@vanilla-extract/css'
 
-export const wrapper = style({ display: 'flex', position: 'relative', width: '100%' })
-
-export const select = style({
-  appearance: 'none',
-  cursor: 'pointer',
-  paddingInlineEnd: theme.spacing(8),
-  selectors: { '&:disabled': { opacity: 0.64, pointerEvents: 'none' } },
+export const content = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(4),
+  minHeight: theme.spacing(0),
+  // Popover-owned trigger width, minus the viewport inline padding and popup border.
+  minWidth: `calc(var(--anchor-width, 0px) - ${theme.spacing(4)} - 2px)`,
 })
 
-globalStyle(`.${select} option`, { color: theme.colors.foreground })
+export const title = style({
+  fontFamily: theme.fonts.heading,
+  fontSize: theme.fontSizes.xl,
+  fontWeight: theme.fontWeights.semibold,
+  lineHeight: theme.lineHeights.none,
+})
+
+export const list = style({
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: theme.spacing(0),
+  overflowY: 'auto',
+})
+
+export const item = style({
+  alignItems: 'center',
+  borderRadius: theme.radius.sm,
+  display: 'flex',
+  fontSize: theme.fontSizes.base,
+  justifyContent: 'space-between',
+  padding: theme.spacing(1),
+  width: '100%',
+  selectors: {
+    '&:hover': {
+      '@media': {
+        '(hover: hover) and (pointer: fine)': {
+          backgroundColor: theme.colors.accent,
+          color: theme.colors['accent-foreground'],
+        },
+      },
+    },
+  },
+})
+
+export const label = style({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+})
 
 export const icon = style({
-  vars: { '--owner-icon-size': '16px' },
-  alignItems: 'center',
-  display: 'flex',
-  insetBlock: 0,
-  insetInlineEnd: theme.spacing(2),
-  opacity: 0.8,
-  pointerEvents: 'none',
-  position: 'absolute',
+  flexShrink: 0,
 })

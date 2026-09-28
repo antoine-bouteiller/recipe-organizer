@@ -4,7 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-import * as drawerStyles from '../drawer/drawer.css'
+import * as drawerStyles from '../drawer.css'
 import * as styles from './popover.css'
 
 export interface PopoverProps {
@@ -67,6 +67,7 @@ export const Popover = ({ trigger, children, onOpenChange, open: controlledOpen 
       const top = rect.bottom + SIDE_OFFSET
       positioner.style.top = `${top}px`
       positioner.style.left = `${rect.left + rect.width / 2}px`
+      positioner.style.setProperty('--anchor-width', `${rect.width}px`)
       positioner.style.setProperty('--available-height', `${window.innerHeight - top - COLLISION_PADDING}px`)
     }
     update()

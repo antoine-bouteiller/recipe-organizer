@@ -56,7 +56,6 @@ export const viewport = style({
   borderRadius: theme.radius.inherit,
   maxHeight: 'var(--available-height)',
   overflowY: 'auto',
-  paddingBlock: theme.spacing(4),
-  paddingInline: theme.spacing(2),
+  padding: theme.spacing(2),
   position: 'relative',
 })
