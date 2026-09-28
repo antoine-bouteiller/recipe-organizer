@@ -56,11 +56,11 @@ const ComboboxField = <TValue extends ValueOptions>({
       <Popover
         onOpenChange={handleOpenChange}
         open={open}
-        trigger={
-          <SelectButton aria-invalid={(field.state.meta.isTouched && !field.state.meta.isValid) || undefined} disabled={disabled}>
+        renderTrigger={(props) => (
+          <SelectButton {...props} aria-invalid={(field.state.meta.isTouched && !field.state.meta.isValid) || undefined} disabled={disabled}>
             {selectedOption?.label ?? placeholder}
           </SelectButton>
-        }
+        )}
       >
         <div className={styles.column}>
           <Input onChange={(event) => setSearch(event.target.value)} placeholder={searchPlaceholder} value={search} />

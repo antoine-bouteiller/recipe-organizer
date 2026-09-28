@@ -1,4 +1,5 @@
 import { capitalize } from '@client/utils/string'
+import type { DialogProps } from '@recipe-organizer/design-system/dialog'
 import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels } from '@recipe-organizer/shared/recipe/magimix'
@@ -6,7 +7,6 @@ import type { MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix
 import { revalidateLogic } from '@tanstack/react-form'
 import { useSelector } from '@tanstack/react-store'
 import { useState } from 'react'
-import type { ReactElement } from 'react'
 import * as z from 'zod'
 
 interface MagimixStepDialogProps {
@@ -14,7 +14,7 @@ interface MagimixStepDialogProps {
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
-  triggerRender?: ReactElement
+  triggerRender?: DialogProps['renderTrigger']
 }
 
 const magimixProgramSchema = z.object({
@@ -80,7 +80,7 @@ export const MagimixStepDialog = ({ initialData, onSubmit, submitLabel, title, t
   }))
 
   return (
-    <FormDialog form={form} trigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
+    <FormDialog form={form} renderTrigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
       <form.AppField name="program">
         {({ SelectField }) => <SelectField disabled={isSubmitting} items={programItems} label="Programme" />}
       </form.AppField>

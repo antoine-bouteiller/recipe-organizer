@@ -47,11 +47,11 @@ export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe })
 
   return (
     <Popover
-      trigger={
-        <Button size="icon" variant="ghost">
+      renderTrigger={(props) => (
+        <Button {...props} size="icon" variant="ghost">
           <DotsThreeVerticalIcon weight="bold" />
         </Button>
-      }
+      )}
     >
       <div className={styles.managementActions}>
         <Button align="start" asLink params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition variant="list-action" width="full">
@@ -63,7 +63,7 @@ export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe })
           description={`Êtes-vous sûr de vouloir supprimer la recette ${recipe.name}?`}
           onDelete={handleDelete}
           title="Supprimer la recette"
-          trigger={<Button variant="destructive-ghost" />}
+          renderTrigger={(props) => <Button {...props} variant="destructive-ghost" />}
         />
       </div>
     </Popover>

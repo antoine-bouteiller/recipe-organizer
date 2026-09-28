@@ -1,10 +1,19 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import type { RefObject } from 'react'
+import type { Ref, RefObject } from 'react'
 
 /** Longest exit transition in drawer.css (swipe strength 1 × 400ms), plus headroom. */
 const DRAWER_ENDING_MS = 450
 /** Release speed (px/ms) that dismisses the drawer regardless of distance. */
 const DISMISS_VELOCITY = 0.5
+
+/** Props an overlay passes to its trigger render function; spread them onto the trigger button. */
+export interface TriggerProps {
+  'aria-expanded': boolean
+  'aria-haspopup': 'dialog'
+  onClick: () => void
+  onPointerDown?: () => void
+  ref?: Ref<HTMLButtonElement>
+}
 
 interface OverlayStateProps {
   cancelDisabled?: boolean
@@ -14,6 +23,7 @@ interface OverlayStateProps {
 
 interface OverlayState {
   close: () => void
+  isOpen: boolean
   mounted: boolean
   phase: 'ending' | 'starting' | undefined
   setOpen: (next: boolean) => void
@@ -68,7 +78,7 @@ const useOverlayState = ({ cancelDisabled, onOpenChange, open }: OverlayStatePro
     return () => document.removeEventListener('keydown', onKeyDown)
   })
 
-  return { close, mounted, phase, setOpen }
+  return { close, isOpen, mounted, phase, setOpen }
 }
 
 interface SwipeToDismissOptions {
@@ -181,6 +191,7 @@ interface DrawerOptions extends OverlayStateProps {
 interface Drawer {
   backdropRef: RefObject<HTMLDivElement | null>
   close: () => void
+  isOpen: boolean
   mounted: boolean
   phaseProps: { 'data-ending-style'?: ''; 'data-starting-style'?: '' }
   popupRef: RefObject<HTMLDivElement | null>
@@ -189,7 +200,7 @@ interface Drawer {
 
 /** Portal overlay state with drawer transitions and swipe-to-dismiss; attach the refs to the backdrop and popup. */
 export const useDrawer = ({ endingMs = DRAWER_ENDING_MS, swipeable = true, ...props }: DrawerOptions): Drawer => {
-  const { close, mounted, phase, setOpen } = useOverlayState(props, endingMs)
+  const { close, isOpen, mounted, phase, setOpen } = useOverlayState(props, endingMs)
   const backdropRef = useRef<HTMLDivElement>(null)
   const popupRef = useRef<HTMLDivElement>(null)
   useSwipeToDismiss({ backdropRef, cancelDisabled: props.cancelDisabled, enabled: swipeable && mounted, onDismiss: close, popupRef })
@@ -197,5 +208,5 @@ export const useDrawer = ({ endingMs = DRAWER_ENDING_MS, swipeable = true, ...pr
     'data-ending-style': phase === 'ending' ? ('' as const) : undefined,
     'data-starting-style': phase === 'starting' ? ('' as const) : undefined,
   }
-  return { backdropRef, close, mounted, phaseProps, popupRef, setOpen }
+  return { backdropRef, close, isOpen, mounted, phaseProps, popupRef, setOpen }
 }

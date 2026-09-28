@@ -1,3 +1,4 @@
+import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { Button } from '@recipe-organizer/design-system/button'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -11,14 +12,14 @@ const dialogProps = {
   cancelLabel: 'Cancel',
   children: <p>Changes are saved only after you confirm this action.</p>,
   footer: <Button>Save changes</Button>,
+  renderTrigger: (props: TriggerProps) => <Button {...props}>Edit recipe</Button>,
   title: 'Edit recipe',
-  trigger: <Button>Edit recipe</Button>,
 }
 
 const ResponsiveExample = (): React.ReactElement => <Dialog {...dialogProps} />
 
 const BareExample = (): React.ReactElement => (
-  <Dialog bare title="Search" trigger={<Button>Open search</Button>}>
+  <Dialog bare title="Search" renderTrigger={(props) => <Button {...props}>Open search</Button>}>
     <p>Children own the whole popup surface.</p>
   </Dialog>
 )

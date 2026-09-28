@@ -1,4 +1,5 @@
 import { useDrawer } from '@design-system/hooks/use-drawer'
+import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
@@ -11,7 +12,7 @@ export interface PopoverProps {
   children: ReactNode
   onOpenChange?: (open: boolean) => void
   open?: boolean
-  trigger: ReactElement
+  renderTrigger: (props: TriggerProps) => ReactElement
 }
 
 /** Exit transition of the anchored popover. */
@@ -19,7 +20,7 @@ const POPOVER_ENDING_MS = 150
 const SIDE_OFFSET = 4
 const COLLISION_PADDING = 8
 
-export const Popover = ({ trigger, children, onOpenChange, open: controlledOpen }: PopoverProps): ReactElement => {
+export const Popover = ({ renderTrigger, children, onOpenChange, open: controlledOpen }: PopoverProps): ReactElement => {
   const isMobile = useIsMobile()
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
   const open = controlledOpen ?? uncontrolledOpen
@@ -34,7 +35,7 @@ export const Popover = ({ trigger, children, onOpenChange, open: controlledOpen 
     open,
     swipeable: isMobile,
   })
-  const triggerRef = useRef<HTMLSpanElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   // Set by React pointer events, which also bubble from nested portals (e.g. a dialog opened from the popover).
   const insideRef = useRef(false)
   const markInside = (): void => {
@@ -58,7 +59,7 @@ export const Popover = ({ trigger, children, onOpenChange, open: controlledOpen 
 
   /** Anchors the positioner below the trigger while it is mounted. */
   const anchorPositioner = (positioner: HTMLDivElement): (() => void) | undefined => {
-    const anchor = triggerRef.current?.firstElementChild
+    const anchor = triggerRef.current
     if (!anchor) {
       return undefined
     }
@@ -81,9 +82,7 @@ export const Popover = ({ trigger, children, onOpenChange, open: controlledOpen 
 
   return (
     <>
-      <span className={styles.trigger} onClick={() => setOpen(!open)} onPointerDown={markInside} ref={triggerRef}>
-        {trigger}
-      </span>
+      {renderTrigger({ 'aria-expanded': open, 'aria-haspopup': 'dialog', onClick: () => setOpen(!open), onPointerDown: markInside, ref: triggerRef })}
       {mounted &&
         createPortal(
           isMobile ? (

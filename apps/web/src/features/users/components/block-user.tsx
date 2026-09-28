@@ -21,7 +21,7 @@ export const BlockUser = ({ userEmail, userId }: BlockUserProps) => {
       icon={ProhibitIcon}
       onDelete={handleBlock}
       title="Bloquer l'utilisateur"
-      trigger={<Button aria-label="Bloquer l'utilisateur" size="icon" variant="destructive-outline" />}
+      renderTrigger={(props) => <Button {...props} aria-label="Bloquer l'utilisateur" size="icon" variant="destructive-outline" />}
     />
   )
 }

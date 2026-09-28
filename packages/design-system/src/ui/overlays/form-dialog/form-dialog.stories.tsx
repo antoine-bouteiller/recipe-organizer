@@ -18,7 +18,14 @@ const FormDialogExample = (): ReactElement => {
 
   return (
     <form.AppForm>
-      <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Save recipe" title="Edit recipe" trigger={<Button>Edit recipe</Button>}>
+      <FormDialog
+        form={form}
+        open={open}
+        setOpen={setOpen}
+        submitLabel="Save recipe"
+        title="Edit recipe"
+        renderTrigger={(props) => <Button {...props}>Edit recipe</Button>}
+      >
         <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
       </FormDialog>
     </form.AppForm>
@@ -41,7 +48,14 @@ const RegressionExample = (): ReactElement => {
 
   return (
     <form.AppForm>
-      <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Save recipe" title="Edit recipe" trigger={<Button>Edit recipe</Button>}>
+      <FormDialog
+        form={form}
+        open={open}
+        setOpen={setOpen}
+        submitLabel="Save recipe"
+        title="Edit recipe"
+        renderTrigger={(props) => <Button {...props}>Edit recipe</Button>}
+      >
         <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
         <div className={styles.container}>
           {Array.from({ length: 20 }, (_item, index) => (

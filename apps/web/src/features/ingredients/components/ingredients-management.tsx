@@ -39,11 +39,13 @@ export const IngredientsManagement = ({ isAdmin }: IngredientsManagementProps) =
     <>
       <div className={styles.searchBar}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
-        <AddIngredient>
-          <Button aria-label="Ajouter un ingrédient" size="icon-lg" variant="outline">
-            <PlusIcon />
-          </Button>
-        </AddIngredient>
+        <AddIngredient
+          renderTrigger={(props) => (
+            <Button {...props} aria-label="Ajouter un ingrédient" size="icon-lg" variant="outline">
+              <PlusIcon />
+            </Button>
+          )}
+        />
       </div>
       {filteredIngredients.length === 0 ? (
         <p className={styles.emptyState}>

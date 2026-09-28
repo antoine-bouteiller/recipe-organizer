@@ -2,9 +2,10 @@ import { Form as FormPrimitive } from '@base-ui/react/form'
 import { withForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { formatFormErrors } from '@recipe-organizer/design-system/utils/format-form-errors'
 import { useSelector } from '@tanstack/react-store'
-import type { ReactElement, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import { Dialog } from '../dialog/dialog'
+import type { DialogProps } from '../dialog/dialog'
 import { DialogFormProvider } from '../dialog/dialog-form.private'
 
 import * as styles from './form-dialog.css'
@@ -15,7 +16,7 @@ interface FormModalProps {
   setOpen: (open: boolean) => void
   submitLabel: string
   title: string
-  trigger?: ReactElement
+  renderTrigger?: DialogProps['renderTrigger']
 }
 
 const formModalProps: FormModalProps = { children: null, open: false, setOpen: () => undefined, submitLabel: '', title: '' }
@@ -24,7 +25,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
   withForm({
     defaultValues,
     props: formModalProps,
-    render: ({ children, form, open, setOpen, submitLabel, title, trigger }) => {
+    render: ({ children, form, open, setOpen, submitLabel, title, renderTrigger }) => {
       const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
       const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
       return (
@@ -56,7 +57,7 @@ export const getFormDialog = <TValues,>(defaultValues: TValues) =>
             onOpenChange={setOpen}
             open={open}
             title={title}
-            trigger={trigger}
+            renderTrigger={renderTrigger}
           >
             <div className={styles.fields}>{children}</div>
           </Dialog>

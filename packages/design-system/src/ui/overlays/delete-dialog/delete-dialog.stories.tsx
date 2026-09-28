@@ -22,7 +22,7 @@ const DeleteDialogExample = (): ReactElement => {
         description="This removes Tomato soup from your saved recipes. This action cannot be undone."
         onDelete={handleDelete}
         title="Delete Tomato soup?"
-        trigger={<Button aria-label="Delete Tomato soup" variant="destructive" />}
+        renderTrigger={(props) => <Button {...props} aria-label="Delete Tomato soup" variant="destructive" />}
       />
       {deleted && <p role="status">Tomato soup was deleted.</p>}
     </div>

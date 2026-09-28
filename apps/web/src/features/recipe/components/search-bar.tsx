@@ -40,8 +40,8 @@ const SearchBar = () => {
         onOpenChange={setOpen}
         open={open}
         title="Rechercher une recette"
-        trigger={
-          <Button align="start" variant="outline" width="full">
+        renderTrigger={(props) => (
+          <Button {...props} align="start" variant="outline" width="full">
             Recherche une recette...
             <span className={styles.text}>
               <KbdGroup>
@@ -52,7 +52,7 @@ const SearchBar = () => {
               </KbdGroup>
             </span>
           </Button>
-        }
+        )}
       >
         <div className={styles.palette}>
           <AutocompletePrimitive.Root autoHighlight="always" inline items={recipes} keepHighlight open>

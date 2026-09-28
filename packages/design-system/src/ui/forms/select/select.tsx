@@ -41,11 +41,11 @@ export const Select = ({
     <Popover
       onOpenChange={setOpen}
       open={open}
-      trigger={
-        <SelectButton aria-invalid={ariaInvalid || undefined} disabled={disabled}>
+      renderTrigger={(props) => (
+        <SelectButton {...props} aria-invalid={ariaInvalid || undefined} disabled={disabled}>
           <span className={shared.selectTextState[selected ? 'selected' : 'empty']}>{selected?.label ?? placeholder}</span>
         </SelectButton>
-      }
+      )}
     >
       <div className={styles.content}>
         {isMobile && <h2 className={styles.title}>{title ?? placeholder}</h2>}

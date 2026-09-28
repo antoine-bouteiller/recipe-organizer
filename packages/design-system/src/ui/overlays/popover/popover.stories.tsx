@@ -1,3 +1,4 @@
+import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { Button } from '@recipe-organizer/design-system/button'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
@@ -16,7 +17,11 @@ const popoverProps = {
       <Button variant="ghost">Archive recipe</Button>
     </div>
   ),
-  trigger: <Button variant="outline">Recipe actions</Button>,
+  renderTrigger: (props: TriggerProps) => (
+    <Button {...props} variant="outline">
+      Recipe actions
+    </Button>
+  ),
 }
 
 const ResponsiveExample = (): React.ReactElement => <Popover {...popoverProps} />

@@ -98,11 +98,11 @@ const GroupSteps = withForm({
                                 onSubmit={magimixField.handleChange}
                                 submitLabel="Enregistrer"
                                 title="Modifier le programme Magimix"
-                                triggerRender={
-                                  <button className={styles.magimixTrigger} disabled={disabled} type="button">
+                                triggerRender={(props) => (
+                                  <button {...props} className={styles.magimixTrigger} disabled={disabled} type="button">
                                     <MagimixStepItem {...magimix} />
                                   </button>
-                                }
+                                )}
                               />
                               <Button
                                 aria-label="Retirer le programme Magimix"
@@ -121,11 +121,11 @@ const GroupSteps = withForm({
                                 onSubmit={magimixField.handleChange}
                                 submitLabel="Ajouter"
                                 title="Ajouter un programme Magimix"
-                                triggerRender={
-                                  <Button disabled={disabled} size="sm" type="button" variant="ghost">
+                                triggerRender={(props) => (
+                                  <Button {...props} disabled={disabled} size="sm" type="button" variant="ghost">
                                     Magimix <PlusIcon size="sm" />
                                   </Button>
-                                }
+                                )}
                               />
                             </div>
                           )

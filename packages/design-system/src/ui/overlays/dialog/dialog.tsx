@@ -1,4 +1,5 @@
 import { useDrawer } from '@design-system/hooks/use-drawer'
+import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
 import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
 import { Button } from '@recipe-organizer/design-system/button'
@@ -21,7 +22,7 @@ export interface DialogProps {
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title: string
-  trigger?: ReactElement
+  renderTrigger?: (props: TriggerProps) => ReactElement
 }
 
 /** Exit transition of the centered dialog. */
@@ -90,10 +91,20 @@ const DrawerContent = ({ children, footer, title }: ContentProps): ReactElement 
   </>
 )
 
-export const Dialog = ({ bare, title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
+export const Dialog = ({
+  bare,
+  title,
+  renderTrigger,
+  children,
+  cancelLabel,
+  cancelDisabled,
+  footer,
+  open,
+  onOpenChange,
+}: DialogProps): ReactElement => {
   const isMobile = useIsMobile()
   const formFrame = useDialogFormFrame()
-  const { backdropRef, close, mounted, phaseProps, popupRef, setOpen } = useDrawer({
+  const { backdropRef, close, isOpen, mounted, phaseProps, popupRef, setOpen } = useDrawer({
     cancelDisabled,
     endingMs: isMobile ? undefined : DIALOG_ENDING_MS,
     onOpenChange,
@@ -111,11 +122,7 @@ export const Dialog = ({ bare, title, trigger, children, cancelLabel, cancelDisa
 
   return (
     <>
-      {trigger !== undefined && (
-        <span className={styles.trigger} onClick={() => setOpen(true)}>
-          {trigger}
-        </span>
-      )}
+      {renderTrigger?.({ 'aria-expanded': isOpen, 'aria-haspopup': 'dialog', onClick: () => setOpen(true) })}
       {mounted &&
         createPortal(
           <>

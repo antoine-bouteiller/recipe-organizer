@@ -149,5 +149,3 @@ export const container = style({
   position: 'absolute',
   top: theme.spacing(2),
 })
-
-export const trigger = style({ display: 'contents' })

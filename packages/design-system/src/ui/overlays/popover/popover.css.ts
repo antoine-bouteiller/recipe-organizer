@@ -1,8 +1,6 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const trigger = style({ display: 'contents' })
-
 export const positioner = style({
   position: 'fixed',
   translate: '-50% 0',

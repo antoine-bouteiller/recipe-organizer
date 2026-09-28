@@ -110,11 +110,11 @@ export const UsersManagement = () => {
           setOpen={setOpen}
           submitLabel="Ajouter"
           title="Ajouter un utilisateur"
-          trigger={
-            <Button aria-label="Ajouter un utilisateur" size="icon-lg" variant="outline">
+          renderTrigger={(props) => (
+            <Button {...props} aria-label="Ajouter un utilisateur" size="icon-lg" variant="outline">
               <PlusIcon />
             </Button>
-          }
+          )}
         >
           <AppField name="email">
             {({ TextField }) => <TextField disabled={isSubmitting} label="Email" placeholder="Ex: user@example.com" />}

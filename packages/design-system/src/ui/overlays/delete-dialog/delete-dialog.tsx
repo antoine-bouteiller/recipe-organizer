@@ -1,8 +1,9 @@
+import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { Button } from '@recipe-organizer/design-system/button'
 import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
-import { cloneElement, useState, useTransition } from 'react'
-import type { ElementType, ReactElement } from 'react'
+import { useState, useTransition } from 'react'
+import type { ElementType, ReactElement, ReactNode } from 'react'
 
 import { Dialog } from '../dialog/dialog'
 
@@ -15,10 +16,10 @@ export interface DeleteDialogProps {
   onOpenChange?: (open: boolean) => void
   open?: boolean
   title: string
-  trigger?: ReactElement
+  renderTrigger?: (props: TriggerProps & { children: ReactNode }) => ReactElement
 }
 
-const DefaultTrigger = <Button size="icon" variant="destructive" />
+const defaultTrigger: NonNullable<DeleteDialogProps['renderTrigger']> = (props) => <Button {...props} size="icon" variant="destructive" />
 
 export const DeleteDialog = ({
   actionLabel = 'Supprimer',
@@ -29,7 +30,7 @@ export const DeleteDialog = ({
   onOpenChange: onOpenChangeProp,
   open: openProp,
   title,
-  trigger = DefaultTrigger,
+  renderTrigger = defaultTrigger,
 }: DeleteDialogProps): ReactElement => {
   const TriggerIcon = icon ?? TrashIcon
   const [internalOpen, setInternalOpen] = useState(false)
@@ -52,13 +53,15 @@ export const DeleteDialog = ({
 
   const triggerNode = isControlled
     ? undefined
-    : cloneElement(
-        trigger,
-        undefined,
-        <>
-          <TriggerIcon /> {deleteButtonLabel}
-        </>
-      )
+    : (props: TriggerProps) =>
+        renderTrigger({
+          ...props,
+          children: (
+            <>
+              <TriggerIcon /> {deleteButtonLabel}
+            </>
+          ),
+        })
 
   return (
     <Dialog
@@ -72,7 +75,7 @@ export const DeleteDialog = ({
       onOpenChange={setIsOpen}
       open={isOpen}
       title={title}
-      trigger={triggerNode}
+      renderTrigger={triggerNode}
     >
       {description}
     </Dialog>

@@ -10,42 +10,19 @@ export type ButtonProps = Pick<ComponentProps<'button'>, 'aria-label' | 'childre
   RecipeVariants<typeof styles.button> &
   (
     | ({ asLink: true; onClick?: never } & Pick<LinkProps, 'to' | 'viewTransition' | 'params'>)
-    | ({ asLink?: false; to?: never; viewTransition?: never; params?: never } & Pick<ComponentProps<'button'>, 'onClick'>)
+    | ({ asLink?: false; to?: never; viewTransition?: never; params?: never } & Pick<
+        ComponentProps<'button'>,
+        'aria-expanded' | 'aria-haspopup' | 'onClick' | 'onPointerDown' | 'ref'
+      >)
   )
 
-export const Button = ({
-  align,
-  asLink,
-  size,
-  to,
-  type,
-  variant,
-  width,
-  'aria-label': ariaLabel,
-  children,
-  disabled,
-  onClick,
-  viewTransition,
-  params,
-}: ButtonProps): React.ReactElement => {
-  if (asLink) {
-    return (
-      <Link
-        className={styles.button({ align, size, variant, width })}
-        to={to}
-        aria-label={ariaLabel}
-        disabled={disabled}
-        params={params}
-        viewTransition={viewTransition}
-      >
-        {children}
-      </Link>
-    )
+// Base UI `render` composition injects handlers, ARIA/state attributes, and refs at runtime; the rest spread forwards them.
+export const Button = (props: ButtonProps): React.ReactElement => {
+  if (props.asLink) {
+    const { align, asLink: _asLink, size, variant, width, ...linkProps } = props
+    return <Link {...linkProps} className={styles.button({ align, size, variant, width })} />
   }
 
-  return (
-    <button className={styles.button({ align, size, variant, width })} aria-label={ariaLabel} disabled={disabled} onClick={onClick} type={type}>
-      {children}
-    </button>
-  )
+  const { align, asLink: _asLink, size, variant, width, ...buttonProps } = props
+  return <button {...buttonProps} className={styles.button({ align, size, variant, width })} />
 }
