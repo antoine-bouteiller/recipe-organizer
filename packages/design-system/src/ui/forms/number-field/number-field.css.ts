@@ -1,14 +1,6 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style, globalStyle } from '@vanilla-extract/css'
 
-export const root = style({
-  alignItems: 'flex-start',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(2),
-  width: '100%',
-})
-
 export const group = style({
   selectors: {
     '&:focus-within': {
@@ -78,76 +70,6 @@ export const group = style({
   },
 })
 
-export const decrement = style({
-  alignItems: 'center',
-  borderEndStartRadius: theme.radius.lg,
-  borderStartStartRadius: theme.radius.lg,
-  cursor: 'pointer',
-  display: 'flex',
-  flexShrink: 0,
-  justifyContent: 'center',
-  paddingInline: theme.spacing(2.75),
-  position: 'relative',
-  transitionDuration: '150ms',
-  transitionProperty: 'background-color',
-  transitionTimingFunction: theme.easings['in-out'],
-  selectors: {
-    '&::after': {
-      '@media': {
-        '(pointer: coarse)': {
-          content: '""',
-          inset: theme.spacing(0),
-          minHeight: theme.spacing(11),
-          minWidth: theme.spacing(11),
-          position: 'absolute',
-        },
-      },
-    },
-    '&:hover': {
-      '@media': {
-        '(hover: hover) and (pointer: fine)': {
-          backgroundColor: theme.colors.accent,
-        },
-      },
-    },
-  },
-})
-
-export const increment = style({
-  alignItems: 'center',
-  borderEndEndRadius: theme.radius.lg,
-  borderStartEndRadius: theme.radius.lg,
-  cursor: 'pointer',
-  display: 'flex',
-  flexShrink: 0,
-  justifyContent: 'center',
-  paddingInline: theme.spacing(2.75),
-  position: 'relative',
-  transitionDuration: '150ms',
-  transitionProperty: 'background-color',
-  transitionTimingFunction: theme.easings['in-out'],
-  selectors: {
-    '&::after': {
-      '@media': {
-        '(pointer: coarse)': {
-          content: '""',
-          inset: theme.spacing(0),
-          minHeight: theme.spacing(11),
-          minWidth: theme.spacing(11),
-          position: 'absolute',
-        },
-      },
-    },
-    '&:hover': {
-      '@media': {
-        '(hover: hover) and (pointer: fine)': {
-          backgroundColor: theme.colors.accent,
-        },
-      },
-    },
-  },
-})
-
 export const input = style({
   backgroundColor: 'transparent',
   flexGrow: 1,
@@ -167,15 +89,6 @@ export const input = style({
       lineHeight: '30px',
     },
   },
-})
-
-export const scrubArea = style({
-  cursor: 'ew-resize',
-  display: 'flex',
-})
-
-export const cursor = style({
-  filter: 'drop-shadow(0 1px 1px #0008)',
 })
 
 globalStyle(`.${group} svg`, {

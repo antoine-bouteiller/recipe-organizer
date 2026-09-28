@@ -2,6 +2,7 @@ import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { NumberField } from './number-field'
 
@@ -47,4 +48,22 @@ export const Overview: Story = {
       </StorySection>
     </div>
   ),
+}
+
+export const Interaction: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const input = within(section).getByRole('textbox', { name: 'Servings' })
+    await userEvent.type(input, '2,5')
+    await expect(input).toHaveValue('2,5')
+    await userEvent.click(within(section).getByRole('button', { name: 'Increase' }))
+    await expect(input).toHaveValue('3.5')
+    await userEvent.clear(input)
+    await userEvent.type(input, '-3')
+    await userEvent.tab()
+    await expect(input).toHaveValue('1')
+    await expect(within(section).getByRole('button', { name: 'Decrease' })).toBeDisabled()
+  },
+  tags: ['!dev'],
 }

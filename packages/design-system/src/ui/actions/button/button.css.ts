@@ -171,6 +171,10 @@ export const button = recipe({
           },
         },
       },
+      stretch: {
+        alignSelf: 'stretch',
+        paddingInline: theme.spacing(2.75),
+      },
       sm: {
         gap: theme.spacing(1.5),
         height: theme.spacing(8),
