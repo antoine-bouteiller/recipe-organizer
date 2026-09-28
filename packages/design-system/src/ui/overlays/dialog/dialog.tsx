@@ -1,6 +1,8 @@
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { lazy, Suspense } from 'react'
 import type { ReactElement, ReactNode } from 'react'
+
+import DialogBase from './dialog.base'
+import DialogDrawer from './dialog.drawer'
 
 export interface DialogProps {
   /** Render children directly in the popup, without the header, panel, footer, and close button. */
@@ -15,9 +17,6 @@ export interface DialogProps {
   trigger?: ReactElement
 }
 
-const DialogBase = lazy(() => import('./dialog.base'))
-const DialogDrawer = lazy(() => import('./dialog.drawer'))
-
 export const Dialog = ({ onOpenChange, cancelDisabled, ...props }: DialogProps): ReactElement => {
   const isMobile = useIsMobile()
   const Impl = isMobile ? DialogDrawer : DialogBase
@@ -28,9 +27,5 @@ export const Dialog = ({ onOpenChange, cancelDisabled, ...props }: DialogProps):
     }
     onOpenChange?.(nextOpen)
   }
-  return (
-    <Suspense fallback={props.trigger ?? null}>
-      <Impl {...props} cancelDisabled={cancelDisabled} onOpenChange={handleOpenChange} />
-    </Suspense>
-  )
+  return <Impl {...props} cancelDisabled={cancelDisabled} onOpenChange={handleOpenChange} />
 }
