@@ -1,26 +1,18 @@
 import { useFieldContext } from '@design-system/hooks/use-form-context'
-import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { lazy, Suspense } from 'react'
+import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { Popover } from '@recipe-organizer/design-system/popover'
+import { Separator } from '@recipe-organizer/design-system/separator'
+import { useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 
 import { Field, FieldError, FieldLabel } from '../field/field'
+import { Input } from '../input/input'
+import { SelectButton } from '../select/select.shared'
 import type { Option } from './options'
 
 import * as styles from './combobox-field.css'
 
-export type ValueOptions = number | string | undefined
-
-export interface ComboboxImplProps<TValue extends ValueOptions> {
-  addNew?: (inputValue: string) => ReactNode
-  disabled?: boolean
-  isInvalid: boolean
-  onChange: (option: Option<TValue> | null) => void
-  options: Option<TValue>[]
-  placeholder: string
-  searchPlaceholder: string
-  selectedOption: Option<TValue> | undefined
-  title: string
-}
+type ValueOptions = number | string | undefined
 
 interface ComboboxFieldProps<TValue extends ValueOptions> {
   addNew?: (inputValue: string) => ReactNode
@@ -31,9 +23,6 @@ interface ComboboxFieldProps<TValue extends ValueOptions> {
   searchPlaceholder?: string
 }
 
-const ComboboxBase = lazy(() => import('./combobox.base'))
-const ComboboxDrawer = lazy(() => import('./combobox.drawer'))
-
 const ComboboxField = <TValue extends ValueOptions>({
   addNew,
   disabled,
@@ -43,37 +32,59 @@ const ComboboxField = <TValue extends ValueOptions>({
   searchPlaceholder = 'Rechercher une option',
 }: ComboboxFieldProps<TValue>): ReactElement => {
   const field = useFieldContext<TValue | undefined>()
-  const isMobile = useIsMobile()
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
   const { value } = field.store.state
   const selectedOption = options.find((opt) => opt.value === value)
+  const filteredOptions = search ? options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())) : options
 
-  const handleSelect = (option: Option<TValue> | null) => {
-    if (option === null || option.value === value || option.value === undefined) {
-      field.setValue(undefined)
-    } else {
-      field.setValue(option.value)
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (!next) {
+      setSearch('')
     }
   }
 
-  // Lazy boundaries erase the generic, so impls emit widened options: look the original typed option back up.
-  const implProps: ComboboxImplProps<ValueOptions> = {
-    addNew,
-    disabled,
-    isInvalid: field.state.meta.isTouched && !field.state.meta.isValid,
-    onChange: (option) => handleSelect(options.find((opt) => opt.value === option?.value) ?? null),
-    options,
-    placeholder,
-    searchPlaceholder,
-    selectedOption,
-    title: label ?? placeholder,
+  const handleSelect = (option: Option<TValue>) => {
+    field.setValue(option.value === value ? undefined : option.value)
+    handleOpenChange(false)
   }
 
   return (
     <Field dirty={field.state.meta.isDirty} invalid={!field.state.meta.isValid} name={field.name} touched={field.state.meta.isTouched}>
       {label && <FieldLabel>{label}</FieldLabel>}
-      <Suspense fallback={<div aria-hidden="true" className={styles.fallback} />}>
-        {isMobile ? <ComboboxDrawer {...implProps} /> : <ComboboxBase {...implProps} />}
-      </Suspense>
+      <Popover
+        onOpenChange={handleOpenChange}
+        open={open}
+        trigger={
+          <SelectButton aria-invalid={(field.state.meta.isTouched && !field.state.meta.isValid) || undefined} disabled={disabled}>
+            {selectedOption?.label ?? placeholder}
+          </SelectButton>
+        }
+      >
+        <div className={styles.column}>
+          <Input onChange={(event) => setSearch(event.target.value)} placeholder={searchPlaceholder} value={search} />
+          <div className={styles.options}>
+            {filteredOptions.length === 0 && <p className={styles.empty}>Aucun résultat</p>}
+            {filteredOptions.map((option) => (
+              <button className={styles.item} key={String(option.value)} onClick={() => handleSelect(option)} type="button">
+                <span className={styles.truncate}>{option.label}</span>
+                {selectedOption?.value === option.value && (
+                  <span className={styles.icon}>
+                    <CheckIcon size="sm" />
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+          {addNew && (
+            <>
+              <Separator />
+              {addNew(search)}
+            </>
+          )}
+        </div>
+      </Popover>
       <FieldError />
     </Field>
   )

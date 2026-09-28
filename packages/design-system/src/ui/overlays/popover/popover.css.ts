@@ -1,5 +1,5 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { fallbackVar, style } from '@vanilla-extract/css'
+import { style } from '@vanilla-extract/css'
 
 export const trigger = style({ display: 'contents' })
 
@@ -57,6 +57,6 @@ export const viewport = style({
   maxHeight: 'var(--available-height)',
   overflowY: 'auto',
   paddingBlock: theme.spacing(4),
-  paddingInline: fallbackVar('var(--viewport-inline-padding)', theme.spacing(4)),
+  paddingInline: theme.spacing(2),
   position: 'relative',
 })

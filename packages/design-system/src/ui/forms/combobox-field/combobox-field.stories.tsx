@@ -3,6 +3,7 @@ import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useEffect } from 'react'
 import type { ReactElement } from 'react'
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test'
 
 import type { Option } from './options'
 
@@ -49,6 +50,17 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
+  play: async ({ canvasElement }) => {
+    const [trigger] = within(canvasElement).getAllByRole('button', { name: 'Sélectionner une option' })
+    await userEvent.click(trigger)
+    const search = await screen.findByPlaceholderText('Rechercher une option')
+    await userEvent.type(search, 'lun')
+    const popup = within(search.closest<HTMLElement>('[data-slot=popover-popup], [data-slot=drawer-popup]') ?? document.body)
+    await expect(popup.queryByRole('button', { name: 'Dinner' })).not.toBeInTheDocument()
+    await userEvent.click(popup.getByRole('button', { name: 'Lunch' }))
+    await waitFor(() => expect(screen.queryByPlaceholderText('Rechercher une option')).not.toBeInTheDocument())
+    await expect(trigger).toHaveTextContent('Lunch')
+  },
   render: () => (
     <div className={styles.container}>
       <StorySection title="Default">

@@ -1,6 +1,6 @@
 import { useDrawer } from '@design-system/hooks/use-drawer'
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -9,6 +9,8 @@ import * as styles from './popover.css'
 
 export interface PopoverProps {
   children: ReactNode
+  onOpenChange?: (open: boolean) => void
+  open?: boolean
   trigger: ReactElement
 }
 
@@ -17,9 +19,15 @@ const POPOVER_ENDING_MS = 150
 const SIDE_OFFSET = 4
 const COLLISION_PADDING = 8
 
-export const Popover = ({ trigger, children }: PopoverProps): ReactElement => {
+export const Popover = ({ trigger, children, onOpenChange, open: controlledOpen }: PopoverProps): ReactElement => {
   const isMobile = useIsMobile()
-  const [open, setOpen] = useState(false)
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const open = controlledOpen ?? uncontrolledOpen
+  const setOpen = (next: boolean): void => {
+    setUncontrolledOpen(next)
+    onOpenChange?.(next)
+  }
+  const close = useEffectEvent(() => setOpen(false))
   const { backdropRef, mounted, phaseProps, popupRef } = useDrawer({
     endingMs: isMobile ? undefined : POPOVER_ENDING_MS,
     onOpenChange: setOpen,
@@ -40,7 +48,7 @@ export const Popover = ({ trigger, children }: PopoverProps): ReactElement => {
     insideRef.current = false
     const onPointerDown = (): void => {
       if (!insideRef.current) {
-        setOpen(false)
+        close()
       }
       insideRef.current = false
     }
