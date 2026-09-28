@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+pnpm i --frozen-lockfile --silent
+vp staged
+pnpm knip

@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "vp config --no-agent",
     "build": "vpr @recipe-organizer/web#build && vpr @recipe-organizer/api#build",
     "dev": "vpr --parallel --filter './apps/*' dev",
     "check": "vp check --fix",
@@ -31,7 +32,6 @@
     "@vitest/coverage-v8": "catalog:",
     "drizzle-kit": "catalog:",
     "knip": "catalog:",
-    "lefthook": "catalog:",
     "playwright": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",

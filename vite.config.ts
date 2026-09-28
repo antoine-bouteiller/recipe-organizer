@@ -185,6 +185,9 @@ const viteConfig = defineConfig({
     experimentalSortImports: {},
     ignorePatterns: ['apps/web/src/routeTree.gen.ts'],
   },
+  staged: {
+    '*': 'vp check --fix',
+  },
   resolve: {
     tsconfigPaths: true,
   },

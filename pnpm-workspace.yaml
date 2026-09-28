@@ -5,7 +5,6 @@ packages:
 allowBuilds:
   esbuild: false
   '@parcel/watcher': false
-  lefthook: true
   sharp: false
   workerd: false
 
@@ -44,7 +43,6 @@ catalog:
   drizzle-orm: 1.0.0-rc.3
   hono: 4.13.9
   knip: 6.38.0
-  lefthook: 2.1.14
   oxc-transform-react: 0.151.0
   react: 19.3.0
   react-dom: 19.3.0

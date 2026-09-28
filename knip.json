@@ -19,5 +19,6 @@
       "entry": ["**/*.test.ts"]
     }
   },
+  "husky": { "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"] },
   "ignoreDependencies": ["cloudflare", "@oxlint/plugins"]
 }
