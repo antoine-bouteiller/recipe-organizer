@@ -7,6 +7,7 @@
     "./button": "./src/ui/actions/button/button.tsx",
     "./card": "./src/ui/data-display/card/card.tsx",
     "./combobox-field/options": "./src/ui/forms/combobox-field/options.ts",
+    "./dialog": "./src/ui/overlays/dialog/dialog.tsx",
     "./delete-dialog": "./src/ui/overlays/delete-dialog/delete-dialog.tsx",
     "./form": "./src/ui/forms/form/form.tsx",
     "./form-dialog": "./src/ui/overlays/form-dialog/form-dialog.tsx",

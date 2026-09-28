@@ -8,7 +8,7 @@ import { useDialogFormFrame } from './dialog-form.private'
 
 import * as drawerStyles from '../drawer/drawer.css'
 
-const DialogDrawer = ({ title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
+const DialogDrawer = ({ bare, title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
   const formFrame = useDialogFormFrame()
   const hasFooter = cancelLabel !== undefined || footer !== undefined
   const content: ReactNode = (
@@ -32,7 +32,7 @@ const DialogDrawer = ({ title, trigger, children, cancelLabel, cancelDisabled, f
   return (
     <DrawerRoot onOpenChange={onOpenChange} open={open}>
       {trigger !== undefined && <DrawerPrimitive.Trigger data-slot="drawer-trigger" render={trigger} />}
-      <DrawerPopup>{formFrame?.wrap(content) ?? content}</DrawerPopup>
+      <DrawerPopup aria-label={title}>{bare ? children : (formFrame?.wrap(content) ?? content)}</DrawerPopup>
     </DrawerRoot>
   )
 }

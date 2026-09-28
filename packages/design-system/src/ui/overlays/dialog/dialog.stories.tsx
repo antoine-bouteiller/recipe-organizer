@@ -17,6 +17,12 @@ const dialogProps = {
 
 const ResponsiveExample = (): React.ReactElement => <Dialog {...dialogProps} />
 
+const BareExample = (): React.ReactElement => (
+  <Dialog bare title="Search" trigger={<Button>Open search</Button>}>
+    <p>Children own the whole popup surface.</p>
+  </Dialog>
+)
+
 const meta = { component: ResponsiveExample, title: 'Overlays/Dialog' } satisfies Meta<typeof ResponsiveExample>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -26,6 +32,9 @@ export const Overview: Story = {
     <div className={styles.container}>
       <StorySection title="Responsive">
         <ResponsiveExample />
+      </StorySection>
+      <StorySection title="Bare">
+        <BareExample />
       </StorySection>
     </div>
   ),

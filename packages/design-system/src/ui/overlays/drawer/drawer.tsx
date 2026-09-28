@@ -5,7 +5,7 @@ import type React from 'react'
 import * as styles from './drawer.css'
 
 type DrawerRootProps = Pick<DrawerPrimitive.Root.Props, 'children' | 'onOpenChange' | 'open'>
-type DrawerPopupProps = Pick<DrawerPrimitive.Popup.Props, 'children'>
+type DrawerPopupProps = Pick<DrawerPrimitive.Popup.Props, 'aria-label' | 'children'>
 type DrawerHeaderProps = Pick<React.ComponentProps<'div'>, 'children'>
 type DrawerContentProps = Pick<DrawerPrimitive.Content.Props, 'children'>
 type DrawerTitleProps = Pick<DrawerPrimitive.Title.Props, 'children'>
@@ -15,11 +15,11 @@ export const Drawer = ({ children, onOpenChange, open }: DrawerRootProps): React
     {children}
   </DrawerPrimitive.Root>
 )
-export const DrawerPopup = ({ children }: DrawerPopupProps): React.ReactElement => (
+export const DrawerPopup = ({ 'aria-label': ariaLabel, children }: DrawerPopupProps): React.ReactElement => (
   <DrawerPrimitive.Portal>
     <DrawerPrimitive.Backdrop className={styles.backdrop()} data-slot="drawer-backdrop" />
     <DrawerPrimitive.Viewport className={styles.viewport()} data-slot="drawer-viewport">
-      <DrawerPrimitive.Popup className={styles.popup()} data-slot="drawer-popup">
+      <DrawerPrimitive.Popup aria-label={ariaLabel} className={styles.popup()} data-slot="drawer-popup">
         {children}
         <div aria-hidden className={styles.bar()} data-slot="drawer-bar" />
       </DrawerPrimitive.Popup>

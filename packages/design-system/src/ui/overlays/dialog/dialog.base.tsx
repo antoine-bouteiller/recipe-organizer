@@ -12,7 +12,7 @@ import * as styles from './dialog.base.css'
 
 const TRANSITION_MS = 200
 
-const DialogBase = ({ title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
+const DialogBase = ({ bare, title, trigger, children, cancelLabel, cancelDisabled, footer, open, onOpenChange }: DialogProps): ReactElement => {
   const formFrame = useDialogFormFrame()
   const [internalOpen, setInternalOpen] = useState(false)
   const isOpen = open ?? internalOpen
@@ -107,13 +107,19 @@ const DialogBase = ({ title, trigger, children, cancelLabel, cancelDisabled, foo
                 }
               }}
             >
-              <div className={styles.popup()} data-slot="dialog-popup" role="dialog" {...phaseProps}>
-                {formFrame?.wrap(content) ?? content}
-                <div className={styles.container()}>
-                  <Button disabled={cancelDisabled} onClick={close} size="icon" variant="ghost">
-                    <XIcon />
-                  </Button>
-                </div>
+              <div aria-label={title} className={styles.popup()} data-slot="dialog-popup" role="dialog" {...phaseProps}>
+                {bare ? (
+                  children
+                ) : (
+                  <>
+                    {formFrame?.wrap(content) ?? content}
+                    <div className={styles.container()}>
+                      <Button disabled={cancelDisabled} onClick={close} size="icon" variant="ghost">
+                        <XIcon />
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </>,

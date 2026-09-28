@@ -3,6 +3,8 @@ import { lazy, Suspense } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 
 export interface DialogProps {
+  /** Render children directly in the popup, without the header, panel, footer, and close button. */
+  bare?: boolean
   cancelDisabled?: boolean
   cancelLabel?: string
   children: ReactNode
