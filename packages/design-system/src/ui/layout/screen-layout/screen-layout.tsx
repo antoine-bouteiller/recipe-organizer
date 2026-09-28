@@ -33,27 +33,27 @@ export const ScreenLayout = ({
   const router = useRouter()
   const onBack = withGoBack ? () => router.history.back() : undefined
   const header = backgroundImage ? (
-    <div className={styles.imageHeader()}>
-      <img alt="" className={styles.image()} src={backgroundImage} />
-      <div className={styles.imageOverlay()} />
+    <div className={styles.imageHeader}>
+      <img alt="" className={styles.image} src={backgroundImage} />
+      <div className={styles.imageOverlay} />
       {onBack && (
-        <span className={styles.imageBack()}>
+        <span className={styles.imageBack}>
           <GoBackButton onBack={onBack} />
         </span>
       )}
-      <h1 className={styles.imageTitle()}>{title}</h1>
-      {headerEndItem && <div className={styles.imageAction()}>{headerEndItem}</div>}
+      <h1 className={styles.imageTitle}>{title}</h1>
+      {headerEndItem && <div className={styles.imageAction}>{headerEndItem}</div>}
     </div>
   ) : (
-    <div className={styles.header()}>
+    <div className={styles.header}>
       {onBack && <GoBackButton onBack={onBack} />}
-      <h1 className={styles.title()}>{title}</h1>
-      {headerEndItem && <div className={styles.headerAction()}>{headerEndItem}</div>}
+      <h1 className={styles.title}>{title}</h1>
+      {headerEndItem && <div className={styles.headerAction}>{headerEndItem}</div>}
     </div>
   )
   return (
     <div
-      className={styles.screen()}
+      className={styles.screen}
       data-footer-present={footer ? 'true' : undefined}
       data-scroll-restoration-id={outerScrollId}
       data-slot="screen-layout"

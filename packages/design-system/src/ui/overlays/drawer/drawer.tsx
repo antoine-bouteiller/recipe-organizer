@@ -17,29 +17,29 @@ export const Drawer = ({ children, onOpenChange, open }: DrawerRootProps): React
 )
 export const DrawerPopup = ({ 'aria-label': ariaLabel, children }: DrawerPopupProps): React.ReactElement => (
   <DrawerPrimitive.Portal>
-    <DrawerPrimitive.Backdrop className={styles.backdrop()} data-slot="drawer-backdrop" />
-    <DrawerPrimitive.Viewport className={styles.viewport()} data-slot="drawer-viewport">
-      <DrawerPrimitive.Popup aria-label={ariaLabel} className={styles.popup()} data-slot="drawer-popup">
+    <DrawerPrimitive.Backdrop className={styles.backdrop} data-slot="drawer-backdrop" />
+    <DrawerPrimitive.Viewport className={styles.viewport} data-slot="drawer-viewport">
+      <DrawerPrimitive.Popup aria-label={ariaLabel} className={styles.popup} data-slot="drawer-popup">
         {children}
-        <div aria-hidden className={styles.bar()} data-slot="drawer-bar" />
+        <div aria-hidden className={styles.bar} data-slot="drawer-bar" />
       </DrawerPrimitive.Popup>
     </DrawerPrimitive.Viewport>
   </DrawerPrimitive.Portal>
 )
 export const DrawerHeader = ({ children }: DrawerHeaderProps): React.ReactElement => (
-  <div className={styles.header()} data-slot="drawer-header">
+  <div className={styles.header} data-slot="drawer-header">
     {children}
   </div>
 )
 export const DrawerTitle = ({ children }: DrawerTitleProps): React.ReactElement => (
-  <DrawerPrimitive.Title className={styles.title()} data-slot="drawer-title">
+  <DrawerPrimitive.Title className={styles.title} data-slot="drawer-title">
     {children}
   </DrawerPrimitive.Title>
 )
 export const DrawerPanel = ({ children }: DrawerContentProps): React.ReactElement => (
-  <div className={styles.container()}>
+  <div className={styles.container}>
     <ScrollArea scrollFade>
-      <DrawerPrimitive.Content className={styles.panel()} data-slot="drawer-panel">
+      <DrawerPrimitive.Content className={styles.panel} data-slot="drawer-panel">
         {children}
       </DrawerPrimitive.Content>
     </ScrollArea>

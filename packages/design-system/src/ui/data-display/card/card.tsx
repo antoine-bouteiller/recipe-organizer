@@ -7,16 +7,16 @@ export type CardProps = Pick<React.ComponentProps<'div'>, 'children'> & { descri
 export const Card = ({ children, description, title }: CardProps): React.ReactElement => {
   const hasHeader = title !== undefined || description !== undefined
   return (
-    <div className={styles.card()} data-slot="card">
+    <div className={styles.card} data-slot="card">
       {hasHeader && (
-        <div className={styles.header()} data-slot="card-header">
+        <div className={styles.header} data-slot="card-header">
           {title !== undefined && (
-            <div className={styles.title()} data-slot="card-title">
+            <div className={styles.title} data-slot="card-title">
               {title}
             </div>
           )}
           {description !== undefined && (
-            <div className={styles.description()} data-slot="card-description">
+            <div className={styles.description} data-slot="card-description">
               {description}
             </div>
           )}

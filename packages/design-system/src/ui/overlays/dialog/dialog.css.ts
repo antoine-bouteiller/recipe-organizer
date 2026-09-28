@@ -1,170 +1,153 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
-import { recipe } from '@vanilla-extract/recipes'
 
-export const backdrop = recipe({
-  base: {
-    selectors: {
-      '&[data-ending-style], &[data-starting-style]': {
-        opacity: 0,
-      },
+export const backdrop = style({
+  selectors: {
+    '&[data-ending-style], &[data-starting-style]': {
+      opacity: 0,
     },
-    backgroundColor: `color-mix(in srgb, ${theme.colors.scrim} 32%, transparent)`,
-    inset: theme.spacing(0),
-    position: 'fixed',
-    transition: 'opacity 200ms',
-    zIndex: 50,
   },
+  backgroundColor: `color-mix(in srgb, ${theme.colors.scrim} 32%, transparent)`,
+  inset: theme.spacing(0),
+  position: 'fixed',
+  transition: 'opacity 200ms',
+  zIndex: 50,
 })
 
-export const viewport = recipe({
-  base: {
-    display: 'grid',
-    gridTemplateRows: '1fr auto 3fr',
-    inset: theme.spacing(0),
-    justifyItems: 'center',
-    padding: theme.spacing(4),
-    position: 'fixed',
-    zIndex: 50,
-    '@media': {
-      'screen and (max-width: 639.96px)': {
-        gridTemplateRows: '1fr auto',
-        padding: theme.spacing(0),
-        paddingTop: theme.spacing(12),
-      },
+export const viewport = style({
+  display: 'grid',
+  gridTemplateRows: '1fr auto 3fr',
+  inset: theme.spacing(0),
+  justifyItems: 'center',
+  padding: theme.spacing(4),
+  position: 'fixed',
+  zIndex: 50,
+  '@media': {
+    'screen and (max-width: 639.96px)': {
+      gridTemplateRows: '1fr auto',
+      padding: theme.spacing(0),
+      paddingTop: theme.spacing(12),
     },
   },
 })
 
-export const popup = recipe({
-  base: {
-    selectors: {
-      '&[data-ending-style], &[data-starting-style]': {
-        opacity: 0,
-        '@media': {
-          'screen and (min-width: 640px)': {
-            scale: '0.98',
-          },
-          'screen and (max-width: 639.96px)': {
-            translate: '0 16px',
-          },
+export const popup = style({
+  selectors: {
+    '&[data-ending-style], &[data-starting-style]': {
+      opacity: 0,
+      '@media': {
+        'screen and (min-width: 640px)': {
+          scale: '0.98',
         },
-      },
-      '&::before': {
-        borderRadius: theme.radius['2xl'],
-        boxShadow: theme.shadows.edge,
-        content: '""',
-        inset: theme.spacing(0),
-        pointerEvents: 'none',
-        position: 'absolute',
-        '@media': {
-          'screen and (max-width: 639.96px)': {
-            display: 'none',
-          },
+        'screen and (max-width: 639.96px)': {
+          translate: '0 16px',
         },
       },
     },
-    backgroundClip: 'padding-box',
-    WebkitBackgroundClip: 'padding-box',
-    backgroundColor: theme.colors.popover,
-    borderRadius: theme.radius['2xl'],
-    borderWidth: '1px',
-    boxShadow: theme.shadows.overlay,
-    color: theme.colors['popover-foreground'],
-    display: 'flex',
-    flexDirection: 'column',
-    gridRowStart: '2',
-    maxHeight: '100%',
-    maxWidth: theme.spacing(128),
-    minHeight: theme.spacing(0),
-    minWidth: theme.spacing(0),
-    outline: '2px solid transparent',
-    outlineOffset: '2px',
-    position: 'relative',
-    transitionDuration: '200ms',
-    transitionProperty: 'scale, opacity, translate',
-    transitionTimingFunction: theme.easings['in-out'],
-    width: '100%',
-    '@media': {
-      'screen and (max-width: 639.96px)': {
-        borderBottomWidth: '0',
-        borderInlineWidth: '0',
-        borderRadius: theme.radius.none,
-        maxWidth: 'none',
-        transformOrigin: 'bottom',
+    '&::before': {
+      borderRadius: theme.radius['2xl'],
+      boxShadow: theme.shadows.edge,
+      content: '""',
+      inset: theme.spacing(0),
+      pointerEvents: 'none',
+      position: 'absolute',
+      '@media': {
+        'screen and (max-width: 639.96px)': {
+          display: 'none',
+        },
       },
+    },
+  },
+  backgroundClip: 'padding-box',
+  WebkitBackgroundClip: 'padding-box',
+  backgroundColor: theme.colors.popover,
+  borderRadius: theme.radius['2xl'],
+  borderWidth: '1px',
+  boxShadow: theme.shadows.overlay,
+  color: theme.colors['popover-foreground'],
+  display: 'flex',
+  flexDirection: 'column',
+  gridRowStart: '2',
+  maxHeight: '100%',
+  maxWidth: theme.spacing(128),
+  minHeight: theme.spacing(0),
+  minWidth: theme.spacing(0),
+  outline: '2px solid transparent',
+  outlineOffset: '2px',
+  position: 'relative',
+  transitionDuration: '200ms',
+  transitionProperty: 'scale, opacity, translate',
+  transitionTimingFunction: theme.easings['in-out'],
+  width: '100%',
+  '@media': {
+    'screen and (max-width: 639.96px)': {
+      borderBottomWidth: '0',
+      borderInlineWidth: '0',
+      borderRadius: theme.radius.none,
+      maxWidth: 'none',
+      transformOrigin: 'bottom',
     },
   },
 })
 
-export const header = recipe({
-  base: {
-    selectors: {
-      '&:has(+ [data-slot=dialog-panel])': {
-        paddingBottom: theme.spacing(3),
-      },
+export const header = style({
+  selectors: {
+    '&:has(+ [data-slot=dialog-panel])': {
+      paddingBottom: theme.spacing(3),
     },
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing(2),
-    padding: theme.spacing(6),
-    '@media': {
-      'screen and (max-width: 639.96px)': {
-        paddingBottom: theme.spacing(4),
-      },
+  },
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(2),
+  padding: theme.spacing(6),
+  '@media': {
+    'screen and (max-width: 639.96px)': {
+      paddingBottom: theme.spacing(4),
     },
   },
 })
 
-export const footer = recipe({
-  base: {
-    backgroundColor: `color-mix(in srgb, ${theme.colors.muted} 72%, transparent)`,
-    borderTopWidth: '1px',
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    gap: theme.spacing(2),
-    paddingBlock: theme.spacing(4),
-    paddingInline: theme.spacing(6),
-    '@media': {
-      'screen and (min-width: 640px)': {
-        borderBottomLeftRadius: theme.radius['2xl'],
-        borderBottomRightRadius: theme.radius['2xl'],
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-      },
+export const footer = style({
+  backgroundColor: `color-mix(in srgb, ${theme.colors.muted} 72%, transparent)`,
+  borderTopWidth: '1px',
+  display: 'flex',
+  flexDirection: 'column-reverse',
+  gap: theme.spacing(2),
+  paddingBlock: theme.spacing(4),
+  paddingInline: theme.spacing(6),
+  '@media': {
+    'screen and (min-width: 640px)': {
+      borderBottomLeftRadius: theme.radius['2xl'],
+      borderBottomRightRadius: theme.radius['2xl'],
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
     },
   },
 })
 
-export const panel = recipe({
-  base: {
-    selectors: {
-      '&:has(+ [data-slot=dialog-footer]:not([data-plain]))': {
-        paddingBottom: theme.spacing(1),
-      },
-      '[data-slot=dialog-header] + &': {
-        paddingTop: theme.spacing(1),
-      },
+export const panel = style({
+  selectors: {
+    '&:has(+ [data-slot=dialog-footer]:not([data-plain]))': {
+      paddingBottom: theme.spacing(1),
     },
-    padding: theme.spacing(6),
+    '[data-slot=dialog-header] + &': {
+      paddingTop: theme.spacing(1),
+    },
   },
+  padding: theme.spacing(6),
 })
 
-export const element = recipe({
-  base: {
-    fontFamily: theme.fonts.heading,
-    fontSize: theme.fontSizes.xl,
-    fontWeight: theme.fontWeights.semibold,
-    lineHeight: theme.lineHeights.none,
-  },
+export const element = style({
+  fontFamily: theme.fonts.heading,
+  fontSize: theme.fontSizes.xl,
+  fontWeight: theme.fontWeights.semibold,
+  lineHeight: theme.lineHeights.none,
 })
 
-export const container = recipe({
-  base: {
-    insetInlineEnd: theme.spacing(2),
-    position: 'absolute',
-    top: theme.spacing(2),
-  },
+export const container = style({
+  insetInlineEnd: theme.spacing(2),
+  position: 'absolute',
+  top: theme.spacing(2),
 })
 
 export const trigger = style({ display: 'contents' })

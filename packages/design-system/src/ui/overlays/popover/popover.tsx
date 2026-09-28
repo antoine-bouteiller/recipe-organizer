@@ -79,18 +79,18 @@ export const Popover = ({ trigger, children }: PopoverProps): ReactElement => {
         createPortal(
           isMobile ? (
             <>
-              <div className={drawerStyles.backdrop()} data-slot="drawer-backdrop" ref={backdropRef} {...phaseProps} />
-              <div className={drawerStyles.viewport()} data-slot="drawer-viewport">
-                <div className={drawerStyles.popup()} data-slot="drawer-popup" onPointerDown={markInside} ref={popupRef} {...phaseProps}>
+              <div className={drawerStyles.backdrop} data-slot="drawer-backdrop" ref={backdropRef} {...phaseProps} />
+              <div className={drawerStyles.viewport} data-slot="drawer-viewport">
+                <div className={drawerStyles.popup} data-slot="drawer-popup" onPointerDown={markInside} ref={popupRef} {...phaseProps}>
                   {children}
-                  <div className={drawerStyles.bar()} data-slot="drawer-bar" />
+                  <div className={drawerStyles.bar} data-slot="drawer-bar" />
                 </div>
               </div>
             </>
           ) : (
-            <div className={styles.positioner()} data-slot="popover-positioner" ref={anchorPositioner}>
-              <div className={styles.popup()} data-slot="popover-popup" onPointerDown={markInside} {...phaseProps}>
-                <div className={styles.viewport()} data-slot="popover-viewport">
+            <div className={styles.positioner} data-slot="popover-positioner" ref={anchorPositioner}>
+              <div className={styles.popup} data-slot="popover-popup" onPointerDown={markInside} {...phaseProps}>
+                <div className={styles.viewport} data-slot="popover-viewport">
                   {children}
                 </div>
               </div>

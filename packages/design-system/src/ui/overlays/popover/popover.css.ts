@@ -1,69 +1,62 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { fallbackVar, style } from '@vanilla-extract/css'
-import { recipe } from '@vanilla-extract/recipes'
 
 export const trigger = style({ display: 'contents' })
 
-export const positioner = recipe({
-  base: {
-    position: 'fixed',
-    translate: '-50% 0',
-    zIndex: 50,
-  },
+export const positioner = style({
+  position: 'fixed',
+  translate: '-50% 0',
+  zIndex: 50,
 })
 
-export const popup = recipe({
-  base: {
-    selectors: {
-      '&:has([data-slot=calendar])': {
-        borderRadius: theme.radius.xl,
-      },
-      '&[data-ending-style], &[data-starting-style]': {
-        opacity: 0,
-        scale: '0.98',
-      },
-      '&:has([data-slot=calendar])::before': {
-        borderRadius: theme.radius.xl,
-      },
-      '&::before': {
-        borderRadius: theme.radius.lg,
-        boxShadow: theme.shadows.edge,
-        content: '""',
-        inset: theme.spacing(0),
-        pointerEvents: 'none',
-        position: 'absolute',
-      },
+export const popup = style({
+  selectors: {
+    '&:has([data-slot=calendar])': {
+      borderRadius: theme.radius.xl,
     },
-    backgroundClip: 'padding-box',
-    WebkitBackgroundClip: 'padding-box',
-    backgroundColor: theme.colors.popover,
-    borderRadius: theme.radius.lg,
-    borderWidth: '1px',
-    boxShadow: theme.shadows.overlay,
-    color: theme.colors['popover-foreground'],
-    display: 'flex',
-    outline: '2px solid transparent',
-    outlineOffset: '2px',
-    position: 'relative',
-    transformOrigin: 'top',
-    transitionDuration: '150ms',
-    transitionProperty: 'scale, opacity',
-    transitionTimingFunction: theme.easings['in-out'],
+    '&[data-ending-style], &[data-starting-style]': {
+      opacity: 0,
+      scale: '0.98',
+    },
+    '&:has([data-slot=calendar])::before': {
+      borderRadius: theme.radius.xl,
+    },
+    '&::before': {
+      borderRadius: theme.radius.lg,
+      boxShadow: theme.shadows.edge,
+      content: '""',
+      inset: theme.spacing(0),
+      pointerEvents: 'none',
+      position: 'absolute',
+    },
   },
+  backgroundClip: 'padding-box',
+  WebkitBackgroundClip: 'padding-box',
+  backgroundColor: theme.colors.popover,
+  borderRadius: theme.radius.lg,
+  borderWidth: '1px',
+  boxShadow: theme.shadows.overlay,
+  color: theme.colors['popover-foreground'],
+  display: 'flex',
+  outline: '2px solid transparent',
+  outlineOffset: '2px',
+  position: 'relative',
+  transformOrigin: 'top',
+  transitionDuration: '150ms',
+  transitionProperty: 'scale, opacity',
+  transitionTimingFunction: theme.easings['in-out'],
 })
 
-export const viewport = recipe({
-  base: {
-    selectors: {
-      '&:has([data-slot=calendar])': {
-        padding: theme.spacing(2),
-      },
+export const viewport = style({
+  selectors: {
+    '&:has([data-slot=calendar])': {
+      padding: theme.spacing(2),
     },
-    borderRadius: theme.radius.inherit,
-    maxHeight: 'var(--available-height)',
-    overflowY: 'auto',
-    paddingBlock: theme.spacing(4),
-    paddingInline: fallbackVar('var(--viewport-inline-padding)', theme.spacing(4)),
-    position: 'relative',
   },
+  borderRadius: theme.radius.inherit,
+  maxHeight: 'var(--available-height)',
+  overflowY: 'auto',
+  paddingBlock: theme.spacing(4),
+  paddingInline: fallbackVar('var(--viewport-inline-padding)', theme.spacing(4)),
+  position: 'relative',
 })

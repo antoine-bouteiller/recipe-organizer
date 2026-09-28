@@ -50,18 +50,18 @@ const footerOf = (cancelLabel: string | undefined, cancelDisabled: boolean | und
 
 const DialogContent = ({ children, footer, title }: ContentProps): ReactElement => (
   <>
-    <div className={styles.header()} data-slot="dialog-header">
-      <h2 className={styles.element()} data-slot="dialog-title">
+    <div className={styles.header} data-slot="dialog-header">
+      <h2 className={styles.element} data-slot="dialog-title">
         {title}
       </h2>
     </div>
     <ScrollArea scrollFade>
-      <div className={styles.panel()} data-slot="dialog-panel">
+      <div className={styles.panel} data-slot="dialog-panel">
         {children}
       </div>
     </ScrollArea>
     {footer && (
-      <div className={styles.footer()} data-slot="dialog-footer">
+      <div className={styles.footer} data-slot="dialog-footer">
         {footer}
       </div>
     )}
@@ -70,20 +70,20 @@ const DialogContent = ({ children, footer, title }: ContentProps): ReactElement 
 
 const DrawerContent = ({ children, footer, title }: ContentProps): ReactElement => (
   <>
-    <div className={drawerStyles.header()} data-slot="drawer-header">
-      <h2 className={drawerStyles.title()} data-slot="drawer-title">
+    <div className={drawerStyles.header} data-slot="drawer-header">
+      <h2 className={drawerStyles.title} data-slot="drawer-title">
         {title}
       </h2>
     </div>
-    <div className={drawerStyles.container()}>
+    <div className={drawerStyles.container}>
       <ScrollArea scrollFade>
-        <div className={drawerStyles.panel()} data-slot="drawer-panel">
+        <div className={drawerStyles.panel} data-slot="drawer-panel">
           {children}
         </div>
       </ScrollArea>
     </div>
     {footer && (
-      <div className={drawerStyles.footer()} data-slot="drawer-footer">
+      <div className={drawerStyles.footer} data-slot="drawer-footer">
         {footer}
       </div>
     )}
@@ -119,9 +119,9 @@ export const Dialog = ({ bare, title, trigger, children, cancelLabel, cancelDisa
       {mounted &&
         createPortal(
           <>
-            <div className={surface.backdrop()} data-slot={`${surface.slot}-backdrop`} ref={backdropRef} {...phaseProps} />
+            <div className={surface.backdrop} data-slot={`${surface.slot}-backdrop`} ref={backdropRef} {...phaseProps} />
             <div
-              className={surface.viewport()}
+              className={surface.viewport}
               data-slot={`${surface.slot}-viewport`}
               onClick={(event) => {
                 if (event.target === event.currentTarget) {
@@ -129,13 +129,13 @@ export const Dialog = ({ bare, title, trigger, children, cancelLabel, cancelDisa
                 }
               }}
             >
-              <div aria-label={title} className={surface.popup()} role="dialog" data-slot={`${surface.slot}-popup`} ref={popupRef} {...phaseProps}>
+              <div aria-label={title} className={surface.popup} role="dialog" data-slot={`${surface.slot}-popup`} ref={popupRef} {...phaseProps}>
                 {body}
                 {isMobile ? (
-                  <div className={drawerStyles.bar()} data-slot="drawer-bar" />
+                  <div className={drawerStyles.bar} data-slot="drawer-bar" />
                 ) : (
                   !bare && (
-                    <div className={styles.container()}>
+                    <div className={styles.container}>
                       <Button disabled={cancelDisabled} onClick={close} size="icon" variant="ghost">
                         <XIcon />
                       </Button>

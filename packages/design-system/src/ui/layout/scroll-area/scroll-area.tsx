@@ -14,7 +14,7 @@ export const ScrollArea = ({
   scrollFade = false,
   scrollbarGutter = false,
 }: ScrollAreaProps): React.ReactElement => (
-  <ScrollAreaPrimitive.Root aria-label={ariaLabel} className={styles.root()} data-slot="scroll-area">
+  <ScrollAreaPrimitive.Root aria-label={ariaLabel} className={styles.root} data-slot="scroll-area">
     <ScrollAreaPrimitive.Viewport className={styles.viewport({ scrollFade, scrollbarGutter })} data-slot="scroll-area-viewport">
       {children}
     </ScrollAreaPrimitive.Viewport>
@@ -26,6 +26,6 @@ export const ScrollArea = ({
 
 const ScrollBar = ({ compact, orientation }: { compact: boolean; orientation: 'horizontal' | 'vertical' }): React.ReactElement => (
   <ScrollAreaPrimitive.Scrollbar className={styles.scrollbar({ compact, orientation })} data-slot="scroll-area-scrollbar" orientation={orientation}>
-    <ScrollAreaPrimitive.Thumb className={styles.thumb()} data-slot="scroll-area-thumb" />
+    <ScrollAreaPrimitive.Thumb className={styles.thumb} data-slot="scroll-area-thumb" />
   </ScrollAreaPrimitive.Scrollbar>
 )

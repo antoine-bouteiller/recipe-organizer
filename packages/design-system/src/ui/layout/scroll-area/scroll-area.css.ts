@@ -1,12 +1,11 @@
 import { theme } from '@recipe-organizer/design-system/theme'
+import { style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
 
-export const root = recipe({
-  base: {
-    height: '100%',
-    minHeight: theme.spacing(0),
-    width: '100%',
-  },
+export const root = style({
+  height: '100%',
+  minHeight: theme.spacing(0),
+  width: '100%',
 })
 
 export const viewport = recipe({
@@ -108,11 +107,9 @@ export const scrollbar = recipe({
   },
 })
 
-export const thumb = recipe({
-  base: {
-    backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 20%, transparent)`,
-    borderRadius: theme.radius.full,
-    flex: '1 1 0%',
-    position: 'relative',
-  },
+export const thumb = style({
+  backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 20%, transparent)`,
+  borderRadius: theme.radius.full,
+  flex: '1 1 0%',
+  position: 'relative',
 })
