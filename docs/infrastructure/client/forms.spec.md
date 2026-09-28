@@ -24,7 +24,7 @@ feature from independently composing field state, error presentation, and submis
 | ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `packages/design-system/src/hooks/use-app-form.ts`. |
 | `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding feature API route                        | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.                          |
-| `[KD-3]` Error projection    | TanStack Form errors are projected into Base UI Form and Field primitives                      | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                                        |
+| `[KD-3]` Error projection    | TanStack Form errors are projected into native Form and Field components                       | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                                        |
 | `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/shared/utils/form-data.ts:1-28`).            |
 
 ## 4. Principles & Intents
@@ -71,7 +71,7 @@ feature from independently composing field state, error presentation, and submis
 
 `useAppForm(options)` returns a form with `AppField`, `AppForm`, and `FormSubmit`; `withForm(config)`
 produces a typed reusable form view. The registry includes text, numeric, selection, toggle, file,
-and editor fields plus Base UI field slots (`packages/design-system/src/hooks/use-app-form.ts`). A field reads its
+and editor fields plus Field slots (`packages/design-system/src/hooks/use-app-form.ts`). A field reads its
 value and metadata from field context, updates through the field handler, and renders a named Field
 with an error slot; the text implementation demonstrates that boundary (`packages/design-system/src/ui/forms/text-field/text-field.tsx`).
 
@@ -97,8 +97,8 @@ before route validation (`src/shared/utils/form-data.ts:1-28`). File fields hold
 
 Every registered field receives its value from form context and reports a value through the matching
 field handler. The standard field shape is a named Field root, optional label and description,
-control, and FieldError. The root receives dirty, touched, and invalid metadata so Base UI associates
-its visual and accessibility state with the same field name. Text fields, number fields, selects,
+control, and FieldError. The root receives invalid metadata and server errors by field name, and associates
+its label and error with the control through explicit ids. Text fields, number fields, selects,
 comboboxes, checkboxes, and toggle groups differ only in the value/control translation.
 
 | Field family             | State value                  | Contract boundary                                                          |
@@ -180,3 +180,4 @@ N/A
 
 | 2026-09-15 | Move reusable fields, form registry/context, file support, and dialog adapters to the design-system package. | 3, 6–8 | Share form presentation without depending on feature schemas or app services. |
 | 2026-09-16 | Make the form-aware dialog composition a private styling/render boundary. | 4, 8.6 | Preserve form behavior without reopening Dialog or Form customization APIs. |
+| 2026-09-28 | Describe native Form and Field error projection after removing Base UI. | 3, 8.1, 8.3 | Base UI is no longer a dependency. |

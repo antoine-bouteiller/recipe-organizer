@@ -38,8 +38,8 @@ without becoming a feature data layer.
 - `[PI-3]` **URLs are typed input** — path parameters and search values parse before a screen uses
   them.
 - `[PI-4]` **Use typed router links** — reusable design-system navigation may take TanStack Router
-  `LinkOptions` and render the actual `Link`; Base UI `render` composition remains available for
-  components such as Button, without `useLinkProps` adapters.
+  `LinkOptions` and render the actual `Link`; Button navigates through `asLink`, without
+  `useLinkProps` adapters.
 
 ## 5. Non-Goals
 
@@ -145,8 +145,7 @@ supply search and theme actions.
 The actual TanStack `Link` retains typed route parameters, search, modified clicks, preloading, refs,
 and view-transition behavior; do not replace it with a native anchor or a filtered `useLinkProps`
 adapter. The desktop navbar uses exact matching only for `/`; pages render
-`<TabBar items={mobileMenuItems} />` rather than a `pageKey`. Base UI `render` composition remains
-for Button and similar primitives.
+`<TabBar items={mobileMenuItems} />` rather than a `pageKey`. Button renders the actual `Link` through `asLink`.
 
 `ScreenLayout` calls `router.history.back()` for `withGoBack`, defaults its scroll IDs to
 `screen-inner` and `screen-outer`, and receives an explicit footer. Scroll restoration targets those
@@ -202,3 +201,4 @@ N/A
 | 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.     | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
 | 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.               | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |
 | 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.  | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |
+| 2026-09-28 | Replace Base UI render composition with Button `asLink`.                       | 4, 8.5            | Base UI is no longer a dependency.                                         |

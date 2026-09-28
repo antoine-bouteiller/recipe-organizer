@@ -147,7 +147,7 @@ cascade layers. `src/theme/index.ts` combines the internal variables from `token
 CSS shorthand. The internal token module exports variables only to the public theme index while
 emitting global theme CSS. `.css.ts` consumers use typed `theme` references, including template
 interpolations, instead of shared raw `var(--…)` strings. Native CSS variables remain appropriate for
-component-owned, Base UI, and runtime-owned behavior. No separate generation step or generated utility
+component-owned and runtime-owned behavior. No separate generation step or generated utility
 directory is required. Component recipes remain colocated with their owners. `apps/web/src/routes/`
 contains route declarations and composition only: no `.css.ts` files or styling imports. Feature sections and containers
 own their markup and colocated styles; `apps/web/src/components/app-shell/` owns shell presentation.

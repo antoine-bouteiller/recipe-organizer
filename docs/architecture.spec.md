@@ -109,7 +109,7 @@ Browser SPA (`index.html` + `src/client/main.tsx`)       Cloudflare Worker
 | Hono API          | Library + convention        | Validated, guarded feature routes and query/mutation option factories    | Server routes, client `apiClient` and `*Options()`, `authGuard()` |
 | Auth              | Feature-adjacent infra      | Google OAuth exchange, encrypted sessions, role and status enforcement   | `getAuthUser()`, `authGuard()`, auth routes                       |
 | Routing & SPA     | Convention                  | File-based browser routes, route context, loaders, and provider boundary | Route tree, `beforeLoad` context                                  |
-| Forms             | Library                     | Single application form hook over TanStack Form, Zod and Base UI         | `useAppForm`, `withForm`, field components                        |
+| Forms             | Library                     | Single application form hook over TanStack Form and Zod                  | `useAppForm`, `withForm`, field components                        |
 | Client state      | Library                     | Persisted UI state stores and their layering against server state        | `src/client/stores/*`, `persistedStore`                           |
 | Feature modules   | Runtime feature directories | Recipe, ingredients, search, shopping list and users domains             | Client wrappers/components and server routes                      |
 

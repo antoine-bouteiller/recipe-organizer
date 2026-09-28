@@ -1,12 +1,5 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
-
-export const root = style({
-  height: '100%',
-  minHeight: theme.spacing(0),
-  width: '100%',
-})
 
 export const viewport = recipe({
   base: {
@@ -17,35 +10,28 @@ export const viewport = recipe({
       '&[data-has-overflow-y]': {
         overscrollBehaviorY: 'contain',
       },
-      '&:is(:focus-visible, [data-focus-visible])': {
+      '&:focus-visible': {
         outline: `2px solid ${theme.colors.ring}`,
         outlineOffset: '1px',
       },
     },
     borderRadius: theme.radius.inherit,
     height: '100%',
+    minHeight: theme.spacing(0),
     outline: '2px solid transparent',
     outlineOffset: '2px',
+    overflow: 'auto',
+    scrollbarColor: `color-mix(in srgb, ${theme.colors.foreground} 20%, transparent) transparent`,
+    scrollbarWidth: 'thin',
     transitionDuration: '150ms',
     transitionProperty: 'box-shadow',
     transitionTimingFunction: theme.easings['in-out'],
+    width: '100%',
   },
   defaultVariants: {
-    scrollFade: false,
     scrollbarGutter: false,
   },
   variants: {
-    scrollFade: {
-      true: {
-        vars: {
-          '--fade-size': '24px',
-        },
-        maskImage:
-          'linear-gradient(to bottom, transparent, black min(var(--fade-size), var(--scroll-area-overflow-y-start)), black calc(100% - min(var(--fade-size), var(--scroll-area-overflow-y-end))), transparent)',
-        WebkitMaskImage:
-          'linear-gradient(to bottom, transparent, black min(var(--fade-size), var(--scroll-area-overflow-y-start)), black calc(100% - min(var(--fade-size), var(--scroll-area-overflow-y-end))), transparent)',
-      },
-    },
     scrollbarGutter: {
       compact: {
         selectors: {
@@ -69,47 +55,4 @@ export const viewport = recipe({
       },
     },
   },
-})
-
-export const scrollbar = recipe({
-  base: {
-    selectors: {
-      '&[data-hovering], &[data-scrolling]': {
-        opacity: 1,
-        transitionDelay: '0ms',
-        transitionDuration: '100ms',
-      },
-    },
-    display: 'flex',
-    margin: theme.spacing(1),
-    opacity: 0,
-    transition: 'opacity 150ms',
-    transitionDelay: '300ms',
-  },
-  defaultVariants: {
-    orientation: 'vertical',
-  },
-  variants: {
-    compact: {
-      true: {
-        marginTop: theme.spacing(2),
-      },
-    },
-    orientation: {
-      horizontal: {
-        flexDirection: 'column',
-        height: theme.spacing(1.5),
-      },
-      vertical: {
-        width: theme.spacing(1.5),
-      },
-    },
-  },
-})
-
-export const thumb = style({
-  backgroundColor: `color-mix(in srgb, ${theme.colors.foreground} 20%, transparent)`,
-  borderRadius: theme.radius.full,
-  flex: '1 1 0%',
-  position: 'relative',
 })

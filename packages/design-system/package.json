@@ -43,7 +43,6 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
-    "@base-ui/react": "catalog:",
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-store": "catalog:"

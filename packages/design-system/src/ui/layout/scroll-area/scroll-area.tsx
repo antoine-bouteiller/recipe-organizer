@@ -1,31 +1,28 @@
-import { ScrollArea as ScrollAreaPrimitive } from '@base-ui/react/scroll-area'
 import type React from 'react'
 
 import * as styles from './scroll-area.css'
 
-export type ScrollAreaProps = Pick<ScrollAreaPrimitive.Root.Props, 'aria-label' | 'children'> & {
-  scrollFade?: boolean
+export type ScrollAreaProps = Pick<React.ComponentProps<'div'>, 'aria-label' | 'children'> & {
   scrollbarGutter?: boolean | 'compact'
 }
 
-export const ScrollArea = ({
-  'aria-label': ariaLabel,
-  children,
-  scrollFade = false,
-  scrollbarGutter = false,
-}: ScrollAreaProps): React.ReactElement => (
-  <ScrollAreaPrimitive.Root aria-label={ariaLabel} className={styles.root} data-slot="scroll-area">
-    <ScrollAreaPrimitive.Viewport className={styles.viewport({ scrollFade, scrollbarGutter })} data-slot="scroll-area-viewport">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar compact={scrollbarGutter === 'compact'} orientation="vertical" />
-    <ScrollBar compact={scrollbarGutter === 'compact'} orientation="horizontal" />
-    <ScrollAreaPrimitive.Corner data-slot="scroll-area-corner" />
-  </ScrollAreaPrimitive.Root>
-)
+// Publishes overflow attributes so styles can reserve gutters.
+const trackOverflow = (element: HTMLDivElement): (() => void) => {
+  const update = (): void => {
+    const { clientHeight, clientWidth, scrollHeight, scrollWidth } = element
+    element.toggleAttribute('data-has-overflow-x', scrollWidth > clientWidth)
+    element.toggleAttribute('data-has-overflow-y', scrollHeight > clientHeight)
+  }
+  const observer = new ResizeObserver(update)
+  observer.observe(element)
+  for (const child of element.children) {
+    observer.observe(child)
+  }
+  return () => observer.disconnect()
+}
 
-const ScrollBar = ({ compact, orientation }: { compact: boolean; orientation: 'horizontal' | 'vertical' }): React.ReactElement => (
-  <ScrollAreaPrimitive.Scrollbar className={styles.scrollbar({ compact, orientation })} data-slot="scroll-area-scrollbar" orientation={orientation}>
-    <ScrollAreaPrimitive.Thumb className={styles.thumb} data-slot="scroll-area-thumb" />
-  </ScrollAreaPrimitive.Scrollbar>
+export const ScrollArea = ({ 'aria-label': ariaLabel, children, scrollbarGutter = false }: ScrollAreaProps): React.ReactElement => (
+  <div aria-label={ariaLabel} className={styles.viewport({ scrollbarGutter })} data-slot="scroll-area-viewport" ref={trackOverflow}>
+    {children}
+  </div>
 )

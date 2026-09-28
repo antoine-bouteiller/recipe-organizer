@@ -93,7 +93,7 @@ rows to recents, maintaining the default spice-hiding policy (`src/client/routes
 ### 8.2 Filter utilities
 
 `normalize()` decomposes Unicode with NFD, strips diacritic code points, and lowercases the result
-(`src/client/features/search/utils/normalize.ts:1-5`). The query predicate trims its input, then normalises
+(`src/client/utils/normalize.ts:1-5`). The query predicate trims its input, then normalises
 it and matches a substring of the normalised name. The attribute predicate requires every selected cuisine
 and meal, requires each enabled boolean characteristic, and excludes spice recipes until the spice
 filter is enabled (`src/client/features/search/utils/filter.ts:17-35`). `filterRecipes()` joins those

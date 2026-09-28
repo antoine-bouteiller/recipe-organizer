@@ -16,7 +16,6 @@ export type ButtonProps = Pick<ComponentProps<'button'>, 'aria-label' | 'childre
       >)
   )
 
-// Base UI `render` composition injects handlers, ARIA/state attributes, and refs at runtime; the rest spread forwards them.
 export const Button = (props: ButtonProps): React.ReactElement => {
   if (props.asLink) {
     const { align, asLink: _asLink, size, variant, width, ...linkProps } = props

@@ -1,7 +1,6 @@
 import type { ReducedRecipe } from '@client/types/recipe'
+import { normalize } from '@client/utils/normalize'
 import type { CuisineType, Meal } from '@recipe-organizer/shared/recipe/constants'
-
-import { normalize } from './normalize'
 
 export interface SearchFilters {
   query: string

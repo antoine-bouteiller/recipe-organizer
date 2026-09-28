@@ -56,7 +56,7 @@ const DialogContent = ({ children, footer, title }: ContentProps): ReactElement 
         {title}
       </h2>
     </div>
-    <ScrollArea scrollFade>
+    <ScrollArea>
       <div className={styles.panel} data-slot="dialog-panel">
         {children}
       </div>
@@ -77,7 +77,7 @@ const DrawerContent = ({ children, footer, title }: ContentProps): ReactElement 
       </h2>
     </div>
     <div className={drawerStyles.container}>
-      <ScrollArea scrollFade>
+      <ScrollArea>
         <div className={drawerStyles.panel} data-slot="drawer-panel">
           {children}
         </div>

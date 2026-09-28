@@ -1,4 +1,3 @@
-import { Toggle as TogglePrimitive } from '@base-ui/react/toggle'
 import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
@@ -22,16 +21,13 @@ type Story = StoryObj<typeof meta>
 export const InteractionStates: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    const toggle = canvas.getByRole('button', { name: 'Save recipe' })
     await userEvent.tab()
-    await expect(toggle).toHaveFocus()
-    await userEvent.click(toggle)
-    await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    await expect(canvas.getByRole('button', { name: 'Save recipe' })).toHaveFocus()
     await expect(canvas.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
   },
   render: () => (
     <div className={styles.buttonGroup}>
-      <TogglePrimitive render={<Button variant="secondary" />}>Save recipe</TogglePrimitive>
+      <Button variant="secondary">Save recipe</Button>
       <Button disabled>Unavailable</Button>
     </div>
   ),

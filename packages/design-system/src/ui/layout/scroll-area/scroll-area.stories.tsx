@@ -29,10 +29,10 @@ export const Overview: Story = {
           </ScrollArea>
         </div>
       </StorySection>
-      <StorySection title="With Fade and Gutter">
-        <div className={styles.fadeScrollFrame}>
-          <ScrollArea scrollFade scrollbarGutter>
-            <div className={styles.fadeScrollContent}>
+      <StorySection title="With Gutter">
+        <div className={styles.standardScrollFrame}>
+          <ScrollArea scrollbarGutter>
+            <div className={styles.standardScrollContent}>
               {content.map((step) => (
                 <p key={step}>{step}</p>
               ))}
@@ -40,16 +40,9 @@ export const Overview: Story = {
           </ScrollArea>
         </div>
       </StorySection>
-      <StorySection title="Fade without overflow">
-        <div className={styles.fadeScrollFrame}>
-          <ScrollArea scrollFade>
-            <div className={styles.fadeScrollContent}>Short content stays visible without scrolling.</div>
-          </ScrollArea>
-        </div>
-      </StorySection>
       <StorySection title="Compact Gutter">
         <div className={styles.compactScrollFrame}>
-          <ScrollArea aria-label="Compact scrolling" scrollbarGutter="compact" scrollFade>
+          <ScrollArea aria-label="Compact scrolling" scrollbarGutter="compact">
             <div className={styles.compactScrollContent}>
               {content.map((step) => (
                 <p key={step}>{step}</p>

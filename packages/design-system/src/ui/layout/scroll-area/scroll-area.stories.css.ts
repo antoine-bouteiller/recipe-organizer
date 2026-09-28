@@ -24,21 +24,6 @@ export const standardScrollContent = style({
   gap: theme.spacing(3),
 })
 
-export const fadeScrollFrame = style({
-  borderColor: theme.colors.border,
-  borderRadius: theme.radius.md,
-  borderWidth: '1px',
-  height: theme.spacing(56),
-  padding: theme.spacing(4),
-  width: theme.spacing(80),
-})
-
-export const fadeScrollContent = style({
-  display: 'grid',
-  fontSize: theme.fontSizes.sm,
-  gap: theme.spacing(3),
-})
-
 export const compactScrollFrame = style({
   height: theme.spacing(56),
   width: theme.spacing(80),

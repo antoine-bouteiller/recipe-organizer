@@ -7,7 +7,6 @@
     "build": "vp build"
   },
   "dependencies": {
-    "@base-ui/react": "catalog:",
     "@recipe-organizer/design-system": "workspace:*",
     "@recipe-organizer/shared": "workspace:*",
     "@tanstack/react-form": "catalog:",
