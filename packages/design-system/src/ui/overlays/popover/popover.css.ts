@@ -1,21 +1,13 @@
 import { theme } from '@recipe-organizer/design-system/theme'
-import { fallbackVar, globalStyle } from '@vanilla-extract/css'
+import { fallbackVar, style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
+
+export const trigger = style({ display: 'contents' })
 
 export const positioner = recipe({
   base: {
-    selectors: {
-      '&[data-instant]': {
-        transition: 'none',
-      },
-    },
-    height: 'var(--positioner-height)',
-    maxWidth: 'var(--available-width)',
-    position: 'relative',
-    transitionDuration: '150ms',
-    transitionProperty: 'top, left, right, bottom, transform',
-    transitionTimingFunction: theme.easings['in-out'],
-    width: 'var(--positioner-width)',
+    position: 'fixed',
+    translate: '-50% 0',
     zIndex: 50,
   },
 })
@@ -26,7 +18,7 @@ export const popup = recipe({
       '&:has([data-slot=calendar])': {
         borderRadius: theme.radius.xl,
       },
-      '&[data-starting-style]': {
+      '&[data-ending-style], &[data-starting-style]': {
         opacity: 0,
         scale: '0.98',
       },
@@ -50,15 +42,13 @@ export const popup = recipe({
     boxShadow: theme.shadows.overlay,
     color: theme.colors['popover-foreground'],
     display: 'flex',
-    height: 'var(--popup-height, auto)',
     outline: '2px solid transparent',
     outlineOffset: '2px',
     position: 'relative',
-    transformOrigin: 'var(--transform-origin)',
+    transformOrigin: 'top',
     transitionDuration: '150ms',
-    transitionProperty: 'width, height, scale, opacity',
+    transitionProperty: 'scale, opacity',
     transitionTimingFunction: theme.easings['in-out'],
-    width: 'var(--popup-width, auto)',
   },
 })
 
@@ -68,29 +58,12 @@ export const viewport = recipe({
       '&:has([data-slot=calendar])': {
         padding: theme.spacing(2),
       },
-      '&:not([data-transitioning])': {
-        overflowY: 'auto',
-      },
-      '&[data-instant]': {
-        transition: 'none',
-      },
     },
     borderRadius: theme.radius.inherit,
-    height: '100%',
     maxHeight: 'var(--available-height)',
-    overflow: 'clip',
+    overflowY: 'auto',
     paddingBlock: theme.spacing(4),
     paddingInline: fallbackVar('var(--viewport-inline-padding)', theme.spacing(4)),
     position: 'relative',
   },
-})
-
-globalStyle(`.${viewport.classNames.base} :is([data-current], [data-previous])`, {
-  opacity: 1,
-  transition: `opacity 150ms ${theme.easings['in-out']}`,
-  width: `calc(var(--popup-width) - 2 * ${fallbackVar('var(--viewport-inline-padding)', theme.spacing(4))} - 2px)`,
-})
-
-globalStyle(`.${viewport.classNames.base} :is([data-current], [data-previous]):is([data-ending-style], [data-starting-style])`, {
-  opacity: 0,
 })

@@ -2,6 +2,7 @@ import { Button } from '@recipe-organizer/design-system/button'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type React from 'react'
+import { expect, screen, userEvent, waitFor, within } from 'storybook/test'
 
 import { Popover } from './popover'
 
@@ -25,6 +26,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Overview: Story = {
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Recipe actions' }))
+    await expect(await screen.findByRole('button', { name: 'Duplicate recipe' })).toBeVisible()
+    await userEvent.click(document.body)
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Duplicate recipe' })).not.toBeInTheDocument())
+  },
   render: () => (
     <div className={styles.storyLayout}>
       <StorySection title="Responsive">
