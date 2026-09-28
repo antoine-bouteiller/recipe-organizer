@@ -140,74 +140,23 @@ export const list = style({
   },
 })
 
-export const backdrop = style({
+export const palette = style({
   selectors: {
-    '&[data-ending-style], &[data-starting-style]': {
-      opacity: 0,
-    },
-  },
-  backgroundColor: `color-mix(in srgb, ${theme.colors.scrim} 32%, transparent)`,
-  inset: theme.spacing(0),
-  position: 'fixed',
-  transition: 'opacity 200ms',
-  zIndex: 50,
-})
-
-export const viewport = style({
-  alignItems: 'center',
-  display: 'flex',
-  flexDirection: 'column',
-  inset: theme.spacing(0),
-  padding: theme.spacing(4),
-  position: 'fixed',
-  zIndex: 50,
-})
-
-export const popup = style({
-  selectors: {
-    '&[data-ending-style], &[data-starting-style]': {
-      opacity: 0,
-      scale: '0.98',
-    },
-    '&[data-nested-dialog-open]': {
-      transformOrigin: 'top',
-    },
-    '&[data-nested][data-ending-style], &[data-nested][data-starting-style]': {
-      translate: '0 32px',
-    },
     '&::before': {
       backgroundColor: `color-mix(in srgb, ${theme.colors.muted} 72%, transparent)`,
-      borderRadius: theme.radius['2xl'],
-      boxShadow: theme.shadows.edge,
+      borderRadius: theme.radius.inherit,
       content: '""',
       inset: theme.spacing(0),
       pointerEvents: 'none',
       position: 'absolute',
     },
   },
-  backgroundClip: 'padding-box',
-  WebkitBackgroundClip: 'padding-box',
-  backgroundColor: theme.colors.popover,
-  borderRadius: theme.radius['2xl'],
-  borderWidth: '1px',
-  boxShadow: theme.shadows.overlay,
-  color: theme.colors['popover-foreground'],
+  borderRadius: theme.radius.inherit,
   display: 'flex',
   flexDirection: 'column',
   maxHeight: '420px',
-  maxWidth: theme.spacing(144),
   minHeight: theme.spacing(0),
-  minWidth: theme.spacing(0),
-  opacity: 'calc(1 - 0.1 * var(--nested-dialogs))',
-  outline: '2px solid transparent',
-  outlineOffset: '2px',
   position: 'relative',
-  scale: 'calc(1 - 0.1 * var(--nested-dialogs))',
-  transitionDuration: '200ms',
-  transitionProperty: 'scale, opacity, translate',
-  transitionTimingFunction: theme.easings['in-out'],
-  translate: '0 calc(-20px * var(--nested-dialogs))',
-  width: '100%',
 })
 
 export const panel = style({
