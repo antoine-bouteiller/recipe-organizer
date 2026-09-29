@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vite-plus/test'
 
 import { aggregateShoppingList } from './aggregate-shopping-list'
-import type { ShoppingListIngredient, ShoppingListRecipe } from './aggregate-shopping-list'
+import type { ShoppingListRecipe } from './aggregate-shopping-list'
+
+type ShoppingListIngredient = ShoppingListRecipe['ingredients'][number]
 
 const makeIngredient = (overrides: Partial<ShoppingListIngredient> & Pick<ShoppingListIngredient, 'id'>): ShoppingListIngredient => ({
   category: 'other',

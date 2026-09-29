@@ -6,7 +6,7 @@ import { scaleQuantity } from '@recipe-organizer/shared/utils/scale-quantity'
 
 import type { AggregatedIngredient, IngredientCartItem } from '../types/ingredient-cart-item'
 
-export interface ShoppingListIngredient {
+interface ShoppingListIngredient {
   readonly category: IngredientCategory
   readonly countWeightG: number | null
   readonly densityGPerMl: number | null

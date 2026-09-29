@@ -1,9 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
+  "includeEntryExports": true,
   "workspaces": {
     "apps/web": {
-      "entry": ["public/sw.js", "src/**/*.test.ts"]
+      "entry": ["public/sw.js!", "src/**/*.test.ts"]
     },
     "apps/api": {
       "entry": ["src/**/*.test.ts"]
@@ -12,11 +13,14 @@
       "entry": ["src/**/*.test.ts"]
     },
     "packages/design-system": {
-      "includeEntryExports": true,
-      "entry": ["src/**/*.test.ts"]
+      "entry": ["src/**/*.test.ts"],
+      "project": ["src/**/*.{ts,tsx}!", "!src/**/*.stories.*!"]
     },
     "packages/oxlint": {
       "entry": ["**/*.test.ts"]
+    },
+    "packages/scripts": {
+      "entry": ["apply-migration-local.ts"]
     }
   },
   "husky": { "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"] },

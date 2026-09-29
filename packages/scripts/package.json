@@ -6,11 +6,9 @@
     "check": "vp -C ../.. check packages/scripts",
     "db:migrate:local": "node apply-migration-local.ts"
   },
-  "dependencies": {
-    "wrangler": "catalog:"
-  },
   "devDependencies": {
     "@recipe-organizer/api": "workspace:*",
-    "@recipe-organizer/config": "workspace:*"
+    "@recipe-organizer/config": "workspace:*",
+    "wrangler": "catalog:"
   }
 }

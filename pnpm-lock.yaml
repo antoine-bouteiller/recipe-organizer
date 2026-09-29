@@ -471,10 +471,6 @@ importers:
         version: 1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1)
 
   packages/scripts:
-    dependencies:
-      wrangler:
-        specifier: 'catalog:'
-        version: 4.141.0(@types/node@25.9.8)
     devDependencies:
       '@recipe-organizer/api':
         specifier: workspace:*
@@ -482,6 +478,9 @@ importers:
       '@recipe-organizer/config':
         specifier: workspace:*
         version: link:../config
+      wrangler:
+        specifier: 'catalog:'
+        version: 4.141.0(@types/node@25.9.8)
 
   packages/shared:
     dependencies:

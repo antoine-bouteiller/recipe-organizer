@@ -29,6 +29,9 @@ jobs:
       - name: Run knip
         run: vpr knip
 
+      - name: Run knip (production)
+        run: vpr knip:production
+
       - name: Get Playwright version
         id: playwright
         run: echo "version=$(vp exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"

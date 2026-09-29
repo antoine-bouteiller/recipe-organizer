@@ -3,3 +3,4 @@ set -e
 pnpm i --frozen-lockfile --silent
 vp staged
 pnpm knip
+pnpm knip:production
