@@ -192,9 +192,8 @@ const viteConfig = defineConfig({
     tsconfigPaths: true,
   },
   test: {
-    globals: true,
     projects: [
-      { extends: true, test: { name: 'unit' } },
+      { extends: true, test: { name: 'unit', globals: true } },
       {
         extends: true,
         plugins: [storybookTest({ configDir: 'packages/design-system/.storybook' })],
