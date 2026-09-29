@@ -1,6 +1,6 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
-import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons/arrow-left'
+import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons'
 
 import * as styles from './login-layout.css'
 

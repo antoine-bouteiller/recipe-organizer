@@ -2,7 +2,7 @@ import { Button } from '@recipe-organizer/design-system/button'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { CheckCircleIcon } from '../icons/check-circle'
+import { CheckIcon } from '../icons'
 import { Item, ItemGroup, ItemSeparator } from './item'
 
 import * as styles from './item.stories.css'
@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>
 export const Overview: Story = {
   args: {
     children: 'Keep this recipe in your collection.',
-    media: <CheckCircleIcon />,
+    media: <CheckIcon />,
     title: 'Saved recipe',
   },
   render: (args) => (
@@ -27,16 +27,16 @@ export const Overview: Story = {
       </StorySection>
       <StorySection title="Variants">
         <div className={styles.variantList}>
-          <Item media={<CheckCircleIcon />} title="Default">
+          <Item media={<CheckIcon />} title="Default">
             A standard item.
           </Item>
-          <Item media={<CheckCircleIcon />} title="Outline" variant="outline">
+          <Item media={<CheckIcon />} title="Outline" variant="outline">
             An outlined item.
           </Item>
         </div>
       </StorySection>
       <StorySection title="Row layout">
-        <Item actions={<Button size="sm">View</Button>} layout="row" media={<CheckCircleIcon />} title="Pasta primavera">
+        <Item actions={<Button size="sm">View</Button>} layout="row" media={<CheckIcon />} title="Pasta primavera">
           Open the recipe to review its ingredients.
         </Item>
       </StorySection>

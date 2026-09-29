@@ -1,7 +1,6 @@
 import { useFieldContext } from '@design-system/hooks/use-form-context'
 import { Button } from '@recipe-organizer/design-system/button'
-import { MinusIcon } from '@recipe-organizer/design-system/icons/minus'
-import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { MinusIcon, PlusIcon } from '@recipe-organizer/design-system/icons'
 import { useId, useState } from 'react'
 
 import { Field, FieldError } from '../field/field'

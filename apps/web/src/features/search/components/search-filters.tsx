@@ -1,6 +1,6 @@
 import type { SearchFilters as SearchFiltersValue } from '@client/features/search/utils/filter'
 import { Button } from '@recipe-organizer/design-system/button'
-import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons/funnel-simple'
+import { FunnelSimpleIcon } from '@recipe-organizer/design-system/icons'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
 import { Toggle } from '@recipe-organizer/design-system/toggle'

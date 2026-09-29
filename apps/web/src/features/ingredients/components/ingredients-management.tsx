@@ -6,7 +6,7 @@ import { EditIngredient } from '@client/features/ingredients/components/edit-ing
 import { Badge } from '@recipe-organizer/design-system/badge'
 import type { BadgeProps } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
-import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { PlusIcon } from '@recipe-organizer/design-system/icons'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'

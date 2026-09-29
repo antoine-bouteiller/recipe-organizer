@@ -1,7 +1,5 @@
 import { capitalize } from '@client/utils/string'
-import { SpinnerGapIcon } from '@recipe-organizer/design-system/icons/spinner-gap'
-import { ThermometerIcon } from '@recipe-organizer/design-system/icons/thermometer'
-import { TimerIcon } from '@recipe-organizer/design-system/icons/timer'
+import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@recipe-organizer/design-system/icons'
 import { Item } from '@recipe-organizer/design-system/item'
 import { magimixProgramLabels } from '@recipe-organizer/shared/recipe/magimix'
 import type { MagimixProgramData } from '@recipe-organizer/shared/recipe/magimix'

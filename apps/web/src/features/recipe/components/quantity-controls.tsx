@@ -1,9 +1,7 @@
 import { useIsInShoppingList } from '@client/hooks/use-is-in-shopping-list'
 import { addToShoppingList, removeFromShoppingList } from '@client/stores/shopping-list.store'
 import { Button } from '@recipe-organizer/design-system/button'
-import { MinusIcon } from '@recipe-organizer/design-system/icons/minus'
-import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
-import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
+import { MinusIcon, PlusIcon, TrashIcon } from '@recipe-organizer/design-system/icons'
 
 import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
 

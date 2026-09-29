@@ -1,4 +1,4 @@
-import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { CheckIcon } from '@recipe-organizer/design-system/icons'
 import { useState } from 'react'
 import type React from 'react'
 

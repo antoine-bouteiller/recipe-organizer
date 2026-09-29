@@ -3,11 +3,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ArrowCounterClockwiseIcon } from './arrow-counter-clockwise'
 import { ArrowElbowDownLeftIcon } from './arrow-elbow-down-left'
 import { ArrowLeftIcon } from './arrow-left'
-import { ArrowUUpLeftIcon } from './arrow-u-up-left'
-import { ArrowUUpRightIcon } from './arrow-u-up-right'
 import { BasketIcon } from './basket'
 import { BookIcon } from './book'
-import { BookOpenIcon } from './book-open'
 import { CaretDownIcon } from './caret-down'
 import { CaretLeftIcon } from './caret-left'
 import { CaretRightIcon } from './caret-right'
@@ -15,10 +12,8 @@ import { CaretUpIcon } from './caret-up'
 import { CaretUpDownIcon } from './caret-up-down'
 import { CarrotIcon } from './carrot'
 import { CheckIcon } from './check'
-import { CheckCircleIcon } from './check-circle'
 import { CircleNotchIcon } from './circle-notch'
 import { CookieIcon } from './cookie'
-import { CookingPotIcon } from './cooking-pot'
 import { CowIcon } from './cow'
 import { DotsThreeVerticalIcon } from './dots-three-vertical'
 import { FishIcon } from './fish'
@@ -26,7 +21,6 @@ import { FunnelSimpleIcon } from './funnel-simple'
 import { GearIcon } from './gear'
 import { HouseIcon } from './house'
 import { ImageIcon } from './image'
-import { ListBulletsIcon } from './list-bullets'
 import { MagnifyingGlassIcon } from './magnifying-glass'
 import { MinusIcon } from './minus'
 import { PackageIcon } from './package'
@@ -37,8 +31,6 @@ import { ProhibitIcon } from './prohibit'
 import { ShoppingCartSimpleIcon } from './shopping-cart-simple'
 import { SpinnerGapIcon } from './spinner-gap'
 import { TextBolderIcon } from './text-bolder'
-import { TextItalicIcon } from './text-italic'
-import { TextUnderlineIcon } from './text-underline'
 import { ThemeIcon } from './theme'
 import { ThermometerIcon } from './thermometer'
 import { TimerIcon } from './timer'
@@ -46,7 +38,6 @@ import { TrashIcon } from './trash'
 import { UserIcon } from './user'
 import { UsersIcon } from './users'
 import { VideoIcon } from './video'
-import { WarningCircleIcon } from './warning-circle'
 import { XIcon } from './x'
 
 import * as styles from './icons.stories.css'
@@ -62,11 +53,8 @@ const icons = [
   ['ArrowCounterClockwiseIcon', ArrowCounterClockwiseIcon],
   ['ArrowElbowDownLeftIcon', ArrowElbowDownLeftIcon],
   ['ArrowLeftIcon', ArrowLeftIcon],
-  ['ArrowUUpLeftIcon', ArrowUUpLeftIcon],
-  ['ArrowUUpRightIcon', ArrowUUpRightIcon],
   ['BasketIcon', BasketIcon],
   ['BookIcon', BookIcon],
-  ['BookOpenIcon', BookOpenIcon],
   ['CaretDownIcon', CaretDownIcon],
   ['CaretLeftIcon', CaretLeftIcon],
   ['CaretRightIcon', CaretRightIcon],
@@ -74,10 +62,8 @@ const icons = [
   ['CaretUpDownIcon', CaretUpDownIcon],
   ['CarrotIcon', CarrotIcon],
   ['CheckIcon', CheckIcon],
-  ['CheckCircleIcon', CheckCircleIcon],
   ['CircleNotchIcon', CircleNotchIcon],
   ['CookieIcon', CookieIcon],
-  ['CookingPotIcon', CookingPotIcon],
   ['CowIcon', CowIcon],
   ['DotsThreeVerticalIcon', DotsThreeVerticalIcon],
   ['FishIcon', FishIcon],
@@ -85,7 +71,6 @@ const icons = [
   ['GearIcon', GearIcon],
   ['HouseIcon', HouseIcon],
   ['ImageIcon', ImageIcon],
-  ['ListBulletsIcon', ListBulletsIcon],
   ['MagnifyingGlassIcon', MagnifyingGlassIcon],
   ['MinusIcon', MinusIcon],
   ['PackageIcon', PackageIcon],
@@ -96,8 +81,6 @@ const icons = [
   ['ShoppingCartSimpleIcon', ShoppingCartSimpleIcon],
   ['SpinnerGapIcon', SpinnerGapIcon],
   ['TextBolderIcon', TextBolderIcon],
-  ['TextItalicIcon', TextItalicIcon],
-  ['TextUnderlineIcon', TextUnderlineIcon],
   ['ThemeIcon', ThemeIcon],
   ['ThermometerIcon', ThermometerIcon],
   ['TimerIcon', TimerIcon],
@@ -105,7 +88,6 @@ const icons = [
   ['UserIcon', UserIcon],
   ['UsersIcon', UsersIcon],
   ['VideoIcon', VideoIcon],
-  ['WarningCircleIcon', WarningCircleIcon],
   ['XIcon', XIcon],
 ] as const
 

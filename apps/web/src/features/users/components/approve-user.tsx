@@ -1,6 +1,6 @@
 import { approveUserOptions } from '@client/features/users/api/approve'
 import { Button } from '@recipe-organizer/design-system/button'
-import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { CheckIcon } from '@recipe-organizer/design-system/icons'
 import { useMutation } from '@tanstack/react-query'
 import { useTransition } from 'react'
 

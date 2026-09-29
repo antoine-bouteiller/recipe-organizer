@@ -3,9 +3,7 @@ import { useIsInShoppingList } from '@client/hooks/use-is-in-shopping-list'
 import { addToShoppingList } from '@client/stores/shopping-list.store'
 import type { ReducedRecipe } from '@client/types/recipe'
 import { Button } from '@recipe-organizer/design-system/button'
-import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
-import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
-import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { CheckIcon, MagnifyingGlassIcon, PlusIcon } from '@recipe-organizer/design-system/icons'
 
 import * as styles from './search-results.css'
 

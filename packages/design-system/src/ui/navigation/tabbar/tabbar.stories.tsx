@@ -1,7 +1,4 @@
-import { GearIcon } from '@recipe-organizer/design-system/icons/gear'
-import { HouseIcon } from '@recipe-organizer/design-system/icons/house'
-import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
-import { ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons/shopping-cart-simple'
+import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons'
 import { withRouter } from '@storybook-helpers/router'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'

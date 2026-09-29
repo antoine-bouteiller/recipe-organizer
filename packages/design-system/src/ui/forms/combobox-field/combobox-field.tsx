@@ -1,5 +1,5 @@
 import { useFieldContext } from '@design-system/hooks/use-form-context'
-import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { CheckIcon } from '@recipe-organizer/design-system/icons'
 import { Popover } from '@recipe-organizer/design-system/popover'
 import { Separator } from '@recipe-organizer/design-system/separator'
 import { useState } from 'react'

@@ -1,5 +1,5 @@
 import type { TriggerProps } from '@design-system/hooks/use-drawer'
-import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons/caret-up-down'
+import { CaretUpDownIcon } from '@recipe-organizer/design-system/icons'
 import type { ComponentProps, ReactElement } from 'react'
 
 import * as styles from './select.shared.css'

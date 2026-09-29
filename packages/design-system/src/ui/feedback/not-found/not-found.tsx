@@ -1,5 +1,5 @@
 import { Button } from '@recipe-organizer/design-system/button'
-import { CaretLeftIcon } from '@recipe-organizer/design-system/icons/caret-left'
+import { CaretLeftIcon } from '@recipe-organizer/design-system/icons'
 import type { NotFoundRouteProps } from '@tanstack/react-router'
 import type React from 'react'
 

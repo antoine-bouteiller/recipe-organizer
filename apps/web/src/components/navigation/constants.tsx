@@ -1,7 +1,4 @@
-import { GearIcon } from '@recipe-organizer/design-system/icons/gear'
-import { HouseIcon } from '@recipe-organizer/design-system/icons/house'
-import { MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons/magnifying-glass'
-import { ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons/shopping-cart-simple'
+import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons'
 import type React from 'react'
 
 interface MenuItem {

@@ -1,5 +1,5 @@
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
-import { CheckIcon } from '@recipe-organizer/design-system/icons/check'
+import { CheckIcon } from '@recipe-organizer/design-system/icons'
 import { Popover } from '@recipe-organizer/design-system/popover'
 import { useState } from 'react'
 import type { ReactElement } from 'react'

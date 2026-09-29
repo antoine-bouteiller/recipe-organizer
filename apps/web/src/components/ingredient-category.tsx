@@ -1,8 +1,4 @@
-import { CarrotIcon } from '@recipe-organizer/design-system/icons/carrot'
-import { CowIcon } from '@recipe-organizer/design-system/icons/cow'
-import { FishIcon } from '@recipe-organizer/design-system/icons/fish'
-import { PackageIcon } from '@recipe-organizer/design-system/icons/package'
-import { PepperIcon } from '@recipe-organizer/design-system/icons/pepper'
+import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@recipe-organizer/design-system/icons'
 import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import type { ReactNode } from 'react'
 

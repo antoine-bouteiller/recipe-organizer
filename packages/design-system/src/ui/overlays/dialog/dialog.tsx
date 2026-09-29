@@ -3,7 +3,7 @@ import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { useIsMobile } from '@design-system/hooks/use-is-mobile'
 import { ScrollArea } from '@design-system/ui/layout/scroll-area/scroll-area'
 import { Button } from '@recipe-organizer/design-system/button'
-import { XIcon } from '@recipe-organizer/design-system/icons/x'
+import { XIcon } from '@recipe-organizer/design-system/icons'
 import type { ReactElement, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 

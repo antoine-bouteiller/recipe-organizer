@@ -1,5 +1,5 @@
 import { ingredientCategoryIcons, ingredientCategoryLabels } from '@client/components/ingredient-category'
-import { BasketIcon } from '@recipe-organizer/design-system/icons/basket'
+import { BasketIcon } from '@recipe-organizer/design-system/icons'
 import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { ingredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import { incrementalArray } from '@recipe-organizer/shared/utils/array'

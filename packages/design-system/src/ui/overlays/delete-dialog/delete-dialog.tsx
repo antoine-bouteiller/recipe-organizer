@@ -1,6 +1,6 @@
 import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { Button } from '@recipe-organizer/design-system/button'
-import { TrashIcon } from '@recipe-organizer/design-system/icons/trash'
+import { TrashIcon } from '@recipe-organizer/design-system/icons'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
 import { useState, useTransition } from 'react'
 import type { ElementType, ReactElement, ReactNode } from 'react'

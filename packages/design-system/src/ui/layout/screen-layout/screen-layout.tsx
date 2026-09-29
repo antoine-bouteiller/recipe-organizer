@@ -1,5 +1,5 @@
 import { Button } from '@recipe-organizer/design-system/button'
-import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons/arrow-left'
+import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons'
 import { useRouter } from '@tanstack/react-router'
 
 import * as styles from './screen-layout.css'

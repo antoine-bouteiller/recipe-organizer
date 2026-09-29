@@ -1,4 +1,4 @@
-import { PlusIcon } from '@recipe-organizer/design-system/icons/plus'
+import { PlusIcon } from '@recipe-organizer/design-system/icons'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Select } from '@recipe-organizer/design-system/select'
 import { StorySection } from '@storybook-helpers/story-section'
