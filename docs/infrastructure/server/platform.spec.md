@@ -17,13 +17,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                            | Rationale                                                                                                                           |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | Void generates the Cloudflare Worker entry from API file routes and global middleware.            | One deployment serves the same-origin API, OAuth routes, and media while its ASSETS binding serves the SPA.                         |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                                            |
-| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                               |
-| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                        |
-| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker and forwards every fetch to the network.   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior. |
+| Decision                      | Choice                                                                                            | Rationale                                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Worker runtime       | Void generates the Cloudflare Worker entry from pages, API file routes, and global middleware.    | One deployment serves the same-origin API, OAuth routes, and media while its ASSETS binding serves static assets and pages render on the Worker. |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                                                         |
+| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                                            |
+| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                                     |
+| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker and forwards every fetch to the network.   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior.              |
 
 ## 4. Principles & Intents
 
@@ -42,18 +42,18 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 ## 6. Caveats
 
 - `[C-1]` The Worker runtime feature set is pinned by compatibility date and `nodejs_compat`
-  (`apps/web/void.config.ts`); a change can affect runtime behavior.
+  (`void.config.ts`); a change can affect runtime behavior.
 - `[C-2]` R2 receives a materialized image buffer because the transformed response needs a known
-  length (`apps/web/server/lib/r2.ts:17-21`).
+  length (`src/lib/server/r2.ts:17-21`).
 - `[C-3]` Edge cache entries are local to an edge; the cache header remains the client-visible
   freshness contract.
-- `[C-4]` Normal browser HTTP and TanStack Query caches provide no offline guarantee, though they can yield already-loaded data; server edge media caches remain unchanged.
+- `[C-4]` Normal browser HTTP caching and loaded documents provide no offline guarantee; server edge media caches remain unchanged.
 
 ## 7. High-Level Components
 
 | Component            | Module type          | Responsibility                                                | Public API surface                          |
 | -------------------- | -------------------- | ------------------------------------------------------------- | ------------------------------------------- |
-| Worker configuration | Void configuration   | Server entry, compatibility, D1/R2/Images bindings            | `apps/web/void.config.ts`                   |
+| Worker configuration | Void configuration   | Server entry, compatibility, D1/R2/Images bindings            | `void.config.ts`                            |
 | Media writer         | Server utility       | UUID keys, image transform, R2 writes                         | `uploadFile`, `uploadVideo`, `deleteFile`   |
 | Media reader         | Route helper         | Cached GET and HEAD responses from R2                         | `createR2GetHandler`, `createR2HeadHandler` |
 | Edge cache           | Server utility       | Cache read-through and response metadata                      | `cache.getWithCache()`                      |
@@ -63,48 +63,48 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Worker configuration
 
-Void 0.22 owns the project rooted at `apps/web`. `apps/web/void.config.ts` declares the existing
+Void 0.22 owns the project rooted at the repository root. `void.config.ts` declares the existing
 `recipe-organizer` Worker, compatibility date and `nodejs_compat`, D1 `DB`, R2 `R2_BUCKET`,
 Images `IMAGES`, binding inference, and disabled ISR. Observability records invocation logs;
 trace ingestion is disabled. `keep_vars` preserves dashboard-managed variables and auth secrets.
 
 Global middleware makes every request Worker-first, including static assets. Generated asset
 configuration uses `run_worker_first: ['/**']` and `not_found_handling: 'none'`; the Worker serves
-assets through `ASSETS`. `apps/web/middleware/03.spa-fallback.ts` serves `/index.html` for unmatched
-non-API HTML GET/HEAD navigations without a file extension. This explicit fallback is required
-because Vanilla Extract re-evaluates Vite configuration and the regenerated Void entry loses Void's
-own fallback. Unknown API paths retain the JSON 404 contract rather than receiving the SPA.
+assets through `ASSETS`. Void Pages renders matched document URLs; unknown pages retain Void's
+default 404. No application catch-all exists because it would shadow assets such as
+`/manifest.json`. Unknown API paths retain the JSON 404 contract.
 
-`apps/web/vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })` and
-`appType: 'mpa'` so the Worker, not Vite's SPA fallback, answers unmatched development requests.
-`pnpm dev` runs one Vite server on `http://localhost:3000` for the SPA and same-origin API, without
-a separate API process or proxy. Void reads the project-root `apps/web/.env`.
-`apps/web/.void/` (entry and route types) and `apps/web/.void-wrangler.jsonc` are generated and
-git-ignored. `vp -C apps/web exec void prepare` regenerates route types before clean-tree checks.
+`vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })` and
+`appType: 'mpa'` so the Worker, not Vite, answers unmatched development requests.
+`voidReact({ react: { compiler: true }, viewTransitions: true })` enables React page/island rendering
+and regular-page transitions. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
+a separate API process or proxy. Void reads the project-root `.env`.
+`.void/` (entry and route types) and `.void-wrangler.jsonc` are generated and
+git-ignored. `vp exec void prepare` regenerates route types before clean-tree checks.
 
-`apps/web/server/env.d.ts` declares the non-D1 bindings on `Cloudflare.Env` and keeps them in sync with
-`apps/web/void.config.ts`; secrets come from `apps/web/env.ts`, runtime types from Void's `@cloudflare/workers-types`.
-The tooling-only `apps/web/server/wrangler.jsonc` supports local D1 migrations and dump/import;
-keep its resource IDs synchronized with `apps/web/void.config.ts`. Drizzle-kit alone owns migrations.
+`src/lib/server/env.d.ts` declares the non-D1 bindings on `Cloudflare.Env` and keeps them in sync with
+`void.config.ts`; secrets come from `env.ts`, runtime types from Void's `@cloudflare/workers-types`.
+The tooling-only `tools/wrangler.jsonc` supports local D1 migrations and dump/import;
+keep its resource IDs synchronized with `void.config.ts`. Drizzle-kit alone owns migrations.
 
 ### 8.2 Media write contract
 
 `uploadFile(file)` mints a UUID, transforms the stream to WebP `{ width: 640, quality: 80 }`,
-and writes the resulting bytes with its content type (`apps/web/server/lib/r2.ts:9-23`). `uploadVideo(file)`
-writes the file bytes and supplied MIME type under the same opaque-key rule (`apps/web/server/lib/r2.ts:28-36`).
+and writes the resulting bytes with its content type (`src/lib/server/r2.ts:9-23`). `uploadVideo(file)`
+writes the file bytes and supplied MIME type under the same opaque-key rule (`src/lib/server/r2.ts:28-36`).
 Callers persist keys, never public URLs or filename-derived paths.
 
 ### 8.3 Media read and cache contract
 
 The GET helper validates `{ id: string }`, returns 404 control flow when R2 has no object, and
-responds with object content type or the caller's fallback (`apps/web/server/lib/r2.ts:42-65`). Image GET
+responds with object content type or the caller's fallback (`src/lib/server/r2.ts:42-65`). Image GET
 responses use `public, max-age=31536000, immutable`; video GET and HEAD responses use
-`public, max-age=86400, stale-while-revalidate=604800` (`apps/web/server/lib/r2.ts:60-61`,
-`apps/web/server/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
+`public, max-age=86400, stale-while-revalidate=604800` (`src/lib/server/r2.ts:60-61`,
+`src/lib/server/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
 
 ### 8.4 PWA registration
 
-`apps/web/src/main.tsx` progressively registers `apps/web/public/sw.js` at `/sw.js` with
+The inline head script in `void.config.ts` progressively registers `public/sw.js` at `/sw.js` with
 `navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })`. This registered worker
 is required by the user for Samsung PWA installation; it is not a claim that every browser requires
 a worker to install the manifest. Registration failure does not block application rendering.
@@ -115,7 +115,7 @@ It remains registered and does not reload pages or clean up legacy storage. Its 
 fallback, UI, or session fallback. Navigations and API requests therefore require connectivity.
 
 The web manifest and icons remain available for installability. Normal online browser HTTP caching
-and TanStack Query caching continue unchanged, while providing no offline guarantee. The Worker edge
+provides no offline guarantee. The Worker edge
 media cache and its response freshness headers also remain unchanged.
 
 ### 8.5 Interaction boundary
@@ -131,7 +131,7 @@ a fallback. This permits the image route to advertise WebP and the video route t
 stored MIME type without asking a client to infer the object representation.
 
 A missing object is not represented as an empty successful response. The helper throws a Hono
-`HTTPException(404)` before a response is built (`apps/web/server/lib/r2.ts:51-55`), allowing the shared API
+`HTTPException(404)` before a response is built (`src/lib/server/r2.ts:51-55`), allowing the shared API
 boundary to return its `not_found` error envelope without caching a missing object.
 
 ### 8.7 Cache lifetime boundary
@@ -146,12 +146,15 @@ that endpoint.
 
 ### 8.8 Runtime configuration boundary
 
-The Void configuration uses one Worker name and a generated API handler entry. D1, R2, and Images remain separately named capabilities, which permits
-the data and media contracts to state exactly which resource they consume.
+The Void configuration uses one Worker name and a generated page/API entry. D1, R2, and Images
+remain separately named capabilities. Auth secrets stay dashboard-managed through `keep_vars`.
 
-Runtime secrets do not appear in this configuration. Auth defines their semantic use, while the
-Cloudflare deployment environment supplies their values. This prevents build output from becoming
-the secret authority.
+`void.config.ts` also owns the French HTML language, title, viewport/safe-area metadata,
+theme-color, manifest/favicon links, and progressive service-worker registration.
+An inline script sets the theme class before paint from `ui-theme`, else system preference.
+A `pagereveal` script adds the `back` transition type during backward cross-document traversal;
+island pages use that hook alongside shared navigation-auto CSS. No inner scroll-container
+restoration is implemented beyond browser bfcache.
 
 ### 8.9 Failure behavior
 
@@ -176,10 +179,10 @@ is available.
 ### 8.11 Build and deployment
 
 `pnpm build` builds the web project's browser assets and Worker bundle into
-`apps/web/dist/client` and `apps/web/dist/ssr`; `pnpm serve` runs `vp -C apps/web preview`.
-The `dist/ssr` name denotes the server bundle, not page SSR.
+`dist/client` and `dist/ssr`; `pnpm serve` runs `vp preview`.
+The `dist/ssr` directory contains the Worker bundle, including server page rendering.
 
-`pnpm deploy` and production CI use `vp -C apps/web exec void deploy --platform cloudflare` with
+`pnpm deploy` and production CI use `vp exec void deploy --platform cloudflare` with
 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and build-time `VITE_PUBLIC_URL`.
 The CI "Migrate Database" step runs drizzle-kit after deployment. `SESSION_SECRET`,
 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and the runtime `VITE_PUBLIC_URL` Worker variable
@@ -188,7 +191,7 @@ remain dashboard-managed and are preserved through `keep_vars`.
 ### 8.12 Existing-image migration
 
 `scripts/migrate-images.ts` uses Wrangler's remote bindings for the D1, R2, and Images resources
-configured in `apps/web/server/wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
+configured in `tools/wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
 endpoint or deployment is needed.
 
 - `pnpm images:migrate` previews changes without writing D1 or R2.
@@ -206,10 +209,10 @@ are not automatically garbage-collected on retry. Refresh the app after migratio
 
 ### 8.13 Outcome and acceptance
 
-- `[SO-1]` One Void project serves the SPA and API from the same origin while preserving storage
+- `[SO-1]` One Void project serves rendered pages and API from the same origin while preserving storage
   and secret authorities — demonstrated by `[VC-1]` and `[VC-2]`.
 - `[VC-1]` Given the local server or a production-build preview, the root page renders,
-  `GET /api/health` returns JSON 200, and a hard reload of a deep browser URL loads the SPA;
+  `GET /api/health` returns JSON 200, and a hard reload of a deep page URL renders its document;
   an unknown `/api/*` URL returns JSON 404 rather than HTML — demonstrates `[SO-1]`.
 - `[VC-2]` Deployment targets the configured Worker/resources and preserves dashboard-managed
   variables without applying Void migrations — demonstrates `[SO-1]`.
@@ -228,3 +231,6 @@ N/A
 | 2026-09-13 | Use a direct Worker entry and SPA assets fallback.                                                           | 3, 8.1, 8.4, 8.8–8.9 |
 | 2026-09-14 | Scope precaching to the initial shell graph and isolate public offline caches from sensitive API traffic.    | 3, 6, 8.4            |
 | 2026-09-14 | Register a minimal network-only `/sw.js` for Samsung installation without offline support or legacy cleanup. | 2–3, 5–8             |
+
+| 2026-10-02 | Move Void configuration and runtime persistence to root; package server implementation. | 8.1, 8.11 | Preserve one Worker and existing local D1 state. |
+| 2026-10-02 | Document Void Pages rendering, islands, head configuration, and default 404s. | 3, 6, 8 |

@@ -17,13 +17,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                    | Choice                                                                                       | Rationale                                                                                     |
-| --------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `[KD-1]` Database access    | `getDb()` creates a Drizzle D1 client from the Worker `DB` binding.                          | Request execution supplies the binding, so a retained cross-request client is unnecessary.    |
-| `[KD-2]` Relation model     | Tables and `defineRelations` form one typed graph.                                           | Nested reads declare their traversal explicitly and relation names remain type-checked.       |
-| `[KD-3]` Referential policy | Foreign-key removal uses restrict semantics; dependent deletion is explicit and child-first. | The write path makes destructive scope visible and avoids implicit cascades.                  |
-| `[KD-4]` Atomic write unit  | Related independent statements use D1 `batch([...])`.                                        | D1 batches provide the multi-statement atomicity required by graph updates.                   |
-| `[KD-5]` Query identity     | Query option factories use shared, hierarchical query keys.                                  | Mutations can invalidate every affected list and detail view without duplicating cache names. |
+| Decision                    | Choice                                                                                       | Rationale                                                                                  |
+| --------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `[KD-1]` Database access    | `getDb()` creates a Drizzle D1 client from the Worker `DB` binding.                          | Request execution supplies the binding, so a retained cross-request client is unnecessary. |
+| `[KD-2]` Relation model     | Tables and `defineRelations` form one typed graph.                                           | Nested reads declare their traversal explicitly and relation names remain type-checked.    |
+| `[KD-3]` Referential policy | Foreign-key removal uses restrict semantics; dependent deletion is explicit and child-first. | The write path makes destructive scope visible and avoids implicit cascades.               |
+| `[KD-4]` Atomic write unit  | Related independent statements use D1 `batch([...])`.                                        | D1 batches provide the multi-statement atomicity required by graph updates.                |
+| `[KD-5]` Read projections   | Server query helpers supply loader props and remaining API reads.                            | One server projection serves browsing without a client query-key namespace.                |
 
 ## 4. Principles & Intents
 
@@ -44,25 +44,24 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[C-1]` D1 is SQLite and has the limitations called out by architecture [C-2].
 - `[C-2]` A batch is atomic but statement ordering still matters for restrict foreign keys.
-- `[C-3]` Query keys are client cache identities, not database identifiers; callers invalidate a
-  broad key after a mutation.
+- `[C-3]` Page data is a loader snapshot; actions refresh it, but independent browser-only request promises have no general invalidation lifecycle.
 - `[C-4]` Schema evolution includes committed Drizzle SQL and platform schema-application
   configuration; this specification defines the resulting schema contract, not an execution procedure.
 
 ## 7. High-Level Components
 
-| Component                | Module type     | Responsibility                                                                   | Public API surface                       |
-| ------------------------ | --------------- | -------------------------------------------------------------------------------- | ---------------------------------------- |
-| Database factory         | Server library  | Bind Drizzle to request-scoped D1                                                | `getDb(): DrizzleD1Database`             |
-| Schema exports           | Type modules    | Tables, value types, and relation graph                                          | `#server/db/schema` exports, `relations` |
-| Recipe graph persistence | Feature utility | Write dependent ingredient and linked-recipe rows with caller-supplied D1 client | `writeRecipeIngredientGraph(db, ...)`    |
-| Query keys               | Shared library  | Stable server-data cache namespaces                                              | `queryKeys`                              |
+| Component                | Module type            | Responsibility                                                                   | Public API surface                                            |
+| ------------------------ | ---------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Database factory         | Server library         | Bind Drizzle to request-scoped D1                                                | `getDb(): DrizzleD1Database`                                  |
+| Schema exports           | Type modules           | Tables, value types, and relation graph                                          | `@/db/schema` exports, `relations`                            |
+| Recipe graph persistence | Feature utility        | Write dependent ingredient and linked-recipe rows with caller-supplied D1 client | `writeRecipeIngredientGraph(db, ...)`                         |
+| Read projections         | Server feature helpers | Name-ordered list, detail, and embedded instruction reads                        | `listRecipes`, `getRecipeDetails`, `getSubrecipeInstructions` |
 
 ## 8. Detailed Design
 
 ### 8.1 Database factory
 
-`getDb()` returns `drizzle(cloudflareEnv.DB, { relations })` (`apps/web/server/lib/db.ts:1-5`). It is the only
+`getDb()` returns `drizzle(cloudflareEnv.DB, { relations })` (`src/lib/server/db.ts:1-5`). It is the only
 application construction point for the Drizzle 1.0 D1 client and imports `env` from
 `cloudflare:workers`; Void supplies the binding, but the app does not use `void/db`. Consumers use the returned query builder for
 reads, inserts, updates, deletes, and batches; they do not retain a binding-derived client in
@@ -70,10 +69,10 @@ module state.
 
 ### 8.2 Schema and relation graph
 
-The schema index re-exports domain tables and units (`apps/web/server/db/schema/index.ts:9-15`) and defines the
-relation graph (`apps/web/server/db/schema/index.ts:17-76`). Recipe traversal includes creator, ingredient groups,
-and both directions of linked recipes (`apps/web/server/db/schema/index.ts:34-49`); ingredient traversal includes
-its parent and group uses (`apps/web/server/db/schema/index.ts:28-33`). A relation addition accompanies each
+The schema index re-exports domain tables and units (`src/db/schema/index.ts:9-15`) and defines the
+relation graph (`src/db/schema/index.ts:17-76`). Recipe traversal includes creator, ingredient groups,
+and both directions of linked recipes (`src/db/schema/index.ts:34-49`); ingredient traversal includes
+its parent and group uses (`src/db/schema/index.ts:28-33`). A relation addition accompanies each
 nested `with` access that relies on it.
 
 ### 8.3 Read contract
@@ -87,21 +86,23 @@ selected object shape a feature-route contract rather than a client-assembled qu
 A graph write persists its root row and dependent rows within the feature route's write boundary.
 For deletion, dependent `groupIngredient`, ingredient-group, and linked-recipe rows precede the
 recipe row in one batch; the owned R2 file is removed only after that batch resolves
-(`apps/web/routes/api/recipes/delete.ts`). This keeps a database failure from leaving a row that
+(`src/features/recipe/server/recipe-delete.ts`). This keeps a database failure from leaving a row that
 points to a missing object.
 
 ### 8.5 Query-key contract
 
-`queryKeys` groups recipes, ingredients, and users under broad roots and derives list/detail keys
-from them (`apps/web/src/lib/query-keys.ts:1-12`). A query factory uses the narrow key needed to read;
-a mutation invalidates the broadest affected root or list. This refines architecture [PI-4]: the
-client cache is server data, while UI stores retain selections only.
+`src/features/recipe/server/queries.ts` owns `listRecipes(db)`, `getRecipeDetails(db, id)`,
+and `getSubrecipeInstructions(db, ids)`. Pages call these directly; the remaining recipe-list API
+reuses `listRecipes`. List reads select card fields, order by name, and map image keys to URLs.
+Detail reads include ingredients/links/ordered step groups; embedded instruction reads resolve each
+source's name and default steps. Missing rows remain optional server results.
+No central client query-key namespace or query-option factory participates.
 
 ### 8.6 Interaction boundary
 
 Void feature routes own validation, authorization, and the API return shape. The data layer owns
 typed persistence primitives; it does not decide who may mutate a row. Platform owns the `DB` binding
-whose configured name is `DB` (`apps/web/void.config.ts`).
+whose configured name is `DB` (`void.config.ts`).
 
 ### 8.7 Table ownership boundary
 
@@ -112,7 +113,7 @@ business-policy layer.
 
 The schema index is the import boundary for table and relation symbols. Its explicit exports allow
 Drizzle configuration and application code to use one typed vocabulary instead of reaching into
-unrelated schema modules (`apps/web/server/db/schema/index.ts:9-17`).
+unrelated schema modules (`src/db/schema/index.ts:9-17`).
 
 ### 8.8 Batch boundary
 
@@ -127,18 +128,15 @@ them as database success.
 
 ### 8.9 Cache invalidation boundary
 
-Query keys form prefixes: `allRecipes` contains recipe lists, details, and instructions, while the
-more specific helpers add a purpose and identifier (`apps/web/src/lib/query-keys.ts:1-12`). A mutation
-chooses a prefix that covers every representation it can make stale.
-
-Invalidation requests a refetch on later observation; it does not modify cached domain objects in
-place. This keeps cache coherence tied to the server's persisted result and reinforces architecture
-[PI-4].
+The data layer does not own a browser cache. Regular-page action submission refreshes loader props;
+navigation reads a new document snapshot. Durable stores hold IDs and quantities, not rows.
+Browser-only palette/shopping-list reads retain stable request promises within a document with no
+timed freshness or shared mutation invalidation. The database helper does not patch those promises.
 
 ### 8.10 Failure behavior
 
 A missing row remains a feature API concern because different calls may return an optional result or
-router not-found control flow. The data layer exposes the query result without imposing either
+in-page not-found presentation. The data layer exposes the query result without imposing either
 response semantics.
 
 Constraint failures and provider failures propagate to the shared API error middleware. That boundary
@@ -146,11 +144,11 @@ maps user-visible errors while retaining the original cause for server diagnosis
 
 ### 8.11 Migration authority
 
-Drizzle-kit is the only migration authority. Authored schema and history live under `apps/web/server/db/`;
+Drizzle-kit is the only migration authority. Authored schema lives under `src/db/schema/` and history under `src/db/migrations/`;
 Void declares no database migrations and the app does not use `void/db`.
-`pnpm db:migrate:local` uses the tooling-only `apps/web/server/wrangler.jsonc` and shared
-`apps/web/.wrangler/state`; `pnpm db:migrate:remote` uses drizzle-kit. Dump/import retain
-the tooling configuration, whose resource IDs must match `apps/web/void.config.ts`.
+`pnpm db:migrate:local` uses the tooling-only `tools/wrangler.jsonc` and shared
+`.wrangler/state`; `pnpm db:migrate:remote` uses drizzle-kit. Dump/import retain
+the tooling configuration, whose resource IDs must match `void.config.ts`.
 
 ### 8.12 Contract sketch
 
@@ -163,7 +161,8 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                           | Sections affected          | Reason                                                                |
-| ---------- | ------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------- |
-| 2026-09-13 | Inject the D1 client into recipe graph helpers used by Hono routes. | 7, 8.3–8.4, 8.6, 8.8, 8.10 | Keep graph writes within the request-scoped API transaction boundary. |
-| 2026-09-13 | Update the recipe route citation to `src/server/routes/`.           | 8.4                        | Match the server route layout.                                        |
+| Date       | Amendment                                                                              | Sections affected          | Reason                                                                |
+| ---------- | -------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------- |
+| 2026-09-13 | Inject the D1 client into recipe graph helpers used by Hono routes.                    | 7, 8.3–8.4, 8.6, 8.8, 8.10 | Keep graph writes within the request-scoped API transaction boundary. |
+| 2026-09-13 | Update the recipe route citation to `src/server/routes/`.                              | 8.4                        | Match the server route layout.                                        |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts          | Reflect the completed page migration.                                 |

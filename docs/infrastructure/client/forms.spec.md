@@ -20,12 +20,12 @@ feature from independently composing field state, error presentation, and submis
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                         | Rationale                                                                                                                                              |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `packages/design-system/src/hooks/use-app-form.ts`. |
-| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding feature API route                        | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.                          |
-| `[KD-3]` Error projection    | TanStack Form errors are projected into native Form and Field components                       | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                                        |
-| `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/shared/utils/form-data.ts:1-28`).            |
+| Decision                     | Choice                                                                                         | Rationale                                                                                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `src/hooks/use-app-form.ts`.      |
+| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding page action or API route                 | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.        |
+| `[KD-3]` Error projection    | TanStack Form errors are projected into native Form and Field components                       | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                      |
+| `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/utils/form-data.ts:1-28`). |
 
 ## 4. Principles & Intents
 
@@ -48,22 +48,22 @@ feature from independently composing field state, error presentation, and submis
 ## 6. Caveats
 
 - `[C-1]` `FormData` omits `undefined` and `null`; an input contract that distinguishes an explicit
-  clearing value represents it directly rather than relying on an absent entry (`src/shared/utils/form-data.ts:1-10`).
+  clearing value represents it directly rather than relying on an absent entry (`src/utils/form-data.ts:1-10`).
 - `[C-2]` File previews use browser resources and upload acceptance is a user-experience check;
   server validation and storage controls remain required.
 - `[C-3]` Nested dialog forms stop submit propagation because a dialog can render within a page
-  form (`packages/design-system/src/ui/overlays/form-dialog/form-dialog.tsx`).
+  form (`src/components/ui/overlays/form-dialog/form-dialog.tsx`).
 
 ## 7. High-Level Components
 
-| Component         | Module type                                                          | Responsibility                                      | Public API surface                  |
-| ----------------- | -------------------------------------------------------------------- | --------------------------------------------------- | ----------------------------------- |
-| Form factory      | `packages/design-system/src/hooks/use-app-form.ts`                   | Register fields and form components                 | `useAppForm`, `withForm`            |
-| Field components  | `packages/design-system/src/ui/forms/*-field/`                       | Bind a typed field value to a UI control            | registered `*Field` components      |
-| UI wrappers       | `packages/design-system/src/ui/forms/{form,field}/`                  | Associate errors, labels, controls, and messages    | `Form`, `Field`, error slots        |
-| File adapter      | `packages/design-system/src/hooks/use-file-upload.ts`                | Select, validate, preview, and remove browser files | `useFileUpload`, `FileMetadata`     |
-| Dialog adapter    | `packages/design-system/src/ui/overlays/form-dialog/form-dialog.tsx` | Place a shared form inside dialog chrome            | `getFormDialog()`                   |
-| Transport helpers | `src/shared/utils/form-data.ts`                                      | Convert values to and from multipart payloads       | `objectToFormData`, `parseFormData` |
+| Component         | Module type                                              | Responsibility                                      | Public API surface                  |
+| ----------------- | -------------------------------------------------------- | --------------------------------------------------- | ----------------------------------- |
+| Form factory      | `src/hooks/use-app-form.ts`                              | Register fields and form components                 | `useAppForm`, `withForm`            |
+| Field components  | `src/components/ui/forms/*-field/`                       | Bind a typed field value to a UI control            | registered `*Field` components      |
+| UI wrappers       | `src/components/ui/forms/{form,field}/`                  | Associate errors, labels, controls, and messages    | `Form`, `Field`, error slots        |
+| File adapter      | `src/hooks/use-file-upload.ts`                           | Select, validate, preview, and remove browser files | `useFileUpload`, `FileMetadata`     |
+| Dialog adapter    | `src/components/ui/overlays/form-dialog/form-dialog.tsx` | Place a shared form inside dialog chrome            | `getFormDialog()`                   |
+| Transport helpers | `src/utils/form-data.ts`                                 | Convert values to and from multipart payloads       | `objectToFormData`, `parseFormData` |
 
 ## 8. Detailed Design
 
@@ -71,9 +71,9 @@ feature from independently composing field state, error presentation, and submis
 
 `useAppForm(options)` returns a form with `AppField`, `AppForm`, and `FormSubmit`; `withForm(config)`
 produces a typed reusable form view. The registry includes text, numeric, selection, toggle, file,
-and editor fields plus Field slots (`packages/design-system/src/hooks/use-app-form.ts`). A field reads its
+and editor fields plus Field slots (`src/hooks/use-app-form.ts`). A field reads its
 value and metadata from field context, updates through the field handler, and renders a named Field
-with an error slot; the text implementation demonstrates that boundary (`packages/design-system/src/ui/forms/text-field/text-field.tsx`).
+with an error slot; the text implementation demonstrates that boundary (`src/components/ui/forms/text-field/text-field.tsx`).
 
 Feature forms provide typed defaults, a server-owned schema, submit behavior, and reusable child
 views. Dynamic collections use the form array-field surface; each row carries a stable browser key
@@ -85,12 +85,14 @@ Forms apply their schema through TanStack Form revalidation and project the firs
 `Form errors`. Page submission prevents browser navigation and invokes `form.handleSubmit()`. A
 dialog produced by `getFormDialog(defaultValues)` selects errors from form state, disables cancel
 while submitting, stops propagation, and supplies its typed submit component
-(`packages/design-system/src/ui/overlays/form-dialog/form-dialog.tsx`).
+(`src/components/ui/overlays/form-dialog/form-dialog.tsx`).
 
-The multipart submit contract is `values -> FormData -> Void multipart handler -> schema`; JSON-only
-mutations send their validated values through the typed `void/client` fetch. `objectToFormData` appends a raw
-`File` and JSON-stringifies other present values; `parseFormData` restores parseable string entries
-before route validation (`src/shared/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
+Recipe page forms use `values -> objectToFormData -> Object.fromEntries -> page action -> schema`.
+`usePageAction()` submits these entries (including raw `File` values); `readRecipeFormData` accepts the
+Void action body and restores the structured JSON entries before schema validation. JSON-only page
+actions receive typed values directly; inline ingredient creation retains typed `void/client` fetch.
+`objectToFormData` appends a raw `File` and JSON-stringifies other present values; `parseFormData`
+restores parseable string entries (`src/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
 `{ id, url }` metadata so an unchanged asset retains its reference.
 
 ### 8.3 Field value and UI contract
@@ -109,7 +111,7 @@ comboboxes, checkboxes, and toggle groups differ only in the value/control trans
 | Image and video          | `File                        | FileMetadata                                                               | undefined` | Selection exposes a browser file or an unchanged asset reference. |
 | Array field              | collection of typed items    | Parent form owns add, remove, and stable browser keys.                     |
 
-The editor field is lazy in the registry (`packages/design-system/src/hooks/use-app-form.ts`). A screen placing it in
+The editor field is lazy in the registry (`src/hooks/use-app-form.ts`). A screen placing it in
 the form provides a suspense boundary sized for the editor region, so editor loading does not change
 the form's structural contract.
 
@@ -130,7 +132,7 @@ inventing a server record.
 `useFileUpload` accepts type, size, multiplicity, initial metadata, and change callbacks. It exposes
 drag/drop, picker, and removal interactions, rejects unacceptable files, and supplies previews. Its
 paste listener ignores focused textareas and contenteditable elements, preserving rich-text editing
-(`packages/design-system/src/hooks/use-file-upload.ts`).
+(`src/hooks/use-file-upload.ts`).
 
 A single-file field replaces its selected value. A file metadata value supplies an existing preview
 and travels back through form state when the user retains that asset. Image and video fields set the
@@ -142,7 +144,7 @@ server contract. The browser's acceptance result never authorizes an upload.
 The form observes submission state to disable its submit action and exposes a progress indication.
 On an unsuccessful validation pass, errors remain associated with their field paths and the user can
 correct values under dynamic revalidation. On a successful server mutation, the owning feature
-performs navigation, query invalidation, dialog closing, or form reset according to its domain
+performs navigation, loader-prop refresh, dialog closing, or form reset according to its domain
 contract; the form infrastructure does not choose those effects.
 
 A dialog uses the same lifecycle as a page form but contains it within dialog chrome. It receives
@@ -152,6 +154,11 @@ not expose content-render/panel-style hooks and public Form does not gain a disp
 This keeps close-state local while validation and submission remain shared, preserving Enter
 submission, async cancellation/disable behavior, errors, focus return, and submit-propagation
 handling without nested forms.
+
+Regular-page forms await `usePageAction()` outside React transitions; the helper preserves
+URL/history, refreshes loader props in place, alerts expected failures, and returns a success boolean.
+Callers navigate or close only after success. `DeleteDialog` tracks loading with local state while
+awaiting `onDelete`, rather than awaiting an action inside a transition.
 
 ### 8.7 Form contract summary
 
@@ -164,9 +171,9 @@ handling without nested forms.
 | File submit | `File` plus structured values | multipart payload with JSON entries         |
 | Complete    | mutation result               | feature-owned navigation or local UI effect |
 
-The shared factory and context are owned by `@recipe-organizer/design-system`; application code imports
-`@recipe-organizer/design-system/hooks/use-app-form`. Feature schemas, mutations, domain-specific
-editor nodes, and query-backed option hooks remain app-owned and enter the shared UI through props.
+The shared factory and context are owned by `src/hooks/use-app-form.ts` and `src/components/ui/forms/`; application code imports
+`@/hooks/use-app-form`. Feature schemas, mutations, domain-specific
+editor nodes, and loader-fed catalogue option hooks remain app-owned and enter the shared UI through props.
 
 ## 9. Open Questions
 
@@ -181,3 +188,4 @@ N/A
 | 2026-09-15 | Move reusable fields, form registry/context, file support, and dialog adapters to the design-system package. | 3, 6–8 | Share form presentation without depending on feature schemas or app services. |
 | 2026-09-16 | Make the form-aware dialog composition a private styling/render boundary. | 4, 8.6 | Preserve form behavior without reopening Dialog or Form customization APIs. |
 | 2026-09-28 | Describe native Form and Field error projection after removing Base UI. | 3, 8.1, 8.3 | Base UI is no longer a dependency. |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
