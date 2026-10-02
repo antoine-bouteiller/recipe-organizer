@@ -18,13 +18,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                   | Rationale                                                                                    |
-| ----------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `[KD-1]` Identity framework   | Better Auth drives Google OAuth, session issuance, and its HTTP catch-all.               | OAuth state, PKCE, and cookie protocol stay in a maintained identity boundary.               |
-| `[KD-2]` Account admission    | Google-created accounts have `pending` status; only `active` accounts receive a session. | OAuth proves identity but does not establish group membership.                               |
-| `[KD-3]` Authorization shape  | `authGuard(role?)` resolves a user and injects it into protected Hono routes.            | Routes obtain a consistent status and role decision before their body executes.              |
-| `[KD-4]` Session construction | `getAuth()` is a request-scoped factory using D1 and Worker secrets.                     | Worker bindings are request-scoped and sessions need the same persistence boundary as users. |
-| `[KD-5]` Login feedback       | Login consumes authorization failure codes and displays French messages.                 | A rejected member receives an actionable explanation without exposing server internals.      |
+| Decision                      | Choice                                                                                              | Rationale                                                                                    |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `[KD-1]` Identity framework   | Better Auth drives Google OAuth, session issuance, and its HTTP catch-all.                          | OAuth state, PKCE, and cookie protocol stay in a maintained identity boundary.               |
+| `[KD-2]` Account admission    | Google-created accounts have `pending` status; only `active` accounts receive a session.            | OAuth proves identity but does not establish group membership.                               |
+| `[KD-3]` Authorization shape  | `withAuthGuard(handler, role?)` resolves a user before a protected Void handler and its validators. | Routes obtain a consistent status and role decision before their body executes.              |
+| `[KD-4]` Session construction | `getAuth()` is a request-scoped factory using D1 and Worker secrets.                                | Worker bindings are request-scoped and sessions need the same persistence boundary as users. |
+| `[KD-5]` Login feedback       | Login consumes authorization failure codes and displays French messages.                            | A rejected member receives an actionable explanation without exposing server internals.      |
 
 ## 4. Principles & Intents
 
@@ -33,7 +33,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[PI-2]` **Server-side secrets** — refine architecture [C-7]; OAuth credentials and session
   secret only enter server-side factory configuration.
 - `[PI-3]` **Guard before effects** — refine server-functions [KD-2]; route context may inform UI,
-  but protected Hono RPC repeats its authorization decision.
+  but protected Void API repeats its authorization decision.
 
 ## 5. Non-Goals
 
@@ -46,10 +46,10 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[C-1]` Google callback availability and userinfo shape remain external dependencies, refining
   architecture [C-6].
-- `[C-2]` The development branch returns a synthetic active admin (`src/client/lib/auth/get-auth-user.ts:34-41`),
+- `[C-2]` The development branch returns a synthetic active admin (`apps/web/server/lib/auth/api-user.ts`),
   so it does not exercise provider callbacks.
 - `[C-3]` `VITE_PUBLIC_URL` must resolve to an origin accepted by Google because Better Auth uses it
-  as `baseURL` (`src/server/lib/auth/auth-server.ts:16-20`).
+  as `baseURL` (`apps/web/server/lib/auth/auth-server.ts:16-20`).
 - `[C-4]` Role checks authorize a capability; handlers still perform row-ownership checks where a
   resource belongs to a user.
 
@@ -59,8 +59,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | ------------------------- | ------------------------- | -------------------------------------------------- | ------------------------------------------ |
 | Auth factory              | Server library            | Configure Better Auth with D1, secrets, and Google | `getAuth()`                                |
 | Membership hooks          | Auth configuration        | Set pending accounts and reject inactive sessions  | `databaseHooks`                            |
-| Auth user resolver        | Hono session route        | Resolve session identity or development identity   | `GET /api/session`                         |
-| Guard middleware          | Hono middleware           | Enforce presence, status, and optional role        | `authGuard(role?)`                         |
+| Auth user resolver        | Void session route        | Resolve session identity or development identity   | `GET /api/session`                         |
+| Guard wrapper             | Handler wrapper           | Enforce presence, status, and optional role        | `withAuthGuard(handler, role?)`            |
 | Browser client and routes | Client library and routes | Start sign-in, sign out, surface login outcomes    | `authClient`, `/auth/login`, `/api/auth/*` |
 
 ## 8. Detailed Design
@@ -68,48 +68,52 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 ### 8.1 Auth factory and secrets
 
 `getAuth(db = getDb())` creates Better Auth per request, connects the Drizzle adapter to that client,
-and exposes the account, session, user, and verification schema (`src/server/lib/auth/auth-server.ts:1-18`).
-The Hono request handler supplies its request-scoped database client. It uses
+and exposes the account, session, user, and verification schema (`apps/web/server/lib/auth/auth-server.ts:1-18`).
+Void routes import the factory directly; its default argument obtains a request-scoped database client. It uses
 `SESSION_SECRET` as the auth secret and passes Google client credentials only in the social-provider
-configuration (`src/server/lib/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
-Better Auth's raw `Response` cookie headers are returned unchanged by the Hono/Worker boundary.
+configuration (`apps/web/server/lib/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
+Better Auth's raw `Response` cookie headers are returned unchanged by the Void/Worker boundary.
 
 ### 8.2 Account and session admission
 
 The user-create hook sets every Google-created account to `pending`
-(`src/server/lib/auth/auth-server.ts:38-42`). Before session creation, the session hook loads the user and
+(`apps/web/server/lib/auth/auth-server.ts:38-42`). Before session creation, the session hook loads the user and
 rejects `blocked` or `pending` statuses with `account_blocked` or `account_pending`
-(`src/server/lib/auth/auth-server.ts:21-36`). Additional `role` and `status` fields have `input: false`,
-so client-facing auth calls cannot provide them (`src/server/lib/auth/auth-server.ts:52-57`).
+(`apps/web/server/lib/auth/auth-server.ts:21-36`). Additional `role` and `status` fields have `input: false`,
+so client-facing auth calls cannot provide them (`apps/web/server/lib/auth/auth-server.ts:52-57`).
 
 ### 8.3 User resolution and guard
 
-`GET /api/session` returns the session identity or `null`; `getAuthUser()` consumes it through the
-typed Hono client and converts `null` to `undefined` (`src/client/lib/auth/get-auth-user.ts:1-30`).
-`getApiUser()` receives an explicit request-scoped development boolean, returning the bounded
-synthetic identity only when it is true; other execution reads Better Auth session headers
-(`src/server/lib/auth/api-user.ts:5-17`). `authGuard()` returns authorization failures or calls `next` with
-the user context.
+`apps/web/routes/api/session.ts` exports GET and returns the session identity or JSON `null` with
+status 200 through `jsonNullable`; Void would otherwise map returned `null` to 204.
+`getAuthUser()` consumes the typed `void/client` fetch through `readResponse` and converts
+`null` to `undefined` (`apps/web/src/lib/auth/get-auth-user.ts`).
+`getApiUser(context)` uses `import.meta.env.DEV` to select a fixed active admin identity in
+development; production resolves the Better Auth session from request headers.
+`withAuthGuard(handler, role?)` authorizes before the handler's validation and sets `apiUser`
+in the Void context (`user` is reserved by Void). It throws `HTTPException` for missing identity
+(`401 unauthorized`), blocked/pending membership (`403 account_blocked` / `account_pending`),
+or a failed admin requirement (`403 Permission denied`).
 
 ### 8.4 OAuth and HTTP route contract
 
-The direct Worker Hono handler delegates GET and POST `/api/auth/*` requests to the per-request
-Better Auth handler (`src/server/api.ts:17`). Request bodies, cookies, raw `Response` headers, and
+`apps/web/routes/api/auth/[...path].ts` exports GET and POST handlers that delegate
+`/api/auth/*` to the per-request Better Auth handler; the app does not use `void/auth`. Request bodies, cookies, raw `Response` headers, and
 redirects pass through unchanged. Better Auth owns the OAuth redirect, callback, state, PKCE,
-provider exchange, and session protocol. Application Hono routes never construct OAuth state or
+provider exchange, and session protocol. Application Void routes never construct OAuth state or
 session cookies directly.
 
 ### 8.5 Login and sign-out contract
 
 The login action invokes `authClient.signIn.social` with provider `google`, callback `/`, and login
-error callback (`src/client/routes/auth/login.tsx:13-18`). The login route maps pending and blocked codes
-to French messages (`src/client/routes/auth/login.tsx:20-29`) and redirects an authenticated visitor away
-from login (`src/client/routes/auth/login.tsx:59-65`). Browser sign-out uses `authClient.signOut()` from
+error callback (`apps/web/src/routes/auth/login.tsx:13-18`). The login route maps pending and blocked codes
+to French messages (`apps/web/src/routes/auth/login.tsx:20-29`) and redirects an authenticated visitor away
+from login (`apps/web/src/routes/auth/login.tsx:59-65`). Browser sign-out uses `authClient.signOut()` from
 an account UI; protected calls become anonymous once the session is absent.
 
 ### 8.6 Interaction boundary
 
-Auth owns identity, membership status, and role. Hono feature routes consume `authGuard()` and
+Auth owns identity, membership status, and role. Void feature routes consume `withAuthGuard(handler, role?)` and
 enforce resource ownership; the data layer owns storage mechanics; platform owns Worker secret provisioning.
 This division refines the server umbrella dependency direction [KD-2].
 
@@ -117,10 +121,10 @@ This division refines the server umbrella dependency direction [KD-2].
 
 A session represents an already-approved identity at the time the session hook runs. The hook checks
 the persisted status before issuance, so a pending or blocked account does not receive the session
-that protected functions would otherwise resolve (`src/server/lib/auth/auth-server.ts:21-36`).
+that protected functions would otherwise resolve (`apps/web/server/lib/auth/auth-server.ts:21-36`).
 
 Session cookies are Better Auth response state. The direct Worker preserves the raw `Response`
-cookie headers. Hono session resolution calls `auth.api.getSession({ headers, returnHeaders: true })`
+cookie headers. The Void session resolver calls `auth.api.getSession({ headers, returnHeaders: true })`
 and appends each returned `Set-Cookie` header, including refreshed or expired session cookies, to
 its response. Application code does not parse or encrypt session cookies. This refines architecture
 [KD-5] and keeps cookie mechanics within the identity library.
@@ -145,8 +149,8 @@ application message, while provider and server details remain in server-side dia
 
 ### 8.10 Development boundary
 
-The development identity is a bounded local capability selected by the explicit `development` value
-passed into the API request context (`src/server/lib/auth/api-user.ts:5-17`). Production session resolution
+The development identity is a bounded local capability selected by `import.meta.env.DEV`
+in `apps/web/server/lib/auth/api-user.ts`. Production session resolution
 always calls Better Auth, so a deployed request has no synthetic identity path.
 
 Tests can exercise status and role branches by supplying controlled resolver results. End-to-end

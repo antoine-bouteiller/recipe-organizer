@@ -1,12 +1,13 @@
 {
-  "extends": "@recipe-organizer/config/tsconfig.base.json",
+  "extends": ["@recipe-organizer/config/tsconfig.base.json", "./.void/tsconfig.json"],
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["node", "vite-plus/client", "@recipe-organizer/api/worker-configuration"],
+    "types": ["node", "vite-plus/client", "void/env"],
     "jsx": "react-jsx",
     "paths": {
-      "@client/*": ["./src/*"]
+      "@client/*": ["./src/*"],
+      "void/routes": ["./.void/routes.d.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "routes", "middleware", "server", "void.config.ts", ".void/routes.d.ts"]
 }

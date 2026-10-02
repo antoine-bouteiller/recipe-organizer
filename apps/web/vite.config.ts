@@ -1,12 +1,12 @@
-import path from 'node:path'
-
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
+import { voidPlugin } from 'void'
 
 const viteConfig = defineConfig({
-  envDir: path.join(import.meta.dirname, '../..'),
+  // The Worker owns unmatched requests; Vite's SPA fallback would answer API 404s with index.html.
+  appType: 'mpa',
   resolve: {
     tsconfigPaths: true,
   },
@@ -17,12 +17,10 @@ const viteConfig = defineConfig({
       autoCodeSplitting: true,
     }),
     react({ compiler: true }),
+    voidPlugin({ persistTo: '.wrangler/state' }),
   ],
   server: {
     port: 3000,
-    proxy: {
-      '/api': 'http://127.0.0.1:8787',
-    },
   },
 })
 
