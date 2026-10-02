@@ -231,8 +231,8 @@ catalogs:
       specifier: ^4.13.11
       version: 4.13.12
     knip:
-      specifier: 6.38.0
-      version: 6.38.0
+      specifier: 6.39.0
+      version: 6.39.0
     oxc-transform-react:
       specifier: 0.151.0
       version: 0.151.0
@@ -307,7 +307,7 @@ importers:
         version: 1.0.0-rc.3
       knip:
         specifier: 'catalog:'
-        version: 6.38.0
+        version: 6.39.0
       playwright:
         specifier: 'catalog:'
         version: 1.63.0
@@ -4285,8 +4285,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@6.38.0:
-    resolution: {integrity: sha512-umytiMCaZf02MV9SOO1FEDgbDf6h20VZk3ruJE0kh52kkGjYZFRUAXHJWYoLhvhoHGINO/7GXVJmQ2vxTBvl6A==}
+  knip@6.39.0:
+    resolution: {integrity: sha512-Y7g6Ve1ATMox1u1v+gx3z9LTlvzVLTJISm/LVn9TgBU4qc7OoC63AWGO8qCFPVDDdaqlYdXkDDvvO1METBfTRw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -8007,7 +8007,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@6.38.0:
+  knip@6.39.0:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.7)
       formatly: 0.7.0
