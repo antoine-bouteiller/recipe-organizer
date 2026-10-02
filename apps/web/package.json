@@ -2,6 +2,10 @@
   "name": "@recipe-organizer/web",
   "private": true,
   "type": "module",
+  "imports": {
+    "#server/db/schema": "./server/db/schema/index.ts",
+    "#server/*": "./server/*.ts"
+  },
   "scripts": {
     "dev": "vp dev",
     "build": "vp build"
@@ -14,13 +18,14 @@
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-store": "catalog:",
     "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
     "hono": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "void": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@recipe-organizer/api": "workspace:*",
     "@recipe-organizer/config": "workspace:*",
     "@tanstack/router-plugin": "catalog:",
     "@types/react": "catalog:",
@@ -28,6 +33,7 @@
     "@vanilla-extract/css": "catalog:",
     "@vanilla-extract/vite-plugin": "catalog:",
     "@vitejs/plugin-react": "catalog:",
-    "oxc-transform-react": "catalog:"
+    "oxc-transform-react": "catalog:",
+    "vite-plus": "catalog:"
   }
 }

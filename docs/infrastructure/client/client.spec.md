@@ -27,10 +27,10 @@ boundary while leaving product goals and system-wide principles to
 
 ## 3. Key Design Decisions
 
-| Decision                 | Choice                                                                 | Rationale                                                                                                               |
-| ------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Client split    | Routing, forms, and client state have separate leaves                  | Each area has a distinct public contract and verification surface, while their boundaries remain explicit.              |
-| `[KD-2]` Server boundary | Route and form consumers use typed Hono RPC query and mutation clients | This refines the Worker-as-API decision in `docs/architecture.spec.md` `[KD-1]` and keeps access control at the Worker. |
+| Decision                 | Choice                                                                  | Rationale                                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Client split    | Routing, forms, and client state have separate leaves                   | Each area has a distinct public contract and verification surface, while their boundaries remain explicit.              |
+| `[KD-2]` Server boundary | Route and form consumers use typed Void HTTP query and mutation clients | This refines the Worker-as-API decision in `docs/architecture.spec.md` `[KD-1]` and keeps access control at the Worker. |
 
 ## 4. Principles & Intents
 
@@ -66,8 +66,8 @@ Leaf execution order:
 
 | Leaf                                     | Depends on                                                                      | Rationale                                                                   |
 | ---------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [`routing-ssr`](./routing-ssr.spec.md)   | `../server/auth.spec.md`, `../server/server-functions.spec.md`                  | Route context and loaders consume authentication and Hono RPC contracts.    |
-| [`forms`](./forms.spec.md)               | `../server/server-functions.spec.md`                                            | Form schemas and Hono RPC submissions meet the Worker validation boundary.  |
+| [`routing-ssr`](./routing-ssr.spec.md)   | `../server/auth.spec.md`, `../server/server-functions.spec.md`                  | Route context and loaders consume authentication and Void HTTP contracts.   |
+| [`forms`](./forms.spec.md)               | `../server/server-functions.spec.md`                                            | Form schemas and Void HTTP submissions meet the Worker validation boundary. |
 | [`client-state`](./client-state.spec.md) | [`routing-ssr`](./routing-ssr.spec.md) `[KD-1]`, `../server/data-layer.spec.md` | Query lifecycle follows router context and represents Worker-owned records. |
 
 ## 8. Detailed Design

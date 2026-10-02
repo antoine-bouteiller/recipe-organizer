@@ -19,3 +19,7 @@ scheduled_tasks.lock
 skills-lock.json
 skills
 .vitest/
+
+# Void
+.void
+.void-wrangler.jsonc
