@@ -97,13 +97,13 @@ globalStyle('body', {
   },
 })
 
-globalStyle('html:has(body > #root)', {
+globalStyle('html:has(body > #app)', {
   scrollBehavior: 'smooth',
   height: '100%',
   overflow: 'hidden',
 })
 
-globalStyle('body:has(> #root)', {
+globalStyle('body:has(> #app)', {
   position: 'fixed',
   top: 0,
   isolation: 'isolate',
@@ -114,20 +114,20 @@ globalStyle('body:has(> #root)', {
   overflow: 'hidden',
 })
 
-globalStyle('#root', {
+globalStyle('#app', {
   display: 'flex',
   minHeight: 0,
   flex: '1 1 0%',
   flexDirection: 'column',
 })
 
-globalStyle('body:has(> #root) *', {
+globalStyle('body:has(> #app) *', {
   '@media': {
     '(max-width: 767px)': { scrollbarWidth: 'none' },
   },
 })
 
-globalStyle('body:has(> #root) *::-webkit-scrollbar', {
+globalStyle('body:has(> #app) *::-webkit-scrollbar', {
   '@media': {
     '(max-width: 767px)': { display: 'none' },
   },

@@ -20,7 +20,7 @@ export const QuantityControls = ({ recipeId, servings, variant = 'default' }: Qu
   if (variant === 'card') {
     if (!isInShoppingList) {
       return (
-        <Button onClick={() => addToShoppingList(recipeId)}>
+        <Button onClick={() => addToShoppingList(recipeId)} width="full">
           <PlusIcon weight="bold" />
           Ajouter à la liste
         </Button>
