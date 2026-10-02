@@ -1,6 +1,5 @@
-import { deleteIngredientOptions } from '@client/features/ingredients/api/delete'
+import { usePageAction } from '@client/lib/page-action'
 import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
-import { useMutation } from '@tanstack/react-query'
 
 interface DeleteIngredientProps {
   ingredientId: number
@@ -8,9 +7,10 @@ interface DeleteIngredientProps {
 }
 
 export const DeleteIngredient = ({ ingredientId, ingredientName }: DeleteIngredientProps) => {
-  const deleteMutation = useMutation(deleteIngredientOptions())
-
-  const handleDelete = () => deleteMutation.mutate({ data: { id: ingredientId } })
+  const runPageAction = usePageAction()
+  const handleDelete = async () => {
+    await runPageAction('/settings/ingredients?delete', { data: { id: ingredientId } }, "Erreur lors de la suppression de l'ingrédient")
+  }
 
   return (
     <DeleteDialog

@@ -35,8 +35,7 @@ serving `index.spec.md` [G-2] and [G-4].
 | `[KD-4]` Asset delivery          | Image and video route handlers stream R2 objects through the shared cache boundary.                                                                                               | Media remains private to application routing while retaining cacheable delivery.              |
 
 The instruction renderer receives step groups and delegates to `RecipeStepGroups` (`editor.spec.md`
-[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. Display uses mutation
-options for deletion while CRUD retains authorization and graph removal.
+[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. The detail island posts its page action for deletion while CRUD retains authorization and graph removal.
 
 ## Outcome
 
@@ -51,31 +50,41 @@ options for deletion while CRUD retains authorization and graph removal.
 
 ### `[CT-1]` Query projections
 
-| Projection     | Fields                                                 | Surface              | Endpoint                            |
-| -------------- | ------------------------------------------------------ | -------------------- | ----------------------------------- |
-| Reduced recipe | id, name, image URL, servings, derived flags           | Card grid and search | `getRecipeListOptions`              |
-| Detail recipe  | reduced fields plus groups, links, `stepGroups`, video | Cooking view         | `getRecipeDetailsOptions`           |
-| Instructions   | id, name, default-group `steps: RecipeStep[]`          | Sub-recipe section   | `GET /api/recipes/:id/instructions` |
+| Projection            | Fields                                                         | Surface               | Server helper                       |
+| --------------------- | -------------------------------------------------------------- | --------------------- | ----------------------------------- |
+| Reduced recipe        | ID, name, image URL, servings, flags, meals/cuisines           | Home, search, palette | `listRecipes(db)`                   |
+| Detail recipe         | Reduced fields plus ingredient graph, links, stepGroups, video | Cooking view          | `getRecipeDetails(db, id)`          |
+| Embedded instructions | ID, name, default-group steps                                  | Sub-recipe section    | `getSubrecipeInstructions(db, ids)` |
 
-- `stepGroups` and `steps` use `RecipeStepGroup` and `RecipeStep` (`editor.spec.md` [CT-1]), mapped
-  from rows by the shared mapper (`crud.spec.md` [CT-1]); they replace the serialized `instructions`
-  string.
-- The list maps image keys to display URLs and represents absent flag collections as empty.
-- Detail orders default ingredient groups first and includes each linked recipe's default group.
-- A missing recipe is not-found for detail; the instructions projection's not-found renders as an
-  unavailable sub-recipe source (`editor.spec.md` [CT-4]).
+`packages/server/src/recipe/queries.ts` owns these projections. Home/search loaders read the list
+directly; the palette alone retains `GET /api/recipes`. Detail loader reads the recipe, extracts
+sub-recipe IDs from its step groups, and resolves names/default steps before returning props.
+No browser instructions request remains.
+
+- Steps use `RecipeStepGroup`/`RecipeStep` (`editor.spec.md` [CT-1]) mapped from rows.
+- The list is name-ordered, maps image keys to display URLs, and normalizes absent flag arrays.
+- Detail orders default ingredient groups first and includes linked recipes' default groups.
+- Missing/invalid detail IDs return `recipe: null` for in-page NotFound. Missing instruction
+  sources are omitted and the renderer hides missing or empty sub-recipe sections.
 
 ### `[CT-2]` Navigation and cards
 
 ```text
-list query ──► card grid ──► /recipe/$id ──► detail query
-     │              │                                  │
-     └──────────────┴──────────── search ──────────────┘
+home/search loader ──► list props ──► cards ──► /recipe/<id> loader
+                                                   │
+                              detail + subrecipe props ──► cooking HTML + islands
 ```
 
-Search opens from the platform shortcut, filters the shared list, and navigates to the selected
-recipe. Cards show localised flags and a view-transition link; quantity controls sit outside the
-link.
+Home composes `RecipeListContent` with `renderCardAction` islands for quantity/membership.
+Detail composes `RecipeDetailsContent` with a quantityControls slot and renderIngredientGroups
+islands. Static metadata and preparation remain server-rendered. Relative nearby `_name.tsx`
+default re-exports carry the island import attributes; feature components do not wire framework
+islands themselves.
+
+Void card links perform document navigation to island details; cross-document transitions enhance
+supported browsers. Controls remain outside links. Header SearchBar opens with ⌘K/Ctrl+K, loads
+the list on first open, filters locally, and navigates with `location.assign`.
+Full search is its own load island with loader-fed recipes and local filters/recents.
 
 ### `[CT-3]` Cooking view and quantities
 
@@ -87,9 +96,12 @@ link.
   detail page show decrement, quantity, increment, and membership toggle. A missing recipe id yields
   no mutation.
 - Edit and delete actions show only for an authenticated viewer; CRUD enforces owner-or-admin.
-- Routes render client-side in the authenticated shell and grant no public document caching. The
-  edit route redirects an unauthenticated viewer to sign-in and prefetches the recipe, ingredients,
-  and recipe list.
+- Home and details render as server island pages in the browse layout; search receives the same list projection in its load island. Browse loaders do not gate membership; edit/create affordances derive from shared identity. The regular edit loader gates membership and reads recipe, ingredients, and recipe list directly.
+- The page passes GoBackButton as a load island. Mobile tabs remain native hash anchors in static
+  HTML; hydrated DS Tabs scroll and replace the hash without extra history entries.
+- The idle management-actions island posts native `fetch('/recipe/<id>', { method: 'POST' })`
+  for deletion, alerts non-OK responses, and navigates home on success. The guarded server action
+  retains owner-or-admin deletion policy.
 
 ### `[CT-4]` Media handlers
 
@@ -105,7 +117,7 @@ the file-url helper.
 ## Acceptance
 
 - `[VC-1]` Given the home grid, when the cook clicks a card's quantity action, then membership
-  changes without navigation; clicking the card link opens `/recipe/$id`; search filters the same
+  changes without navigation; clicking the card link opens `/recipe/<id>`; search filters the same
   list. — demonstrates `[SO-1]`
 - `[VC-2]` Given a recipe with servings 4 and an ingredient of 200 g, when the quantity is set to 6,
   then 300 g renders, and decrementing stops at 1. — demonstrates `[SO-2]`

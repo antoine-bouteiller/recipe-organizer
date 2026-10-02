@@ -1,4 +1,3 @@
-import { withRouter } from '@storybook-helpers/router'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type React from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
@@ -37,7 +36,7 @@ const TabsExample = (): React.ReactElement => (
   </div>
 )
 
-const meta = { component: TabsExample, decorators: [withRouter], title: 'Navigation/Tabs' } satisfies Meta<typeof TabsExample>
+const meta = { component: TabsExample, title: 'Navigation/Tabs' } satisfies Meta<typeof TabsExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Swipeable: Story = {}

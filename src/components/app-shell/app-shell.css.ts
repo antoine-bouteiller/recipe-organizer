@@ -15,11 +15,6 @@ export const element = style({
   },
 })
 
-export const container = style({
-  height: theme.spacing(9),
-  width: theme.spacing(56),
-})
-
 export const mainContent = style({
   display: 'flex',
   flex: '1 1 0%',

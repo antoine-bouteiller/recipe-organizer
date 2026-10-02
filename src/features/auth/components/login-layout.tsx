@@ -15,7 +15,7 @@ export const LoginLayout = ({ error, onSignIn }: { error?: string; onSignIn: () 
           </Button>
         </div>
         <div className={styles.backLinkContainer}>
-          <Button asLink to="/" size="sm" variant="ghost">
+          <Button asLink href="/" size="sm" variant="ghost">
             <ArrowLeftIcon size="sm" />
             Retour à l&apos;accueil
           </Button>

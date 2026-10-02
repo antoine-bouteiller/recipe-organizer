@@ -69,8 +69,6 @@ export const recipeSchema = z.object({
 })
 
 export const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
-export const deleteRecipeSchema = z.number()
-
 type RecipeFormValues = z.infer<typeof recipeSchema>
 export type RecipeFormInput = Partial<RecipeFormValues>
 type UpdateRecipeFormValues = z.infer<typeof updateRecipeSchema>

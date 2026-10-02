@@ -1,7 +1,6 @@
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
-import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
-import react from '@vitejs/plugin-react'
+import { voidReact } from '@void/react/plugin'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
 import { voidPlugin } from 'void'
@@ -21,7 +20,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     // Checks and tests must not initialize the Worker or validate deployment environment values.
     // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
     ...(process.env.VP_RESOLVING_CONFIG_METADATA !== '1' && !process.env.VITEST && isPreview !== undefined
-      ? [tanstackRouter({ target: 'react', autoCodeSplitting: true }), react({ compiler: true }), voidPlugin({ persistTo: '.wrangler/state' })]
+      ? [voidPlugin({ persistTo: '.wrangler/state' }), voidReact({ react: { compiler: true }, viewTransitions: true })]
       : []),
   ],
   server: { port: 3000 },
@@ -42,7 +41,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
+    ignorePatterns: ['vite.config.ts'],
     overrides: [
       ...features.map((feature) => ({
         files: [`src/features/${feature}/**/*.{ts,tsx}`],
@@ -196,7 +195,6 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     singleQuote: true,
     printWidth: 150,
     experimentalSortImports: {},
-    ignorePatterns: ['src/routeTree.gen.ts'],
   },
   staged: {
     '*': 'vp check --fix',
@@ -225,8 +223,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
-      exclude: ['**/*.stories.tsx', '**/*.css.ts', '**/routeTree.gen.ts'],
+      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
+      exclude: ['**/*.stories.tsx', '**/*.css.ts'],
     },
   },
 }))

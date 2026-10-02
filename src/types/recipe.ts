@@ -1,3 +1,3 @@
-import type { RouteMap } from 'void/routes'
+import type { listRecipes } from '@recipe-organizer/server/recipe/queries'
 
-export type ReducedRecipe = RouteMap['/api/recipes']['GET']['output'][number]
+export type ReducedRecipe = Awaited<ReturnType<typeof listRecipes>>[number]

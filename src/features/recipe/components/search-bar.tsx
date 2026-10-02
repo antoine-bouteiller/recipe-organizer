@@ -1,4 +1,4 @@
-import { getRecipeListOptions } from '@client/features/recipe/api/get-all'
+import { loadRecipeList } from '@client/features/recipe/api/get-all'
 import type { ReducedRecipe } from '@client/types/recipe'
 import { normalize } from '@client/utils/normalize'
 import { Button } from '@recipe-organizer/design-system/button'
@@ -7,16 +7,13 @@ import { usePlatform } from '@recipe-organizer/design-system/hooks/use-platform'
 import { ArrowElbowDownLeftIcon, MagnifyingGlassIcon } from '@recipe-organizer/design-system/icons'
 import { Kbd, KbdGroup } from '@recipe-organizer/design-system/kbd'
 import { ScrollArea } from '@recipe-organizer/design-system/scroll-area'
-import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
-import { useEffect, useId, useState } from 'react'
+import { Suspense, use, useEffect, useId, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 
 import * as styles from './search-bar.css'
 
 const SearchPalette = ({ onClose }: { onClose: () => void }) => {
-  const navigate = useNavigate()
-  const { data: recipes = [] } = useQuery(getRecipeListOptions())
+  const recipes = use(loadRecipeList())
   const listId = useId()
   const [query, setQuery] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState(0)
@@ -27,7 +24,8 @@ const SearchPalette = ({ onClose }: { onClose: () => void }) => {
 
   const select = (recipe: ReducedRecipe) => {
     onClose()
-    void navigate({ params: { id: recipe.id.toString() }, to: '/recipe/$id' })
+    // Recipe pages are island pages, so this is a document navigation from any page kind.
+    globalThis.location.assign(`/recipe/${recipe.id}`)
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
@@ -145,7 +143,9 @@ const SearchBar = () => {
           </Button>
         )}
       >
-        <SearchPalette onClose={() => setOpen(false)} />
+        <Suspense>
+          <SearchPalette onClose={() => setOpen(false)} />
+        </Suspense>
       </Dialog>
     </div>
   )

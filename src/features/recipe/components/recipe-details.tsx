@@ -1,75 +1,66 @@
-import { deleteRecipeOptions } from '@client/features/recipe/api/delete'
 import type { Recipe } from '@client/features/recipe/api/get-one'
-import { QuantityControls } from '@client/features/recipe/components/quantity-controls'
-import { RecipeIngredientGroups } from '@client/features/recipe/components/recipe-section'
+import type { RecipeIngredientGroupsProps } from '@client/features/recipe/components/recipe-section'
 import { RecipeStepGroups } from '@client/features/recipe/components/steps/recipe-steps'
+import type { SubrecipeInstructions } from '@client/features/recipe/components/steps/recipe-steps'
 import { alertError } from '@client/lib/alert-error'
+import { getErrorMessage } from '@client/lib/api-client'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
 import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@recipe-organizer/design-system/icons'
 import { Popover } from '@recipe-organizer/design-system/popover'
-import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { Tabs } from '@recipe-organizer/design-system/tabs'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
-import { incrementalArray } from '@recipe-organizer/shared/utils/array'
-import { useMutation } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
+import type { ReactNode } from 'react'
 
 import * as styles from './recipe-details.css'
 
-export const RecipeDetailsSkeleton = () => (
-  <>
-    <div className={styles.container}>
-      <Skeleton preset="recipe-details-title" />
-    </div>
-    <div className={styles.skeletonDetails}>
-      {incrementalArray({ length: 6 }).map((index) => (
-        <Skeleton preset="recipe-details-text" key={index} />
-      ))}
-    </div>
-  </>
-)
-
-export const RecipeManagementActions = ({ recipe }: { readonly recipe: Recipe }) => {
-  const { mutateAsync: deleteRecipe } = useMutation(deleteRecipeOptions())
-  const router = useRouter()
-
-  const handleDelete = () =>
-    deleteRecipe(
-      { data: recipe.id },
-      {
-        onError: (error) => alertError('Une erreur est survenue lors de la suppression de la recette', error),
-        onSuccess: () => router.navigate({ to: '/' }),
-      }
+// The details page is an island page without a client router, so it posts its delete action directly.
+const deleteRecipe = async (recipeId: number) => {
+  const response = await fetch(`/recipe/${recipeId}`, { method: 'POST' })
+  if (!response.ok) {
+    alertError(
+      'Une erreur est survenue lors de la suppression de la recette',
+      new Error(getErrorMessage(await response.json().catch(() => undefined)))
     )
-
-  return (
-    <Popover
-      renderTrigger={(props) => (
-        <Button {...props} size="icon" variant="ghost">
-          <DotsThreeVerticalIcon weight="bold" />
-        </Button>
-      )}
-    >
-      <div className={styles.managementActions}>
-        <Button align="start" asLink params={{ id: recipe.id.toString() }} to="/recipe/edit/$id" viewTransition variant="list-action" width="full">
-          <PencilSimpleIcon size="sm" />
-          Modifier la recette
-        </Button>
-        <DeleteDialog
-          deleteButtonLabel="Supprimer la recette"
-          description={`Êtes-vous sûr de vouloir supprimer la recette ${recipe.name}?`}
-          onDelete={handleDelete}
-          title="Supprimer la recette"
-          renderTrigger={(props) => <Button {...props} variant="destructive-ghost" />}
-        />
-      </div>
-    </Popover>
-  )
+    return
+  }
+  globalThis.location.assign('/')
 }
 
-export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Recipe; readonly recipeId: number }) => {
+export const RecipeManagementActions = ({ recipeId, recipeName }: { readonly recipeId: number; readonly recipeName: string }) => (
+  <Popover
+    renderTrigger={(props) => (
+      <Button {...props} size="icon" variant="ghost">
+        <DotsThreeVerticalIcon weight="bold" />
+      </Button>
+    )}
+  >
+    <div className={styles.managementActions}>
+      <Button align="start" asLink href={`/recipe/edit/${recipeId}`} variant="list-action" width="full">
+        <PencilSimpleIcon size="sm" />
+        Modifier la recette
+      </Button>
+      <DeleteDialog
+        deleteButtonLabel="Supprimer la recette"
+        description={`Êtes-vous sûr de vouloir supprimer la recette ${recipeName}?`}
+        onDelete={() => deleteRecipe(recipeId)}
+        title="Supprimer la recette"
+        renderTrigger={(props) => <Button {...props} variant="destructive-ghost" />}
+      />
+    </div>
+  </Popover>
+)
+
+export interface RecipeDetailsContentProps {
+  readonly recipe: Recipe
+  readonly subrecipes: readonly SubrecipeInstructions[]
+  /** Island pages pass the servings controls and scaled ingredient lists as islands. */
+  readonly quantityControls: ReactNode
+  readonly renderIngredientGroups: (props: RecipeIngredientGroupsProps) => ReactNode
+}
+
+export const RecipeDetailsContent = ({ quantityControls, recipe, renderIngredientGroups, subrecipes }: RecipeDetailsContentProps) => {
   const ingredientGroups = [
     ...recipe.ingredientGroups,
     ...recipe.linkedRecipes.map(({ linkedRecipe }) => ({ ...linkedRecipe.ingredientGroups[0], groupName: linkedRecipe.name, isDefault: false })),
@@ -93,9 +84,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
           ))}
         </div>
       )}
-      <div className={styles.quantityControls}>
-        <QuantityControls recipeId={recipeId} servings={recipe.servings} />
-      </div>
+      <div className={styles.quantityControls}>{quantityControls}</div>
       <div className={styles.detailsContent}>
         <div className={styles.mobileTabs}>
           <Tabs
@@ -103,12 +92,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
               {
                 content: (
                   <div className={styles.ingredientsPanel}>
-                    <RecipeIngredientGroups
-                      recipeId={recipe.id}
-                      baseServings={recipe.servings}
-                      ingredientGroups={ingredientGroups}
-                      presentation="standalone"
-                    />
+                    {renderIngredientGroups({ baseServings: recipe.servings, ingredientGroups, presentation: 'standalone', recipeId: recipe.id })}
                   </div>
                 ),
                 label: 'Ingrédients',
@@ -117,7 +101,7 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
               {
                 content: (
                   <div className={styles.instructionsPanel}>
-                    <RecipeStepGroups stepGroups={recipe.stepGroups} />
+                    <RecipeStepGroups stepGroups={recipe.stepGroups} subrecipes={subrecipes} />
                   </div>
                 ),
                 label: 'Préparation',
@@ -129,12 +113,12 @@ export const RecipeDetailsContent = ({ recipe, recipeId }: { readonly recipe: Re
         <div className={styles.desktopLayout}>
           <section className={styles.section}>
             <h2 className={styles.ingredientsHeading}>Ingrédients</h2>
-            <RecipeIngredientGroups recipeId={recipeId} baseServings={recipe.servings} ingredientGroups={ingredientGroups} presentation="embedded" />
+            {renderIngredientGroups({ baseServings: recipe.servings, ingredientGroups, presentation: 'embedded', recipeId: recipe.id })}
           </section>
           <section className={styles.instructionsSection}>
             <h2 className={styles.instructionsHeading}>Préparation</h2>
             <div className={styles.instructionsContent}>
-              <RecipeStepGroups stepGroups={recipe.stepGroups} />
+              <RecipeStepGroups stepGroups={recipe.stepGroups} subrecipes={subrecipes} />
             </div>
           </section>
         </div>

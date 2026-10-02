@@ -1,14 +1,13 @@
-import { ingredientSchema } from '@client/features/ingredients/api/create'
-import { updateIngredientOptions, updateIngredientSchema } from '@client/features/ingredients/api/update'
-import type { UpdateIngredientFormInput } from '@client/features/ingredients/api/update'
 import { getIngredientDefaultValues, IngredientForm } from '@client/features/ingredients/components/ingredient-form'
+import { usePageAction } from '@client/lib/page-action'
 import type { Ingredient } from '@client/types/ingredient'
 import { Button } from '@recipe-organizer/design-system/button'
 import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { PencilSimpleIcon } from '@recipe-organizer/design-system/icons'
+import { ingredientSchema, updateIngredientSchema } from '@recipe-organizer/shared/ingredients/schemas'
+import type { UpdateIngredientFormInput } from '@recipe-organizer/shared/ingredients/schemas'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 
 interface EditIngredientProps {
@@ -18,7 +17,7 @@ interface EditIngredientProps {
 const FormDialog = getFormDialog(getIngredientDefaultValues())
 
 export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
-  const updateMutation = useMutation(updateIngredientOptions())
+  const runPageAction = usePageAction()
   const [open, setOpen] = useState(false)
 
   const initialValues: UpdateIngredientFormInput = {
@@ -34,17 +33,16 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
   const form = useAppForm({
     defaultValues: initialValues,
     onSubmit: async (data) => {
-      await updateMutation.mutateAsync(
-        {
-          data: updateIngredientSchema.parse(data.value),
-        },
-        {
-          onSuccess: () => {
-            form.reset()
-            setOpen(false)
-          },
-        }
-      )
+      if (
+        await runPageAction(
+          '/settings/ingredients?update',
+          { data: updateIngredientSchema.parse(data.value) },
+          `Erreur lors de la mise à jour de l'ingrédient ${data.value.name}`
+        )
+      ) {
+        form.reset()
+        setOpen(false)
+      }
     },
     validationLogic: revalidateLogic(),
     validators: {

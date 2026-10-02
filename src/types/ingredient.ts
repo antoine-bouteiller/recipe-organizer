@@ -1,3 +1,3 @@
-import type { RouteMap } from 'void/routes'
+import type { listIngredients } from '@recipe-organizer/server/ingredients/queries'
 
-export type Ingredient = RouteMap['/api/ingredients']['GET']['output'][number]
+export type Ingredient = Awaited<ReturnType<typeof listIngredients>>[number]

@@ -2,25 +2,21 @@ import type { ReducedRecipe } from '@client/types/recipe'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { BookIcon, PlusIcon } from '@recipe-organizer/design-system/icons'
-import { Skeleton } from '@recipe-organizer/design-system/skeleton'
 import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@recipe-organizer/shared/recipe/constants'
-import { incrementalArray } from '@recipe-organizer/shared/utils/array'
-import { Link } from '@tanstack/react-router'
-
-import { QuantityControls } from './quantity-controls'
+import { Link } from '@void/react'
+import type { ReactNode } from 'react'
 
 import * as cardStyles from './recipe-card.css'
 import * as styles from './recipe-list.css'
 
-export const RecipeListSkeleton = () => (
-  <div className={styles.container}>
-    {incrementalArray({ length: 6 }).map((index) => (
-      <Skeleton preset="recipe-card" key={index} />
-    ))}
-  </div>
-)
+export interface RecipeListContentProps {
+  readonly canCreate: boolean
+  readonly recipes: ReducedRecipe[]
+  /** Interactive per-card controls; island pages pass an island here. */
+  readonly renderCardAction: (recipe: ReducedRecipe) => ReactNode
+}
 
-export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: ReducedRecipe[]; readonly canCreate: boolean }) => {
+export const RecipeListContent = ({ canCreate, recipes, renderCardAction }: RecipeListContentProps) => {
   const visibleRecipes = recipes.filter((recipe) => !recipe.isSpice)
 
   return (
@@ -32,7 +28,7 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
           </div>
           <p className={styles.text}>Aucune recette</p>
           {canCreate && (
-            <Button to="/recipe/new" viewTransition asLink>
+            <Button asLink href="/recipe/new">
               <PlusIcon size="sm" />
               Ajouter une recette
             </Button>
@@ -43,7 +39,7 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
           {visibleRecipes.map((recipe, index) => (
             <article className={cardStyles.card} key={recipe.id}>
               <img alt={recipe.name} className={cardStyles.image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} src={recipe.image} />
-              <Link className={cardStyles.recipeLink} params={{ id: recipe.id.toString() }} to="/recipe/$id" viewTransition>
+              <Link className={cardStyles.recipeLink} href={`/recipe/${recipe.id}`}>
                 <div className={cardStyles.tags}>
                   {recipe.isVegetarian && (
                     <Badge size="sm" variant="secondary">
@@ -73,14 +69,14 @@ export const RecipeListContent = ({ recipes, canCreate }: { readonly recipes: Re
                 </div>
                 <h2 className={cardStyles.heading}>{recipe.name}</h2>
               </Link>
-              <QuantityControls recipeId={recipe.id} servings={recipe.servings} variant="card" />
+              {renderCardAction(recipe)}
             </article>
           ))}
         </div>
       )}
       {canCreate && (
         <div className={styles.floatingAction}>
-          <Button aria-label="Ajouter une recette" asLink to="/recipe/new" viewTransition size="icon-xl">
+          <Button aria-label="Ajouter une recette" asLink href="/recipe/new" size="icon-xl">
             <PlusIcon size="xl" />
           </Button>
         </div>

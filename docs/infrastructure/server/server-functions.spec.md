@@ -1,5 +1,5 @@
 ---
-title: Void Feature API
+title: Void Pages and Feature API
 status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
@@ -9,31 +9,28 @@ related: [docs/infrastructure/server/data-layer.spec.md, docs/infrastructure/ser
 
 ## 2. Problem Statement
 
-Client routes and forms need a typed Void RPC boundary that validates untrusted input, applies
-membership and ownership policy, performs persistence effects, and refreshes server data predictably. This
-leaf refines architecture [PI-2], [PI-3], [PI-4], and the system request lifecycle
-(`docs/architecture.spec.md`, section 8.1).
+Pages and forms need a typed Worker boundary that validates untrusted input, applies membership
+and ownership policy, performs persistence effects, and refreshes server data. Void page loaders
+read server helpers directly; page actions own page mutations; a small API remains for browser-only
+data, auth, health, and media. This refines architecture [PI-2], [PI-3], and [PI-4].
 
 N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                | Rationale                                                                                         |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `[KD-1]` RPC declaration          | Void file routes export GET reads and POST mutations; `void/client` supplies typed `fetch`.           | One route contract serves native same-origin browser fetches without server-action serialization. |
-| `[KD-2]` Trust sequence           | A protected route guards, validates, checks row ownership where applicable, then effects writes.      | Rejected requests cannot reach persistence and role-only checks cannot substitute for ownership.  |
-| `[KD-3]` Wire transport           | JSON carries scalar values and multipart `FormData` carries files; route schemas validate wire input. | Files retain their binary identity while schemas receive typed structured input.                  |
-| `[KD-4]` Error envelope           | `readResponse` maps HTTP failures to Router controls or a safe application error.                     | Navigation semantics survive while internal failures do not leak to callers.                      |
-| `[KD-5]` Client cache integration | Feature API modules export query or mutation option factories beside their RPC client calls.          | Reads and writes share keys, invalidation, and localized feedback at the feature boundary.        |
+| Decision                     | Choice                                                                                     | Rationale                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `[KD-1]` Declaration         | Pages export loaders and actions; remaining API files export HTTP methods.                 | Page data need not make a duplicate HTTP request; APIs serve independent browser consumers. |
+| `[KD-2]` Trust sequence      | Protected handlers authorize, validate, check ownership where applicable, then write.      | UI gates cannot authorize persistence.                                                      |
+| `[KD-3]` Wire transport      | Actions accept typed body entries including files; API POST uses JSON where needed.        | Shared schemas validate structured inputs at the Worker.                                    |
+| `[KD-4]` Error envelope      | API and thrown action failures share JSON `{ error }`; clients provide redirects/alerts.   | Internal faults remain safe application messages.                                           |
+| `[KD-5]` Refresh integration | `usePageAction()` refreshes regular-page props with URL/history and local state preserved. | No query-option factories or cache invalidation are required.                               |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **Validate inside the Worker** — refine architecture [PI-3]; client validation is never
-  authorization for a write.
-- `[PI-2]` **One feature API owns one route group** — `routes/api/<feature>/` modules expose
-  contracts rather than routes reaching into another feature's persistence.
-- `[PI-3]` **Control flow is semantic** — HTTP `401`, membership `403`, and `404` become Router
-  controls; ordinary failures have one application error envelope.
+- `[PI-1]` **Validate inside the Worker** — client validation never authorizes writes.
+- `[PI-2]` **Page owns its mutation** — server companions compose domain helpers; APIs remain only for independent HTTP consumers.
+- `[PI-3]` **Control flow is semantic** — page gates return redirects, API status codes remain HTTP errors, and ordinary failures share a safe envelope.
 
 ## 5. Non-Goals
 
@@ -49,146 +46,138 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[C-2]` Void RPC crosses an HTTP boundary, so route contracts use JSON or multipart data rather
   than Worker objects or streams.
 - `[C-3]` R2 effects cannot join D1 batching; write ordering explicitly limits inconsistent states.
-- `[C-4]` Void generates API route types in `.void/routes.d.ts`; run
-  `vp exec void prepare` before checks on a clean tree. TanStack browser routes and Void
-  API routes use separate directories and generators.
+- `[C-4]` Void generates page/action/API types in `.void/`; run `vp exec void prepare` after route changes and before clean-tree checks.
 
 ## 7. High-Level Components
 
-| Component                 | Module type                  | Responsibility                                    | Public API surface                                       |
-| ------------------------- | ---------------------------- | ------------------------------------------------- | -------------------------------------------------------- |
-| Route declaration         | Void `routes/api/<feature>/` | Typed read and mutation HTTP RPC                  | Void GET/POST routes                                     |
-| Schema boundary           | Feature API module           | Validate JSON, query, params, and multipart input | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
-| Error boundary            | Shared API client            | Map HTTP statuses to Router controls and errors   | `readResponse`                                           |
-| Authorization composition | Handler wrapper              | Inject active authorized caller                   | `withAuthGuard(handler, role?)`                          |
-| Query integration         | Feature API module           | Query/mutation options and cache refresh          | `readResponse(fetch(...))`, `get*Options`, `*Options`    |
-| API handler               | Generated Worker + Void      | Dispatch API, auth, and media requests            | `/api/*`                                                 |
+| Component            | Module type              | Responsibility                             | Public API surface                                       |
+| -------------------- | ------------------------ | ------------------------------------------ | -------------------------------------------------------- |
+| Server companion     | `pages/**/*.server.ts`   | Page reads, gates, mutations               | `loader`, `action`, `actions`, `InferProps`              |
+| Schema boundary      | Page/API handler         | Validate body, query, params, file entries | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
+| Client action helper | `src/lib/page-action.ts` | In-place refresh and failure alert         | `usePageAction()`                                        |
+| Response helper      | `src/lib/api-client.ts`  | Safe HTTP errors and login navigation      | `readResponse`, `getErrorMessage`                        |
+| Authorization        | Server auth helpers      | Gate page reads and protect writes         | `guardPage`, `withAuthGuard`                             |
+| API handlers         | `routes/api/**`          | Remaining HTTP contracts                   | Named GET/POST exports                                   |
 
 ## 8. Detailed Design
 
 ### 8.1 Function declaration and placement
 
-A feature owns file routes under `routes/api/<feature>/` and small query/mutation wrappers
-in `src/features/<feature>/api/`. Route files export named methods such as
-`export const GET = defineHandler(...)`; reads use GET and mutations use POST, including
-`POST /api/recipes/update` and `POST /api/recipes/delete`. Shared schemas live in
-`packages/shared/src/<feature>/schemas.ts`; domain persistence helpers live in `packages/server/src/<feature>/`.
+Void pages live under `pages/` with server companions exporting `defineHandler` loaders and
+`action` or named `actions`. They import domain reads/writes from `@recipe-organizer/server/*`.
+Shared schemas live in `packages/shared/src/<feature>/`; server persistence helpers live in
+`packages/server/src/<feature>/`. Browser components receive loader props rather than importing
+Worker-bound helpers at runtime.
 
 ### 8.2 Validation and FormData contract
 
-JSON, query, and path input use `defineHandler.withValidator({ body | query | params })` with shared
-Zod schemas. Guarded routes wrap the validated handler so authorization runs before validation.
-The body slot reads JSON, not multipart input: recipe create/update handlers call
-`readRecipeFormData(context)` and parse the result with `recipeSchema` or `updateRecipeSchema`.
-The browser sends `FormData` unchanged, preserving `File` values while structured scalar values
-JSON-round-trip through the shared form-data helper.
+JSON/query/params use `defineHandler.withValidator` and shared Zod schemas. Recipe forms serialize
+with `objectToFormData`, convert to entries for `usePageAction`, and server actions call
+`readRecipeFormData` before `recipeSchema`/`updateRecipeSchema` parsing. That reader accepts
+Void action bodies as well as multipart requests; files remain raw while other structured values
+JSON-round-trip. Edit actions verify the body ID matches the page ID.
 
 ### 8.3 Authorization and ownership contract
 
-Protected routes use `withAuthGuard(handler, role?)` from `packages/server/src/lib/auth/auth-guard.ts`;
-admin-only routes pass `'admin'`. The wrapper authorizes before the handler and its validators,
-then sets `apiUser` in the context, read through `context.get('apiUser')` on success paths; Void reserves `user` for its own integration.
-Failures throw `HTTPException`: `401 unauthorized`, `403 account_blocked`,
-`403 account_pending`, or `403 Permission denied`. Handlers that update or remove user-owned rows
-also load the row and call `assertOwnerOrAdmin` before persistence.
+Protected loaders return `guardPage(context, role?)` redirects before data reads.
+Recipe create/edit actions repeat that gate. Settings actions and recipe deletion wrap handlers in
+`withAuthGuard(handler, role?)`, which authorizes before handler validation and sets `apiUser`.
+Missing identity throws JSON 401; inactive membership throws its JSON 403 code; an admin requirement
+failure throws 403. Recipe write/delete helpers independently check owner-or-admin authorization.
 
 ### 8.4 Error contract
 
-Global `middleware/01.api-errors.ts` normalizes API failures through
-`toApiErrorResponse` and `toApiValidationResponse` in `packages/server/src/lib/api-error.ts`:
+`middleware/01.api-errors.ts` maps thrown API errors and errors from non-GET page requests through
+`toApiErrorResponse`. API-only validator responses also pass through `toApiValidationResponse`.
 
-| Failure                                     | HTTP response                                                                      |
-| ------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `HTTPException`                             | Its status and `{ error }`: its message, or `'Une erreur est survenue'` when empty |
-| Thrown `ZodError` or Void validator failure | `400 { error: 'Invalid Schema; …' }`                                               |
-| Unknown API path                            | `404 { error: 'not_found' }`                                                       |
-| Unexpected error                            | Logged server-side; `500 { error: 'Une erreur est survenue' }`                     |
+| Failure           | HTTP response                                                  |
+| ----------------- | -------------------------------------------------------------- |
+| `HTTPException`   | Its status and `{ error }` message                             |
+| Thrown `ZodError` | 400 schema error envelope                                      |
+| Unknown API path  | `404 { error: 'not_found' }`                                   |
+| Unexpected error  | Logged server-side; `500 { error: 'Une erreur est survenue' }` |
 
-`readResponse(requestPromise)` catches `FetchError` from `void/client`: `401` redirects to
-`/auth/login`; membership `403` redirects there with the corresponding `error` search value;
-`404` throws Router `notFound()`; `400` becomes `Invalid Schema`; other HTTP failures use
-the JSON `error` message. Non-HTTP failures propagate unchanged.
+`readResponse` catches typed `FetchError`: 401 uses `location.assign('/auth/login')`;
+blocked/pending 403 adds the login error query; 400 becomes `Invalid Schema`; other statuses,
+including 404 and ordinary permission 403, throw safe Errors rather than page-control exceptions.
+Non-HTTP failures propagate unchanged. `usePageAction` also describes validation `errors` records
+returned by action submission and alerts an unsuccessful result.
 
 ### 8.5 Effects and ordering
 
-A mutation validates and authorizes before it reads or writes. It performs related D1 statements
-through data-layer primitives, then executes compensating or object-store effects according to its
-feature contract. Recipe deletion batches relational removal before `deleteFile`; creation writes
-the root then delegates its ingredient graph (`routes/api/recipes/index.ts`, `routes/api/recipes/delete.ts`).
+Actions validate/authorize before effects and delegate aggregate writes to server helpers.
+D1 batching and R2 ordering follow the feature/data-layer contracts. Recipe deletion uses
+`packages/server/src/recipe/recipe-delete.ts`; create/update use `recipe-mutations.ts`.
+R2 cannot participate in a D1 batch.
 
-### 8.6 Query and mutation option contract
+### 8.6 Page-action client contract
 
-Option factories call typed `fetch` from `void/client` through `readResponse` and use `queryKeys` namespaces from the data layer. A
-mutation invalidates its affected key only after a successful response. User-facing mutations add
-localized feedback in their feature module; client UI state remains outside this cache contract.
+`usePageAction()` submits typed action URLs, body data, and required dynamic params through
+`submitAction(router, url, { data, method: 'POST', preserveState: true })`. It preserves URL/history,
+refreshes props in place, alerts expected failures, and returns `Promise<boolean>`.
+Callers own navigation/reset/close after success. Never await an action inside a React transition.
+The DS `DeleteDialog` uses local loading state while awaiting its callback.
 
 ### 8.7 API route boundary
 
-Void generates the Worker entry from `routes/api/**` and global middleware under
-`middleware/`. Routes import `getDb()`, `getAuth()`, and media helpers directly from
-`packages/server/src/` (`@recipe-organizer/server/*`); services are not injected into the request environment.
-`02.csrf.ts` applies `hono/csrf` to `/api/*` except `/api/auth/*`, whose origin checks belong
-to Better Auth. The Worker handles every request, including assets, and serves browser navigations
-through the SPA fallback described in the platform leaf.
+The remaining routes are:
 
-The browser calls same-origin `fetch` from `void/client`, typed by the generated `RouteMap` from
-`void/routes`, for example `readResponse(fetch('/api/recipes/:id', { params: { id } }))`.
-There is no SSR bridge or in-process transport; output types in `src/types/` derive from
-`RouteMap`.
+| Route                            | Consumer                                        |
+| -------------------------------- | ----------------------------------------------- |
+| `/api/auth/*`                    | Better Auth sign-in/session protocol            |
+| `/api/image/*`, `/api/video/*`   | Media reads; video HEAD handled through GET     |
+| `GET /api/health`                | Liveness                                        |
+| `GET /api/recipes`               | Header search palette, fetched on first open    |
+| `GET /api/shopping-list/recipes` | IDs selected in localStorage                    |
+| `POST /api/ingredients`          | Inline `AddIngredient`; then `router.refresh()` |
 
-`GET /api/health` is a liveness check. Image and video routes delegate to R2 helpers, preserving
-binary bodies and cache headers. Void dispatches video HEAD through GET; the handler selects the
-R2 HEAD helper to return metadata without reading the object body.
+API clients use same-origin typed `void/client` fetch through `readResponse`.
+`02.csrf.ts` applies `hono/csrf` only to `/api/*` except auth; it does not wrap page-action URLs.
+Void generates one Worker from pages, API routes, and middleware; its asset serving and default 404
+remain intact without an application catch-all.
 
 ### 8.8 Read contract
 
-A GET route returns a JSON projection suited to its caller and is paired with a query option whose
-`queryFn` invokes the typed Void `fetch`. Route loaders may ensure that option before a component
-renders; components observe the same key instead of issuing a parallel ad-hoc request. Public read
-access remains a feature-level policy; user-scoped and administrative reads compose the guard.
+Loaders return serializable props typed with `InferProps`. Recipe list/detail types derive from
+server query return types; no separate query-option layer exists. Missing detail recipes use
+`recipe: null`; embedded instructions resolve in the detail loader and absent sources are omitted.
 
-HTTP dates are ISO strings: the user-list wrapper revives `createdAt` and `updatedAt` to `Date`
-instances. Routes that use `null` as an HTTP absence value convert it to the existing client contract
-where needed: the session and recipe-instructions wrappers expose `undefined`
-(`src/features/users/api/get-all.ts`, `src/features/recipe/api/get-instructions.ts`).
-The session and recipe-instructions handlers use `jsonNullable` to return JSON `null` with status
-200 instead of Void's default 204 for a returned `null`.
+The header palette retains a stable promise per document, initialized on first open.
+Shopping-list reads retain one promise per serialized ID selection; rejected promises are removed.
+These browser-only reads have no timed freshness or mutation invalidation lifecycle.
 
 ### 8.9 Mutation contract
 
-A mutation option passes variables to the typed Void `fetch` and invalidates a key only after a
-successful response. Failures raise a French `alert()` describing the operation, while field-level parsing
-errors remain attributable to their form input where the client can present them.
+Regular-page forms submit page actions, then use refreshed props and caller-owned UI effects.
+Recipe details is an island page with no client router: its control posts a native fetch to
+`/recipe/<id>`, alerts a non-OK response, and navigates home on success. The guarded action
+deletes the aggregate and returns a home redirect.
 
-Mutation payloads name domain values, not database implementation details. A recipe form carries
-its ingredient groups and linked recipes as validated shape; the handler delegates persistence
-rather than exposing a sequence of storage calls to the browser.
+Inline ingredient creation uses the remaining API POST; success awaits `router.refresh()` before
+form reset and dialog closing. Settings ingredient update/delete use page actions.
 
 ### 8.10 Failure and retry boundary
 
-A client can retry a failed operation only by invoking its Void HTTP mutation again; no browser-side
-write queue exists, refining architecture [NG-4]. Routes avoid reporting success until their required
-D1 work has resolved. `204 No Content` writes resolve as `void`.
-
-Server faults expose only the API error envelope. The response helper translates authorization and
-not-found statuses into Router controls, preserving route-owned rendering.
+There is no browser write queue or automatic mutation retry. Callers may explicitly resubmit.
+Required D1 work resolves before success. `usePageAction` reports unsuccessful results as false;
+HTTP clients throw safe errors. Loader errors remain server responses, not API JSON success values.
 
 ### 8.11 Contract sketch
 
-The meaningful surface is a typed Void HTTP route and its client options, for example
-`GET /api/recipes/:id -> Recipe` and `POST /api/recipes/delete -> 204`. Validation and the guard are
-part of the route contract even though callers interact through concise feature wrappers.
+`loader(context) -> props | redirect Response`;
+`action(context) -> result | redirect Response`.
+For example, `/search` returns `{ recipes }` from a direct D1 read and
+`/recipe/edit/[id]` validates an action body before replacing the aggregate.
+`GET /api/recipes -> ReducedRecipe[]` remains an independent palette read.
 
 ### 8.12 Outcome and acceptance
 
-- `[SO-1]` Feature calls use a generated, typed same-origin HTTP contract with stable authorization,
-  validation, and optional-read semantics — demonstrated by `[VC-1]` and `[VC-2]`.
-- `[VC-1]` Given a guarded endpoint, an anonymous request receives JSON 401 before input validation;
-  blocked/pending members receive their JSON 403 code; invalid authorized input receives JSON 400
-  without persistence effects — demonstrates `[SO-1]`.
-- `[VC-2]` Given no session or no recipe instructions, GET returns status 200 with JSON `null`;
-  an unknown API path returns JSON `404 { error: 'not_found' }`. Successful feature writes invalidate
-  their query-key family — demonstrates `[SO-1]`.
+- `[SO-1]` Direct loader reads and guarded page actions replace page-specific HTTP clients while
+  remaining APIs preserve safe typed responses — demonstrated by `[VC-1]` and `[VC-2]`.
+- `[VC-1]` A protected loader redirects before reading data; a guarded action/API rejects missing,
+  inactive, or insufficient-role callers and invalid authorized input before persistence — demonstrates `[SO-1]`.
+- `[VC-2]` A regular-page write refreshes its props without changing URL/history; the palette fetches
+  on opening, shopping-list reads selected IDs, and an unknown API returns JSON 404 — demonstrates `[SO-1]`.
 
 ## 9. Open Questions
 
@@ -196,10 +185,11 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                 | Sections affected   | Reason                                                                       |
-| ---------- | ------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------- |
-| 2026-09-13 | Add the Hono HTTP foundation with request-scoped Drizzle and Better Auth. | 5, 7, 8.1, 8.7      | Prepare a shared API without migrating feature actions.                      |
-| 2026-09-13 | Migrate all feature actions to Hono RPC routes and clients.               | 2–8                 | Replace `createServerFn` contracts while retaining the same Worker boundary. |
-| 2026-09-13 | Move media endpoints into Hono.                                           | 5, 7, 8.7           | Use one API dispatcher while preserving binary HTTP delivery.                |
-| 2026-09-13 | Make Hono the direct Wrangler entry and browser fetch boundary.           | 3, 5, 7, 8.7        | Remove the file-route and SSR transport adapters.                            |
-| 2026-09-13 | Document Hono route groups under `src/server/routes/`.                    | 4, 7, 8.1, 8.3, 8.5 | Match the server route layout and runtime-specific API placement.            |
+| Date       | Amendment                                                                              | Sections affected   | Reason                                                                       |
+| ---------- | -------------------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------- |
+| 2026-09-13 | Add the Hono HTTP foundation with request-scoped Drizzle and Better Auth.              | 5, 7, 8.1, 8.7      | Prepare a shared API without migrating feature actions.                      |
+| 2026-09-13 | Migrate all feature actions to Hono RPC routes and clients.                            | 2–8                 | Replace `createServerFn` contracts while retaining the same Worker boundary. |
+| 2026-09-13 | Move media endpoints into Hono.                                                        | 5, 7, 8.7           | Use one API dispatcher while preserving binary HTTP delivery.                |
+| 2026-09-13 | Make Hono the direct Wrangler entry and browser fetch boundary.                        | 3, 5, 7, 8.7        | Remove the file-route and SSR transport adapters.                            |
+| 2026-09-13 | Document Hono route groups under `src/server/routes/`.                                 | 4, 7, 8.1, 8.3, 8.5 | Match the server route layout and runtime-specific API placement.            |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts   | Reflect the completed page migration.                                        |

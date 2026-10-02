@@ -13,4 +13,5 @@ const subscribe = (onStoreChange: () => void) => {
   }
 }
 
-export const useIsMobile = (): boolean => useSyncExternalStore(subscribe, getMatches, getMatches)
+// Server HTML assumes desktop; mobile clients re-render after hydration.
+export const useIsMobile = (): boolean => useSyncExternalStore(subscribe, getMatches, () => false)

@@ -2,7 +2,7 @@
 title: Recipe CRUD
 status: amended
 author: Antoine Bouteiller
-date: 2026-08-14
+date: 2026-10-02
 parent-spec: src/features/recipe/spec/index.spec.md
 related: [docs/infrastructure/server/data-layer.spec.md, docs/infrastructure/server/server-functions.spec.md]
 ---
@@ -27,7 +27,7 @@ the relational ingredient, link, and step graph — serving `index.spec.md` [G-1
 
 | Decision                       | Choice                                                                                                                                                             | Rationale                                                                                                                                     |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Validation boundary   | Create and update accept `FormData`, parse it into typed values, and validate it inside guarded API routes.                                                        | Multipart files and structured fields reach one trust boundary that gates storage effects.                                                    |
+| `[KD-1]` Validation boundary   | Create and update decode multipart or JSON action bodies and validate shared schemas inside guarded page actions.                                                  | Multipart files and structured fields reach one trust boundary that gates storage effects.                                                    |
 | `[KD-2]` Aggregate replacement | Update removes the recipe's outgoing graph rows — ingredient groups, ingredients, links, and steps — and writes the submitted graph.                               | The submitted form is the complete aggregate, avoiding an error-prone row-level diff.                                                         |
 | `[KD-3]` Derived flags         | The write path derives `isVegetarian`, `isSpice`, and `isMagimix`; `isMagimix` is true when any own-group step links a Magimix program.                            | Durable flags stay consistent with the graph; a typed step replaces the former `"type":"magimixProgram"` string marker.                       |
 | `[KD-4]` Media lifecycle       | Images pass through a transform into R2; videos retain uploaded bytes; stale keys use best-effort deletion.                                                        | Images have a bounded delivery format while media-cleanup failure does not invalidate a committed recipe.                                     |
@@ -79,8 +79,9 @@ recipe
 ├── image key
 └── video key?
 
-FormData → guarded validator ([KD-5] check) → ownership lookup → media keys + derived flags
-         → D1 recipe + graph writes → query invalidation + French feedback
+Multipart / JSON page action → guarded validator ([KD-5] check) → ownership lookup
+                            → media keys + derived flags → D1 recipe + graph writes
+                            → loader refresh + page navigation / French feedback
 ```
 
 - **Input:** the parser preserves `File` values for media and decodes JSON fields, including
@@ -88,14 +89,17 @@ FormData → guarded validator ([KD-5] check) → ownership lookup → media key
   Ingredient entries pair a non-negative ingredient id and quantity with an optional unit; linked
   recipes pair a non-negative target id with a non-negative ratio; step groups satisfy
   `recipeSchema.stepGroups`, whose first group owns steps.
-- **Create** binds `createdBy` to the authenticated user, writes the recipe row, then the graph; a
-  graph error compensates by deleting the new recipe (and any rows written under it).
-- **Update** loads the recipe and requires owner or admin, then batches removal of group ingredients,
-  ingredient groups, outgoing links, and step groups before writing the submitted graph.
-- **Delete** requires owner or admin, batches child removal (steps included) ahead of the recipe row,
-  then attempts image deletion.
+- **Create** is the page action at `/recipe/new`: it binds `createdBy` to the authenticated user,
+  writes the recipe row, then the graph; a graph error compensates by deleting the new recipe
+  (and any rows written under it). The browser visits `/` after success.
+- **Update** is the page action at `/recipe/edit/[id]`: it validates the route id and requires the
+  submitted id to match, loads the recipe and requires owner or admin, then batches removal of group
+  ingredients, ingredient groups, outgoing links, and step groups before writing the submitted graph.
+  The browser returns to the preceding page after success.
+- **Delete** is a page action on the recipe details page `/recipe/[id]`: it requires owner or admin,
+  batches child removal (steps included) ahead of the recipe row, then attempts image deletion.
 - **Failure:** a missing target is not-found; an unauthorized target or a schema / [KD-5] violation
-  produces no media or database effect. Mutation options map failures to French feedback.
+  produces no media or database effect. Page-action feedback maps failures to French alerts.
 - **Referential guard:** a recipe referenced by another recipe's link or `subrecipe_id` cannot be
   deleted (restrict FKs); since [KD-5] requires a link for every sub-recipe group, the link is the
   user-visible reason.
@@ -111,13 +115,13 @@ isMagimix = ownGroupSteps.some((s) => s.magimix)
 `resolveAutoFlags` receives the flattened steps of own groups. A Magimix program inside an embedded
 sub-recipe group does not make the parent Magimix, matching the previous behavior.
 
-### `[CT-4]` Media and invalidation
+### `[CT-4]` Media and freshness
 
 An image file becomes a Cloudflare Images transformed WebP (bounded width and quality) under a random
 R2 key; a video keeps its bytes and content type under an opaque key; a retained reference keeps its
 key. D1 stores keys, never public URLs; display resolves them through media routes. Stale keys are
-deleted best-effort after the database write. Create invalidates recipe-list keys; update and delete
-invalidate the all-recipes key family.
+deleted best-effort after the database write. Successful actions refresh loader props; subsequent
+page navigation reads fresh recipes instead of invalidating a query cache.
 
 ## Acceptance
 
@@ -132,7 +136,7 @@ invalidate the all-recipes key family.
   `NOT NULL`, unique, or CHECK constraint rejects it. —
   demonstrates `[SO-2]`
 - `[VC-4]` Given a submission whose sub-recipe group references a recipe absent from `linkedRecipes`,
-  or the recipe's own id, when submitted, then the API returns 400 and nothing is written. —
+  or the recipe's own id, when submitted, then the page action returns 400 and nothing is written. —
   demonstrates `[SO-2]`
 - `[VC-5]` Given steps with and without a Magimix program, when flags are computed, then `isMagimix`
   is true and false respectively (`computeAutoFlags` test). — demonstrates `[SO-3]`

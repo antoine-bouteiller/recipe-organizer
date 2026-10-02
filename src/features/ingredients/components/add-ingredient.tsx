@@ -1,13 +1,16 @@
-import { createIngredientOptions, ingredientSchema } from '@client/features/ingredients/api/create'
 import { getIngredientDefaultValues, IngredientForm } from '@client/features/ingredients/components/ingredient-form'
+import { alertError } from '@client/lib/alert-error'
+import { readResponse } from '@client/lib/api-client'
 import { Button } from '@recipe-organizer/design-system/button'
 import type { DialogProps } from '@recipe-organizer/design-system/dialog'
 import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
 import { useAppForm } from '@recipe-organizer/design-system/hooks/use-app-form'
 import { PlusIcon } from '@recipe-organizer/design-system/icons'
+import { ingredientSchema } from '@recipe-organizer/shared/ingredients/schemas'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation } from '@tanstack/react-query'
+import { useRouter } from '@void/react'
 import { useState } from 'react'
+import { fetch } from 'void/client'
 
 interface AddIngredientProps {
   defaultValue?: string
@@ -17,23 +20,21 @@ interface AddIngredientProps {
 const FormDialog = getFormDialog(getIngredientDefaultValues())
 
 export const AddIngredient = ({ defaultValue, renderTrigger }: AddIngredientProps) => {
-  const createMutation = useMutation(createIngredientOptions())
+  const router = useRouter()
   const [open, setOpen] = useState(false)
 
   const form = useAppForm({
     defaultValues: getIngredientDefaultValues(defaultValue),
     onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync(
-        {
-          data: ingredientSchema.parse(value),
-        },
-        {
-          onSuccess: () => {
-            form.reset()
-            setOpen(false)
-          },
-        }
-      )
+      try {
+        await readResponse(fetch('/api/ingredients', { body: ingredientSchema.parse(value), method: 'POST' }))
+      } catch (error) {
+        alertError(`Erreur lors de la création de l'ingrédient ${value.name}`, error)
+        return
+      }
+      await router.refresh()
+      form.reset()
+      setOpen(false)
     },
     validationLogic: revalidateLogic(),
     validators: {

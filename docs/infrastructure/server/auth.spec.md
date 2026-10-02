@@ -32,8 +32,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
   identity is distinct from application membership.
 - `[PI-2]` **Server-side secrets** — refine architecture [C-7]; OAuth credentials and session
   secret only enter server-side factory configuration.
-- `[PI-3]` **Guard before effects** — refine server-functions [KD-2]; route context may inform UI,
-  but protected Void API repeats its authorization decision.
+- `[PI-3]` **Guard before effects** — refine server-functions [KD-2]; shared page context may inform UI,
+  but protected page actions and APIs repeat their authorization decision.
 
 ## 5. Non-Goals
 
@@ -55,13 +55,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component                 | Module type               | Responsibility                                     | Public API surface                         |
-| ------------------------- | ------------------------- | -------------------------------------------------- | ------------------------------------------ |
-| Auth factory              | Server library            | Configure Better Auth with D1, secrets, and Google | `getAuth()`                                |
-| Membership hooks          | Auth configuration        | Set pending accounts and reject inactive sessions  | `databaseHooks`                            |
-| Auth user resolver        | Void session route        | Resolve session identity or development identity   | `GET /api/session`                         |
-| Guard wrapper             | Handler wrapper           | Enforce presence, status, and optional role        | `withAuthGuard(handler, role?)`            |
-| Browser client and routes | Client library and routes | Start sign-in, sign out, surface login outcomes    | `authClient`, `/auth/login`, `/api/auth/*` |
+| Component                 | Module type                 | Responsibility                                                    | Public API surface                                           |
+| ------------------------- | --------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| Auth factory              | Server library              | Configure Better Auth with D1, secrets, and Google                | `getAuth()`                                                  |
+| Membership hooks          | Auth configuration          | Set pending accounts and reject inactive sessions                 | `databaseHooks`                                              |
+| Auth user resolver        | Server helper               | Resolve session identity once per request or development identity | `getApiUser(context)`                                        |
+| Guard wrapper             | Handler wrapper / page gate | Enforce presence, status, and optional role                       | `withAuthGuard(handler, role?)`, `guardPage(context, role?)` |
+| Browser client and routes | Client library and routes   | Start sign-in, sign out, surface login outcomes                   | `authClient`, `/auth/login`, `/api/auth/*`                   |
 
 ## 8. Detailed Design
 
@@ -84,16 +84,24 @@ so client-facing auth calls cannot provide them (`packages/server/src/lib/auth/a
 
 ### 8.3 User resolution and guard
 
-`routes/api/session.ts` exports GET and returns the session identity or JSON `null` with
-status 200 through `jsonNullable`; Void would otherwise map returned `null` to 204.
-`getAuthUser()` consumes the typed `void/client` fetch through `readResponse` and converts
-`null` to `undefined` (`src/lib/auth/get-auth-user.ts`).
-`getApiUser(context)` uses `import.meta.env.DEV` to select a fixed active admin identity in
-development; production resolves the Better Auth session from request headers.
-`withAuthGuard(handler, role?)` authorizes before the handler's validation and sets `apiUser`
-in the Void context (`user` is reserved by Void). It throws `HTTPException` for missing identity
+`getApiUser(context)` resolves a fixed active admin identity in development. In production it calls
+Better Auth `getSession({ headers, returnHeaders: true })`, returning identity or `undefined`,
+and appends returned session cookies to `context.res`. A WeakMap memoizes the promise by raw Request
+so page-context middleware and loaders share one session read; no standalone session API is needed.
+
+`middleware/03.page-context.ts` sets `shared = { authUser: { email, role } | null, pathname }`
+for non-API, non-file-extension paths. Shared identity controls affordances, not authorization.
+
+`guardPage(context, role?)` returns an allowed user or a redirect Response: missing identity →
+`/auth/login`; blocked/pending → login with the matching account error; non-admin when admin is
+required → `/settings`. Protected loaders return that Response before reading their data.
+Recipe create/edit actions also call the gate.
+
+`withAuthGuard(handler, role?)` authorizes before handler validation and sets `apiUser`
+(`user` is reserved by Void). It throws `HTTPException` for missing identity
 (`401 unauthorized`), blocked/pending membership (`403 account_blocked` / `account_pending`),
-or a failed admin requirement (`403 Permission denied`).
+or failed admin requirement (`403 Permission denied`). Settings actions, recipe deletion,
+and inline ingredient API creation use this wrapper.
 
 ### 8.4 OAuth and HTTP route contract
 
@@ -105,15 +113,20 @@ session cookies directly.
 
 ### 8.5 Login and sign-out contract
 
-The login action invokes `authClient.signIn.social` with provider `google`, callback `/`, and login
-error callback (`src/routes/auth/login.tsx:13-18`). The login route maps pending and blocked codes
-to French messages (`src/routes/auth/login.tsx:20-29`) and redirects an authenticated visitor away
-from login (`src/routes/auth/login.tsx:59-65`). Browser sign-out uses `authClient.signOut()` from
-an account UI; protected calls become anonymous once the session is absent.
+The regular login page in `pages/(app)/auth/login/index.tsx` starts
+`authClient.signIn.social` with provider `google`, callback `/`, and error callback `/auth/login`.
+It displays French messages for pending, blocked, or unverified-email codes and a generic fallback.
+Its server loader redirects any resolved identity to `/`; otherwise it passes the error query prop.
+Account sign-out calls `authClient.signOut()` then uses `location.assign('/auth/login')`.
+Protected calls become anonymous when the session is absent.
+
+Browse loaders are not guarded: recipe list/search/details remain readable without identity;
+creation/settings/editor pages require membership and users administration requires admin.
+This is the shipped read-access boundary, distinct from private-group product intent.
 
 ### 8.6 Interaction boundary
 
-Auth owns identity, membership status, and role. Void feature routes consume `withAuthGuard(handler, role?)` and
+Auth owns identity, membership status, and role. Void loaders/actions/API handlers consume `guardPage` or `withAuthGuard(handler, role?)` and
 enforce resource ownership; the data layer owns storage mechanics; platform owns Worker secret provisioning.
 This division refines the server umbrella dependency direction [KD-2].
 
@@ -124,7 +137,7 @@ the persisted status before issuance, so a pending or blocked account does not r
 that protected functions would otherwise resolve (`packages/server/src/lib/auth/auth-server.ts:21-36`).
 
 Session cookies are Better Auth response state. The direct Worker preserves the raw `Response`
-cookie headers. The Void session resolver calls `auth.api.getSession({ headers, returnHeaders: true })`
+cookie headers. The request identity resolver calls `auth.api.getSession({ headers, returnHeaders: true })`
 and appends each returned `Set-Cookie` header, including refreshed or expired session cookies, to
 its response. Application code does not parse or encrypt session cookies. This refines architecture
 [KD-5] and keeps cookie mechanics within the identity library.
@@ -162,8 +175,9 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                   | Sections affected            | Reason                                                            |
-| ---------- | --------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------- |
-| 2026-09-13 | Mount Better Auth through Hono with a shared request-scoped Drizzle client. | 7, 8.1, 8.4                  | Preserve the auth contract while introducing the shared HTTP API. |
-| 2026-09-13 | Move session resolution and protected actions to Hono RPC.                  | 3, 4, 7, 8.3, 8.6, 8.8, 8.10 | Preserve membership policy across the migrated transport.         |
-| 2026-09-13 | Remove the Start cookie adapter from the Worker boundary.                   | 8.1, 8.4, 8.7                | Preserve Better Auth raw response cookies in the direct handler.  |
+| Date       | Amendment                                                                              | Sections affected            | Reason                                                            |
+| ---------- | -------------------------------------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------- |
+| 2026-09-13 | Mount Better Auth through Hono with a shared request-scoped Drizzle client.            | 7, 8.1, 8.4                  | Preserve the auth contract while introducing the shared HTTP API. |
+| 2026-09-13 | Move session resolution and protected actions to Hono RPC.                             | 3, 4, 7, 8.3, 8.6, 8.8, 8.10 | Preserve membership policy across the migrated transport.         |
+| 2026-09-13 | Remove the Start cookie adapter from the Worker boundary.                              | 8.1, 8.4, 8.7                | Preserve Better Auth raw response cookies in the direct handler.  |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts            | Reflect the completed page migration.                             |

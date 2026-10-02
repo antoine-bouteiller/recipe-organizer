@@ -1,4 +1,3 @@
-import { withRouter } from '@storybook-helpers/router'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
@@ -9,7 +8,6 @@ import * as styles from './not-found.stories.css'
 
 const meta = {
   component: NotFound,
-  decorators: [withRouter],
   title: 'Feedback/Not Found',
 } satisfies Meta<typeof NotFound>
 export default meta

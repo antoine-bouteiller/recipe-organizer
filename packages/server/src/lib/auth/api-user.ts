@@ -9,7 +9,7 @@ export interface ApiUser {
   email?: string
 }
 
-export const getApiUser = async (context: CloudContext): Promise<ApiUser | undefined> => {
+const resolveApiUser = async (context: CloudContext): Promise<ApiUser | undefined> => {
   // Preserve the existing local-development identity; production always resolves a session.
   if (import.meta.env.DEV) {
     return { email: 'admin@test.fr', id: 'string', role: 'admin', status: 'active' }
@@ -24,5 +24,17 @@ export const getApiUser = async (context: CloudContext): Promise<ApiUser | undef
     return undefined
   }
 
-  return { id: session.user.id, role: session.user.role, status: session.user.status }
+  return { email: session.user.email, id: session.user.id, role: session.user.role, status: session.user.status }
+}
+
+// Page middleware and the page loader both need the user; resolve the session once per request.
+const requestUsers = new WeakMap<Request, Promise<ApiUser | undefined>>()
+
+export const getApiUser = (context: CloudContext): Promise<ApiUser | undefined> => {
+  let user = requestUsers.get(context.req.raw)
+  if (!user) {
+    user = resolveApiUser(context)
+    requestUsers.set(context.req.raw, user)
+  }
+  return user
 }

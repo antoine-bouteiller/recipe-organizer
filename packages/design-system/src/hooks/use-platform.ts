@@ -26,4 +26,4 @@ const getPlatformFromUserAgent = (userAgent: string | undefined) => {
 // The platform never changes for a given document, so there is nothing to subscribe to.
 const subscribe = () => () => undefined
 
-export const usePlatform = (): Platform => useSyncExternalStore(subscribe, getPlatform, getPlatform)
+export const usePlatform = (): Platform => useSyncExternalStore(subscribe, getPlatform, () => 'Unknown')

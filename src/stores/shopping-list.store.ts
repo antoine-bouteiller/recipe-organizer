@@ -1,9 +1,8 @@
 import { persistedStore } from '@client/lib/persisted-store'
-import { useSelector } from '@tanstack/react-store'
 
-const shoppingListStore = persistedStore<number[]>('shopping-list', [])
+const { store: shoppingListStore, useValue } = persistedStore<number[]>('shopping-list', [])
 
-export const useShoppingListIds = () => useSelector(shoppingListStore)
+export const useShoppingListIds = useValue
 
 export const addToShoppingList = (recipeId: number) => shoppingListStore.setState((list) => [...list, recipeId])
 

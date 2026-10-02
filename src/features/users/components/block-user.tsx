@@ -1,8 +1,7 @@
-import { blockUserOptions } from '@client/features/users/api/block'
+import { usePageAction } from '@client/lib/page-action'
 import { Button } from '@recipe-organizer/design-system/button'
 import { DeleteDialog } from '@recipe-organizer/design-system/delete-dialog'
 import { ProhibitIcon } from '@recipe-organizer/design-system/icons'
-import { useMutation } from '@tanstack/react-query'
 
 interface BlockUserProps {
   userEmail: string
@@ -10,9 +9,10 @@ interface BlockUserProps {
 }
 
 export const BlockUser = ({ userEmail, userId }: BlockUserProps) => {
-  const blockMutation = useMutation(blockUserOptions())
-
-  const handleBlock = () => blockMutation.mutate({ data: { id: userId } })
+  const runPageAction = usePageAction()
+  const handleBlock = async () => {
+    await runPageAction('/settings/users?block', { data: { id: userId } }, "Erreur lors du blocage de l'utilisateur")
+  }
 
   return (
     <DeleteDialog

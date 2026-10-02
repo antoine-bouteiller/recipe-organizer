@@ -1,16 +1,15 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { CaretLeftIcon } from '@recipe-organizer/design-system/icons'
-import type { NotFoundRouteProps } from '@tanstack/react-router'
 import type React from 'react'
 
 import * as styles from './not-found.css'
 
-export interface NotFoundProps extends Partial<Pick<NotFoundRouteProps, 'data'>> {
+export interface NotFoundProps {
   action?: React.ReactNode
 }
 
 const defaultAction = (
-  <Button asLink to="/" size="lg">
+  <Button asLink href="/" size="lg">
     <CaretLeftIcon />
     Retour à l'accueil
   </Button>

@@ -23,7 +23,7 @@ application.
 
 - `[G-1]` Components expose semantic, accessible intent rather than caller-controlled CSS.
 - `[G-2]` Web, the design system, and Storybook compile owner-local Vanilla Extract styles against one shared token contract.
-- `[G-3]` Existing form, Lexical, and application dependency boundaries remain intact; router-aware shared navigation may depend on TanStack Router without depending on app or feature code.
+- `[G-3]` Existing form, Lexical, and application dependency boundaries remain intact; shared navigation may depend on `@void/react` without depending on app or feature code.
 
 ## 3. Key Design Decisions
 
@@ -32,7 +32,7 @@ application.
 | `[KD-1]` Shared styling infrastructure | `src/theme/index.ts` exports the public `theme` API; internal `src/theme/tokens.css.ts` owns the Vanilla Extract global token contract. | Consumers share typed theme references without generated infrastructure or a public token module.                              |
 | `[KD-2]` Component API                 | Each component uses a local minimal `Pick` of used native props plus its own semantic options.                                          | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.                  |
 | `[KD-3]` Styling ownership             | Recipes are colocated with their visual owner and remain private.                                                                       | Finite presentations are emitted independently of stories and cannot become caller override APIs.                              |
-| `[KD-4]` Integration seams             | Overlays pass typed trigger props to a `renderTrigger` callback; router-aware DS navigation uses TanStack Router `LinkOptions`.         | Typed links preserve router navigation while trigger props carry handlers, refs, and ARIA state without shared recipe exports. |
+| `[KD-4]` Integration seams             | Overlays pass typed trigger props to a `renderTrigger` callback; DS navigation uses `@void/react` `Link` with `href`.                   | Typed links preserve router navigation while trigger props carry handlers, refs, and ARIA state without shared recipe exports. |
 | `[KD-5]` Theme variable names          | `tokens.css.ts` uses Vanilla Extract's `createThemeContract` variable generation.                                                       | Scoped generated names remain an internal implementation detail rather than a custom raw-CSS compatibility API.                |
 
 ## 4. Principles & Intents
@@ -47,7 +47,7 @@ application.
 
 - `[NG-1]` A generic `Box`/`Flex`, JSX style-prop, or public recipe/styled-factory API.
 - `[NG-2]` A consumer API for arbitrary CSS variables, class strings, runtime geometry, or direct DOM styling.
-- `[NG-3]` Adopting a headless primitive library, or replacing TanStack Router/Form, Lexical, React Compiler, or app-owned feature dependencies.
+- `[NG-3]` Adopting a headless primitive library, or replacing Void navigation or TanStack Form, Lexical, React Compiler, or app-owned feature dependencies.
 
 ## 6. Detailed Design
 
@@ -113,7 +113,7 @@ including internal composition, rather than importing files.
 Component styling remains owner-local rather than a public `className`, `style`, or CSS-bag API.
 Where composition is needed, an overlay passes its `TriggerProps` (handlers, ARIA state, and ref)
 to a `renderTrigger` callback that spreads them onto an existing component such as Button or
-`SelectButton`. Button renders an actual router Link through `asLink`.
+`SelectButton`. Button renders the actual `@void/react` Link through `asLink` + `href`.
 
 A component may add a finite named `variant`, `size`, or narrowly proven local-layout control when it
 has actual callers and a story. It must not add a `custom`/`unstyled` variant or universal spacing,
@@ -140,34 +140,33 @@ scoped to editor-generated DOM and excludes interactive decorators.
 
 ### 6.4 Navigation and form integrations
 
-The design system may depend on catalogued `@tanstack/react-router` for reusable router-aware
-navigation, but never imports app or feature code. `TabBar` receives items with a `label`, typed
-`linkProps` (`LinkOptions`), and inactive/active icons. The single-use desktop navbar is inlined into
-`src/components/app-shell/app-shell.tsx`'s `AppHeader`, with children supplying its actions.
-Their actual TanStack `Link` owns typed route parameters, search, preloading, modified clicks, view
-transitions, navigation state, and semantics. The desktop navbar uses exact matching only for `/`. Do not replace Link with a native anchor or recreate its
-props through a `useLinkProps` adapter.
+The design system may depend on `@void/react` for actual navigation Links, but never imports app
+or feature policy. Button navigates with `asLink` + `href` and optional `viewTransition`, for example
+`<Button asLink href="/recipe/new" />`; it renders the actual Void `Link`, not a click-driven button.
+TabBar takes `currentPath` and items with `label`, `href`, and inactive/active icons.
+`isCurrentPath` matches `/` exactly and other items at their path or descendants; desktop AppHeader
+navigation uses the same matcher. Pages pass current path explicitly, so static island layouts do
+not require router context. Storybook needs no router decorator.
 
-Button navigates through `asLink`, for example `<Button asLink to="/recipe/new" />`. Router-aware Storybook stories use a local memory-router decorator.
-`ScreenLayout`'s `withGoBack` calls `router.history.back()`; its scroll IDs default to
-`screen-inner` and `screen-outer`, and its footer is explicit. The default error renderer is inlined into `src/router.tsx`;
-`NotFound` remains shared. Both provide actual home Links and French messages; Error details appear
-only in development. The single-use command palette is inlined into the feature's `SearchBar`, built on
-the shared `Dialog` and `ScrollArea` with a native ARIA combobox and listbox.
+Tabs are native hash anchors with scroll-snap panels. Once hydrated, clicks scroll the matching
+panel and replace the URL hash with `history.replaceState`; tab changes do not push history entries.
+Unhydrated static tabs retain native hash behavior.
+ScreenLayout accepts a `backButton` slot, usually DS `GoBackButton`, whose default handler calls
+`history.back()`; island pages hydrate that control through an island import. Scroll IDs remain
+`screen-inner`/`screen-outer`, but there is no managed scroll-container restoration.
+DS NotFound provides a Void home Link by default. The regular app layout owns its React render-error
+boundary; unknown URLs use Void's default 404.
 
-`FloatingAction` is generic (`label`, `linkProps`, and `children`) rather than a recipe-create
-wrapper. Recipe/auth policy belongs in the index route. Menus and filtering remain app-owned in
-`src/components/navigation/constants.tsx`; `__root` composes the theme control and search
-inside styled app-shell containers. Pages pass `<TabBar items={mobileMenuItems} />`, not a `pageKey`.
-Route files compose styled components without `.css.ts` files, styling imports, or JSX styling props;
-feature sections, containers, and app-shell components own that markup and its colocated styles.
-Routes retain page construction and cross-feature coordination; do not replace them with intermediary page wrappers.
+The app's SearchBar owns the single-use command palette with shared Dialog/ScrollArea and native
+ARIA combobox/listbox semantics. Pages/layouts own theme/search composition and recipe/auth policy.
+Pages remain unstyled composition of feature sections and app-shell components; they own
+cross-feature coordination rather than intermediary page wrappers.
 
-Form dialogs keep a private form-aware dialog composition so dialog body and submit footer share the
-same form lifecycle. Public dialogs do not expose `contentRender` or panel styling props, and public
-forms do not gain a display/style escape hatch. This private composition preserves Enter submission,
-async cancellation/disable behavior, errors, focus return, and the nested-form submit-propagation
-boundary without nesting forms.
+Form dialogs keep a private form-aware composition so body and submit footer share one lifecycle.
+Public dialogs do not expose content-render or panel-style props, and forms have no styling escape
+hatch. This preserves Enter submission, async disable/cancellation, errors, focus return, and nested
+submit-propagation handling. DeleteDialog tracks loading through local state while awaiting
+`onDelete`; action callbacks must not be awaited inside a React transition.
 
 ### 6.5 Visual role map
 
@@ -201,7 +200,7 @@ role at the token owner and review its consumers rather than introducing local c
 ## 7. Compatibility and Review Criteria
 
 Existing dependency direction remains: the design system does not import web, app, feature, or
-router-policy code, while its reusable navigation may use TanStack Router. Feature schemas, queries,
+router-policy code, while its reusable navigation may use `@void/react` Links. Feature schemas, queries,
 mutations, domain presentation, menus/filtering, and recipe/auth policy stay app-owned. Use actual
 Links for navigation; do not substitute click-driven buttons.
 
@@ -231,6 +230,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-19 | Retain production-backed APIs and inline single-use navigation, errors, and command UI.              | §6.2, §6.4        | Reduce ownership without breaking framework or route-styling boundaries.                 |
 | 2026-09-19 | Share subtle badges and check-row toggles instead of feature-local controls.                         | §6.5              | Keep semantic styling and accessible control state in the design system.                 |
 | 2026-09-28 | Remove Base UI; compose overlays through `renderTrigger` and native elements.                        | §2–§6.4           | Own every primitive natively and drop the dependency.                                    |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.               | Updated contracts | Reflect the completed page migration.                                                    |
 
 ## 8. Open Questions
 

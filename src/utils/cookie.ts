@@ -6,16 +6,6 @@ interface CookieOptions {
   secure?: boolean
 }
 
-export const getCookie = (key: string): string | undefined => {
-  const match = document.cookie.split('; ').find((row) => row.startsWith(`${key}=`))
-
-  if (!match) {
-    return undefined
-  }
-
-  return decodeURIComponent(match.split('=')[1])
-}
-
 export const setCookie = (key: string, value: string, options: CookieOptions = {}) => {
   const { domain, maxAge = 31_536_000, path = '/', sameSite = 'lax', secure = false } = options
 

@@ -1,18 +1,8 @@
-import { getCookie, setCookie } from '@client/utils/cookie'
+import { setCookie } from '@client/utils/cookie'
 
-type Theme = 'dark' | 'light'
-
-const storageKey = 'ui-theme'
-
-const systemTheme = (): Theme => (globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-
-export const getTheme = (): Theme => {
-  const stored = getCookie(storageKey)
-  return stored === 'dark' || stored === 'light' ? stored : systemTheme()
-}
-
+// The inline head script in void.config.ts applies the stored theme before first paint.
 export const toggleTheme = () => {
-  const currentTheme = getTheme()
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
-  setCookie(storageKey, newTheme)
+  const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark'
+  setCookie('ui-theme', newTheme)
+  document.documentElement.className = newTheme
 }

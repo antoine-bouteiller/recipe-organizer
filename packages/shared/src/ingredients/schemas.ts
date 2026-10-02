@@ -14,7 +14,7 @@ export const ingredientSchema = z.object({
 export const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
 export const deleteIngredientSchema = z.object({ id: z.number() })
 
-export type IngredientFormValues = z.infer<typeof ingredientSchema>
+type IngredientFormValues = z.infer<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>
-export type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
+type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
 export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>

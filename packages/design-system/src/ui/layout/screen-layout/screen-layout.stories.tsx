@@ -1,12 +1,11 @@
 import { Button } from '@recipe-organizer/design-system/button'
-import { withRouter } from '@storybook-helpers/router'
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useLocation } from '@tanstack/react-router'
+import { useState } from 'react'
 import type { ComponentProps } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { ScreenLayout } from './screen-layout'
+import { GoBackButton, ScreenLayout } from './screen-layout'
 
 import * as styles from './screen-layout.stories.css'
 
@@ -20,10 +19,10 @@ const content = (
 )
 
 const BackExample = () => {
-  const pathname = useLocation({ select: (location) => location.pathname })
+  const [requested, setRequested] = useState(false)
   return (
-    <LayoutExample withGoBack title="Details">
-      {pathname === '/' && <p role="status">Back action requested.</p>}
+    <LayoutExample backButton={<GoBackButton onBack={() => setRequested(true)} />} title="Details">
+      {requested && <p role="status">Back action requested.</p>}
       {content}
     </LayoutExample>
   )
@@ -38,8 +37,7 @@ const LayoutExample = (props: ComponentProps<typeof ScreenLayout>) => (
 const meta = {
   args: { children: content, title: 'Library' },
   component: ScreenLayout,
-  decorators: [withRouter],
-  parameters: { layout: 'padded', router: { initialEntries: ['/', '/settings'] } },
+  parameters: { layout: 'padded' },
   title: 'Layout/Screen Layout',
 } satisfies Meta<typeof ScreenLayout>
 

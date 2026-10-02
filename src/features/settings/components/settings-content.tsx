@@ -1,9 +1,9 @@
-import { useToggleTheme } from '@client/hooks/use-toggle-theme'
+import { toggleTheme } from '@client/lib/theme'
 import { Button } from '@recipe-organizer/design-system/button'
 import { Card } from '@recipe-organizer/design-system/card'
 import { CaretRightIcon, CookieIcon, ThemeIcon, UserIcon, UsersIcon } from '@recipe-organizer/design-system/icons'
 import type { IconProps } from '@recipe-organizer/design-system/icons'
-import { Link } from '@tanstack/react-router'
+import { Link } from '@void/react'
 
 import * as styles from './settings-content.css'
 
@@ -40,7 +40,6 @@ interface SettingsContentProps {
 }
 
 export const SettingsContent = ({ isAdmin }: SettingsContentProps) => {
-  const toggleTheme = useToggleTheme()
   const visibleSections = settingsSections.filter((section) => !section.adminOnly || isAdmin)
 
   return (
@@ -55,7 +54,7 @@ export const SettingsContent = ({ isAdmin }: SettingsContentProps) => {
         {visibleSections.map((section) => {
           const Icon = section.icon
           return (
-            <Link key={section.id} to={section.path} viewTransition>
+            <Link href={section.path} key={section.id}>
               <div className={styles.sectionLink}>
                 <Card>
                   <div className={styles.sectionCard}>

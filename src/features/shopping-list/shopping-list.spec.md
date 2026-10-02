@@ -30,7 +30,7 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 ## 4. Principles & Intents
 
 - `[PI-1]` **Persist intent, query records** — refine architecture [PI-4]; stores hold recipe IDs and
-  serving values, while TanStack Query owns recipe data.
+  serving values, while an API response supplies recipe data.
 - `[PI-2]` **No lost quantity** — an incompatible or unitless conversion remains a separately labelled
   fallback amount.
 - `[PI-3]` **Server projection, client presentation** — the feature API owns relational traversal and
@@ -48,21 +48,20 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 
 ## 6. Caveats
 
-- `[C-1]` The query key contains the selected ID array, so each distinct compact selection has a
-  separate cache entry, refining architecture [C-5].
+- `[C-1]` Each distinct selected-ID array retains one request promise per document, with no TTL or mutation invalidation; failed promises are evicted, refining architecture [C-5].
 - `[C-2]` A missing selected recipe produces no projection row and therefore no shopping-list lines.
 - `[C-3]` `convert` returns `null` for incompatible dimensions or absent conversion metadata; those
-  amounts remain fallback lines (`src/client/features/shopping-list/utils/aggregate-shopping-list.ts:38-49`).
+  amounts remain fallback lines (`src/features/shopping-list/utils/aggregate-shopping-list.ts`).
 - `[C-4]` A child ingredient contributes only its greatest primary amount among siblings, not a sum
-  (`src/client/features/shopping-list/utils/aggregate-shopping-list.ts:101-120`).
+  (`src/features/shopping-list/utils/aggregate-shopping-list.ts`).
 - `[C-5]` Checkmarks are component-local state and reset when their `CartItem` unmounts
-  (`src/client/features/shopping-list/component/cart-item.tsx:17-39`).
+  (`src/features/shopping-list/component/cart-item.tsx`).
 
 ## 7. High-Level Components
 
 ```text
 persisted recipe IDs ─┐
-                       ├─> query options ─> recipe projection ─┐
+                       ├─> stable request promise ─> recipe projection ─┐
 persisted servings ───┘                                         │
                                                                   v
                                                          aggregateShoppingList
@@ -72,47 +71,49 @@ persisted servings ───┘                                         │
                                                        category sections and cart items
 ```
 
-| Component          | Module type              | Responsibility                                           | Public API surface                                 |
-| ------------------ | ------------------------ | -------------------------------------------------------- | -------------------------------------------------- |
-| Selection store    | Persisted TanStack Store | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
-| Quantity store     | Persisted TanStack Store | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
-| Recipe projection  | Feature GET API          | Read selected recipes and flattened linked-recipe lines  | `getRecipeByIdsOptions(ids)`                       |
-| Aggregator         | Pure feature utility     | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
-| Shopping-list hook | Feature hook             | Join stores, query result, and derived output            | `useShoppingList()`                                |
-| List screen        | Route and components     | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
+| Component          | Module type                     | Responsibility                                           | Public API surface                                 |
+| ------------------ | ------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
+| Selection store    | Persisted TanStack Store        | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
+| Quantity store     | Persisted TanStack Store        | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
+| Recipe projection  | Feature GET API                 | Read selected recipes and flattened linked-recipe lines  | `loadRecipesByIds(ids)`                            |
+| Aggregator         | Pure feature utility            | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
+| Shopping-list hook | Feature hook                    | Join stores, API projection, and derived output          | `useShoppingList()`                                |
+| List screen        | Void island page and components | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
 
 ## 8. Detailed Design
 
 ### 8.1 Durable selection and serving intent
 
 `shopping-list` holds `number[]` recipe identifiers; `recipe-quantities` holds
-`Record<number, number>` overrides. Both are data-only persisted stores with selector hooks and
-exported mutation functions (`src/client/stores/shopping-list.store.ts:1-12`,
-`src/client/stores/recipe-quantities.store.ts:1-10`). A serving override defaults to the recipe's declared
+`Record<number, number>` overrides. Both are data-only persisted stores with hydration-safe read hooks and
+exported mutation functions (`src/stores/shopping-list.store.ts`,
+`src/stores/recipe-quantities.store.ts`). A serving override defaults to the recipe's declared
 `servings` only when its map entry is nullish. This refines the client-state specification's
 [persisted selection contract](../../../docs/infrastructure/client/client-state.spec.md).
 
 ### 8.2 Projection contract
 
-`getRecipeByIdsOptions(ids)` addresses `queryKeys.recipeListByIds(ids)` and disables its read for
-an empty selection (`src/client/features/shopping-list/api/get-recipe-by-ids.ts:75-81`). Its server function
-returns this serializable shape:
+`loadRecipesByIds(ids)` calls typed `GET /api/shopping-list/recipes` with a JSON-stringified
+`ids` query value. A map retains one stable promise per distinct ID array for React `use()`;
+failed promises are removed (`src/features/shopping-list/api/get-recipe-by-ids.ts`).
+The hook makes no request for an empty selection. This is not a timed query cache.
 
-| Field                          | Meaning                                                                    |
-| ------------------------------ | -------------------------------------------------------------------------- |
-| `RecipeForCart.id`, `servings` | Recipe identity and baseline serving count                                 |
-| `ingredients[]`                | Direct ingredient lines followed by linked-recipe lines                    |
-| ingredient metadata            | `id`, category, name, parent ID, preferred unit, density, and count weight |
-| ingredient quantity and unit   | Amount at the recipe's baseline serving scale                              |
+| Field                          | Meaning                                                              |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `RecipeForCart.id`, `servings` | Identity and baseline serving count                                  |
+| `ingredients[]`                | Direct lines followed by linked-recipe lines                         |
+| Ingredient metadata            | ID, category, name, parent ID, preferred unit, density, count weight |
+| Quantity and unit              | Amount at the recipe baseline                                        |
 
-Linked-recipe lines use `line.quantity × ratio ÷ linkedRecipe.servings`
-(`src/client/features/shopping-list/api/get-recipe-by-ids.ts:55-70`). The shared ingredient-group projection
-excludes `spices` in the database read (`packages/server/src/shopping-list/ingredient-group-select.ts`).
+The API handler traverses direct and linked ingredient groups. Linked lines use
+`quantity × ratio ÷ linkedRecipe.servings` (`routes/api/shopping-list/recipes.ts`).
+The shared database projection excludes `spices`
+(`packages/server/src/shopping-list/ingredient-group-select.ts`).
 
 ### 8.3 Aggregation contract
 
 For each recipe, the aggregator calculates `line.quantity × wantedServings ÷ recipe.servings`,
-then accumulates raw lines by ingredient ID (`src/client/features/shopping-list/utils/aggregate-shopping-list.ts:68-99`).
+then accumulates raw lines by ingredient ID (`src/features/shopping-list/utils/aggregate-shopping-list.ts`).
 The accumulator chooses `preferredUnitSlug`, or its first line's unit, as the primary target. Lines
 with that unit or a successful conversion add to the primary total; every other line totals under its
 original unit in `fallback`.
@@ -130,22 +131,27 @@ place surviving ingredients under their category
 
 The resulting item shape is `{ id, name, category, primary, fallback }`, where `primary` and every
 fallback entry contain `quantity` and `unitSlug`
-(`src/client/features/shopping-list/types/ingredient-cart-item.ts:5-20`).
+(`src/features/shopping-list/types/ingredient-cart-item.ts`).
 
 ### 8.4 List interaction
 
-The `/shopping-list` route supplies the screen layout and reset control
-(`src/client/routes/shopping-list.tsx:8-16`). `ShoppingList` renders skeleton sections while the query is
-loading, an empty French message for no groups, then a category heading and item list per category
-(`src/client/features/shopping-list/component/shopping-list.tsx:11-56`). `CartItem` formats primary and
-fallback values with the unit schema, applies a local checked style, and leaves fallback values
-visible (`src/client/features/shopping-list/component/cart-item.tsx:10-39`). Reset clears only the selected
-recipe IDs; serving overrides remain available for a later selection
-(`src/client/features/shopping-list/component/reset-cart-button.tsx:6-10`).
+`pages/(browse)/shopping-list/index.island.tsx` composes ScreenLayout, current-path TabBar, and
+load islands for ShoppingList and its reset control. Its server companion sets `prerender = false`
+because header identity remains request-dependent; device-local selected recipes cannot be loaded
+on the server.
 
-The screen derives its content from selection, serving intent, and the query response on each render.
-It retains no separate persisted copy of recipe or aggregate data, so reset and query invalidation
-always converge on their respective owners.
+ShoppingList uses `useIsHydrated()`: SSR and hydration render neutral skeleton sections, then
+a Suspense boundary displays the same skeleton while selected recipe promises load. The hook reads
+hydration-safe persisted ID/quantity stores, calls React `use(loadRecipesByIds(ids))` for nonempty
+selection, and aggregates the projection. Empty groups render the French empty-list message;
+otherwise category headings and CartItems render (`src/features/shopping-list/component/shopping-list.tsx`).
+
+CartItem formats primary/fallback values, retains incompatible amounts visibly, and keeps checked
+state local to the mounted row. Reset clears only selected recipe IDs; serving overrides remain
+available later (`pages/(browse)/shopping-list/_reset-shopping-list.tsx`).
+
+The list is derived from selection, quantity intent, and API records. No records or aggregates are
+persisted, but fulfilled request promises remain document-local snapshots until document reload.
 
 ## 9. Open Questions
 
@@ -153,6 +159,7 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                               | Sections affected | Reason                         |
-| ---------- | ------------------------------------------------------- | ----------------- | ------------------------------ |
-| 2026-09-13 | Update the projection citation to `src/server/routes/`. | 8.2               | Match the server route layout. |
+| Date       | Amendment                                                                              | Sections affected | Reason                                |
+| ---------- | -------------------------------------------------------------------------------------- | ----------------- | ------------------------------------- |
+| 2026-09-13 | Update the projection citation to `src/server/routes/`.                                | 8.2               | Match the server route layout.        |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |

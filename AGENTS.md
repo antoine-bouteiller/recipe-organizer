@@ -1,11 +1,11 @@
 # Recipe Organizer
 
-Full-stack recipe management app with a TanStack Router browser SPA and Void API, deployed on Cloudflare Workers.
+Full-stack recipe management app with server-rendered Void Pages, islands, and a same-origin Void API, deployed on Cloudflare Workers.
 
 ## Quick Reference
 
 - **Toolchain:** Vite+ (`vp`) wrapping pnpm + Vite + Vitest + Oxlint + Oxfmt
-- **Dev:** `pnpm dev` (one Vite server on 3000 for the SPA and same-origin API)
+- **Dev:** `pnpm dev` (one Vite server on 3000 for rendered pages and the same-origin API)
 - **Build:** `pnpm build` (Void builds `dist/client` assets and `dist/ssr` Worker bundle)
 - **Test:** `vp test`
 - **Check (fmt + lint + types):** `vp check`
@@ -17,11 +17,11 @@ See the Vite+ section below for the full command reference.
 ## Critical Rules
 
 - **Always run `vp check` before committing.**
-- **Route changes require regeneration:** restart `pnpm dev` after adding/moving TanStack browser routes; `vp exec void prepare` regenerates ignored API route types before clean-tree checks.
-- **Runtime boundary:** the browser SPA starts at `index.html` and `src/main.tsx`; Void generates the Worker entry from `routes/api/**` and global `middleware/**`. Browser API modules call same-origin typed `fetch` from `void/client` through `readResponse`; route handlers import server code from `packages/server` via `@recipe-organizer/server/*`.
-- **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports. Follow `packages/design-system/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and compose overlay triggers through `renderTrigger` props; Button navigates with an actual router `Link` via `asLink`. Parent wrappers own external layout.
+- **Route changes require regeneration:** run `vp exec void prepare` after adding/moving Void pages or API routes to regenerate ignored route types before checks.
+- **Runtime boundary:** Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`. Page loaders read `@recipe-organizer/server/*` directly; page actions own mutations. `(browse)` uses an island layout; `(app)` uses a regular hydrated layout. Each route is a folder with `index.tsx`/`index.island.tsx` + `index.server.ts`. Island imports are relative `_name.tsx` default re-exports next to the importing page with `with { island: ... }`. Remaining browser API calls use typed `void/client` fetch through `readResponse`. Regular-page callers use `usePageAction()` to refresh props without changing URL/history; never await an action inside a React transition.
+- **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports. Follow `packages/design-system/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and compose overlay triggers through `renderTrigger` props; Button navigates with the actual `@void/react` `Link` via `asLink` + `href`. Parent wrappers own external layout.
 - **Styling:** Vanilla Extract compiles owner-local `*.css.ts` files through the web and Storybook Vite plugins. Import typed shared values as `theme` from `@recipe-organizer/design-system/theme`, including in template interpolations; do not use shared raw `var(--…)` strings. Load `@recipe-organizer/design-system/global.css` for the global Vanilla Extract reset/base rules and theme. Native `@recipe-organizer/design-system/styles.css` retains font faces and layer order; safe-area insets use `theme.safeArea.top/bottom`; native CSS variables remain appropriate for component-owned and runtime-owned behavior. Keep component and app styles unlayered so they override the layered reset/base defaults.
-- **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update colocated stories for changed interactions or new component presentations; styling-only changes can reuse existing stories for visual review. Use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
+- **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update colocated stories for changed interactions or new component presentations; styling-only changes can reuse existing stories for visual review. No router decorator is needed. Use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
 - **Test boundaries:** `*.test.*` files test pure logic only; `*.stories.*` play functions test user interactions and their behavioral outcomes only. Do not assert design details in either: CSS classes, computed styles, colors, spacing, geometry, or animation properties. Review visual design in the browser instead.
 - **Worker config and environment:** `void.config.ts` owns runtime/deploy bindings; `.env` is the local env file. `packages/server/wrangler.jsonc` is tooling-only; keep its resource IDs synchronized with Void config. Do not use `void/db`, `void/auth`, or Void migrations; Drizzle-kit owns migrations and auth secrets remain dashboard-managed through `keep_vars`.
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
@@ -38,7 +38,7 @@ colocated with the code.
 - [Void API](docs/infrastructure/server/server-functions.spec.md)
 - [Form Patterns](docs/infrastructure/client/forms.spec.md)
 - [Client State Layering](docs/infrastructure/client/client-state.spec.md)
-- [Routing & SPA](docs/infrastructure/client/routing-ssr.spec.md)
+- [Routing & Islands](docs/infrastructure/client/routing-ssr.spec.md)
 - [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
 - Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 

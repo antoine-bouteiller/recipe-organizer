@@ -1,8 +1,5 @@
-import { getRecipeInstructionsOptions } from '@client/features/recipe/api/get-instructions'
-import { Spinner } from '@recipe-organizer/design-system/spinner'
 import { parseBoldText } from '@recipe-organizer/shared/recipe/bold-text'
 import type { RecipeStep, RecipeStepGroup } from '@recipe-organizer/shared/recipe/schemas'
-import { useQuery } from '@tanstack/react-query'
 
 import { MagimixStepItem } from './magimix-step-item'
 
@@ -31,12 +28,14 @@ const StepList = ({ steps }: { readonly steps: readonly RecipeStep[] }) =>
     </ol>
   )
 
+export interface SubrecipeInstructions {
+  readonly id: number
+  readonly name: string
+  readonly steps: readonly RecipeStep[]
+}
+
 // Shows the linked recipe's default group, which never embeds another recipe.
-const SubrecipeGroup = ({ recipeId }: { readonly recipeId: number }) => {
-  const { data: source, isLoading } = useQuery(getRecipeInstructionsOptions(recipeId))
-  if (isLoading) {
-    return <Spinner />
-  }
+const SubrecipeGroup = ({ source }: { readonly source: SubrecipeInstructions | undefined }) => {
   if (!source || source.steps.length === 0) {
     return null
   }
@@ -48,7 +47,13 @@ const SubrecipeGroup = ({ recipeId }: { readonly recipeId: number }) => {
   )
 }
 
-export const RecipeStepGroups = ({ stepGroups }: { readonly stepGroups: readonly RecipeStepGroup[] }) => (
+export const RecipeStepGroups = ({
+  stepGroups,
+  subrecipes,
+}: {
+  readonly stepGroups: readonly RecipeStepGroup[]
+  readonly subrecipes: readonly SubrecipeInstructions[]
+}) => (
   <div className={styles.groups}>
     {stepGroups.map((group, index) =>
       group.kind === 'steps' ? (
@@ -62,7 +67,7 @@ export const RecipeStepGroups = ({ stepGroups }: { readonly stepGroups: readonly
         )
       ) : (
         // oxlint-disable-next-line react/no-array-index-key
-        <SubrecipeGroup key={index} recipeId={group.recipeId} />
+        <SubrecipeGroup key={index} source={subrecipes.find((source) => source.id === group.recipeId)} />
       )
     )}
   </div>

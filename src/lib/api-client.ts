@@ -1,8 +1,13 @@
-import { notFound, redirect } from '@tanstack/react-router'
 import { FetchError } from 'void/client'
 import * as z from 'zod'
 
 const errorSchema = z.object({ error: z.string() })
+
+/** Reads the `{ error }` message of a failed API or page-action response. */
+export const getErrorMessage = (body: unknown) => {
+  const parsed = errorSchema.safeParse(body)
+  return parsed.success ? parsed.data.error : 'Une erreur est survenue'
+}
 
 export const readResponse = async <TResponse>(request: Promise<TResponse>): Promise<TResponse> => {
   try {
@@ -11,16 +16,12 @@ export const readResponse = async <TResponse>(request: Promise<TResponse>): Prom
     if (!(error instanceof FetchError) || error.status === undefined) {
       throw error
     }
-    const parsed = errorSchema.safeParse(error.data)
-    const message = parsed.success ? parsed.data.error : 'Une erreur est survenue'
+    const message = getErrorMessage(error.data)
     if (error.status === 401) {
-      throw redirect({ to: '/auth/login' })
+      globalThis.location.assign('/auth/login')
     }
     if (error.status === 403 && (message === 'account_blocked' || message === 'account_pending')) {
-      throw redirect({ search: { error: message }, to: '/auth/login' })
-    }
-    if (error.status === 404) {
-      throw notFound()
+      globalThis.location.assign(`/auth/login?error=${message}`)
     }
     throw new Error(error.status === 400 ? 'Invalid Schema' : message, { cause: error })
   }

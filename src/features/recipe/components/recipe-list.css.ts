@@ -1,21 +1,6 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const container = style({
-  display: 'grid',
-  gap: theme.spacing(4),
-  gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
-  '@media': {
-    'screen and (min-width: 640px)': {
-      gap: theme.spacing(6),
-      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    },
-    'screen and (min-width: 1024px)': {
-      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    },
-  },
-})
-
 export const floatingAction = style({
   bottom: theme.spacing(16),
   position: 'fixed',

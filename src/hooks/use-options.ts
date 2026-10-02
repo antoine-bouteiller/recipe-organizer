@@ -1,28 +1,21 @@
 import type { Option } from '@recipe-organizer/design-system/combobox-field/options'
-import { useQuery } from '@tanstack/react-query'
-import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 export type { Option } from '@recipe-organizer/design-system/combobox-field/options'
 
-export const createOptionsHook = <TQueryOptionData, TError, TData extends object[], TQueryKey extends QueryKey>(
-  getQueryOptions: () => UseQueryOptions<TQueryOptionData, TError, TData, TQueryKey>,
-  mapFn: (item: TData[number]) => Option
-) => {
-  function useOptions(props?: { allowEmpty?: false; filter?: (item: TData[number]) => boolean }): Option<number>[]
+/** Builds an options hook over a catalogue that a page provides through context. */
+export const createOptionsHook = <TItem>(useItems: () => readonly TItem[], mapFn: (item: TItem) => Option) => {
+  function useOptions(props?: { allowEmpty?: false; filter?: (item: TItem) => boolean }): Option<number>[]
 
-  function useOptions(props: { allowEmpty: true; filter?: (item: TData[number]) => boolean }): Option[]
+  function useOptions(props: { allowEmpty: true; filter?: (item: TItem) => boolean }): Option[]
 
   function useOptions({
     allowEmpty,
     filter = () => true,
   }: {
     allowEmpty?: boolean
-    filter?: (item: TData[number]) => boolean
+    filter?: (item: TItem) => boolean
   } = {}): Option[] {
-    const { data } = useQuery(getQueryOptions())
-
-    const items = data ?? []
-    const options: Option[] = items.filter(filter).map(mapFn)
+    const options: Option[] = useItems().filter(filter).map(mapFn)
 
     if (allowEmpty) {
       options.unshift({ label: 'Aucune', value: undefined })

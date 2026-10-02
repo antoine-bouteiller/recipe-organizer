@@ -2,7 +2,7 @@
 title: Recipe Step Editor
 status: amended
 author: Antoine Bouteiller
-date: 2026-08-14
+date: 2026-10-02
 parent-spec: src/features/recipe/spec/index.spec.md
 related: [docs/infrastructure/client/forms.spec.md, src/features/recipe/spec/crud.spec.md]
 ---
@@ -58,6 +58,8 @@ The Magimix constants move from `src/features/recipe/types/magimix.ts` to
 - `[SO-3]` A sub-recipe group embeds a linked recipe's live default group, which cannot itself embed
   a recipe, so a link cycle cannot recurse. — demonstrated by `[VC-5]`, `[VC-6]`
 - `[SO-4]` Recipe code and the design system no longer depend on Lexical. — demonstrated by `[VC-7]`
+- `[SO-5]` Guarded editor pages receive picker catalogues from loaders and save through page actions
+  without losing existing file references or form state on ingredient refresh. — demonstrated by `[VC-8]`
 
 ## Contracts
 
@@ -90,7 +92,8 @@ stepGroups: z.array(ownGroup | subrecipeGroup).refine((groups) => groups[0]?.kin
   (`crud.spec.md` [CT-1]).
 - The first group is the default: always an own group, never named or removed.
 - `_key` is a form-only identity for stable React keys; it is not persisted.
-- The FormData wire carries `stepGroups` as one JSON string, like `ingredientGroups`.
+- Page actions carry `stepGroups` as one JSON-stringified field, like `ingredientGroups`; the
+  transport is multipart when a file is present and JSON otherwise.
 
 ### `[CT-2]` Bold-only text
 
@@ -135,6 +138,20 @@ StepsField (withForm, array field `stepGroups`)
   a group still references leaves the group invalid: the form shows the field error and CRUD rejects
   the submission (`crud.spec.md` [KD-5]).
 
+### `[CT-5]` Editor pages
+
+- `/recipe/new` and `/recipe/edit/[id]` are regular Void pages. Their loaders call `guardPage`
+  before reading ingredient and recipe catalogues; the edit loader validates the route id and
+  returns the recipe or a missing value rendered as `NotFound`.
+- Pages compose `IngredientCatalogProvider` and `RecipeCatalogProvider` around the form; features
+  do not import each other. Inline ingredient creation refreshes loader props without discarding
+  the current form values.
+- TanStack Form keeps the shared `recipeSchema` / `updateRecipeSchema` validation and existing
+  controls. Submissions call the page action through `usePageAction` (`src/lib/page-action.ts`),
+  which keeps the history entry, with French error feedback on expected failure.
+- Successful creation and Cancel visit `/`. Successful editing and edit Cancel go back once.
+  Browse targets use document navigation.
+
 ### `[CT-4]` Step renderer
 
 ```text
@@ -170,6 +187,10 @@ RecipeStepGroups(stepGroups)
 - `[VC-6]` _Superseded by [KD-10]:_ a default group cannot embed a recipe, so no cycle renders.
 - `[VC-7]` Given the change, when `vp check` (including knip) runs, then it passes and no `lexical`
   import remains in `src/` or `packages/design-system`. — demonstrates `[SO-4]`
+
+- `[VC-8]` Given the new or edit page, when a recipe is saved with an image upload or edited with
+  its image retained, then the action persists the form and returns to home or the preceding page;
+  adding an ingredient refreshes picker options while preserving entered values. — demonstrates `[SO-5]`
 
 ## Caveats
 

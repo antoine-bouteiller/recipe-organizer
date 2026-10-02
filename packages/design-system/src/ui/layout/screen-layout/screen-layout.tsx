@@ -1,26 +1,29 @@
 import { Button } from '@recipe-organizer/design-system/button'
 import { ArrowLeftIcon } from '@recipe-organizer/design-system/icons'
-import { useRouter } from '@tanstack/react-router'
 
 import * as styles from './screen-layout.css'
 
-const GoBackButton = ({ onBack }: { onBack: () => void }) => (
+const goBack = () => history.back()
+
+export const GoBackButton = ({ onBack = goBack }: { onBack?: () => void }): React.ReactElement => (
   <Button aria-label="Retour" onClick={onBack} size="icon" variant="ghost">
     <ArrowLeftIcon />
   </Button>
 )
 
 export type ScreenLayoutProps = Pick<React.ComponentProps<'div'>, 'children'> & {
+  /** Usually `GoBackButton`; island pages pass it as an island so it hydrates. */
+  backButton?: React.ReactNode
   backgroundImage?: string
   footer?: React.ReactNode
   headerEndItem?: React.ReactNode
   innerScrollId?: string
   outerScrollId?: string
   title: string
-  withGoBack?: boolean
 }
 
 export const ScreenLayout = ({
+  backButton,
   backgroundImage,
   children,
   footer,
@@ -28,25 +31,18 @@ export const ScreenLayout = ({
   innerScrollId = 'screen-inner',
   outerScrollId = 'screen-outer',
   title,
-  withGoBack = false,
 }: ScreenLayoutProps): React.ReactElement => {
-  const router = useRouter()
-  const onBack = withGoBack ? () => router.history.back() : undefined
   const header = backgroundImage ? (
     <div className={styles.imageHeader}>
       <img alt="" className={styles.image} src={backgroundImage} />
       <div className={styles.imageOverlay} />
-      {onBack && (
-        <span className={styles.imageBack}>
-          <GoBackButton onBack={onBack} />
-        </span>
-      )}
+      {backButton && <span className={styles.imageBack}>{backButton}</span>}
       <h1 className={styles.imageTitle}>{title}</h1>
       {headerEndItem && <div className={styles.imageAction}>{headerEndItem}</div>}
     </div>
   ) : (
     <div className={styles.header}>
-      {onBack && <GoBackButton onBack={onBack} />}
+      {backButton}
       <h1 className={styles.title}>{title}</h1>
       {headerEndItem && <div className={styles.headerAction}>{headerEndItem}</div>}
     </div>

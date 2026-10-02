@@ -1,22 +1,32 @@
-import { Link } from '@tanstack/react-router'
-import type { LinkOptions } from '@tanstack/react-router'
+import { Link } from '@void/react'
 import type React from 'react'
 
 import * as styles from './tabbar.css'
 
 export interface TabBarProps {
+  currentPath: string
   items: readonly {
     label: string
-    linkProps: LinkOptions
+    href: string
     activeIcon: React.ReactNode
     icon: React.ReactNode
   }[]
 }
 
-export const TabBar = ({ items }: TabBarProps): React.ReactElement => (
+/** Home only matches exactly; other items stay current on their nested pages. */
+export const isCurrentPath = (currentPath: string, href: string): boolean =>
+  href === '/' ? currentPath === '/' : currentPath === href || currentPath.startsWith(`${href}/`)
+
+export const TabBar = ({ currentPath, items }: TabBarProps): React.ReactElement => (
   <nav className={styles.element} data-slot="tab-bar">
     {items.map((item) => (
-      <Link {...item.linkProps} className={styles.tabBarItem} data-slot="tab-bar-item" key={item.linkProps.to}>
+      <Link
+        aria-current={isCurrentPath(currentPath, item.href) ? 'page' : undefined}
+        className={styles.tabBarItem}
+        data-slot="tab-bar-item"
+        href={item.href}
+        key={item.href}
+      >
         <span aria-hidden="true" className={styles.iconSlot} data-slot="tab-bar-item-icon-inactive">
           {item.icon}
         </span>

@@ -1,8 +1,7 @@
-import { createUserOptions, userSchema } from '@client/features/users/api/create'
-import type { UserFormInput } from '@client/features/users/api/create'
-import { getUserListOptions } from '@client/features/users/api/get-all'
 import { ApproveUser } from '@client/features/users/components/approve-user'
 import { BlockUser } from '@client/features/users/components/block-user'
+import { usePageAction } from '@client/lib/page-action'
+import type { User } from '@client/types/user'
 import { Badge } from '@recipe-organizer/design-system/badge'
 import { Button } from '@recipe-organizer/design-system/button'
 import { getFormDialog } from '@recipe-organizer/design-system/form-dialog'
@@ -11,8 +10,9 @@ import { PlusIcon } from '@recipe-organizer/design-system/icons'
 import { Item, ItemGroup, ItemSeparator } from '@recipe-organizer/design-system/item'
 import { SearchInput } from '@recipe-organizer/design-system/search-input'
 import { Tabs } from '@recipe-organizer/design-system/tabs'
+import { userSchema } from '@recipe-organizer/shared/users/schemas'
+import type { UserFormInput } from '@recipe-organizer/shared/users/schemas'
 import { revalidateLogic } from '@tanstack/react-form'
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useSelector } from '@tanstack/react-store'
 import React, { useState } from 'react'
 
@@ -39,8 +39,7 @@ const USER_TAB_LABELS = {
   pending: { empty: 'Aucun utilisateur en attente.', label: 'En attente' },
 } satisfies Record<UserStatus, { empty: string; label: string }>
 
-const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: string; status: UserStatus }) => {
-  const { data: users } = useSuspenseQuery(getUserListOptions(status))
+const UserList = ({ emptyLabel, search, status, users }: { emptyLabel: string; search: string; status: UserStatus; users: readonly User[] }) => {
   const query = search.trim().toLowerCase()
   const filteredUsers = users.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
   if (filteredUsers.length === 0) {
@@ -73,24 +72,19 @@ const UserList = ({ emptyLabel, search, status }: { emptyLabel: string; search: 
   )
 }
 
-export const UsersManagement = () => {
-  const createMutation = useMutation(createUserOptions())
+export const UsersManagement = ({ users }: { users: Record<UserStatus, readonly User[]> }) => {
+  const runPageAction = usePageAction()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const form = useAppForm({
     defaultValues: userDefaultValues,
     onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync(
-        {
-          data: userSchema.parse(value),
-        },
-        {
-          onSuccess: () => {
-            form.reset()
-            setOpen(false)
-          },
-        }
-      )
+      if (
+        await runPageAction('/settings/users?create', { data: userSchema.parse(value) }, `Erreur lors de la création de l'utilisateur ${value.email}`)
+      ) {
+        form.reset()
+        setOpen(false)
+      }
     },
     validationLogic: revalidateLogic(),
     validators: {
@@ -127,9 +121,7 @@ export const UsersManagement = () => {
           items={USER_TABS.map((status) => ({
             content: (
               <div className={styles.panel}>
-                <React.Suspense fallback={null}>
-                  <UserList emptyLabel={USER_TAB_LABELS[status].empty} search={search} status={status} />
-                </React.Suspense>
+                <UserList emptyLabel={USER_TAB_LABELS[status].empty} search={search} status={status} users={users[status]} />
               </div>
             ),
             label: USER_TAB_LABELS[status].label,

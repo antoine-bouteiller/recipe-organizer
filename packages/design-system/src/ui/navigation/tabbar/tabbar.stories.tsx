@@ -1,35 +1,45 @@
 import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons'
-import { withRouter } from '@storybook-helpers/router'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
 import { TabBar } from './tabbar'
 
 import * as styles from './tabbar.stories.css'
 
-const TabBarExample = (): React.ReactElement => (
-  <div className={styles.container}>
-    <main className={styles.appSurface}>
-      <span>App surface</span>
-      <section className={styles.contentSurface}>Content surface</section>
-    </main>
-    <TabBar
-      items={[
-        { activeIcon: <HouseIcon weight="fill" />, icon: <HouseIcon />, label: 'Home', linkProps: { to: '/' } },
-        {
-          activeIcon: <ShoppingCartSimpleIcon weight="fill" />,
-          icon: <ShoppingCartSimpleIcon />,
-          label: 'Shopping',
-          linkProps: { to: '/shopping-list' },
-        },
-        { activeIcon: <MagnifyingGlassIcon weight="bold" />, icon: <MagnifyingGlassIcon />, label: 'Search', linkProps: { to: '/search' } },
-        { activeIcon: <GearIcon weight="fill" />, icon: <GearIcon />, label: 'Settings', linkProps: { to: '/settings' } },
-      ]}
-    />
-  </div>
-)
+const TabBarExample = (): React.ReactElement => {
+  const [currentPath, setCurrentPath] = useState('/')
+  return (
+    <div className={styles.container}>
+      <main className={styles.appSurface}>
+        <span>App surface</span>
+        <section className={styles.contentSurface}>Content surface</section>
+      </main>
+      {/* Stands in for page navigation inside the story frame. */}
+      <div
+        onClickCapture={(event) => {
+          const link = event.target instanceof Element ? event.target.closest('a') : null
+          if (link) {
+            event.preventDefault()
+            setCurrentPath(new URL(link.href).pathname)
+          }
+        }}
+      >
+        <TabBar
+          currentPath={currentPath}
+          items={[
+            { activeIcon: <HouseIcon weight="fill" />, href: '/', icon: <HouseIcon />, label: 'Home' },
+            { activeIcon: <ShoppingCartSimpleIcon weight="fill" />, href: '/shopping-list', icon: <ShoppingCartSimpleIcon />, label: 'Shopping' },
+            { activeIcon: <MagnifyingGlassIcon weight="bold" />, href: '/search', icon: <MagnifyingGlassIcon />, label: 'Search' },
+            { activeIcon: <GearIcon weight="fill" />, href: '/settings', icon: <GearIcon />, label: 'Settings' },
+          ]}
+        />
+      </div>
+    </div>
+  )
+}
 
-const meta = { component: TabBarExample, decorators: [withRouter], title: 'Navigation/TabBar' } satisfies Meta<typeof TabBarExample>
+const meta = { component: TabBarExample, title: 'Navigation/TabBar' } satisfies Meta<typeof TabBarExample>
 
 export default meta
 type Story = StoryObj<typeof meta>

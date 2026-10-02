@@ -1,15 +1,18 @@
 import { readResponse } from '@client/lib/api-client'
-import { queryKeys } from '@client/lib/query-keys'
-import { queryOptions } from '@tanstack/react-query'
 import { fetch } from 'void/client'
 
-const getRecipesByIds = async (ids: number[]) => readResponse(fetch('/api/shopping-list/recipes', { query: { ids: JSON.stringify(ids) } }))
+const getRecipesByIds = (ids: readonly number[]) => readResponse(fetch('/api/shopping-list/recipes', { query: { ids: JSON.stringify(ids) } }))
 
-const getRecipeByIdsOptions = (ids: number[]) =>
-  queryOptions({
-    enabled: ids.length > 0,
-    queryFn: () => getRecipesByIds(ids),
-    queryKey: queryKeys.recipeListByIds(ids),
-  })
+const requests = new Map<string, ReturnType<typeof getRecipesByIds>>()
 
-export { getRecipeByIdsOptions }
+/** One request per distinct selection; `use()` needs the same promise across renders. */
+export const loadRecipesByIds = (ids: readonly number[]) => {
+  const key = JSON.stringify(ids)
+  let request = requests.get(key)
+  if (!request) {
+    request = getRecipesByIds(ids)
+    requests.set(key, request)
+    request.catch(() => requests.delete(key))
+  }
+  return request
+}

@@ -1,17 +1,6 @@
 import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
 
-export const container = style({
-  marginTop: theme.spacing(3),
-})
-
-export const skeletonDetails = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(3),
-  paddingTop: theme.spacing(5),
-})
-
 export const managementActions = style({
   alignItems: 'flex-start',
   display: 'flex',

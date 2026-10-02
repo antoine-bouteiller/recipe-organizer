@@ -2,7 +2,7 @@ import type { TriggerProps } from '@design-system/hooks/use-drawer'
 import { Button } from '@recipe-organizer/design-system/button'
 import { TrashIcon } from '@recipe-organizer/design-system/icons'
 import { Spinner } from '@recipe-organizer/design-system/spinner'
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import type { ElementType, ReactElement, ReactNode } from 'react'
 
 import { Dialog } from '../dialog/dialog'
@@ -42,13 +42,18 @@ export const DeleteDialog = ({
     }
     onOpenChangeProp?.(value)
   }
-  const [isLoading, startTransition] = useTransition()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleDelete = () => {
-    startTransition(async () => {
+  const handleDelete = async () => {
+    setIsLoading(true)
+    try {
       await onDelete()
       setIsOpen(false)
-    })
+    } catch (error) {
+      setIsLoading(false)
+      throw error
+    }
+    setIsLoading(false)
   }
 
   const triggerNode = isControlled

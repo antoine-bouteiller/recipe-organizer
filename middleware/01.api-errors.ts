@@ -11,11 +11,13 @@ const readJson = (response: Response): Promise<unknown> =>
 
 export default defineMiddleware(async (context, next) => {
   await next()
-  if (!isApiPath(context.req.path)) {
+  const isApi = isApiPath(context.req.path)
+  // Page actions share the JSON error body so `action()` callers can surface the message.
+  if (context.error && (isApi || context.req.method !== 'GET')) {
+    context.res = toApiErrorResponse(context.error)
     return
   }
-  if (context.error) {
-    context.res = toApiErrorResponse(context.error)
+  if (!isApi) {
     return
   }
   // Void's fallback for unmatched API paths is a text 404.

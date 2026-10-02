@@ -41,8 +41,8 @@
   },
   "dependencies": {
     "@tanstack/react-form": "catalog:",
-    "@tanstack/react-router": "catalog:",
-    "@tanstack/react-store": "catalog:"
+    "@tanstack/react-store": "catalog:",
+    "@void/react": "catalog:"
   },
   "devDependencies": {
     "@recipe-organizer/config": "workspace:*",

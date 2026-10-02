@@ -2,7 +2,7 @@
 
 Create and organize recipes, manage ingredients, and generate shopping lists. Supports Google sign-in, desktop and mobile layouts, and PWA installation (requires connectivity).
 
-Built with React, TanStack Router, Void, and Drizzle on Cloudflare Workers, with D1 for data and R2 for images.
+Built with React, Void Pages with islands, and Drizzle on Cloudflare Workers, with D1 for data and R2 for images.
 
 ## Get started
 
@@ -26,7 +26,7 @@ pnpm db:migrate:local
 pnpm dev
 ```
 
-Open http://localhost:3000. One Vite server serves the SPA and `/api/*` from the same origin; local data is stored in `.wrangler/state`.
+Open http://localhost:3000. One Vite server serves server-rendered pages and `/api/*` from the same origin; local data is stored in `.wrangler/state`.
 
 ## Commands
 
@@ -41,7 +41,8 @@ pnpm db:migrate:local  # Apply local database migrations
 
 ## Project layout
 
-- `src/` — React browser application
+- `pages/` — Void page components, layouts, loaders, actions, and island wrappers
+- `src/` — React feature components, app shell, hooks, and browser-local stores
 - `routes/api/`, `middleware/` — Void HTTP adapters and request lifecycle
 - `void.config.ts`, `vite.config.ts` — Application runtime and build configuration
 - `packages/server` — Worker services, domain helpers, database schema, and Drizzle migrations
@@ -49,6 +50,12 @@ pnpm db:migrate:local  # Apply local database migrations
 - Other `packages/*` — Shared logic, configuration, and tooling
 
 See the [project structure](docs/file-structure.spec.md) and [design-system guidelines](packages/design-system/styling.spec.md) for details.
+
+Home, search, shopping list, and recipe details are island pages: the document is server-rendered and
+only interactive controls hydrate. Login, settings, and recipe editors are regular hydrated pages.
+Loaders read server helpers directly; page actions handle writes and refresh props in place.
+Unknown URLs return Void's default 404; missing recipes show in-page recovery.
+Local development always supplies an active admin identity, so it does not exercise Google sign-in.
 
 ## Deploy
 
@@ -61,7 +68,7 @@ VITE_PUBLIC_URL=https://recipes.example.com pnpm deploy
 ```
 
 Void builds and deploys the Worker and web assets together. `pnpm build` outputs
-`dist/client` and `dist/ssr`; the latter is the Worker bundle, not page SSR.
+`dist/client` and `dist/ssr`; the latter is the Worker bundle, including page rendering.
 CI deploys with `vp exec void deploy --platform cloudflare` and then runs the
 Drizzle-kit database migration step. Authentication secrets (`SESSION_SECRET`, `GOOGLE_CLIENT_ID`,
 `GOOGLE_CLIENT_SECRET`) and the runtime `VITE_PUBLIC_URL` Worker variable remain dashboard-managed,

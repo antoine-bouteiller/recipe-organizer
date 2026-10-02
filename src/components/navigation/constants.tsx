@@ -6,42 +6,34 @@ interface MenuItem {
   display?: 'desktop' | 'mobile'
   icon: React.ReactNode
   label: string
-  linkProps: { to: '/' | '/search' | '/shopping-list' | '/settings' }
+  href: '/' | '/search' | '/shopping-list' | '/settings'
 }
 
 const menuItems: MenuItem[] = [
   {
     activeIcon: <HouseIcon weight="fill" />,
+    href: '/',
     icon: <HouseIcon />,
     label: 'Accueil',
-    linkProps: {
-      to: '/',
-    },
   },
   {
     activeIcon: <MagnifyingGlassIcon weight="bold" />,
     display: 'mobile',
+    href: '/search',
     icon: <MagnifyingGlassIcon />,
     label: 'Rechercher',
-    linkProps: {
-      to: '/search',
-    },
   },
   {
     activeIcon: <ShoppingCartSimpleIcon weight="fill" />,
+    href: '/shopping-list',
     icon: <ShoppingCartSimpleIcon />,
     label: 'Courses',
-    linkProps: {
-      to: '/shopping-list',
-    },
   },
   {
     activeIcon: <GearIcon weight="fill" />,
+    href: '/settings',
     icon: <GearIcon />,
     label: 'Paramètres',
-    linkProps: {
-      to: '/settings',
-    },
   },
 ]
 

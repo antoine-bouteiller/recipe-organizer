@@ -1,21 +1,25 @@
-import { approveUserOptions } from '@client/features/users/api/approve'
+import { usePageAction } from '@client/lib/page-action'
 import { Button } from '@recipe-organizer/design-system/button'
 import { CheckIcon } from '@recipe-organizer/design-system/icons'
-import { useMutation } from '@tanstack/react-query'
-import { useTransition } from 'react'
+import { useState } from 'react'
 
 interface ApproveUserProps {
   userId: string
 }
 
 export const ApproveUser = ({ userId }: ApproveUserProps) => {
-  const approveMutation = useMutation(approveUserOptions())
-  const [isPending, startTransition] = useTransition()
+  const runPageAction = usePageAction()
+  const [isPending, setIsPending] = useState(false)
 
-  const handleApprove = () => {
-    startTransition(async () => {
-      await approveMutation.mutateAsync({ data: { id: userId } })
-    })
+  const handleApprove = async () => {
+    setIsPending(true)
+    try {
+      await runPageAction('/settings/users?approve', { data: { id: userId } }, "Erreur lors de l'approbation de l'utilisateur")
+    } catch (error) {
+      setIsPending(false)
+      throw error
+    }
+    setIsPending(false)
   }
 
   return (

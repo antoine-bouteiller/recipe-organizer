@@ -1,6 +1,5 @@
-import { Link } from '@tanstack/react-router'
-import type { LinkProps } from '@tanstack/react-router'
 import type { RecipeVariants } from '@vanilla-extract/recipes'
+import { Link } from '@void/react'
 import type React from 'react'
 import type { ComponentProps } from 'react'
 
@@ -9,8 +8,8 @@ import * as styles from './button.css'
 export type ButtonProps = Pick<ComponentProps<'button'>, 'aria-label' | 'children' | 'disabled' | 'type'> &
   RecipeVariants<typeof styles.button> &
   (
-    | ({ asLink: true; onClick?: never } & Pick<LinkProps, 'to' | 'viewTransition' | 'params'>)
-    | ({ asLink?: false; to?: never; viewTransition?: never; params?: never } & Pick<
+    | ({ asLink: true; onClick?: never } & Pick<ComponentProps<typeof Link>, 'href' | 'viewTransition'>)
+    | ({ asLink?: false; href?: never; viewTransition?: never } & Pick<
         ComponentProps<'button'>,
         'aria-expanded' | 'aria-haspopup' | 'onClick' | 'onPointerDown' | 'ref'
       >)
