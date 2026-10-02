@@ -46,7 +46,7 @@ catalog:
   react-dom: 19.3.0
   typescript: 7.0.2
   vite-plus: 1.0.0
-  void: 0.22.0
+  void: 0.23.0
   wrangler: 4.146.0
   zod: 4.6.5
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0
@@ -61,6 +61,11 @@ peerDependencyRules:
     vitest: '*'
 
 minimumReleaseAgeExclude:
-  - '@void/platform@0.22.0'
+  - '@void/platform@0.22.0 || 0.23.0'
   - miniflare@5.20261001.0-alpha
   - wrangler@4.146.0
+  - '@void/deploy-cloudflare@0.23.0'
+  - '@void/deploy-core@0.23.0'
+  - '@void/edge@0.23.0'
+  - '@void/isr@0.23.0'
+  - void@0.23.0

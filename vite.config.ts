@@ -13,13 +13,14 @@ const restrictedReactImports = {
   message: 'Rely on React Compiler instead of manual memoization with useMemo or useCallback.',
 }
 
-const viteConfig = defineConfig({
+const viteConfig = defineConfig(({ isPreview }) => ({
   // The Worker owns unmatched requests; Vite's SPA fallback would answer API 404s with index.html.
   appType: 'mpa',
   plugins: [
     vanillaExtractPlugin(),
     // Checks and tests must not initialize the Worker or validate deployment environment values.
-    ...(process.env.VP_RESOLVING_CONFIG_METADATA !== '1' && !process.env.VITEST
+    // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
+    ...(process.env.VP_RESOLVING_CONFIG_METADATA !== '1' && !process.env.VITEST && isPreview !== undefined
       ? [tanstackRouter({ target: 'react', autoCodeSplitting: true }), react({ compiler: true }), voidPlugin({ persistTo: '.wrangler/state' })]
       : []),
   ],
@@ -228,6 +229,6 @@ const viteConfig = defineConfig({
       exclude: ['**/*.stories.tsx', '**/*.css.ts', '**/routeTree.gen.ts'],
     },
   },
-})
+}))
 
 export default viteConfig
