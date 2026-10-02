@@ -1,5 +1,5 @@
-import { UsersManagement } from '@client/features/users/components/users-management'
-import { GoBackButton, ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
+import { GoBackButton, ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { UsersManagement } from '@/features/users/client/components/users-management'
 
 import type { Props } from './index.server'
 

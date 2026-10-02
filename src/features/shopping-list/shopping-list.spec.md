@@ -51,11 +51,11 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 - `[C-1]` Each distinct selected-ID array retains one request promise per document, with no TTL or mutation invalidation; failed promises are evicted, refining architecture [C-5].
 - `[C-2]` A missing selected recipe produces no projection row and therefore no shopping-list lines.
 - `[C-3]` `convert` returns `null` for incompatible dimensions or absent conversion metadata; those
-  amounts remain fallback lines (`src/features/shopping-list/utils/aggregate-shopping-list.ts`).
+  amounts remain fallback lines (`src/features/shopping-list/client/utils/aggregate-shopping-list.ts`).
 - `[C-4]` A child ingredient contributes only its greatest primary amount among siblings, not a sum
-  (`src/features/shopping-list/utils/aggregate-shopping-list.ts`).
+  (`src/features/shopping-list/client/utils/aggregate-shopping-list.ts`).
 - `[C-5]` Checkmarks are component-local state and reset when their `CartItem` unmounts
-  (`src/features/shopping-list/component/cart-item.tsx`).
+  (`src/features/shopping-list/client/component/cart-item.tsx`).
 
 ## 7. High-Level Components
 
@@ -95,7 +95,7 @@ exported mutation functions (`src/stores/shopping-list.store.ts`,
 
 `loadRecipesByIds(ids)` calls typed `GET /api/shopping-list/recipes` with a JSON-stringified
 `ids` query value. A map retains one stable promise per distinct ID array for React `use()`;
-failed promises are removed (`src/features/shopping-list/api/get-recipe-by-ids.ts`).
+failed promises are removed (`src/features/shopping-list/client/api/get-recipe-by-ids.ts`).
 The hook makes no request for an empty selection. This is not a timed query cache.
 
 | Field                          | Meaning                                                              |
@@ -108,12 +108,12 @@ The hook makes no request for an empty selection. This is not a timed query cach
 The API handler traverses direct and linked ingredient groups. Linked lines use
 `quantity × ratio ÷ linkedRecipe.servings` (`routes/api/shopping-list/recipes.ts`).
 The shared database projection excludes `spices`
-(`packages/server/src/shopping-list/ingredient-group-select.ts`).
+(`src/features/shopping-list/server/ingredient-group-select.ts`).
 
 ### 8.3 Aggregation contract
 
 For each recipe, the aggregator calculates `line.quantity × wantedServings ÷ recipe.servings`,
-then accumulates raw lines by ingredient ID (`src/features/shopping-list/utils/aggregate-shopping-list.ts`).
+then accumulates raw lines by ingredient ID (`src/features/shopping-list/client/utils/aggregate-shopping-list.ts`).
 The accumulator chooses `preferredUnitSlug`, or its first line's unit, as the primary target. Lines
 with that unit or a successful conversion add to the primary total; every other line totals under its
 original unit in `fallback`.
@@ -131,7 +131,7 @@ place surviving ingredients under their category
 
 The resulting item shape is `{ id, name, category, primary, fallback }`, where `primary` and every
 fallback entry contain `quantity` and `unitSlug`
-(`src/features/shopping-list/types/ingredient-cart-item.ts`).
+(`src/features/shopping-list/client/types/ingredient-cart-item.ts`).
 
 ### 8.4 List interaction
 
@@ -144,7 +144,7 @@ ShoppingList uses `useIsHydrated()`: SSR and hydration render neutral skeleton s
 a Suspense boundary displays the same skeleton while selected recipe promises load. The hook reads
 hydration-safe persisted ID/quantity stores, calls React `use(loadRecipesByIds(ids))` for nonempty
 selection, and aggregates the projection. Empty groups render the French empty-list message;
-otherwise category headings and CartItems render (`src/features/shopping-list/component/shopping-list.tsx`).
+otherwise category headings and CartItems render (`src/features/shopping-list/client/component/shopping-list.tsx`).
 
 CartItem formats primary/fallback values, retains incompatible amounts visibly, and keeps checked
 state local to the mounted row. Reset clears only selected recipe IDs; serving overrides remain

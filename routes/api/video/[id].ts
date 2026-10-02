@@ -1,5 +1,6 @@
-import { createR2GetHandler, createR2HeadHandler } from '@recipe-organizer/server/lib/r2'
 import { defineHandler } from 'void'
+
+import { createR2GetHandler, createR2HeadHandler } from '@/lib/server/r2'
 
 export const GET = defineHandler((context) => {
   // Hono dispatches HEAD through GET handlers while preserving the original method.

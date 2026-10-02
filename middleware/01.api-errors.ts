@@ -1,5 +1,6 @@
-import { toApiErrorResponse, toApiValidationResponse } from '@recipe-organizer/server/lib/api-error'
 import { defineMiddleware } from 'void'
+
+import { toApiErrorResponse, toApiValidationResponse } from '@/lib/server/api-error'
 
 const isApiPath = (path: string) => path === '/api' || path.startsWith('/api/')
 

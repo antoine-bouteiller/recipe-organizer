@@ -47,9 +47,9 @@ history of opened results, making repeat visits quick without duplicating recipe
 ## 6. Caveats
 
 - `[C-1]` Results are limited to `listRecipes`' card projection; ingredient names are not present
-  (`packages/server/src/recipe/queries.ts`).
+  (`src/features/recipe/server/queries.ts`).
 - `[C-2]` Deleted recent IDs are skipped; if none resolve, rendering falls back to the supplied
-  non-spice catalogue (`src/features/search/components/recent-recipes.tsx`).
+  non-spice catalogue (`src/features/search/client/components/recent-recipes.tsx`).
 - `[C-3]` Search is a server-rendered island page; the loader supplies recipes and the load island
   owns local filtering/recents (`pages/(browse)/search/index.server.ts`, `search/index.island.tsx`).
 
@@ -95,9 +95,9 @@ resolve against loader props without a hydration mismatch.
 (`src/utils/normalize.ts`). The query predicate trims its input, then normalises
 it and matches a substring of the normalised name. The attribute predicate requires every selected cuisine
 and meal, requires each enabled boolean characteristic, and excludes spice recipes until the spice
-filter is enabled (`src/features/search/utils/filter.ts`). `filterRecipes()` joins those
+filter is enabled (`src/features/search/client/utils/filter.ts`). `filterRecipes()` joins those
 predicates; `hasActiveFilters()` treats every non-empty or enabled filter as active
-(`src/features/search/utils/filter.ts`).
+(`src/features/search/client/utils/filter.ts`).
 
 | Filter value                | Match rule                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -111,12 +111,12 @@ predicates; `hasActiveFilters()` treats every non-empty or enabled filter as act
 
 `SearchResults` renders a French no-match state with an action that resets all filters. Matched rows
 retain list order, show a count, and offer a shopping-list action when appropriate
-(`src/features/search/components/search-results.tsx`). The server list projection orders rows by
-name, so the feature does not impose a competing sort (`packages/server/src/recipe/queries.ts`).
+(`src/features/search/client/components/search-results.tsx`). The server list projection orders rows by
+name, so the feature does not impose a competing sort (`src/features/recipe/server/queries.ts`).
 
 The result action consults shopping-list membership: an included recipe shows a confirmation marker;
 an absent recipe exposes an add control. That control is independent of card navigation, which
-continues to capture the recent-recipe visit (`src/features/search/components/search-results.tsx`; `src/features/search/components/recipe-search-card.tsx`).
+continues to capture the recent-recipe visit (`src/features/search/client/components/search-results.tsx`; `src/features/search/client/components/recipe-search-card.tsx`).
 
 ### 8.4 Recent recipes
 
@@ -124,11 +124,11 @@ The store persists `number[]` under `recent-recipes`. `addRecentRecipe(id)` prep
 its prior occurrence, and retains ten entries; a separate action clears the history
 (`src/stores/recent-recipes.store.ts`). `RecentRecipes` resolves IDs in stored order against the
 loader-provided catalogue, omits stale IDs, and displays the supplied catalogue when resolution yields no rows
-(`src/features/search/components/recent-recipes.tsx`).
+(`src/features/search/client/components/recent-recipes.tsx`).
 
 The store exposes its array through a hydration-safe store read hook, keeping persistence mechanics outside the page
 component (`src/stores/recent-recipes.store.ts`). The visible history header includes the French
-clear control only when at least one recent row resolves (`src/features/search/components/recent-recipes.tsx`).
+clear control only when at least one recent row resolves (`src/features/search/client/components/recent-recipes.tsx`).
 
 No active filter selects the recent-recipes branch. A resolved history retains its stored recency
 order; an empty or entirely stale history renders the non-spice catalogue supplied by the route.
@@ -138,11 +138,11 @@ This keeps the default screen populated without promoting stale browser state in
 
 Every search card uses a Void Link to `/recipe/<id>` and records the ID on activation.
 Island document navigations use cross-document view transitions
-(`src/features/search/components/recipe-search-card.tsx`). The card renders the recipe image,
-name, and attribute badges from the recipe projection (`src/features/search/components/recipe-search-card.tsx`).
+(`src/features/search/client/components/recipe-search-card.tsx`). The card renders the recipe image,
+name, and attribute badges from the recipe projection (`src/features/search/client/components/recipe-search-card.tsx`).
 
 The optional action slot lets filtered results add a recipe to the shopping list without changing the
-navigation contract (`src/features/search/components/search-results.tsx`; `src/features/search/components/recipe-search-card.tsx`).
+navigation contract (`src/features/search/client/components/search-results.tsx`; `src/features/search/client/components/recipe-search-card.tsx`).
 
 ## 9. Open Questions
 

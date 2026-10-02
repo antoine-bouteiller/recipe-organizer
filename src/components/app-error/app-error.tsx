@@ -1,6 +1,7 @@
-import { Button } from '@recipe-organizer/design-system/button'
 import { Component } from 'react'
 import type { ReactNode } from 'react'
+
+import { Button } from '@/design-system/ui/actions/button/button'
 
 import * as styles from './app-error.css'
 

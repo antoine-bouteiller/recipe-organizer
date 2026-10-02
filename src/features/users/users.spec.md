@@ -87,7 +87,7 @@ page guard ──> loader: active / pending / blocked ──> status tabs + sear
 
 The `user` table has a text primary key, unique email, display name, Better Auth timestamps, role,
 and status. Role defaults to `user`; status defaults to `active`
-(`packages/server/src/db/schema/user.ts`). Google account creation belongs to the authentication contract; its
+(`src/db/schema/user.ts`). Google account creation belongs to the authentication contract; its
 account hook assigns `pending` as part of session admission
 ([auth specification](../../../docs/infrastructure/server/auth.spec.md#82-account-and-session-admission)).
 An administrative create request accepts only email and role, generates `crypto.randomUUID()` on the
@@ -104,7 +104,7 @@ server, and supplies the required display name from the email
 
 `listUsers(db, status)` orders results by email. The regular page loader gates access with
 `guardPage(context, 'admin')` before reading all three statuses and returning
-`{ users: { active, pending, blocked } }` (`packages/server/src/users/queries.ts`,
+`{ users: { active, pending, blocked } }` (`src/features/users/server/queries.ts`,
 `pages/(app)/settings/users/index.server.ts`). Anonymous visitors redirect to `/auth/login`, pending/blocked
 visitors to that page with their error code, and active non-admin visitors to `/settings`.
 
@@ -119,7 +119,7 @@ invalidation. `runPageAction` displays French expected-error feedback at the fea
 
 The page passes loader-owned lists into `UsersManagement`, which renders panels in `active`,
 `pending`, `blocked` order with hash anchors. A shared case-insensitive search matches email or role
-(`src/features/users/components/users-management.tsx`). The tab labels remain `Actifs`, `En attente`,
+(`src/features/users/client/components/users-management.tsx`). The tab labels remain `Actifs`, `En attente`,
 and `Bloqués`.
 
 `Tabs` makes the panels available in one screen. Active rows expose blocking; pending rows
@@ -134,7 +134,7 @@ expected failure leaves values editable. The form retains its French user and ad
 `ApproveUser` tracks pending explicitly while awaiting its page action; confirmation dialogs use the
 same explicit pending lifecycle. Actions are not awaited inside React transitions because Void resolves
 navigation after the updated page commits. `BlockUser` uses a confirmation dialog whose
-action is labelled `Bloquer` and identifies the target email (`src/features/users/components/`).
+action is labelled `Bloquer` and identifies the target email (`src/features/users/client/components/`).
 
 The loader redirect is a navigation affordance, not a substitute for the authoritative action guard.
 Loader refresh occurs after the guarded write resolves, so every status tab reflects persisted membership.

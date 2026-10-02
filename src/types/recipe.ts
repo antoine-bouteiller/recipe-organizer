@@ -1,3 +1,3 @@
-import type { listRecipes } from '@recipe-organizer/server/recipe/queries'
+import type { listRecipes } from '@/features/recipe/server/queries'
 
 export type ReducedRecipe = Awaited<ReturnType<typeof listRecipes>>[number]

@@ -1,12 +1,13 @@
-import { user } from '@recipe-organizer/server/db/schema'
-import { withAuthGuard } from '@recipe-organizer/server/lib/auth/auth-guard'
-import { guardPage } from '@recipe-organizer/server/lib/auth/page-guard'
-import { getDb } from '@recipe-organizer/server/lib/db'
-import { listUsers } from '@recipe-organizer/server/users/queries'
-import { userIdSchema, userSchema } from '@recipe-organizer/shared/users/schemas'
 import { eq } from 'drizzle-orm'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
+
+import { user } from '@/db/schema'
+import { userIdSchema, userSchema } from '@/features/users/schemas'
+import { listUsers } from '@/features/users/server/queries'
+import { withAuthGuard } from '@/lib/server/auth/auth-guard'
+import { guardPage } from '@/lib/server/auth/page-guard'
+import { getDb } from '@/lib/server/db'
 
 export type Props = InferProps<typeof loader>
 

@@ -45,7 +45,7 @@ model, the bold-only text format, the form field that edits steps, and the read-
 | `[KD-11]` Text step with Magimix   | Every step is text; it optionally links one Magimix program, shown inside the same step.                                        | A program always accompanies the instruction that launches it; one step shape removes the kind switch.        |
 
 The Magimix constants move from `src/features/recipe/types/magimix.ts` to
-`packages/shared/src/recipe/` because the server now validates them. The recipe Lexical extensions
+`src/features/recipe/` because the server now validates them. The recipe Lexical extensions
 (`components/editor/**`, `recipeNodes`) are removed, together with the design-system `editor` and
 `editor-field` components whose only consumer was recipe instructions.
 
@@ -66,7 +66,7 @@ The Magimix constants move from `src/features/recipe/types/magimix.ts` to
 ### `[CT-1]` Step model
 
 ```ts
-// packages/shared/src/recipe/schemas.ts
+// src/features/recipe/schemas.ts
 const magimixSchema = z.object({
   program: z.enum(magimixProgram),
   rotationSpeed: z.enum(allowedRotationSpeed),
@@ -147,7 +147,7 @@ StepsField (withForm, array field `stepGroups`)
   do not import each other. Inline ingredient creation refreshes loader props without discarding
   the current form values.
 - TanStack Form keeps the shared `recipeSchema` / `updateRecipeSchema` validation and existing
-  controls. Submissions call the page action through `usePageAction` (`src/lib/page-action.ts`),
+  controls. Submissions call the page action through `usePageAction` (`src/lib/client/page-action.ts`),
   which keeps the history entry, with French error feedback on expected failure.
 - Successful creation and Cancel visit `/`. Successful editing and edit Cancel go back once.
   Browse targets use document navigation.
@@ -186,7 +186,7 @@ RecipeStepGroups(stepGroups)
   group gains a step, 4 appear. — demonstrates `[SO-3]`
 - `[VC-6]` _Superseded by [KD-10]:_ a default group cannot embed a recipe, so no cycle renders.
 - `[VC-7]` Given the change, when `vp check` (including knip) runs, then it passes and no `lexical`
-  import remains in `src/` or `packages/design-system`. — demonstrates `[SO-4]`
+  import remains in `src/`. — demonstrates `[SO-4]`
 
 - `[VC-8]` Given the new or edit page, when a recipe is saved with an image upload or edited with
   its image retained, then the action persists the form and returns to home or the preceding page;

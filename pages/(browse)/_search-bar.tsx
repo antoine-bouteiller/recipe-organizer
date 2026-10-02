@@ -1,1 +1,1 @@
-export { default } from '@client/features/recipe/components/search-bar'
+export { default } from '@/features/recipe/client/components/search-bar'

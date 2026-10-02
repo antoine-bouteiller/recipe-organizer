@@ -50,23 +50,23 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component            | Module type              | Responsibility                             | Public API surface                                       |
-| -------------------- | ------------------------ | ------------------------------------------ | -------------------------------------------------------- |
-| Server companion     | `pages/**/*.server.ts`   | Page reads, gates, mutations               | `loader`, `action`, `actions`, `InferProps`              |
-| Schema boundary      | Page/API handler         | Validate body, query, params, file entries | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
-| Client action helper | `src/lib/page-action.ts` | In-place refresh and failure alert         | `usePageAction()`                                        |
-| Response helper      | `src/lib/api-client.ts`  | Safe HTTP errors and login navigation      | `readResponse`, `getErrorMessage`                        |
-| Authorization        | Server auth helpers      | Gate page reads and protect writes         | `guardPage`, `withAuthGuard`                             |
-| API handlers         | `routes/api/**`          | Remaining HTTP contracts                   | Named GET/POST exports                                   |
+| Component            | Module type                     | Responsibility                             | Public API surface                                       |
+| -------------------- | ------------------------------- | ------------------------------------------ | -------------------------------------------------------- |
+| Server companion     | `pages/**/*.server.ts`          | Page reads, gates, mutations               | `loader`, `action`, `actions`, `InferProps`              |
+| Schema boundary      | Page/API handler                | Validate body, query, params, file entries | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
+| Client action helper | `src/lib/client/page-action.ts` | In-place refresh and failure alert         | `usePageAction()`                                        |
+| Response helper      | `src/lib/client/api-client.ts`  | Safe HTTP errors and login navigation      | `readResponse`, `getErrorMessage`                        |
+| Authorization        | Server auth helpers             | Gate page reads and protect writes         | `guardPage`, `withAuthGuard`                             |
+| API handlers         | `routes/api/**`                 | Remaining HTTP contracts                   | Named GET/POST exports                                   |
 
 ## 8. Detailed Design
 
 ### 8.1 Function declaration and placement
 
 Void pages live under `pages/` with server companions exporting `defineHandler` loaders and
-`action` or named `actions`. They import domain reads/writes from `@recipe-organizer/server/*`.
-Shared schemas live in `packages/shared/src/<feature>/`; server persistence helpers live in
-`packages/server/src/<feature>/`. Browser components receive loader props rather than importing
+`action` or named `actions`. They import domain reads/writes from `@/features/<feature>/server/*`.
+Shared schemas live at the `src/features/<feature>/` root; server persistence helpers live in
+`src/features/<feature>/server/`. Browser components receive loader props rather than importing
 Worker-bound helpers at runtime.
 
 ### 8.2 Validation and FormData contract
@@ -107,7 +107,7 @@ returned by action submission and alerts an unsuccessful result.
 
 Actions validate/authorize before effects and delegate aggregate writes to server helpers.
 D1 batching and R2 ordering follow the feature/data-layer contracts. Recipe deletion uses
-`packages/server/src/recipe/recipe-delete.ts`; create/update use `recipe-mutations.ts`.
+`src/features/recipe/server/recipe-delete.ts`; create/update use `recipe-mutations.ts`.
 R2 cannot participate in a D1 batch.
 
 ### 8.6 Page-action client contract

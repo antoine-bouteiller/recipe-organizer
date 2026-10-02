@@ -1,5 +1,6 @@
-import { getAuth } from '@recipe-organizer/server/lib/auth/auth-server'
 import { defineHandler } from 'void'
+
+import { getAuth } from '@/lib/server/auth/auth-server'
 
 const handleAuth = defineHandler((context) => getAuth().handler(context.req.raw))
 

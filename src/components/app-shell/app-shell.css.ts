@@ -1,5 +1,6 @@
-import { theme } from '@recipe-organizer/design-system/theme'
 import { style } from '@vanilla-extract/css'
+
+import { theme } from '@/design-system/theme'
 
 export const element = style({
   background: theme.colors.muted,

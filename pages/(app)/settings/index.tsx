@@ -1,7 +1,7 @@
-import { mobileMenuItems } from '@client/components/navigation/constants'
-import { SettingsContent } from '@client/features/settings/components/settings-content'
-import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
-import { TabBar } from '@recipe-organizer/design-system/tabbar'
+import { mobileMenuItems } from '@/components/navigation/constants'
+import { ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { TabBar } from '@/design-system/ui/navigation/tabbar/tabbar'
+import { SettingsContent } from '@/features/settings/client/components/settings-content'
 
 import type { Props } from './index.server'
 

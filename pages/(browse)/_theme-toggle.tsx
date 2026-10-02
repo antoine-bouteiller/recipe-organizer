@@ -1,1 +1,1 @@
-export { ThemeToggle as default } from '@client/components/app-shell/theme-toggle'
+export { ThemeToggle as default } from '@/components/app-shell/theme-toggle'

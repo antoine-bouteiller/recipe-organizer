@@ -1,4 +1,4 @@
-import { useShoppingListIds } from '@client/stores/shopping-list.store'
+import { useShoppingListIds } from '@/stores/shopping-list.store'
 
 export const useIsInShoppingList = (recipeId: number) => {
   const shoppingList = useShoppingListIds()

@@ -1,6 +1,7 @@
-import { getApiUser } from '@recipe-organizer/server/lib/auth/api-user'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
+
+import { getApiUser } from '@/lib/server/auth/api-user'
 
 export type Props = InferProps<typeof loader>
 

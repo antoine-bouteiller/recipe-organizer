@@ -1,1 +1,1 @@
-export { RecipeSearch as default } from '@client/features/search/components/recipe-search'
+export { RecipeSearch as default } from '@/features/search/client/components/recipe-search'

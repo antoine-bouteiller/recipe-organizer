@@ -1,6 +1,6 @@
-import { IngredientsManagement } from '@client/features/ingredients/components/ingredients-management'
-import { IngredientCatalogProvider } from '@client/features/ingredients/contexts/ingredient-catalog-context'
-import { GoBackButton, ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
+import { GoBackButton, ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { IngredientsManagement } from '@/features/ingredients/client/components/ingredients-management'
+import { IngredientCatalogProvider } from '@/features/ingredients/client/contexts/ingredient-catalog-context'
 
 import type { Props } from './index.server'
 

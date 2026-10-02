@@ -1,12 +1,13 @@
-import { listIngredients } from '@recipe-organizer/server/ingredients/queries'
-import { guardPage } from '@recipe-organizer/server/lib/auth/page-guard'
-import { getDb } from '@recipe-organizer/server/lib/db'
-import { listRecipes } from '@recipe-organizer/server/recipe/queries'
-import { readRecipeFormData } from '@recipe-organizer/server/recipe/recipe-form-data'
-import { createRecipe } from '@recipe-organizer/server/recipe/recipe-mutations'
-import { recipeSchema } from '@recipe-organizer/shared/recipe/schemas'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
+
+import { listIngredients } from '@/features/ingredients/server/queries'
+import { recipeSchema } from '@/features/recipe/schemas'
+import { listRecipes } from '@/features/recipe/server/queries'
+import { readRecipeFormData } from '@/features/recipe/server/recipe-form-data'
+import { createRecipe } from '@/features/recipe/server/recipe-mutations'
+import { guardPage } from '@/lib/server/auth/page-guard'
+import { getDb } from '@/lib/server/db'
 
 export type Props = InferProps<typeof loader>
 

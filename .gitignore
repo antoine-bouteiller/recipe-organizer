@@ -28,3 +28,6 @@ skills
 .env.*
 !.env.example
 *.tsbuildinfo
+
+# Storybook
+storybook-static

@@ -56,7 +56,7 @@ The instruction renderer receives step groups and delegates to `RecipeStepGroups
 | Detail recipe         | Reduced fields plus ingredient graph, links, stepGroups, video | Cooking view          | `getRecipeDetails(db, id)`          |
 | Embedded instructions | ID, name, default-group steps                                  | Sub-recipe section    | `getSubrecipeInstructions(db, ids)` |
 
-`packages/server/src/recipe/queries.ts` owns these projections. Home/search loaders read the list
+`src/features/recipe/server/queries.ts` owns these projections. Home/search loaders read the list
 directly; the palette alone retains `GET /api/recipes`. Detail loader reads the recipe, extracts
 sub-recipe IDs from its step groups, and resolves names/default steps before returning props.
 No browser instructions request remains.

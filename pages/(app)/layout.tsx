@@ -1,12 +1,13 @@
-import '@recipe-organizer/design-system/global.css'
-import '@recipe-organizer/design-system/styles.css'
-import '@client/lib/zod-locale'
-import { AppErrorBoundary } from '@client/components/app-error/app-error'
-import { AppHeader, AppMain } from '@client/components/app-shell/app-shell'
-import { ThemeToggle } from '@client/components/app-shell/theme-toggle'
-import SearchBar from '@client/features/recipe/components/search-bar'
+import '@/design-system/global.css'
+import '@/design-system/styles.css'
+import '@/lib/client/zod-locale'
 import { useShared } from '@void/react'
 import type { ReactNode } from 'react'
+
+import { AppErrorBoundary } from '@/components/app-error/app-error'
+import { AppHeader, AppMain } from '@/components/app-shell/app-shell'
+import { ThemeToggle } from '@/components/app-shell/theme-toggle'
+import SearchBar from '@/features/recipe/client/components/search-bar'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { pathname } = useShared()

@@ -1,1 +1,1 @@
-export { RecipeManagementActions as default } from '@client/features/recipe/components/recipe-details'
+export { RecipeManagementActions as default } from '@/features/recipe/client/components/recipe-details'

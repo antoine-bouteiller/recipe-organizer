@@ -1,6 +1,6 @@
-import { mobileMenuItems } from '@client/components/navigation/constants'
-import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
-import { TabBar } from '@recipe-organizer/design-system/tabbar'
+import { mobileMenuItems } from '@/components/navigation/constants'
+import { ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { TabBar } from '@/design-system/ui/navigation/tabbar/tabbar'
 
 import ResetShoppingList from './_reset-shopping-list' with { island: 'load' }
 import ShoppingList from './_shopping-list' with { island: 'load' }

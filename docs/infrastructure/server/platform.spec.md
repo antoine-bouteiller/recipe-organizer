@@ -44,7 +44,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[C-1]` The Worker runtime feature set is pinned by compatibility date and `nodejs_compat`
   (`void.config.ts`); a change can affect runtime behavior.
 - `[C-2]` R2 receives a materialized image buffer because the transformed response needs a known
-  length (`packages/server/src/lib/r2.ts:17-21`).
+  length (`src/lib/server/r2.ts:17-21`).
 - `[C-3]` Edge cache entries are local to an edge; the cache header remains the client-visible
   freshness contract.
 - `[C-4]` Normal browser HTTP caching and loaded documents provide no offline guarantee; server edge media caches remain unchanged.
@@ -82,25 +82,25 @@ a separate API process or proxy. Void reads the project-root `.env`.
 `.void/` (entry and route types) and `.void-wrangler.jsonc` are generated and
 git-ignored. `vp exec void prepare` regenerates route types before clean-tree checks.
 
-`packages/server/src/env.d.ts` declares the non-D1 bindings on `Cloudflare.Env` and keeps them in sync with
+`src/lib/server/env.d.ts` declares the non-D1 bindings on `Cloudflare.Env` and keeps them in sync with
 `void.config.ts`; secrets come from `env.ts`, runtime types from Void's `@cloudflare/workers-types`.
-The tooling-only `packages/server/wrangler.jsonc` supports local D1 migrations and dump/import;
+The tooling-only `tools/wrangler.jsonc` supports local D1 migrations and dump/import;
 keep its resource IDs synchronized with `void.config.ts`. Drizzle-kit alone owns migrations.
 
 ### 8.2 Media write contract
 
 `uploadFile(file)` mints a UUID, transforms the stream to WebP `{ width: 640, quality: 80 }`,
-and writes the resulting bytes with its content type (`packages/server/src/lib/r2.ts:9-23`). `uploadVideo(file)`
-writes the file bytes and supplied MIME type under the same opaque-key rule (`packages/server/src/lib/r2.ts:28-36`).
+and writes the resulting bytes with its content type (`src/lib/server/r2.ts:9-23`). `uploadVideo(file)`
+writes the file bytes and supplied MIME type under the same opaque-key rule (`src/lib/server/r2.ts:28-36`).
 Callers persist keys, never public URLs or filename-derived paths.
 
 ### 8.3 Media read and cache contract
 
 The GET helper validates `{ id: string }`, returns 404 control flow when R2 has no object, and
-responds with object content type or the caller's fallback (`packages/server/src/lib/r2.ts:42-65`). Image GET
+responds with object content type or the caller's fallback (`src/lib/server/r2.ts:42-65`). Image GET
 responses use `public, max-age=31536000, immutable`; video GET and HEAD responses use
-`public, max-age=86400, stale-while-revalidate=604800` (`packages/server/src/lib/r2.ts:60-61`,
-`packages/server/src/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
+`public, max-age=86400, stale-while-revalidate=604800` (`src/lib/server/r2.ts:60-61`,
+`src/lib/server/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
 
 ### 8.4 PWA registration
 
@@ -131,7 +131,7 @@ a fallback. This permits the image route to advertise WebP and the video route t
 stored MIME type without asking a client to infer the object representation.
 
 A missing object is not represented as an empty successful response. The helper throws a Hono
-`HTTPException(404)` before a response is built (`packages/server/src/lib/r2.ts:51-55`), allowing the shared API
+`HTTPException(404)` before a response is built (`src/lib/server/r2.ts:51-55`), allowing the shared API
 boundary to return its `not_found` error envelope without caching a missing object.
 
 ### 8.7 Cache lifetime boundary
@@ -191,7 +191,7 @@ remain dashboard-managed and are preserved through `keep_vars`.
 ### 8.12 Existing-image migration
 
 `scripts/migrate-images.ts` uses Wrangler's remote bindings for the D1, R2, and Images resources
-configured in `packages/server/wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
+configured in `tools/wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
 endpoint or deployment is needed.
 
 - `pnpm images:migrate` previews changes without writing D1 or R2.

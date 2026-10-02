@@ -1,5 +1,6 @@
-import { getApiUser } from '@recipe-organizer/server/lib/auth/api-user'
 import { defineMiddleware } from 'void'
+
+import { getApiUser } from '@/lib/server/auth/api-user'
 
 interface PageAuthUser {
   email?: string

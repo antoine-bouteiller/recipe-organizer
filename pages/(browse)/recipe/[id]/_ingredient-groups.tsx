@@ -1,1 +1,1 @@
-export { RecipeIngredientGroups as default } from '@client/features/recipe/components/recipe-section'
+export { RecipeIngredientGroups as default } from '@/features/recipe/client/components/recipe-section'

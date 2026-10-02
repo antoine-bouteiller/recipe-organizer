@@ -49,11 +49,11 @@ consistent ingredient vocabulary across the product.
 ## 6. Caveats
 
 - `[C-1]` `parentId` is nullable metadata rather than a database-enforced relationship, so a deleted parent
-  can leave a child reference (`packages/server/src/db/schema/ingredient.ts`).
+  can leave a child reference (`src/db/schema/ingredient.ts`).
 - `[C-2]` A conversion returns no value when a unit chain is malformed, input is non-finite, or density/count
   weight needed to bridge dimensions is absent or non-positive (`src/utils/unit-converter.ts`).
 - `[C-3]` The category index supports category-oriented access but the settings search filters the fetched
-  list in the browser (`packages/server/src/db/schema/ingredient.ts`; `src/features/ingredients/components/ingredients-management.tsx`).
+  list in the browser (`src/db/schema/ingredient.ts`; `src/features/ingredients/client/components/ingredients-management.tsx`).
 
 ## 7. High-Level Components
 
@@ -80,7 +80,7 @@ Shopping list ──▶ unit converter
 
 The ingredient shape is `{ id, name, category, parentId, densityGPerMl, countWeightG,
 preferredUnitSlug }`. `category` is one of `meat`, `fish`, `vegetables`, `spices`, or `other`; the
-row defaults to `other` and indexes that column (`packages/server/src/db/schema/ingredient.ts`).
+row defaults to `other` and indexes that column (`src/db/schema/ingredient.ts`).
 
 | Field               | Meaning                          | Validity rule                           |
 | ------------------- | -------------------------------- | --------------------------------------- |
@@ -93,15 +93,15 @@ row defaults to `other` and indexes that column (`packages/server/src/db/schema/
 
 `listIngredients(db)` returns rows in ascending name order. The settings loader calls `guardPage`
 before reading and returns `{ ingredients, isAdmin }`; recipe loaders can reuse the same server query
-(`packages/server/src/ingredients/queries.ts`, `pages/(app)/settings/ingredients/index.server.ts`).
+(`src/features/ingredients/server/queries.ts`, `pages/(app)/settings/ingredients/index.server.ts`).
 
 Creation keeps `POST /api/ingredients` for both settings and inline recipe-editor use. Update and delete
 are named actions at `/settings/ingredients?update` and `/settings/ingredients?delete`. Creation and
 update require `withAuthGuard`; delete requires `withAuthGuard(handler, 'admin')`. The shared schemas
 validate name, category, optional parent, non-negative conversion metadata, unit slug, and mutation ID
-(`packages/shared/src/ingredients/schemas.ts`). Successful actions rerun the settings loader. API creation
+(`src/features/ingredients/schemas.ts`). Successful actions rerun the settings loader. API creation
 calls `router.refresh()` to reload whichever page owns the catalogue; it does not depend on a browser
-query cache (`src/features/ingredients/components/add-ingredient.tsx`). Expected failures retain form
+query cache (`src/features/ingredients/client/components/add-ingredient.tsx`). Expected failures retain form
 values and display French error feedback.
 
 ### 8.2 Settings management
@@ -109,7 +109,7 @@ values and display French error feedback.
 The regular Void page wraps its content in `IngredientCatalogProvider ingredients={ingredients}`.
 The management view filters name and stored category case-insensitively and shows distinct French empty
 messages for an empty query and an unmatched query. It always shows addition; edit and deletion controls
-appear only for loader-resolved administrators (`src/features/ingredients/components/ingredients-management.tsx`).
+appear only for loader-resolved administrators (`src/features/ingredients/client/components/ingredients-management.tsx`).
 Category badges pair the central icon with the French label on medium and wider viewports
 (`src/components/ingredient-category.tsx`).
 
@@ -121,21 +121,21 @@ in either case.
 ### 8.3 Form and option adapter
 
 One form renders name, category, parent, density, item weight, and preferred unit. Its empty unit
-choice represents no preference, and parent choices permit no parent (`src/features/ingredients/components/ingredient-form.tsx`).
+choice represents no preference, and parent choices permit no parent (`src/features/ingredients/client/components/ingredient-form.tsx`).
 Add accepts a name for prefill; add and edit dynamically validate and close on successful mutation
-(`src/features/ingredients/components/add-ingredient.tsx`; `src/features/ingredients/components/edit-ingredient.tsx`).
+(`src/features/ingredients/client/components/add-ingredient.tsx`; `src/features/ingredients/client/components/edit-ingredient.tsx`).
 `useIngredientOptions` maps provider-supplied loader rows to the unchanged combobox contract
-`{ label: name, value: id }` (`src/features/ingredients/hooks/use-ingredient-options.ts`).
+`{ label: name, value: id }` (`src/features/ingredients/client/hooks/use-ingredient-options.ts`).
 `AddIngredient` and `renderAddIngredientOption` retain their export names and prefill/trigger props;
 TanStack Form still owns field state and validation.
 
 The editing form maps a stored null parent to an absent form selection, allowing the combobox to
-represent no parent without submitting a synthetic ID (`src/features/ingredients/components/edit-ingredient.tsx`).
+represent no parent without submitting a synthetic ID (`src/features/ingredients/client/components/edit-ingredient.tsx`).
 
 ### 8.4 Measurement contract
 
 `UNITS` defines each slug's dimension, optional parent, and scale factor; `unitSlugSchema` constrains
-stored preferences to that catalogue (`packages/shared/src/units.ts`). `convert(quantity, fromSlug,
+stored preferences to that catalogue (`src/utils/units.ts`). `convert(quantity, fromSlug,
 toSlug, ingredient)` follows this flow:
 
 ```text

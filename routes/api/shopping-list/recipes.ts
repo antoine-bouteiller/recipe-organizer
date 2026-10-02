@@ -1,8 +1,9 @@
-import { getDb } from '@recipe-organizer/server/lib/db'
-import { ingredientGroupSelect } from '@recipe-organizer/server/shopping-list/ingredient-group-select'
-import { scaleQuantity } from '@recipe-organizer/shared/utils/scale-quantity'
 import { defineHandler } from 'void'
 import * as z from 'zod'
+
+import { ingredientGroupSelect } from '@/features/shopping-list/server/ingredient-group-select'
+import { getDb } from '@/lib/server/db'
+import { scaleQuantity } from '@/utils/scale-quantity'
 
 const idsSchema = z.object({
   ids: z

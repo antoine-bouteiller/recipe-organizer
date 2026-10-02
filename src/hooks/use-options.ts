@@ -1,6 +1,6 @@
-import type { Option } from '@recipe-organizer/design-system/combobox-field/options'
+import type { Option } from '@/design-system/ui/forms/combobox-field/options'
 
-export type { Option } from '@recipe-organizer/design-system/combobox-field/options'
+export type { Option } from '@/design-system/ui/forms/combobox-field/options'
 
 /** Builds an options hook over a catalogue that a page provides through context. */
 export const createOptionsHook = <TItem>(useItems: () => readonly TItem[], mapFn: (item: TItem) => Option) => {

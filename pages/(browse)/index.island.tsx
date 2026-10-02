@@ -1,8 +1,9 @@
-import { mobileMenuItems } from '@client/components/navigation/constants'
-import { RecipeListContent } from '@client/features/recipe/components/recipe-list'
-import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
-import { TabBar } from '@recipe-organizer/design-system/tabbar'
 import { useShared } from '@void/react'
+
+import { mobileMenuItems } from '@/components/navigation/constants'
+import { ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { TabBar } from '@/design-system/ui/navigation/tabbar/tabbar'
+import { RecipeListContent } from '@/features/recipe/client/components/recipe-list'
 
 import QuantityControls from './_quantity-controls' with { island: 'load' }
 import type { Props } from './index.server'

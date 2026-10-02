@@ -1,6 +1,7 @@
-import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@recipe-organizer/design-system/icons'
-import type { IngredientCategory } from '@recipe-organizer/shared/ingredients/categories'
 import type { ReactNode } from 'react'
+
+import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@/design-system/ui/data-display/icons'
+import type { IngredientCategory } from '@/features/ingredients/categories'
 
 export const ingredientCategoryLabels = {
   fish: 'Poissons',

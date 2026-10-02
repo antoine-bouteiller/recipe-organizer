@@ -1,14 +1,15 @@
-import { listIngredients } from '@recipe-organizer/server/ingredients/queries'
-import { guardPage } from '@recipe-organizer/server/lib/auth/page-guard'
-import { getDb } from '@recipe-organizer/server/lib/db'
-import { getRecipeDetails, listRecipes } from '@recipe-organizer/server/recipe/queries'
-import { readRecipeFormData } from '@recipe-organizer/server/recipe/recipe-form-data'
-import { recipeIdParamsSchema } from '@recipe-organizer/server/recipe/recipe-id-params'
-import { updateRecipe } from '@recipe-organizer/server/recipe/recipe-mutations'
-import { updateRecipeSchema } from '@recipe-organizer/shared/recipe/schemas'
 import { HTTPException } from 'hono/http-exception'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
+
+import { listIngredients } from '@/features/ingredients/server/queries'
+import { updateRecipeSchema } from '@/features/recipe/schemas'
+import { getRecipeDetails, listRecipes } from '@/features/recipe/server/queries'
+import { readRecipeFormData } from '@/features/recipe/server/recipe-form-data'
+import { recipeIdParamsSchema } from '@/features/recipe/server/recipe-id-params'
+import { updateRecipe } from '@/features/recipe/server/recipe-mutations'
+import { guardPage } from '@/lib/server/auth/page-guard'
+import { getDb } from '@/lib/server/db'
 
 export type Props = InferProps<typeof loader>
 

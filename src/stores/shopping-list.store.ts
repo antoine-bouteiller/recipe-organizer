@@ -1,4 +1,4 @@
-import { persistedStore } from '@client/lib/persisted-store'
+import { persistedStore } from '@/lib/client/persisted-store'
 
 const { store: shoppingListStore, useValue } = persistedStore<number[]>('shopping-list', [])
 

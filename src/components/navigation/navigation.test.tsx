@@ -1,9 +1,10 @@
-import { AppHeader } from '@client/components/app-shell/app-shell'
-import { GoBackButton, ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
-import { TabBar } from '@recipe-organizer/design-system/tabbar'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vite-plus/test'
+
+import { AppHeader } from '@/components/app-shell/app-shell'
+import { GoBackButton, ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { TabBar } from '@/design-system/ui/navigation/tabbar/tabbar'
 
 import { mobileMenuItems } from './constants'
 

@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url'
+
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { voidReact } from '@void/react/plugin'
@@ -27,7 +29,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
   lint: {
     options: { typeAware: true, typeCheck: true, reportUnusedDisableDirectives: 'error' },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
-    jsPlugins: [{ name: 'recipe-oranizer', specifier: '@recipe-organizer/oxlint' }],
+    jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
     categories: {
       correctness: 'error',
       suspicious: 'error',
@@ -58,8 +60,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
                 ...features
                   .filter((other) => other !== feature)
                   .map((other) => ({
-                    group: [`@client/features/${other}`, `@client/features/${other}/**`, `../**/${other}`, `../**/${other}/**`],
-                    message: 'Features must not import other features. Compose them in routes or app-owned components.',
+                    group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
+                    message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
                   })),
               ],
             },
@@ -81,7 +83,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       },
       {
         // Numeric token scales are intentionally ordered by value.
-        files: ['packages/design-system/src/theme/**/*.ts'],
+        files: ['src/design-system/theme/**/*.ts'],
         rules: {
           'sort-keys': 'off',
         },
@@ -200,6 +202,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     '*': 'vp check --fix',
   },
   resolve: {
+    // Virtual island entries sit outside the tsconfig project, so tsconfig paths don't resolve their imports.
+    alias: [{ find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) }],
     tsconfigPaths: true,
   },
   test: {
@@ -207,7 +211,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       { extends: true, test: { name: 'unit', globals: true } },
       {
         extends: true,
-        plugins: [storybookTest({ configDir: 'packages/design-system/.storybook' })],
+        plugins: [storybookTest({ configDir: '.storybook' })],
         optimizeDeps: { include: ['@vanilla-extract/recipes/createRuntimeFn'] },
         test: {
           name: 'storybook',
@@ -223,7 +227,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
+      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'tools/oxlint/rules/**/*.ts'],
       exclude: ['**/*.stories.tsx', '**/*.css.ts'],
     },
   },

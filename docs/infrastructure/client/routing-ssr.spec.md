@@ -25,7 +25,7 @@ Browsing ships static HTML with focused islands, while editing and administratio
 | Decision                     | Choice                                                                                            | Rationale                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `[KD-1]` Route declaration   | Void file pages and colocated `.server.ts` loaders/actions under `pages/`.                        | One URL owns its server input and mutation boundary.                                                      |
-| `[KD-2]` Data lifecycle      | Loaders read `@recipe-organizer/server/*` directly; actions refresh loader props.                 | No browser query cache or duplicate HTTP read is needed for page data.                                    |
+| `[KD-2]` Data lifecycle      | Loaders read `@/features/*/server/*` directly; actions refresh loader props.                      | No browser query cache or duplicate HTTP read is needed for page data.                                    |
 | `[KD-3]` Render mode         | `(browse)` has an island layout; `(app)` has a regular hydrated layout.                           | Browsing needs JavaScript only for interactive controls; Void forbids regular pages under island layouts. |
 | `[KD-4]` Navigation feedback | Void client view transitions for regular pages; cross-document transitions for island navigation. | Navigation remains native without transition support; backward traversals get a `back` transition type.   |
 

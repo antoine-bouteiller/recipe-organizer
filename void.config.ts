@@ -6,7 +6,7 @@ const themeScript = `document.documentElement.className = /(?:^|; )ui-theme=dark
 const backTransitionScript = `addEventListener('pagereveal', (event) => { const activation = globalThis.navigation?.activation; if (event.viewTransition && activation?.navigationType === 'traverse' && activation.entry.index < (activation.from?.index ?? 0)) event.viewTransition.types.add('back') })`
 const serviceWorkerScript = `if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' }).catch(() => undefined)`
 
-// Keep resource IDs in sync with packages/server/wrangler.jsonc (local migrations, dump/import) and packages/server/src/env.d.ts.
+// Keep resource IDs in sync with tools/wrangler.jsonc (local migrations, dump/import) and src/lib/server/env.d.ts.
 const voidConfig = defineConfig({
   cloudflare: {
     d1_databases: [{ binding: 'DB', database_id: '542863e2-5f6d-4ef7-9fd0-84b673f76f43', database_name: 'recipe-organizer' }],

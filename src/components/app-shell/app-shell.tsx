@@ -1,7 +1,8 @@
-import { desktopMenuItems } from '@client/components/navigation/constants'
-import { isCurrentPath } from '@recipe-organizer/design-system/tabbar'
 import { Link } from '@void/react'
 import type { ReactNode } from 'react'
+
+import { desktopMenuItems } from '@/components/navigation/constants'
+import { isCurrentPath } from '@/design-system/ui/navigation/tabbar/tabbar'
 
 import * as styles from './app-shell.css'
 

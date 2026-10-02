@@ -76,11 +76,11 @@ recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
 
 ### `[CT-1]` Leaf inventory
 
-| Leaf                           | Owns                                                                                                                             | Key contracts                                        |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`crud`](./crud.spec.md)       | `pages/(app)/recipe/**`, `pages/(browse)/recipe/**`, `packages/server/src/recipe/**`, `packages/server/src/db/schema/recipe*.ts` | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
-| [`editor`](./editor.spec.md)   | `RecipeStep` schema and Magimix constants in `packages/shared/src/recipe/`, `StepsField`, `RecipeSteps`, `parseBoldText`         | step model [CT-1], bold text [CT-2], renderer [CT-4] |
-| [`display`](./display.spec.md) | list/detail/instructions queries, cards, search, cooking view, media handlers                                                    | projections [CT-1], cooking view [CT-3]              |
+| Leaf                           | Owns                                                                                                              | Key contracts                                        |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`crud`](./crud.spec.md)       | `pages/(app)/recipe/**`, `pages/(browse)/recipe/**`, `src/features/recipe/server/**`, `src/db/schema/recipe*.ts`  | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
+| [`editor`](./editor.spec.md)   | `RecipeStep` schema and Magimix constants in `src/features/recipe/`, `StepsField`, `RecipeSteps`, `parseBoldText` | step model [CT-1], bold text [CT-2], renderer [CT-4] |
+| [`display`](./display.spec.md) | list/detail/instructions queries, cards, search, cooking view, media handlers                                     | projections [CT-1], cooking view [CT-3]              |
 
 Dependencies: `crud.spec.md` [CT-1] persists `editor.spec.md` [CT-1]; `display.spec.md` [CT-1]
 returns it; `display.spec.md` [CT-3] renders it through `editor.spec.md` [CT-4].

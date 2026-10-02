@@ -1,10 +1,11 @@
-import { withAuthGuard } from '@recipe-organizer/server/lib/auth/auth-guard'
-import { getDb } from '@recipe-organizer/server/lib/db'
-import { getRecipeDetails, getSubrecipeInstructions } from '@recipe-organizer/server/recipe/queries'
-import { deleteRecipe } from '@recipe-organizer/server/recipe/recipe-delete'
-import { recipeIdParamsSchema } from '@recipe-organizer/server/recipe/recipe-id-params'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
+
+import { getRecipeDetails, getSubrecipeInstructions } from '@/features/recipe/server/queries'
+import { deleteRecipe } from '@/features/recipe/server/recipe-delete'
+import { recipeIdParamsSchema } from '@/features/recipe/server/recipe-id-params'
+import { withAuthGuard } from '@/lib/server/auth/auth-guard'
+import { getDb } from '@/lib/server/db'
 
 export type Props = InferProps<typeof loader>
 

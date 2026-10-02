@@ -1,6 +1,6 @@
-import { resetShoppingList } from '@client/stores/shopping-list.store'
-import { Button } from '@recipe-organizer/design-system/button'
-import { ArrowCounterClockwiseIcon } from '@recipe-organizer/design-system/icons'
+import { Button } from '@/design-system/ui/actions/button/button'
+import { ArrowCounterClockwiseIcon } from '@/design-system/ui/data-display/icons'
+import { resetShoppingList } from '@/stores/shopping-list.store'
 
 export default function ResetShoppingList() {
   return (

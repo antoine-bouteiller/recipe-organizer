@@ -1,0 +1,21 @@
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+
+import type { CuisineType, Meal } from '@/features/recipe/constants'
+
+import { user } from './user'
+
+export const recipe = sqliteTable('recipes', {
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => user.id, { onDelete: 'restrict' }),
+  cuisineTypes: text('cuisine_types', { mode: 'json' }).$type<CuisineType[]>().notNull().default([]),
+  id: integer('id').primaryKey(),
+  image: text('image', { length: 255 }).notNull(),
+  isMagimix: integer('is_magimix', { mode: 'boolean' }).notNull().default(false),
+  isSpice: integer('is_spice', { mode: 'boolean' }).notNull().default(false),
+  isVegetarian: integer('is_vegetarian', { mode: 'boolean' }).notNull().default(false),
+  meals: text('meals', { mode: 'json' }).$type<Meal[]>().notNull().default([]),
+  name: text('name', { length: 255 }).notNull(),
+  servings: integer('servings').notNull(),
+  video: text('video', { length: 255 }),
+})

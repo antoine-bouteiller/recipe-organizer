@@ -18,7 +18,6 @@ on:
       - tsconfig.json
       - drizzle.config.ts
       - package.json
-      - packages/**/*
       - pnpm-workspace.yaml
       - pnpm-lock.yaml
       - .github/workflows/deploy-production.yaml

@@ -56,15 +56,15 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 ## 7. High-Level Components
 
-| Component           | Module type                          | Responsibility                                    | Public API surface              |
-| ------------------- | ------------------------------------ | ------------------------------------------------- | ------------------------------- |
-| Page data           | `pages/**/*.server.ts`               | Read records and return typed props               | `loader`, `InferProps`          |
-| Page actions        | Pages + `src/lib/page-action.ts`     | Mutate and refresh regular-page props             | `usePageAction()`               |
-| Persisted stores    | `src/stores/*.store.ts`              | Durable IDs and quantities                        | Read hooks and exported actions |
-| Persistence adapter | `src/lib/persisted-store.ts`         | Initial SSR snapshot and localStorage persistence | `persistedStore<T>()`           |
-| Theme               | `void.config.ts`, `src/lib/theme.ts` | Resolve before paint and toggle                   | `ui-theme`, `toggleTheme`       |
-| Hydration gate      | `src/hooks/use-is-hydrated.ts`       | Distinguish SSR/hydration from client-only intent | `useIsHydrated()`               |
-| Feature context     | `src/features/*/contexts/*`          | Thread loader catalogues                          | Feature provider and hook       |
+| Component           | Module type                                 | Responsibility                                    | Public API surface              |
+| ------------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------- |
+| Page data           | `pages/**/*.server.ts`                      | Read records and return typed props               | `loader`, `InferProps`          |
+| Page actions        | Pages + `src/lib/client/page-action.ts`     | Mutate and refresh regular-page props             | `usePageAction()`               |
+| Persisted stores    | `src/stores/*.store.ts`                     | Durable IDs and quantities                        | Read hooks and exported actions |
+| Persistence adapter | `src/lib/client/persisted-store.ts`         | Initial SSR snapshot and localStorage persistence | `persistedStore<T>()`           |
+| Theme               | `void.config.ts`, `src/lib/client/theme.ts` | Resolve before paint and toggle                   | `ui-theme`, `toggleTheme`       |
+| Hydration gate      | `src/hooks/use-is-hydrated.ts`              | Distinguish SSR/hydration from client-only intent | `useIsHydrated()`               |
+| Feature context     | `src/features/*/contexts/*`                 | Thread loader catalogues                          | Feature provider and hook       |
 
 ## 8. Detailed Design
 

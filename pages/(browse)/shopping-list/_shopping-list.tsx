@@ -1,1 +1,1 @@
-export { ShoppingList as default } from '@client/features/shopping-list/component/shopping-list'
+export { ShoppingList as default } from '@/features/shopping-list/client/component/shopping-list'

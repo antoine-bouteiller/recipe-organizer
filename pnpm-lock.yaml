@@ -266,15 +266,6 @@ importers:
 
   .:
     dependencies:
-      '@recipe-organizer/design-system':
-        specifier: workspace:*
-        version: link:packages/design-system
-      '@recipe-organizer/server':
-        specifier: workspace:*
-        version: link:packages/server
-      '@recipe-organizer/shared':
-        specifier: workspace:*
-        version: link:packages/shared
       '@tanstack/react-form':
         specifier: 'catalog:'
         version: 1.33.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -312,81 +303,15 @@ importers:
       '@commitlint/config-conventional':
         specifier: 'catalog:'
         version: 21.2.3
-      '@recipe-organizer/config':
-        specifier: workspace:*
-        version: link:packages/config
-      '@recipe-organizer/oxlint':
-        specifier: workspace:*
-        version: link:packages/oxlint
       '@storybook/addon-vitest':
         specifier: 'catalog:'
         version: 10.6.0(@vitest/browser-playwright@5.0.1)(react@19.3.0)(storybook@10.6.0(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0)(vite-plus@1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)))(vitest@5.0.1)
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.9.8
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@types/react-dom':
-        specifier: 'catalog:'
-        version: 19.3.0(@types/react@19.3.0)
-      '@vanilla-extract/css':
-        specifier: 'catalog:'
-        version: 1.21.2
-      '@vanilla-extract/vite-plugin':
-        specifier: 'catalog:'
-        version: 5.2.6(@types/node@25.9.8)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(esbuild@0.28.2)(jiti@2.7.0)(supports-color@10.2.2)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-      '@vitest/browser-playwright':
-        specifier: 'catalog:'
-        version: 5.0.1(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(playwright@1.63.0)(tsx@4.23.15)(typescript@7.0.2)(vitest@5.0.1)(yaml@2.9.1)
-      '@vitest/coverage-v8':
-        specifier: 'catalog:'
-        version: 5.0.1(@vitest/browser@5.0.1)(vitest@5.0.1)
-      drizzle-kit:
-        specifier: 'catalog:'
-        version: 1.0.0-rc.3
-      knip:
-        specifier: 'catalog:'
-        version: 6.39.0
-      oxc-transform-react:
-        specifier: 'catalog:'
-        version: 0.152.0
-      playwright:
-        specifier: 'catalog:'
-        version: 1.63.0
-      typescript:
-        specifier: 'catalog:'
-        version: 7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-      vitest:
-        specifier: 'catalog:'
-        version: 5.0.1(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/browser-preview@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-      wrangler:
-        specifier: 'catalog:'
-        version: 4.146.0(@cloudflare/workers-types@4.20260702.1)(@types/node@25.9.8)
-
-  packages/config: {}
-
-  packages/design-system:
-    dependencies:
-      '@tanstack/react-form':
-        specifier: 'catalog:'
-        version: 1.33.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@tanstack/react-store':
-        specifier: 'catalog:'
-        version: 0.11.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@void/react':
-        specifier: 'catalog:'
-        version: 0.23.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(oxc-transform-react@0.152.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(void@0.23.0(@types/node@25.9.8)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(arktype@2.2.6)(kysely@0.29.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(valibot@1.5.0(typescript@7.0.2))(vitest@5.0.1)(wrangler@4.146.0(@cloudflare/workers-types@4.20260702.1)(@types/node@25.9.8))(zod@4.6.5))
-    devDependencies:
-      '@recipe-organizer/config':
-        specifier: workspace:*
-        version: link:../config
       '@storybook/react-vite':
         specifier: 'catalog:'
         version: 10.6.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(storybook@10.6.0(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0)(vite-plus@1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)))(supports-color@10.2.2)(typescript@7.0.2)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.8
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -402,74 +327,39 @@ importers:
       '@vanilla-extract/vite-plugin':
         specifier: 'catalog:'
         version: 5.2.6(@types/node@25.9.8)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(esbuild@0.28.2)(jiti@2.7.0)(supports-color@10.2.2)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-      react:
+      '@vitest/browser-playwright':
         specifier: 'catalog:'
-        version: 19.3.0
-      react-dom:
+        version: 5.0.1(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(playwright@1.63.0)(tsx@4.23.15)(typescript@7.0.2)(vitest@5.0.1)(yaml@2.9.1)
+      '@vitest/coverage-v8':
         specifier: 'catalog:'
-        version: 19.3.0(react@19.3.0)
+        version: 5.0.1(vitest@5.0.1)
+      drizzle-kit:
+        specifier: 'catalog:'
+        version: 1.0.0-rc.3
+      knip:
+        specifier: 'catalog:'
+        version: 6.39.0
+      oxc-transform-react:
+        specifier: 'catalog:'
+        version: 0.152.0
+      playwright:
+        specifier: 'catalog:'
+        version: 1.63.0
       storybook:
         specifier: 'catalog:'
         version: 10.6.0(@types/react@19.3.0)(prettier@3.9.6)(react@19.3.0)(vite-plus@1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))
-
-  packages/oxlint:
-    devDependencies:
-      '@recipe-organizer/config':
-        specifier: workspace:*
-        version: link:../config
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
       vite-plus:
         specifier: 'catalog:'
         version: 1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-
-  packages/scripts:
-    devDependencies:
-      '@recipe-organizer/config':
-        specifier: workspace:*
-        version: link:../config
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.1(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/browser-preview@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
       wrangler:
         specifier: 'catalog:'
         version: 4.146.0(@cloudflare/workers-types@4.20260702.1)(@types/node@25.9.8)
-
-  packages/server:
-    dependencies:
-      '@recipe-organizer/shared':
-        specifier: workspace:*
-        version: link:../shared
-      better-auth:
-        specifier: 'catalog:'
-        version: 1.7.7(drizzle-kit@1.0.0-rc.3)(drizzle-orm@1.0.0-rc.3(@cloudflare/workers-types@4.20260702.1)(arktype@2.2.6)(better-sqlite3@13.0.3)(mysql2@3.24.5(@types/node@25.9.8))(pg@8.23.0)(valibot@1.5.0(typescript@7.0.2))(zod@4.6.5))(mysql2@3.24.5(@types/node@25.9.8))(pg@8.23.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(vitest@5.0.1)
-      drizzle-orm:
-        specifier: 'catalog:'
-        version: 1.0.0-rc.3(@cloudflare/workers-types@4.20260702.1)(arktype@2.2.6)(better-sqlite3@13.0.3)(mysql2@3.24.5(@types/node@25.9.8))(pg@8.23.0)(valibot@1.5.0(typescript@7.0.2))(zod@4.6.5)
-      hono:
-        specifier: 'catalog:'
-        version: 4.13.12
-      void:
-        specifier: 'catalog:'
-        version: 0.23.0(@types/node@25.9.8)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(arktype@2.2.6)(kysely@0.29.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(valibot@1.5.0(typescript@7.0.2))(vitest@5.0.1)(wrangler@4.146.0(@cloudflare/workers-types@4.20260702.1)(@types/node@25.9.8))(zod@4.6.5)
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.5
-    devDependencies:
-      '@recipe-organizer/config':
-        specifier: workspace:*
-        version: link:../config
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.9.8
-      vite-plus:
-        specifier: 'catalog:'
-        version: 1.0.0(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-
-  packages/shared:
-    dependencies:
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.5
-    devDependencies:
-      '@recipe-organizer/config':
-        specifier: workspace:*
-        version: link:../config
 
 packages:
 
@@ -7000,7 +6890,7 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  '@vitest/coverage-v8@5.0.1(@vitest/browser@5.0.1)(vitest@5.0.1)':
+  '@vitest/coverage-v8@5.0.1(vitest@5.0.1)':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/istanbul-lib-coverage': 1.0.1
@@ -7011,8 +6901,6 @@ snapshots:
       std-env: 4.2.0
       tinyrainbow: 3.1.1
       vitest: 5.0.1(@types/node@25.9.8)(@vitest/browser-playwright@5.0.1)(@vitest/browser-preview@5.0.1)(@vitest/coverage-v8@5.0.1)(@vitest/ui@5.0.1)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1)
-    optionalDependencies:
-      '@vitest/browser': 5.0.1(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(vitest@5.0.1)(yaml@2.9.1)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -8745,7 +8633,7 @@ snapshots:
       '@types/node': 25.9.8
       '@vitest/browser-playwright': 5.0.1(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(playwright@1.63.0)(tsx@4.23.15)(typescript@7.0.2)(vitest@5.0.1)(yaml@2.9.1)
       '@vitest/browser-preview': 5.0.1(@types/node@25.9.8)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(vitest@5.0.1)(yaml@2.9.1)
-      '@vitest/coverage-v8': 5.0.1(@vitest/browser@5.0.1)(vitest@5.0.1)
+      '@vitest/coverage-v8': 5.0.1(vitest@5.0.1)
       '@vitest/ui': 5.0.1(vitest@5.0.1)
     transitivePeerDependencies:
       - '@arethetypeswrong/core'

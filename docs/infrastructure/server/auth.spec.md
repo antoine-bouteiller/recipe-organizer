@@ -46,10 +46,10 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[C-1]` Google callback availability and userinfo shape remain external dependencies, refining
   architecture [C-6].
-- `[C-2]` The development branch returns a synthetic active admin (`packages/server/src/lib/auth/api-user.ts`),
+- `[C-2]` The development branch returns a synthetic active admin (`src/lib/server/auth/api-user.ts`),
   so it does not exercise provider callbacks.
 - `[C-3]` `VITE_PUBLIC_URL` must resolve to an origin accepted by Google because Better Auth uses it
-  as `baseURL` (`packages/server/src/lib/auth/auth-server.ts:16-20`).
+  as `baseURL` (`src/lib/server/auth/auth-server.ts:16-20`).
 - `[C-4]` Role checks authorize a capability; handlers still perform row-ownership checks where a
   resource belongs to a user.
 
@@ -68,19 +68,19 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 ### 8.1 Auth factory and secrets
 
 `getAuth(db = getDb())` creates Better Auth per request, connects the Drizzle adapter to that client,
-and exposes the account, session, user, and verification schema (`packages/server/src/lib/auth/auth-server.ts:1-18`).
+and exposes the account, session, user, and verification schema (`src/lib/server/auth/auth-server.ts:1-18`).
 Void routes import the factory directly; its default argument obtains a request-scoped database client. It uses
 `SESSION_SECRET` as the auth secret and passes Google client credentials only in the social-provider
-configuration (`packages/server/src/lib/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
+configuration (`src/lib/server/auth/auth-server.ts:45-51`). There is no TanStack Start cookies adapter:
 Better Auth's raw `Response` cookie headers are returned unchanged by the Void/Worker boundary.
 
 ### 8.2 Account and session admission
 
 The user-create hook sets every Google-created account to `pending`
-(`packages/server/src/lib/auth/auth-server.ts:38-42`). Before session creation, the session hook loads the user and
+(`src/lib/server/auth/auth-server.ts:38-42`). Before session creation, the session hook loads the user and
 rejects `blocked` or `pending` statuses with `account_blocked` or `account_pending`
-(`packages/server/src/lib/auth/auth-server.ts:21-36`). Additional `role` and `status` fields have `input: false`,
-so client-facing auth calls cannot provide them (`packages/server/src/lib/auth/auth-server.ts:52-57`).
+(`src/lib/server/auth/auth-server.ts:21-36`). Additional `role` and `status` fields have `input: false`,
+so client-facing auth calls cannot provide them (`src/lib/server/auth/auth-server.ts:52-57`).
 
 ### 8.3 User resolution and guard
 
@@ -134,7 +134,7 @@ This division refines the server umbrella dependency direction [KD-2].
 
 A session represents an already-approved identity at the time the session hook runs. The hook checks
 the persisted status before issuance, so a pending or blocked account does not receive the session
-that protected functions would otherwise resolve (`packages/server/src/lib/auth/auth-server.ts:21-36`).
+that protected functions would otherwise resolve (`src/lib/server/auth/auth-server.ts:21-36`).
 
 Session cookies are Better Auth response state. The direct Worker preserves the raw `Response`
 cookie headers. The request identity resolver calls `auth.api.getSession({ headers, returnHeaders: true })`
@@ -163,7 +163,7 @@ application message, while provider and server details remain in server-side dia
 ### 8.10 Development boundary
 
 The development identity is a bounded local capability selected by `import.meta.env.DEV`
-in `packages/server/src/lib/auth/api-user.ts`. Production session resolution
+in `src/lib/server/auth/api-user.ts`. Production session resolution
 always calls Better Auth, so a deployed request has no synthetic identity path.
 
 Tests can exercise status and role branches by supplying controlled resolver results. End-to-end

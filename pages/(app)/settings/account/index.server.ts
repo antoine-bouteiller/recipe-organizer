@@ -1,6 +1,7 @@
-import { guardPage } from '@recipe-organizer/server/lib/auth/page-guard'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
+
+import { guardPage } from '@/lib/server/auth/page-guard'
 
 export type Props = InferProps<typeof loader>
 

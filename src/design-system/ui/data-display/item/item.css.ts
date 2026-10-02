@@ -1,0 +1,113 @@
+import { globalStyle, style } from '@vanilla-extract/css'
+import { recipe } from '@vanilla-extract/recipes'
+
+import { theme } from '@/design-system/theme'
+
+export const group = style({
+  display: 'flex',
+  flexDirection: 'column',
+})
+
+export const separator = style({
+  backgroundColor: theme.colors.border,
+  height: '1px',
+  width: '100%',
+})
+
+export const item = recipe({
+  base: {
+    alignItems: 'center',
+    borderColor: 'transparent',
+    borderRadius: theme.radius.md,
+    borderWidth: '1px',
+    display: 'flex',
+    flexWrap: 'wrap',
+    fontSize: theme.fontSizes.sm,
+    gap: theme.spacing(4),
+    outline: '2px solid transparent',
+    outlineOffset: '2px',
+    padding: theme.spacing(4),
+    transitionDuration: '100ms',
+    transitionProperty: 'color, background-color, border-color, outline-color, text-decoration-color, fill, stroke',
+    transitionTimingFunction: theme.easings['in-out'],
+    selectors: {
+      '&:is(:focus-visible, [data-focus-visible])': {
+        borderColor: theme.colors.ring,
+        boxShadow: theme.shadows.ring,
+      },
+    },
+  },
+  variants: {
+    layout: {
+      row: {
+        flexWrap: 'nowrap',
+      },
+    },
+    variant: {
+      outline: {
+        borderColor: theme.colors.border,
+      },
+    },
+  },
+})
+
+export const media = style({
+  selectors: {
+    '[data-slot=item]:has([data-slot=item-description]) &': {
+      alignSelf: 'flex-start',
+      transform: 'translateY(2px)',
+    },
+  },
+  alignItems: 'center',
+  display: 'flex',
+  flexShrink: 0,
+  gap: theme.spacing(2),
+  justifyContent: 'center',
+})
+
+export const content = style({
+  display: 'flex',
+  flex: '1 1 0%',
+  flexDirection: 'column',
+  gap: theme.spacing(1),
+})
+
+export const title = style({
+  alignItems: 'center',
+  display: 'flex',
+  fontSize: theme.fontSizes.sm,
+  fontWeight: theme.fontWeights.medium,
+  gap: theme.spacing(2),
+  lineHeight: theme.lineHeights.snug,
+  width: 'fit-content',
+})
+
+export const description = style({
+  alignItems: 'center',
+  color: theme.colors['muted-foreground'],
+  display: 'flex',
+  fontSize: theme.fontSizes.sm,
+  fontWeight: theme.fontWeights.normal,
+  gap: theme.spacing(1),
+  lineHeight: theme.lineHeights.normal,
+  textWrap: 'balance',
+})
+
+export const actions = style({
+  alignItems: 'center',
+  display: 'flex',
+  gap: theme.spacing(2),
+})
+
+globalStyle(`.${description} > a`, {
+  textDecoration: 'underline',
+  textUnderlineOffset: '4px',
+})
+
+globalStyle(`.${description} > a:hover`, {
+  '@media': {
+    '(hover: hover) and (pointer: fine)': {
+      color: theme.colors.primary,
+    },
+  },
+})

@@ -1,5 +1,5 @@
-import { AccountContent } from '@client/features/settings/components/account-content'
-import { GoBackButton, ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
+import { GoBackButton, ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { AccountContent } from '@/features/settings/client/components/account-content'
 
 import type { Props } from './index.server'
 

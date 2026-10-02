@@ -1,5 +1,6 @@
-import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@recipe-organizer/design-system/icons'
 import type React from 'react'
+
+import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@/design-system/ui/data-display/icons'
 
 interface MenuItem {
   activeIcon: React.ReactNode

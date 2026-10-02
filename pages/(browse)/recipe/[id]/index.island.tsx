@@ -1,7 +1,8 @@
-import { RecipeDetailsContent } from '@client/features/recipe/components/recipe-details'
-import { NotFound } from '@recipe-organizer/design-system/not-found'
-import { ScreenLayout } from '@recipe-organizer/design-system/screen-layout'
 import { useShared } from '@void/react'
+
+import { NotFound } from '@/design-system/ui/feedback/not-found/not-found'
+import { ScreenLayout } from '@/design-system/ui/layout/screen-layout/screen-layout'
+import { RecipeDetailsContent } from '@/features/recipe/client/components/recipe-details'
 
 import GoBack from './_go-back' with { island: 'load' }
 import IngredientGroups from './_ingredient-groups' with { island: 'load' }

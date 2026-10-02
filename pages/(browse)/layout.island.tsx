@@ -1,8 +1,9 @@
-import '@recipe-organizer/design-system/global.css'
-import '@recipe-organizer/design-system/styles.css'
-import { AppHeader, AppMain } from '@client/components/app-shell/app-shell'
+import '@/design-system/global.css'
+import '@/design-system/styles.css'
 import { useShared } from '@void/react'
 import type { ReactNode } from 'react'
+
+import { AppHeader, AppMain } from '@/components/app-shell/app-shell'
 
 // Keep in sync with the AppHeader breakpoint in app-shell.css.ts.
 import SearchBar from './_search-bar' with { island: 'media:(min-width: 768px)' }

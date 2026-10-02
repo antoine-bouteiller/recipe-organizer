@@ -42,14 +42,16 @@ pnpm db:migrate:local  # Apply local database migrations
 ## Project layout
 
 - `pages/` — Void page components, layouts, loaders, actions, and island wrappers
-- `src/` — React feature components, app shell, hooks, and browser-local stores
+- `src/features/<feature>/` — `client/` components and hooks, `server/` domain helpers, and shared schemas at the root
+- `src/lib/` — `client/` browser services and `server/` auth, D1, R2, and errors
+- `src/db/` — Drizzle schema and migrations
+- `src/design-system/` — Owned UI, styles, and Storybook stories
+- `src/` — App shell, hooks, browser-local stores, and shared utils
 - `routes/api/`, `middleware/` — Void HTTP adapters and request lifecycle
 - `void.config.ts`, `vite.config.ts` — Application runtime and build configuration
-- `packages/server` — Worker services, domain helpers, database schema, and Drizzle migrations
-- `packages/design-system` — Shared UI, styles, and Storybook stories
-- Other `packages/*` — Shared logic, configuration, and tooling
+- `tools/` — Custom Oxlint rules, scripts, and tooling-only Wrangler config
 
-See the [project structure](docs/file-structure.spec.md) and [design-system guidelines](packages/design-system/styling.spec.md) for details.
+See the [project structure](docs/file-structure.spec.md) and [design-system guidelines](src/design-system/styling.spec.md) for details.
 
 Home, search, shopping list, and recipe details are island pages: the document is server-rendered and
 only interactive controls hydrate. Login, settings, and recipe editors are regular hydrated pages.
@@ -61,7 +63,7 @@ Local development always supplies an active admin identity, so it does not exerc
 
 Requires a Cloudflare account with D1 and R2 configured in [`void.config.ts`](void.config.ts), plus `CLOUDFLARE_API_TOKEN`,
 `CLOUDFLARE_ACCOUNT_ID`, and production authentication secrets. Keep tooling resource IDs in
-`packages/server/wrangler.jsonc` synchronized with Void config.
+`tools/wrangler.jsonc` synchronized with Void config.
 
 ```bash
 VITE_PUBLIC_URL=https://recipes.example.com pnpm deploy

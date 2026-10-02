@@ -1,5 +1,5 @@
-import { LoginLayout } from '@client/features/auth/components/login-layout'
-import { authClient } from '@client/lib/auth/auth-client'
+import { LoginLayout } from '@/features/auth/client/components/login-layout'
+import { authClient } from '@/lib/client/auth/auth-client'
 
 import type { Props } from './index.server'
 

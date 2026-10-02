@@ -1,0 +1,73 @@
+import { Button } from '@/design-system/ui/actions/button/button'
+import { MinusIcon, PlusIcon, TrashIcon } from '@/design-system/ui/data-display/icons'
+import { useIsInShoppingList } from '@/hooks/use-is-in-shopping-list'
+import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store'
+
+import { useRecipeQuantities } from '../hooks/use-recipe-quantities'
+
+import * as styles from './quantity-controls.css'
+
+export interface QuantityControlsProps {
+  readonly recipeId: number
+  readonly servings: number
+  readonly variant?: 'default' | 'card'
+}
+
+export const QuantityControls = ({ recipeId, servings, variant = 'default' }: QuantityControlsProps) => {
+  const isInShoppingList = useIsInShoppingList(recipeId)
+  const { decrementQuantity, incrementQuantity, quantity } = useRecipeQuantities(recipeId, servings)
+
+  if (variant === 'card') {
+    if (!isInShoppingList) {
+      return (
+        <Button onClick={() => addToShoppingList(recipeId)}>
+          <PlusIcon weight="bold" />
+          Ajouter à la liste
+        </Button>
+      )
+    }
+
+    return (
+      <div className={styles.container}>
+        <Button onClick={decrementQuantity} disabled={quantity === 1} aria-label="Retirer un couvert" size="icon-xs" variant="secondary">
+          <MinusIcon weight="bold" />
+        </Button>
+        <span className={styles.text}>{quantity} couverts</span>
+        <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs" variant="secondary">
+          <PlusIcon weight="bold" />
+        </Button>
+        <Button onClick={() => removeFromShoppingList(recipeId)} aria-label="Retirer de la liste" size="icon-xs" variant="secondary">
+          <TrashIcon />
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.controlsContainer}>
+      <div className={styles.labelGroup}>
+        <span className={styles.controlsLabel}>Couverts</span>
+        <div className={styles.adjustmentControls}>
+          <Button disabled={quantity === 1} onClick={decrementQuantity} aria-label="Retirer un couvert" size="icon-sm" variant="outline">
+            <MinusIcon />
+          </Button>
+          <span className={styles.quantityDisplay}>{quantity}</span>
+          <Button onClick={incrementQuantity} aria-label="Ajouter un couvert" size="icon-sm">
+            <PlusIcon />
+          </Button>
+        </div>
+      </div>
+      {isInShoppingList ? (
+        <Button onClick={() => removeFromShoppingList(recipeId)} variant="destructive-outline">
+          <TrashIcon />
+          Retirer
+        </Button>
+      ) : (
+        <Button onClick={() => addToShoppingList(recipeId)} variant="secondary">
+          <PlusIcon weight="bold" />
+          Ajouter
+        </Button>
+      )}
+    </div>
+  )
+}

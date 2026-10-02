@@ -53,7 +53,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | Component                | Module type            | Responsibility                                                                   | Public API surface                                            |
 | ------------------------ | ---------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | Database factory         | Server library         | Bind Drizzle to request-scoped D1                                                | `getDb(): DrizzleD1Database`                                  |
-| Schema exports           | Type modules           | Tables, value types, and relation graph                                          | `@recipe-organizer/server/db/schema` exports, `relations`     |
+| Schema exports           | Type modules           | Tables, value types, and relation graph                                          | `@/db/schema` exports, `relations`                            |
 | Recipe graph persistence | Feature utility        | Write dependent ingredient and linked-recipe rows with caller-supplied D1 client | `writeRecipeIngredientGraph(db, ...)`                         |
 | Read projections         | Server feature helpers | Name-ordered list, detail, and embedded instruction reads                        | `listRecipes`, `getRecipeDetails`, `getSubrecipeInstructions` |
 
@@ -61,7 +61,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Database factory
 
-`getDb()` returns `drizzle(cloudflareEnv.DB, { relations })` (`packages/server/src/lib/db.ts:1-5`). It is the only
+`getDb()` returns `drizzle(cloudflareEnv.DB, { relations })` (`src/lib/server/db.ts:1-5`). It is the only
 application construction point for the Drizzle 1.0 D1 client and imports `env` from
 `cloudflare:workers`; Void supplies the binding, but the app does not use `void/db`. Consumers use the returned query builder for
 reads, inserts, updates, deletes, and batches; they do not retain a binding-derived client in
@@ -69,10 +69,10 @@ module state.
 
 ### 8.2 Schema and relation graph
 
-The schema index re-exports domain tables and units (`packages/server/src/db/schema/index.ts:9-15`) and defines the
-relation graph (`packages/server/src/db/schema/index.ts:17-76`). Recipe traversal includes creator, ingredient groups,
-and both directions of linked recipes (`packages/server/src/db/schema/index.ts:34-49`); ingredient traversal includes
-its parent and group uses (`packages/server/src/db/schema/index.ts:28-33`). A relation addition accompanies each
+The schema index re-exports domain tables and units (`src/db/schema/index.ts:9-15`) and defines the
+relation graph (`src/db/schema/index.ts:17-76`). Recipe traversal includes creator, ingredient groups,
+and both directions of linked recipes (`src/db/schema/index.ts:34-49`); ingredient traversal includes
+its parent and group uses (`src/db/schema/index.ts:28-33`). A relation addition accompanies each
 nested `with` access that relies on it.
 
 ### 8.3 Read contract
@@ -86,12 +86,12 @@ selected object shape a feature-route contract rather than a client-assembled qu
 A graph write persists its root row and dependent rows within the feature route's write boundary.
 For deletion, dependent `groupIngredient`, ingredient-group, and linked-recipe rows precede the
 recipe row in one batch; the owned R2 file is removed only after that batch resolves
-(`packages/server/src/recipe/recipe-delete.ts`). This keeps a database failure from leaving a row that
+(`src/features/recipe/server/recipe-delete.ts`). This keeps a database failure from leaving a row that
 points to a missing object.
 
 ### 8.5 Query-key contract
 
-`packages/server/src/recipe/queries.ts` owns `listRecipes(db)`, `getRecipeDetails(db, id)`,
+`src/features/recipe/server/queries.ts` owns `listRecipes(db)`, `getRecipeDetails(db, id)`,
 and `getSubrecipeInstructions(db, ids)`. Pages call these directly; the remaining recipe-list API
 reuses `listRecipes`. List reads select card fields, order by name, and map image keys to URLs.
 Detail reads include ingredients/links/ordered step groups; embedded instruction reads resolve each
@@ -113,7 +113,7 @@ business-policy layer.
 
 The schema index is the import boundary for table and relation symbols. Its explicit exports allow
 Drizzle configuration and application code to use one typed vocabulary instead of reaching into
-unrelated schema modules (`packages/server/src/db/schema/index.ts:9-17`).
+unrelated schema modules (`src/db/schema/index.ts:9-17`).
 
 ### 8.8 Batch boundary
 
@@ -144,9 +144,9 @@ maps user-visible errors while retaining the original cause for server diagnosis
 
 ### 8.11 Migration authority
 
-Drizzle-kit is the only migration authority. Authored schema lives under `packages/server/src/db/schema/` and history under `packages/server/migrations/`;
+Drizzle-kit is the only migration authority. Authored schema lives under `src/db/schema/` and history under `src/db/migrations/`;
 Void declares no database migrations and the app does not use `void/db`.
-`pnpm db:migrate:local` uses the tooling-only `packages/server/wrangler.jsonc` and shared
+`pnpm db:migrate:local` uses the tooling-only `tools/wrangler.jsonc` and shared
 `.wrangler/state`; `pnpm db:migrate:remote` uses drizzle-kit. Dump/import retain
 the tooling configuration, whose resource IDs must match `void.config.ts`.
 

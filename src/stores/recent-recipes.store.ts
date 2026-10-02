@@ -1,5 +1,5 @@
-import { persistedStore } from '@client/lib/persisted-store'
-import { pushRecentRecipe } from '@client/utils/push-recent-recipe'
+import { persistedStore } from '@/lib/client/persisted-store'
+import { pushRecentRecipe } from '@/utils/push-recent-recipe'
 
 const { store: recentRecipesStore, useValue } = persistedStore<number[]>('recent-recipes', [])
 
