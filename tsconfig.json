@@ -1,7 +1,23 @@
 {
-  "extends": "@recipe-organizer/config/tsconfig.base.json",
+  "extends": ["@recipe-organizer/config/tsconfig.base.json", "./.void/tsconfig.json"],
   "compilerOptions": {
-    "types": ["node"]
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite-plus/client", "void/env"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@client/*": ["./src/*"],
+      "void/routes": ["./.void/routes.d.ts"]
+    }
   },
-  "include": ["vite.config.ts", "drizzle.config.ts", "apps/web/vite.config.ts"]
+  "include": [
+    "src",
+    "routes",
+    "middleware",
+    "env.ts",
+    "packages/server/src/env.d.ts",
+    "void.config.ts",
+    "vite.config.ts",
+    "drizzle.config.ts",
+    ".void/routes.d.ts"
+  ]
 }

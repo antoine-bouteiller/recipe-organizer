@@ -6,7 +6,7 @@ Full-stack recipe management app with a TanStack Router browser SPA and Void API
 
 - **Toolchain:** Vite+ (`vp`) wrapping pnpm + Vite + Vitest + Oxlint + Oxfmt
 - **Dev:** `pnpm dev` (one Vite server on 3000 for the SPA and same-origin API)
-- **Build:** `pnpm build` (Void builds `apps/web/dist/client` assets and `dist/ssr` Worker bundle)
+- **Build:** `pnpm build` (Void builds `dist/client` assets and `dist/ssr` Worker bundle)
 - **Test:** `vp test`
 - **Check (fmt + lint + types):** `vp check`
 - **Lint:** `vp lint`
@@ -17,13 +17,13 @@ See the Vite+ section below for the full command reference.
 ## Critical Rules
 
 - **Always run `vp check` before committing.**
-- **Route changes require regeneration:** restart `pnpm dev` after adding/moving TanStack browser routes; `vp -C apps/web exec void prepare` regenerates ignored API route types before clean-tree checks.
-- **Runtime boundary:** the browser SPA starts at `apps/web/index.html` and `apps/web/src/main.tsx`; Void generates the Worker entry from `apps/web/routes/api/**` and global `apps/web/middleware/**`. Browser API modules call same-origin typed `fetch` from `void/client` through `readResponse`; route handlers import server code from `apps/web/server` via `#server/*`.
+- **Route changes require regeneration:** restart `pnpm dev` after adding/moving TanStack browser routes; `vp exec void prepare` regenerates ignored API route types before clean-tree checks.
+- **Runtime boundary:** the browser SPA starts at `index.html` and `src/main.tsx`; Void generates the Worker entry from `routes/api/**` and global `middleware/**`. Browser API modules call same-origin typed `fetch` from `void/client` through `readResponse`; route handlers import server code from `packages/server` via `@recipe-organizer/server/*`.
 - **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports. Follow `packages/design-system/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and compose overlay triggers through `renderTrigger` props; Button navigates with an actual router `Link` via `asLink`. Parent wrappers own external layout.
 - **Styling:** Vanilla Extract compiles owner-local `*.css.ts` files through the web and Storybook Vite plugins. Import typed shared values as `theme` from `@recipe-organizer/design-system/theme`, including in template interpolations; do not use shared raw `var(--…)` strings. Load `@recipe-organizer/design-system/global.css` for the global Vanilla Extract reset/base rules and theme. Native `@recipe-organizer/design-system/styles.css` retains font faces and layer order; safe-area insets use `theme.safeArea.top/bottom`; native CSS variables remain appropriate for component-owned and runtime-owned behavior. Keep component and app styles unlayered so they override the layered reset/base defaults.
 - **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update colocated stories for changed interactions or new component presentations; styling-only changes can reuse existing stories for visual review. Use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
 - **Test boundaries:** `*.test.*` files test pure logic only; `*.stories.*` play functions test user interactions and their behavioral outcomes only. Do not assert design details in either: CSS classes, computed styles, colors, spacing, geometry, or animation properties. Review visual design in the browser instead.
-- **Worker config and environment:** `apps/web/void.config.ts` owns runtime/deploy bindings; `apps/web/.env` is the local env file. `apps/web/server/wrangler.jsonc` is tooling-only; keep its resource IDs synchronized with Void config. Do not use `void/db`, `void/auth`, or Void migrations; Drizzle-kit owns migrations and auth secrets remain dashboard-managed through `keep_vars`.
+- **Worker config and environment:** `void.config.ts` owns runtime/deploy bindings; `.env` is the local env file. `packages/server/wrangler.jsonc` is tooling-only; keep its resource IDs synchronized with Void config. Do not use `void/db`, `void/auth`, or Void migrations; Drizzle-kit owns migrations and auth secrets remain dashboard-managed through `keep_vars`.
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
 ## Guidelines
@@ -40,7 +40,7 @@ colocated with the code.
 - [Client State Layering](docs/infrastructure/client/client-state.spec.md)
 - [Routing & SPA](docs/infrastructure/client/routing-ssr.spec.md)
 - [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
-- Per-feature specs: `apps/web/src/features/<name>/<name>.spec.md` (or `apps/web/src/features/<name>/spec/index.spec.md`)
+- Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 
 <!--VITE PLUS START-->
 
@@ -58,3 +58,14 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
 <!--VITE PLUS END-->
+
+<!--injected-by-void-v0.22.0-->
+
+## Void
+
+- This project uses [Void](https://void.cloud), a full-stack Vite framework for Cloudflare Workers with file-based API routing, server-rendered pages, and typed backend services.
+- Deploy to your Cloudflare account with `void deploy --platform cloudflare`, or connect to a Void platform with `void connect <url>` and deploy with `void deploy --platform void`. `void deploy` uses the saved destination.
+- Use Void's CLI and typed APIs for development and infrastructure. Void infers Cloudflare bindings from your imports; use Void commands to manage them.
+- Before working with Void, read the relevant Markdown docs in `node_modules/void/skills/void/docs/`. Start with `guide/quickstart.md` for setup and `reference/cli.md` for commands; consult the other guides and references for any Void feature.
+
+<!--/injected-by-void-->

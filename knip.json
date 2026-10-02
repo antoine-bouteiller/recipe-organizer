@@ -3,8 +3,11 @@
   "tags": ["-lintignore"],
   "includeEntryExports": true,
   "workspaces": {
-    "apps/web": {
-      "entry": ["public/sw.js!", "{src,server}/**/*.test.ts", "routes/**/*.ts!", "middleware/**/*.ts!", "void.config.ts", "env.ts!"]
+    ".": {
+      "entry": ["public/sw.js!", "src/**/*.test.{ts,tsx}", "routes/**/*.ts!", "middleware/**/*.ts!", "void.config.ts", "env.ts!"]
+    },
+    "packages/server": {
+      "entry": ["src/**/*.test.ts"]
     },
     "packages/shared": {
       "entry": ["src/**/*.test.ts"]
@@ -20,10 +23,12 @@
       "entry": ["apply-migration-local.ts"]
     }
   },
-  "husky": { "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"] },
+  "husky": {
+    "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"]
+  },
   "ignoreDependencies": ["cloudflare"],
   "ignoreIssues": {
-    "apps/web/{routes,middleware}/**/*.ts": ["exports"],
-    "apps/web/{void.config,env}.ts": ["exports"]
+    "{routes,middleware}/**/*.ts": ["exports"],
+    "{void.config,env}.ts": ["exports"]
   }
 }

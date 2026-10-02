@@ -80,7 +80,7 @@ value uses feature context.
 ### 8.2 Query cache and routing
 
 `getRouter()` creates the QueryClient and explicitly wraps the Router in `QueryClientProvider`
-(`apps/web/src/router.tsx`). Loaders that prefetch await
+(`src/router.tsx`). Loaders that prefetch await
 `context.queryClient.query({ ...options, staleTime: 'static' })`, and their screens consume the same
 feature options through `useSuspenseQuery` or `useQuery`. Recipe creation/editing and settings routes
 retain prefetch. Home, search, and recipe details instead query inside the page with `useQuery` and

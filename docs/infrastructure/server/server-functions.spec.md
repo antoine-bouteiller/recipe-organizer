@@ -30,7 +30,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[PI-1]` **Validate inside the Worker** — refine architecture [PI-3]; client validation is never
   authorization for a write.
-- `[PI-2]` **One feature API owns one route group** — `apps/web/routes/api/<feature>/` modules expose
+- `[PI-2]` **One feature API owns one route group** — `routes/api/<feature>/` modules expose
   contracts rather than routes reaching into another feature's persistence.
 - `[PI-3]` **Control flow is semantic** — HTTP `401`, membership `403`, and `404` become Router
   controls; ordinary failures have one application error envelope.
@@ -49,8 +49,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[C-2]` Void RPC crosses an HTTP boundary, so route contracts use JSON or multipart data rather
   than Worker objects or streams.
 - `[C-3]` R2 effects cannot join D1 batching; write ordering explicitly limits inconsistent states.
-- `[C-4]` Void generates API route types in `apps/web/.void/routes.d.ts`; run
-  `vp -C apps/web exec void prepare` before checks on a clean tree. TanStack browser routes and Void
+- `[C-4]` Void generates API route types in `.void/routes.d.ts`; run
+  `vp exec void prepare` before checks on a clean tree. TanStack browser routes and Void
   API routes use separate directories and generators.
 
 ## 7. High-Level Components
@@ -68,11 +68,11 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Function declaration and placement
 
-A feature owns file routes under `apps/web/routes/api/<feature>/` and small query/mutation wrappers
-in `apps/web/src/features/<feature>/api/`. Route files export named methods such as
+A feature owns file routes under `routes/api/<feature>/` and small query/mutation wrappers
+in `src/features/<feature>/api/`. Route files export named methods such as
 `export const GET = defineHandler(...)`; reads use GET and mutations use POST, including
 `POST /api/recipes/update` and `POST /api/recipes/delete`. Shared schemas live in
-`packages/shared/src/<feature>/schemas.ts`; domain persistence helpers live in `apps/web/server/<feature>/`.
+`packages/shared/src/<feature>/schemas.ts`; domain persistence helpers live in `packages/server/src/<feature>/`.
 
 ### 8.2 Validation and FormData contract
 
@@ -85,7 +85,7 @@ JSON-round-trip through the shared form-data helper.
 
 ### 8.3 Authorization and ownership contract
 
-Protected routes use `withAuthGuard(handler, role?)` from `apps/web/server/lib/auth/auth-guard.ts`;
+Protected routes use `withAuthGuard(handler, role?)` from `packages/server/src/lib/auth/auth-guard.ts`;
 admin-only routes pass `'admin'`. The wrapper authorizes before the handler and its validators,
 then sets `apiUser` in the context, read through `context.get('apiUser')` on success paths; Void reserves `user` for its own integration.
 Failures throw `HTTPException`: `401 unauthorized`, `403 account_blocked`,
@@ -94,8 +94,8 @@ also load the row and call `assertOwnerOrAdmin` before persistence.
 
 ### 8.4 Error contract
 
-Global `apps/web/middleware/01.api-errors.ts` normalizes API failures through
-`toApiErrorResponse` and `toApiValidationResponse` in `apps/web/server/lib/api-error.ts`:
+Global `middleware/01.api-errors.ts` normalizes API failures through
+`toApiErrorResponse` and `toApiValidationResponse` in `packages/server/src/lib/api-error.ts`:
 
 | Failure                                     | HTTP response                                                                      |
 | ------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -114,7 +114,7 @@ the JSON `error` message. Non-HTTP failures propagate unchanged.
 A mutation validates and authorizes before it reads or writes. It performs related D1 statements
 through data-layer primitives, then executes compensating or object-store effects according to its
 feature contract. Recipe deletion batches relational removal before `deleteFile`; creation writes
-the root then delegates its ingredient graph (`apps/web/routes/api/recipes/index.ts`, `apps/web/routes/api/recipes/delete.ts`).
+the root then delegates its ingredient graph (`routes/api/recipes/index.ts`, `routes/api/recipes/delete.ts`).
 
 ### 8.6 Query and mutation option contract
 
@@ -124,16 +124,16 @@ localized feedback in their feature module; client UI state remains outside this
 
 ### 8.7 API route boundary
 
-Void generates the Worker entry from `apps/web/routes/api/**` and global middleware under
-`apps/web/middleware/`. Routes import `getDb()`, `getAuth()`, and media helpers directly from
-`apps/web/server/` (`#server/*`); services are not injected into the request environment.
+Void generates the Worker entry from `routes/api/**` and global middleware under
+`middleware/`. Routes import `getDb()`, `getAuth()`, and media helpers directly from
+`packages/server/src/` (`@recipe-organizer/server/*`); services are not injected into the request environment.
 `02.csrf.ts` applies `hono/csrf` to `/api/*` except `/api/auth/*`, whose origin checks belong
 to Better Auth. The Worker handles every request, including assets, and serves browser navigations
 through the SPA fallback described in the platform leaf.
 
 The browser calls same-origin `fetch` from `void/client`, typed by the generated `RouteMap` from
 `void/routes`, for example `readResponse(fetch('/api/recipes/:id', { params: { id } }))`.
-There is no SSR bridge or in-process transport; output types in `apps/web/src/types/` derive from
+There is no SSR bridge or in-process transport; output types in `src/types/` derive from
 `RouteMap`.
 
 `GET /api/health` is a liveness check. Image and video routes delegate to R2 helpers, preserving
@@ -150,7 +150,7 @@ access remains a feature-level policy; user-scoped and administrative reads comp
 HTTP dates are ISO strings: the user-list wrapper revives `createdAt` and `updatedAt` to `Date`
 instances. Routes that use `null` as an HTTP absence value convert it to the existing client contract
 where needed: the session and recipe-instructions wrappers expose `undefined`
-(`apps/web/src/features/users/api/get-all.ts`, `apps/web/src/features/recipe/api/get-instructions.ts`).
+(`src/features/users/api/get-all.ts`, `src/features/recipe/api/get-instructions.ts`).
 The session and recipe-instructions handlers use `jsonNullable` to return JSON `null` with status
 200 instead of Void's default 204 for a returned `null`.
 

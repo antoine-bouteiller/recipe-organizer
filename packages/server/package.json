@@ -1,0 +1,26 @@
+{
+  "name": "@recipe-organizer/server",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#server/db/schema": "./src/db/schema/index.ts",
+    "#server/*": "./src/*.ts"
+  },
+  "exports": {
+    "./db/schema": "./src/db/schema/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@recipe-organizer/shared": "workspace:*",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "hono": "catalog:",
+    "void": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@recipe-organizer/config": "workspace:*",
+    "@types/node": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

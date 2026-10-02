@@ -1,7 +1,10 @@
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
+import { voidPlugin } from 'void'
 
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
 const restrictedReactImports = {
@@ -11,7 +14,16 @@ const restrictedReactImports = {
 }
 
 const viteConfig = defineConfig({
-  plugins: [vanillaExtractPlugin()],
+  // The Worker owns unmatched requests; Vite's SPA fallback would answer API 404s with index.html.
+  appType: 'mpa',
+  plugins: [
+    vanillaExtractPlugin(),
+    // Checks and tests must not initialize the Worker or validate deployment environment values.
+    ...(process.env.VP_RESOLVING_CONFIG_METADATA !== '1' && !process.env.VITEST
+      ? [tanstackRouter({ target: 'react', autoCodeSplitting: true }), react({ compiler: true }), voidPlugin({ persistTo: '.wrangler/state' })]
+      : []),
+  ],
+  server: { port: 3000 },
   lint: {
     options: { typeAware: true, typeCheck: true, reportUnusedDisableDirectives: 'error' },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
@@ -32,7 +44,7 @@ const viteConfig = defineConfig({
     ignorePatterns: ['**/routeTree.gen.ts', 'vite.config.ts'],
     overrides: [
       ...features.map((feature) => ({
-        files: [`apps/web/src/features/${feature}/**/*.{ts,tsx}`],
+        files: [`src/features/${feature}/**/*.{ts,tsx}`],
         rules: {
           'no-restricted-imports': [
             'error',
@@ -183,7 +195,7 @@ const viteConfig = defineConfig({
     singleQuote: true,
     printWidth: 150,
     experimentalSortImports: {},
-    ignorePatterns: ['apps/web/src/routeTree.gen.ts'],
+    ignorePatterns: ['src/routeTree.gen.ts'],
   },
   staged: {
     '*': 'vp check --fix',
@@ -212,7 +224,7 @@ const viteConfig = defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['apps/*/src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
+      include: ['src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
       exclude: ['**/*.stories.tsx', '**/*.css.ts', '**/routeTree.gen.ts'],
     },
   },

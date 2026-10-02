@@ -22,12 +22,12 @@ without becoming a feature data layer.
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                     | Rationale                                                                                                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Route declaration   | File routes declare matching, context gates, parameter/search parsing, and loader prefetch | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                         |
-| `[KD-2]` Query lifecycle     | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`         | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`apps/web/src/router.tsx`). |
-| `[KD-3]` Browser application | `index.html` and `apps/web/src/main.tsx` mount the Router and page chrome in the browser   | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                          |
-| `[KD-4]` Navigation feedback | Router links use view-transition support and route resolution owns back/forward direction  | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`apps/web/src/router.tsx:42-49`).         |
+| Decision                     | Choice                                                                                     | Rationale                                                                                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Route declaration   | File routes declare matching, context gates, parameter/search parsing, and loader prefetch | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                |
+| `[KD-2]` Query lifecycle     | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`         | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`src/router.tsx`). |
+| `[KD-3]` Browser application | `index.html` and `src/main.tsx` mount the Router and page chrome in the browser            | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                 |
+| `[KD-4]` Navigation feedback | Router links use view-transition support and route resolution owns back/forward direction  | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`src/router.tsx:42-49`).         |
 
 ## 4. Principles & Intents
 
@@ -54,29 +54,29 @@ without becoming a feature data layer.
   from its file is invalid.
 - `[C-2]` Intent preloading runs loaders before an explicit navigation, so loaders remain
   idempotent and read-only.
-- `[C-3]` `apps/web/src/main.tsx` progressively registers `/sw.js` with `{ scope: '/', type: 'module' }` through `navigator.serviceWorker.register(...)` for the user-required Samsung PWA installation path. Registration failure does not block rendering; the worker provides no offline UI or session fallback, and route and query requests require connectivity.
+- `[C-3]` `src/main.tsx` progressively registers `/sw.js` with `{ scope: '/', type: 'module' }` through `navigator.serviceWorker.register(...)` for the user-required Samsung PWA installation path. Registration failure does not block rendering; the worker provides no offline UI or session fallback, and route and query requests require connectivity.
 
 ## 7. High-Level Components
 
-| Component      | Module type                           | Responsibility                                                           | Public API surface               |
-| -------------- | ------------------------------------- | ------------------------------------------------------------------------ | -------------------------------- |
-| Browser entry  | `index.html`, `apps/web/src/main.tsx` | Mount the browser SPA and Router                                         | application mount                |
-| Router factory | `apps/web/src/router.tsx`             | Create route context, query cache, matching defaults, and Query provider | `getRouter()`                    |
-| Root route     | `apps/web/src/routes/__root.tsx`      | Render application-wide browser chrome and outlet                        | root `Route` context             |
-| Page routes    | `apps/web/src/routes/**/*.tsx`        | Parse URL state, gate entry, prefetch feature queries, render screens    | `createFileRoute()` declarations |
-| API handler    | `apps/web/routes/api/**`              | Declare Void API, auth, and media handlers                               | Worker `fetch`, `/api/*`         |
+| Component      | Module type                  | Responsibility                                                           | Public API surface               |
+| -------------- | ---------------------------- | ------------------------------------------------------------------------ | -------------------------------- |
+| Browser entry  | `index.html`, `src/main.tsx` | Mount the browser SPA and Router                                         | application mount                |
+| Router factory | `src/router.tsx`             | Create route context, query cache, matching defaults, and Query provider | `getRouter()`                    |
+| Root route     | `src/routes/__root.tsx`      | Render application-wide browser chrome and outlet                        | root `Route` context             |
+| Page routes    | `src/routes/**/*.tsx`        | Parse URL state, gate entry, prefetch feature queries, render screens    | `createFileRoute()` declarations |
+| API handler    | `routes/api/**`              | Declare Void API, auth, and media handlers                               | Worker `fetch`, `/api/*`         |
 
 ## 8. Detailed Design
 
 ### 8.1 Router and root context
 
-`index.html` loads `apps/web/src/main.tsx`, which progressively registers `/sw.js` with
+`index.html` loads `src/main.tsx`, which progressively registers `/sw.js` with
 `navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })` and mounts the browser
 application. The registration serves the user-required Samsung PWA installation path; it does not
 provide offline behavior or delay rendering if it fails. `getRouter()` creates a `QueryClient`,
 explicitly wraps the router in `QueryClientProvider`, and registers the generated route tree with
 `defaultPreload: 'intent'`, root not-found handling, and scroll restoration
-(`apps/web/src/router.tsx`). This browser provider replaces the former SSR-query bridge. The root route
+(`src/router.tsx`). This browser provider replaces the former SSR-query bridge. The root route
 provides application chrome and the outlet; it does not resolve a Worker request or render an HTML
 document shell. Both query and mutation caches handle Router redirect errors through the same
 callback, preserving login redirects for expired sessions and blocked or pending accounts.
@@ -99,7 +99,7 @@ derive from route context rather than replacing Worker checks.
 ### 8.3 Access and URL parsing
 
 A route that requires membership throws a redirect from `beforeLoad`; the settings layout supplies
-that gate to its descendant settings screens (`apps/web/src/routes/settings.tsx:3-9`). A public route omits
+that gate to its descendant settings screens (`src/routes/settings.tsx:3-9`). A public route omits
 that redirect and uses route context only to choose presentation affordances. Admin-only navigation
 uses an additional role gate at the matching route, while Worker handlers make the final access
 decision under [`../server/auth.spec.md`](../server/auth.spec.md).
@@ -117,9 +117,9 @@ system owns reusable router-aware navigation and screen layout; the app shell ow
 it does not import app or feature code. A page route owns screen selection, pending UI, route-specific
 layout inputs, and recipe/auth policy. Feature components own recipe cards, editors, settings controls,
 and all domain presentation. This division lets a layout consume router context without importing a
-feature's private API. `apps/web/src/routes/` contains no `.css.ts` files, styling imports, or JSX
+feature's private API. `src/routes/` contains no `.css.ts` files, styling imports, or JSX
 `className`/`style` props. Styled sections, containers, and pending content live with their features;
-shell markup and styles live in `apps/web/src/components/app-shell/`. Routes retain page construction,
+shell markup and styles live in `src/components/app-shell/`. Routes retain page construction,
 forms, and cross-feature coordination rather than delegating to intermediary page wrappers.
 Features must not import one another, even through public APIs.
 Route-derived IDs, search values, and access
@@ -132,8 +132,8 @@ remain shared router-level surfaces so a failed match has one consistent recover
 
 ### 8.5 Errors, HTTP, and navigation
 
-The router supplies the root error and not-found surfaces (`apps/web/src/router.tsx:39-52`). Void generates the Worker entry from
-`apps/web/routes/api/**` and global `apps/web/middleware/**`. Its API routes own feature,
+The router supplies the root error and not-found surfaces (`src/router.tsx:39-52`). Void generates the Worker entry from
+`routes/api/**` and global `middleware/**`. Its API routes own feature,
 authentication, session, health, and media responses; media handlers delegate binary reads to R2
 helpers. Browser query and mutation modules use typed `fetch` from `void/client` through
 `readResponse`, with inputs and outputs inferred from the generated `RouteMap` (`void/routes`).
@@ -143,7 +143,7 @@ Every request reaches the Worker, including assets; its ASSETS binding serves br
 contract; browser page routes do not wrap it.
 
 Forward links request view transitions; the router determines back navigation from history indexes
-(`apps/web/src/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
+(`src/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
 transition support. `TabBar` is a DS router-aware component: items provide `label`, `linkProps`
 (`LinkOptions`), and inactive/active icons. The desktop navbar is inlined into `AppHeader`, whose children
 supply search and theme actions.
@@ -154,10 +154,10 @@ adapter. The desktop navbar uses exact matching only for `/`; pages render
 
 `ScreenLayout` calls `router.history.back()` for `withGoBack`, defaults its scroll IDs to
 `screen-inner` and `screen-outer`, and receives an explicit footer. Scroll restoration targets those
-containers (`apps/web/src/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic.
-The default error callback in `apps/web/src/router.tsx` and shared DS `NotFound` provide home Links and
+containers (`src/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic.
+The default error callback in `src/router.tsx` and shared DS `NotFound` provide home Links and
 French messages, with Error details only in development.
-Menus/filtering remain in `apps/web/src/components/navigation/constants.tsx`; `__root` composes the
+Menus/filtering remain in `src/components/navigation/constants.tsx`; `__root` composes the
 theme control and search inside styled app-shell containers. `FloatingAction` is generic (`label`, `linkProps`, `children`), while the
 index route owns recipe/auth policy. Router-dependent Storybook stories use a local memory-router
 decorator.

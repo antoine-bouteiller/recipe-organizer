@@ -143,21 +143,21 @@ scoped to editor-generated DOM and excludes interactive decorators.
 The design system may depend on catalogued `@tanstack/react-router` for reusable router-aware
 navigation, but never imports app or feature code. `TabBar` receives items with a `label`, typed
 `linkProps` (`LinkOptions`), and inactive/active icons. The single-use desktop navbar is inlined into
-`apps/web/src/components/app-shell/app-shell.tsx`'s `AppHeader`, with children supplying its actions.
+`src/components/app-shell/app-shell.tsx`'s `AppHeader`, with children supplying its actions.
 Their actual TanStack `Link` owns typed route parameters, search, preloading, modified clicks, view
 transitions, navigation state, and semantics. The desktop navbar uses exact matching only for `/`. Do not replace Link with a native anchor or recreate its
 props through a `useLinkProps` adapter.
 
 Button navigates through `asLink`, for example `<Button asLink to="/recipe/new" />`. Router-aware Storybook stories use a local memory-router decorator.
 `ScreenLayout`'s `withGoBack` calls `router.history.back()`; its scroll IDs default to
-`screen-inner` and `screen-outer`, and its footer is explicit. The default error renderer is inlined into `apps/web/src/router.tsx`;
+`screen-inner` and `screen-outer`, and its footer is explicit. The default error renderer is inlined into `src/router.tsx`;
 `NotFound` remains shared. Both provide actual home Links and French messages; Error details appear
 only in development. The single-use command palette is inlined into the feature's `SearchBar`, built on
 the shared `Dialog` and `ScrollArea` with a native ARIA combobox and listbox.
 
 `FloatingAction` is generic (`label`, `linkProps`, and `children`) rather than a recipe-create
 wrapper. Recipe/auth policy belongs in the index route. Menus and filtering remain app-owned in
-`apps/web/src/components/navigation/constants.tsx`; `__root` composes the theme control and search
+`src/components/navigation/constants.tsx`; `__root` composes the theme control and search
 inside styled app-shell containers. Pages pass `<TabBar items={mobileMenuItems} />`, not a `pageKey`.
 Route files compose styled components without `.css.ts` files, styling imports, or JSX styling props;
 feature sections, containers, and app-shell components own that markup and its colocated styles.
