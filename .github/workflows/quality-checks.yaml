@@ -24,7 +24,7 @@ jobs:
         run: vp install --frozen-lockfile
 
       - name: Generate Void route types
-        run: vp -C apps/web exec void prepare
+        run: vp exec void prepare
 
       - name: Run checks
         run: vpr check
