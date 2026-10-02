@@ -1,0 +1,121 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useRef, useState } from 'react'
+import type { ReactElement } from 'react'
+import { expect, userEvent, waitFor, within } from 'storybook/test'
+
+import { Button } from '@/components/ui/actions/button/button'
+import { useAppForm } from '@/hooks/use-app-form'
+
+import { getFormDialog } from './form-dialog'
+
+import * as styles from './form-dialog.stories.css'
+
+const defaultValues = { title: 'Tomato soup' }
+const FormDialog = getFormDialog(defaultValues)
+
+const FormDialogExample = (): ReactElement => {
+  const [open, setOpen] = useState(false)
+  const form = useAppForm({ defaultValues, onSubmit: async () => setOpen(false) })
+
+  return (
+    <form.AppForm>
+      <FormDialog
+        form={form}
+        open={open}
+        setOpen={setOpen}
+        submitLabel="Save recipe"
+        title="Edit recipe"
+        renderTrigger={(props) => <Button {...props}>Edit recipe</Button>}
+      >
+        <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
+      </FormDialog>
+    </form.AppForm>
+  )
+}
+
+const RegressionExample = (): ReactElement => {
+  const [open, setOpen] = useState(false)
+  const resolveSubmit = useRef<(() => void) | null>(null)
+  const form = useAppForm({
+    defaultValues,
+    onSubmit: async () =>
+      new Promise<void>((resolve) => {
+        resolveSubmit.current = () => {
+          resolve()
+          setOpen(false)
+        }
+      }),
+  })
+
+  return (
+    <form.AppForm>
+      <FormDialog
+        form={form}
+        open={open}
+        setOpen={setOpen}
+        submitLabel="Save recipe"
+        title="Edit recipe"
+        renderTrigger={(props) => <Button {...props}>Edit recipe</Button>}
+      >
+        <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
+        <div className={styles.container}>
+          {Array.from({ length: 20 }, (_item, index) => (
+            <p key={index}>Long form content {index + 1}</p>
+          ))}
+        </div>
+        <Button onClick={() => resolveSubmit.current?.()} type="button" variant="outline">
+          Complete save
+        </Button>
+      </FormDialog>
+    </form.AppForm>
+  )
+}
+
+const meta = { component: FormDialogExample, title: 'Overlays/FormDialog' } satisfies Meta<typeof FormDialogExample>
+export default meta
+type Story = StoryObj<typeof meta>
+export const Default: Story = { render: () => <FormDialogExample /> }
+
+export const Mobile: Story = {
+  ...Default,
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
+}
+
+export const SubmitOnEnter: Story = {
+  ...Default,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('button', { name: 'Edit recipe' }))
+    const dialog = within(document.body)
+    const field = await dialog.findByLabelText('Recipe title')
+    await expect(field).toBeVisible()
+    await userEvent.clear(field)
+    await userEvent.type(field, 'Vegetable soup{Enter}')
+    await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
+  },
+  tags: ['!dev'],
+}
+export const PendingDismissalRegression: Story = {
+  globals: { viewport: { isRotated: false, value: 'mobile1' } },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await userEvent.click(await canvas.findByRole('button', { expanded: false, name: 'Edit recipe' }))
+    const dialog = within(document.body)
+    await userEvent.click(await dialog.findByRole('button', { name: 'Save recipe' }))
+    await waitFor(() => expect(dialog.getByRole('button', { name: 'Annuler' })).toBeDisabled())
+    await userEvent.keyboard('{Escape}')
+    await expect(dialog.getByRole('dialog')).toBeVisible()
+    await userEvent.click(document.body)
+    await expect(dialog.getByRole('dialog')).toBeVisible()
+    await userEvent.click(dialog.getByRole('button', { name: 'Complete save' }))
+    await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
+    await userEvent.click(canvas.getByRole('button', { name: 'Edit recipe' }))
+    await userEvent.click(dialog.getByLabelText('Recipe title'))
+    await userEvent.keyboard('{Enter}')
+    await waitFor(() => expect(dialog.getByRole('button', { name: 'Loading Save recipe' })).toBeDisabled())
+    await userEvent.click(dialog.getByRole('button', { name: 'Complete save' }))
+    await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
+  },
+  render: () => <RegressionExample />,
+  tags: ['!dev'],
+}

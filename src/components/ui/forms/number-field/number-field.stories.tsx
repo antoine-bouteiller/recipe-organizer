@@ -1,0 +1,70 @@
+import { StorySection } from '@storybook-helpers/story-section'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import type { ReactElement } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
+
+import { useAppForm } from '@/hooks/use-app-form'
+
+import { NumberField } from './number-field'
+
+import * as styles from './number-field.stories.css'
+
+const NumberFieldExample = ({
+  disabled = false,
+  invalid = false,
+  initialValue,
+}: {
+  disabled?: boolean
+  invalid?: boolean
+  initialValue?: number
+}): ReactElement => {
+  const form = useAppForm({ defaultValues: { servings: initialValue }, onSubmit: async () => undefined })
+
+  return (
+    <form.AppForm>
+      <form.AppField name="servings" validators={invalid ? { onMount: () => 'Invalid' } : undefined}>
+        {({ NumberField: AppNumberField }) => <AppNumberField disabled={disabled} label="Servings" min={1} placeholder="4" />}
+      </form.AppField>
+    </form.AppForm>
+  )
+}
+
+const meta = { component: NumberField, title: 'Forms/NumberField' } satisfies Meta<typeof NumberField>
+export default meta
+type Story = StoryObj<typeof meta>
+export const Overview: Story = {
+  render: () => (
+    <div className={styles.container}>
+      <StorySection title="Default">
+        <NumberFieldExample />
+      </StorySection>
+      <StorySection title="Initial Value">
+        <NumberFieldExample initialValue={4} />
+      </StorySection>
+      <StorySection title="Invalid">
+        <NumberFieldExample initialValue={20} invalid />
+      </StorySection>
+      <StorySection title="Disabled">
+        <NumberFieldExample disabled initialValue={4} />
+      </StorySection>
+    </div>
+  ),
+}
+
+export const Interaction: Story = {
+  ...Overview,
+  play: async ({ canvasElement }) => {
+    const section = within(canvasElement).getByRole('region', { name: 'Default' })
+    const input = within(section).getByRole('textbox', { name: 'Servings' })
+    await userEvent.type(input, '2,5')
+    await expect(input).toHaveValue('2,5')
+    await userEvent.click(within(section).getByRole('button', { name: 'Increase' }))
+    await expect(input).toHaveValue('3.5')
+    await userEvent.clear(input)
+    await userEvent.type(input, '-3')
+    await userEvent.tab()
+    await expect(input).toHaveValue('1')
+    await expect(within(section).getByRole('button', { name: 'Decrease' })).toBeDisabled()
+  },
+  tags: ['!dev'],
+}
