@@ -1,14 +1,14 @@
 import { alertError } from '@client/lib/alert-error'
-import { apiClient, readResponse } from '@client/lib/api-client'
+import { readResponse } from '@client/lib/api-client'
 import { queryKeys } from '@client/lib/query-keys'
-import { recipeFormDataToWire } from '@recipe-organizer/shared/recipe/schemas'
 import { mutationOptions } from '@tanstack/react-query'
+import { fetch } from 'void/client'
 
 import { getTitle } from '../utils/get-recipe-title'
 
 export { recipeSchema, type RecipeFormInput } from '@recipe-organizer/shared/recipe/schemas'
 
-const createRecipe = async ({ data }: { data: FormData }) => readResponse(apiClient.recipes.$post({ form: recipeFormDataToWire(data) }))
+const createRecipe = async ({ data }: { data: FormData }) => readResponse(fetch('/api/recipes', { body: data, method: 'POST' }))
 
 const createRecipeOptions = () =>
   mutationOptions({

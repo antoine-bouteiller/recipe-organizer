@@ -31,7 +31,7 @@ feature from independently composing field state, error presentation, and submis
 
 - `[PI-1]` **One form vocabulary** — refine `client.spec.md` `[PI-3]`: feature forms compose
   registered fields rather than owning form-framework setup.
-- `[PI-2]` **Validation is informative, not authoritative** — client errors guide users; Hono
+- `[PI-2]` **Validation is informative, not authoritative** — client errors guide users; Void
   routes validate all writes under `../../architecture.spec.md` `[PI-3]`.
 - `[PI-3]` **Fields own control wiring** — a field translates its framework context into a UI
   primitive and error slot, keeping feature views declarative.
@@ -87,8 +87,8 @@ dialog produced by `getFormDialog(defaultValues)` selects errors from form state
 while submitting, stops propagation, and supplies its typed submit component
 (`packages/design-system/src/ui/overlays/form-dialog/form-dialog.tsx`).
 
-The multipart submit contract is `values -> FormData -> Hono route parser -> schema`; JSON-only
-mutations send their validated values through the typed Hono client. `objectToFormData` appends a raw
+The multipart submit contract is `values -> FormData -> Void multipart handler -> schema`; JSON-only
+mutations send their validated values through the typed `void/client` fetch. `objectToFormData` appends a raw
 `File` and JSON-stringifies other present values; `parseFormData` restores parseable string entries
 before route validation (`src/shared/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
 `{ id, url }` metadata so an unchanged asset retains its reference.

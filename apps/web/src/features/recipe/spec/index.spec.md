@@ -78,7 +78,7 @@ recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
 
 | Leaf                           | Owns                                                                                                                     | Key contracts                                        |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
-| [`crud`](./crud.spec.md)       | `apps/api/src/routes/recipe/**`, `apps/api/db/schema/recipe*.ts`                                                         | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
+| [`crud`](./crud.spec.md)       | `apps/web/routes/api/recipes/**`, `apps/web/server/recipe/**`, `apps/web/server/db/schema/recipe*.ts`                    | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
 | [`editor`](./editor.spec.md)   | `RecipeStep` schema and Magimix constants in `packages/shared/src/recipe/`, `StepsField`, `RecipeSteps`, `parseBoldText` | step model [CT-1], bold text [CT-2], renderer [CT-4] |
 | [`display`](./display.spec.md) | list/detail/instructions queries, cards, search, cooking view, media handlers                                            | projections [CT-1], cooking view [CT-3]              |
 

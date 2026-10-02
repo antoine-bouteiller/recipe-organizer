@@ -1,4 +1,5 @@
-import { apiClient, readResponse } from '@client/lib/api-client'
+import { readResponse } from '@client/lib/api-client'
+import { fetch } from 'void/client'
 
 let pending: ReturnType<typeof getAuthUser> | undefined = undefined
 
@@ -21,4 +22,4 @@ export const resetAuthUserCache = () => {
   pending = undefined
 }
 
-export const getAuthUser = async () => (await readResponse(apiClient.session.$get())) ?? undefined
+export const getAuthUser = async () => (await readResponse(fetch('/api/session'))) ?? undefined

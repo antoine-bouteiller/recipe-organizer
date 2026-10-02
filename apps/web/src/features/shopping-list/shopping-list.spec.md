@@ -107,7 +107,7 @@ returns this serializable shape:
 
 Linked-recipe lines use `line.quantity × ratio ÷ linkedRecipe.servings`
 (`src/client/features/shopping-list/api/get-recipe-by-ids.ts:55-70`). The shared ingredient-group projection
-excludes `spices` in the database read (`src/server/routes/shopping-list/utils/ingredient-group-select.ts:14-31`).
+excludes `spices` in the database read (`apps/web/server/shopping-list/ingredient-group-select.ts`).
 
 ### 8.3 Aggregation contract
 

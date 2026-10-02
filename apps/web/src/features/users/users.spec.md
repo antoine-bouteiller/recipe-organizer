@@ -20,14 +20,14 @@ and refines its identity and membership decisions [KD-5] and [KD-6].
 
 ## 3. Key Design Decisions
 
-| Decision                         | Choice                                                                                        | Rationale                                                                                                            |
-| -------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Authorization           | Every user API composes `authGuard('admin')`; the route also redirects non-admin visitors.    | The Worker remains the enforcement boundary while the route avoids presenting an unavailable screen.                 |
-| `[KD-2]` Membership model        | A user has `user` or `admin` role and `pending`, `active`, or `blocked` status.               | Role grants administrative capability; status expresses admission independently of capability.                       |
-| `[KD-3]` Administrative creation | An administrator-created account receives a generated ID and the schema's active status.      | A pre-approved invitation path does not depend on an OAuth callback to establish membership.                         |
-| `[KD-4]` Lifecycle actions       | Approve sets `active`; block sets `blocked`; no delete operation exists.                      | Reversible state transitions preserve an account's identity and allow an administrator to restore access.            |
-| `[KD-5]` List coherence          | Successful mutations invalidate the users query-key family.                                   | A status transition moves a person between cached lists, so each status view must refresh from the Worker.           |
-| `[KD-6]` Directory interaction   | The route preloads three status lists and presents them in swipeable tabs with shared search. | Administrators can inspect all admission states without a route change while retaining a compact mobile interaction. |
+| Decision                         | Choice                                                                                                              | Rationale                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Authorization           | Every user API wraps its handler in `withAuthGuard(handler, 'admin')`; the route also redirects non-admin visitors. | The Worker remains the enforcement boundary while the route avoids presenting an unavailable screen.                 |
+| `[KD-2]` Membership model        | A user has `user` or `admin` role and `pending`, `active`, or `blocked` status.                                     | Role grants administrative capability; status expresses admission independently of capability.                       |
+| `[KD-3]` Administrative creation | An administrator-created account receives a generated ID and the schema's active status.                            | A pre-approved invitation path does not depend on an OAuth callback to establish membership.                         |
+| `[KD-4]` Lifecycle actions       | Approve sets `active`; block sets `blocked`; no delete operation exists.                                            | Reversible state transitions preserve an account's identity and allow an administrator to restore access.            |
+| `[KD-5]` List coherence          | Successful mutations invalidate the users query-key family.                                                         | A status transition moves a person between cached lists, so each status view must refresh from the Worker.           |
+| `[KD-6]` Directory interaction   | The route preloads three status lists and presents them in swipeable tabs with shared search.                       | Administrators can inspect all admission states without a route change while retaining a compact mobile interaction. |
 
 ## 4. Principles & Intents
 
@@ -75,7 +75,7 @@ route guard ──> status tabs + search ──> query options ──> admin ser
 | ------------------ | ------------------------ | -------------------------------------------------- | ---------------------------------------------------- |
 | User schema        | Drizzle schema           | Store identity, role, and admission status         | `user` table                                         |
 | User APIs          | Feature server functions | List and transition user records                   | `getUserListOptions`, create, approve, block options |
-| Guard              | Server middleware        | Require an active administrator                    | `authGuard('admin')`                                 |
+| Guard              | Server handler wrapper   | Require an active administrator                    | `withAuthGuard(handler, 'admin')`                    |
 | User form          | Feature form component   | Capture email and role for administrative creation | `UserForm`, `AddUser`                                |
 | Lifecycle controls | Feature components       | Confirm blocking and initiate approval             | `ApproveUser`, `BlockUser`                           |
 | Directory route    | File route               | Preload, filter, and partition lists by status     | `/settings/users`                                    |
@@ -103,11 +103,11 @@ server, and supplies the required display name from the email
 
 The list API accepts a status, defaults it to `active`, orders results by email, and pairs the call
 with `queryKeys.listUsers(status)` (`src/client/features/users/api/get-all.ts:10-31`). Create, approve, and
-block validate their respective payloads and use the same `authGuard('admin')` middleware
+block validate their respective payloads and use the same `withAuthGuard(handler, 'admin')` wrapper
 (`src/client/features/users/api/create.ts:13-26`, `src/client/features/users/api/approve.ts:14-27`,
 `src/client/features/users/api/block.ts:14-27`). The guard redirects anonymous, pending, and blocked
 callers and rejects an active non-admin ahead of handler execution
-(`src/server/lib/auth/auth-guard.ts:6-27`).
+(`apps/web/server/lib/auth/auth-guard.ts`).
 
 Approve writes `status: 'active'`; block writes `status: 'blocked'`. Their mutation options
 invalidate `queryKeys.allUsers`; create invalidates the no-argument users-list prefix. Each option

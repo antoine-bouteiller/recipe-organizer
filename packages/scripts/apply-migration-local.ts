@@ -3,7 +3,7 @@ import { copyFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 
 const ROOT_DIR = join(import.meta.dirname, '../..')
-const SOURCE_DIR = join(ROOT_DIR, 'apps/api/db/migrations')
+const SOURCE_DIR = join(ROOT_DIR, 'apps/web/server/db/migrations')
 const TMP_DIR = join(ROOT_DIR, 'migrations_tmp')
 
 rmSync(TMP_DIR, { force: true, recursive: true })
@@ -28,6 +28,6 @@ for (const folder of folders) {
   }
 }
 
-exec('pnpm wrangler d1 migrations apply recipe-organizer --config apps/api/wrangler.jsonc --local --persist-to .wrangler/state', {
+exec('pnpm wrangler d1 migrations apply recipe-organizer --config apps/web/server/wrangler.jsonc --local --persist-to apps/web/.wrangler/state', {
   cwd: ROOT_DIR,
 }).on('exit', () => rmSync(TMP_DIR, { force: true, recursive: true }))
