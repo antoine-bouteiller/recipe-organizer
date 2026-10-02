@@ -4,10 +4,7 @@
   "includeEntryExports": true,
   "workspaces": {
     "apps/web": {
-      "entry": ["public/sw.js!", "src/**/*.test.ts"]
-    },
-    "apps/api": {
-      "entry": ["src/**/*.test.ts"]
+      "entry": ["public/sw.js!", "{src,server}/**/*.test.ts", "routes/**/*.ts!", "middleware/**/*.ts!", "void.config.ts"]
     },
     "packages/shared": {
       "entry": ["src/**/*.test.ts"]
@@ -24,5 +21,9 @@
     }
   },
   "husky": { "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"] },
-  "ignoreDependencies": ["cloudflare"]
+  "ignoreDependencies": ["cloudflare"],
+  "ignoreIssues": {
+    "apps/web/{routes,middleware}/**/*.ts": ["exports"],
+    "apps/web/void.config.ts": ["exports"]
+  }
 }

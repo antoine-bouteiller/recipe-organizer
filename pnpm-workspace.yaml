@@ -7,6 +7,7 @@ allowBuilds:
   '@parcel/watcher': false
   sharp: false
   workerd: false
+  better-sqlite3: false
 
 overrides:
   vite@*: 'catalog:'
@@ -25,7 +26,6 @@ catalog:
   '@commitlint/cli': 21.2.3
   '@commitlint/config-conventional': 21.2.3
   '@vitest/coverage-v8': 5.0.1
-  '@hono/zod-validator': 0.9.1
   '@vanilla-extract/css': 1.21.2
   '@vanilla-extract/recipes': 0.5.7
   '@vanilla-extract/vite-plugin': 5.2.6
@@ -41,14 +41,15 @@ catalog:
   better-auth: 1.7.6
   drizzle-kit: 1.0.0-rc.3
   drizzle-orm: 1.0.0-rc.3
-  hono: 4.13.9
+  hono: ^4.13.11
   knip: 6.38.0
   oxc-transform-react: 0.151.0
   react: 19.3.0
   react-dom: 19.3.0
   typescript: 7.0.2
   vite-plus: 1.0.0
-  wrangler: 4.141.0
+  void: 0.22.0
+  wrangler: 4.146.0
   zod: 4.6.5
   vite: npm:@voidzero-dev/vite-plus-core@1.0.0
   vitest: 5.0.1
@@ -60,3 +61,8 @@ peerDependencyRules:
   allowedVersions:
     vite: '*'
     vitest: '*'
+
+minimumReleaseAgeExclude:
+  - '@void/platform@0.22.0'
+  - miniflare@5.20261001.0-alpha
+  - wrangler@4.146.0

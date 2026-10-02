@@ -29,7 +29,7 @@ const viteConfig = defineConfig({
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: ['**/routeTree.gen.ts', 'apps/api/worker-configuration.d.ts', 'vite.config.ts'],
+    ignorePatterns: ['**/routeTree.gen.ts', 'apps/web/server/worker-configuration.d.ts', 'vite.config.ts'],
     overrides: [
       ...features.map((feature) => ({
         files: [`apps/web/src/features/${feature}/**/*.{ts,tsx}`],

@@ -19,7 +19,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 | Decision                      | Choice                                                                                            | Rationale                                                                                                                           |
 | ----------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Worker runtime       | `src/server/index.ts` exports the direct Cloudflare Worker `fetch` handler.                       | One deployment serves the same-origin API, OAuth routes, and media while Cloudflare assets serve the SPA.                           |
+| `[KD-1]` Worker runtime       | Void generates the Cloudflare Worker entry from API file routes and global middleware.            | One deployment serves the same-origin API, OAuth routes, and media while its ASSETS binding serves the SPA.                         |
 | `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                                            |
 | `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                               |
 | `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                        |
@@ -42,9 +42,9 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 ## 6. Caveats
 
 - `[C-1]` The Worker runtime feature set is pinned by compatibility date and `nodejs_compat`
-  (`wrangler.jsonc:4-6`); a change can affect runtime behavior.
+  (`apps/web/void.config.ts`); a change can affect runtime behavior.
 - `[C-2]` R2 receives a materialized image buffer because the transformed response needs a known
-  length (`src/server/lib/r2.ts:17-21`).
+  length (`apps/web/server/lib/r2.ts:17-21`).
 - `[C-3]` Edge cache entries are local to an edge; the cache header remains the client-visible
   freshness contract.
 - `[C-4]` Normal browser HTTP and TanStack Query caches provide no offline guarantee, though they can yield already-loaded data; server edge media caches remain unchanged.
@@ -53,7 +53,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 | Component            | Module type          | Responsibility                                                | Public API surface                          |
 | -------------------- | -------------------- | ------------------------------------------------------------- | ------------------------------------------- |
-| Worker configuration | JSON configuration   | Server entry, compatibility, D1/R2/Images bindings            | `wrangler.jsonc`                            |
+| Worker configuration | Void configuration   | Server entry, compatibility, D1/R2/Images bindings            | `apps/web/void.config.ts`                   |
 | Media writer         | Server utility       | UUID keys, image transform, R2 writes                         | `uploadFile`, `uploadVideo`, `deleteFile`   |
 | Media reader         | Route helper         | Cached GET and HEAD responses from R2                         | `createR2GetHandler`, `createR2HeadHandler` |
 | Edge cache           | Server utility       | Cache read-through and response metadata                      | `cache.getWithCache()`                      |
@@ -63,32 +63,47 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Worker configuration
 
-The Worker entry is `src/server/index.ts`, whose default export supplies `fetch`; the
-configuration declares the `DB`, `R2_BUCKET`, and `IMAGES` bindings (`wrangler.jsonc:3-8`,
-`wrangler.jsonc:20-36`). Cloudflare assets serve the built browser SPA with
-`not_found_handling: "single-page-application"`, while `/api` and `/api/*` use
-`run_worker_first` so API requests reach Hono. Observability records invocation logs while trace
-ingestion is disabled (`wrangler.jsonc:11-18`). Binding type changes require regenerated Worker
-environment types so utility contracts stay typed.
+Void 0.22 owns the project rooted at `apps/web`. `apps/web/void.config.ts` declares the existing
+`recipe-organizer` Worker, compatibility date and `nodejs_compat`, D1 `DB`, R2 `R2_BUCKET`,
+Images `IMAGES`, binding inference, and disabled ISR. Observability records invocation logs;
+trace ingestion is disabled. `keep_vars` preserves dashboard-managed variables and auth secrets.
+
+Global middleware makes every request Worker-first, including static assets. Generated asset
+configuration uses `run_worker_first: ['/**']` and `not_found_handling: 'none'`; the Worker serves
+assets through `ASSETS`. `apps/web/middleware/03.spa-fallback.ts` serves `/index.html` for unmatched
+non-API HTML GET/HEAD navigations without a file extension. This explicit fallback is required
+because Vanilla Extract re-evaluates Vite configuration and the regenerated Void entry loses Void's
+own fallback. Unknown API paths retain the JSON 404 contract rather than receiving the SPA.
+
+`apps/web/vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })` and
+`appType: 'mpa'` so the Worker, not Vite's SPA fallback, answers unmatched development requests.
+`pnpm dev` runs one Vite server on `http://localhost:3000` for the SPA and same-origin API, without
+a separate API process or proxy. Void reads the project-root `apps/web/.env`.
+`apps/web/.void/` (entry and route types) and `apps/web/.void-wrangler.jsonc` are generated and
+git-ignored. `vp -C apps/web exec void prepare` regenerates route types before clean-tree checks.
+
+Binding types remain in `apps/web/server/worker-configuration.d.ts`, generated by `pnpm cf-typegen`.
+The tooling-only `apps/web/server/wrangler.jsonc` supports local D1 migrations, dump/import, and typegen;
+keep its resource IDs synchronized with `apps/web/void.config.ts`. Drizzle-kit alone owns migrations.
 
 ### 8.2 Media write contract
 
 `uploadFile(file)` mints a UUID, transforms the stream to WebP `{ width: 640, quality: 80 }`,
-and writes the resulting bytes with its content type (`src/server/lib/r2.ts:9-23`). `uploadVideo(file)`
-writes the file bytes and supplied MIME type under the same opaque-key rule (`src/server/lib/r2.ts:28-36`).
+and writes the resulting bytes with its content type (`apps/web/server/lib/r2.ts:9-23`). `uploadVideo(file)`
+writes the file bytes and supplied MIME type under the same opaque-key rule (`apps/web/server/lib/r2.ts:28-36`).
 Callers persist keys, never public URLs or filename-derived paths.
 
 ### 8.3 Media read and cache contract
 
 The GET helper validates `{ id: string }`, returns 404 control flow when R2 has no object, and
-responds with object content type or the caller's fallback (`src/server/lib/r2.ts:42-65`). Image GET
+responds with object content type or the caller's fallback (`apps/web/server/lib/r2.ts:42-65`). Image GET
 responses use `public, max-age=31536000, immutable`; video GET and HEAD responses use
-`public, max-age=86400, stale-while-revalidate=604800` (`src/server/lib/r2.ts:60-61`,
-`src/server/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
+`public, max-age=86400, stale-while-revalidate=604800` (`apps/web/server/lib/r2.ts:60-61`,
+`apps/web/server/lib/r2.ts:82-84`). The cache wrapper stores successful response work by request URL.
 
 ### 8.4 PWA registration
 
-`src/client/main.tsx` progressively registers `apps/web/public/sw.js` at `/sw.js` with
+`apps/web/src/main.tsx` progressively registers `apps/web/public/sw.js` at `/sw.js` with
 `navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })`. This registered worker
 is required by the user for Samsung PWA installation; it is not a claim that every browser requires
 a worker to install the manifest. Registration failure does not block application rendering.
@@ -104,7 +119,7 @@ media cache and its response freshness headers also remain unchanged.
 
 ### 8.5 Interaction boundary
 
-Hono feature routes invoke media writers after authorization and validation. Hono media routes use
+Void feature routes invoke media writers after authorization and validation. Void media routes use
 read helpers for binary responses; application data remains behind RPC and D1 contracts owned by
 sibling leaves.
 
@@ -115,7 +130,7 @@ a fallback. This permits the image route to advertise WebP and the video route t
 stored MIME type without asking a client to infer the object representation.
 
 A missing object is not represented as an empty successful response. The helper throws a Hono
-`HTTPException(404)` before a response is built (`src/server/lib/r2.ts:51-55`), allowing the shared API
+`HTTPException(404)` before a response is built (`apps/web/server/lib/r2.ts:51-55`), allowing the shared API
 boundary to return its `not_found` error envelope without caching a missing object.
 
 ### 8.7 Cache lifetime boundary
@@ -130,8 +145,7 @@ that endpoint.
 
 ### 8.8 Runtime configuration boundary
 
-The configuration uses one Worker name and the direct API handler entry
-(`wrangler.jsonc:3-8`). D1, R2, and Images remain separately named capabilities, which permits
+The Void configuration uses one Worker name and a generated API handler entry. D1, R2, and Images remain separately named capabilities, which permits
 the data and media contracts to state exactly which resource they consume.
 
 Runtime secrets do not appear in this configuration. Auth defines their semantic use, while the
@@ -158,10 +172,22 @@ The PWA-worker contract is the stable `/sw.js` URL and the minimal lifecycle in 
 Page and feature code do not invoke Cache APIs. The Worker remains the authority while connectivity
 is available.
 
-### 8.11 Existing-image migration
+### 8.11 Build and deployment
+
+`pnpm build` builds the web project's browser assets and Worker bundle into
+`apps/web/dist/client` and `apps/web/dist/ssr`; `pnpm serve` runs `vp -C apps/web preview`.
+The `dist/ssr` name denotes the server bundle, not page SSR.
+
+`pnpm deploy` and production CI use `vp -C apps/web exec void deploy --platform cloudflare` with
+`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and build-time `VITE_PUBLIC_URL`.
+The CI "Migrate Database" step runs drizzle-kit after deployment. `SESSION_SECRET`,
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and the runtime `VITE_PUBLIC_URL` Worker variable
+remain dashboard-managed and are preserved through `keep_vars`.
+
+### 8.12 Existing-image migration
 
 `scripts/migrate-images.ts` uses Wrangler's remote bindings for the D1, R2, and Images resources
-configured in `wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
+configured in `apps/web/server/wrangler.jsonc`. It runs locally with an authenticated Wrangler session; no application
 endpoint or deployment is needed.
 
 - `pnpm images:migrate` previews changes without writing D1 or R2.
@@ -176,6 +202,16 @@ The script stops on failure and can be rerun: completed replacements are skipped
 If an upload or database update fails, originals remain intact. An uncertain database result can leave
 an extra uploaded object; a failed deletion can leave an unreferenced original. These safe leftovers
 are not automatically garbage-collected on retry. Refresh the app after migration to refetch recipe URLs.
+
+### 8.13 Outcome and acceptance
+
+- `[SO-1]` One Void project serves the SPA and API from the same origin while preserving storage
+  and secret authorities — demonstrated by `[VC-1]` and `[VC-2]`.
+- `[VC-1]` Given the local server or a production-build preview, the root page renders,
+  `GET /api/health` returns JSON 200, and a hard reload of a deep browser URL loads the SPA;
+  an unknown `/api/*` URL returns JSON 404 rather than HTML — demonstrates `[SO-1]`.
+- `[VC-2]` Deployment targets the configured Worker/resources and preserves dashboard-managed
+  variables without applying Void migrations — demonstrates `[SO-1]`.
 
 ## 9. Open Questions
 

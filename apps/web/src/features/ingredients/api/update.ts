@@ -1,14 +1,15 @@
 import { alertError } from '@client/lib/alert-error'
-import { apiClient, readResponse } from '@client/lib/api-client'
+import { readResponse } from '@client/lib/api-client'
 import { queryKeys } from '@client/lib/query-keys'
 import type { UpdateIngredientFormValues } from '@recipe-organizer/shared/ingredients/schemas'
 import { mutationOptions } from '@tanstack/react-query'
+import { fetch } from 'void/client'
 
 export { type UpdateIngredientFormInput, updateIngredientSchema } from '@recipe-organizer/shared/ingredients/schemas'
 
 const updateIngredientOptions = () =>
   mutationOptions({
-    mutationFn: ({ data }: { data: UpdateIngredientFormValues }) => readResponse(apiClient.ingredients.update.$post({ json: data })),
+    mutationFn: ({ data }: { data: UpdateIngredientFormValues }) => readResponse(fetch('/api/ingredients/update', { body: data, method: 'POST' })),
     onError: (error, variables) => {
       alertError(`Erreur lors de la mise à jour de l'ingrédient ${variables.data.name}`, error)
     },

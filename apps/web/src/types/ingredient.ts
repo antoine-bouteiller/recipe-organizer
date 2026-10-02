@@ -1,4 +1,3 @@
-import type { apiClient } from '@client/lib/api-client'
-import type { InferResponseType } from 'hono/client'
+import type { RouteMap } from 'void/routes'
 
-export type Ingredient = InferResponseType<typeof apiClient.ingredients.$get>[number]
+export type Ingredient = RouteMap['/api/ingredients']['GET']['output'][number]
