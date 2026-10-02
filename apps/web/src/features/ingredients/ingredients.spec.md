@@ -91,10 +91,10 @@ row defaults to `other` and indexes that column (`src/db/schema/ingredient.ts:3-
 | `preferredUnitSlug` | Shopping-list display preference | Nullable unit from `UNITS`              |
 
 The list server function returns rows in ascending name order under `queryKeys.listIngredients()`
-(`src/client/features/ingredients/api/get-all.ts:7-22`). Create and update require `authGuard()` and parse
+(`src/client/features/ingredients/api/get-all.ts:7-22`). Create and update require `withAuthGuard` and validate
 name, category, optional parent, positive-or-zero conversion fields, and optional unit slug
 (`src/client/features/ingredients/api/create.ts:12-31`; `src/client/features/ingredients/api/update.ts:15-28`).
-Delete requires `authGuard('admin')` (`src/client/features/ingredients/api/delete.ts:13-21`). Each mutation
+Delete requires `withAuthGuard(handler, 'admin')` (`src/client/features/ingredients/api/delete.ts:13-21`). Each mutation
 invalidates the list key; create and update also deliver French success or failure feedback
 (`src/client/features/ingredients/api/create.ts:33-51`; `src/client/features/ingredients/api/update.ts:30-48`).
 

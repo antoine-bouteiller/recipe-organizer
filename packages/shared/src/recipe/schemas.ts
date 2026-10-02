@@ -71,27 +71,6 @@ export const recipeSchema = z.object({
 export const updateRecipeSchema = recipeSchema.extend({ id: z.number() })
 export const deleteRecipeSchema = z.number()
 
-const wireEntrySchema = z.union([z.string(), z.instanceof(File)])
-
-// FormData transports each recipe field as either a JSON string or a File.
-export const recipeFormWireSchema = z.object({
-  cuisineTypes: wireEntrySchema,
-  image: wireEntrySchema,
-  ingredientGroups: wireEntrySchema,
-  linkedRecipes: wireEntrySchema.optional(),
-  meals: wireEntrySchema,
-  name: wireEntrySchema,
-  servings: wireEntrySchema,
-  stepGroups: wireEntrySchema,
-  video: wireEntrySchema.optional(),
-})
-
-export const updateRecipeFormWireSchema = recipeFormWireSchema.extend({ id: wireEntrySchema })
-
-export const recipeFormDataToWire = (data: FormData) => recipeFormWireSchema.parse(Object.fromEntries(data))
-
-export const updateRecipeFormDataToWire = (data: FormData) => updateRecipeFormWireSchema.parse(Object.fromEntries(data))
-
 type RecipeFormValues = z.infer<typeof recipeSchema>
 export type RecipeFormInput = Partial<RecipeFormValues>
 type UpdateRecipeFormValues = z.infer<typeof updateRecipeSchema>

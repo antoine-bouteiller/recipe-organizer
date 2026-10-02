@@ -1,29 +1,27 @@
-import type * as server from '@recipe-organizer/api'
 import { notFound, redirect } from '@tanstack/react-router'
-import { hc, parseResponse } from 'hono/client'
-import type { ClientResponse } from 'hono/client'
+import { FetchError } from 'void/client'
 import * as z from 'zod'
-
-export const apiClient = hc<typeof server.api>('/', { init: { credentials: 'same-origin' } }).api
 
 const errorSchema = z.object({ error: z.string() })
 
-export const readResponse = async <TResponse extends ClientResponse<unknown>>(request: Promise<TResponse>) => {
-  const response = await request
-  if (!response.ok) {
-    const body: unknown = await response.json()
-    const parsed = errorSchema.safeParse(body)
-    const error = parsed.success ? parsed.data.error : 'Une erreur est survenue'
-    if (response.status === 401) {
+export const readResponse = async <TResponse>(request: Promise<TResponse>): Promise<TResponse> => {
+  try {
+    return await request
+  } catch (error) {
+    if (!(error instanceof FetchError) || error.status === undefined) {
+      throw error
+    }
+    const parsed = errorSchema.safeParse(error.data)
+    const message = parsed.success ? parsed.data.error : 'Une erreur est survenue'
+    if (error.status === 401) {
       throw redirect({ to: '/auth/login' })
     }
-    if (response.status === 403 && (error === 'account_blocked' || error === 'account_pending')) {
-      throw redirect({ search: { error }, to: '/auth/login' })
+    if (error.status === 403 && (message === 'account_blocked' || message === 'account_pending')) {
+      throw redirect({ search: { error: message }, to: '/auth/login' })
     }
-    if (response.status === 404) {
+    if (error.status === 404) {
       throw notFound()
     }
-    throw new Error(response.status === 400 ? 'Invalid Schema' : error)
+    throw new Error(error.status === 400 ? 'Invalid Schema' : message, { cause: error })
   }
-  return parseResponse(response)
 }
