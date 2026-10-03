@@ -48,8 +48,6 @@ jobs:
 
       - name: Build
         run: vp build
-        env:
-          VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
 
       # Uploads a non-active version so production traffic stays on the current deployment.
       - name: Upload preview version

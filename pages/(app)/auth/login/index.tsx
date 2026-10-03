@@ -1,5 +1,6 @@
+import { auth } from 'void/client'
+
 import { LoginLayout } from '@/features/auth/client/components/login-layout'
-import { authClient } from '@/lib/client/auth/auth-client'
 
 import type { Props } from './index.server'
 
@@ -20,7 +21,7 @@ export default function LoginPage({ error }: Props) {
   return (
     <LoginLayout
       error={error && getErrorMessage(error)}
-      onSignIn={() => authClient.signIn.social({ callbackURL: '/', errorCallbackURL: '/auth/login', provider: 'google' })}
+      onSignIn={() => auth.signIn.social({ callbackURL: '/', errorCallbackURL: '/auth/login', provider: 'google' })}
     />
   )
 }

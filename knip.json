@@ -11,6 +11,7 @@
     "tools/oxlint/index.ts",
     "tools/scripts/apply-migration-local.ts",
     "void.config.ts",
+    "auth.ts!",
     "env.ts!"
   ],
   "project": ["**/*.{ts,tsx}!", "!**/*.stories.*!", "!tools/**!"],
@@ -21,7 +22,8 @@
   "ignoreIssues": {
     "{routes,middleware}/**/*.ts": ["exports"],
     "pages/**/*.{ts,tsx}": ["exports", "types"],
-    "{void.config,env}.ts": ["exports"],
+    "{void.config,env,auth}.ts": ["exports"],
+    "src/db/schema/auth.ts": ["exports"],
     "tools/oxlint/index.ts": ["exports"]
   }
 }

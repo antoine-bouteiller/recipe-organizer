@@ -32,7 +32,7 @@ const serviceWorkerScript = `if ('serviceWorker' in navigator) navigator.service
 const voidConfig = defineConfig({
   cloudflare: {
     images: { binding: 'IMAGES' },
-    // VITE_PUBLIC_URL and the auth secrets are dashboard-managed.
+    // The auth secrets are dashboard-managed.
     keep_vars: true,
     observability: { logs: { enabled: true, invocation_logs: true }, traces: { enabled: false } },
     preview_urls: true,

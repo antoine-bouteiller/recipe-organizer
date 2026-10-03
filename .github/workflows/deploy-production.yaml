@@ -60,7 +60,6 @@ jobs:
           CLOUDFLARE_WORKERS_SUBDOMAIN: ${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-          VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
 
       - name: Migrate Database
         run: vp run db:migrate:remote
