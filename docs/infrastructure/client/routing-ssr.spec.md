@@ -118,8 +118,10 @@ development-only Error details; server loader failures are not handled by that R
 `01.api-errors.ts` maps thrown page-action errors as well as API errors to JSON `{ error }`.
 
 Regular pages use Void client navigation; island pages navigate across documents. Shared CSS enables
-`@view-transition { navigation: auto }`; `void.config.ts` adds a `pagereveal` listener that marks
-backward traversal transitions with the `back` type when Navigation API activation is available.
+`@view-transition { navigation: auto }` in `src/styles/styles.css`. The head script in
+`void.config.ts` marks both outgoing (`pageswap`) and incoming (`pagereveal`) backward document
+transitions with the `back` type. For regular pages, it tracks Navigation API traversal direction
+and tags Void's `document.startViewTransition()` result; forward visits retain the default animation.
 Unsupported browsers retain ordinary navigation.
 
 DS Button uses `asLink` + `href` and optional `viewTransition` with the actual Void `Link`.
