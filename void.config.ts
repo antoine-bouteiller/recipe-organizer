@@ -2,8 +2,30 @@ import { defineConfig } from 'void/config'
 
 // Runs before first paint on server-rendered and island pages alike.
 const themeScript = `document.documentElement.className = /(?:^|; )ui-theme=dark(?:;|$)/.test(document.cookie) || (!/(?:^|; )ui-theme=/.test(document.cookie) && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'`
-// Island pages navigate across documents; mark backward traversals so the CSS can reverse the slide.
-const backTransitionScript = `addEventListener('pagereveal', (event) => { const activation = globalThis.navigation?.activation; if (event.viewTransition && activation?.navigationType === 'traverse' && activation.entry.index < (activation.from?.index ?? 0)) event.viewTransition.types.add('back') })`
+// Void starts client transitions without direction types; document transitions need both snapshots tagged.
+const backTransitionScript = `(() => {
+  const navigation = globalThis.navigation
+  if (!navigation) return
+  const isBack = (activation) => activation?.navigationType === 'traverse' && activation.entry.index < (activation.from?.index ?? 0)
+  addEventListener('pageswap', (event) => {
+    if (event.viewTransition && isBack(event.activation)) event.viewTransition.types.add('back')
+  })
+  addEventListener('pagereveal', (event) => {
+    if (event.viewTransition && isBack(navigation.activation)) event.viewTransition.types.add('back')
+  })
+  if (!document.startViewTransition) return
+  let back = false
+  navigation.addEventListener('navigate', (event) => {
+    back = !event.hashChange && event.navigationType === 'traverse' && event.destination.index < navigation.currentEntry.index
+  })
+  const startViewTransition = document.startViewTransition.bind(document)
+  document.startViewTransition = (update) => {
+    const transition = startViewTransition(update)
+    if (back) transition.types?.add('back')
+    back = false
+    return transition
+  }
+})()`
 const serviceWorkerScript = `if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' }).catch(() => undefined)`
 
 // Keep resource IDs in sync with tools/wrangler.jsonc (local migrations, dump/import) and src/lib/server/env.d.ts.

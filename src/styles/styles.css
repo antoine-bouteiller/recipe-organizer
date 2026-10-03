@@ -1,5 +1,9 @@
 @layer reset, base, tokens, recipes, utilities;
 
+@view-transition {
+  navigation: auto;
+}
+
 @font-face {
   font-family: 'Bricolage Grotesque';
   font-style: normal;
