@@ -4,40 +4,43 @@ import { VideoIcon, XIcon } from '@/components/ui/data-display/icons'
 import { Kbd, KbdGroup } from '@/components/ui/data-display/kbd/kbd'
 import { useFileUpload } from '@/hooks/use-file-upload'
 import type { FileMetadata } from '@/hooks/use-file-upload'
-import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platform'
 
-import { Field, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel, useFieldInvalid } from '../field/field'
 
 import * as styles from './video-field.css'
 
 export interface VideoFieldProps {
+  name: string
+  value: File | FileMetadata | undefined
+  onChange: (value: File | FileMetadata | undefined) => void
   disabled?: boolean
   initialVideo?: FileMetadata
   label: string
 }
 
-export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) => {
+export const VideoField = ({ name, value, onChange, disabled, initialVideo, label }: VideoFieldProps) => {
   const platform = usePlatform()
-  const field = useFieldContext<File | FileMetadata>()
+  const invalid = useFieldInvalid(name)
   const id = useId()
+  const previewFile = value && !(value instanceof File) ? value : initialVideo
 
   const MAX_VIDEO_SIZE_MB = 100
   const maxVideoSizeBytes = MAX_VIDEO_SIZE_MB * 1024 * 1024
 
   const [{ files }, { getInputProps, removeFile }] = useFileUpload({
     accept: 'video/*',
-    initialFiles: initialVideo ? [initialVideo] : [],
+    initialFiles: previewFile ? [previewFile] : [],
     maxSize: maxVideoSizeBytes,
     onFilesChange: (newFiles) => {
-      field.setValue(newFiles[0]?.file)
+      onChange(newFiles[0]?.file)
     },
   })
 
   const [videoFile] = files
 
   return (
-    <Field invalid={!field.state.meta.isValid} name={field.name}>
+    <Field name={name}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <FieldLabel htmlFor={id} presentation="dropzone-video">
         {videoFile ? (
@@ -84,7 +87,7 @@ export const VideoField = ({ disabled, initialVideo, label }: VideoFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={styles.fileInput} disabled={disabled} id={id} {...getInputProps()} />
+      <input aria-invalid={invalid || undefined} className={styles.fileInput} disabled={disabled} id={id} {...getInputProps()} />
       <FieldError />
     </Field>
   )

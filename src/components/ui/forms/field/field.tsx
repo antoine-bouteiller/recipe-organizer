@@ -13,6 +13,8 @@ type FieldErrorProps = Pick<React.ComponentProps<'div'>, 'children'>
 
 const FieldContext = createContext<{ error?: string; invalid: boolean }>({ invalid: false })
 
+export const useFieldInvalid = (name: string): boolean => Boolean(use(FormErrorsContext)[name])
+
 export const Field = ({ children, invalid, name }: FieldProps): React.ReactElement => {
   const error = name ? use(FormErrorsContext)[name] : undefined
   const isInvalid = Boolean(invalid || error)

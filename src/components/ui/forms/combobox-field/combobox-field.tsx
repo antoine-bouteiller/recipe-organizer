@@ -4,9 +4,8 @@ import type { ReactElement, ReactNode } from 'react'
 import { CheckIcon } from '@/components/ui/data-display/icons'
 import { Separator } from '@/components/ui/layout/separator/separator'
 import { Popover } from '@/components/ui/overlays/popover/popover'
-import { useFieldContext } from '@/hooks/use-form-context'
 
-import { Field, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel, useFieldInvalid } from '../field/field'
 import { Input } from '../input/input'
 import { SelectButton } from '../select/select.shared'
 import type { Option } from './options'
@@ -16,6 +15,9 @@ import * as styles from './combobox-field.css'
 type ValueOptions = number | string | undefined
 
 interface ComboboxFieldProps<TValue extends ValueOptions> {
+  name: string
+  value: TValue | undefined
+  onChange: (value: TValue | undefined) => void
   addNew?: (inputValue: string) => ReactNode
   disabled?: boolean
   label?: string
@@ -25,6 +27,9 @@ interface ComboboxFieldProps<TValue extends ValueOptions> {
 }
 
 const ComboboxField = <TValue extends ValueOptions>({
+  name,
+  value,
+  onChange,
   addNew,
   disabled,
   label,
@@ -32,10 +37,9 @@ const ComboboxField = <TValue extends ValueOptions>({
   placeholder = 'Sélectionner une option',
   searchPlaceholder = 'Rechercher une option',
 }: ComboboxFieldProps<TValue>): ReactElement => {
-  const field = useFieldContext<TValue | undefined>()
+  const invalid = useFieldInvalid(name)
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const { value } = field.store.state
   const selectedOption = options.find((opt) => opt.value === value)
   const filteredOptions = search ? options.filter((opt) => opt.label.toLowerCase().includes(search.toLowerCase())) : options
 
@@ -47,18 +51,18 @@ const ComboboxField = <TValue extends ValueOptions>({
   }
 
   const handleSelect = (option: Option<TValue>) => {
-    field.setValue(option.value === value ? undefined : option.value)
+    onChange(option.value === value ? undefined : option.value)
     handleOpenChange(false)
   }
 
   return (
-    <Field invalid={!field.state.meta.isValid} name={field.name}>
+    <Field name={name}>
       {label && <FieldLabel>{label}</FieldLabel>}
       <Popover
         onOpenChange={handleOpenChange}
         open={open}
         renderTrigger={(props) => (
-          <SelectButton {...props} aria-invalid={(field.state.meta.isTouched && !field.state.meta.isValid) || undefined} disabled={disabled}>
+          <SelectButton {...props} aria-invalid={invalid || undefined} disabled={disabled}>
             {selectedOption?.label ?? placeholder}
           </SelectButton>
         )}

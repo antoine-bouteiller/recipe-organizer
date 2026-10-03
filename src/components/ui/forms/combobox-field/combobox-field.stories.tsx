@@ -1,11 +1,11 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useEffect } from 'react'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test'
 
-import { useAppForm } from '@/hooks/use-app-form'
-
+import { FormErrorsContext } from '../form/form'
+import { ComboboxField } from './combobox-field'
 import type { Option } from './options'
 
 import * as styles from './combobox-field.stories.css'
@@ -29,20 +29,11 @@ const ComboboxFieldExample = ({
   invalid = false,
   options: items = options,
 }: ComboboxFieldExampleProps): ReactElement => {
-  const form = useAppForm({ defaultValues: { meal: initialValue }, onSubmit: async () => undefined })
-  // Invalid combobox styling appears once the field is touched, as after a submit attempt.
-  useEffect(() => {
-    if (invalid) {
-      void form.handleSubmit()
-    }
-  }, [form, invalid])
-
+  const [value, setValue] = useState<string | undefined>(initialValue)
   return (
-    <form.AppForm>
-      <form.AppField name="meal" validators={invalid ? { onSubmit: () => 'Invalid' } : undefined}>
-        {({ ComboboxField }) => <ComboboxField disabled={disabled} label="Meal" options={items} />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={invalid ? { meal: 'Invalid' } : {}}>
+      <ComboboxField name="meal" value={value} onChange={setValue} disabled={disabled} label="Meal" options={items} />
+    </FormErrorsContext>
   )
 }
 

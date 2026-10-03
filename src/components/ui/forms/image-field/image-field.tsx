@@ -4,36 +4,39 @@ import { ImageIcon, XIcon } from '@/components/ui/data-display/icons'
 import { Kbd, KbdGroup } from '@/components/ui/data-display/kbd/kbd'
 import { useFileUpload } from '@/hooks/use-file-upload'
 import type { FileMetadata } from '@/hooks/use-file-upload'
-import { useFieldContext } from '@/hooks/use-form-context'
 import { usePlatform } from '@/hooks/use-platform'
 
-import { Field, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel, useFieldInvalid } from '../field/field'
 
 import * as styles from './image-field.css'
 
 export interface ImageFieldProps {
+  name: string
+  value: File | FileMetadata | undefined
+  onChange: (value: File | FileMetadata | undefined) => void
   disabled?: boolean
   initialImage?: FileMetadata
   label: string
 }
 
-export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) => {
+export const ImageField = ({ name, value, onChange, disabled, initialImage, label }: ImageFieldProps) => {
   const platform = usePlatform()
-  const field = useFieldContext<File | FileMetadata>()
+  const invalid = useFieldInvalid(name)
   const id = useId()
+  const previewFile = value && !(value instanceof File) ? value : initialImage
 
   const [{ files }, { getInputProps, removeFile }] = useFileUpload({
     accept: 'image/*',
-    initialFiles: initialImage ? [initialImage] : [],
+    initialFiles: previewFile ? [previewFile] : [],
     onFilesChange: (newFiles) => {
-      field.setValue(newFiles[0]?.file)
+      onChange(newFiles[0]?.file)
     },
   })
 
   const previewUrl = files[0]?.preview
 
   return (
-    <Field invalid={!field.state.meta.isValid} name={field.name}>
+    <Field name={name}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <FieldLabel htmlFor={id} presentation="dropzone-image">
         {previewUrl ? (
@@ -73,7 +76,7 @@ export const ImageField = ({ disabled, initialImage, label }: ImageFieldProps) =
           </div>
         )}
       </FieldLabel>
-      <input className={styles.fileInput} disabled={disabled} id={id} {...getInputProps()} />
+      <input aria-invalid={invalid || undefined} className={styles.fileInput} disabled={disabled} id={id} {...getInputProps()} />
       <FieldError />
     </Field>
   )

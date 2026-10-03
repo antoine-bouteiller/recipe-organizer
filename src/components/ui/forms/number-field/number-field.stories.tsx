@@ -1,10 +1,10 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { useAppForm } from '@/hooks/use-app-form'
-
+import { FormErrorsContext } from '../form/form'
 import { NumberField } from './number-field'
 
 import * as styles from './number-field.stories.css'
@@ -18,18 +18,15 @@ const NumberFieldExample = ({
   invalid?: boolean
   initialValue?: number
 }): ReactElement => {
-  const form = useAppForm({ defaultValues: { servings: initialValue }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<number | undefined>(initialValue)
   return (
-    <form.AppForm>
-      <form.AppField name="servings" validators={invalid ? { onMount: () => 'Invalid' } : undefined}>
-        {({ NumberField: AppNumberField }) => <AppNumberField disabled={disabled} label="Servings" min={1} placeholder="4" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={invalid ? { servings: 'Invalid' } : {}}>
+      <NumberField name="servings" value={value} onChange={setValue} disabled={disabled} label="Servings" min={1} placeholder="4" />
+    </FormErrorsContext>
   )
 }
 
-const meta = { component: NumberField, title: 'Forms/NumberField' } satisfies Meta<typeof NumberField>
+const meta = { component: NumberFieldExample, title: 'Forms/NumberField' } satisfies Meta<typeof NumberFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

@@ -22,7 +22,6 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
-    "@tanstack/react-form": "catalog:",
     "@tanstack/react-store": "catalog:",
     "@void/react": "catalog:",
     "better-auth": "catalog:",

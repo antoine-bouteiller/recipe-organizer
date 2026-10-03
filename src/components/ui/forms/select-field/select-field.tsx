@@ -1,31 +1,32 @@
 import { useId } from 'react'
 
-import { useFieldContext } from '@/hooks/use-form-context'
-
-import { Field, FieldError, FieldLabel } from '../field/field'
+import { Field, FieldError, FieldLabel, useFieldInvalid } from '../field/field'
 import { Select } from '../select/select'
 
 interface SelectFieldProps {
+  name: string
+  value: string | null | undefined
+  onChange: (value: string | null | undefined) => void
   disabled?: boolean
   items: { label: string; value: string | null }[]
   label?: string
 }
 
-const SelectField = ({ disabled, items, label }: SelectFieldProps) => {
-  const field = useFieldContext<string | null | undefined>()
+const SelectField = ({ name, value, onChange, disabled, items, label }: SelectFieldProps) => {
+  const invalid = useFieldInvalid(name)
   const id = useId()
 
   return (
-    <Field invalid={!field.state.meta.isValid} name={field.name}>
+    <Field name={name}>
       {label && <FieldLabel htmlFor={id}>{label}</FieldLabel>}
       <Select
-        aria-invalid={!field.state.meta.isValid}
+        aria-invalid={invalid}
         disabled={disabled}
         id={id}
         items={items}
-        onValueChange={(value) => field.setValue(value ?? undefined)}
+        onValueChange={(next) => onChange(next ?? undefined)}
         title={label}
-        value={field.state.value ?? null}
+        value={value ?? null}
       />
       <FieldError />
     </Field>

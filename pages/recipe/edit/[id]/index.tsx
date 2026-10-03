@@ -1,9 +1,10 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useSelector } from '@tanstack/react-store'
+import { useForm, useRouter } from '@void/react'
+import { useEffect } from 'react'
 
 import { NotFound } from '@/components/not-found/not-found'
 import { GoBackButton, ScreenLayout } from '@/components/screen-layout/screen-layout'
 import { Button } from '@/components/ui/actions/button/button'
+import { FormSubmit } from '@/components/ui/forms/form-submit/form-submit'
 import { Form } from '@/components/ui/forms/form/form'
 import { renderAddIngredientOption } from '@/features/ingredients/client/components/add-ingredient'
 import { IngredientCatalogProvider } from '@/features/ingredients/client/contexts/ingredient-catalog-context'
@@ -12,13 +13,8 @@ import type { Recipe, RecipeIngredientGroup } from '@/features/recipe/client/api
 import { RecipeForm } from '@/features/recipe/client/components/recipe-form'
 import { RecipeFormActions } from '@/features/recipe/client/components/recipe-form-actions'
 import { RecipeCatalogProvider } from '@/features/recipe/client/contexts/recipe-catalog-context'
-import { recipeFormFields } from '@/features/recipe/client/utils/form'
-import { updateRecipeSchema } from '@/features/recipe/schemas'
 import type { UpdateRecipeFormInput } from '@/features/recipe/schemas'
-import { useAppForm } from '@/hooks/use-app-form'
-import { usePageAction } from '@/lib/client/page-action'
-import { objectToFormData } from '@/utils/form-data'
-import { formatFormErrors } from '@/utils/format-form-errors'
+import { useFormActionError } from '@/lib/client/page-action'
 import { getVideoUrl } from '@/utils/get-file-url'
 
 import type { Props } from './index.server'
@@ -55,7 +51,7 @@ export default function EditRecipePage({ ingredients, recipe, recipes }: Props) 
 }
 
 const EditRecipeForm = ({ recipe }: { recipe: Recipe }) => {
-  const runPageAction = usePageAction()
+  const router = useRouter()
   const ingredientOptions = useIngredientOptions()
 
   const initialValues: UpdateRecipeFormInput = {
@@ -67,6 +63,7 @@ const EditRecipeForm = ({ recipe }: { recipe: Recipe }) => {
     },
     ingredientGroups: recipe.ingredientGroups.map(formatIngredientGroup),
     linkedRecipes: recipe.linkedRecipes.map((linkedRecipe) => ({
+      _key: newKey(),
       id: linkedRecipe.linkedRecipe.id,
       ratio: linkedRecipe.ratio,
     })),
@@ -82,38 +79,19 @@ const EditRecipeForm = ({ recipe }: { recipe: Recipe }) => {
       : undefined,
   }
 
-  const form = useAppForm({
-    defaultValues: initialValues,
-    onSubmit: async ({ value }) => {
-      const succeeded = await runPageAction(
-        '/recipe/edit/:id',
-        { data: Object.fromEntries(objectToFormData(value)), params: { id: String(recipe.id) } },
-        `Erreur lors de la mise à jour de la recette ${value.name ?? ''}`
-      )
-      if (succeeded) {
-        history.back()
-      }
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: updateRecipeSchema,
-    },
-  })
-
-  const errors = useSelector(form.store, (state) => formatFormErrors(state.errors))
+  const form = useForm('/recipe/edit/:id', initialValues, { params: { id: String(recipe.id) } })
+  useFormActionError(form.error, `Erreur lors de la mise à jour de la recette ${form.data.name ?? ''}`)
+  useEffect(() => {
+    if (form.wasSuccessful) {
+      void router.visit(`/recipe/${recipe.id}`, { replace: true })
+    }
+  }, [form.wasSuccessful, recipe.id, router])
 
   return (
     <ScreenLayout title="Modifier la recette" backButton={<GoBackButton />}>
-      <Form
-        errors={errors}
-        onSubmit={(event) => {
-          event.preventDefault()
-          void form.handleSubmit()
-        }}
-      >
+      <Form errors={form.errors} action={(data) => form.post(data)}>
         <RecipeForm
           addNewIngredientOption={renderAddIngredientOption}
-          fields={recipeFormFields}
           form={form}
           id={recipe.id}
           ingredientOptions={ingredientOptions}
@@ -121,12 +99,10 @@ const EditRecipeForm = ({ recipe }: { recipe: Recipe }) => {
           initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
         />
         <RecipeFormActions>
-          <Button disabled={form.state.isSubmitting} onClick={() => history.back()} type="button" variant="outline">
+          <Button disabled={form.pending} onClick={() => history.back()} type="button" variant="outline">
             Annuler
           </Button>
-          <form.AppForm>
-            <form.FormSubmit label="Modifier la recette" />
-          </form.AppForm>
+          <FormSubmit pending={form.pending} label="Modifier la recette" />
         </RecipeFormActions>
       </Form>
     </ScreenLayout>

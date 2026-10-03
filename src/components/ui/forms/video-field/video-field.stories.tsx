@@ -1,24 +1,24 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { useAppForm } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
+
+import { FormErrorsContext } from '../form/form'
+import { VideoField } from './video-field'
 
 import * as styles from './video-field.stories.css'
 
 const video: FileMetadata = { id: 'recipe-video', name: 'tomato-soup.mp4', size: 1_572_864, type: 'video/mp4', url: 'data:video/mp4;base64,' }
 
 const VideoFieldExample = ({ disabled = false, initialVideo }: { disabled?: boolean; initialVideo?: FileMetadata }): ReactElement => {
-  const form = useAppForm({ defaultValues: { video: initialVideo }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<File | FileMetadata | undefined>(initialVideo)
   return (
-    <form.AppForm>
-      <form.AppField name="video">
-        {({ VideoField: AppVideoField }) => <AppVideoField disabled={disabled} initialVideo={initialVideo} label="Recipe video" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={{}}>
+      <VideoField name="video" value={value} onChange={setValue} disabled={disabled} initialVideo={initialVideo} label="Recipe video" />
+    </FormErrorsContext>
   )
 }
 

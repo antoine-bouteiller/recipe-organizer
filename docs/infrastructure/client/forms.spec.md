@@ -20,20 +20,19 @@ feature from independently composing field state, error presentation, and submis
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                         | Rationale                                                                                                                            |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Form composition    | `useAppForm` and `withForm` are the only application form factories                            | One registry gives all features the same typed fields and form context; the registry is defined in `src/hooks/use-app-form.ts`.      |
-| `[KD-2]` Validation contract | Forms use the input schema owned by the corresponding page action or API route                 | Shared shape detects input problems promptly while the Worker remains the trust boundary, refining `client.spec.md` `[PI-3]`.        |
-| `[KD-3]` Error projection    | TanStack Form errors are projected into native Form and Field components                       | Controls receive consistent field-level accessibility and presentation without feature-specific error plumbing.                      |
-| `[KD-4]` File transport      | A values object serialises files as multipart entries and other present values as JSON entries | Multipart carries binary data while JSON preserves nested values for the same server input contract (`src/utils/form-data.ts:1-28`). |
+| Decision                     | Choice                                                                                                                | Rationale                                                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Form composition    | Page-backed forms use `useForm` from `@void/react`; API ingredient creation and local Magimix dialogs use React state | One controlled field vocabulary without a second form framework.                                                    |
+| `[KD-2]` Validation contract | Page actions and API routes validate on the server; browser forms do not run Zod schemas                              | Editable drafts remain intact on failure; the Worker owns the trust boundary.                                       |
+| `[KD-3]` Error projection    | `form.errors` uses dotted paths through `FormErrorsContext`; controls look up their `name`                            | Shared field errors and `aria-invalid` without application dependencies in UI components.                           |
+| `[KD-4]` File transport      | Void sends structured JSON, or bracket-key multipart when any value is a file                                         | The recipe server reader reconstructs multipart and normalizes only that transport before strict schema validation. |
 
 ## 4. Principles & Intents
 
 - `[PI-1]` **One form vocabulary** — refine `client.spec.md` `[PI-3]`: feature forms compose
-  registered fields rather than owning form-framework setup.
-- `[PI-2]` **Validation is informative, not authoritative** — client errors guide users; Void
-  routes validate all writes under `../../architecture.spec.md` `[PI-3]`.
-- `[PI-3]` **Fields own control wiring** — a field translates its framework context into a UI
+  controlled fields rather than owning form-framework setup.
+- `[PI-2]` **Validation belongs to the server** — Void routes validate all writes under `../../architecture.spec.md` `[PI-3]`.
+- `[PI-3]` **Fields own control wiring** — a field translates its controlled value into a UI
   primitive and error slot, keeping feature views declarative.
 - `[PI-4]` **Dialog form composition stays private** — the form-aware dialog integration preserves
   form semantics without exposing form-wrapper or panel-styling seams to features.
@@ -47,8 +46,12 @@ feature from independently composing field state, error presentation, and submis
 
 ## 6. Caveats
 
-- `[C-1]` `FormData` omits `undefined` and `null`; an input contract that distinguishes an explicit
-  clearing value represents it directly rather than relying on an absent entry (`src/utils/form-data.ts:1-10`).
+- `[C-1]` Void multipart converts numbers to strings, `null`/`undefined` to empty strings, and omits
+  empty arrays. The recipe reader restores collections and optional values; JSON validation stays strict.
+- `[C-4]` Named-action form submissions can add `?actionName` history entries. Edit success replaces
+  the current entry with `/recipe/<id>` rather than using Back.
+- `[C-5]` Void updates reset defaults to submitted data after success. User creation clears email and
+  restores the default role explicitly; resetting alone would retain the created user.
 - `[C-2]` File previews use browser resources and upload acceptance is a user-experience check;
   server validation and storage controls remain required.
 - `[C-3]` Nested dialog forms stop submit propagation because a dialog can render within a page
@@ -56,124 +59,96 @@ feature from independently composing field state, error presentation, and submis
 
 ## 7. High-Level Components
 
-| Component         | Module type                                              | Responsibility                                      | Public API surface                  |
-| ----------------- | -------------------------------------------------------- | --------------------------------------------------- | ----------------------------------- |
-| Form factory      | `src/hooks/use-app-form.ts`                              | Register fields and form components                 | `useAppForm`, `withForm`            |
-| Field components  | `src/components/ui/forms/*-field/`                       | Bind a typed field value to a UI control            | registered `*Field` components      |
-| UI wrappers       | `src/components/ui/forms/{form,field}/`                  | Associate errors, labels, controls, and messages    | `Form`, `Field`, error slots        |
-| File adapter      | `src/hooks/use-file-upload.ts`                           | Select, validate, preview, and remove browser files | `useFileUpload`, `FileMetadata`     |
-| Dialog adapter    | `src/components/ui/overlays/form-dialog/form-dialog.tsx` | Place a shared form inside dialog chrome            | `getFormDialog()`                   |
-| Transport helpers | `src/utils/form-data.ts`                                 | Convert values to and from multipart payloads       | `objectToFormData`, `parseFormData` |
+| Component         | Location                                         | Responsibility                            | Public API                                               |
+| ----------------- | ------------------------------------------------ | ----------------------------------------- | -------------------------------------------------------- |
+| Form state        | `@void/react` / feature components               | Page action state, or local React state   | `useForm(url, defaults, { params })`, `useState`         |
+| Controlled fields | `src/components/ui/forms/*-field/`               | Translate values into accessible controls | `name`, `value`, `onChange`, existing presentation props |
+| UI wrappers       | `src/components/ui/forms/{form,field}/`          | Project dotted-path errors into controls  | `Form`, `FormErrorsContext`, `Field`, `useFieldInvalid`  |
+| Submit            | `src/components/ui/forms/form-submit/`           | Disable and indicate submission           | `label`, `pending`                                       |
+| File adapter      | `src/hooks/use-file-upload.ts`                   | Select, validate, preview, remove files   | `useFileUpload`, `FileMetadata`                          |
+| Dialog            | `src/components/ui/overlays/form-dialog/`        | Private form frame and dialog chrome      | `FormDialog`                                             |
+| Recipe transport  | `src/features/recipe/server/recipe-form-data.ts` | Read JSON or Void multipart and validate  | `readRecipeFormData`, `validateRecipeForm`               |
 
 ## 8. Detailed Design
 
-### 8.1 Factory and field contract
+### 8.1 Controlled field contract
 
-`useAppForm(options)` returns a form with `AppField`, `AppForm`, and `FormSubmit`; `withForm(config)`
-produces a typed reusable form view. The registry includes text, numeric, selection, toggle, file,
-and editor fields plus Field slots (`src/hooks/use-app-form.ts`). A field reads its
-value and metadata from field context, updates through the field handler, and renders a named Field
-with an error slot; the text implementation demonstrates that boundary (`src/components/ui/forms/text-field/text-field.tsx`).
+```tsx
+const form = useForm('/recipe/new', recipeDefaultValues)
+<Form errors={form.errors} action={(data) => form.post(data)}>
+  <TextField name="name" value={form.data.name ?? ''}
+    onChange={(value) => form.setData('name', value)} label="Nom de la recette" />
+  <FormSubmit label="Créer la recette" pending={form.pending} />
+</Form>
+```
 
-Feature forms provide typed defaults, a server-owned schema, submit behavior, and reusable child
-views. Dynamic collections use the form array-field surface; each row carries a stable browser key
-separate from any persisted identifier.
+Fields are ordinary controlled components, not registrations or context-bound state owners.
+`FormErrorsContext` contains `Record<string, string>`; a `Field` and its control look up a dotted
+`name` such as `ingredientGroups.0.ingredients.0.quantity`. Field roots associate labels and errors
+with controls, and `useFieldInvalid(name)` supplies control-level `aria-invalid`.
 
-### 8.2 Validation and submission
+### 8.2 Validation and transport
 
-Forms apply their schema through TanStack Form revalidation and project the first error per path to
-`Form errors`. Page submission prevents browser navigation and invokes `form.handleSubmit()`. A
-dialog produced by `getFormDialog(defaultValues)` selects errors from form state, disables cancel
-while submitting, stops propagation, and supplies its typed submit component
-(`src/components/ui/overlays/form-dialog/form-dialog.tsx`).
+Recipe actions expose their partial draft schema through the handler's `__validators.body` metadata
+for generated Void form typing. They do not invoke Void's JSON-only `withValidator` body reader.
+Instead they read structured JSON unchanged, or reconstruct bracket-key multipart, then validate
+against `recipeSchema` / `updateRecipeSchema`. Multipart-only normalization converts numeric
+fields, restores omitted empty arrays (including nested ingredients and steps), and restores blank
+optional assets, units, and Magimix values. Numeric-looking file metadata ids remain strings.
+Required empty numbers do not become zero. JSON numbers, required arrays, and null handling retain
+strict schema semantics. Schema failures become `ValidationError` from `void/pages-protocol` with
+last-issue-per-dotted-path messages, which Void projects into `form.errors`.
 
-Recipe page forms use `values -> objectToFormData -> Object.fromEntries -> page action -> schema`.
-`usePageAction()` submits these entries (including raw `File` values); `readRecipeFormData` accepts the
-Void action body and restores the structured JSON entries before schema validation. JSON-only page
-actions receive typed values directly; inline ingredient creation retains typed `void/client` fetch.
-`objectToFormData` appends a raw `File` and JSON-stringifies other present values; `parseFormData`
-restores parseable string entries (`src/utils/form-data.ts:1-28`). File fields hold either a browser `File` or
-`{ id, url }` metadata so an unchanged asset retains its reference.
+Settings ingredient update and user creation use `withValidator`; editable ingredient body schemas
+are partial inputs piped into the strict ingredient schema, so route typing admits incomplete drafts
+without relaxing server writes. Browser forms never parse schemas. Inline ingredient creation uses
+React state and typed `void/client` fetch through `readResponse`; API failures preserve the draft and
+show the existing French alert, and success refreshes catalogues and closes/reset the dialog.
 
-### 8.3 Field value and UI contract
+### 8.3 Arrays and local dialogs
 
-Every registered field receives its value from form context and reports a value through the matching
-field handler. The standard field shape is a named Field root, optional label and description,
-control, and FieldError. The root receives invalid metadata and server errors by field name, and associates
-its label and error with the control through explicit ids. Text fields, number fields, selects,
-comboboxes, checkboxes, and toggle groups differ only in the value/control translation.
+Void `setData` accepts top-level keys only. Recipe views replace entire nested collections using
+immutable `replaceAt`, `removeAt`, and `moveAt` helpers. Unsaved rows carry stable `_key` values,
+including linked recipes. The default own-steps group remains first and cannot be removed or moved.
+Textarea bold shortcuts retain selection after immutable updates; eligible sub-recipes still derive
+from the current positive linked-recipe ids.
 
-| Field family             | State value                  | Contract boundary                                                          |
-| ------------------------ | ---------------------------- | -------------------------------------------------------------------------- |
-| Text and editor          | `string`                     | Control reports textual value; editor receives feature node configuration. |
-| Numeric and selection    | number or string value       | UI conversion happens at the field boundary.                               |
-| Boolean and multi-select | boolean or string collection | Field preserves the schema's collection shape.                             |
-| Image and video          | `File                        | FileMetadata                                                               | undefined` | Selection exposes a browser file or an unchanged asset reference. |
-| Array field              | collection of typed items    | Parent form owns add, remove, and stable browser keys.                     |
+The Magimix dialog uses local React state, bounded numeric controls, supported program/speed options,
+and converts minutes/seconds to total seconds. Recipe submission owns server validation of Magimix
+values; the dialog has no action or client Zod validation. Opening an edit dialog restores its current
+program data, not stale initial values.
 
-The editor field is lazy in the registry (`src/hooks/use-app-form.ts`). A screen placing it in
-the form provides a suspense boundary sized for the editor region, so editor loading does not change
-the form's structural contract.
+### 8.4 File interaction
 
-### 8.4 Reusable form views and arrays
+Image/video fields expose a browser `File`, retained `{ id, url }` metadata, or `undefined` when
+removed. `useFileUpload` retains picker/paste, preview, type and size checks. Paste ignores focused
+textareas/contenteditable elements. Browser file acceptance is not authorization or server validation.
+Void sends multipart only when a file exists anywhere in the form; unchanged assets travel as JSON
+metadata otherwise. Existing video removal semantics remain unchanged by this migration.
 
-A feature declares defaults that describe its input shape, then uses `withForm` for a reusable view
-that receives the parent form instance. The view uses only its assigned field paths; it does not
-instantiate a nested form. This permits the same fields in a page form and a dialog while preserving
-one submission lifecycle.
+### 8.5 Submit and error lifecycle
 
-An array field represents a collection whose rows can be inserted and removed before submission.
-Each unsaved row has a browser-stable key distinct from a database identifier. The collection value
-remains optional until its defaults establish it, so renderers handle an absent collection without
-inventing a server record.
+`Form` accepts a native React `action` callback and/or an event `onSubmit`. `FormDialog` receives
+`errors`, `pending`, `action`/`onSubmit`, children, open/setOpen, title, submit label, and `renderTrigger`.
+Its private wrapper stops submit propagation, preserving nested recipe-dialog isolation. Pending state
+disables submit and cancellation. Imperative Void form callbacks run inside synchronous
+`startTransition(() => form.post(new FormData()))`; no action is awaited inside a transition.
 
-### 8.5 File interaction
+Server validation appears after submission, with drafts retained and editable. Non-validation
+expected `form.error` failures use `useFormActionError` with the existing French feature message;
+authentication/server failures follow Void's error boundary behavior. Successful creation replaces
+navigation to `/`; successful editing replaces navigation to `/recipe/<id>`. Edit Cancel still goes
+Back. Settings dialogs close on `wasSuccessful`; user creation clears fields explicitly because
+Void's reset defaults become the last submitted data. Button-only approval/block/deletion mutations
+retain `usePageAction` for in-place prop refresh without adding history entries.
 
-`useFileUpload` accepts type, size, multiplicity, initial metadata, and change callbacks. It exposes
-drag/drop, picker, and removal interactions, rejects unacceptable files, and supplies previews. Its
-paste listener ignores focused textareas and contenteditable elements, preserving rich-text editing
-(`src/hooks/use-file-upload.ts`).
+### 8.6 Verification
 
-A single-file field replaces its selected value. A file metadata value supplies an existing preview
-and travels back through form state when the user retains that asset. Image and video fields set the
-form value from the first selected file; a feature chooses accept and size limits appropriate to its
-server contract. The browser's acceptance result never authorizes an upload.
-
-### 8.6 Error and submit lifecycle
-
-The form observes submission state to disable its submit action and exposes a progress indication.
-On an unsuccessful validation pass, errors remain associated with their field paths and the user can
-correct values under dynamic revalidation. On a successful server mutation, the owning feature
-performs navigation, loader-prop refresh, dialog closing, or form reset according to its domain
-contract; the form infrastructure does not choose those effects.
-
-A dialog uses the same lifecycle as a page form but contains it within dialog chrome. It receives
-`open`, `setOpen`, title, trigger, child fields, and submit label as view inputs; its form instance
-continues to belong to the caller. Its form-aware dialog composition is private: public Dialog does
-not expose content-render/panel-style hooks and public Form does not gain a display/style override.
-This keeps close-state local while validation and submission remain shared, preserving Enter
-submission, async cancellation/disable behavior, errors, focus return, and submit-propagation
-handling without nested forms.
-
-Regular-page forms await `usePageAction()` outside React transitions; the helper preserves
-URL/history, refreshes loader props in place, alerts expected failures, and returns a success boolean.
-Callers navigate or close only after success. `DeleteDialog` tracks loading with local state while
-awaiting `onDelete`, rather than awaiting an action inside a transition.
-
-### 8.7 Form contract summary
-
-| Stage       | Input                         | Output                                      |
-| ----------- | ----------------------------- | ------------------------------------------- |
-| Defaults    | typed feature input shape     | initial form values and field paths         |
-| Edit        | registered field interaction  | typed form-state value and metadata         |
-| Validate    | feature schema                | path-indexed user feedback                  |
-| Submit      | valid values                  | feature mutation invocation                 |
-| File submit | `File` plus structured values | multipart payload with JSON entries         |
-| Complete    | mutation result               | feature-owned navigation or local UI effect |
-
-The shared factory and context are owned by `src/hooks/use-app-form.ts` and `src/components/ui/forms/`; application code imports
-`@/hooks/use-app-form`. Feature schemas, mutations, domain-specific
-editor nodes, and loader-fed catalogue option hooks remain app-owned and enter the shared UI through props.
+The recipe transport tests cover structured JSON, uploaded binary files with nested bracket keys,
+omitted nested collections and optional values, retained numeric-looking metadata ids, and strict
+JSON rejection projected to dotted errors. Field/dialog stories cover controlled interaction, Enter
+submission, pending dismissal prevention, and file selection/removal. Visual design remains a browser
+review concern; tests do not assert CSS or geometry.
 
 ## 9. Open Questions
 
@@ -189,3 +164,5 @@ N/A
 | 2026-09-16 | Make the form-aware dialog composition a private styling/render boundary. | 4, 8.6 | Preserve form behavior without reopening Dialog or Form customization APIs. |
 | 2026-09-28 | Describe native Form and Field error projection after removing Base UI. | 3, 8.1, 8.3 | Base UI is no longer a dependency. |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
+
+| 2026-10-03 | Replace TanStack form state with Void page forms and controlled fields; retain local React forms for API ingredients/Magimix. | 3, 6–8 | One form vocabulary with server validation and native Void transport. |

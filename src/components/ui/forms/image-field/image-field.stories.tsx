@@ -1,10 +1,13 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
-import { useAppForm } from '@/hooks/use-app-form'
 import type { FileMetadata } from '@/hooks/use-file-upload'
+
+import { FormErrorsContext } from '../form/form'
+import { ImageField } from './image-field'
 
 import * as styles from './image-field.stories.css'
 
@@ -17,14 +20,11 @@ const image: FileMetadata = {
 }
 
 const ImageFieldExample = ({ disabled = false, initialImage }: { disabled?: boolean; initialImage?: FileMetadata }): ReactElement => {
-  const form = useAppForm({ defaultValues: { image: initialImage }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<File | FileMetadata | undefined>(initialImage)
   return (
-    <form.AppForm>
-      <form.AppField name="image">
-        {({ ImageField: AppImageField }) => <AppImageField disabled={disabled} initialImage={initialImage} label="Recipe image" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={{}}>
+      <ImageField name="image" value={value} onChange={setValue} disabled={disabled} initialImage={initialImage} label="Recipe image" />
+    </FormErrorsContext>
   )
 }
 

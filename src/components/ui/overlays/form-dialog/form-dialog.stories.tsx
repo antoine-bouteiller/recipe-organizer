@@ -4,60 +4,66 @@ import type { ReactElement } from 'react'
 import { expect, userEvent, waitFor, within } from 'storybook/test'
 
 import { Button } from '@/components/ui/actions/button/button'
-import { useAppForm } from '@/hooks/use-app-form'
+import { TextField } from '@/components/ui/forms/text-field/text-field'
 
-import { getFormDialog } from './form-dialog'
+import { FormDialog } from './form-dialog'
 
 import * as styles from './form-dialog.stories.css'
 
 const defaultValues = { title: 'Tomato soup' }
-const FormDialog = getFormDialog(defaultValues)
 
 const FormDialogExample = (): ReactElement => {
   const [open, setOpen] = useState(false)
-  const form = useAppForm({ defaultValues, onSubmit: async () => setOpen(false) })
+  const [title, setTitle] = useState(defaultValues.title)
 
   return (
-    <form.AppForm>
+    <>
       <FormDialog
-        form={form}
+        pending={false}
+        onSubmit={(event) => {
+          event.preventDefault()
+          setOpen(false)
+        }}
         open={open}
         setOpen={setOpen}
         submitLabel="Save recipe"
         title="Edit recipe"
         renderTrigger={(props) => <Button {...props}>Edit recipe</Button>}
       >
-        <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
+        <TextField name="title" value={title} onChange={setTitle} label="Recipe title" />
       </FormDialog>
-    </form.AppForm>
+    </>
   )
 }
 
 const RegressionExample = (): ReactElement => {
   const [open, setOpen] = useState(false)
   const resolveSubmit = useRef<(() => void) | null>(null)
-  const form = useAppForm({
-    defaultValues,
-    onSubmit: async () =>
-      new Promise<void>((resolve) => {
-        resolveSubmit.current = () => {
-          resolve()
-          setOpen(false)
-        }
-      }),
-  })
+  const [title, setTitle] = useState(defaultValues.title)
+  const [pending, setPending] = useState(false)
+  const submit = () => {
+    setPending(true)
+    resolveSubmit.current = () => {
+      setPending(false)
+      setOpen(false)
+    }
+  }
 
   return (
-    <form.AppForm>
+    <>
       <FormDialog
-        form={form}
+        pending={pending}
+        onSubmit={(event) => {
+          event.preventDefault()
+          submit()
+        }}
         open={open}
         setOpen={setOpen}
         submitLabel="Save recipe"
         title="Edit recipe"
         renderTrigger={(props) => <Button {...props}>Edit recipe</Button>}
       >
-        <form.AppField name="title">{({ TextField }) => <TextField label="Recipe title" />}</form.AppField>
+        <TextField name="title" value={title} onChange={setTitle} label="Recipe title" />
         <div className={styles.container}>
           {Array.from({ length: 20 }, (_item, index) => (
             <p key={index}>Long form content {index + 1}</p>
@@ -67,7 +73,7 @@ const RegressionExample = (): ReactElement => {
           Complete save
         </Button>
       </FormDialog>
-    </form.AppForm>
+    </>
   )
 }
 

@@ -1,10 +1,10 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { useAppForm } from '@/hooks/use-app-form'
-
+import { FormErrorsContext } from '../form/form'
 import { TextField } from './text-field'
 
 import * as styles from './text-field.stories.css'
@@ -18,18 +18,15 @@ const TextFieldExample = ({
   invalid?: boolean
   initialValue?: string
 }): ReactElement => {
-  const form = useAppForm({ defaultValues: { title: initialValue }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<string>(initialValue)
   return (
-    <form.AppForm>
-      <form.AppField name="title" validators={invalid ? { onMount: () => 'Invalid' } : undefined}>
-        {({ TextField: AppTextField }) => <AppTextField disabled={disabled} label="Recipe title" placeholder="Tomato soup" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={invalid ? { title: 'Invalid' } : {}}>
+      <TextField name="title" value={value} onChange={setValue} disabled={disabled} label="Recipe title" placeholder="Tomato soup" />
+    </FormErrorsContext>
   )
 }
 
-const meta = { component: TextField, title: 'Forms/TextField' } satisfies Meta<typeof TextField>
+const meta = { component: TextFieldExample, title: 'Forms/TextField' } satisfies Meta<typeof TextFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {
