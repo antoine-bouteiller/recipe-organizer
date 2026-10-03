@@ -1,27 +1,21 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useState } from 'react'
+import { useForm } from '@void/react'
+import { useState, useEffect, startTransition } from 'react'
 
 import { Button } from '@/components/ui/actions/button/button'
 import { PencilSimpleIcon } from '@/components/ui/data-display/icons'
-import { getFormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
-import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/client/components/ingredient-form'
-import { ingredientSchema, updateIngredientSchema } from '@/features/ingredients/schemas'
-import type { UpdateIngredientFormInput } from '@/features/ingredients/schemas'
-import { useAppForm } from '@/hooks/use-app-form'
-import { usePageAction } from '@/lib/client/page-action'
+import { FormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
+import { IngredientForm } from '@/features/ingredients/client/components/ingredient-form'
+import { useFormActionError } from '@/lib/client/page-action'
 import type { Ingredient } from '@/types/ingredient'
 
 interface EditIngredientProps {
   ingredient: Ingredient
 }
 
-const FormDialog = getFormDialog(getIngredientDefaultValues())
-
 export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
-  const runPageAction = usePageAction()
   const [open, setOpen] = useState(false)
 
-  const initialValues: UpdateIngredientFormInput = {
+  const initialValues = {
     category: ingredient.category,
     countWeightG: ingredient.countWeightG,
     densityGPerMl: ingredient.densityGPerMl,
@@ -31,29 +25,22 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
     preferredUnitSlug: ingredient.preferredUnitSlug,
   }
 
-  const form = useAppForm({
-    defaultValues: initialValues,
-    onSubmit: async (data) => {
-      if (
-        await runPageAction(
-          '/settings/ingredients?update',
-          { data: updateIngredientSchema.parse(data.value) },
-          `Erreur lors de la mise à jour de l'ingrédient ${data.value.name}`
-        )
-      ) {
-        form.reset()
-        setOpen(false)
-      }
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: ingredientSchema,
-    },
-  })
+  const form = useForm('/settings/ingredients?update', initialValues)
+  useFormActionError(form.error, `Erreur lors de la mise à jour de l'ingrédient ${form.data.name}`)
+  useEffect(() => {
+    if (form.wasSuccessful) {
+      queueMicrotask(() => setOpen(false))
+    }
+  }, [form.wasSuccessful])
 
   return (
     <FormDialog
-      form={form}
+      errors={form.errors}
+      pending={form.pending}
+      onSubmit={(event) => {
+        event.preventDefault()
+        startTransition(() => form.post(new FormData()))
+      }}
       open={open}
       setOpen={setOpen}
       submitLabel="Mettre à jour"
@@ -64,7 +51,7 @@ export const EditIngredient = ({ ingredient }: EditIngredientProps) => {
         </Button>
       )}
     >
-      <IngredientForm form={form} />
+      <IngredientForm data={form.data} setData={form.setData} pending={form.pending} />
     </FormDialog>
   )
 }

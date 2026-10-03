@@ -1,4 +1,6 @@
 import { useRouter } from '@void/react'
+import { useEffect, useEffectEvent } from 'react'
+import type { VoidActionError } from 'void/pages-client'
 import { submitAction } from 'void/pages-client'
 import type { ActionUrl, ResolveActionBody, ResolveActionParams } from 'void/routes'
 import * as z from 'zod'
@@ -39,4 +41,14 @@ export const usePageAction = () => {
     }
     return result.ok
   }
+}
+
+/** Alert expected non-validation failures; Void projects validation errors into fields. */
+export const useFormActionError = (error: VoidActionError | null, message: string) => {
+  const showError = useEffectEvent((failure: VoidActionError) => alertError(message, new Error(describe(failure.body))))
+  useEffect(() => {
+    if (error) {
+      showError(error)
+    }
+  }, [error])
 }

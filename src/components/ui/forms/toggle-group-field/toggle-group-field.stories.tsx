@@ -1,8 +1,10 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 
-import { useAppForm } from '@/hooks/use-app-form'
+import { FormErrorsContext } from '../form/form'
+import { ToggleGroupField } from './toggle-group-field'
 
 import * as styles from './toggle-group-field.stories.css'
 
@@ -15,14 +17,11 @@ const items = [
 ]
 
 const ToggleGroupFieldExample = ({ disabled = false, initialValue = emptyMeals }: { disabled?: boolean; initialValue?: string[] }): ReactElement => {
-  const form = useAppForm({ defaultValues: { meals: initialValue }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<string[]>(initialValue)
   return (
-    <form.AppForm>
-      <form.AppField name="meals">
-        {({ ToggleGroupField: AppToggleGroupField }) => <AppToggleGroupField disabled={disabled} items={items} label="Meals" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={{}}>
+      <ToggleGroupField name="meals" value={value} onChange={setValue} disabled={disabled} items={items} label="Meals" />
+    </FormErrorsContext>
   )
 }
 

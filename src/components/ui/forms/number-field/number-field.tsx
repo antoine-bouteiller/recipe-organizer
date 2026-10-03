@@ -2,14 +2,16 @@ import { useId, useState } from 'react'
 
 import { Button } from '@/components/ui/actions/button/button'
 import { MinusIcon, PlusIcon } from '@/components/ui/data-display/icons'
-import { useFieldContext } from '@/hooks/use-form-context'
 
-import { Field, FieldError } from '../field/field'
+import { Field, FieldError, useFieldInvalid } from '../field/field'
 import { Label } from '../label/label'
 
 import * as styles from './number-field.css'
 
 export interface NumberFieldProps {
+  name: string
+  value: number | undefined
+  onChange: (value: number | undefined) => void
   disabled?: boolean
   label?: string
   max?: number
@@ -22,19 +24,18 @@ const parse = (text: string): number | undefined => {
   return text.trim() === '' || Number.isNaN(value) ? undefined : value
 }
 
-export const NumberField = ({ disabled, label, max = Infinity, min = -Infinity, placeholder }: NumberFieldProps) => {
-  const field = useFieldContext<number | undefined>()
+export const NumberField = ({ name, value, onChange, disabled, label, max = Infinity, min = -Infinity, placeholder }: NumberFieldProps) => {
+  const invalid = useFieldInvalid(name)
   const id = useId()
   const [text, setText] = useState('')
-  const { value } = field.state
   const clamp = (next: number) => Math.min(max, Math.max(min, next))
   const commit = (next: number) => {
     setText(String(next))
-    field.handleChange(next)
+    onChange(next)
   }
 
   return (
-    <Field invalid={!field.state.meta.isValid} name={field.name}>
+    <Field name={name}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <div className={styles.group} data-disabled={disabled || undefined} data-slot="number-field-group">
         <Button
@@ -48,7 +49,7 @@ export const NumberField = ({ disabled, label, max = Infinity, min = -Infinity, 
           <MinusIcon />
         </Button>
         <input
-          aria-invalid={!field.state.meta.isValid || undefined}
+          aria-invalid={invalid || undefined}
           autoComplete="off"
           className={styles.input}
           data-slot="number-field-input"
@@ -56,7 +57,6 @@ export const NumberField = ({ disabled, label, max = Infinity, min = -Infinity, 
           id={id}
           inputMode="decimal"
           onBlur={() => {
-            field.handleBlur()
             if (value !== undefined) {
               commit(clamp(value))
             }
@@ -66,7 +66,7 @@ export const NumberField = ({ disabled, label, max = Infinity, min = -Infinity, 
               return
             }
             setText(event.target.value)
-            field.handleChange(parse(event.target.value))
+            onChange(parse(event.target.value))
           }}
           placeholder={placeholder}
           value={parse(text) === value ? text : String(value ?? '')}

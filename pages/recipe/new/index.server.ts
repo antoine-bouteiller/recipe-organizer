@@ -4,7 +4,7 @@ import type { InferProps } from 'void'
 import { listIngredients } from '@/features/ingredients/server/queries'
 import { recipeSchema } from '@/features/recipe/schemas'
 import { listRecipes } from '@/features/recipe/server/queries'
-import { readRecipeFormData } from '@/features/recipe/server/recipe-form-data'
+import { readRecipeFormData, validateRecipeForm } from '@/features/recipe/server/recipe-form-data'
 import { createRecipe } from '@/features/recipe/server/recipe-mutations'
 import { guardPage } from '@/lib/server/auth/page-guard'
 import { getDb } from '@/lib/server/db'
@@ -21,12 +21,17 @@ export const loader = defineHandler(async (context) => {
   return { ingredients, recipes }
 })
 
-export const action = defineHandler(async (context) => {
-  const user = await guardPage(context)
-  if (user instanceof Response) {
-    return user
-  }
-  const data = recipeSchema.parse(await readRecipeFormData(context))
-  await createRecipe(getDb(), user, data)
-  return undefined
-})
+// Expose the draft body to Void codegen without its JSON-only withValidator parser.
+// Runtime validation remains strict after the transport-aware reader.
+export const action = Object.assign(
+  defineHandler(async (context) => {
+    const user = await guardPage(context)
+    if (user instanceof Response) {
+      return user
+    }
+    const data = validateRecipeForm(recipeSchema, await readRecipeFormData(context))
+    await createRecipe(getDb(), user, data)
+    return undefined
+  }),
+  { __validators: { body: recipeSchema.partial() } }
+)

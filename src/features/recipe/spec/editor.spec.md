@@ -30,19 +30,19 @@ model, the bold-only text format, the form field that edits steps, and the read-
 - `[PI-4]` **Data, not markup** — every step field is structured data; bold is the only inline
   formatting; labels, icons, and numbering are renderer choices.
 
-| Decision                           | Choice                                                                                                                          | Rationale                                                                                                     |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Domain-node registration  | _Superseded by [KD-5]._                                                                                                         | —                                                                                                             |
-| `[KD-2]` Node representation       | _Superseded by [KD-5]._                                                                                                         | —                                                                                                             |
-| `[KD-3]` Sub-recipe selection      | A sub-recipe group offers only recipe ids selected in the form's linked-recipe rows; CRUD re-checks it (`crud.spec.md` [KD-5]). | Embedded references stay aligned with the declared recipe relationship, now enforced at the trust boundary.   |
-| `[KD-4]` Magimix flag signal       | _Superseded by `crud.spec.md` [KD-3]:_ the flag derives from linked Magimix programs; no serialized marker exists.              | —                                                                                                             |
-| `[KD-5]` Polymorphic step model    | _Superseded by [KD-11]._                                                                                                        | —                                                                                                             |
-| `[KD-6]` Bold-only markdown text   | A text step stores a plain string where `**…**` marks bold; nothing else is interpreted.                                        | Readable storage for the one formatting need; a tiny pure parser replaces a document model.                   |
-| `[KD-7]` Textarea editing          | A text step is a textarea with a bold toggle (and `⌘B`/`Ctrl+B`) that wraps or unwraps the selection in `**`.                   | Raw markdown stays visible and predictable; recipe editing drops Lexical.                                     |
-| `[KD-8]` Sub-recipe step range     | _Superseded by [KD-10]._                                                                                                        | —                                                                                                             |
-| `[KD-9]` Step list as a form field | Step groups and their steps are nested `useAppForm` array fields keyed by `_key`; the cook adds, edits, reorders, or removes.   | Follows the ingredient-group field-array pattern of `docs/infrastructure/client/forms.spec.md`.               |
-| `[KD-10]` Step groups              | Preparation is an ordered `RecipeStepGroup[]`: own groups (`steps`, optional name) or sub-recipe groups (`recipeId`).           | Groups mirror ingredient groups: an unnamed default first, and a linked recipe contributes its default group. |
-| `[KD-11]` Text step with Magimix   | Every step is text; it optionally links one Magimix program, shown inside the same step.                                        | A program always accompanies the instruction that launches it; one step shape removes the kind switch.        |
+| Decision                           | Choice                                                                                                                                           | Rationale                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Domain-node registration  | _Superseded by [KD-5]._                                                                                                                          | —                                                                                                             |
+| `[KD-2]` Node representation       | _Superseded by [KD-5]._                                                                                                                          | —                                                                                                             |
+| `[KD-3]` Sub-recipe selection      | A sub-recipe group offers only recipe ids selected in the form's linked-recipe rows; CRUD re-checks it (`crud.spec.md` [KD-5]).                  | Embedded references stay aligned with the declared recipe relationship, now enforced at the trust boundary.   |
+| `[KD-4]` Magimix flag signal       | _Superseded by `crud.spec.md` [KD-3]:_ the flag derives from linked Magimix programs; no serialized marker exists.                               | —                                                                                                             |
+| `[KD-5]` Polymorphic step model    | _Superseded by [KD-11]._                                                                                                                         | —                                                                                                             |
+| `[KD-6]` Bold-only markdown text   | A text step stores a plain string where `**…**` marks bold; nothing else is interpreted.                                                         | Readable storage for the one formatting need; a tiny pure parser replaces a document model.                   |
+| `[KD-7]` Textarea editing          | A text step is a textarea with a bold toggle (and `⌘B`/`Ctrl+B`) that wraps or unwraps the selection in `**`.                                    | Raw markdown stays visible and predictable; recipe editing drops Lexical.                                     |
+| `[KD-8]` Sub-recipe step range     | _Superseded by [KD-10]._                                                                                                                         | —                                                                                                             |
+| `[KD-9]` Step list as a form field | Step groups and their steps are immutable controlled arrays owned by Void `useForm` keyed by `_key`; the cook adds, edits, reorders, or removes. | Follows the ingredient-group field-array pattern of `docs/infrastructure/client/forms.spec.md`.               |
+| `[KD-10]` Step groups              | Preparation is an ordered `RecipeStepGroup[]`: own groups (`steps`, optional name) or sub-recipe groups (`recipeId`).                            | Groups mirror ingredient groups: an unnamed default first, and a linked recipe contributes its default group. |
+| `[KD-11]` Text step with Magimix   | Every step is text; it optionally links one Magimix program, shown inside the same step.                                                         | A program always accompanies the instruction that launches it; one step shape removes the kind switch.        |
 
 The Magimix constants move from `src/features/recipe/types/magimix.ts` to
 `src/features/recipe/` because the server now validates them. The recipe Lexical extensions
@@ -120,7 +120,7 @@ parseBoldText(text: string): TextSegment[]
 ### `[CT-3]` Steps field
 
 ```text
-StepsField (withForm, array field `stepGroups`)
+StepsField (controlled Void form arrays `stepGroups`)
 ├── default group (index 0): its steps only
 ├── later groups: name field or linked-recipe picker · move up · move down · remove
 │   └── own group steps (array field `stepGroups[i].steps`)
@@ -131,8 +131,9 @@ StepsField (withForm, array field `stepGroups`)
 └── add: « Groupe » · « Sous-recette »
 ```
 
-- **Magimix dialog** keeps the previous validation — supported program and speed, temperature
-  0–200, minutes and seconds each 0–60 — and converts the time fields to total seconds.
+- **Magimix dialog** uses local React state with supported program/speed choices and bounded numeric
+  controls (temperature 0–200, minutes 0–60, seconds 0–59), then converts time to total seconds.
+  The recipe action validates the combined values on submission.
 - **Sub-recipe picker** reads eligible ids and names from `LinkedRecipesProvider`, derived from the
   form's positive linked-recipe ids; placeholder rows are not eligible. Removing a linked recipe that
   a group still references leaves the group invalid: the form shows the field error and CRUD rejects
@@ -146,11 +147,12 @@ StepsField (withForm, array field `stepGroups`)
 - Pages compose `IngredientCatalogProvider` and `RecipeCatalogProvider` around the form; features
   do not import each other. Inline ingredient creation refreshes loader props without discarding
   the current form values.
-- TanStack Form keeps the shared `recipeSchema` / `updateRecipeSchema` validation and existing
-  controls. Submissions call the page action through `usePageAction` (`src/lib/client/page-action.ts`),
-  which keeps the history entry, with French error feedback on expected failure.
-- Successful creation and Cancel visit `/`. Successful editing and edit Cancel go back once.
-  Browse targets use document navigation.
+- Void `useForm` owns page action state and controlled drafts. The server validates the shared
+  `recipeSchema` / `updateRecipeSchema` after JSON or bracket-key multipart parsing; dotted field
+  errors preserve drafts, and expected action failures retain French alert feedback.
+- Successful creation replaces navigation to `/`; successful editing replaces navigation to
+  `/recipe/<id>` because useForm can add history entries. Create Cancel visits `/`; edit Cancel goes
+  Back. Inline ingredient creation still refreshes catalogues in place.
 
 ### `[CT-4]` Step renderer
 

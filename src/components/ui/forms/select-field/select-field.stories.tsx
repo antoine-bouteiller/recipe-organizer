@@ -1,8 +1,10 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 
-import { useAppForm } from '@/hooks/use-app-form'
+import { FormErrorsContext } from '../form/form'
+import { SelectField } from './select-field'
 
 import * as styles from './select-field.stories.css'
 
@@ -13,14 +15,11 @@ const items = [
 ]
 
 const SelectFieldExample = ({ disabled = false, initialValue }: { disabled?: boolean; initialValue?: string }): ReactElement => {
-  const form = useAppForm({ defaultValues: { status: initialValue }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<string | null | undefined>(initialValue)
   return (
-    <form.AppForm>
-      <form.AppField name="status">
-        {({ SelectField: AppSelectField }) => <AppSelectField disabled={disabled} items={items} label="Status" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={{}}>
+      <SelectField name="status" value={value} onChange={setValue} disabled={disabled} items={items} label="Status" />
+    </FormErrorsContext>
   )
 }
 

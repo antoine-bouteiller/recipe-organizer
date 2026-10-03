@@ -6,7 +6,7 @@ import { withAuthGuard } from '@/lib/server/auth/auth-guard'
 import { getDb } from '@/lib/server/db'
 
 export const POST = withAuthGuard(
-  defineHandler.withValidator({ body: ingredientSchema })(async (_context, { body }) => {
+  defineHandler.withValidator({ body: ingredientSchema.partial().pipe(ingredientSchema) })(async (_context, { body }) => {
     await getDb().insert(ingredient).values(body)
   })
 )

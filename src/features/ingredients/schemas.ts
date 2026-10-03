@@ -17,5 +17,3 @@ export const deleteIngredientSchema = z.object({ id: z.number() })
 
 type IngredientFormValues = z.infer<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>
-type UpdateIngredientFormValues = z.infer<typeof updateIngredientSchema>
-export type UpdateIngredientFormInput = Partial<UpdateIngredientFormValues>

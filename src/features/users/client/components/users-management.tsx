@@ -1,26 +1,25 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useSelector } from '@tanstack/react-store'
-import React, { useState } from 'react'
+import { useForm } from '@void/react'
+import React, { useState, useEffect, startTransition } from 'react'
 
 import { Button } from '@/components/ui/actions/button/button'
 import { Badge } from '@/components/ui/data-display/badge/badge'
 import { PlusIcon } from '@/components/ui/data-display/icons'
 import { Item, ItemGroup, ItemSeparator } from '@/components/ui/data-display/item/item'
 import { SearchInput } from '@/components/ui/forms/search-input/search-input'
+import { SelectField } from '@/components/ui/forms/select-field/select-field'
+import { TextField } from '@/components/ui/forms/text-field/text-field'
 import { Tabs } from '@/components/ui/navigation/tabs/tabs'
-import { getFormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
+import { FormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
 import { ApproveUser } from '@/features/users/client/components/approve-user'
 import { BlockUser } from '@/features/users/client/components/block-user'
-import { userSchema } from '@/features/users/schemas'
 import type { UserFormInput } from '@/features/users/schemas'
-import { useAppForm } from '@/hooks/use-app-form'
-import { usePageAction } from '@/lib/client/page-action'
+import { useFormActionError } from '@/lib/client/page-action'
 import type { User } from '@/types/user'
 
 import * as styles from './users-management.css'
 
 const USER_TABS = ['active', 'pending', 'blocked'] as const
-const userDefaultValues: UserFormInput = {
+const userDefaultValues: Required<UserFormInput> = {
   email: '',
   role: 'user',
 }
@@ -28,7 +27,6 @@ const roleOptions = [
   { label: 'Utilisateur', value: 'user' },
   { label: 'Administrateur', value: 'admin' },
 ]
-const FormDialog = getFormDialog(userDefaultValues)
 const roleLabels = new Map([
   ['admin', 'Admin'],
   ['user', 'Utilisateur'],
@@ -74,33 +72,32 @@ const UserList = ({ emptyLabel, search, status, users }: { emptyLabel: string; s
 }
 
 export const UsersManagement = ({ users }: { users: Record<UserStatus, readonly User[]> }) => {
-  const runPageAction = usePageAction()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const form = useAppForm({
-    defaultValues: userDefaultValues,
-    onSubmit: async ({ value }) => {
-      if (
-        await runPageAction('/settings/users?create', { data: userSchema.parse(value) }, `Erreur lors de la création de l'utilisateur ${value.email}`)
-      ) {
-        form.reset()
+  const form = useForm('/settings/users?create', userDefaultValues)
+  useFormActionError(form.error, `Erreur lors de la création de l'utilisateur ${form.data.email}`)
+  const { wasSuccessful, setData } = form
+  useEffect(() => {
+    if (wasSuccessful) {
+      queueMicrotask(() => {
+        setData('email', '')
+        setData('role', 'user')
         setOpen(false)
-      }
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: userSchema,
-    },
-  })
-  const isSubmitting = useSelector(form.store, (state) => state.isSubmitting)
-  const { AppField } = form
+      })
+    }
+  }, [wasSuccessful, setData])
 
   return (
     <>
       <div className={styles.searchBar}>
         <SearchInput placeholder="Rechercher une recette, un ingrédient…" search={search} setSearch={setSearch} />
         <FormDialog
-          form={form}
+          errors={form.errors}
+          pending={form.pending}
+          onSubmit={(event) => {
+            event.preventDefault()
+            startTransition(() => form.post(new FormData()))
+          }}
           open={open}
           setOpen={setOpen}
           submitLabel="Ajouter"
@@ -111,10 +108,26 @@ export const UsersManagement = ({ users }: { users: Record<UserStatus, readonly 
             </Button>
           )}
         >
-          <AppField name="email">
-            {({ TextField }) => <TextField disabled={isSubmitting} label="Email" placeholder="Ex: user@example.com" />}
-          </AppField>
-          <AppField name="role">{({ SelectField }) => <SelectField disabled={isSubmitting} items={roleOptions} label="Rôle" />}</AppField>
+          <TextField
+            name="email"
+            value={form.data.email}
+            onChange={(value) => form.setData('email', value)}
+            disabled={form.pending}
+            label="Email"
+            placeholder="Ex: user@example.com"
+          />
+          <SelectField
+            name="role"
+            value={form.data.role}
+            onChange={(value) => {
+              if (value === 'admin' || value === 'user') {
+                form.setData('role', value)
+              }
+            }}
+            disabled={form.pending}
+            items={roleOptions}
+            label="Rôle"
+          />
         </FormDialog>
       </div>
       <div className={styles.tabs}>

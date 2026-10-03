@@ -1,27 +1,24 @@
 import { StorySection } from '@storybook-helpers/story-section'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ReactElement } from 'react'
+import { useState } from 'react'
 import { expect, userEvent, within } from 'storybook/test'
 
-import { useAppForm } from '@/hooks/use-app-form'
-
+import { FormErrorsContext } from '../form/form'
 import { TextareaField } from './textarea-field'
 
 import * as styles from './textarea-field.stories.css'
 
 const TextareaFieldExample = ({ disabled = false, initialValue = '' }: { disabled?: boolean; initialValue?: string }): ReactElement => {
-  const form = useAppForm({ defaultValues: { step: initialValue }, onSubmit: async () => undefined })
-
+  const [value, setValue] = useState<string>(initialValue)
   return (
-    <form.AppForm>
-      <form.AppField name="step">
-        {({ TextareaField: AppTextareaField }) => <AppTextareaField disabled={disabled} label="Étape" placeholder="Décrivez l'étape" />}
-      </form.AppField>
-    </form.AppForm>
+    <FormErrorsContext value={{}}>
+      <TextareaField name="step" value={value} onChange={setValue} disabled={disabled} label="Étape" placeholder="Décrivez l’étape" />
+    </FormErrorsContext>
   )
 }
 
-const meta = { component: TextareaField, title: 'Forms/TextareaField' } satisfies Meta<typeof TextareaField>
+const meta = { component: TextareaFieldExample, title: 'Forms/TextareaField' } satisfies Meta<typeof TextareaFieldExample>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Overview: Story = {

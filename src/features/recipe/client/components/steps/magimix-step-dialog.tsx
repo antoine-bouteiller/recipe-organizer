@@ -1,13 +1,11 @@
-import { revalidateLogic } from '@tanstack/react-form'
-import { useSelector } from '@tanstack/react-store'
 import { useState } from 'react'
-import * as z from 'zod'
 
+import { NumberField } from '@/components/ui/forms/number-field/number-field'
+import { SelectField } from '@/components/ui/forms/select-field/select-field'
 import type { DialogProps } from '@/components/ui/overlays/dialog/dialog'
-import { getFormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
+import { FormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
 import { allowedRotationSpeed, magimixProgram, magimixProgramLabels } from '@/features/recipe/magimix'
 import type { MagimixProgramData } from '@/features/recipe/magimix'
-import { useAppForm } from '@/hooks/use-app-form'
 import { capitalize } from '@/utils/string'
 
 interface MagimixStepDialogProps {
@@ -15,18 +13,16 @@ interface MagimixStepDialogProps {
   onSubmit: (data: MagimixProgramData) => void
   submitLabel: string
   title: string
-  triggerRender?: DialogProps['renderTrigger']
+  renderTrigger?: DialogProps['renderTrigger']
 }
 
-const magimixProgramSchema = z.object({
-  program: z.enum([...magimixProgram]),
-  rotationSpeed: z.enum([...allowedRotationSpeed]),
-  temperature: z.number().min(0).max(200).optional(),
-  timeMinutes: z.number().min(0).max(60),
-  timeSeconds: z.number().min(0).max(60),
-})
-
-type MagimixProgramFormInput = z.infer<typeof magimixProgramSchema>
+interface MagimixProgramFormInput {
+  program: MagimixProgramData['program']
+  rotationSpeed: MagimixProgramData['rotationSpeed']
+  temperature?: number
+  timeMinutes: number | undefined
+  timeSeconds: number | undefined
+}
 
 const magimixProgramDefaultValues: MagimixProgramFormInput = {
   program: 'expert',
@@ -36,74 +32,72 @@ const magimixProgramDefaultValues: MagimixProgramFormInput = {
   timeSeconds: 0,
 }
 
-const programItems = Object.entries(magimixProgramLabels).map(([value, label]) => ({
-  label,
-  value,
-}))
+const programItems = Object.entries(magimixProgramLabels).map(([value, label]) => ({ label, value }))
 
-const FormDialog = getFormDialog(magimixProgramDefaultValues)
-
-export const MagimixStepDialog = ({ initialData, onSubmit, submitLabel, title, triggerRender }: MagimixStepDialogProps) => {
+export const MagimixStepDialog = ({ initialData, onSubmit, submitLabel, title, renderTrigger }: MagimixStepDialogProps) => {
   const [open, setOpen] = useState(false)
-
-  const form = useAppForm({
-    defaultValues: initialData
-      ? {
-          program: initialData.program,
-          rotationSpeed: initialData.rotationSpeed,
-          temperature: initialData.temperature,
-          timeMinutes: Math.floor(initialData.time / 60),
-          timeSeconds: initialData.time % 60,
-        }
-      : magimixProgramDefaultValues,
-    onSubmit: async ({ value }) => {
-      const validated = magimixProgramSchema.parse(value)
-
-      const time = validated.timeMinutes * 60 + validated.timeSeconds
-
-      onSubmit({
-        program: validated.program,
-        rotationSpeed: validated.rotationSpeed,
-        temperature: validated.temperature,
-        time,
-      })
-      form.reset()
-      setOpen(false)
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: magimixProgramSchema,
-    },
-  })
-
-  const { isSubmitting } = useSelector(form.store, (state) => ({
-    isSubmitting: state.isSubmitting,
-  }))
-
+  const defaults = initialData
+    ? { ...initialData, timeMinutes: Math.floor(initialData.time / 60), timeSeconds: initialData.time % 60 }
+    : magimixProgramDefaultValues
+  const [data, setData] = useState<MagimixProgramFormInput>(defaults)
+  const update = <TKey extends keyof MagimixProgramFormInput>(key: TKey, value: MagimixProgramFormInput[TKey]) =>
+    setData((previous) => ({ ...previous, [key]: value }))
   return (
-    <FormDialog form={form} renderTrigger={triggerRender} open={open} setOpen={setOpen} submitLabel={submitLabel} title={title}>
-      <form.AppField name="program">
-        {({ SelectField }) => <SelectField disabled={isSubmitting} items={programItems} label="Programme" />}
-      </form.AppField>
-      <form.AppField name="timeMinutes">{({ NumberField }) => <NumberField disabled={isSubmitting} label="Minutes*" min={0} />}</form.AppField>
-      <form.AppField name="timeSeconds">
-        {({ NumberField }) => <NumberField disabled={isSubmitting} label="Secondes*" max={59} min={0} />}
-      </form.AppField>
-      <form.AppField name="rotationSpeed">
-        {({ SelectField }) => (
-          <SelectField
-            disabled={isSubmitting}
-            items={allowedRotationSpeed.map((speed) => ({
-              label: capitalize(speed),
-              value: speed,
-            }))}
-            label="Vitesse de rotation*"
-          />
-        )}
-      </form.AppField>
-      <form.AppField name="temperature">
-        {({ NumberField }) => <NumberField disabled={isSubmitting} label="Température (°C) - Optionnel" max={200} min={0} placeholder="Ex: 100" />}
-      </form.AppField>
+    <FormDialog
+      renderTrigger={renderTrigger}
+      open={open}
+      setOpen={(next) => {
+        if (next) {
+          setData(defaults)
+        }
+        setOpen(next)
+      }}
+      pending={false}
+      submitLabel={submitLabel}
+      title={title}
+      onSubmit={(event) => {
+        event.preventDefault()
+        onSubmit({
+          program: data.program,
+          rotationSpeed: data.rotationSpeed,
+          temperature: data.temperature,
+          time: (data.timeMinutes ?? 0) * 60 + (data.timeSeconds ?? 0),
+        })
+        setOpen(false)
+      }}
+    >
+      <SelectField
+        name="program"
+        value={data.program}
+        onChange={(value) => update('program', magimixProgram.find((program) => program === value) ?? 'expert')}
+        items={programItems}
+        label="Programme"
+      />
+      <NumberField name="timeMinutes" value={data.timeMinutes} onChange={(value) => update('timeMinutes', value)} label="Minutes*" min={0} max={60} />
+      <NumberField
+        name="timeSeconds"
+        value={data.timeSeconds}
+        onChange={(value) => update('timeSeconds', value)}
+        label="Secondes*"
+        max={59}
+        min={0}
+      />
+      <SelectField
+        name="rotationSpeed"
+        value={data.rotationSpeed}
+        onChange={(value) => update('rotationSpeed', allowedRotationSpeed.find((speed) => speed === value) ?? 'auto')}
+        items={allowedRotationSpeed.map((speed) => ({ label: capitalize(speed), value: speed }))}
+        label="Vitesse de rotation*"
+      />
+      <NumberField
+        name="temperature"
+        value={data.temperature}
+        onChange={(value) => update('temperature', value)}
+        label="Température (°C) - Optionnel"
+        max={200}
+        min={0}
+        placeholder="Ex: 100"
+      />
     </FormDialog>
   )
 }

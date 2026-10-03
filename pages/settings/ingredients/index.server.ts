@@ -27,7 +27,7 @@ export const actions = {
     'admin'
   ),
   update: withAuthGuard(
-    defineHandler.withValidator({ body: updateIngredientSchema })(async (_context, { body }) => {
+    defineHandler.withValidator({ body: updateIngredientSchema.partial().pipe(updateIngredientSchema) })(async (_context, { body }) => {
       const { id, ...newIngredient } = body
       await getDb().update(ingredient).set(newIngredient).where(eq(ingredient.id, id))
     })

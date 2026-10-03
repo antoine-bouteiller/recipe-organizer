@@ -77,7 +77,7 @@ page guard ──> loader: active / pending / blocked ──> status tabs + sear
 | User schema        | Drizzle schema                | Store identity, role, and admission status         | `user` table                              |
 | Directory boundary | Server query and page actions | List and transition user records                   | `listUsers`, create/approve/block actions |
 | Guard              | Server handler wrapper        | Require an active administrator                    | `withAuthGuard(handler, 'admin')`         |
-| User form          | Feature form component        | Capture email and role for administrative creation | `UsersManagement` with `useAppForm`       |
+| User form          | Feature form component        | Capture email and role for administrative creation | `UsersManagement` with Void `useForm`     |
 | Lifecycle controls | Feature components            | Confirm blocking and initiate approval             | `ApproveUser`, `BlockUser`                |
 | Directory route    | File route                    | Preload, filter, and partition lists by status     | `/settings/users`                         |
 
@@ -128,8 +128,9 @@ status from a search with no match.
 
 ### 8.4 Administrative controls
 
-`UsersManagement` uses TanStack Form through `useAppForm`, validating the shared user schema dynamically
-and before calling the create action. A successful creation resets the form and closes its dialog;
+`UsersManagement` uses Void `useForm` with server-only validation through the create action. A successful
+creation explicitly clears email/restores the default role and closes its dialog (Void resets defaults
+to submitted data, so `reset()` alone would retain the created user);
 expected failure leaves values editable. The form retains its French user and administrator role labels.
 `ApproveUser` tracks pending explicitly while awaiting its page action; confirmation dialogs use the
 same explicit pending lifecycle. Actions are not awaited inside React transitions because Void resolves
@@ -148,7 +149,7 @@ Loader refresh occurs after the guarded write resolves, so every status tab refl
   `[VC-2]` Create a throwaway email, block it, then approve it from the blocked panel: it moves to the
   expected status panel after each action without a full reload.
 - `[SO-3]` Existing French search, validation and dialog behavior remains available.
-  `[VC-3]` Invalid email prevents submission; successful creation closes/resets the form; email/role
+  `[VC-3]` Server validation rejects invalid email and preserves the draft; successful creation closes/resets the form; email/role
   search filters every tab and confirmation identifies the user being blocked.
 
 ## 9. Open Questions

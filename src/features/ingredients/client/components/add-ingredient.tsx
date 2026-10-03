@@ -1,4 +1,3 @@
-import { revalidateLogic } from '@tanstack/react-form'
 import { useRouter } from '@void/react'
 import { useState } from 'react'
 import { fetch } from 'void/client'
@@ -6,10 +5,9 @@ import { fetch } from 'void/client'
 import { Button } from '@/components/ui/actions/button/button'
 import { PlusIcon } from '@/components/ui/data-display/icons'
 import type { DialogProps } from '@/components/ui/overlays/dialog/dialog'
-import { getFormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
+import { FormDialog } from '@/components/ui/overlays/form-dialog/form-dialog'
 import { getIngredientDefaultValues, IngredientForm } from '@/features/ingredients/client/components/ingredient-form'
-import { ingredientSchema } from '@/features/ingredients/schemas'
-import { useAppForm } from '@/hooks/use-app-form'
+import type { IngredientFormInput } from '@/features/ingredients/schemas'
 import { alertError } from '@/lib/client/alert-error'
 import { readResponse } from '@/lib/client/api-client'
 
@@ -18,34 +16,41 @@ interface AddIngredientProps {
   renderTrigger: DialogProps['renderTrigger']
 }
 
-const FormDialog = getFormDialog(getIngredientDefaultValues())
-
 export const AddIngredient = ({ defaultValue, renderTrigger }: AddIngredientProps) => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
-  const form = useAppForm({
-    defaultValues: getIngredientDefaultValues(defaultValue),
-    onSubmit: async ({ value }) => {
-      try {
-        await readResponse(fetch('/api/ingredients', { body: ingredientSchema.parse(value), method: 'POST' }))
-      } catch (error) {
-        alertError(`Erreur lors de la création de l'ingrédient ${value.name}`, error)
-        return
-      }
+  const [ingredientData, setIngredientData] = useState(() => getIngredientDefaultValues(defaultValue))
+  const [pending, setPending] = useState(false)
+  const setData = <TKey extends keyof IngredientFormInput>(key: TKey, value: IngredientFormInput[TKey]) =>
+    setIngredientData((previous) => ({ ...previous, [key]: value }))
+  const submit = async () => {
+    setPending(true)
+    try {
+      await readResponse(fetch('/api/ingredients', { body: ingredientData, method: 'POST' }))
       await router.refresh()
-      form.reset()
+      setIngredientData(getIngredientDefaultValues(defaultValue))
       setOpen(false)
-    },
-    validationLogic: revalidateLogic(),
-    validators: {
-      onDynamic: ingredientSchema,
-    },
-  })
+    } catch (error) {
+      alertError(`Erreur lors de la création de l'ingrédient ${ingredientData.name ?? ''}`, error)
+    }
+    setPending(false)
+  }
 
   return (
-    <FormDialog form={form} open={open} setOpen={setOpen} submitLabel="Ajouter" title="Ajouter un ingrédient" renderTrigger={renderTrigger}>
-      <IngredientForm form={form} />
+    <FormDialog
+      pending={pending}
+      onSubmit={(event) => {
+        event.preventDefault()
+        void submit()
+      }}
+      open={open}
+      setOpen={setOpen}
+      submitLabel="Ajouter"
+      title="Ajouter un ingrédient"
+      renderTrigger={renderTrigger}
+    >
+      <IngredientForm data={ingredientData} setData={setData} pending={pending} />
     </FormDialog>
   )
 }
