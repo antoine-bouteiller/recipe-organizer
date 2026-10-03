@@ -1,5 +1,6 @@
-import { HTTPException } from 'hono/http-exception'
 import type { CloudContext } from 'void'
+
+import { HttpError } from '@/lib/server/http-error'
 
 import { getApiUser } from './api-user'
 import type { ApiUser } from './api-user'
@@ -15,16 +16,16 @@ const authorize = (context: CloudContext, role?: string) => {
   const user = getApiUser()
 
   if (!user) {
-    throw new HTTPException(401, { message: 'unauthorized' })
+    throw new HttpError(401, 'unauthorized')
   }
   if (user.status === 'blocked') {
-    throw new HTTPException(403, { message: 'account_blocked' })
+    throw new HttpError(403, 'account_blocked')
   }
   if (user.status === 'pending') {
-    throw new HTTPException(403, { message: 'account_pending' })
+    throw new HttpError(403, 'account_pending')
   }
   if (role === 'admin' && user.role !== 'admin') {
-    throw new HTTPException(403, { message: 'Permission denied' })
+    throw new HttpError(403, 'Permission denied')
   }
 
   context.set('apiUser', user)

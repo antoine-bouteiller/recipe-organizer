@@ -133,7 +133,7 @@ a fallback. This permits the image route to advertise WebP and the video route t
 stored MIME type without asking a client to infer the object representation.
 
 A missing object is not represented as an empty successful response. The helper throws a Hono
-`HTTPException(404)` before a response is built (`src/lib/server/r2.ts:51-55`), allowing the shared API
+`HttpError(404)` before a response is built (`src/lib/server/r2.ts:51-55`), allowing the shared API
 boundary to return its `not_found` error envelope without caching a missing object.
 
 ### 8.7 Cache lifetime boundary

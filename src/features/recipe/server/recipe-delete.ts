@@ -1,11 +1,11 @@
 import { eq, inArray } from 'drizzle-orm'
-import { HTTPException } from 'hono/http-exception'
 
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/db/schema'
 import { deleteRecipeSteps } from '@/features/recipe/server/recipe-steps'
 import { assertOwnerOrAdmin } from '@/lib/server/assert-owner-or-admin'
 import type { ApiUser } from '@/lib/server/auth/api-user'
 import type { getDb } from '@/lib/server/db'
+import { HttpError } from '@/lib/server/http-error'
 import { deleteFile } from '@/lib/server/r2'
 
 export const deleteRecipe = async (db: ReturnType<typeof getDb>, user: ApiUser, id: number) => {
@@ -15,7 +15,7 @@ export const deleteRecipe = async (db: ReturnType<typeof getDb>, user: ApiUser, 
     with: { ingredientGroups: { columns: { id: true } } },
   })
   if (!currentRecipe) {
-    throw new HTTPException(404, { message: 'Recipe not found' })
+    throw new HttpError(404, 'Recipe not found')
   }
   assertOwnerOrAdmin(user, currentRecipe)
   await db.batch([

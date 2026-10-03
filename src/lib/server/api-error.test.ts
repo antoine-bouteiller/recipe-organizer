@@ -1,21 +1,21 @@
-import { HTTPException } from 'hono/http-exception'
 import { describe, expect, it, vi } from 'vite-plus/test'
 import * as z from 'zod'
 
 import { toApiErrorResponse, toApiValidationResponse } from './api-error'
+import { HttpError } from './http-error'
 
 const readContract = async (response: Response | undefined) => ({ body: await response?.json(), status: response?.status })
 
 describe('toApiErrorResponse', () => {
   it('keeps an HTTP exception status and message', async () => {
-    expect(await readContract(toApiErrorResponse(new HTTPException(403, { message: 'account_blocked' })))).toEqual({
+    expect(await readContract(toApiErrorResponse(new HttpError(403, 'account_blocked')))).toEqual({
       body: { error: 'account_blocked' },
       status: 403,
     })
   })
 
   it('uses the generic message for an HTTP exception without one', async () => {
-    expect(await readContract(toApiErrorResponse(new HTTPException(404)))).toEqual({ body: { error: 'Une erreur est survenue' }, status: 404 })
+    expect(await readContract(toApiErrorResponse(new HttpError(404)))).toEqual({ body: { error: 'Une erreur est survenue' }, status: 404 })
   })
 
   it('reports a schema error as a bad request', async () => {

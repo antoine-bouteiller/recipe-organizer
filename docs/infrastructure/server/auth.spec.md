@@ -102,7 +102,7 @@ required → `/settings`. Protected loaders return that Response before reading 
 Recipe create/edit actions also call the gate.
 
 `withAuthGuard(handler, role?)` authorizes before handler validation and sets `apiUser`
-(`user` is reserved by Void). It throws `HTTPException` for missing identity
+(`user` is reserved by Void). It throws `HttpError` for missing identity
 (`401 unauthorized`), blocked/pending membership (`403 account_blocked` / `account_pending`),
 or failed admin requirement (`403 Permission denied`). Settings actions, recipe deletion,
 and inline ingredient API creation use this wrapper.

@@ -1,5 +1,4 @@
 import { eq, inArray } from 'drizzle-orm'
-import { HTTPException } from 'hono/http-exception'
 import type * as z from 'zod'
 
 import { groupIngredient, recipe, recipeIngredientGroup, recipeLinkedRecipes } from '@/db/schema'
@@ -9,6 +8,7 @@ import { resolveAutoFlags, writeRecipeIngredientGraph } from '@/features/recipe/
 import { assertOwnerOrAdmin } from '@/lib/server/assert-owner-or-admin'
 import type { ApiUser } from '@/lib/server/auth/api-user'
 import type { getDb } from '@/lib/server/db'
+import { HttpError } from '@/lib/server/http-error'
 import { deleteFile, uploadFile, uploadVideo } from '@/lib/server/r2'
 
 const resolveImageKey = async (
@@ -76,7 +76,7 @@ export const updateRecipe = async (db: ReturnType<typeof getDb>, user: ApiUser, 
   assertSubrecipeGroups(stepGroups, linkedRecipeIds, id)
   const currentRecipe = await db.query.recipe.findFirst({ where: { id }, with: { ingredientGroups: { columns: { id: true } } } })
   if (!currentRecipe) {
-    throw new HTTPException(404)
+    throw new HttpError(404)
   }
   assertOwnerOrAdmin(user, currentRecipe)
   const { key: imageKey, staleKey: imageStale } = await resolveImageKey(image, currentRecipe.image)

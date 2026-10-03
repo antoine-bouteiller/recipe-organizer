@@ -1,7 +1,7 @@
-import { HTTPException } from 'hono/http-exception'
-import type { CloudContext } from 'void'
 import { ValidationError } from 'void/pages-protocol'
 import type * as z from 'zod'
+
+import { HttpError } from '@/lib/server/http-error'
 
 const numericFields = new Set(['id', 'recipeId', 'quantity', 'ratio', 'servings', 'temperature', 'time'])
 const optionalFields = new Set(['image', 'video', 'groupName', 'unitSlug', 'magimix', 'temperature'])
@@ -35,7 +35,7 @@ const insertField = (root: MultipartObject, path: string[], value: MultipartValu
       child = /^\d+$/.test(path[index + 1] ?? '') ? [] : {}
     }
     if (!isContainer(child)) {
-      throw new HTTPException(400, { message: 'Invalid form field' })
+      throw new HttpError(400, 'Invalid form field')
     }
     if (Array.isArray(node)) {
       node[Number(part)] = child
@@ -72,7 +72,7 @@ const readMultipart = (formData: FormData): MultipartObject => {
   for (const [key, value] of formData) {
     const path = key.replaceAll(']', '').split('[')
     if (path.some((part) => ['__proto__', 'constructor', 'prototype'].includes(part) || (/^\d+$/.test(part) && Number(part) > 10_000))) {
-      throw new HTTPException(400, { message: 'Invalid form field' })
+      throw new HttpError(400, 'Invalid form field')
     }
     insertField(root, path, normalizeScalar(path, value))
   }
@@ -80,14 +80,18 @@ const readMultipart = (formData: FormData): MultipartObject => {
   return root
 }
 
-export const readRecipeFormData = async (context: CloudContext): Promise<unknown> => {
+interface FormRequestContext {
+  readonly req: { formData: () => Promise<FormData>; header: (name: string) => string | undefined; json: () => Promise<unknown> }
+}
+
+export const readRecipeFormData = async (context: FormRequestContext): Promise<unknown> => {
   if (context.req.header('Content-Type')?.includes('application/json')) {
     return context.req.json().catch(() => {
-      throw new HTTPException(400, { message: 'Invalid Schema; expected JSON form data' })
+      throw new HttpError(400, 'Invalid Schema; expected JSON form data')
     })
   }
   const formData = await context.req.formData().catch(() => {
-    throw new HTTPException(400, { message: 'Invalid Schema; expected multipart form data' })
+    throw new HttpError(400, 'Invalid Schema; expected multipart form data')
   })
   return readMultipart(formData)
 }

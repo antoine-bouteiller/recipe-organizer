@@ -1,11 +1,11 @@
 import { randomUUID } from 'node:crypto'
 
 import { env } from 'cloudflare:workers'
-import { HTTPException } from 'hono/http-exception'
 import { storage } from 'void/storage'
 import * as z from 'zod'
 
 import { cache } from './cache-manager'
+import { HttpError } from './http-error'
 
 const uploadFile = async (file: File) => {
   const key = randomUUID()
@@ -53,7 +53,7 @@ export const createR2GetHandler =
       const file = await storage.get(id)
 
       if (!file) {
-        throw new HTTPException(404, { message: 'not_found' })
+        throw new HttpError(404, 'not_found')
       }
 
       return new Response(file.body, {
@@ -75,7 +75,7 @@ export const createR2HeadHandler =
       const file = await storage.head(id)
 
       if (!file) {
-        throw new HTTPException(404, { message: 'not_found' })
+        throw new HttpError(404, 'not_found')
       }
 
       return new Response(null, {

@@ -1,5 +1,15 @@
-import { APIError } from 'better-auth/api'
 import { defineAuth } from 'void/auth'
+
+// Better Auth recognizes its API errors by name, so the OAuth callback redirects with this `code`.
+class APIError extends Error {
+  override readonly name = 'APIError'
+  readonly body: { code: string; message: string }
+
+  constructor(code: string, message: string) {
+    super(message)
+    this.body = { code, message }
+  }
+}
 
 const timestamps = { createdAt: 'created_at', updatedAt: 'updated_at' }
 
@@ -27,10 +37,10 @@ export default defineAuth(({ defaults, env }) => ({
           const existing = await context?.context.internalAdapter.findUserById(newSession.userId)
           const status = existing && 'status' in existing ? existing.status : undefined
           if (status === 'blocked') {
-            throw new APIError('FORBIDDEN', { code: 'account_blocked', message: 'Account blocked' })
+            throw new APIError('account_blocked', 'Account blocked')
           }
           if (status === 'pending') {
-            throw new APIError('FORBIDDEN', { code: 'account_pending', message: 'Account pending approval' })
+            throw new APIError('account_pending', 'Account pending approval')
           }
         },
       },
