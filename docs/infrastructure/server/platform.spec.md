@@ -63,9 +63,10 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Worker configuration
 
-Void 0.22 owns the project rooted at the repository root. `void.config.ts` declares the existing
-`recipe-organizer` Worker, compatibility date and `nodejs_compat`, D1 `DB`, R2 `R2_BUCKET`,
-Images `IMAGES`, binding inference, and disabled ISR. Observability records invocation logs;
+Void owns the project rooted at the repository root. `void.config.ts` declares the compatibility
+date and `nodejs_compat`, Images `IMAGES`, D1/R2 binding inference (`R2_BUCKET`), routes, and
+disabled ISR. `void.lock.json` records the `recipe-organizer` Worker name, account, D1 `DB`, and
+R2 `R2_BUCKET`; remove a recorded value from its `resolved` object, not just from the config. Observability records invocation logs;
 trace ingestion is disabled. `keep_vars` preserves dashboard-managed variables and auth secrets.
 
 Global middleware makes every request Worker-first, including static assets. Generated asset
@@ -74,8 +75,8 @@ assets through `ASSETS`. Void Pages renders matched document URLs; unknown pages
 default 404. No application catch-all exists because it would shadow assets such as
 `/manifest.json`. Unknown API paths retain the JSON 404 contract.
 
-`vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })` and
-`appType: 'mpa'` so the Worker, not Vite, answers unmatched development requests.
+`vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })`; the Worker answers unmatched
+development requests.
 `voidReact({ react: { compiler: true }, viewTransitions: true })` enables React page/island rendering
 and regular-page transitions. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
 a separate API process or proxy. Void reads the project-root `.env`.
@@ -83,9 +84,9 @@ a separate API process or proxy. Void reads the project-root `.env`.
 git-ignored. `vp exec void prepare` regenerates route types before clean-tree checks.
 
 `src/lib/server/env.d.ts` declares the non-D1 bindings on `Cloudflare.Env` and keeps them in sync with
-`void.config.ts`; secrets come from `env.ts`, runtime types from Void's `@cloudflare/workers-types`.
+`void.config.ts` and `void.lock.json`; secrets come from `env.ts`, runtime types from Void's `@cloudflare/workers-types`.
 The tooling-only `tools/wrangler.jsonc` supports local D1 migrations and dump/import;
-keep its resource IDs synchronized with `void.config.ts`. Drizzle-kit alone owns migrations.
+keep its resource IDs synchronized with `void.lock.json`. Drizzle-kit alone owns migrations.
 
 ### 8.2 Media write contract
 

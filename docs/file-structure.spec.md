@@ -170,7 +170,7 @@ pages or app-owned components coordinate their client and server code. Shared br
 outside features.
 
 Database table modules live in `src/db/schema/`, Drizzle history in
-`src/db/migrations/`. Tooling-only Wrangler resource IDs must match `void.config.ts`;
+`src/db/migrations/`. Tooling-only Wrangler resource IDs must match `void.lock.json`;
 runtime generated files and local persistence remain at root. Worker-only imports such as
 `cloudflare:workers` stay on server execution paths.
 

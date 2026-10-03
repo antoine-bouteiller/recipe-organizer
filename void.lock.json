@@ -1,18 +1,10 @@
 {
   "version": 1,
   "source": {
-    "d1_databases": [
-      {
-        "binding": "DB",
-        "database_id": "542863e2-5f6d-4ef7-9fd0-84b673f76f43",
-        "database_name": "recipe-organizer"
-      }
-    ],
     "images": {
       "binding": "IMAGES"
     },
     "keep_vars": true,
-    "name": "recipe-organizer",
     "observability": {
       "logs": {
         "enabled": true,
@@ -23,12 +15,6 @@
       }
     },
     "preview_urls": true,
-    "r2_buckets": [
-      {
-        "binding": "R2_BUCKET",
-        "bucket_name": "recipe-organizer"
-      }
-    ],
     "routes": [
       {
         "custom_domain": true,
