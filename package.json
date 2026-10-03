@@ -22,7 +22,6 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
-    "@tanstack/react-store": "catalog:",
     "@void/react": "catalog:",
     "drizzle-orm": "catalog:",
     "react": "catalog:",

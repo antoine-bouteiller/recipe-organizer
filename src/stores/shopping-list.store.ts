@@ -1,11 +1,11 @@
 import { persistedStore } from '@/lib/client/persisted-store'
 
-const { store: shoppingListStore, useValue } = persistedStore<number[]>('shopping-list', [])
+const { setState: setShoppingList, useValue } = persistedStore<number[]>('shopping-list', [])
 
 export const useShoppingListIds = useValue
 
-export const addToShoppingList = (recipeId: number) => shoppingListStore.setState((list) => [...list, recipeId])
+export const addToShoppingList = (recipeId: number) => setShoppingList((list) => [...list, recipeId])
 
-export const removeFromShoppingList = (recipeId: number) => shoppingListStore.setState((list) => list.filter((id) => id !== recipeId))
+export const removeFromShoppingList = (recipeId: number) => setShoppingList((list) => list.filter((id) => id !== recipeId))
 
-export const resetShoppingList = () => shoppingListStore.setState(() => [])
+export const resetShoppingList = () => setShoppingList(() => [])

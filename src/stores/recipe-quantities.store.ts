@@ -1,8 +1,8 @@
 import { persistedStore } from '@/lib/client/persisted-store'
 
-const { store: recipeQuantitiesStore, useValue } = persistedStore<Record<number, number>>('recipe-quantities', {})
+const { setState: setRecipeQuantities, useValue } = persistedStore<Record<number, number>>('recipe-quantities', {})
 
 export const useRecipeQuantitiesState = useValue
 
 export const setRecipesQuantities = (recipeId: number, quantity: number) =>
-  recipeQuantitiesStore.setState((quantities) => ({ ...quantities, [recipeId]: quantity }))
+  setRecipeQuantities((quantities) => ({ ...quantities, [recipeId]: quantity }))
