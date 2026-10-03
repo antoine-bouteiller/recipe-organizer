@@ -26,6 +26,7 @@ export const TabBar = ({ currentPath, items }: TabBarProps): React.ReactElement 
         data-slot="tab-bar-item"
         href={item.href}
         key={item.href}
+        viewTransition={false}
       >
         <span aria-hidden="true" className={styles.iconSlot} data-slot="tab-bar-item-icon-inactive">
           {item.icon}
