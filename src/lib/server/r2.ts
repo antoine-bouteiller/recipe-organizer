@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { env } from 'cloudflare:workers'
 import { HTTPException } from 'hono/http-exception'
+import { storage } from 'void/storage'
 import * as z from 'zod'
 
 import { cache } from './cache-manager'
@@ -19,7 +20,7 @@ const uploadFile = async (file: File) => {
 
   // R2 requires known-length bodies for uploads; convert to ArrayBuffer
   const optimizedBuffer = await optimizedImage.response().arrayBuffer()
-  await env.R2_BUCKET.put(key, optimizedBuffer, {
+  await storage.put(key, optimizedBuffer, {
     httpMetadata: { contentType: optimizedImage.contentType() },
   })
 
@@ -30,7 +31,7 @@ const uploadVideo = async (file: File) => {
   const key = randomUUID()
 
   const videoBuffer = await file.arrayBuffer()
-  await env.R2_BUCKET.put(key, videoBuffer, {
+  await storage.put(key, videoBuffer, {
     httpMetadata: { contentType: file.type },
   })
 
@@ -38,7 +39,7 @@ const uploadVideo = async (file: File) => {
 }
 
 const deleteFile = async (key: string) => {
-  await env.R2_BUCKET.delete(key)
+  await storage.delete(key)
 }
 
 const paramsSchema = z.object({ id: z.string() })
@@ -49,7 +50,7 @@ export const createR2GetHandler =
     const { id } = paramsSchema.parse(params)
 
     return cache.getWithCache(request.url)(async () => {
-      const file = await env.R2_BUCKET.get(id)
+      const file = await storage.get(id)
 
       if (!file) {
         throw new HTTPException(404, { message: 'not_found' })
@@ -71,7 +72,7 @@ export const createR2HeadHandler =
     const { id } = paramsSchema.parse(params)
 
     return cache.getWithCache(request.url)(async () => {
-      const file = await env.R2_BUCKET.head(id)
+      const file = await storage.head(id)
 
       if (!file) {
         throw new HTTPException(404, { message: 'not_found' })

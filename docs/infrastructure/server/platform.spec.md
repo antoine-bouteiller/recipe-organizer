@@ -20,7 +20,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | Decision                      | Choice                                                                                            | Rationale                                                                                                                                        |
 | ----------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `[KD-1]` Worker runtime       | Void generates the Cloudflare Worker entry from pages, API file routes, and global middleware.    | One deployment serves the same-origin API, OAuth routes, and media while its ASSETS binding serves static assets and pages render on the Worker. |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                                                         |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `STORAGE`; Images is `IMAGES`.                                                  | Named bindings make provider services available without application-managed credentials.                                                         |
 | `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                                            |
 | `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                                     |
 | `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker without a fetch handler.                   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior.              |
@@ -64,9 +64,9 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 ### 8.1 Worker configuration
 
 Void owns the project rooted at the repository root. `void.config.ts` declares the compatibility
-date and `nodejs_compat`, Images `IMAGES`, D1/R2 binding inference (`R2_BUCKET`), routes, and
+date and `nodejs_compat`, Images `IMAGES`, D1/R2 binding inference (R2 uses the default `STORAGE`), routes, and
 disabled ISR. `void.lock.json` records the `recipe-organizer` Worker name, account, D1 `DB`, and
-R2 `R2_BUCKET`; remove a recorded value from its `resolved` object, not just from the config. Observability records invocation logs;
+R2 `STORAGE`; remove a recorded value from its `resolved` object, not just from the config. Observability records invocation logs;
 trace ingestion is disabled. `keep_vars` preserves dashboard-managed variables and auth secrets.
 
 Global middleware makes every request Worker-first, including static assets. Generated asset
