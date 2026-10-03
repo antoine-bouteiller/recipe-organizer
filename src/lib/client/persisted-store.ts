@@ -1,4 +1,3 @@
-import { Store } from '@tanstack/react-store'
 import { useSyncExternalStore } from 'react'
 
 const readSaved = <TValue>(key: string, initial: TValue): TValue | undefined => {
@@ -17,15 +16,28 @@ const readSaved = <TValue>(key: string, initial: TValue): TValue | undefined => 
 
 export const persistedStore = <TValue>(key: string, initial: TValue) => {
   const hasStorage = typeof localStorage !== 'undefined'
-  const store = new Store<TValue>((hasStorage && readSaved(key, initial)) || initial)
-  if (hasStorage) {
-    store.subscribe(() => localStorage.setItem(key, JSON.stringify(store.get())))
+  let value = (hasStorage && readSaved(key, initial)) || initial
+  const listeners = new Set<() => void>()
+
+  const setState = (update: (previous: TValue) => TValue) => {
+    value = update(value)
+    if (hasStorage) {
+      localStorage.setItem(key, JSON.stringify(value))
+    }
+    for (const listener of listeners) {
+      listener()
+    }
   }
-  const subscribe = (onChange: () => void) => store.subscribe(onChange).unsubscribe
-  const getSnapshot = () => store.get()
+  const subscribe = (onChange: () => void) => {
+    listeners.add(onChange)
+    return () => {
+      listeners.delete(onChange)
+    }
+  }
+  const getSnapshot = () => value
   // Server HTML and hydration render `initial`; React then re-renders with the saved value.
   const getServerSnapshot = () => initial
   const useValue = () => useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
-  return { store, useValue }
+  return { setState, useValue }
 }

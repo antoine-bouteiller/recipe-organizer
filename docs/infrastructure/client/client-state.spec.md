@@ -26,7 +26,7 @@ of Worker-owned data while preserving responsive, device-local interactions.
 | --------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `[KD-1]` Server records     | Void loader props own page data; small remaining APIs serve browser-only reads.                | Server data comes from authoritative reads without a browser query cache.        |
 | `[KD-2]` Refresh identity   | Page actions refresh the current loader props in place.                                        | URL/history and local UI state survive refresh; there are no central query keys. |
-| `[KD-3]` Durable UI state   | TanStack Store persists data-only selections through `persistedStore`.                         | IDs and quantities survive reload without copying server entities.               |
+| `[KD-3]` Durable UI state   | A custom `useSyncExternalStore` store persists data-only selections through `persistedStore`.  | IDs and quantities survive reload without copying server entities.               |
 | `[KD-4]` Shareable state    | URL params/query/hash remain navigation input; search filters stay component-local.            | Only intentionally navigable values affect history.                              |
 | `[KD-5]` Browser preference | Head script resolves the theme cookie, else system preference; toggle writes cookie and class. | SSR documents receive the theme before first paint without loader theme props.   |
 
@@ -85,13 +85,13 @@ Browse documents receive new loader snapshots on navigation.
 ### 8.3 Persisted selection and derived data
 
 `shopping-list` persists recipe IDs, `recipe-quantities` serving overrides, and `recent-recipes`
-recent IDs. Hooks expose data-only Store snapshots and exported functions call `store.setState(...)`.
+recent IDs. Hooks expose data-only store snapshots and exported functions call the store's `setState(...)`.
 The shopping-list hook combines IDs, quantity overrides, and `loadRecipesByIds(ids)`, then runs
 `aggregateShoppingList`. No recipe or aggregate records are written to localStorage.
 
 ### 8.4 Persistent-store contract
 
-`persistedStore<T>(key, initial)` constructs a Store from saved JSON when storage exists, otherwise
+`persistedStore<T>(key, initial)` holds a module-level value read from saved JSON when storage exists, otherwise
 the initial value, and serializes later changes. It discards malformed JSON and values whose
 array/non-array shape differs from the initial value (including old wrapped array stores).
 `useValue()` uses `useSyncExternalStore`: its server snapshot is always `initial`, including
@@ -106,7 +106,7 @@ skeleton on the server and a Suspense skeleton while selected recipes load.
 | Is the Worker the source of truth? | Loader props / remaining HTTP read | Server read determines current records. |
 | Is it navigable?                   | URL input                          | Links/history carry the value.          |
 | Is it browser-wide preference?     | Cookie and document class          | Theme applies before first paint.       |
-| Is it durable personal intent?     | Persisted Store                    | Survives reload on one device.          |
+| Is it durable personal intent?     | Persisted store                    | Survives reload on one device.          |
 | Is it a short interaction?         | Component state                    | No durable/global ownership needed.     |
 | Does one feature subtree need it?  | Feature context                    | Avoids unrelated global wiring.         |
 

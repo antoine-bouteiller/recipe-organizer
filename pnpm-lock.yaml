@@ -176,9 +176,6 @@ catalogs:
     '@storybook/react-vite':
       specifier: 10.6.0
       version: 10.6.0
-    '@tanstack/react-store':
-      specifier: 0.11.2
-      version: 0.11.2
     '@types/node':
       specifier: 25.9.9
       version: 25.9.9
@@ -257,9 +254,6 @@ importers:
 
   .:
     dependencies:
-      '@tanstack/react-store':
-        specifier: 'catalog:'
-        version: 0.11.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@void/react':
         specifier: 'catalog:'
         version: 0.23.0(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(oxc-transform-react@0.152.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(void@0.23.0(@types/node@25.9.9)(@voidzero-dev/vite-plus-core@1.0.0(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@7.0.2)(yaml@2.9.1))(arktype@2.2.7)(kysely@0.29.6)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(valibot@1.5.0(typescript@7.0.2))(vitest@5.0.1)(wrangler@4.147.0(@cloudflare/workers-types@4.20260702.1)(@types/node@25.9.9))(zod@4.6.5))
@@ -2680,15 +2674,6 @@ packages:
         optional: true
       typescript:
         optional: true
-
-  '@tanstack/react-store@0.11.2':
-    resolution: {integrity: sha512-oj5O5DmiMWE+ih+SioX2ayC1kbK7d3fpLx0B75fPJr9nY3zU+hoW010yr64qXsY/9fyiLVE2bn5mGNV3owm8RQ==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  '@tanstack/store@0.11.2':
-    resolution: {integrity: sha512-sJ4mjol8uQsHV0gOJzzjwXfh2Fwm+Sz0+8deqiTm4jGbMdjzNSW+xZCFm0kUa870uhd8yi+DpKnZb5Kc4apa0Q==}
 
   '@testing-library/dom@10.4.2':
     resolution: {integrity: sha512-yzr2S9HyAIdhz2/6qHgbs665Q7PKVcDF05vsOlHPxG1mo36gKVesdYVeDLnXgfjJ03CrKRk08knc6+E/9m8v2Q==}
@@ -6476,15 +6461,6 @@ snapshots:
       typescript: 7.0.2
     transitivePeerDependencies:
       - supports-color
-
-  '@tanstack/react-store@0.11.2(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
-    dependencies:
-      '@tanstack/store': 0.11.2
-      react: 19.3.0
-      react-dom: 19.3.0(react@19.3.0)
-      use-sync-external-store: 1.7.0(react@19.3.0)
-
-  '@tanstack/store@0.11.2': {}
 
   '@testing-library/dom@10.4.2':
     dependencies:
