@@ -52,7 +52,7 @@ const voidConfig = defineConfig({
     script: [{ innerHTML: themeScript }, { innerHTML: backTransitionScript }, { innerHTML: serviceWorkerScript }],
     title: 'Recipe Organizer',
   },
-  inference: { bindings: { db: true, storage: 'R2_BUCKET' } },
+  inference: { bindings: { db: true } },
   routing: {
     // Native Cloudflare deploys only mark JS immutable; CSS and fonts would revalidate on every document navigation.
     headers: { '/assets/*': ['Cache-Control: public, max-age=31536000, immutable'] },

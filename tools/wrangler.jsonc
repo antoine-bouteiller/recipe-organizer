@@ -15,7 +15,7 @@
   ],
   "r2_buckets": [
     {
-      "binding": "R2_BUCKET",
+      "binding": "STORAGE",
       "bucket_name": "recipe-organizer",
     },
   ],
