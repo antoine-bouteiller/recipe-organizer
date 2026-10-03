@@ -131,7 +131,7 @@ page/action/API route metadata before clean-tree checks.
 
 The document head in `void.config.ts` owns metadata, manifest/favicon, theme initialization,
 service-worker registration, and the backward cross-document transition hook.
-`public/sw.js` forwards fetches to the network without offline support or legacy cleanup.
+`public/sw.js` registers without a fetch handler, offline support, or legacy cleanup.
 
 ### Component and styling ownership
 

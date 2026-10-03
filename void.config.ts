@@ -56,7 +56,11 @@ const voidConfig = defineConfig({
     title: 'Recipe Organizer',
   },
   inference: { appType: 'void', bindings: { ai: false, db: 'DB', kv: false, storage: 'R2_BUCKET' } },
-  routing: { isr: false },
+  routing: {
+    // Native Cloudflare deploys only mark JS immutable; CSS and fonts would revalidate on every document navigation.
+    headers: { '/assets/*': ['Cache-Control: public, max-age=31536000, immutable'] },
+    isr: false,
+  },
   worker: { compatibility_date: '2026-01-28', compatibility_flags: ['nodejs_compat'] },
 })
 
