@@ -1,6 +1,7 @@
+import { auth } from 'void/client'
+
 import { Button } from '@/components/ui/actions/button/button'
 import { Card } from '@/components/ui/data-display/card/card'
-import { authClient } from '@/lib/client/auth/auth-client'
 
 import * as styles from './account-content.css'
 
@@ -9,7 +10,7 @@ interface AccountContentProps {
 }
 
 const handleLogout = async () => {
-  await authClient.signOut()
+  await auth.signOut()
   globalThis.location.assign('/auth/login')
 }
 

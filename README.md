@@ -18,7 +18,6 @@ Create `.env` (Void's project-root environment file):
 SESSION_SECRET=your_local_session_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-VITE_PUBLIC_URL=http://localhost:3000
 ```
 
 ```bash
@@ -67,12 +66,12 @@ Requires a Cloudflare account with D1 and R2 configured in [`void.config.ts`](vo
 `tools/wrangler.jsonc` synchronized with Void config.
 
 ```bash
-VITE_PUBLIC_URL=https://recipes.example.com pnpm deploy
+pnpm deploy
 ```
 
 Void builds and deploys the Worker and web assets together. `pnpm build` outputs
 `dist/client` and `dist/ssr`; the latter is the Worker bundle, including page rendering.
 CI deploys with `vp exec void deploy --platform cloudflare` and then runs the
 Drizzle-kit database migration step. Authentication secrets (`SESSION_SECRET`, `GOOGLE_CLIENT_ID`,
-`GOOGLE_CLIENT_SECRET`) and the runtime `VITE_PUBLIC_URL` Worker variable remain dashboard-managed,
+`GOOGLE_CLIENT_SECRET`) remain dashboard-managed,
 preserved by `keep_vars`. See the [platform](docs/infrastructure/server/platform.spec.md) and [authentication](docs/infrastructure/server/auth.spec.md) docs for configuration.

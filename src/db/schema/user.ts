@@ -1,9 +1,9 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 // Core Better Auth `user` fields plus the app-specific `role` / `status` columns
-// (declared to Better Auth via `user.additionalFields`).
+// (declared in the root `auth.ts`; keep column names in sync with its `user.fields`).
 export const user = sqliteTable('user', {
-  createdAt: integer('created_at', { mode: 'timestamp' })
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date()),
   email: text('email').notNull().unique(),
@@ -17,7 +17,7 @@ export const user = sqliteTable('user', {
   status: text('status', { enum: ['pending', 'active', 'blocked'] })
     .notNull()
     .default('active'),
-  updatedAt: integer('updated_at', { mode: 'timestamp' })
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .$defaultFn(() => new Date()),
 })

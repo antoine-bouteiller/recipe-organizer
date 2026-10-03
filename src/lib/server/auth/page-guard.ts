@@ -5,7 +5,7 @@ import type { ApiUser } from './api-user'
 
 /** Resolves the member allowed to see a page, or the redirect a page loader must return instead. */
 export const guardPage = async (context: CloudContext, role?: 'admin'): Promise<ApiUser | Response> => {
-  const user = await getApiUser(context)
+  const user = getApiUser()
   if (!user) {
     return context.redirect('/auth/login')
   }

@@ -68,10 +68,10 @@ Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `mi
 `vite.config.ts` uses `voidReact({ react: { compiler: true }, viewTransitions: true })` alongside
 `voidPlugin` and `appType: 'mpa'`. One dev server on port 3000 serves rendered pages and the API.
 
-`03.page-context.ts` excludes API and file-extension paths, resolves `getApiUser(context)`, and sets
+`03.page-context.ts` excludes API and file-extension paths, resolves `getApiUser()`, and sets
 `shared = { authUser: user ? { email, role } : null, pathname }`. Layouts use `useShared()` to
 mark navigation; pages use identity only for affordances, not write authorization.
-The resolver memoizes its promise per request and forwards Better Auth session response cookies.
+The resolver reads the session that Void's auth middleware already resolved for the request.
 
 ### 8.2 Page contract
 

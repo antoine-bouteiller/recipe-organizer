@@ -122,14 +122,14 @@ The DS `DeleteDialog` uses local loading state while awaiting its callback.
 
 The remaining routes are:
 
-| Route                            | Consumer                                        |
-| -------------------------------- | ----------------------------------------------- |
-| `/api/auth/*`                    | Better Auth sign-in/session protocol            |
-| `/api/image/*`, `/api/video/*`   | Media reads; video HEAD handled through GET     |
-| `GET /api/health`                | Liveness                                        |
-| `GET /api/recipes`               | Header search palette, fetched on first open    |
-| `GET /api/shopping-list/recipes` | IDs selected in localStorage                    |
-| `POST /api/ingredients`          | Inline `AddIngredient`; then `router.refresh()` |
+| Route                            | Consumer                                         |
+| -------------------------------- | ------------------------------------------------ |
+| `/api/auth/*`                    | Void auth (Better Auth) sign-in/session protocol |
+| `/api/image/*`, `/api/video/*`   | Media reads; video HEAD handled through GET      |
+| `GET /api/health`                | Liveness                                         |
+| `GET /api/recipes`               | Header search palette, fetched on first open     |
+| `GET /api/shopping-list/recipes` | IDs selected in localStorage                     |
+| `POST /api/ingredients`          | Inline `AddIngredient`; then `router.refresh()`  |
 
 API clients use same-origin typed `void/client` fetch through `readResponse`.
 `02.csrf.ts` applies `hono/csrf` only to `/api/*` except auth; it does not wrap page-action URLs.

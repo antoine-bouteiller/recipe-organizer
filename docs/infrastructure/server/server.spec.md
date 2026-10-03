@@ -56,7 +56,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | Platform   | Worker configuration and utilities | Bindings, media transformation, edge cache, network-only PWA worker | bindings, R2 helpers                           |
 | Data layer | Library                            | Typed D1 schema, relations, and client                              | `getDb()`                                      |
 | Void API   | Convention and library             | Validated RPC, errors, query integration                            | Void file routes, API client, option factories |
-| Auth       | Library and routes                 | Google identity, sessions, membership guards                        | `getAuth()`, `withAuthGuard(handler, role?)`   |
+| Auth       | Library and routes                 | Google identity, sessions, membership guards                        | `auth.ts`, `withAuthGuard(handler, role?)`     |
 
 | Leaf                                             | Depends on                                                  | Rationale                                                                 |
 | ------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------- |

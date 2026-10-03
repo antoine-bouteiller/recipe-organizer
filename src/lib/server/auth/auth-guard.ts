@@ -11,8 +11,8 @@ declare module 'void' {
   }
 }
 
-const authorize = async (context: CloudContext, role?: string) => {
-  const user = await getApiUser(context)
+const authorize = (context: CloudContext, role?: string) => {
+  const user = getApiUser()
 
   if (!user) {
     throw new HTTPException(401, { message: 'unauthorized' })
@@ -33,6 +33,6 @@ const authorize = async (context: CloudContext, role?: string) => {
 /** Authorizes the request before `handler` runs (and before its validators), keeping the handler's route types. */
 export const withAuthGuard = <THandler extends (context: CloudContext) => unknown>(handler: THandler, role?: string) =>
   Object.assign(async (context: CloudContext) => {
-    await authorize(context, role)
+    authorize(context, role)
     return handler(context)
   }, handler)

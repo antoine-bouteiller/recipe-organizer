@@ -18,7 +18,7 @@ const isPagePath = (path: string) => path !== '/api' && !path.startsWith('/api/'
 
 export default defineMiddleware(async (context, next) => {
   if (isPagePath(context.req.path)) {
-    const user = await getApiUser(context)
+    const user = getApiUser()
     context.set('shared', { authUser: user ? { email: user.email, role: user.role } : null, pathname: context.req.path })
   }
   await next()
