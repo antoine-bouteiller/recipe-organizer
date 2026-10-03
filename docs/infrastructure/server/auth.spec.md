@@ -72,7 +72,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 Void enables auth because the root `auth.ts` exports `defineAuth(({ defaults, env }) => ...)`. Void
 creates Better Auth per request on the `DB` D1 binding through its generated Drizzle schema
 (`.void/better-auth-schema.ts`). `auth.ts` extends `defaults`: it disables email/password, uses
-`SESSION_SECRET` as the secret, configures Google from `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`,
+`BETTER_AUTH_SECRET` as the secret (Void reads it before `auth.ts` runs), configures Google from `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`,
 and maps every Better Auth field onto the existing snake_case columns. Void also imports `auth.ts`
 in Node to derive that schema, so it imports only packages and reads secrets from `env`.
 

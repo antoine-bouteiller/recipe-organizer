@@ -185,7 +185,7 @@ The `dist/ssr` directory contains the Worker bundle, including server page rende
 
 `pnpm deploy` and production CI use `vp exec void deploy --platform cloudflare` with
 `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
-The CI "Migrate Database" step runs drizzle-kit after deployment. `SESSION_SECRET`,
+The CI "Migrate Database" step runs drizzle-kit after deployment. `BETTER_AUTH_SECRET`,
 `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET`
 remain dashboard-managed and are preserved through `keep_vars`.
 

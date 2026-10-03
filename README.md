@@ -15,7 +15,7 @@ vp install
 Create `.env` (Void's project-root environment file):
 
 ```dotenv
-SESSION_SECRET=your_local_session_secret
+BETTER_AUTH_SECRET=your_local_session_secret
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
@@ -72,6 +72,6 @@ pnpm deploy
 Void builds and deploys the Worker and web assets together. `pnpm build` outputs
 `dist/client` and `dist/ssr`; the latter is the Worker bundle, including page rendering.
 CI deploys with `vp exec void deploy --platform cloudflare` and then runs the
-Drizzle-kit database migration step. Authentication secrets (`SESSION_SECRET`, `GOOGLE_CLIENT_ID`,
+Drizzle-kit database migration step. Authentication secrets (`BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`,
 `GOOGLE_CLIENT_SECRET`) remain dashboard-managed,
 preserved by `keep_vars`. See the [platform](docs/infrastructure/server/platform.spec.md) and [authentication](docs/infrastructure/server/auth.spec.md) docs for configuration.
