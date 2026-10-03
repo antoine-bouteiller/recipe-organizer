@@ -1,5 +1,5 @@
 // Tooling only (local migrations, D1 dump/import); void.config.ts owns the deployed Worker.
-// Keep resource IDs in sync with void.config.ts.
+// Keep resource IDs in sync with void.lock.json.
 {
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "recipe-organizer",

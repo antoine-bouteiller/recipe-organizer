@@ -15,13 +15,11 @@ const restrictedReactImports = {
 }
 
 const viteConfig = defineConfig(({ isPreview }) => ({
-  // The Worker owns unmatched requests; Vite's SPA fallback would answer API 404s with index.html.
-  appType: 'mpa',
   plugins: [
     vanillaExtractPlugin(),
-    // Checks and tests must not initialize the Worker or validate deployment environment values.
+    // Vitest cannot run the Worker environment.
     // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
-    ...(process.env.VP_RESOLVING_CONFIG_METADATA !== '1' && !process.env.VITEST && isPreview !== undefined
+    ...(!process.env.VITEST && isPreview !== undefined
       ? [voidPlugin({ persistTo: '.wrangler/state' }), voidReact({ react: { compiler: true }, viewTransitions: true })]
       : []),
   ],

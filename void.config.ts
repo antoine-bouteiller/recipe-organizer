@@ -28,17 +28,14 @@ const backTransitionScript = `(() => {
 })()`
 const serviceWorkerScript = `if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' }).catch(() => undefined)`
 
-// Keep resource IDs in sync with tools/wrangler.jsonc (local migrations, dump/import) and src/lib/server/env.d.ts.
+// Worker name, account and D1/R2 resources are recorded in void.lock.json; keep tools/wrangler.jsonc and src/lib/server/env.d.ts in sync.
 const voidConfig = defineConfig({
   cloudflare: {
-    d1_databases: [{ binding: 'DB', database_id: '542863e2-5f6d-4ef7-9fd0-84b673f76f43', database_name: 'recipe-organizer' }],
     images: { binding: 'IMAGES' },
     // VITE_PUBLIC_URL and the auth secrets are dashboard-managed.
     keep_vars: true,
-    name: 'recipe-organizer',
     observability: { logs: { enabled: true, invocation_logs: true }, traces: { enabled: false } },
     preview_urls: true,
-    r2_buckets: [{ binding: 'R2_BUCKET', bucket_name: 'recipe-organizer' }],
     routes: [{ custom_domain: true, pattern: 'recipes.antoinebouteiller.fr' }],
     workers_dev: false,
   },
@@ -55,7 +52,7 @@ const voidConfig = defineConfig({
     script: [{ innerHTML: themeScript }, { innerHTML: backTransitionScript }, { innerHTML: serviceWorkerScript }],
     title: 'Recipe Organizer',
   },
-  inference: { appType: 'void', bindings: { ai: false, db: 'DB', kv: false, storage: 'R2_BUCKET' } },
+  inference: { bindings: { db: true, storage: 'R2_BUCKET' } },
   routing: {
     // Native Cloudflare deploys only mark JS immutable; CSS and fonts would revalidate on every document navigation.
     headers: { '/assets/*': ['Cache-Control: public, max-age=31536000, immutable'] },
