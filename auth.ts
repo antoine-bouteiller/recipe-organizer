@@ -42,7 +42,6 @@ export default defineAuth(({ defaults, env }) => ({
     },
   },
   emailAndPassword: { enabled: false },
-  secret: typeof env.SESSION_SECRET === 'string' ? env.SESSION_SECRET : defaults.secret,
   session: {
     fields: { ...timestamps, expiresAt: 'expires_at', ipAddress: 'ip_address', userAgent: 'user_agent', userId: 'user_id' },
   },
