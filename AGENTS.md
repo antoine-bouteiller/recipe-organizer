@@ -1,12 +1,12 @@
 # Recipe Organizer
 
-Full-stack recipe management app with a TanStack Router browser SPA and Hono API, deployed on Cloudflare Workers.
+Full-stack recipe management app using server-rendered Void Pages with client navigation and a same-origin Void API, deployed on Cloudflare Workers.
 
 ## Quick Reference
 
 - **Toolchain:** Vite+ (`vp`) wrapping pnpm + Vite + Vitest + Oxlint + Oxfmt
-- **Dev:** `pnpm dev` (runs Vite on 3000 and Wrangler on 8787 in parallel)
-- **Build:** `pnpm build` (web assets, then the Worker bundle)
+- **Dev:** `pnpm dev` (one Vite server on 3000 for rendered pages and the same-origin API)
+- **Build:** `pnpm build` (Void builds `dist/client` assets and `dist/ssr` Worker bundle)
 - **Test:** `vp test`
 - **Check (fmt + lint + types):** `vp check`
 - **Lint:** `vp lint`
@@ -17,12 +17,13 @@ See the Vite+ section below for the full command reference.
 ## Critical Rules
 
 - **Always run `vp check` before committing.**
-- **Route changes require regeneration:** restart `pnpm dev` after adding/moving routes.
-- **Runtime boundary:** the browser SPA starts at `apps/web/index.html` and `apps/web/src/main.tsx`; the Worker entry is `apps/api/src/index.ts`'s default `fetch` export. Browser API calls use same-origin `/api/*` fetches.
-- **UI components are owned:** `packages/design-system/src/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@recipe-organizer/design-system/<component>`; keep app dependencies out of the package. `knip` checks its exports. Follow `packages/design-system/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and compose overlay triggers through `renderTrigger` props; Button navigates with an actual router `Link` via `asLink`. Parent wrappers own external layout.
-- **Styling:** Vanilla Extract compiles owner-local `*.css.ts` files through the web and Storybook Vite plugins. Import typed shared values as `theme` from `@recipe-organizer/design-system/theme`, including in template interpolations; do not use shared raw `var(--…)` strings. Load `@recipe-organizer/design-system/global.css` for the global Vanilla Extract reset/base rules and theme. Native `@recipe-organizer/design-system/styles.css` retains font faces and layer order; safe-area insets use `theme.safeArea.top/bottom`; native CSS variables remain appropriate for component-owned and runtime-owned behavior. Keep component and app styles unlayered so they override the layered reset/base defaults.
-- **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update colocated stories for changed interactions or new component presentations; styling-only changes can reuse existing stories for visual review. Use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
+- **Route changes require regeneration:** run `vp exec void prepare` after adding/moving Void pages or API routes to regenerate ignored route types before checks.
+- **Runtime boundary:** Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`. Feature code splits into `src/features/<feature>/{client,server}/` with isomorphic contracts at the feature root; `src/lib/` splits the same way. Page loaders read `@/features/<feature>/server/*` and `@/lib/server/*` directly; page actions own mutations. One root hydrated layout (`pages/layout.tsx`) wraps every page, with Void client navigation after SSR on first load. Each route is a folder with `index.tsx` and an optional `index.server.ts`; pages import components directly via `@/...`. Remaining browser API calls use typed `void/client` fetch through `readResponse`. Use `usePageAction()` for in-place prop refresh without changing URL/history; redirecting recipe deletion uses `submitAction` with `replace: true` instead. Never await an action inside a React transition.
+- **UI components are owned:** `src/components/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@/components/ui/<category>/<component>/<component>`; keep app dependencies out of `src/components/ui/`. Follow `src/styles/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and compose overlay triggers through `renderTrigger` props; Button navigates with the actual `@void/react` `Link` via `asLink` + `href`. Parent wrappers own external layout.
+- **Styling:** Vanilla Extract compiles owner-local `*.css.ts` files through the web and Storybook Vite plugins. Import typed shared values as `theme` from `@/styles/theme`, including in template interpolations; do not use shared raw `var(--…)` strings. Load `@/styles/global.css` for the global Vanilla Extract reset/base rules and theme. Native `@/styles/styles.css` retains font faces and layer order; safe-area insets use `theme.safeArea.top/bottom`; native CSS variables remain appropriate for component-owned and runtime-owned behavior. Keep component and app styles unlayered so they override the layered reset/base defaults.
+- **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update colocated stories for changed interactions or new component presentations; styling-only changes can reuse existing stories for visual review. No router decorator is needed. Use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
 - **Test boundaries:** `*.test.*` files test pure logic only; `*.stories.*` play functions test user interactions and their behavioral outcomes only. Do not assert design details in either: CSS classes, computed styles, colors, spacing, geometry, or animation properties. Review visual design in the browser instead.
+- **Worker config and environment:** `void.config.ts` owns runtime/deploy bindings; `.env` is the local env file. `tools/wrangler.jsonc` is tooling-only; keep its resource IDs synchronized with `void.lock.json`. Auth uses `void/auth` configured by the root `auth.ts`; do not use `void/db` in app code or Void migrations. Drizzle-kit owns all migrations, including the auth tables, so keep `src/db/schema/{user,auth}.ts` in sync with the `auth.ts` field mappings. Auth secrets remain dashboard-managed through `keep_vars`.
 - **DB migrations:** `pnpm db:migrate:local` (local D1) / `pnpm db:migrate:remote` (production D1).
 
 ## Guidelines
@@ -31,15 +32,15 @@ Canonical reference = the `*.spec.md` files under `docs/` + `docs/infrastructure
 colocated with the code.
 
 - [Project Structure](docs/file-structure.spec.md)
-- [Design-system styling and ownership](packages/design-system/styling.spec.md)
+- [UI styling and ownership](src/styles/styling.spec.md)
 - [Platform (Cloudflare Workers)](docs/infrastructure/server/platform.spec.md)
 - [Data Layer (Drizzle + D1)](docs/infrastructure/server/data-layer.spec.md)
-- [Hono API](docs/infrastructure/server/server-functions.spec.md)
+- [Void API](docs/infrastructure/server/server-functions.spec.md)
 - [Form Patterns](docs/infrastructure/client/forms.spec.md)
 - [Client State Layering](docs/infrastructure/client/client-state.spec.md)
-- [Routing & SPA](docs/infrastructure/client/routing-ssr.spec.md)
+- [Routing & SSR](docs/infrastructure/client/routing-ssr.spec.md)
 - [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
-- Per-feature specs: `apps/web/src/features/<name>/<name>.spec.md` (or `apps/web/src/features/<name>/spec/index.spec.md`)
+- Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 
 <!--VITE PLUS START-->
 
@@ -57,3 +58,14 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
 <!--VITE PLUS END-->
+
+<!--injected-by-void-v0.22.0-->
+
+## Void
+
+- This project uses [Void](https://void.cloud), a full-stack Vite framework for Cloudflare Workers with file-based API routing, server-rendered pages, and typed backend services.
+- Deploy to your Cloudflare account with `void deploy --platform cloudflare`, or connect to a Void platform with `void connect <url>` and deploy with `void deploy --platform void`. `void deploy` uses the saved destination.
+- Use Void's CLI and typed APIs for development and infrastructure. Void infers Cloudflare bindings from your imports; use Void commands to manage them.
+- Before working with Void, read the relevant Markdown docs in `node_modules/void/skills/void/docs/`. Start with `guide/quickstart.md` for setup and `reference/cli.md` for commands; consult the other guides and references for any Void feature.
+
+<!--/injected-by-void-->

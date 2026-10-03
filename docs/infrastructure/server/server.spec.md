@@ -10,7 +10,7 @@ related: []
 
 ## 2. Problem Statement
 
-The Worker needs a coherent server boundary for persistence, media, Hono RPC, and identity so
+The Worker needs a coherent server boundary for persistence, media, Void HTTP, and identity so
 feature modules can serve private recipe data without operating a separate backend. This sub-umbrella
 refines the Worker, storage, and identity goals in the architecture umbrella [G-1], [G-2], and
 [G-3] (`docs/architecture.spec.md:18-22`) into four independently specified responsibilities.
@@ -21,14 +21,14 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 | Decision                         | Choice                                                                                         | Rationale                                                                                           |
 | -------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Server decomposition    | Platform, data layer, Hono API, and auth have separate leaves.                                 | Each has a distinct contract and verification surface while sharing one Worker boundary.            |
-| `[KD-2]` Dependency direction    | Platform supplies bindings; data and auth consume them; Hono feature routes compose all three. | A directed dependency chain prevents feature handlers from owning runtime setup or identity policy. |
-| `[KD-3]` Feature-facing boundary | Feature modules reach infrastructure through exported helpers and Hono RPC conventions.        | This refines architecture [PI-5] and keeps feature code independent of binding details.             |
+| `[KD-1]` Server decomposition    | Platform, data layer, Void API, and auth have separate leaves.                                 | Each has a distinct contract and verification surface while sharing one Worker boundary.            |
+| `[KD-2]` Dependency direction    | Platform supplies bindings; data and auth consume them; Void feature routes compose all three. | A directed dependency chain prevents feature handlers from owning runtime setup or identity policy. |
+| `[KD-3]` Feature-facing boundary | Feature modules reach infrastructure through exported helpers and Void HTTP conventions.       | This refines architecture [PI-5] and keeps feature code independent of binding details.             |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **One Worker boundary** — refine architecture [PI-1]: bindings, the direct Worker
-  `fetch` handler, Hono RPC, and media routes remain capabilities of the same Worker.
+- `[PI-1]` **One Worker boundary** — refine architecture [PI-1]: bindings, the generated Worker
+  `fetch` handler, Void HTTP, and media routes remain capabilities of the same Worker.
 - `[PI-2]` **Trust at the server boundary** — refine architecture [PI-3]: input, membership, role,
   and ownership decisions execute before protected persistence effects.
 - `[PI-3]` **Request-scoped resources** — refine architecture [C-1]: factories obtain Worker-bound
@@ -51,19 +51,19 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component  | Module type                        | Responsibility                                                      | Public API surface                        |
-| ---------- | ---------------------------------- | ------------------------------------------------------------------- | ----------------------------------------- |
-| Platform   | Worker configuration and utilities | Bindings, media transformation, edge cache, network-only PWA worker | bindings, R2 helpers                      |
-| Data layer | Library                            | Typed D1 schema, relations, and client                              | `getDb()`                                 |
-| Hono API   | Convention and library             | Validated RPC, errors, query integration                            | Hono routes, API client, option factories |
-| Auth       | Library and routes                 | Google identity, sessions, membership guards                        | `getAuth()`, `authGuard()`                |
+| Component  | Module type                        | Responsibility                                                      | Public API surface                             |
+| ---------- | ---------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------- |
+| Platform   | Worker configuration and utilities | Bindings, media transformation, edge cache, network-only PWA worker | bindings, R2 helpers                           |
+| Data layer | Library                            | Typed D1 schema, relations, and client                              | `getDb()`                                      |
+| Void API   | Convention and library             | Validated RPC, errors, query integration                            | Void file routes, API client, option factories |
+| Auth       | Library and routes                 | Google identity, sessions, membership guards                        | `auth.ts`, `withAuthGuard(handler, role?)`     |
 
-| Leaf                                             | Depends on                                                  | Rationale                                                                |
-| ------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [`platform`](./platform.spec.md)                 | —                                                           | Establishes the Worker capabilities consumed by the other leaves.        |
-| [`data-layer`](./data-layer.spec.md)             | `platform` `[KD-1]`                                         | D1 binding access depends on the runtime contract.                       |
-| [`auth`](./auth.spec.md)                         | `data-layer` `[KD-1]`, `platform` `[KD-1]`                  | Identity stores sessions in D1 and reads Worker secrets.                 |
-| [`server-functions`](./server-functions.spec.md) | `data-layer` `[KD-1]`, `auth` `[KD-1]`, `platform` `[KD-1]` | Hono feature RPC composes persistence, authorization, and media effects. |
+| Leaf                                             | Depends on                                                  | Rationale                                                                 |
+| ------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [`platform`](./platform.spec.md)                 | —                                                           | Establishes the Worker capabilities consumed by the other leaves.         |
+| [`data-layer`](./data-layer.spec.md)             | `platform` `[KD-1]`                                         | D1 binding access depends on the runtime contract.                        |
+| [`auth`](./auth.spec.md)                         | `data-layer` `[KD-1]`, `platform` `[KD-1]`                  | Identity stores sessions in D1 and reads Worker secrets.                  |
+| [`server-functions`](./server-functions.spec.md) | `data-layer` `[KD-1]`, `auth` `[KD-1]`, `platform` `[KD-1]` | Void feature HTTP composes persistence, authorization, and media effects. |
 
 ## 8. Detailed Design
 
@@ -71,7 +71,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | ---------- | ---------------------------------------------------------- |
 | Platform   | [`./platform.spec.md`](./platform.spec.md)                 |
 | Data layer | [`./data-layer.spec.md`](./data-layer.spec.md)             |
-| Hono API   | [`./server-functions.spec.md`](./server-functions.spec.md) |
+| Void API   | [`./server-functions.spec.md`](./server-functions.spec.md) |
 | Auth       | [`./auth.spec.md`](./auth.spec.md)                         |
 
 ## 9. Open Questions

@@ -1,7 +1,44 @@
 {
-  "extends": "@recipe-organizer/config/tsconfig.base.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./.void/tsconfig.json",
   "compilerOptions": {
-    "types": ["node"]
+    "target": "es2023",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["node", "vite-plus/client", "void/env"],
+    "module": "esnext",
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "paths": {
+      "@/*": ["./src/*"],
+      "@storybook-helpers/*": ["./.storybook/*"],
+      "void/routes": ["./.void/routes.d.ts"]
+    }
   },
-  "include": ["vite.config.ts", "drizzle.config.ts", "apps/web/vite.config.ts"]
+  "include": [
+    "src",
+    "pages",
+    "routes",
+    "middleware",
+    "tools",
+    "auth.ts",
+    "env.ts",
+    "void.config.ts",
+    "vite.config.ts",
+    "drizzle.config.ts",
+    ".void/routes.d.ts"
+  ]
 }

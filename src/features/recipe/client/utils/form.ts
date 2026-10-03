@@ -1,0 +1,24 @@
+import type { RecipeFormInput } from '../api/create'
+
+export const recipeDefaultValues: Partial<RecipeFormInput> = {
+  cuisineTypes: [],
+  image: undefined,
+  ingredientGroups: [
+    {
+      _key: Math.random().toString(36).substring(7),
+      ingredients: [
+        {
+          _key: Math.random().toString(36).substring(7),
+          id: -1,
+          quantity: 0,
+        },
+      ],
+    },
+  ],
+  linkedRecipes: [],
+  meals: [],
+  name: '',
+  servings: 4,
+  stepGroups: [{ _key: Math.random().toString(36).substring(7), kind: 'steps', steps: [] }],
+  video: undefined,
+}

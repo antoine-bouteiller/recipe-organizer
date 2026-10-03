@@ -19,3 +19,15 @@ scheduled_tasks.lock
 skills-lock.json
 skills
 .vitest/
+
+# Void
+.void
+.void-wrangler.jsonc
+
+# Local environment and compiler output
+.env.*
+!.env.example
+*.tsbuildinfo
+
+# Storybook
+storybook-static

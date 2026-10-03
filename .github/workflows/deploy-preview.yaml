@@ -1,0 +1,57 @@
+name: Deploy Void
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - void
+    paths:
+      - src/**/*
+      - routes/**/*
+      - middleware/**/*
+      - public/**/*
+      - index.html
+      - env*.ts
+      - void.config.ts
+      - void.lock.json
+      - vite.config.ts
+      - tsconfig.json
+      - drizzle.config.ts
+      - package.json
+      - pnpm-workspace.yaml
+      - pnpm-lock.yaml
+      - .github/workflows/deploy-preview.yaml
+
+concurrency:
+  group: deploy-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    environment: void
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: true
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Build
+        run: vp build
+
+      # Uploads a non-active version so production traffic stays on the current deployment.
+      - name: Upload preview version
+        run: vp exec wrangler versions upload --config dist/ssr/wrangler.json --preview-alias void --message "preview ${GITHUB_SHA::7}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

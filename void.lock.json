@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "source": {
+    "images": {
+      "binding": "IMAGES"
+    },
+    "keep_vars": true,
+    "observability": {
+      "logs": {
+        "enabled": true,
+        "invocation_logs": true
+      },
+      "traces": {
+        "enabled": false
+      }
+    },
+    "preview_urls": true,
+    "routes": [
+      {
+        "custom_domain": true,
+        "pattern": "recipes.antoinebouteiller.fr"
+      }
+    ],
+    "workers_dev": false
+  },
+  "resolved": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_id": "542863e2-5f6d-4ef7-9fd0-84b673f76f43",
+        "database_name": "recipe-organizer",
+        "migrations_dir": "./db/migrations"
+      }
+    ],
+    "images": {
+      "binding": "IMAGES"
+    },
+    "keep_vars": true,
+    "name": "recipe-organizer",
+    "observability": {
+      "logs": {
+        "enabled": true,
+        "invocation_logs": true
+      },
+      "traces": {
+        "enabled": false
+      }
+    },
+    "preview_urls": true,
+    "r2_buckets": [
+      {
+        "binding": "STORAGE",
+        "bucket_name": "recipe-organizer"
+      }
+    ],
+    "routes": [
+      {
+        "custom_domain": true,
+        "pattern": "recipes.antoinebouteiller.fr"
+      }
+    ],
+    "workers_dev": false,
+    "account_id": "61ceb770f2c760aea66dfabfb03c4284",
+    "compatibility_date": "2026-02-24"
+  },
+  "text": "{\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_id\": \"542863e2-5f6d-4ef7-9fd0-84b673f76f43\",\n      \"database_name\": \"recipe-organizer\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"images\": {\n    \"binding\": \"IMAGES\"\n  },\n  \"keep_vars\": true,\n  \"name\": \"recipe-organizer\",\n  \"observability\": {\n    \"logs\": {\n      \"enabled\": true,\n      \"invocation_logs\": true\n    },\n    \"traces\": {\n      \"enabled\": false\n    }\n  },\n  \"preview_urls\": true,\n  \"r2_buckets\": [\n    {\n      \"binding\": \"STORAGE\",\n      \"bucket_name\": \"recipe-organizer\"\n    }\n  ],\n  \"routes\": [\n    {\n      \"custom_domain\": true,\n      \"pattern\": \"recipes.antoinebouteiller.fr\"\n    }\n  ],\n  \"workers_dev\": false,\n  \"account_id\": \"61ceb770f2c760aea66dfabfb03c4284\",\n  \"compatibility_date\": \"2026-02-24\"\n}\n"
+}

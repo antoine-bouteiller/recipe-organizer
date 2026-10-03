@@ -1,7 +1,11 @@
+import { fileURLToPath } from 'node:url'
+
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
+import { voidReact } from '@void/react/plugin'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
+import { voidPlugin } from 'void'
 
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
 const restrictedReactImports = {
@@ -10,12 +14,33 @@ const restrictedReactImports = {
   message: 'Rely on React Compiler instead of manual memoization with useMemo or useCallback.',
 }
 
-const viteConfig = defineConfig({
-  plugins: [vanillaExtractPlugin()],
+const viteConfig = defineConfig(({ isPreview }) => ({
+  plugins: [
+    vanillaExtractPlugin(),
+    // Vitest cannot run the Worker environment.
+    // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
+    ...(!process.env.VITEST && isPreview !== undefined
+      ? [
+          voidPlugin({ persistTo: '.wrangler/state' }),
+          voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true }),
+        ]
+      : []),
+  ],
+  server: { port: 3000 },
+  environments: {
+    client: {
+      build: {
+        rolldownOptions: {
+          // Void links CSS per JS chunk; one shared style chunk yields one stylesheet instead of one per component.
+          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(\.ts)?($|\?)|\.vanilla\.css/ }] } },
+        },
+      },
+    },
+  },
   lint: {
     options: { typeAware: true, typeCheck: true, reportUnusedDisableDirectives: 'error' },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
-    jsPlugins: [{ name: 'recipe-oranizer', specifier: '@recipe-organizer/oxlint' }],
+    jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
     categories: {
       correctness: 'error',
       suspicious: 'error',
@@ -29,10 +54,10 @@ const viteConfig = defineConfig({
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: ['**/routeTree.gen.ts', 'apps/api/worker-configuration.d.ts', 'vite.config.ts'],
+    ignorePatterns: ['vite.config.ts'],
     overrides: [
       ...features.map((feature) => ({
-        files: [`apps/web/src/features/${feature}/**/*.{ts,tsx}`],
+        files: [`src/features/${feature}/**/*.{ts,tsx}`],
         rules: {
           'no-restricted-imports': [
             'error',
@@ -46,8 +71,8 @@ const viteConfig = defineConfig({
                 ...features
                   .filter((other) => other !== feature)
                   .map((other) => ({
-                    group: [`@client/features/${other}`, `@client/features/${other}/**`, `../**/${other}`, `../**/${other}/**`],
-                    message: 'Features must not import other features. Compose them in routes or app-owned components.',
+                    group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
+                    message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
                   })),
               ],
             },
@@ -69,7 +94,7 @@ const viteConfig = defineConfig({
       },
       {
         // Numeric token scales are intentionally ordered by value.
-        files: ['packages/design-system/src/theme/**/*.ts'],
+        files: ['src/styles/theme/**/*.ts'],
         rules: {
           'sort-keys': 'off',
         },
@@ -183,12 +208,13 @@ const viteConfig = defineConfig({
     singleQuote: true,
     printWidth: 150,
     experimentalSortImports: {},
-    ignorePatterns: ['apps/web/src/routeTree.gen.ts'],
   },
   staged: {
     '*': 'vp check --fix',
   },
   resolve: {
+    // Virtual island entries sit outside the tsconfig project, so tsconfig paths don't resolve their imports.
+    alias: [{ find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) }],
     tsconfigPaths: true,
   },
   test: {
@@ -196,7 +222,7 @@ const viteConfig = defineConfig({
       { extends: true, test: { name: 'unit', globals: true } },
       {
         extends: true,
-        plugins: [storybookTest({ configDir: 'packages/design-system/.storybook' })],
+        plugins: [storybookTest({ configDir: '.storybook' })],
         optimizeDeps: { include: ['@vanilla-extract/recipes/createRuntimeFn'] },
         test: {
           name: 'storybook',
@@ -212,10 +238,10 @@ const viteConfig = defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['apps/*/src/**/*.{ts,tsx}', 'packages/*/src/**/*.{ts,tsx}', 'packages/oxlint/rules/**/*.ts'],
-      exclude: ['**/*.stories.tsx', '**/*.css.ts', '**/routeTree.gen.ts'],
+      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'tools/oxlint/rules/**/*.ts'],
+      exclude: ['**/*.stories.tsx', '**/*.css.ts'],
     },
   },
-})
+}))
 
 export default viteConfig

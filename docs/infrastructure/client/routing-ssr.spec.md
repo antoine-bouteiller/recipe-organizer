@@ -1,5 +1,5 @@
 ---
-title: Routing and SPA
+title: Routing and SSR
 status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
@@ -16,174 +16,158 @@ related:
 
 ## 2. Problem Statement
 
-Browser navigation needs typed URLs, predictable access gates, and data available when a screen
-renders. The route layer coordinates those concerns with browser application chrome and Worker contracts
-without becoming a feature data layer.
+Every URL needs a server-rendered document, predictable access gates, and data ready for rendering.
+Void Pages owns matching, loaders, actions, and layouts; feature components retain domain presentation.
+All pages hydrate after SSR on first load and use Void client navigation, avoiding sluggish full-document recipe visits.
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                     | Rationale                                                                                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Route declaration   | File routes declare matching, context gates, parameter/search parsing, and loader prefetch | Co-locating navigation concerns gives each URL one typed contract while feature query factories retain data ownership.                                       |
-| `[KD-2]` Query lifecycle     | A router-scoped `QueryClient` is provided explicitly through `QueryClientProvider`         | A single browser cache supports intent preloading and avoids a second fetch at render; the provider replaces the SSR-query bridge (`src/client/router.tsx`). |
-| `[KD-3]` Browser application | `index.html` and `src/client/main.tsx` mount the Router and page chrome in the browser     | No document shell is rendered by the Worker; cross-cutting browser state is resolved through route and React context.                                        |
-| `[KD-4]` Navigation feedback | Router links use view-transition support and route resolution owns back/forward direction  | Navigation remains native when transitions are unsupported, while supported browsers receive direction-aware motion (`src/client/router.tsx:42-49`).         |
+| Decision                     | Choice                                                                                   | Rationale                                                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Route declaration   | Void file pages and colocated `.server.ts` loaders/actions under `pages/`.               | One URL owns its server input and mutation boundary.                                                    |
+| `[KD-2]` Data lifecycle      | Loaders read `@/features/*/server/*` directly; actions refresh loader props.             | No browser query cache or duplicate HTTP read is needed for page data.                                  |
+| `[KD-3]` Render mode         | One root hydrated layout wraps every page.                                               | SSR preserves first-load content; client navigation avoids document reloads throughout the app.         |
+| `[KD-4]` Navigation feedback | Void client view transitions; cross-document transitions for document redirects/reloads. | Navigation remains native without transition support; backward traversals get a `back` transition type. |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **Compose, do not own data** — refine `client.spec.md` `[PI-2]`: loaders call feature
-  query options and components consume those same options.
-- `[PI-2]` **Gates precede screens** — authentication and role redirects occur in route lifecycle,
-  with Worker enforcement remaining authoritative under `../../architecture.spec.md` `[PI-3]`.
-- `[PI-3]` **URLs are typed input** — path parameters and search values parse before a screen uses
-  them.
-- `[PI-4]` **Use typed router links** — reusable design-system navigation may take TanStack Router
-  `LinkOptions` and render the actual `Link`; Button navigates through `asLink`, without
-  `useLinkProps` adapters.
+- `[PI-1]` **Compose, do not own domain logic** — loaders and actions call server helpers; pages wire feature components.
+- `[PI-2]` **Gates precede screens** — protected loaders return `guardPage` redirects before reading protected data; writes enforce their own authorization.
+- `[PI-3]` **URLs are input** — server loaders/actions parse dynamic IDs and read search values before use.
+- `[PI-4]` **Use actual navigation links** — Button `asLink` with `href` renders `@void/react` `Link`; navigation policy stays app-owned.
 
 ## 5. Non-Goals
 
-- `[NG-1]` Authorization decisions in browser routes; this refines `client.spec.md` `[KD-2]`.
+- `[NG-1]` Browser-only authorization or a separate application mount.
 - `[NG-2]` A public cache policy for personalised document responses.
-- `[NG-3]` Feature-specific query keys or mutation behavior; those belong to feature APIs and
-  [`./client-state.spec.md`](./client-state.spec.md).
+- `[NG-3]` A client query cache or offline navigation; see [client state](./client-state.spec.md).
 
 ## 6. Caveats
 
-- `[C-1]` The generated route tree follows route-file names; a route declaration whose path differs
-  from its file is invalid.
-- `[C-2]` Intent preloading runs loaders before an explicit navigation, so loaders remain
-  idempotent and read-only.
-- `[C-3]` `src/client/main.tsx` progressively registers `/sw.js` with `{ scope: '/', type: 'module' }` through `navigator.serviceWorker.register(...)` for the user-required Samsung PWA installation path. Registration failure does not block rendering; the worker provides no offline UI or session fallback, and route and query requests require connectivity.
+- `[C-1]` Run `vp exec void prepare` after page/API route changes to regenerate ignored route types.
+- `[C-2]` Inner scroll-container restoration is not managed. The retained scroll IDs do not supply restoration.
+- `[C-3]` The head config progressively registers a network-only `/sw.js`; registration failure does not block rendering and no offline fallback exists.
+- `[C-4]` Local development always resolves an active admin identity, so it does not prove anonymous or non-admin behavior.
 
 ## 7. High-Level Components
 
-| Component      | Module type                         | Responsibility                                                           | Public API surface               |
-| -------------- | ----------------------------------- | ------------------------------------------------------------------------ | -------------------------------- |
-| Browser entry  | `index.html`, `src/client/main.tsx` | Mount the browser SPA and Router                                         | application mount                |
-| Router factory | `src/client/router.tsx`             | Create route context, query cache, matching defaults, and Query provider | `getRouter()`                    |
-| Root route     | `src/client/routes/__root.tsx`      | Render application-wide browser chrome and outlet                        | root `Route` context             |
-| Page routes    | `src/client/routes/**/*.tsx`        | Parse URL state, gate entry, prefetch feature queries, render screens    | `createFileRoute()` declarations |
-| API handler    | `src/server/index.ts`               | Serve Hono API, auth, and media requests                                 | Worker `fetch`, `/api/*`         |
+| Component         | Module type                     | Responsibility                                                                  | Public API surface                          |
+| ----------------- | ------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- |
+| Root layout       | `pages/layout.tsx`              | Hydrated shell, search/theme controls, French Zod locale, render-error boundary | `useShared()`, children                     |
+| Page components   | `pages/**/*.tsx`                | Compose loader props and feature slots                                          | Default page export                         |
+| Server companions | `pages/**/*.server.ts`          | Reads, gates, mutations                                                         | `loader`, `action`, `actions`, `InferProps` |
+| Page context      | `middleware/03.page-context.ts` | Request identity and navigation path                                            | `{ authUser, pathname }`                    |
+| API handlers      | `routes/api/**`                 | Remaining HTTP, auth, health, media                                             | Named HTTP methods                          |
 
 ## 8. Detailed Design
 
-### 8.1 Router and root context
+### 8.1 Pages and shared context
 
-`index.html` loads `src/client/main.tsx`, which progressively registers `/sw.js` with
-`navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })` and mounts the browser
-application. The registration serves the user-required Samsung PWA installation path; it does not
-provide offline behavior or delay rendering if it fails. `getRouter()` creates a `QueryClient`,
-explicitly wraps the router in `QueryClientProvider`, and registers the generated route tree with
-`defaultPreload: 'intent'`, root not-found handling, and scroll restoration
-(`src/client/router.tsx`). This browser provider replaces the former SSR-query bridge. The root route
-provides application chrome and the outlet; it does not resolve a Worker request or render an HTML
-document shell. Both query and mutation caches handle Router redirect errors through the same
-callback, preserving login redirects for expired sessions and blocked or pending accounts.
+Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`.
+`vite.config.ts` uses `voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true })` alongside
+`voidPlugin` and `appType: 'mpa'`. One dev server on port 3000 serves rendered pages and the API.
 
-### 8.2 Page-route contract
+`03.page-context.ts` excludes API and file-extension paths, resolves `getApiUser()`, and sets
+`shared = { authUser: user ? { email, role } : null, pathname }`. Layouts use `useShared()` to
+mark navigation; pages use identity only for affordances, not write authorization.
+The resolver reads the session that Void's auth middleware already resolved for the request.
 
-A page route declares its file-route path, optional `beforeLoad` gate, optional Zod
-`validateSearch`, and an optional loader. Loaders that prefetch data call
-`context.queryClient.query({ ...options, staleTime: 'static' })`; recipe creation/editing and settings
-routes retain this pattern. Dynamic routes parse their segment and return typed loader data for the
-component. Authentication redirects remain in `beforeLoad`, before screen render.
+### 8.2 Page contract
 
-Routes render screens and select layouts; feature components own the content. Home, search, and
-recipe details use `useQuery(options)` without blocking query loaders. They render skeletons directly
-inside `ScreenLayout` while the query's `isLoading` is true; details reuse cached list metadata for
-the title and image. Routes that use `useSuspenseQuery(options)` retain loader prefetch with the same
-feature query options. Public routes remain readable where the feature permits it, and UI affordances
-derive from route context rather than replacing Worker checks.
+The root `pages/layout.tsx` wraps `/`, `/search`, `/shopping-list`, `/recipe/[id]`, `/auth/login`, `/settings`,
+`/settings/account`, `/settings/ingredients`, `/settings/users`, `/recipe/new`, and `/recipe/edit/[id]`. Pages export default components from `index.tsx`.
+Optional server companions export `defineHandler` loaders/actions and `InferProps<typeof loader>`
+types. Home and search read `listRecipes(getDb())`; recipe details read the recipe and embedded
+sub-recipe instructions in the loader. Shopping-list data depends on localStorage; its page needs
+no server companion or prerender override because regular pages are not auto-prerendered.
 
 ### 8.3 Access and URL parsing
 
-A route that requires membership throws a redirect from `beforeLoad`; the settings layout supplies
-that gate to its descendant settings screens (`src/client/routes/settings.tsx:3-9`). A public route omits
-that redirect and uses route context only to choose presentation affordances. Admin-only navigation
-uses an additional role gate at the matching route, while Worker handlers make the final access
-decision under [`../server/auth.spec.md`](../server/auth.spec.md).
-
-Search state is parsed through a route-local Zod schema. Invalid input fails before the screen
-receives it; valid output is the sole search-state surface for that screen. Dynamic segments follow
-the same rule: parse the path parameter in the loader and return the typed identifier as loader data.
-Queries use that parsed identifier, whether they run in a loader or inside the page. URL strings therefore never become implicit feature IDs.
+Protected settings and editor loaders call `guardPage(context)` and return its `Response` before
+data reads. Anonymous visitors redirect to `/auth/login`; blocked/pending users redirect to
+`/auth/login?error=account_blocked` or `account_pending`. The users loader requests `'admin'`;
+a non-admin redirects to `/settings`. The login loader redirects any resolved identity to `/`.
+Browse loaders do not require membership. The editor gates entry but its mutation helpers still
+enforce owner-or-admin checks. A missing or invalid recipe ID returns `recipe: null` for in-page
+`NotFound`, including on the edit page.
 
 ### 8.4 Screen and layout boundary
 
-The browser entry owns application mounting; the router provider owns the query context. The root
-route owns the outlet and composes navigation, search, and the theme toggle inside styled app-shell containers. The design
-system owns reusable router-aware navigation and screen layout; the app shell owns the single-use desktop navbar and the router owns its default error renderer;
-it does not import app or feature code. A page route owns screen selection, pending UI, route-specific
-layout inputs, and recipe/auth policy. Feature components own recipe cards, editors, settings controls,
-and all domain presentation. This division lets a layout consume router context without importing a
-feature's private API. `apps/web/src/routes/` contains no `.css.ts` files, styling imports, or JSX
-`className`/`style` props. Styled sections, containers, and pending content live with their features;
-shell markup and styles live in `apps/web/src/components/app-shell/`. Routes retain page construction,
-forms, and cross-feature coordination rather than delegating to intermediary page wrappers.
-Features must not import one another, even through public APIs.
-Route-derived IDs, search values, and access
-affordances cross that boundary as props, without components importing route modules.
+The root layout composes `AppHeader` and `AppMain`, imports search/theme controls directly, loads the
+French Zod locale, and wraps children in `AppErrorBoundary` keyed by pathname.
 
-Loading feedback belongs directly inside the page layout: render feature skeletons from TanStack
-Query's `isLoading`, not a route-level pending/loading component. This keeps the destination layout
-visible while its content loads, without a second cache or a write. Error and not-found rendering
-remain shared router-level surfaces so a failed match has one consistent recovery UI.
+Pages import feature components directly via `@/...`. Features expose slots/render props, such as
+`renderCardAction`, `quantityControls`, `renderIngredientGroups`, and `backButton`, for plain
+composition. The shopping-list page owns its reset button inline. Pages retain unstyled composition;
+feature and app-shell owners retain CSS.
 
 ### 8.5 Errors, HTTP, and navigation
 
-The router supplies the root error and not-found surfaces (`src/client/router.tsx:39-52`). The Worker entry's `fetch` dispatches `/api/*` directly to the shared Hono API, which owns feature,
-authentication, session, health, and media responses. Hono media handlers delegate binary reads to
-platform R2 helpers. Each handler preserves the response shape, headers, and redirects owned by its
-contract; browser page routes do not wrap it.
+Unknown URLs use Void's default 404. An in-app catch-all page is deliberately absent: it shadowed
+static assets such as `/manifest.json`. Missing recipes instead render DS `NotFound` within the page.
+The root layout handles client render errors with French recovery text, a home link, and
+development-only Error details; server loader failures are not handled by that React boundary.
+`01.api-errors.ts` maps thrown page-action errors as well as API errors to JSON `{ error }`.
 
-Forward links request view transitions; the router determines back navigation from history indexes
-(`src/client/router.tsx:42-49`). The interaction remains a normal navigation when the browser lacks view
-transition support. `TabBar` is a DS router-aware component: items provide `label`, `linkProps`
-(`LinkOptions`), and inactive/active icons. The desktop navbar is inlined into `AppHeader`, whose children
-supply search and theme actions.
-The actual TanStack `Link` retains typed route parameters, search, modified clicks, preloading, refs,
-and view-transition behavior; do not replace it with a native anchor or a filtered `useLinkProps`
-adapter. The desktop navbar uses exact matching only for `/`; pages render
-`<TabBar items={mobileMenuItems} />` rather than a `pageKey`. Button renders the actual `Link` through `asLink`.
+All pages use Void client navigation after SSR on first load. Shared CSS still enables
+`@view-transition { navigation: auto }` in `src/styles/styles.css`. The head script in
+`void.config.ts` marks both outgoing (`pageswap`) and incoming (`pagereveal`) backward document
+transitions with the `back` type. For regular pages, it tracks Navigation API traversal direction
+and tags Void's `document.startViewTransition()` result; forward visits retain the default animation.
+Unsupported browsers retain navigation without transition animations.
 
-`ScreenLayout` calls `router.history.back()` for `withGoBack`, defaults its scroll IDs to
-`screen-inner` and `screen-outer`, and receives an explicit footer. Scroll restoration targets those
-containers (`src/client/router.tsx:51-54`), so layouts do not implement their own scroll-restoration logic.
-The default error callback in `apps/web/src/router.tsx` and shared DS `NotFound` provide home Links and
-French messages, with Error details only in development.
-Menus/filtering remain in `apps/web/src/components/navigation/constants.tsx`; `__root` composes the
-theme control and search inside styled app-shell containers. `FloatingAction` is generic (`label`, `linkProps`, `children`), while the
-index route owns recipe/auth policy. Router-dependent Storybook stories use a local memory-router
-decorator.
+Home recipe links use `prefetch={['visible', 'hover']}`; search cards use `prefetch` (hover,
+touchstart, and focus). Prefetched loader props are fresh for 30s and usable up to 1h with background
+revalidation. Void flushes the prefetch cache on any non-GET navigation/action.
+The search palette navigates with `router.visit`, not `location.assign`.
+
+DS Button uses `asLink` + `href` and optional `viewTransition` with the actual Void `Link`.
+`TabBar` takes `currentPath` and items with `href`; `isCurrentPath` matches home exactly and other
+items at their path or descendants. Desktop navigation follows the same matcher.
+`Tabs` are native hash anchors; once hydrated their click handler scrolls the panel and calls
+`history.replaceState`, avoiding extra history entries. Static tabs retain native hash behavior.
+`ScreenLayout` takes a `backButton` slot; DS `GoBackButton` defaults to `history.back()` and is
+passed directly on recipe details. Storybook needs no router decorator.
 
 ### 8.6 Route contract summary
 
-| Concern        | Route-owned shape                                                          | Consumer                        |
-| -------------- | -------------------------------------------------------------------------- | ------------------------------- |
-| Context        | `{ authUser, queryClient, theme, isAdmin }`                                | `Route.useRouteContext()`       |
-| Search         | `validateSearch(input) -> typed output`                                    | `Route.useSearch()`             |
-| Dynamic path   | loader parses segment and returns data                                     | `Route.useLoaderData()`         |
-| Data readiness | Optional `queryClient.query({ ...options, staleTime: 'static' })` prefetch | matching feature query hook     |
-| Page loading   | `useQuery(options).isLoading`                                              | skeleton inside the page layout |
-| Access         | `beforeLoad` redirect                                                      | router navigation lifecycle     |
-| HTTP endpoint  | Worker `fetch` → Hono `/api/*`                                             | browser or external HTTP client |
+| Concern            | Page-owned shape                      | Consumer                            |
+| ------------------ | ------------------------------------- | ----------------------------------- |
+| Shared context     | `{ authUser, pathname }`              | `useShared()`                       |
+| URL input          | Parsed params and request query       | Loader/action                       |
+| Data readiness     | Direct server read → loader props     | Default page component              |
+| Local-only loading | Hydration gate + Suspense             | Shopping-list skeleton              |
+| Access             | `guardPage` redirect Response         | Protected loader/action             |
+| Mutation           | `action` or named `actions`           | `usePageAction()` or `submitAction` |
+| HTTP endpoint      | Typed same-origin `void/client` fetch | Remaining API consumers             |
 
 ### 8.7 Render-boundary rules
 
-The browser entry is the application boundary: it mounts the Router and query provider. A feature
-screen reads browser state only within its matched page route. This keeps application-wide chrome
-at the root while keeping screen-specific work colocated with the URL that needs it.
+Loaders read server data, not browser storage, and do not perform mutations. Actions validate and
+authorize writes. Regular-page clients call `usePageAction()`, which submits POST through
+`submitAction` with `preserveState: true`, keeps the URL/history entry, refreshes page props in place,
+alerts expected failure, and resolves a success boolean. Never await an action inside a React transition:
+submission owns the asynchronous refresh lifecycle. Callers choose subsequent navigation or dialog closing.
 
-A loader may read through a query option and return URL-derived values. It does not submit a form,
-write browser persistence, or perform a mutation. A component may render from loader data and the
-query cache, then delegates writes to the form and Hono RPC contracts. These boundaries make
-intent preloading safe: visiting a link intent can populate a cache without causing a side effect.
+Recipe deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
+from `void/pages-client`. The guarded action deletes the recipe and redirects home; replacement
+keeps Back from reopening the deleted recipe. It bypasses `usePageAction()` because that helper's
+`preserveState: true` keeps the old URL on redirects. Failed results alert via `alertError`.
 
-A page's loading UI represents the same screen shape as its resolved UI where practical. It does
-not disclose data that the route gate would withhold. Redirects abort the route path before its
-loader and component become the active screen, so a protected feature does not need a separate
-render-time access fallback.
+Persisted stores return their initial snapshot for SSR and hydration, then switch to saved localStorage
+values. `useIsHydrated()` keeps the shopping-list skeleton visible until device-local selection can
+be read. This avoids treating unknown server-side browser intent as an empty shopping list.
+
+### 8.8 Outcome and acceptance
+
+- `[SO-1]` Browsing and editing share server-rendered URLs and hydrated client navigation — demonstrated by `[VC-1]`.
+- `[SO-2]` Server gates and page mutations retain access policy and refresh semantics — demonstrated by `[VC-2]`.
+- `[VC-1]` Hard-load each URL in section 8.2: content renders and hydrates without mismatch; subsequent
+  card and palette visits update the page without reloading the document;
+  an unknown URL returns the default 404 and `/manifest.json` remains an asset — demonstrates `[SO-1]`.
+- `[VC-2]` With production-like identities, protected loaders redirect anonymous/inactive/non-admin
+  callers appropriately; a successful in-place action updates props without an action URL/history entry;
+  recipe deletion redirects home without Back reopening the deleted recipe, and missing recipes show in-page recovery — demonstrates `[SO-2]`.
 
 ## 9. Open Questions
 
@@ -191,14 +175,16 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                      | Sections affected | Reason                                                                     |
-| ---------- | ------------------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------- |
-| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers. | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                                 |
-| 2026-09-13 | Dispatch media through the API catch-all.                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.                             |
-| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry. | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                    |
-| 2026-09-16 | Document Base UI render composition with the actual router Link.               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
-| 2026-09-18 | Move reusable router-only presentation into the design system.                 | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
-| 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.     | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
-| 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.               | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |
-| 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.  | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |
-| 2026-09-28 | Replace Base UI render composition with Button `asLink`.                       | 4, 8.5            | Base UI is no longer a dependency.                                         |
+| Date       | Amendment                                                                              | Sections affected | Reason                                                                     |
+| ---------- | -------------------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------------------- |
+| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers.         | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                                 |
+| 2026-09-13 | Dispatch media through the API catch-all.                                              | 7, 8.5            | Give all API endpoints the same Hono boundary.                             |
+| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry.         | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                    |
+| 2026-09-16 | Document Base UI render composition with the actual router Link.                       | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
+| 2026-09-18 | Move reusable router-only presentation into the design system.                         | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
+| 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.             | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
+| 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.                       | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |
+| 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.          | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |
+| 2026-09-28 | Replace Base UI render composition with Button `asLink`.                               | 4, 8.5            | Base UI is no longer a dependency.                                         |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                                      |
+| 2026-10-03 | Document hydrated layouts, client navigation, prefetch, and delete redirects.          | 2–3, 6–8          | Keep recipe visits responsive and deletion history safe.                   |

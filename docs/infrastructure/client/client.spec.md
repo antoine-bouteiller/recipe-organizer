@@ -27,16 +27,16 @@ boundary while leaving product goals and system-wide principles to
 
 ## 3. Key Design Decisions
 
-| Decision                 | Choice                                                                 | Rationale                                                                                                               |
-| ------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Client split    | Routing, forms, and client state have separate leaves                  | Each area has a distinct public contract and verification surface, while their boundaries remain explicit.              |
-| `[KD-2]` Server boundary | Route and form consumers use typed Hono RPC query and mutation clients | This refines the Worker-as-API decision in `docs/architecture.spec.md` `[KD-1]` and keeps access control at the Worker. |
+| Decision                 | Choice                                                                                           | Rationale                                                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `[KD-1]` Client split    | Routing, forms, and client state have separate leaves                                            | Each area has a distinct public contract and verification surface, while their boundaries remain explicit.               |
+| `[KD-2]` Server boundary | Loaders read server helpers directly; forms use page actions or the remaining typed HTTP clients | This refines the Worker runtime decision in `docs/architecture.spec.md` `[KD-1]` and keeps access control at the Worker. |
 
 ## 4. Principles & Intents
 
 - `[PI-1]` **State follows its owner** — refine `docs/architecture.spec.md` `[PI-4]`: server
-  records remain query data; browser state contains only selections and preferences.
-- `[PI-2]` **Routes compose contracts** — routes coordinate authentication, query prefetch, and
+  records remain loader props or HTTP responses; browser state contains only selections and preferences.
+- `[PI-2]` **Routes compose contracts** — routes coordinate server authentication, loader data, and
   layouts without absorbing feature business logic.
 - `[PI-3]` **Forms share validation shape** — form interactions use the input contract owned at
   the Worker boundary, refining `docs/architecture.spec.md` `[PI-3]`.
@@ -51,30 +51,29 @@ boundary while leaving product goals and system-wide principles to
 
 - `[C-1]` Browser persistence is device-local and can be absent or malformed, so persisted values
   require safe fallback behavior.
-- `[C-2]` Generated route metadata constrains route declarations; browser-only state is read only
-  after the SPA mounts.
+- `[C-2]` Void generates page/API route metadata; persisted stores return initial SSR/hydration snapshots before client-local values.
 
 ## 7. High-Level Components
 
-| Leaf                                     | Module type       | Responsibility                                                   | Public API surface                         |
-| ---------------------------------------- | ----------------- | ---------------------------------------------------------------- | ------------------------------------------ |
-| [`routing-ssr`](./routing-ssr.spec.md)   | Router convention | URL matching, route context, browser SPA mount, prefetch         | Route declarations, `getRouter()`          |
-| [`forms`](./forms.spec.md)               | Form library      | Typed form composition, validation display, multipart submission | `useAppForm`, `withForm`, field registry   |
-| [`client-state`](./client-state.spec.md) | State convention  | Query, persistent UI state, URL and cookie state                 | `queryKeys`, `persistedStore`, store hooks |
+| Leaf                                     | Module type           | Responsibility                                                           | Public API surface                             |
+| ---------------------------------------- | --------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
+| [`routing-ssr`](./routing-ssr.spec.md)   | Void Pages convention | URL matching, shared context, SSR/client navigation, loaders and actions | Page exports, `guardPage`, loader props        |
+| [`forms`](./forms.spec.md)               | Form library          | Typed form composition, validation display, multipart submission         | `useAppForm`, `withForm`, field registry       |
+| [`client-state`](./client-state.spec.md) | State convention      | Loader props, persistent UI state, URL and cookie state                  | `usePageAction`, `persistedStore`, store hooks |
 
 Leaf execution order:
 
 | Leaf                                     | Depends on                                                                      | Rationale                                                                   |
 | ---------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [`routing-ssr`](./routing-ssr.spec.md)   | `../server/auth.spec.md`, `../server/server-functions.spec.md`                  | Route context and loaders consume authentication and Hono RPC contracts.    |
-| [`forms`](./forms.spec.md)               | `../server/server-functions.spec.md`                                            | Form schemas and Hono RPC submissions meet the Worker validation boundary.  |
-| [`client-state`](./client-state.spec.md) | [`routing-ssr`](./routing-ssr.spec.md) `[KD-1]`, `../server/data-layer.spec.md` | Query lifecycle follows router context and represents Worker-owned records. |
+| [`routing-ssr`](./routing-ssr.spec.md)   | `../server/auth.spec.md`, `../server/server-functions.spec.md`                  | Shared context and loaders resolve authentication and direct server reads.  |
+| [`forms`](./forms.spec.md)               | `../server/server-functions.spec.md`                                            | Form schemas and Void HTTP submissions meet the Worker validation boundary. |
+| [`client-state`](./client-state.spec.md) | [`routing-ssr`](./routing-ssr.spec.md) `[KD-1]`, `../server/data-layer.spec.md` | Page refresh supplies Worker records; stores retain browser intent.         |
 
 ## 8. Detailed Design
 
 | Component     | Specified in                                     |
 | ------------- | ------------------------------------------------ |
-| Routing & SPA | [`routing-ssr.spec.md`](./routing-ssr.spec.md)   |
+| Routing & SSR | [`routing-ssr.spec.md`](./routing-ssr.spec.md)   |
 | Forms         | [`forms.spec.md`](./forms.spec.md)               |
 | Client state  | [`client-state.spec.md`](./client-state.spec.md) |
 
@@ -84,7 +83,9 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                   | Sections affected | Reason                                                 |
-| ---------- | ----------------------------------------------------------- | ----------------- | ------------------------------------------------------ |
-| 2026-09-13 | Adopt typed Hono RPC clients as the client server boundary. | 3, 5, 7           | Reflect the completed feature-action migration.        |
-| 2026-09-13 | Document the browser SPA mount and query provider.          | 6–8               | Remove SSR render-mode and document-shell assumptions. |
+| Date       | Amendment                                                                              | Sections affected | Reason                                                 |
+| ---------- | -------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------ |
+| 2026-09-13 | Adopt typed Hono RPC clients as the client server boundary.                            | 3, 5, 7           | Reflect the completed feature-action migration.        |
+| 2026-09-13 | Document the browser SPA mount and query provider.                                     | 6–8               | Remove SSR render-mode and document-shell assumptions. |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                  |
+| 2026-10-03 | Update the routing leaf to SSR and client navigation.                                  | 7–8               | Match the shared render mode.                          |

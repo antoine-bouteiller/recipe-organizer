@@ -2,27 +2,28 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "tags": ["-lintignore"],
   "includeEntryExports": true,
-  "workspaces": {
-    "apps/web": {
-      "entry": ["public/sw.js!", "src/**/*.test.ts"]
-    },
-    "apps/api": {
-      "entry": ["src/**/*.test.ts"]
-    },
-    "packages/shared": {
-      "entry": ["src/**/*.test.ts"]
-    },
-    "packages/design-system": {
-      "entry": ["src/**/*.test.ts"],
-      "project": ["src/**/*.{ts,tsx}!", "!src/**/*.stories.*!"]
-    },
-    "packages/oxlint": {
-      "entry": ["**/*.test.ts"]
-    },
-    "packages/scripts": {
-      "entry": ["apply-migration-local.ts"]
-    }
+  "entry": [
+    "public/sw.js!",
+    "{src,tools}/**/*.test.{ts,tsx}",
+    "pages/**/*.{ts,tsx}!",
+    "routes/**/*.ts!",
+    "middleware/**/*.ts!",
+    "tools/oxlint/index.ts",
+    "tools/scripts/apply-migration-local.ts",
+    "void.config.ts",
+    "auth.ts!",
+    "env.ts!"
+  ],
+  "project": ["**/*.{ts,tsx}!", "!**/*.stories.*!", "!tools/**!"],
+  "husky": {
+    "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"]
   },
-  "husky": { "config": [".vite-hooks/pre-commit", ".vite-hooks/commit-msg"] },
-  "ignoreDependencies": ["cloudflare"]
+  "ignoreDependencies": ["cloudflare", "oxc-transform-react"],
+  "ignoreIssues": {
+    "{routes,middleware}/**/*.ts": ["exports"],
+    "pages/**/*.{ts,tsx}": ["exports", "types"],
+    "{void.config,env,auth}.ts": ["exports"],
+    "src/db/schema/auth.ts": ["exports"],
+    "tools/oxlint/index.ts": ["exports"]
+  }
 }

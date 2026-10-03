@@ -13,7 +13,7 @@ related:
     docs/infrastructure/client/routing-ssr.spec.md,
     docs/infrastructure/client/forms.spec.md,
     docs/infrastructure/client/client-state.spec.md,
-    packages/design-system/styling.spec.md,
+    src/styles/styling.spec.md,
   ]
 ---
 
@@ -25,13 +25,13 @@ module so feature ownership and import boundaries remain legible.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                                                                                                                                                                   | Rationale                                                                                                                   |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Ownership boundary       | A product domain spans `src/client/features/<feature>/` for UI and query wrappers and `src/server/routes/<feature>/` for Hono routes and DB utilities; `src/shared/<feature>/` holds only cross-runtime contracts.                                       | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
-| `[KD-2]` Runtime-code placement   | Browser code lives in `src/client/`; Worker code lives in `src/server/`; only actual cross-runtime modules live in `src/shared/`.                                                                                                                        | The top-level directories make runtime boundaries visible before an import is written.                                      |
-| `[KD-3]` Route and data placement | Browser routes follow URL hierarchy in `src/client/routes/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                   | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
-| `[KD-4]` Naming and imports       | Files use kebab-case except TanStack Router dynamic segments; TypeScript imports use `@client/*`, `@server/*`, and `@shared/*` for cross-directory runtime paths, and `@schema` for database schema exports; relative imports remain within a directory. | Filenames match the lint convention and import paths reveal whether a dependency is local or crosses a module boundary.     |
-| `[KD-5]` Styling compilation      | Vanilla-extract compiles owner-local `.css.ts` files; the design-system package exports its public `theme` API while components retain private colocated recipes.                                                                                        | Web, Storybook, and tests share typed theme references without generated utilities or component styling overrides.          |
+| Decision                          | Choice                                                                                                                                                                                                                                                                                           | Rationale                                                                                                                   |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Ownership boundary       | A product domain spans `src/features/<feature>/client/` for UI and browser-only API readers, `src/features/<feature>/server/` for server domain utilities, isomorphic contracts at the feature root, `pages/` for Void loaders/actions, and `routes/api/<feature>/` for remaining HTTP handlers. | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
+| `[KD-2]` Runtime-code placement   | Page composition lives in `pages/` and Worker HTTP routes in `routes/api/`; all application source lives in `src/`, split into `client/` and `server/` folders inside features and `src/lib/`; only actual cross-runtime modules sit outside those folders.                                      | The folder names make runtime boundaries visible before an import is written.                                               |
+| `[KD-3]` Route and data placement | Void pages follow URL hierarchy and layout groups in `pages/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                                                         | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
+| `[KD-4]` Naming and imports       | Files use kebab-case except Void dynamic segments; source imports use `@/*` (resolved to `src/`) and same-directory dependencies are relative.                                                                                                                                                   | Filenames match the lint convention and import paths reveal which runtime folder a dependency belongs to.                   |
+| `[KD-5]` Styling compilation      | Vanilla-extract compiles owner-local `.css.ts` files; `src/styles/` exposes the public `theme` API while components retain private colocated recipes.                                                                                                                                            | Web, Storybook, and tests share typed theme references without generated utilities or component styling overrides.          |
 
 ## 4. Principles & Intents
 
@@ -47,153 +47,133 @@ module so feature ownership and import boundaries remain legible.
 
 ## 6. Caveats
 
-- `[C-1]` The generated `src/client/routeTree.gen.ts` and `worker-configuration.d.ts` files are overwritten by their respective tools and do not accept hand edits; tooling excludes the route tree from formatting and linting (`vite.config.ts:48`, `vite.config.ts:188`).
-- `[C-2]` Worker-only imports, including `cloudflare:workers`, stay on server execution paths; importing them into client-rendered components breaks the runtime boundary (`src/server/lib/db.ts:2`).
-- `[C-3]` `migrations_tmp/` belongs to Wrangler (`wrangler.jsonc:21`), while authored Drizzle schema history belongs in `src/db/migrations/`.
+- `[C-1]` Generated `.void/` and `.void-wrangler.jsonc` files are tool-owned and do not accept hand edits; regenerate page/API metadata with `vp exec void prepare`.
+- `[C-2]` Worker-only imports, including `cloudflare:workers`, stay on server execution paths; importing them into client-rendered components breaks the runtime boundary (`src/lib/server/db.ts`).
+- `[C-3]` `migrations_tmp/` belongs to Wrangler (`tools/wrangler.jsonc`), while authored Drizzle schema history belongs in `src/db/migrations/`.
 
 ## 7. High-Level Components
 
-| Component         | Module type | Responsibility                                                                           | Public API surface                                                     |
-| ----------------- | ----------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Repository layout | Convention  | Places application, database, documentation, static assets and tooling by responsibility | Directory contract rooted at `src/`, `docs/`, `public/` and `scripts/` |
+| Component         | Module type | Responsibility                                                                           | Public API surface                                             |
+| ----------------- | ----------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Repository layout | Convention  | Places application, database, documentation, static assets and tooling by responsibility | Root application adapters, `src/` source, and `tools/` tooling |
 
 ## 8. Detailed Design
 
 ### 8.1 Repository layout
 
+The repository root is the single Void project and deployment. `pages/` and `routes/api/`
+compose `@/features/<feature>/server/*` and `@/lib/server/*`; `src/` also owns React feature
+presentation and browser services. Server folders never import browser components or the design
+system. Isomorphic modules cannot import server implementation.
+
 ```text
 recipe-organizer/
-├── docs/
-│   ├── architecture.spec.md    # Architecture umbrella
-│   ├── file-structure.spec.md  # This repository-layout leaf
-│   └── infrastructure/
-│       ├── client/             # Routing, forms and client-state specs
-│       └── server/             # Platform, data, server-function and auth specs
-├── public/                     # Static assets
-├── scripts/                    # Build, development, and database tooling
-├── packages/
-│   └── design-system/           # Reusable UI and owner-local .css.ts styles
-│       └── src/theme/
-│           ├── index.ts            # Public `theme` API: typed variables and spacing
-│           ├── spacing.ts          # CSS `calc(4px * n)` shorthand helper
-│           └── tokens.css.ts       # Internal variables and global theme CSS
+├── docs/                       # Architecture and infrastructure specs
+├── public/                     # Static assets and network-only sw.js
+├── pages/                      # layout.tsx; regular pages + optional server companions
+├── routes/api/                 # Remaining Void HTTP adapters
+├── middleware/                 # API/action errors, API CSRF, shared page context
 ├── src/
-│   ├── client/
-│   │   ├── components/         # Browser UI, forms, layout, navigation, and errors
-│   │   ├── features/
-│   │   │   └── <feature>/      # UI, query wrappers, local state, and colocated feature specs
-│   │   ├── hooks/              # Shared React hooks
-│   │   ├── lib/                # Browser application services and API client
-│   │   ├── routes/             # File-based browser pages
-│   │   ├── stores/             # Cross-feature persisted UI state
-│   │   ├── styles/             # Global browser styles
-│   │   ├── types/              # Frontend-inferred API types
-│   │   ├── utils/              # Browser-only helpers
-│   │   ├── main.tsx            # Browser SPA entry
-│   │   ├── routeTree.gen.ts    # Generated TanStack Router tree
-│   │   └── router.tsx          # Router factory and Query provider
+│   ├── components/             # App shell, error boundary, navigation, screen layout, not-found
+│   │   └── ui/                 # Owned UI component families and stories
 │   ├── db/
-│   │   ├── migrations/         # Authored Drizzle schema-history artefacts
-│   │   └── schema/             # Table modules and relation exports
-│   ├── server/
-│   │   ├── routes/<feature>/   # Hono routes and feature DB utilities
-│   │   ├── lib/                # Auth, D1, R2, cache, and Worker services
-│   │   ├── utils/              # Server helpers and authorization checks
-│   │   ├── api-context.ts      # Request API context
-│   │   ├── api.ts              # Hono API composition
-│   │   └── index.ts            # Worker entry
-│   └── shared/
-│       ├── <feature>/schemas.ts # Cross-runtime feature schemas
-│       ├── recipe/constants.ts  # Shared recipe constants
-│       ├── ingredients/categories.ts
-│       ├── units.ts
-│       └── utils/               # Cross-runtime helpers
-├── AGENTS.md                   # Contributor guidance
-├── tsconfig.json               # TypeScript aliases and compiler configuration
-├── vite.config.ts              # Application tooling configuration
-└── wrangler.jsonc              # Worker bindings and deployment configuration
+│   │   ├── schema/             # Drizzle tables and relations
+│   │   └── migrations/
+│   ├── features/<feature>/
+│   │   ├── client/             # Components, catalogue contexts, API readers
+│   │   ├── server/             # Queries and aggregate writes
+│   │   ├── *.ts                # Cross-runtime schemas and constants
+│   │   └── *.spec.md
+│   ├── hooks/                  # Shared browser/hydration hooks
+│   ├── lib/
+│   │   ├── client/             # API response, page action, persistence, theme
+│   │   └── server/             # Auth, D1, R2, cache, errors, env.d.ts
+│   ├── stores/                 # Durable IDs and quantities
+│   ├── styles/                 # Theme, global styles, fonts, styling spec
+│   ├── types/                  # Types derived from server projections / HTTP routes
+│   └── utils/                  # Cross-runtime helpers and units
+├── tools/
+│   ├── oxlint/                 # Custom lint rules
+│   ├── scripts/                # Local D1 migration
+│   └── wrangler.jsonc          # D1 tooling only
+├── .storybook/
+├── .void/                      # Generated Worker entry and route types (ignored)
+├── .wrangler/state/            # Local runtime persistence (ignored)
+├── .void-wrangler.jsonc         # Generated runtime config (ignored)
+├── env.ts
+├── void.config.ts              # Runtime/deploy bindings and document head
+├── vite.config.ts              # Void/React plugins, checks, tests, formatting
+├── package.json
+└── AGENTS.md
 ```
 
-`apps/web/public/sw.js` is the registered, module service worker at the stable `/sw.js` URL. It
-supports the user-required Samsung PWA installation path while forwarding fetches to the network,
-without offline support or legacy storage cleanup.
+The root `pages/layout.tsx` wraps every page. Each route is a folder holding `index.tsx` and an optional
+`index.server.ts`; `[id]` is a dynamic segment. Pages export default components and import
+feature components directly via `@/...`; server companions export loaders/actions.
+Features expose slots/render props for page-owned composition without feature-to-feature imports.
+The shopping-list page owns its reset button directly and needs no server companion.
 
-A feature spans runtime-specific directories: `src/client/features/<feature>/` owns its UI,
-query/mutation wrappers, and browser-local code; `src/server/routes/<feature>/` owns its Hono route
-group and feature DB utilities; `src/shared/<feature>/schemas.ts` owns schemas needed by both. Shared
-is not a general reuse bucket: only modules imported by both runtimes belong there. Frontend-inferred
-API types remain in `src/client/types/`. Feature specs remain colocated in `src/client/features/` so
-one spec tree documents both the browser surface and the matching server feature without crossing the
-runtime boundary in code.
+A feature spans `src/features/<feature>/client/` UI and browser-only calls, page composition under
+`pages/`, remaining `routes/api/<feature>/` HTTP adapters, `src/features/<feature>/server/`
+helpers, and narrowly shared contracts at the feature root. Specs stay at the feature root and
+describe both runtimes.
+Loaders read server helpers directly; browser runtime imports never reach Worker-bound code.
+Type-only imports may derive projection types from server helper return types.
+Remaining HTTP clients use typed `void/client` fetch; `vp exec void prepare` regenerates ignored
+page/action/API route metadata before clean-tree checks.
 
-Oxlint import restrictions in `vite.config.ts` enforce the runtime boundary: client and server may
-import shared modules, but shared imports neither runtime, and server does not import client code.
-Client code cannot import database schemas, Worker modules, or server code, except for the type-only
-`@server/api` import in `src/client/lib/api-client.ts` used by `hc<typeof api>`. This exception preserves
-inferred Hono contracts without including the server implementation in the browser bundle.
+The document head in `void.config.ts` owns metadata, manifest/favicon, theme initialization,
+service-worker registration, and the backward cross-document transition hook.
+`public/sw.js` registers without a fetch handler, offline support, or legacy cleanup.
 
-`packages/design-system/src/ui/<category>/<component>/` holds repository-owned component families with
-colocated `<component>.stories.tsx` files. Desktop, drawer, and shared implementation files stay with
-the matching family. Package subpath exports (`@recipe-organizer/design-system/button`, for example)
-expose source modules without a separate library build. Generic hooks live in `src/hooks/` and icons
-in `src/ui/data-display/icons/` inside the package; it never imports the web app. The combobox option type is shared, while query-backed option
-hooks remain app-owned. Vanilla-extract compiles colocated `.css.ts` files through the web,
-Storybook, and root test Vite plugins. The design-system package exports typed shared values as
-`theme` from `@recipe-organizer/design-system/theme`; the web and Storybook entrypoints load
-`@recipe-organizer/design-system/global.css`, which activates the global Vanilla Extract reset/base rules
-and shared theme. `src/global.css.ts` defines both reset and base rules, retaining their named
-cascade layers. `src/theme/index.ts` combines the internal variables from `tokens.css.ts` with the ordinary
-`theme.spacing(...)` helper, which accepts one to four numeric values and returns `calc(4px * n)`
-CSS shorthand. The internal token module exports variables only to the public theme index while
-emitting global theme CSS. `.css.ts` consumers use typed `theme` references, including template
-interpolations, instead of shared raw `var(--…)` strings. Native CSS variables remain appropriate for
-component-owned and runtime-owned behavior. No separate generation step or generated utility
-directory is required. Component recipes remain colocated with their owners. `apps/web/src/routes/`
-contains route declarations and composition only: no `.css.ts` files or styling imports. Feature sections and containers
-own their markup and colocated styles; `apps/web/src/components/app-shell/` owns shell presentation.
-Routes construct pages from those styled components and retain cross-feature coordination, such as
-recipe create/edit and search, rather than delegating to intermediary page wrappers. Native global CSS remains for owned fonts, theme
-activation, safe-area, scrolling, transitions, and runtime-only behavior. Categories are `actions`,
-`data-display`, `feedback`, `forms`, `layout`, `navigation`, and `overlays`; each story uses the
-matching category as its title prefix. Physical categorization does not change package subpath imports.
-`packages/design-system/styling.spec.md` owns the styling and component-ownership guidance.
+### Component and styling ownership
 
-`apps/web/src/components/` retains domain-specific ingredient-category presentation and app-owned
-navigation constants: menus and filtering stay in `navigation/constants.tsx`. Typed form adapters and
-their context/registry, file-input support, rich-text editing, generic dialogs, search input, icons,
-router-aware screen layout/navigation and not-found presentation live in the design system. Single-use
-desktop navigation is inlined into `AppHeader`, and the default error callback is inlined into
-`apps/web/src/router.tsx` with colocated `router.css.ts`. The command palette lives in the feature's
-`SearchBar`, reusing DS `ScrollArea`. The DS may depend on catalogued TanStack Router but never imports
-app or feature code. `TabBar` uses item `label`/`linkProps` (`LinkOptions`) and icons; actual Links retain
-navigation semantics. The desktop navbar uses exact matching to `/` only;
-`ScreenLayout` calls `router.history.back()` when `withGoBack`, defaults scroll IDs to `screen-inner`/
-`screen-outer`, and takes an explicit footer. The router's error renderer and DS not-found component
-provide home Links and French messages, with Error details only in development. Pages pass `mobileMenuItems` to TabBar; `__root`
-composes theme toggle and search inside styled app-shell containers. Recipe/auth policy remains in the index route. Feature schemas,
-query-backed options, API calls, and persisted app state do not move.
-App-specific React hooks and persisted stores live in `apps/web/src/hooks/` and
-`apps/web/src/stores/`. `src/client/lib/` and `src/client/utils/` contain browser application services
-and browser-only helpers. `src/server/lib/` contains Worker-bound auth, database, R2, and cache
-services. `src/shared/` contains cross-runtime schemas, constants, units, and helpers. Shared media URL
-helpers use the common Vite `import.meta.env.DEV` flag; they do not depend on browser or Worker bindings.
+`src/components/ui/<category>/<component>/` holds owned component families and
+colocated stories, imported by path such as `@/components/ui/actions/button/button`.
+Their supporting hooks live in `src/hooks/`, icons in
+`src/components/ui/data-display/icons/`. `src/components/ui/` never imports app or feature code;
+app-specific presentation (TabBar, ScreenLayout, NotFound) lives directly under `src/components/`.
 
-`index.html` loads `src/client/main.tsx`, which mounts the browser SPA. Routes use
-`src/client/routes/` and mirror their URL segments. A dynamic segment uses the TanStack Router
-`$parameter` filename form. The Worker entry is `src/server/index.ts`; it dispatches `/api/*` to Hono
-rather than using route files as HTTP handlers. Route files do not become feature internals: they
-compose a feature's public UI surface.
+Vanilla Extract compiles owner-local `*.css.ts` through web, Storybook, and test plugins.
+Consumers import the typed `theme` from `@/styles/theme`, including in
+template interpolations; raw shared CSS variable strings are not the public API.
+`src/styles/theme/index.ts` combines internal `tokens.css.ts` values with
+`theme.spacing(...)`; `src/styles/global.css.ts` owns layered reset/base rules.
+Layouts and Storybook load `global.css` and `styles.css`. Native styles retain font faces and
+layer order; component/app styles are unlayered. Recipes stay private and colocated.
+Parent wrappers own external layout. Categories and story title prefixes remain Actions, Data Display,
+Feedback, Forms, Layout, Navigation, and Overlays. See
+[UI ownership](../src/styles/styling.spec.md) for the full contract.
 
-Database table modules live under `src/db/schema/`, which exports the schema and relations; generated
-schema-history artefacts live under `src/db/migrations/`. Root configuration and tool-owned directories
-remain at the repository root, separating deployment and build configuration from application code.
+Pages are unstyled composition: feature sections and app-shell components own markup/styles.
+AppHeader owns desktop navigation; `src/components/app-error/` owns the regular-layout React
+render-error boundary. DS Button renders `@void/react` `Link` through `asLink` + `href`;
+TabBar takes `currentPath` and `href` items. ScreenLayout takes a `backButton` slot;
+GoBackButton defaults to `history.back()`. Retained inner/outer scroll IDs do not implement scroll
+restoration. Storybook has no router decorator. Pages/layouts compose header search and theme;
+feature/auth policy does not move into `src/components/ui/`.
 
-All ordinary filenames use kebab-case (`vite.config.ts:120`). `.ts` identifies modules without JSX and
-`.tsx` identifies modules that contain JSX. Specs use the `.spec.md` suffix. Cross-directory
-application imports use `@client/*`, `@server/*`, and `@shared/*` for runtime paths, and `@schema` for database schema exports (`tsconfig.json:26-29`); same-directory dependencies use relative imports. Feature-to-feature imports are forbidden, including public APIs. Per-feature `no-restricted-imports`
-overrides in `vite.config.ts` enforce this for alias and relative imports. Cross-feature composition
-belongs in routes or app-owned components; shared browser hooks such as `useIsInShoppingList` live in
-`apps/web/src/hooks/`.
+### Import and database boundaries
+
+Ordinary files use kebab-case except framework dynamic segments; `.tsx`
+contains JSX and specs use `.spec.md`. Source imports use `@/*` and same-directory
+dependencies are relative. Features may import only the root (isomorphic) modules of other features;
+pages or app-owned components coordinate their client and server code. Shared browser hooks live
+outside features.
+
+Database table modules live in `src/db/schema/`, Drizzle history in
+`src/db/migrations/`. Tooling-only Wrangler resource IDs must match `void.lock.json`;
+runtime generated files and local persistence remain at root. Worker-only imports such as
+`cloudflare:workers` stay on server execution paths.
+
+### 8.2 Outcome and acceptance
+
+- `[SO-1]` Root framework adapters compose client and server source from `src/` without
+  introducing another deployment — demonstrated by `[VC-1]` and `[VC-2]`.
+- `[VC-1]` Root development and production preview render deep page URLs, health JSON, and
+  unknown API JSON 404s — demonstrates `[SO-1]`.
+- `[VC-2]` Server modules resolve in API handlers; browser runtime imports do not reach
+  server implementation. Drizzle history and local runtime persistence survive relocation — demonstrates `[SO-1]`.
 
 ## 9. Open Questions
 
@@ -218,3 +198,9 @@ N/A.
 | 2026-09-18 | Move router-only reusable web presentation into the design system. | 8.1 | Permit typed DS navigation without moving application policy or feature code. |
 | 2026-09-18 | Extract styled sections and containers while retaining route composition. | 8.1 | Keep routes unstyled and component styles colocated with their owners. |
 | 2026-09-19 | Inline single-use navbar, error, and command components into app owners. | 8.1 | Keep the DS surface backed by production reuse. |
+
+| 2026-10-02 | Root the Void application and move Worker implementation into `packages/server`. | 3, 8 | Remove single-app nesting while preserving runtime and deployment boundaries. |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
+| 2026-10-02 | Remove workspace packages: server, shared, and design system move into `src/` with `client/`/`server/` feature and lib folders; oxlint and scripts move to `tools/`. | 3, 6, 7, 8 | Drop package indirection for a single-deployment app. |
+| 2026-10-02 | Fold `src/design-system/` into `src/components/ui/`, `src/hooks/`, `src/utils/`, and `src/styles/`; move TabBar, ScreenLayout, and NotFound back to `src/components/`. | 8.1 | One component root; app-specific presentation sits with the app shell. |
+| 2026-10-03 | Replace browse wrapper entries with regular pages and direct component imports. | 3, 8.1 | Match hydrated route composition. |

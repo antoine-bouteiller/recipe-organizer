@@ -6,11 +6,11 @@ author: Antoine Bouteiller
 date: 2026-08-14
 related:
   [
-    src/client/features/recipe/spec/index.spec.md,
-    src/client/features/ingredients/ingredients.spec.md,
-    src/client/features/search/search.spec.md,
-    src/client/features/shopping-list/shopping-list.spec.md,
-    src/client/features/users/users.spec.md,
+    src/features/recipe/spec/index.spec.md,
+    src/features/ingredients/ingredients.spec.md,
+    src/features/search/search.spec.md,
+    src/features/shopping-list/shopping-list.spec.md,
+    src/features/users/users.spec.md,
   ]
 ---
 
@@ -19,46 +19,46 @@ related:
 A small, closed group of French-speaking home cooks needs one place to write, find, scale and shop
 their recipes, including rich instructions that embed Magimix programs and reusable sub-recipes.
 Off-the-shelf recipe apps neither model those instructions nor allow a private, invitation-controlled
-membership. Recipe Organizer is a browser React SPA and same-origin Hono API served from one
+membership. Recipe Organizer is server-rendered Void Pages with client navigation and a same-origin Void API served from one
 Cloudflare deployment, with all state — relational data, blobs, sessions — kept inside one provider
 so there is no second service to operate.
 
-- `[G-1]` Serve the whole product — pages, Hono RPC, OAuth callback, and media streaming — from a
+- `[G-1]` Serve the whole product — pages, Void HTTP, OAuth callback, and media streaming — from a
   single Cloudflare Worker with no separate API tier.
 - `[G-2]` Keep every persistent byte on Cloudflare: relational rows in D1, blobs in R2.
 - `[G-3]` Admit users only through Google OAuth plus explicit admin approval, and enforce ownership
   on every write.
-- `[G-4]` Give each product domain a self-contained feature module spanning its Hono routes, UI,
+- `[G-4]` Give each product domain a self-contained feature module spanning its Void routes, UI,
   and client state.
 - `[G-5]` Remain installable through the web manifest and icons, independently of offline support.
 - `[G-6]` Present a French-only interface, including validation messages.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                               | Rationale                                                                                                                                                                    |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Runtime                  | TanStack Router browser SPA and Hono on one Cloudflare deployment                                                    | `index.html` and `src/client/main.tsx` start the browser application; the Worker is the same-origin API, so there is no second deployment target to keep in sync.            |
-| `[KD-2]` Render mode              | Browser SPA; no SSR or server actions                                                                                | Every page is personalised and auth-dependent, so page HTML is rendered in the browser; this avoids hydration concerns and lets `localStorage`-backed state render directly. |
-| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                                                                  | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                                       |
-| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                                                                       | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                                      |
-| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                                                                     | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                            |
-| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                                                                  | The product is private by intent, and OAuth alone would let any Google account in.                                                                                           |
-| `[KD-7]` Server-state vs UI-state | TanStack Query owns server data; TanStack Store owns UI selections                                                   | The two have different lifetimes and invalidation rules; keeping them disjoint stops persisted UI state from going stale against the database.                               |
-| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write                                                      | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                                        |
-| `[KD-9]` Rich instructions        | Lexical with custom nodes                                                                                            | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.                        |
-| `[KD-10]` Module boundary         | Features split by runtime: `src/client/features/`, `src/server/routes/`, and narrowly shared `src/shared/` contracts | Runtime-specific imports stay isolated while each domain retains clear ownership; feature specs remain client-colocated because they describe both runtime sides.            |
-| `[KD-11]` PWA registration        | A minimal network-only service worker remains registered at `/sw.js`, without offline support or legacy cleanup      | This is a user requirement for Samsung PWA installation, not a universal browser-installability claim. It provides no offline caching, replay, or fallback.                  |
+| Decision                          | Choice                                                                                                                                                                    | Rationale                                                                                                                                                         |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Runtime                  | Void Pages and API on one Cloudflare deployment                                                                                                                           | The Worker renders page documents and serves API/static assets together; no separate deployment needs synchronization.                                            |
+| `[KD-2]` Render mode              | SSR on first load with regular hydrated pages and Void client navigation throughout                                                                                       | Client navigation avoids full-document recipe visits; initial store snapshots make hydration safe.                                                                |
+| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                                                                                                                       | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                            |
+| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                                                                                                                            | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                           |
+| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                                                                                                                          | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                 |
+| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                                                                                                                       | The product is private by intent, and OAuth alone would let any Google account in.                                                                                |
+| `[KD-7]` Server-state vs UI-state | Loader props own page data; TanStack Store owns durable browser intent                                                                                                    | Page actions refresh server snapshots; persisted IDs/quantities remain device-local rather than stale copies of rows.                                             |
+| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write                                                                                                           | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                             |
+| `[KD-9]` Rich instructions        | Lexical with custom nodes                                                                                                                                                 | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.             |
+| `[KD-10]` Module boundary         | Features split by runtime: `src/features/<feature>/client/`, `src/features/<feature>/server/`, narrowly shared contracts at the feature root, `pages/`, and `routes/api/` | Runtime-specific imports stay isolated while each domain retains clear ownership; feature specs sit at the feature root because they describe both runtime sides. |
+| `[KD-11]` PWA registration        | A minimal network-only service worker remains registered at `/sw.js`, without offline support or legacy cleanup                                                           | This is a user requirement for Samsung PWA installation, not a universal browser-installability claim. It provides no offline caching, replay, or fallback.       |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **The Worker is the API** — any server-side concern is reachable through Hono or a route
+- `[PI-1]` **The Worker owns server execution** — any server-side concern is reachable through Void or a route
   handler; no separate service is introduced.
 - `[PI-2]` **Thin feature routes** — validate, touch the database or bucket, return; substantial
-  logic moves to feature utilities or `src/server/lib/`.
+  logic moves to feature utilities or `src/lib/server/`.
 - `[PI-3]` **Validate at the trust boundary** — every write parses its input with Zod inside its
-  Hono route, never relying on client-side validation.
+  Void route, never relying on client-side validation.
 - `[PI-4]` **Never duplicate server data in a store** — stores hold identifiers and selections; the
-  data behind them is refetched by query.
+  data behind them comes from loaders or the remaining HTTP reads.
 - `[PI-5]` **Features are self-contained** — cross-feature use goes through a feature's public API,
   not into its internals.
 - `[PI-6]` **Design system is owned** — UI primitives live in the repository and are edited in place
@@ -66,7 +66,7 @@ so there is no second service to operate.
 
 ## 5. Non-Goals
 
-- `[NG-1]` Public or anonymous access to recipes; every route is behind approved membership.
+- `[NG-1]` Public sharing and discovery are outside private-group product intent. Shipped browse loaders are not membership-gated; protected writes and app pages require membership.
 - `[NG-2]` Identity providers other than Google, and password or email-link authentication.
 - `[NG-3]` Analytical or reporting workloads over D1.
 - `[NG-4]` Offline functionality: reads and writes require connectivity; the registered worker has no offline UI, session fallback, precaching, runtime caching, or fallback response.
@@ -79,12 +79,10 @@ so there is no second service to operate.
   such as the database client must not be held across requests.
 - `[C-2]` D1 is SQLite: no cross-database joins, limited concurrency, and multi-row atomicity only
   through `batch([...])`.
-- `[C-3]` The generated route tree is a build artefact, so adding or moving a route file requires a
-  dev-server restart.
+- `[C-3]` Void route metadata is generated; run `vp exec void prepare` after adding/moving pages or API routes.
 - `[C-4]` The development bypass in the auth guard yields a fake admin, so development builds
   exercise no OAuth path.
-- `[C-5]` The shopping-list query key contains the selected recipe identifiers, so each selection
-  change mints a new key and refetches; this holds at tens of entries, not thousands.
+- `[C-5]` Shopping-list reads retain a promise per selected-ID array within each document, without TTL or write invalidation. Inner scroll-container restoration is not managed.
 - `[C-6]` Google's userinfo response shape is an external contract; only `id` and `email` are
   persisted, but a change in that payload breaks sign-in.
 - `[C-7]` Session encryption, OAuth client credentials and their rotation are Cloudflare Worker
@@ -93,69 +91,82 @@ so there is no second service to operate.
 ## 7. High-Level Components
 
 ```text
-Browser SPA (`index.html` + `src/client/main.tsx`)       Cloudflare Worker
-┌──────────────────────────────────────────────┐  ┌──────────────────────────────────────────┐
-│ Router · Query provider · Store · Forms       │──▶│ Hono `/api/*` → Data layer → D1          │
-│ Manifest/icons · network-only SW               │   │       └───────────▶ media → R2 / Images  │
-└──────────────────────────────────────────────┘   │       └───────────▶ OAuth → Google       │
-                                                   └──────────────────────────────────────────┘
+Browser document / regular page navigation
+        │ page request or action
+        ▼
+Cloudflare Worker: Void Pages + middleware + API + ASSETS
+        ├─ loaders/actions ──► server helpers ──► D1
+        ├─ auth ──► Better Auth / Google
+        └─ media ──► R2 / Images
+        │ server-rendered HTML + props
+        ▼
+Hydrated browse / app pages · local stores · forms
+Manifest/icons · network-only service worker
 ```
 
-| Component         | Module type                 | Responsibility                                                           | Public API surface                                                |
-| ----------------- | --------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| Repository layout | Convention                  | Where each kind of module lives and what may import what                 | Directory contract under `src/`                                   |
-| Platform          | Worker configuration        | Worker entry, bindings, edge cache, media handlers, PWA worker, CI       | `wrangler.jsonc` bindings, `src/server/lib/{r2,cache-manager}.ts` |
-| Data layer        | Library                     | Drizzle schema, relations, per-request client, migrations                | `getDb()`, table and relation exports                             |
-| Hono API          | Library + convention        | Validated, guarded feature routes and query/mutation option factories    | Server routes, client `apiClient` and `*Options()`, `authGuard()` |
-| Auth              | Feature-adjacent infra      | Google OAuth exchange, encrypted sessions, role and status enforcement   | `getAuthUser()`, `authGuard()`, auth routes                       |
-| Routing & SPA     | Convention                  | File-based browser routes, route context, loaders, and provider boundary | Route tree, `beforeLoad` context                                  |
-| Forms             | Library                     | Single application form hook over TanStack Form and Zod                  | `useAppForm`, `withForm`, field components                        |
-| Client state      | Library                     | Persisted UI state stores and their layering against server state        | `src/client/stores/*`, `persistedStore`                           |
-| Feature modules   | Runtime feature directories | Recipe, ingredients, search, shopping list and users domains             | Client wrappers/components and server routes                      |
+| Component         | Module type          | Responsibility                                          | Public API surface                         |
+| ----------------- | -------------------- | ------------------------------------------------------- | ------------------------------------------ |
+| Repository layout | Convention           | Runtime and ownership placement                         | Root adapters, `src/`, and `tools/`        |
+| Platform          | Worker configuration | Pages/API entry, bindings, media/cache, PWA/head, CI    | `void.config.ts`, R2 helpers               |
+| Data layer        | Library              | Drizzle schema, relations, client, migrations           | `getDb()`, schema exports                  |
+| Void Pages/API    | Library + convention | Reads, actions, validation, remaining HTTP              | `loader`, `action`, `actions`, typed fetch |
+| Auth              | Infrastructure       | Google sessions, status/role enforcement                | `getApiUser`, `guardPage`, `withAuthGuard` |
+| Routing & SSR     | Convention           | File matching, shared context, render/layout boundaries | `pages/`, `useShared()`, `Link`            |
+| Forms             | Library              | TanStack Form and Zod composition                       | `useAppForm`, `withForm`, fields           |
+| Client state      | Library              | Durable intent separated from server props              | `persistedStore`, `usePageAction`          |
+| Features          | Runtime directories  | Recipe, ingredients, search, shopping list, users       | Components and server helpers              |
 
 Leaf execution order:
 
-| Leaf                                                              | Depends on                       | Rationale                                                        |
-| ----------------------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------- |
-| [`file-structure`](./file-structure.spec.md)                      | —                                | Names the directories every other spec places code into          |
-| [`infrastructure/server`](./infrastructure/server/server.spec.md) | `file-structure`                 | Owns the runtime, storage, RPC and identity the client builds on |
-| [`infrastructure/client`](./infrastructure/client/client.spec.md) | `infrastructure/server` `[KD-3]` | Routing, forms and stores consume the server contracts           |
+| Leaf                                                              | Depends on                       | Rationale                                 |
+| ----------------------------------------------------------------- | -------------------------------- | ----------------------------------------- |
+| [`file-structure`](./file-structure.spec.md)                      | —                                | Names directories and boundaries          |
+| [`infrastructure/server`](./infrastructure/server/server.spec.md) | `file-structure`                 | Runtime, storage, validation, identity    |
+| [`infrastructure/client`](./infrastructure/client/client.spec.md) | `infrastructure/server` `[KD-3]` | Pages, forms, stores use server contracts |
 
-Feature specs remain colocated under `src/client/features/` and refine this umbrella through
-`related:`; each spec covers that feature's client surface and its corresponding server routes rather
-than implying that both runtime implementations share one directory.
+Feature specs remain under `src/features/` and cover each domain across pages, components,
+server helpers, and shared schemas rather than implying one shared runtime directory.
 
 ## 8. Detailed Design
 
-| Component         | Specified in                                                                                                                                                                                                                                                                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repository layout | [`file-structure.spec.md`](./file-structure.spec.md)                                                                                                                                                                                                                                                                                  |
-| Platform          | [`infrastructure/server/platform.spec.md`](./infrastructure/server/platform.spec.md)                                                                                                                                                                                                                                                  |
-| Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                                                              |
-| Hono API          | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                                                                  |
-| Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                                                          |
-| Routing & SPA     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                                                            |
-| Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                                                        |
-| Client state      | [`infrastructure/client/client-state.spec.md`](./infrastructure/client/client-state.spec.md)                                                                                                                                                                                                                                          |
-| Feature modules   | [`recipe`](../src/client/features/recipe/spec/index.spec.md), [`ingredients`](../src/client/features/ingredients/ingredients.spec.md), [`search`](../src/client/features/search/search.spec.md), [`shopping-list`](../src/client/features/shopping-list/shopping-list.spec.md), [`users`](../src/client/features/users/users.spec.md) |
+| Component         | Specified in                                                                                                                                                                                                                                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository layout | [`file-structure.spec.md`](./file-structure.spec.md)                                                                                                                                                                                                                                               |
+| Platform          | [`infrastructure/server/platform.spec.md`](./infrastructure/server/platform.spec.md)                                                                                                                                                                                                               |
+| Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                           |
+| Void API          | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
+| Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                       |
+| Routing & SSR     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
+| Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                     |
+| Client state      | [`infrastructure/client/client-state.spec.md`](./infrastructure/client/client-state.spec.md)                                                                                                                                                                                                       |
+| Feature modules   | [`recipe`](../src/features/recipe/spec/index.spec.md), [`ingredients`](../src/features/ingredients/ingredients.spec.md), [`search`](../src/features/search/search.spec.md), [`shopping-list`](../src/features/shopping-list/shopping-list.spec.md), [`users`](../src/features/users/users.spec.md) |
 
 ### 8.1 Request lifecycle
 
-Cloudflare assets serve `index.html` for browser routes, and `apps/web/src/main.tsx` starts the Router
-and an explicit React Query provider. Pages consume feature query options through TanStack Query.
-Routes that prefetch use `queryClient.query({ ...options, staleTime: 'static' })` in their loaders;
-home, search, and recipe details instead use `useQuery` with inline `isLoading` skeletons so their
-layouts render before data is ready. Query functions call the feature's same-origin Hono API client.
-The API runs its guard, parses its input, reads D1, and returns JSON data. Store-backed UI state is
-read directly from `localStorage`; no server render or server action participates in page navigation.
+Void matches `pages/` and runs global middleware. `03.page-context.ts` resolves shared
+`{ authUser, pathname }`; protected loaders return `guardPage` redirects before reads.
+Loaders import `@/features/<feature>/server/*` and `@/lib/server/*` directly and return typed props for SSR.
+One root hydrated layout wraps every page with a pathname-keyed `AppErrorBoundary`.
+Pages import feature components directly; persisted stores use initial SSR/hydration snapshots,
+then saved localStorage values. Shopping-list content is gated with `useIsHydrated`.
+Void client navigation uses prefetched loader props: fresh for 30s, usable up to 1h with background
+revalidation; non-GET navigation/actions flush the prefetch cache.
+
+Only auth, image/video, health, recipe-list palette reads, shopping-list projection reads, and inline
+ingredient POST remain APIs. Static assets remain available and unknown URLs use Void's default 404;
+missing recipe pages show in-page `NotFound`. No application catch-all shadows assets.
 
 ### 8.2 Write lifecycle
 
-A form submission serialises to JSON or `FormData`, a mutation invokes the feature's Hono RPC
-client, and the route runs guard → validator → blob write → row writes, in that order, so a rejected
-input never reaches storage. On success the mutation invalidates the affected query keys and lets
-the router navigate; on failure the error surfaces as a single French `alert()` message and the form maps field
-errors back onto their inputs.
+A regular-page form calls `usePageAction()` with typed data (recipe file entries pass through
+`readRecipeFormData`). The action authorizes and validates before domain writes; recipe helpers
+check owner-or-admin. Success refreshes loader props in place without changing URL/history;
+callers choose navigation or dialog effects. Never await a page action inside a React transition.
+Thrown action/API failures share safe JSON errors and client alerts.
+
+Recipe-details deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`;
+the guarded action redirects home, replacing the deleted recipe's history entry. Inline `AddIngredient` retains `POST /api/ingredients` and awaits
+`router.refresh()` before reset/close. D1 batching and R2 effect ordering remain feature-owned.
 
 ### 8.3 Trust boundary
 
@@ -180,3 +191,7 @@ possession of a URL is never a capability derived from guessing.
 | 2026-09-13 | Rename the server feature directory to `routes`.                       | 3                   | Match the server route layout.                                                |
 | 2026-09-14 | Register a network-only PWA worker while retaining offline removal.    | 2–3, 5, 7           | Meet the Samsung installation requirement without restoring offline behavior. |
 | 2026-09-18 | Align query loading with optional prefetch and inline skeletons.       | 8.1                 | Reflect the current TanStack Query API and page-owned loading.                |
+
+| 2026-10-02 | Root the Void app and package Worker implementation as `server`. | 3, 7–8 | Keep one deployment with explicit source-package boundaries. |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
+| 2026-10-03 | Document hydrated browsing, client navigation, prefetch, and redirecting deletion. | 2–3, 6–8 | Reflect the completed navigation migration. |
