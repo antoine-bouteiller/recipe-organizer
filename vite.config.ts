@@ -24,6 +24,16 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       : []),
   ],
   server: { port: 3000 },
+  environments: {
+    client: {
+      build: {
+        rolldownOptions: {
+          // Void links CSS per JS chunk; one shared style chunk yields one stylesheet instead of one per component.
+          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(\.ts)?($|\?)|\.vanilla\.css/ }] } },
+        },
+      },
+    },
+  },
   lint: {
     options: { typeAware: true, typeCheck: true, reportUnusedDisableDirectives: 'error' },
     plugins: ['typescript', 'react', 'unicorn', 'import'],
