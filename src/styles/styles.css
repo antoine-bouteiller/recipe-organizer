@@ -4,6 +4,16 @@
   navigation: auto;
 }
 
+/* Metric-matched to Bricolage Grotesque at weight 400 so the swap does not reflow text. */
+@font-face {
+  font-family: 'Bricolage Grotesque Fallback';
+  src: local('Arial'), local('ArialMT'), local('Helvetica'), local('Roboto');
+  size-adjust: 94%;
+  ascent-override: 99%;
+  descent-override: 29%;
+  line-gap-override: 0%;
+}
+
 @font-face {
   font-family: 'Bricolage Grotesque';
   font-style: normal;

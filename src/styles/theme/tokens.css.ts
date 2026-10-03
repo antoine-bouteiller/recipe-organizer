@@ -175,8 +175,8 @@ const tokenValues = {
     black: '900',
   },
   fonts: {
-    heading: "'Bricolage Grotesque', sans-serif",
-    sans: "'Bricolage Grotesque', sans-serif",
+    heading: "'Bricolage Grotesque', 'Bricolage Grotesque Fallback', sans-serif",
+    sans: "'Bricolage Grotesque', 'Bricolage Grotesque Fallback', sans-serif",
   },
   letterSpacings: {
     tighter: '-0.05em',

@@ -23,7 +23,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `R2_BUCKET`; Images is `IMAGES`.                                                | Named bindings make provider services available without application-managed credentials.                                                         |
 | `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                                            |
 | `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                                     |
-| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker and forwards every fetch to the network.   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior.              |
+| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker without a fetch handler.                   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior.              |
 
 ## 4. Principles & Intents
 
@@ -51,13 +51,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component            | Module type          | Responsibility                                                | Public API surface                          |
-| -------------------- | -------------------- | ------------------------------------------------------------- | ------------------------------------------- |
-| Worker configuration | Void configuration   | Server entry, compatibility, D1/R2/Images bindings            | `void.config.ts`                            |
-| Media writer         | Server utility       | UUID keys, image transform, R2 writes                         | `uploadFile`, `uploadVideo`, `deleteFile`   |
-| Media reader         | Route helper         | Cached GET and HEAD responses from R2                         | `createR2GetHandler`, `createR2HeadHandler` |
-| Edge cache           | Server utility       | Cache read-through and response metadata                      | `cache.getWithCache()`                      |
-| PWA service worker   | Static module worker | Supports Samsung installation and forwards fetches to network | `/sw.js`                                    |
+| Component            | Module type          | Responsibility                                         | Public API surface                          |
+| -------------------- | -------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| Worker configuration | Void configuration   | Server entry, compatibility, D1/R2/Images bindings     | `void.config.ts`                            |
+| Media writer         | Server utility       | UUID keys, image transform, R2 writes                  | `uploadFile`, `uploadVideo`, `deleteFile`   |
+| Media reader         | Route helper         | Cached GET and HEAD responses from R2                  | `createR2GetHandler`, `createR2HeadHandler` |
+| Edge cache           | Server utility       | Cache read-through and response metadata               | `cache.getWithCache()`                      |
+| PWA service worker   | Static module worker | Supports PWA registration without intercepting fetches | `/sw.js`                                    |
 
 ## 8. Detailed Design
 
@@ -110,9 +110,9 @@ is required by the user for Samsung PWA installation; it is not a claim that eve
 a worker to install the manifest. Registration failure does not block application rendering.
 
 The worker calls `skipWaiting()` on install and `clients.claim()` on activation.
-It remains registered and does not reload pages or clean up legacy storage. Its fetch handler uses
-`event.respondWith(fetch(event.request))`; it does not cache, precache, or provide an offline
-fallback, UI, or session fallback. Navigations and API requests therefore require connectivity.
+It remains registered and does not reload pages or clean up legacy storage. It has no fetch handler, so requests
+bypass the worker; it does not cache, precache, or provide an offline fallback, UI, or session
+fallback. Navigations and API requests therefore require connectivity.
 
 The web manifest and icons remain available for installability. Normal online browser HTTP caching
 provides no offline guarantee. The Worker edge
@@ -234,3 +234,4 @@ N/A
 
 | 2026-10-02 | Move Void configuration and runtime persistence to root; package server implementation. | 8.1, 8.11 | Preserve one Worker and existing local D1 state. |
 | 2026-10-02 | Document Void Pages rendering, islands, head configuration, and default 404s. | 3, 6, 8 |
+| 2026-10-03 | Remove the pass-through `/sw.js` fetch handler so requests skip worker startup. | 3, 7, 8.4 |
