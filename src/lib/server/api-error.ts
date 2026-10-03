@@ -1,5 +1,6 @@
-import { HTTPException } from 'hono/http-exception'
 import * as z from 'zod'
+
+import { HttpError } from './http-error'
 
 const fallbackMessage = 'Une erreur est survenue'
 
@@ -18,7 +19,7 @@ const formatValidationBody = (body: z.infer<typeof voidValidationBodySchema>) =>
 
 /** Maps an error thrown by an API handler to the API's JSON error contract. */
 export const toApiErrorResponse = (error: unknown): Response => {
-  if (error instanceof HTTPException) {
+  if (error instanceof HttpError) {
     return Response.json({ error: error.message || fallbackMessage }, { status: error.status })
   }
   if (error instanceof z.ZodError) {

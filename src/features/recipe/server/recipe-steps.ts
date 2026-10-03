@@ -1,9 +1,9 @@
 import { eq, sql } from 'drizzle-orm'
-import { HTTPException } from 'hono/http-exception'
 
 import { magimixSteps, recipeStep, recipeStepGroup } from '@/db/schema'
 import type { RecipeStep, RecipeStepGroup } from '@/features/recipe/schemas'
 import type { getDb } from '@/lib/server/db'
+import { HttpError } from '@/lib/server/http-error'
 
 type Db = ReturnType<typeof getDb>
 type MagimixStepRow = Pick<typeof magimixSteps.$inferSelect, 'program' | 'rotationSpeed' | 'temperature' | 'time'>
@@ -41,7 +41,7 @@ export const flattenSteps = (groups: readonly RecipeStepGroup[]): RecipeStep[] =
 export const assertSubrecipeGroups = (groups: readonly RecipeStepGroup[], linkedRecipeIds: readonly number[], recipeId?: number): void => {
   const invalid = groups.some((group) => group.kind === 'subrecipe' && (group.recipeId === recipeId || !linkedRecipeIds.includes(group.recipeId)))
   if (invalid) {
-    throw new HTTPException(400, { message: 'Sub-recipe group must reference a linked recipe' })
+    throw new HttpError(400, 'Sub-recipe group must reference a linked recipe')
   }
 }
 

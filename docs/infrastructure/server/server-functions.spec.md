@@ -92,7 +92,7 @@ failure throws 403. Recipe write/delete helpers independently check owner-or-adm
 
 | Failure           | HTTP response                                                  |
 | ----------------- | -------------------------------------------------------------- |
-| `HTTPException`   | Its status and `{ error }` message                             |
+| `HttpError`       | Its status and `{ error }` message                             |
 | Thrown `ZodError` | 400 schema error envelope                                      |
 | Unknown API path  | `404 { error: 'not_found' }`                                   |
 | Unexpected error  | Logged server-side; `500 { error: 'Une erreur est survenue' }` |
@@ -132,7 +132,7 @@ The remaining routes are:
 | `POST /api/ingredients`          | Inline `AddIngredient`; then `router.refresh()`  |
 
 API clients use same-origin typed `void/client` fetch through `readResponse`.
-`02.csrf.ts` applies `hono/csrf` only to `/api/*` except auth; it does not wrap page-action URLs.
+`02.csrf.ts` rejects cross-origin form-encoded requests (Origin / Sec-Fetch-Site) only to `/api/*` except auth; it does not wrap page-action URLs.
 Void generates one Worker from pages, API routes, and middleware; its asset serving and default 404
 remain intact without an application catch-all.
 

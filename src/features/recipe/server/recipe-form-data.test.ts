@@ -1,22 +1,16 @@
-import { Hono } from 'hono'
 import { describe, expect, it } from 'vite-plus/test'
-import type { CloudEnv } from 'void'
 import { ValidationError } from 'void/pages-protocol'
-import * as z from 'zod'
 
 import { recipeSchema } from '@/features/recipe/schemas'
 
 import { readRecipeFormData, validateRecipeForm } from './recipe-form-data'
 
-const app = new Hono<CloudEnv>()
-app.post('/', async (context): Promise<Response> => {
-  const data = z.record(z.string(), z.unknown()).parse(await readRecipeFormData(context))
-  const { image } = data
-  if (image instanceof File) {
-    return context.json({ ...data, image: { name: image.name, text: await image.text(), type: image.type } })
-  }
-  return context.json(data)
-})
+const read = (init: RequestInit) => {
+  const request = new Request('http://localhost/', { ...init, method: 'POST' })
+  return readRecipeFormData({
+    req: { formData: () => request.formData(), header: (name) => request.headers.get(name) ?? undefined, json: () => request.json() },
+  })
+}
 
 const values = {
   ingredientGroups: [{ _key: 'ingredients', ingredients: [{ _key: 'ingredient', id: 3, quantity: 2 }] }],
@@ -27,13 +21,7 @@ const values = {
 
 describe('readRecipeFormData', () => {
   it('decodes structured values sent as a no-file JSON page action', async () => {
-    const response = await app.request('/', {
-      body: JSON.stringify(values),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'POST',
-    })
-    expect(response.status).toBe(200)
-    expect(await response.json()).toEqual(values)
+    expect(await read({ body: JSON.stringify(values), headers: { 'Content-Type': 'application/json' } })).toEqual(values)
   })
 
   it('keeps uploaded files while decoding structured multipart fields', async () => {
@@ -51,12 +39,10 @@ describe('readRecipeFormData', () => {
     body.append('stepGroups[0][steps][0][_key]', 'step')
     body.append('stepGroups[0][steps][0][text]', 'Mélanger.')
     body.append('video', '')
-    const response = await app.request('/', { body, method: 'POST' })
-    expect(response.status).toBe(200)
-    expect(await response.json()).toEqual({
+    expect(await read({ body })).toEqual({
       ...values,
       cuisineTypes: [],
-      image: { name: 'recipe.png', text: 'image bytes', type: 'image/png' },
+      image: expect.objectContaining({ name: 'recipe.png', size: image.size, type: 'image/png' }),
       linkedRecipes: [],
       meals: [],
     })
@@ -93,8 +79,7 @@ describe('recipe form validation', () => {
     body.append('stepGroups[0][_key]', 'group')
     body.append('stepGroups[0][kind]', 'steps')
     body.append('stepGroups[0][groupName]', '')
-    const response = await app.request('/', { body, method: 'POST' })
-    expect(validateRecipeForm(recipeSchema, await response.json())).toEqual({
+    expect(validateRecipeForm(recipeSchema, await read({ body }))).toEqual({
       cuisineTypes: [],
       image: { id: '42', url: 'photo' },
       ingredientGroups: [{ _key: 'ingredients', ingredients: [] }],

@@ -24,9 +24,7 @@
   "dependencies": {
     "@tanstack/react-store": "catalog:",
     "@void/react": "catalog:",
-    "better-auth": "catalog:",
     "drizzle-orm": "catalog:",
-    "hono": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "void": "catalog:",

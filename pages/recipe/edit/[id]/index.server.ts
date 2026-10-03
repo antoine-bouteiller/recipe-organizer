@@ -1,4 +1,3 @@
-import { HTTPException } from 'hono/http-exception'
 import { defineHandler } from 'void'
 import type { InferProps } from 'void'
 
@@ -10,6 +9,7 @@ import { recipeIdParamsSchema } from '@/features/recipe/server/recipe-id-params'
 import { updateRecipe } from '@/features/recipe/server/recipe-mutations'
 import { guardPage } from '@/lib/server/auth/page-guard'
 import { getDb } from '@/lib/server/db'
+import { HttpError } from '@/lib/server/http-error'
 
 export type Props = InferProps<typeof loader>
 
@@ -39,7 +39,7 @@ export const action = Object.assign(
     const { id } = recipeIdParamsSchema.parse(context.req.param())
     const data = validateRecipeForm(updateRecipeSchema, await readRecipeFormData(context))
     if (data.id !== id) {
-      throw new HTTPException(400, { message: 'Recipe id does not match the page' })
+      throw new HttpError(400, 'Recipe id does not match the page')
     }
     await updateRecipe(getDb(), user, data)
     return undefined

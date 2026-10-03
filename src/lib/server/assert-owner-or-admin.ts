@@ -1,4 +1,4 @@
-import { HTTPException } from 'hono/http-exception'
+import { HttpError } from './http-error'
 
 interface OwnableRow {
   readonly createdBy: string | null
@@ -11,6 +11,6 @@ interface OwnershipUser {
 
 export const assertOwnerOrAdmin = (user: OwnershipUser, row: OwnableRow): void => {
   if (user.role !== 'admin' && row.createdBy !== user.id) {
-    throw new HTTPException(403, { message: 'Permission denied' })
+    throw new HttpError(403, 'Permission denied')
   }
 }
