@@ -19,7 +19,7 @@ related:
 A small, closed group of French-speaking home cooks needs one place to write, find, scale and shop
 their recipes, including rich instructions that embed Magimix programs and reusable sub-recipes.
 Off-the-shelf recipe apps neither model those instructions nor allow a private, invitation-controlled
-membership. Recipe Organizer is server-rendered Void Pages with islands and a same-origin Void API served from one
+membership. Recipe Organizer is server-rendered Void Pages with client navigation and a same-origin Void API served from one
 Cloudflare deployment, with all state — relational data, blobs, sessions — kept inside one provider
 so there is no second service to operate.
 
@@ -38,7 +38,7 @@ so there is no second service to operate.
 | Decision                          | Choice                                                                                                                                                                    | Rationale                                                                                                                                                         |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `[KD-1]` Runtime                  | Void Pages and API on one Cloudflare deployment                                                                                                                           | The Worker renders page documents and serves API/static assets together; no separate deployment needs synchronization.                                            |
-| `[KD-2]` Render mode              | SSR with island browsing pages and regular hydrated app pages                                                                                                             | Browsing ships HTML plus focused controls; editors/settings retain client navigation. Initial store snapshots make hydration safe.                                |
+| `[KD-2]` Render mode              | SSR on first load with regular hydrated pages and Void client navigation throughout                                                                                       | Client navigation avoids full-document recipe visits; initial store snapshots make hydration safe.                                                                |
 | `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                                                                                                                       | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                            |
 | `[KD-4]` ORM                      | Drizzle with `defineRelations`                                                                                                                                            | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                           |
 | `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                                                                                                                          | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                 |
@@ -82,7 +82,7 @@ so there is no second service to operate.
 - `[C-3]` Void route metadata is generated; run `vp exec void prepare` after adding/moving pages or API routes.
 - `[C-4]` The development bypass in the auth guard yields a fake admin, so development builds
   exercise no OAuth path.
-- `[C-5]` Shopping-list reads retain a promise per selected-ID array within each document, without TTL or write invalidation. Inner scroll-container restoration is not managed beyond browser bfcache.
+- `[C-5]` Shopping-list reads retain a promise per selected-ID array within each document, without TTL or write invalidation. Inner scroll-container restoration is not managed.
 - `[C-6]` Google's userinfo response shape is an external contract; only `id` and `email` are
   persisted, but a change in that payload breaks sign-in.
 - `[C-7]` Session encryption, OAuth client credentials and their rotation are Cloudflare Worker
@@ -100,7 +100,7 @@ Cloudflare Worker: Void Pages + middleware + API + ASSETS
         └─ media ──► R2 / Images
         │ server-rendered HTML + props
         ▼
-Browse islands / hydrated app pages · local stores · forms
+Hydrated browse / app pages · local stores · forms
 Manifest/icons · network-only service worker
 ```
 
@@ -111,7 +111,7 @@ Manifest/icons · network-only service worker
 | Data layer        | Library              | Drizzle schema, relations, client, migrations           | `getDb()`, schema exports                  |
 | Void Pages/API    | Library + convention | Reads, actions, validation, remaining HTTP              | `loader`, `action`, `actions`, typed fetch |
 | Auth              | Infrastructure       | Google sessions, status/role enforcement                | `getApiUser`, `guardPage`, `withAuthGuard` |
-| Routing & Islands | Convention           | File matching, shared context, render/layout boundaries | `pages/`, `useShared()`, `Link`            |
+| Routing & SSR     | Convention           | File matching, shared context, render/layout boundaries | `pages/`, `useShared()`, `Link`            |
 | Forms             | Library              | TanStack Form and Zod composition                       | `useAppForm`, `withForm`, fields           |
 | Client state      | Library              | Durable intent separated from server props              | `persistedStore`, `usePageAction`          |
 | Features          | Runtime directories  | Recipe, ingredients, search, shopping list, users       | Components and server helpers              |
@@ -136,7 +136,7 @@ server helpers, and shared schemas rather than implying one shared runtime direc
 | Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                           |
 | Void API          | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
 | Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                       |
-| Routing & Islands | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
+| Routing & SSR     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
 | Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                     |
 | Client state      | [`infrastructure/client/client-state.spec.md`](./infrastructure/client/client-state.spec.md)                                                                                                                                                                                                       |
 | Feature modules   | [`recipe`](../src/features/recipe/spec/index.spec.md), [`ingredients`](../src/features/ingredients/ingredients.spec.md), [`search`](../src/features/search/search.spec.md), [`shopping-list`](../src/features/shopping-list/shopping-list.spec.md), [`users`](../src/features/users/users.spec.md) |
@@ -146,10 +146,11 @@ server helpers, and shared schemas rather than implying one shared runtime direc
 Void matches `pages/` and runs global middleware. `03.page-context.ts` resolves shared
 `{ authUser, pathname }`; protected loaders return `guardPage` redirects before reads.
 Loaders import `@/features/<feature>/server/*` and `@/lib/server/*` directly and return typed props for SSR.
-`(browse)` uses an island layout for home, search, shopping list, and details; `(app)` uses
-a regular hydrated layout for login, settings, and editors. Relative `_name.tsx` imports mark
-the specific interactive controls as islands. Persisted stores use initial SSR/hydration snapshots,
-then saved localStorage values; the shopping-list island gates content with `useIsHydrated`.
+One root hydrated layout wraps every page with a pathname-keyed `AppErrorBoundary`.
+Pages import feature components directly; persisted stores use initial SSR/hydration snapshots,
+then saved localStorage values. Shopping-list content is gated with `useIsHydrated`.
+Void client navigation uses prefetched loader props: fresh for 30s, usable up to 1h with background
+revalidation; non-GET navigation/actions flush the prefetch cache.
 
 Only auth, image/video, health, recipe-list palette reads, shopping-list projection reads, and inline
 ingredient POST remain APIs. Static assets remain available and unknown URLs use Void's default 404;
@@ -163,8 +164,8 @@ check owner-or-admin. Success refreshes loader props in place without changing U
 callers choose navigation or dialog effects. Never await a page action inside a React transition.
 Thrown action/API failures share safe JSON errors and client alerts.
 
-Recipe-details deletion posts its guarded page action with native fetch from an island, then
-navigates home. Inline `AddIngredient` retains `POST /api/ingredients` and awaits
+Recipe-details deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`;
+the guarded action redirects home, replacing the deleted recipe's history entry. Inline `AddIngredient` retains `POST /api/ingredients` and awaits
 `router.refresh()` before reset/close. D1 batching and R2 effect ordering remain feature-owned.
 
 ### 8.3 Trust boundary
@@ -193,3 +194,4 @@ possession of a URL is never a capability derived from guessing.
 
 | 2026-10-02 | Root the Void app and package Worker implementation as `server`. | 3, 7–8 | Keep one deployment with explicit source-package boundaries. |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
+| 2026-10-03 | Document hydrated browsing, client navigation, prefetch, and redirecting deletion. | 2–3, 6–8 | Reflect the completed navigation migration. |

@@ -15,7 +15,7 @@ describe('page presentation boundary', () => {
     for (const file of pageFiles.filter((name) => name.endsWith('.tsx'))) {
       const source = readFileSync(`${pagesDirectory}/${file}`, 'utf8')
       // Layouts load the global stylesheets; everything else composes styled components.
-      const imports = /(?:^|\/)layout(?:\.island)?\.tsx$/.test(file) ? source.replaceAll(/import '@\/styles\/[\w.]+\.css'/g, '') : source
+      const imports = /(?:^|\/)layout\.tsx$/.test(file) ? source.replaceAll(/import '@\/styles\/[\w.]+\.css'/g, '') : source
       expect(imports, file).not.toMatch(/['"][^'"]*\.css(?:\.ts)?['"]|\s(?:className|style)\s*=/)
     }
   })

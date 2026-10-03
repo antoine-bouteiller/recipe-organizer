@@ -71,14 +71,14 @@ persisted servings ───┘                                         │
                                                        category sections and cart items
 ```
 
-| Component          | Module type                     | Responsibility                                           | Public API surface                                 |
-| ------------------ | ------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
-| Selection store    | Persisted TanStack Store        | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
-| Quantity store     | Persisted TanStack Store        | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
-| Recipe projection  | Feature GET API                 | Read selected recipes and flattened linked-recipe lines  | `loadRecipesByIds(ids)`                            |
-| Aggregator         | Pure feature utility            | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
-| Shopping-list hook | Feature hook                    | Join stores, API projection, and derived output          | `useShoppingList()`                                |
-| List screen        | Void island page and components | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
+| Component          | Module type                       | Responsibility                                           | Public API surface                                 |
+| ------------------ | --------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
+| Selection store    | Persisted TanStack Store          | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
+| Quantity store     | Persisted TanStack Store          | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
+| Recipe projection  | Feature GET API                   | Read selected recipes and flattened linked-recipe lines  | `loadRecipesByIds(ids)`                            |
+| Aggregator         | Pure feature utility              | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
+| Shopping-list hook | Feature hook                      | Join stores, API projection, and derived output          | `useShoppingList()`                                |
+| List screen        | Void hydrated page and components | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
 
 ## 8. Detailed Design
 
@@ -135,10 +135,9 @@ fallback entry contain `quantity` and `unitSlug`
 
 ### 8.4 List interaction
 
-`pages/(browse)/shopping-list/index.island.tsx` composes ScreenLayout, current-path TabBar, and
-load islands for ShoppingList and its reset control. Its server companion sets `prerender = false`
-because header identity remains request-dependent; device-local selected recipes cannot be loaded
-on the server.
+`pages/shopping-list/index.tsx` directly composes ScreenLayout, current-path TabBar,
+ShoppingList, and an inline reset button. It has no server companion: regular pages are not
+auto-prerendered, and device-local selected recipes cannot be loaded on the server.
 
 ShoppingList uses `useIsHydrated()`: SSR and hydration render neutral skeleton sections, then
 a Suspense boundary displays the same skeleton while selected recipe promises load. The hook reads
@@ -148,7 +147,7 @@ otherwise category headings and CartItems render (`src/features/shopping-list/cl
 
 CartItem formats primary/fallback values, retains incompatible amounts visibly, and keeps checked
 state local to the mounted row. Reset clears only selected recipe IDs; serving overrides remain
-available later (`pages/(browse)/shopping-list/_reset-shopping-list.tsx`).
+available later (`pages/shopping-list/index.tsx`).
 
 The list is derived from selection, quantity intent, and API records. No records or aggregates are
 persisted, but fulfilled request promises remain document-local snapshots until document reload.
@@ -163,3 +162,4 @@ N/A
 | ---------- | -------------------------------------------------------------------------------------- | ----------------- | ------------------------------------- |
 | 2026-09-13 | Update the projection citation to `src/server/routes/`.                                | 8.2               | Match the server route layout.        |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
+| 2026-10-03 | Document regular page composition and inline reset without a server companion.         | 7, 8.4            | Match hydrated local-only browsing.   |

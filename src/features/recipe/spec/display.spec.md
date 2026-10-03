@@ -35,7 +35,7 @@ serving `index.spec.md` [G-2] and [G-4].
 | `[KD-4]` Asset delivery          | Image and video route handlers stream R2 objects through the shared cache boundary.                                                                                               | Media remains private to application routing while retaining cacheable delivery.              |
 
 The instruction renderer receives step groups and delegates to `RecipeStepGroups` (`editor.spec.md`
-[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. The detail island posts its page action for deletion while CRUD retains authorization and graph removal.
+[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. The detail control submits its page action for deletion while CRUD retains authorization and graph removal.
 
 ## Outcome
 
@@ -72,19 +72,19 @@ No browser instructions request remains.
 ```text
 home/search loader ──► list props ──► cards ──► /recipe/<id> loader
                                                    │
-                              detail + subrecipe props ──► cooking HTML + islands
+                              detail + subrecipe props ──► hydrated cooking view
 ```
 
-Home composes `RecipeListContent` with `renderCardAction` islands for quantity/membership.
-Detail composes `RecipeDetailsContent` with a quantityControls slot and renderIngredientGroups
-islands. Static metadata and preparation remain server-rendered. Relative nearby `_name.tsx`
-default re-exports carry the island import attributes; feature components do not wire framework
-islands themselves.
+Home composes `RecipeListContent` with `renderCardAction` for quantity/membership.
+Detail composes `RecipeDetailsContent` with `quantityControls` and `renderIngredientGroups`.
+Pages import components directly; slots remain plain composition. Metadata and preparation
+are server-rendered on first load with the rest of the hydrated page.
 
-Void card links perform document navigation to island details; cross-document transitions enhance
-supported browsers. Controls remain outside links. Header SearchBar opens with ⌘K/Ctrl+K, loads
-the list on first open, filters locally, and navigates with `location.assign`.
-Full search is its own load island with loader-fed recipes and local filters/recents.
+Void card links use client navigation. Home links use `prefetch={['visible', 'hover']}`;
+search links use `prefetch` for hover, touchstart, and focus. The navigation cache is fresh for 30s,
+usable up to 1h with background revalidation, and flushed on non-GET navigation/actions.
+Controls remain outside links. Header SearchBar opens with ⌘K/Ctrl+K, loads the list on first open,
+filters locally, and navigates with `router.visit`. Full search uses loader-fed recipes and local filters/recents.
 
 ### `[CT-3]` Cooking view and quantities
 
@@ -96,12 +96,13 @@ Full search is its own load island with loader-fed recipes and local filters/rec
   detail page show decrement, quantity, increment, and membership toggle. A missing recipe id yields
   no mutation.
 - Edit and delete actions show only for an authenticated viewer; CRUD enforces owner-or-admin.
-- Home and details render as server island pages in the browse layout; search receives the same list projection in its load island. Browse loaders do not gate membership; edit/create affordances derive from shared identity. The regular edit loader gates membership and reads recipe, ingredients, and recipe list directly.
-- The page passes GoBackButton as a load island. Mobile tabs remain native hash anchors in static
+- Home, details, and search are regular hydrated pages in the root layout; search receives the same list projection. Browse loaders do not gate membership; edit/create affordances derive from shared identity. The regular edit loader gates membership and reads recipe, ingredients, and recipe list directly.
+- The page passes GoBackButton through the `backButton` slot. Mobile tabs remain native hash anchors in static
   HTML; hydrated DS Tabs scroll and replace the hash without extra history entries.
-- The idle management-actions island posts native `fetch('/recipe/<id>', { method: 'POST' })`
-  for deletion, alerts non-OK responses, and navigates home on success. The guarded server action
-  retains owner-or-admin deletion policy.
+- Management actions call `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
+  from `void/pages-client` for deletion. The guarded action retains owner-or-admin policy and redirects
+  home; replacement keeps Back from reopening the deleted recipe. `usePageAction()` is not used because
+  its `preserveState` keeps the old URL on redirects. Failed results alert via `alertError`.
 
 ### `[CT-4]` Media handlers
 
@@ -139,3 +140,9 @@ the file-url helper.
 ## Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                                           | Sections affected | Reason                          |
+| ---------- | ----------------------------------------------------------------------------------- | ----------------- | ------------------------------- |
+| 2026-10-03 | Document direct control composition, card prefetch, and replacing delete redirects. | Design, CT-2–CT-3 | Match hydrated recipe browsing. |

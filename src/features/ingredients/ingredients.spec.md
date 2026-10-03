@@ -93,7 +93,7 @@ row defaults to `other` and indexes that column (`src/db/schema/ingredient.ts`).
 
 `listIngredients(db)` returns rows in ascending name order. The settings loader calls `guardPage`
 before reading and returns `{ ingredients, isAdmin }`; recipe loaders can reuse the same server query
-(`src/features/ingredients/server/queries.ts`, `pages/(app)/settings/ingredients/index.server.ts`).
+(`src/features/ingredients/server/queries.ts`, `pages/settings/ingredients/index.server.ts`).
 
 Creation keeps `POST /api/ingredients` for both settings and inline recipe-editor use. Update and delete
 are named actions at `/settings/ingredients?update` and `/settings/ingredients?delete`. Creation and

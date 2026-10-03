@@ -1,3 +1,4 @@
+import { useRouter } from '@void/react'
 import { Suspense, use, useEffect, useId, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 
@@ -15,6 +16,7 @@ import * as styles from './search-bar.css'
 
 const SearchPalette = ({ onClose }: { onClose: () => void }) => {
   const recipes = use(loadRecipeList())
+  const router = useRouter()
   const listId = useId()
   const [query, setQuery] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState(0)
@@ -25,8 +27,7 @@ const SearchPalette = ({ onClose }: { onClose: () => void }) => {
 
   const select = (recipe: ReducedRecipe) => {
     onClose()
-    // Recipe pages are island pages, so this is a document navigation from any page kind.
-    globalThis.location.assign(`/recipe/${recipe.id}`)
+    void router.visit(`/recipe/${recipe.id}`)
   }
 
   const onKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {

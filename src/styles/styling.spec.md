@@ -145,17 +145,16 @@ or feature policy. Button navigates with `asLink` + `href` and optional `viewTra
 `<Button asLink href="/recipe/new" />`; it renders the actual Void `Link`, not a click-driven button.
 TabBar takes `currentPath` and items with `label`, `href`, and inactive/active icons.
 `isCurrentPath` matches `/` exactly and other items at their path or descendants; desktop AppHeader
-navigation uses the same matcher. Pages pass current path explicitly, so static island layouts do
-not require router context. Storybook needs no router decorator.
+navigation uses the same matcher. Pages pass current path explicitly. Storybook needs no router decorator.
 
 Tabs are native hash anchors with scroll-snap panels. Once hydrated, clicks scroll the matching
 panel and replace the URL hash with `history.replaceState`; tab changes do not push history entries.
 Unhydrated static tabs retain native hash behavior.
 ScreenLayout accepts a `backButton` slot, usually DS `GoBackButton`, whose default handler calls
-`history.back()`; island pages hydrate that control through an island import. Scroll IDs remain
+`history.back()`. Scroll IDs remain
 `screen-inner`/`screen-outer`, but there is no managed scroll-container restoration.
-DS NotFound provides a Void home Link by default. The regular app layout owns its React render-error
-boundary; unknown URLs use Void's default 404.
+DS NotFound provides a Void home Link by default. The root layout owns pathname-keyed React render-error
+boundaries; unknown URLs use Void's default 404.
 
 The app's SearchBar owns the single-use command palette with shared Dialog/ScrollArea and native
 ARIA combobox/listbox semantics. Pages/layouts own theme/search composition and recipe/auth policy.
@@ -231,6 +230,7 @@ uses feature-owned DOM rather than a shared-component override.
 | 2026-09-19 | Share subtle badges and check-row toggles instead of feature-local controls.                         | §6.5              | Keep semantic styling and accessible control state in the design system.                 |
 | 2026-09-28 | Remove Base UI; compose overlays through `renderTrigger` and native elements.                        | §2–§6.4           | Own every primitive natively and drop the dependency.                                    |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.               | Updated contracts | Reflect the completed page migration.                                                    |
+| 2026-10-03 | Document direct back-button composition and both layout error boundaries.                            | §6.4              | Match hydrated route composition.                                                        |
 
 ## 8. Open Questions
 

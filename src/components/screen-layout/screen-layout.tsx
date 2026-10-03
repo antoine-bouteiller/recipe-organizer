@@ -12,7 +12,7 @@ export const GoBackButton = ({ onBack = goBack }: { onBack?: () => void }): Reac
 )
 
 export type ScreenLayoutProps = Pick<React.ComponentProps<'div'>, 'children'> & {
-  /** Usually `GoBackButton`; island pages pass it as an island so it hydrates. */
+  /** Usually `GoBackButton`. */
   backButton?: React.ReactNode
   backgroundImage?: string
   footer?: React.ReactNode

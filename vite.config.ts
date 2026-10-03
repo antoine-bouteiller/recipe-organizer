@@ -20,7 +20,10 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     // Vitest cannot run the Worker environment.
     // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
     ...(!process.env.VITEST && isPreview !== undefined
-      ? [voidPlugin({ persistTo: '.wrangler/state' }), voidReact({ react: { compiler: true }, viewTransitions: true })]
+      ? [
+          voidPlugin({ persistTo: '.wrangler/state' }),
+          voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true }),
+        ]
       : []),
   ],
   server: { port: 3000 },
