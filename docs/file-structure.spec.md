@@ -30,7 +30,7 @@ module so feature ownership and import boundaries remain legible.
 | `[KD-1]` Ownership boundary       | A product domain spans `src/features/<feature>/client/` for UI and browser-only API readers, `src/features/<feature>/server/` for server domain utilities, isomorphic contracts at the feature root, `pages/` for Void loaders/actions, and `routes/api/<feature>/` for remaining HTTP handlers. | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
 | `[KD-2]` Runtime-code placement   | Page composition lives in `pages/` and Worker HTTP routes in `routes/api/`; all application source lives in `src/`, split into `client/` and `server/` folders inside features and `src/lib/`; only actual cross-runtime modules sit outside those folders.                                      | The folder names make runtime boundaries visible before an import is written.                                               |
 | `[KD-3]` Route and data placement | Void pages follow URL hierarchy and layout groups in `pages/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                                                         | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
-| `[KD-4]` Naming and imports       | Files use kebab-case except Void dynamic segments and `_name.tsx` island wrappers; source imports use `@/*` (resolved to `src/`) and same-directory dependencies are relative.                                                                                                                   | Filenames match the lint convention and import paths reveal which runtime folder a dependency belongs to.                   |
+| `[KD-4]` Naming and imports       | Files use kebab-case except Void dynamic segments; source imports use `@/*` (resolved to `src/`) and same-directory dependencies are relative.                                                                                                                                                   | Filenames match the lint convention and import paths reveal which runtime folder a dependency belongs to.                   |
 | `[KD-5]` Styling compilation      | Vanilla-extract compiles owner-local `.css.ts` files; `src/styles/` exposes the public `theme` API while components retain private colocated recipes.                                                                                                                                            | Web, Storybook, and tests share typed theme references without generated utilities or component styling overrides.          |
 
 ## 4. Principles & Intents
@@ -70,10 +70,7 @@ system. Isomorphic modules cannot import server implementation.
 recipe-organizer/
 ├── docs/                       # Architecture and infrastructure specs
 ├── public/                     # Static assets and network-only sw.js
-├── pages/
-│   ├── (browse)/               # layout.island.tsx; island pages + server companions
-│   │   └── _name.tsx           # Relative default-export island entry modules
-│   └── (app)/                  # layout.tsx; regular pages + server companions
+├── pages/                      # layout.tsx; regular pages + optional server companions
 ├── routes/api/                 # Remaining Void HTTP adapters
 ├── middleware/                 # API/action errors, API CSRF, shared page context
 ├── src/
@@ -110,15 +107,11 @@ recipe-organizer/
 └── AGENTS.md
 ```
 
-`pages/(browse)/layout.island.tsx` wraps home, search, shopping list, and recipe details.
-`pages/(app)/layout.tsx` wraps login, settings/account/ingredients/users, and recipe new/edit.
-Groups do not change URLs. Each route is a folder holding `index.tsx` (or `index.island.tsx`) and
-`index.server.ts`; `[id]` is a dynamic segment. Island wrappers sit in the folder of the page that
-imports them, because island specifiers must be relative and imports may climb at most one level.
-Pages export default components, server companions export loaders/actions, and relative
-`_name.tsx` entries default-re-export island components for `with { island: ... }` imports
-(the reset-shopping-list wrapper owns its small control directly).
-Features expose slots/render props so pages attach islands without feature-to-feature imports.
+The root `pages/layout.tsx` wraps every page. Each route is a folder holding `index.tsx` and an optional
+`index.server.ts`; `[id]` is a dynamic segment. Pages export default components and import
+feature components directly via `@/...`; server companions export loaders/actions.
+Features expose slots/render props for page-owned composition without feature-to-feature imports.
+The shopping-list page owns its reset button directly and needs no server companion.
 
 A feature spans `src/features/<feature>/client/` UI and browser-only calls, page composition under
 `pages/`, remaining `routes/api/<feature>/` HTTP adapters, `src/features/<feature>/server/`
@@ -162,10 +155,9 @@ feature/auth policy does not move into `src/components/ui/`.
 
 ### Import and database boundaries
 
-Ordinary files use kebab-case except framework dynamic segments and island wrappers; `.tsx`
+Ordinary files use kebab-case except framework dynamic segments; `.tsx`
 contains JSX and specs use `.spec.md`. Source imports use `@/*` and same-directory
-dependencies are relative. Island imports must be relative because Void resolves their specifiers
-relative to the importer. Features may import only the root (isomorphic) modules of other features;
+dependencies are relative. Features may import only the root (isomorphic) modules of other features;
 pages or app-owned components coordinate their client and server code. Shared browser hooks live
 outside features.
 
@@ -211,3 +203,4 @@ N/A.
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
 | 2026-10-02 | Remove workspace packages: server, shared, and design system move into `src/` with `client/`/`server/` feature and lib folders; oxlint and scripts move to `tools/`. | 3, 6, 7, 8 | Drop package indirection for a single-deployment app. |
 | 2026-10-02 | Fold `src/design-system/` into `src/components/ui/`, `src/hooks/`, `src/utils/`, and `src/styles/`; move TabBar, ScreenLayout, and NotFound back to `src/components/`. | 8.1 | One component root; app-specific presentation sits with the app shell. |
+| 2026-10-03 | Replace browse wrapper entries with regular pages and direct component imports. | 3, 8.1 | Match hydrated route composition. |

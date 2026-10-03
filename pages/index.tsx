@@ -3,9 +3,9 @@ import { useShared } from '@void/react'
 import { mobileMenuItems } from '@/components/navigation/constants'
 import { TabBar } from '@/components/navigation/tabbar'
 import { ScreenLayout } from '@/components/screen-layout/screen-layout'
+import { QuantityControls } from '@/features/recipe/client/components/quantity-controls'
 import { RecipeListContent } from '@/features/recipe/client/components/recipe-list'
 
-import QuantityControls from './_quantity-controls' with { island: 'load' }
 import type { Props } from './index.server'
 
 export default function RecipeListPage({ recipes }: Props) {

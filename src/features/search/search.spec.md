@@ -20,7 +20,7 @@ history of opened results, making repeat visits quick without duplicating recipe
 
 | Decision                    | Choice                                                                                                              | Rationale                                                                                                           |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Filtering location | The RecipeSearch island filters the loader's recipe-list props.                                                     | Typing and toggle changes produce no Worker round trip, and the list remains available to an already-loaded client. |
+| `[KD-1]` Filtering location | The RecipeSearch component filters the loader's recipe-list props.                                                  | Typing and toggle changes produce no Worker round trip, and the list remains available to an already-loaded client. |
 | `[KD-2]` Text comparison    | Both query and recipe name use NFD diacritic removal and lowercase comparison.                                      | French names match regardless of case or accents without an i18n dependency.                                        |
 | `[KD-3]` Filter semantics   | Selected meals and cuisines are each AND-combined; vegetarian, Magimix, and spice values act as boolean predicates. | Multiple selections consistently narrow results while the spice toggle controls whether spice recipes are visible.  |
 | `[KD-4]` Recent state       | The persisted store retains recipe IDs only, most-recent-first, capped at ten.                                      | IDs avoid stale recipe snapshots and resolve against the loader-provided catalogue.                                 |
@@ -50,8 +50,8 @@ history of opened results, making repeat visits quick without duplicating recipe
   (`src/features/recipe/server/queries.ts`).
 - `[C-2]` Deleted recent IDs are skipped; if none resolve, rendering falls back to the supplied
   non-spice catalogue (`src/features/search/client/components/recent-recipes.tsx`).
-- `[C-3]` Search is a server-rendered island page; the loader supplies recipes and the load island
-  owns local filtering/recents (`pages/(browse)/search/index.server.ts`, `search/index.island.tsx`).
+- `[C-3]` Search is a regular hydrated page; the loader supplies recipes and RecipeSearch
+  owns local filtering/recents (`pages/search/index.server.ts`, `search/index.tsx`).
 
 ## 7. High-Level Components
 
@@ -66,7 +66,7 @@ local filter state ──▶ filterRecipes() ──▶ results / empty state
 
 | Component        | Module type                            | Responsibility                                                     | Public API surface                  |
 | ---------------- | -------------------------------------- | ------------------------------------------------------------------ | ----------------------------------- |
-| Search route     | Void island page                       | Read recipe props and compose the search island                    | `/search`                           |
+| Search route     | Void hydrated page                     | Read recipe props and compose RecipeSearch                         | `/search`                           |
 | Filter utilities | Pure feature utility                   | Normalise names and apply text/attribute predicates                | `filterRecipes`, `hasActiveFilters` |
 | Search results   | React component                        | Render matched rows, count, clear action, and shopping-list action | `SearchResults`                     |
 | Recent recipes   | Persisted TanStack Store and component | Retain IDs and resolve them to live recipe rows                    | `addRecentRecipe`, `RecentRecipes`  |
@@ -76,16 +76,16 @@ local filter state ──▶ filterRecipes() ──▶ results / empty state
 
 ### 8.1 Search route
 
-The `pages/(browse)/search/index.server.ts` loader directly calls `listRecipes(getDb())`.
-`search/index.island.tsx` passes `recipes` to the relative `_recipe-search.tsx` default re-export with
-`with { island: 'load' }`. The browse island layout supplies search palette/theme header islands.
+The `pages/search/index.server.ts` loader directly calls `listRecipes(getDb())`.
+`pages/search/index.tsx` imports RecipeSearch directly and passes `recipes`.
+The root layout supplies the search palette and theme controls.
 
 `RecipeSearch` maintains one local `SearchFilters` value: query text, cuisine and meal arrays,
 and vegetarian/Magimix/spice booleans. SearchFilters owns the collapsible single-select controls
 (stored as arrays of at most one value). Filters do not become URL or durable state.
 `EMPTY_FILTERS` provides empty selections and disabled booleans; clear restores that value.
 
-Active filters show filtered results; without filters the island passes non-spice catalogue rows
+Active filters show filtered results; without filters RecipeSearch passes non-spice catalogue rows
 to RecentRecipes. SSR/hydration read the initial recent-ID snapshot, then saved browser recents
 resolve against loader props without a hydration mismatch.
 
@@ -137,7 +137,7 @@ This keeps the default screen populated without promoting stale browser state in
 ### 8.5 Search card
 
 Every search card uses a Void Link to `/recipe/<id>` and records the ID on activation.
-Island document navigations use cross-document view transitions
+Links use client navigation with `prefetch` on hover, touchstart, and focus
 (`src/features/search/client/components/recipe-search-card.tsx`). The card renders the recipe image,
 name, and attribute badges from the recipe projection (`src/features/search/client/components/recipe-search-card.tsx`).
 
@@ -147,3 +147,9 @@ navigation contract (`src/features/search/client/components/search-results.tsx`;
 ## 9. Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                               | Sections affected | Reason                        |
+| ---------- | ------------------------------------------------------- | ----------------- | ----------------------------- |
+| 2026-10-03 | Document hydrated search composition and card prefetch. | 3, 6–8            | Match Void client navigation. |

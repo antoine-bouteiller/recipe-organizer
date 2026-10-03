@@ -78,7 +78,7 @@ recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
 
 | Leaf                           | Owns                                                                                                              | Key contracts                                        |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`crud`](./crud.spec.md)       | `pages/(app)/recipe/**`, `pages/(browse)/recipe/**`, `src/features/recipe/server/**`, `src/db/schema/recipe*.ts`  | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
+| [`crud`](./crud.spec.md)       | `pages/recipe/**`, `pages/recipe/**`, `src/features/recipe/server/**`, `src/db/schema/recipe*.ts`                 | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
 | [`editor`](./editor.spec.md)   | `RecipeStep` schema and Magimix constants in `src/features/recipe/`, `StepsField`, `RecipeSteps`, `parseBoldText` | step model [CT-1], bold text [CT-2], renderer [CT-4] |
 | [`display`](./display.spec.md) | list/detail/instructions queries, cards, search, cooking view, media handlers                                     | projections [CT-1], cooking view [CT-3]              |
 
@@ -95,7 +95,7 @@ returns it; `display.spec.md` [CT-3] renders it through `editor.spec.md` [CT-4].
 
 Server helpers expose list/detail/sub-recipe projections and aggregate writes; Void loaders/actions
 compose them. Features expose loader-fed components with slots/render props and the shared
-`recipeStepSchema` and `RecipeStepGroup`. Home/details are island pages; new/edit are regular pages. Ingredients contribute
+`recipeStepSchema` and `RecipeStepGroup`. Home/details and new/edit are regular hydrated pages with Void client navigation. Ingredients contribute
 catalogue ids and units; search consumes the list projection; shopping-list state consumes recipe
 ids; none reach into recipe internals.
 
@@ -122,3 +122,9 @@ ids; none reach into recipe internals.
 ## Open Questions
 
 N/A
+
+## Changelog
+
+| Date       | Amendment                                                      | Sections affected | Reason                             |
+| ---------- | -------------------------------------------------------------- | ----------------- | ---------------------------------- |
+| 2026-10-03 | Document regular hydrated recipe pages with client navigation. | CT-2              | Match the shared page render mode. |

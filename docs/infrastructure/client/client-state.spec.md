@@ -22,13 +22,13 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 ## 3. Key Design Decisions
 
-| Decision                    | Choice                                                                                         | Rationale                                                                                 |
-| --------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `[KD-1]` Server records     | Void loader props own page data; small remaining APIs serve browser-only reads.                | Server data comes from authoritative reads without a browser query cache.                 |
-| `[KD-2]` Refresh identity   | Page actions refresh the current loader props in place.                                        | URL/history and local UI state survive refresh; there are no central query keys.          |
-| `[KD-3]` Durable UI state   | TanStack Store persists data-only selections through `persistedStore`.                         | IDs and quantities survive reload without copying server entities.                        |
-| `[KD-4]` Shareable state    | URL params/query/hash remain navigation input; search filters stay component-local.            | Only intentionally navigable values affect history.                                       |
-| `[KD-5]` Browser preference | Head script resolves the theme cookie, else system preference; toggle writes cookie and class. | SSR and island documents receive the theme before first paint without loader theme props. |
+| Decision                    | Choice                                                                                         | Rationale                                                                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `[KD-1]` Server records     | Void loader props own page data; small remaining APIs serve browser-only reads.                | Server data comes from authoritative reads without a browser query cache.        |
+| `[KD-2]` Refresh identity   | Page actions refresh the current loader props in place.                                        | URL/history and local UI state survive refresh; there are no central query keys. |
+| `[KD-3]` Durable UI state   | TanStack Store persists data-only selections through `persistedStore`.                         | IDs and quantities survive reload without copying server entities.               |
+| `[KD-4]` Shareable state    | URL params/query/hash remain navigation input; search filters stay component-local.            | Only intentionally navigable values affect history.                              |
+| `[KD-5]` Browser preference | Head script resolves the theme cookie, else system preference; toggle writes cookie and class. | SSR documents receive the theme before first paint without loader theme props.   |
 
 ## 4. Principles & Intents
 
@@ -49,8 +49,8 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 - `[C-1]` `persistedStore` handles absent storage and malformed JSON with the initial value, but does not catch
   localStorage read/write exceptions. Validation checks array-versus-non-array shape, not full schemas.
-- `[C-2]` There is no timed page-data freshness or query invalidation. Existing documents remain snapshots
-  until navigation, page refresh, or action refresh.
+- `[C-2]` Rendered props remain snapshots until navigation, page refresh, or action refresh. Void's navigation
+  prefetch cache is fresh for 30s and usable up to 1h with background revalidation; non-GET navigation/actions flush it.
 - `[C-3]` Shopping-list requests retain one fulfilled promise per distinct selected-ID array within the
   document; they have no TTL or mutation invalidation. Failed promises are removed so a later render can retry.
 
@@ -118,8 +118,10 @@ Callers own navigation and closing effects; never await an action inside a React
 
 Inline ingredient creation retains `POST /api/ingredients`; `AddIngredient` calls
 `router.refresh()` after success to refresh the catalogue props, then resets and closes its form.
-The settings ingredient page owns update/delete actions. Recipe-details deletion posts the page
-action directly from its island and navigates home, rather than using the regular-page router hook.
+The settings ingredient page owns update/delete actions. Recipe-details deletion uses
+`submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })` to follow the home redirect
+and replace the deleted recipe's history entry. It does not use `usePageAction()`: that helper's
+`preserveState: true` keeps the old URL even when the action redirects. Failed results use `alertError`.
 
 ### 8.6 Cookie, URL, local, and feature state
 
@@ -169,3 +171,4 @@ N/A
 | 2026-09-13 | Use an explicit browser Query provider.                                                | 3, 7, 8.1–8.2     | Replace the SSR-query bridge and isomorphic preference boundary. |
 | 2026-09-18 | Describe current query prefetch and page-owned loading.                                | 8.2               | Match the query API and inline isLoading skeletons.              |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                            |
+| 2026-10-03 | Document navigation prefetch freshness and redirecting recipe deletion.                | 3, 6, 8.5         | Distinguish navigation caching from durable browser intent.      |

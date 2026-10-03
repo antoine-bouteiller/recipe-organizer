@@ -77,8 +77,9 @@ default 404. No application catch-all exists because it would shadow assets such
 
 `vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })`; the Worker answers unmatched
 development requests.
-`voidReact({ react: { compiler: true }, viewTransitions: true })` enables React page/island rendering
-and regular-page transitions. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
+`voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true })`
+enables hydrated React pages, client transitions, and stale-while-revalidate navigation prefetching
+(fresh 30s, usable up to 1h). Non-GET navigation/actions flush the prefetch cache. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
 a separate API process or proxy. Void reads the project-root `.env`.
 `.void/` (entry and route types) and `.void-wrangler.jsonc` are generated and
 git-ignored. `vp exec void prepare` regenerates route types before clean-tree checks.
@@ -153,9 +154,9 @@ remain separately named capabilities. Auth secrets stay dashboard-managed throug
 `void.config.ts` also owns the French HTML language, title, viewport/safe-area metadata,
 theme-color, manifest/favicon links, and progressive service-worker registration.
 An inline script sets the theme class before paint from `ui-theme`, else system preference.
-A `pagereveal` script adds the `back` transition type during backward cross-document traversal;
-island pages use that hook alongside shared navigation-auto CSS. No inner scroll-container
-restoration is implemented beyond browser bfcache.
+The backward-transition script handles client transitions and `pageswap`/`pagereveal` document
+traversals. Shared `@view-transition { navigation: auto }` CSS remains for document navigation,
+including login redirects and reloads. No inner scroll-container restoration is implemented.
 
 ### 8.9 Failure behavior
 
@@ -236,3 +237,4 @@ N/A
 | 2026-10-02 | Move Void configuration and runtime persistence to root; package server implementation. | 8.1, 8.11 | Preserve one Worker and existing local D1 state. |
 | 2026-10-02 | Document Void Pages rendering, islands, head configuration, and default 404s. | 3, 6, 8 |
 | 2026-10-03 | Remove the pass-through `/sw.js` fetch handler so requests skip worker startup. | 3, 7, 8.4 |
+| 2026-10-03 | Document hydrated pages, navigation prefetch, and retained document transitions. | 8.1, 8.8 |

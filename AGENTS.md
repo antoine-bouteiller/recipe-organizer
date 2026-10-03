@@ -1,6 +1,6 @@
 # Recipe Organizer
 
-Full-stack recipe management app with server-rendered Void Pages, islands, and a same-origin Void API, deployed on Cloudflare Workers.
+Full-stack recipe management app using server-rendered Void Pages with client navigation and a same-origin Void API, deployed on Cloudflare Workers.
 
 ## Quick Reference
 
@@ -18,7 +18,7 @@ See the Vite+ section below for the full command reference.
 
 - **Always run `vp check` before committing.**
 - **Route changes require regeneration:** run `vp exec void prepare` after adding/moving Void pages or API routes to regenerate ignored route types before checks.
-- **Runtime boundary:** Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`. Feature code splits into `src/features/<feature>/{client,server}/` with isomorphic contracts at the feature root; `src/lib/` splits the same way. Page loaders read `@/features/<feature>/server/*` and `@/lib/server/*` directly; page actions own mutations. `(browse)` uses an island layout; `(app)` uses a regular hydrated layout. Each route is a folder with `index.tsx`/`index.island.tsx` + `index.server.ts`. Island imports are relative `_name.tsx` default re-exports next to the importing page with `with { island: ... }`. Remaining browser API calls use typed `void/client` fetch through `readResponse`. Regular-page callers use `usePageAction()` to refresh props without changing URL/history; never await an action inside a React transition.
+- **Runtime boundary:** Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`. Feature code splits into `src/features/<feature>/{client,server}/` with isomorphic contracts at the feature root; `src/lib/` splits the same way. Page loaders read `@/features/<feature>/server/*` and `@/lib/server/*` directly; page actions own mutations. One root hydrated layout (`pages/layout.tsx`) wraps every page, with Void client navigation after SSR on first load. Each route is a folder with `index.tsx` and an optional `index.server.ts`; pages import components directly via `@/...`. Remaining browser API calls use typed `void/client` fetch through `readResponse`. Use `usePageAction()` for in-place prop refresh without changing URL/history; redirecting recipe deletion uses `submitAction` with `replace: true` instead. Never await an action inside a React transition.
 - **UI components are owned:** `src/components/ui/<category>/<component>/` holds each reusable component family and its colocated `*.stories.tsx` — edit them directly, don't re-pull from a registry. Import via `@/components/ui/<category>/<component>/<component>`; keep app dependencies out of `src/components/ui/`. Follow `src/styles/styling.spec.md`: use minimal component-local `Pick` props, keep recipes private, and compose overlay triggers through `renderTrigger` props; Button navigates with the actual `@void/react` `Link` via `asLink` + `href`. Parent wrappers own external layout.
 - **Styling:** Vanilla Extract compiles owner-local `*.css.ts` files through the web and Storybook Vite plugins. Import typed shared values as `theme` from `@/styles/theme`, including in template interpolations; do not use shared raw `var(--…)` strings. Load `@/styles/global.css` for the global Vanilla Extract reset/base rules and theme. Native `@/styles/styles.css` retains font faces and layer order; safe-area insets use `theme.safeArea.top/bottom`; native CSS variables remain appropriate for component-owned and runtime-owned behavior. Keep component and app styles unlayered so they override the layered reset/base defaults.
 - **Storybook:** `vp run storybook` (6006) / `vp run storybook:build`. Add or update colocated stories for changed interactions or new component presentations; styling-only changes can reuse existing stories for visual review. No router decorator is needed. Use the folder category as the Storybook title prefix (Actions, Data Display, Feedback, Forms, Layout, Navigation, Overlays).
@@ -38,7 +38,7 @@ colocated with the code.
 - [Void API](docs/infrastructure/server/server-functions.spec.md)
 - [Form Patterns](docs/infrastructure/client/forms.spec.md)
 - [Client State Layering](docs/infrastructure/client/client-state.spec.md)
-- [Routing & Islands](docs/infrastructure/client/routing-ssr.spec.md)
+- [Routing & SSR](docs/infrastructure/client/routing-ssr.spec.md)
 - [Auth (Better Auth)](docs/infrastructure/server/auth.spec.md)
 - Per-feature specs: `src/features/<name>/<name>.spec.md` (or `src/features/<name>/spec/index.spec.md`)
 

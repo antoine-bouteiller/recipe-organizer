@@ -17,7 +17,12 @@ export interface RecipeSearchCardProps {
 
 export const RecipeSearchCard = ({ recipe, action, index = 0 }: RecipeSearchCardProps) => (
   <div className={styles.container} style={staggerStyle(index, 10)}>
-    <Link className={styles.card[action ? 'withAction' : 'withoutAction']} href={`/recipe/${recipe.id}`} onClick={() => addRecentRecipe(recipe.id)}>
+    <Link
+      className={styles.card[action ? 'withAction' : 'withoutAction']}
+      href={`/recipe/${recipe.id}`}
+      onClick={() => addRecentRecipe(recipe.id)}
+      prefetch
+    >
       <img src={recipe.image} alt={recipe.name} className={styles.image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
       <div className={styles.content}>
         <span className={styles.name}>{recipe.name}</span>

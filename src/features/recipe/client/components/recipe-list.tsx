@@ -10,10 +10,12 @@ import type { ReducedRecipe } from '@/types/recipe'
 import * as cardStyles from './recipe-card.css'
 import * as styles from './recipe-list.css'
 
+const recipePrefetch = ['visible', 'hover'] as const
+
 export interface RecipeListContentProps {
   readonly canCreate: boolean
   readonly recipes: ReducedRecipe[]
-  /** Interactive per-card controls; island pages pass an island here. */
+  /** Interactive per-card controls. */
   readonly renderCardAction: (recipe: ReducedRecipe) => ReactNode
 }
 
@@ -40,7 +42,7 @@ export const RecipeListContent = ({ canCreate, recipes, renderCardAction }: Reci
           {visibleRecipes.map((recipe, index) => (
             <article className={cardStyles.card} key={recipe.id}>
               <img alt={recipe.name} className={cardStyles.image} decoding="async" loading={index < 6 ? 'eager' : 'lazy'} src={recipe.image} />
-              <Link className={cardStyles.recipeLink} href={`/recipe/${recipe.id}`}>
+              <Link className={cardStyles.recipeLink} href={`/recipe/${recipe.id}`} prefetch={recipePrefetch}>
                 <div className={cardStyles.tags}>
                   {recipe.isVegetarian && (
                     <Badge size="sm" variant="secondary">

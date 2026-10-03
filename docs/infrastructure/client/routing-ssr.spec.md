@@ -1,5 +1,5 @@
 ---
-title: Routing and Islands
+title: Routing and SSR
 status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
@@ -18,16 +18,16 @@ related:
 
 Every URL needs a server-rendered document, predictable access gates, and data ready for rendering.
 Void Pages owns matching, loaders, actions, and layouts; feature components retain domain presentation.
-Browsing ships static HTML with focused islands, while editing and administration retain hydrated client navigation.
+All pages hydrate after SSR on first load and use Void client navigation, avoiding sluggish full-document recipe visits.
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                            | Rationale                                                                                                 |
-| ---------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Route declaration   | Void file pages and colocated `.server.ts` loaders/actions under `pages/`.                        | One URL owns its server input and mutation boundary.                                                      |
-| `[KD-2]` Data lifecycle      | Loaders read `@/features/*/server/*` directly; actions refresh loader props.                      | No browser query cache or duplicate HTTP read is needed for page data.                                    |
-| `[KD-3]` Render mode         | `(browse)` has an island layout; `(app)` has a regular hydrated layout.                           | Browsing needs JavaScript only for interactive controls; Void forbids regular pages under island layouts. |
-| `[KD-4]` Navigation feedback | Void client view transitions for regular pages; cross-document transitions for island navigation. | Navigation remains native without transition support; backward traversals get a `back` transition type.   |
+| Decision                     | Choice                                                                                   | Rationale                                                                                               |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Route declaration   | Void file pages and colocated `.server.ts` loaders/actions under `pages/`.               | One URL owns its server input and mutation boundary.                                                    |
+| `[KD-2]` Data lifecycle      | Loaders read `@/features/*/server/*` directly; actions refresh loader props.             | No browser query cache or duplicate HTTP read is needed for page data.                                  |
+| `[KD-3]` Render mode         | One root hydrated layout wraps every page.                                               | SSR preserves first-load content; client navigation avoids document reloads throughout the app.         |
+| `[KD-4]` Navigation feedback | Void client view transitions; cross-document transitions for document redirects/reloads. | Navigation remains native without transition support; backward traversals get a `back` transition type. |
 
 ## 4. Principles & Intents
 
@@ -45,27 +45,26 @@ Browsing ships static HTML with focused islands, while editing and administratio
 ## 6. Caveats
 
 - `[C-1]` Run `vp exec void prepare` after page/API route changes to regenerate ignored route types.
-- `[C-2]` Inner scroll-container restoration is not managed. The retained scroll IDs do not supply restoration; island back navigation relies on browser bfcache.
+- `[C-2]` Inner scroll-container restoration is not managed. The retained scroll IDs do not supply restoration.
 - `[C-3]` The head config progressively registers a network-only `/sw.js`; registration failure does not block rendering and no offline fallback exists.
 - `[C-4]` Local development always resolves an active admin identity, so it does not prove anonymous or non-admin behavior.
 
 ## 7. High-Level Components
 
-| Component         | Module type                        | Responsibility                                           | Public API surface                          |
-| ----------------- | ---------------------------------- | -------------------------------------------------------- | ------------------------------------------- |
-| Browse layout     | `pages/(browse)/layout.island.tsx` | Static shell with desktop-only search/theme islands      | `useShared()`, children                     |
-| App layout        | `pages/(app)/layout.tsx`           | Hydrated shell, French Zod locale, render-error boundary | `AppErrorBoundary`, children                |
-| Page components   | `pages/**/*.tsx`                   | Compose loader props and feature slots                   | Default page export                         |
-| Server companions | `pages/**/*.server.ts`             | Reads, gates, mutations                                  | `loader`, `action`, `actions`, `InferProps` |
-| Page context      | `middleware/03.page-context.ts`    | Request identity and navigation path                     | `{ authUser, pathname }`                    |
-| API handlers      | `routes/api/**`                    | Remaining HTTP, auth, health, media                      | Named HTTP methods                          |
+| Component         | Module type                     | Responsibility                                                                  | Public API surface                          |
+| ----------------- | ------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- |
+| Root layout       | `pages/layout.tsx`              | Hydrated shell, search/theme controls, French Zod locale, render-error boundary | `useShared()`, children                     |
+| Page components   | `pages/**/*.tsx`                | Compose loader props and feature slots                                          | Default page export                         |
+| Server companions | `pages/**/*.server.ts`          | Reads, gates, mutations                                                         | `loader`, `action`, `actions`, `InferProps` |
+| Page context      | `middleware/03.page-context.ts` | Request identity and navigation path                                            | `{ authUser, pathname }`                    |
+| API handlers      | `routes/api/**`                 | Remaining HTTP, auth, health, media                                             | Named HTTP methods                          |
 
 ## 8. Detailed Design
 
 ### 8.1 Pages and shared context
 
 Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`.
-`vite.config.ts` uses `voidReact({ react: { compiler: true }, viewTransitions: true })` alongside
+`vite.config.ts` uses `voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true })` alongside
 `voidPlugin` and `appType: 'mpa'`. One dev server on port 3000 serves rendered pages and the API.
 
 `03.page-context.ts` excludes API and file-extension paths, resolves `getApiUser()`, and sets
@@ -75,17 +74,12 @@ The resolver reads the session that Void's auth middleware already resolved for 
 
 ### 8.2 Page contract
 
-| Group      | Layout              | URLs                                                                                                                            |
-| ---------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `(browse)` | `layout.island.tsx` | `/`, `/search`, `/shopping-list`, `/recipe/[id]`                                                                                |
-| `(app)`    | `layout.tsx`        | `/auth/login`, `/settings`, `/settings/account`, `/settings/ingredients`, `/settings/users`, `/recipe/new`, `/recipe/edit/[id]` |
-
-Route groups do not add URL segments. Browsing pages export default components from
-`*.island.tsx`; regular pages use `*.tsx`. Server companions export `defineHandler` loaders and
-`InferProps<typeof loader>` types. Home and search read `listRecipes(getDb())`; recipe details
-read the recipe and embedded sub-recipe instructions in the loader. Shopping-list data depends on
-localStorage, so its server companion sets `prerender = false` for request-dependent header identity
-rather than supplying recipe props.
+The root `pages/layout.tsx` wraps `/`, `/search`, `/shopping-list`, `/recipe/[id]`, `/auth/login`, `/settings`,
+`/settings/account`, `/settings/ingredients`, `/settings/users`, `/recipe/new`, and `/recipe/edit/[id]`. Pages export default components from `index.tsx`.
+Optional server companions export `defineHandler` loaders/actions and `InferProps<typeof loader>`
+types. Home and search read `listRecipes(getDb())`; recipe details read the recipe and embedded
+sub-recipe instructions in the loader. Shopping-list data depends on localStorage; its page needs
+no server companion or prerender override because regular pages are not auto-prerendered.
 
 ### 8.3 Access and URL parsing
 
@@ -99,30 +93,33 @@ enforce owner-or-admin checks. A missing or invalid recipe ID returns `recipe: n
 
 ### 8.4 Screen and layout boundary
 
-Both layouts compose `AppHeader` and `AppMain`. Browse header search and theme controls are islands
-that hydrate only at the header's desktop breakpoint, `media:(min-width: 768px)`; the regular layout hydrates its shell, loads the French Zod locale, and wraps children in
-`AppErrorBoundary` keyed by pathname. The browse layout has no equivalent app render-error boundary.
+The root layout composes `AppHeader` and `AppMain`, imports search/theme controls directly, loads the
+French Zod locale, and wraps children in `AppErrorBoundary` keyed by pathname.
 
-Island imports must be relative: nearby `_name.tsx` modules default-re-export components and pages
-import them with `with { island: 'load' }`, `'idle'`, or `'media:(…)'`. The reset-shopping-list
-wrapper owns its small button directly. Features expose slots/render props, such as
-`renderCardAction`, `quantityControls`, and `renderIngredientGroups`, so pages attach islands without
-feature-to-feature imports. Pages retain unstyled composition; feature and app-shell owners retain CSS.
+Pages import feature components directly via `@/...`. Features expose slots/render props, such as
+`renderCardAction`, `quantityControls`, `renderIngredientGroups`, and `backButton`, for plain
+composition. The shopping-list page owns its reset button inline. Pages retain unstyled composition;
+feature and app-shell owners retain CSS.
 
 ### 8.5 Errors, HTTP, and navigation
 
 Unknown URLs use Void's default 404. An in-app catch-all page is deliberately absent: it shadowed
 static assets such as `/manifest.json`. Missing recipes instead render DS `NotFound` within the page.
-The regular layout handles client render errors with French recovery text, a home link, and
+The root layout handles client render errors with French recovery text, a home link, and
 development-only Error details; server loader failures are not handled by that React boundary.
 `01.api-errors.ts` maps thrown page-action errors as well as API errors to JSON `{ error }`.
 
-Regular pages use Void client navigation; island pages navigate across documents. Shared CSS enables
+All pages use Void client navigation after SSR on first load. Shared CSS still enables
 `@view-transition { navigation: auto }` in `src/styles/styles.css`. The head script in
 `void.config.ts` marks both outgoing (`pageswap`) and incoming (`pagereveal`) backward document
 transitions with the `back` type. For regular pages, it tracks Navigation API traversal direction
 and tags Void's `document.startViewTransition()` result; forward visits retain the default animation.
-Unsupported browsers retain ordinary navigation.
+Unsupported browsers retain navigation without transition animations.
+
+Home recipe links use `prefetch={['visible', 'hover']}`; search cards use `prefetch` (hover,
+touchstart, and focus). Prefetched loader props are fresh for 30s and usable up to 1h with background
+revalidation. Void flushes the prefetch cache on any non-GET navigation/action.
+The search palette navigates with `router.visit`, not `location.assign`.
 
 DS Button uses `asLink` + `href` and optional `viewTransition` with the actual Void `Link`.
 `TabBar` takes `currentPath` and items with `href`; `isCurrentPath` matches home exactly and other
@@ -130,19 +127,19 @@ items at their path or descendants. Desktop navigation follows the same matcher.
 `Tabs` are native hash anchors; once hydrated their click handler scrolls the panel and calls
 `history.replaceState`, avoiding extra history entries. Static tabs retain native hash behavior.
 `ScreenLayout` takes a `backButton` slot; DS `GoBackButton` defaults to `history.back()` and is
-passed as an island on recipe details. Storybook needs no router decorator.
+passed directly on recipe details. Storybook needs no router decorator.
 
 ### 8.6 Route contract summary
 
-| Concern            | Page-owned shape                      | Consumer                                 |
-| ------------------ | ------------------------------------- | ---------------------------------------- |
-| Shared context     | `{ authUser, pathname }`              | `useShared()`                            |
-| URL input          | Parsed params and request query       | Loader/action                            |
-| Data readiness     | Direct server read → loader props     | Default page component                   |
-| Local-only loading | Hydration gate + Suspense             | Shopping-list island skeleton            |
-| Access             | `guardPage` redirect Response         | Protected loader/action                  |
-| Mutation           | `action` or named `actions`           | `usePageAction()` or direct island fetch |
-| HTTP endpoint      | Typed same-origin `void/client` fetch | Remaining API consumers                  |
+| Concern            | Page-owned shape                      | Consumer                            |
+| ------------------ | ------------------------------------- | ----------------------------------- |
+| Shared context     | `{ authUser, pathname }`              | `useShared()`                       |
+| URL input          | Parsed params and request query       | Loader/action                       |
+| Data readiness     | Direct server read → loader props     | Default page component              |
+| Local-only loading | Hydration gate + Suspense             | Shopping-list skeleton              |
+| Access             | `guardPage` redirect Response         | Protected loader/action             |
+| Mutation           | `action` or named `actions`           | `usePageAction()` or `submitAction` |
+| HTTP endpoint      | Typed same-origin `void/client` fetch | Remaining API consumers             |
 
 ### 8.7 Render-boundary rules
 
@@ -152,9 +149,10 @@ authorize writes. Regular-page clients call `usePageAction()`, which submits POS
 alerts expected failure, and resolves a success boolean. Never await an action inside a React transition:
 submission owns the asynchronous refresh lifecycle. Callers choose subsequent navigation or dialog closing.
 
-Recipe deletion is the island exception: its management control posts `fetch('/recipe/<id>', { method: 'POST' })`
-without the client router, alerts a failed HTTP response, and navigates home on success. The guarded
-page action deletes the recipe and returns a home redirect.
+Recipe deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
+from `void/pages-client`. The guarded action deletes the recipe and redirects home; replacement
+keeps Back from reopening the deleted recipe. It bypasses `usePageAction()` because that helper's
+`preserveState: true` keeps the old URL on redirects. Failed results alert via `alertError`.
 
 Persisted stores return their initial snapshot for SSR and hydration, then switch to saved localStorage
 values. `useIsHydrated()` keeps the shopping-list skeleton visible until device-local selection can
@@ -162,13 +160,14 @@ be read. This avoids treating unknown server-side browser intent as an empty sho
 
 ### 8.8 Outcome and acceptance
 
-- `[SO-1]` Browsing and editing share server-rendered URLs with distinct hydration budgets — demonstrated by `[VC-1]`.
+- `[SO-1]` Browsing and editing share server-rendered URLs and hydrated client navigation — demonstrated by `[VC-1]`.
 - `[SO-2]` Server gates and page mutations retain access policy and refresh semantics — demonstrated by `[VC-2]`.
-- `[VC-1]` Hard-load each URL in section 8.2: content renders; browse controls hydrate without mismatch;
+- `[VC-1]` Hard-load each URL in section 8.2: content renders and hydrates without mismatch; subsequent
+  card and palette visits update the page without reloading the document;
   an unknown URL returns the default 404 and `/manifest.json` remains an asset — demonstrates `[SO-1]`.
 - `[VC-2]` With production-like identities, protected loaders redirect anonymous/inactive/non-admin
-  callers appropriately; a successful regular-page action updates props without an action URL/history entry,
-  and missing recipes show in-page recovery — demonstrates `[SO-2]`.
+  callers appropriately; a successful in-place action updates props without an action URL/history entry;
+  recipe deletion redirects home without Back reopening the deleted recipe, and missing recipes show in-page recovery — demonstrates `[SO-2]`.
 
 ## 9. Open Questions
 
@@ -188,3 +187,4 @@ N/A
 | 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.          | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |
 | 2026-09-28 | Replace Base UI render composition with Button `asLink`.                               | 4, 8.5            | Base UI is no longer a dependency.                                         |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                                      |
+| 2026-10-03 | Document hydrated layouts, client navigation, prefetch, and delete redirects.          | 2–3, 6–8          | Keep recipe visits responsive and deletion history safe.                   |

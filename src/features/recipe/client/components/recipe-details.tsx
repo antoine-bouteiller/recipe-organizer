@@ -1,4 +1,6 @@
+import { useRouter } from '@void/react'
 import type { ReactNode } from 'react'
+import { submitAction } from 'void/pages-client'
 
 import { Button } from '@/components/ui/actions/button/button'
 import { Badge } from '@/components/ui/data-display/badge/badge'
@@ -16,47 +18,44 @@ import { getErrorMessage } from '@/lib/client/api-client'
 
 import * as styles from './recipe-details.css'
 
-// The details page is an island page without a client router, so it posts its delete action directly.
-const deleteRecipe = async (recipeId: number) => {
-  const response = await fetch(`/recipe/${recipeId}`, { method: 'POST' })
-  if (!response.ok) {
-    alertError(
-      'Une erreur est survenue lors de la suppression de la recette',
-      new Error(getErrorMessage(await response.json().catch(() => undefined)))
-    )
-    return
+export const RecipeManagementActions = ({ recipeId, recipeName }: { readonly recipeId: number; readonly recipeName: string }) => {
+  const router = useRouter()
+  // The action redirects home; replacing keeps Back from reopening the deleted recipe.
+  const deleteRecipe = async () => {
+    const result = await submitAction(router, `/recipe/${recipeId}`, { method: 'POST', replace: true })
+    if (!result.ok) {
+      alertError('Une erreur est survenue lors de la suppression de la recette', new Error(getErrorMessage(result.error.body)))
+    }
   }
-  globalThis.location.assign('/')
-}
 
-export const RecipeManagementActions = ({ recipeId, recipeName }: { readonly recipeId: number; readonly recipeName: string }) => (
-  <Popover
-    renderTrigger={(props) => (
-      <Button {...props} size="icon" variant="ghost">
-        <DotsThreeVerticalIcon weight="bold" />
-      </Button>
-    )}
-  >
-    <div className={styles.managementActions}>
-      <Button align="start" asLink href={`/recipe/edit/${recipeId}`} variant="list-action" width="full">
-        <PencilSimpleIcon size="sm" />
-        Modifier la recette
-      </Button>
-      <DeleteDialog
-        deleteButtonLabel="Supprimer la recette"
-        description={`Êtes-vous sûr de vouloir supprimer la recette ${recipeName}?`}
-        onDelete={() => deleteRecipe(recipeId)}
-        title="Supprimer la recette"
-        renderTrigger={(props) => <Button {...props} variant="destructive-ghost" />}
-      />
-    </div>
-  </Popover>
-)
+  return (
+    <Popover
+      renderTrigger={(props) => (
+        <Button {...props} size="icon" variant="ghost">
+          <DotsThreeVerticalIcon weight="bold" />
+        </Button>
+      )}
+    >
+      <div className={styles.managementActions}>
+        <Button align="start" asLink href={`/recipe/edit/${recipeId}`} variant="list-action" width="full">
+          <PencilSimpleIcon size="sm" />
+          Modifier la recette
+        </Button>
+        <DeleteDialog
+          deleteButtonLabel="Supprimer la recette"
+          description={`Êtes-vous sûr de vouloir supprimer la recette ${recipeName}?`}
+          onDelete={deleteRecipe}
+          title="Supprimer la recette"
+          renderTrigger={(props) => <Button {...props} variant="destructive-ghost" />}
+        />
+      </div>
+    </Popover>
+  )
+}
 
 export interface RecipeDetailsContentProps {
   readonly recipe: Recipe
   readonly subrecipes: readonly SubrecipeInstructions[]
-  /** Island pages pass the servings controls and scaled ingredient lists as islands. */
   readonly quantityControls: ReactNode
   readonly renderIngredientGroups: (props: RecipeIngredientGroupsProps) => ReactNode
 }

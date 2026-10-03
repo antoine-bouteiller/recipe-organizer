@@ -9,7 +9,6 @@ interface PageAuthUser {
 
 declare module 'void' {
   interface CloudContextVariables {
-    // `pathname` lets island layouts, which have no router, mark the current navigation item.
     shared: { authUser: PageAuthUser | null; pathname: string }
   }
 }

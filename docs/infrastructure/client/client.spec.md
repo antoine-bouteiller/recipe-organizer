@@ -55,11 +55,11 @@ boundary while leaving product goals and system-wide principles to
 
 ## 7. High-Level Components
 
-| Leaf                                     | Module type           | Responsibility                                                   | Public API surface                             |
-| ---------------------------------------- | --------------------- | ---------------------------------------------------------------- | ---------------------------------------------- |
-| [`routing-ssr`](./routing-ssr.spec.md)   | Void Pages convention | URL matching, shared context, SSR/islands, loaders and actions   | Page exports, `guardPage`, loader props        |
-| [`forms`](./forms.spec.md)               | Form library          | Typed form composition, validation display, multipart submission | `useAppForm`, `withForm`, field registry       |
-| [`client-state`](./client-state.spec.md) | State convention      | Loader props, persistent UI state, URL and cookie state          | `usePageAction`, `persistedStore`, store hooks |
+| Leaf                                     | Module type           | Responsibility                                                           | Public API surface                             |
+| ---------------------------------------- | --------------------- | ------------------------------------------------------------------------ | ---------------------------------------------- |
+| [`routing-ssr`](./routing-ssr.spec.md)   | Void Pages convention | URL matching, shared context, SSR/client navigation, loaders and actions | Page exports, `guardPage`, loader props        |
+| [`forms`](./forms.spec.md)               | Form library          | Typed form composition, validation display, multipart submission         | `useAppForm`, `withForm`, field registry       |
+| [`client-state`](./client-state.spec.md) | State convention      | Loader props, persistent UI state, URL and cookie state                  | `usePageAction`, `persistedStore`, store hooks |
 
 Leaf execution order:
 
@@ -71,11 +71,11 @@ Leaf execution order:
 
 ## 8. Detailed Design
 
-| Component         | Specified in                                     |
-| ----------------- | ------------------------------------------------ |
-| Routing & Islands | [`routing-ssr.spec.md`](./routing-ssr.spec.md)   |
-| Forms             | [`forms.spec.md`](./forms.spec.md)               |
-| Client state      | [`client-state.spec.md`](./client-state.spec.md) |
+| Component     | Specified in                                     |
+| ------------- | ------------------------------------------------ |
+| Routing & SSR | [`routing-ssr.spec.md`](./routing-ssr.spec.md)   |
+| Forms         | [`forms.spec.md`](./forms.spec.md)               |
+| Client state  | [`client-state.spec.md`](./client-state.spec.md) |
 
 ## 9. Open Questions
 
@@ -88,3 +88,4 @@ N/A
 | 2026-09-13 | Adopt typed Hono RPC clients as the client server boundary.                            | 3, 5, 7           | Reflect the completed feature-action migration.        |
 | 2026-09-13 | Document the browser SPA mount and query provider.                                     | 6–8               | Remove SSR render-mode and document-shell assumptions. |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                  |
+| 2026-10-03 | Update the routing leaf to SSR and client navigation.                                  | 7–8               | Match the shared render mode.                          |

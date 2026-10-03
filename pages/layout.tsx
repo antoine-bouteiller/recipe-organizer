@@ -9,7 +9,7 @@ import { AppHeader, AppMain } from '@/components/app-shell/app-shell'
 import { ThemeToggle } from '@/components/app-shell/theme-toggle'
 import SearchBar from '@/features/recipe/client/components/search-bar'
 
-export default function AppLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const { pathname } = useShared()
 
   return (

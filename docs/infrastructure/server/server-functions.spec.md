@@ -149,9 +149,10 @@ These browser-only reads have no timed freshness or mutation invalidation lifecy
 ### 8.9 Mutation contract
 
 Regular-page forms submit page actions, then use refreshed props and caller-owned UI effects.
-Recipe details is an island page with no client router: its control posts a native fetch to
-`/recipe/<id>`, alerts a non-OK response, and navigates home on success. The guarded action
-deletes the aggregate and returns a home redirect.
+Recipe deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
+from `void/pages-client`. The guarded action deletes the aggregate and redirects home; replacement
+keeps Back from reopening the deleted recipe. It bypasses `usePageAction()` because `preserveState`
+keeps the old URL on redirects. Failed results alert via `alertError`.
 
 Inline ingredient creation uses the remaining API POST; success awaits `router.refresh()` before
 form reset and dialog closing. Settings ingredient update/delete use page actions.
@@ -176,7 +177,7 @@ For example, `/search` returns `{ recipes }` from a direct D1 read and
   remaining APIs preserve safe typed responses — demonstrated by `[VC-1]` and `[VC-2]`.
 - `[VC-1]` A protected loader redirects before reading data; a guarded action/API rejects missing,
   inactive, or insufficient-role callers and invalid authorized input before persistence — demonstrates `[SO-1]`.
-- `[VC-2]` A regular-page write refreshes its props without changing URL/history; the palette fetches
+- `[VC-2]` An in-place page write refreshes its props without changing URL/history; the palette fetches
   on opening, shopping-list reads selected IDs, and an unknown API returns JSON 404 — demonstrates `[SO-1]`.
 
 ## 9. Open Questions
@@ -193,3 +194,4 @@ N/A
 | 2026-09-13 | Make Hono the direct Wrangler entry and browser fetch boundary.                        | 3, 5, 7, 8.7        | Remove the file-route and SSR transport adapters.                            |
 | 2026-09-13 | Document Hono route groups under `src/server/routes/`.                                 | 4, 7, 8.1, 8.3, 8.5 | Match the server route layout and runtime-specific API placement.            |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts   | Reflect the completed page migration.                                        |
+| 2026-10-03 | Submit recipe deletion through the client router with history replacement.             | 8.9, 8.12           | Follow the guarded home redirect without preserving the deleted URL.         |

@@ -92,7 +92,7 @@ account hook assigns `pending` as part of session admission
 ([auth specification](../../../docs/infrastructure/server/auth.spec.md#82-account-and-session-admission)).
 An administrative create request accepts only email and role, generates `crypto.randomUUID()` on the
 server, and supplies the required display name from the email
-(`pages/(app)/settings/users/index.server.ts`).
+(`pages/settings/users/index.server.ts`).
 
 | Status    | Meaning in this feature                            | Available lifecycle control |
 | --------- | -------------------------------------------------- | --------------------------- |
@@ -105,7 +105,7 @@ server, and supplies the required display name from the email
 `listUsers(db, status)` orders results by email. The regular page loader gates access with
 `guardPage(context, 'admin')` before reading all three statuses and returning
 `{ users: { active, pending, blocked } }` (`src/features/users/server/queries.ts`,
-`pages/(app)/settings/users/index.server.ts`). Anonymous visitors redirect to `/auth/login`, pending/blocked
+`pages/settings/users/index.server.ts`). Anonymous visitors redirect to `/auth/login`, pending/blocked
 visitors to that page with their error code, and active non-admin visitors to `/settings`.
 
 Named actions are `/settings/users?create`, `?approve`, and `?block`. Create accepts `{ email, role }`;
