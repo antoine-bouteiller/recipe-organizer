@@ -73,7 +73,6 @@
   <div class={surface.viewport} data-slot={`${surface.slot}-viewport`} {@attach portal} {@attach outsideClick}>
     <div
       aria-label={title}
-      aria-modal="true"
       class={surface.popup}
       role="dialog"
       tabindex="-1"
