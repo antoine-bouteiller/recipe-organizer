@@ -1,7 +1,7 @@
 <script module lang="ts">
   import type { FileMetadata } from '@/hooks/use-file-upload.svelte'
 
-  export interface VideoFieldProps {
+  interface VideoFieldProps {
     name: string
     value: File | FileMetadata | undefined
     onChange: (value: File | FileMetadata | undefined) => void
@@ -24,7 +24,7 @@
 <script lang="ts">
   import { untrack } from 'svelte'
 
-  import { VideoIcon, XIcon } from '@/components/ui/data-display/icons/svelte'
+  import { VideoIcon, XIcon } from '@/components/ui/data-display/icons'
   import KbdGroup from '@/components/ui/data-display/kbd/kbd-group.svelte'
   import Kbd from '@/components/ui/data-display/kbd/kbd.svelte'
   import { useFileUpload } from '@/hooks/use-file-upload.svelte'

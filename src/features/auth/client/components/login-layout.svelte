@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
   import Card from '@/components/ui/data-display/card/card.svelte'
-  import { ArrowLeftIcon } from '@/components/ui/data-display/icons/svelte'
+  import { ArrowLeftIcon } from '@/components/ui/data-display/icons'
   import { alertError } from '@/lib/client/alert-error'
 
   import * as styles from './login-layout.css'

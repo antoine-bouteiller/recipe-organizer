@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ingredientCategoryIcons, ingredientCategoryLabels } from '@/components/ingredient-categories'
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { BasketIcon } from '@/components/ui/data-display/icons/svelte'
+  import { BasketIcon } from '@/components/ui/data-display/icons'
   import Skeleton from '@/components/ui/feedback/skeleton/skeleton.svelte'
   import { ingredientCategory } from '@/features/ingredients/categories'
   import { incrementalArray } from '@/utils/array'

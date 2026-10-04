@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { CheckIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CheckIcon } from '@/components/ui/data-display/icons'
   import { alertError } from '@/lib/client/alert-error'
   import { usePageAction } from '@/lib/client/page-action.svelte'
 

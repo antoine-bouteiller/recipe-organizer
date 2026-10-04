@@ -3,7 +3,7 @@
   import type { Snippet } from 'svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
 
-  import { CheckIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CheckIcon } from '@/components/ui/data-display/icons'
 
   import * as styles from './toggle.css'
 

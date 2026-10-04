@@ -3,7 +3,7 @@
   import { submitAction } from 'void/pages-client'
 
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@/components/ui/data-display/icons/svelte'
+  import { DotsThreeVerticalIcon, PencilSimpleIcon } from '@/components/ui/data-display/icons'
   import DeleteDialog from '@/components/ui/overlays/delete-dialog/delete-dialog.svelte'
   import Popover from '@/components/ui/overlays/popover/popover.svelte'
   import { alertError } from '@/lib/client/alert-error'

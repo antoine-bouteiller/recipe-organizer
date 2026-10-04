@@ -20,7 +20,7 @@
   import { on } from 'svelte/events'
 
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { XIcon } from '@/components/ui/data-display/icons/svelte'
+  import { XIcon } from '@/components/ui/data-display/icons'
   import ScrollArea from '@/components/ui/layout/scroll-area/scroll-area.svelte'
   import { useDrawer } from '@/hooks/use-drawer.svelte'
   import { useIsMobile } from '@/hooks/use-is-mobile.svelte'

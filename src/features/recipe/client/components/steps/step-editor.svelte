@@ -2,7 +2,7 @@
   import { onDestroy, tick } from 'svelte'
 
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { CaretDownIcon, CaretUpIcon, PlusIcon, TextBolderIcon, TrashIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CaretDownIcon, CaretUpIcon, PlusIcon, TextBolderIcon, TrashIcon } from '@/components/ui/data-display/icons'
   import FieldError from '@/components/ui/forms/field/field-error.svelte'
   import Field from '@/components/ui/forms/field/field.svelte'
   import TextareaField from '@/components/ui/forms/textarea-field/textarea-field.svelte'

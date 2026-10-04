@@ -1,7 +1,7 @@
 <script module lang="ts">
   import type { Snippet } from 'svelte'
 
-  import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@/components/ui/data-display/icons/svelte'
+  import { GearIcon, HouseIcon, MagnifyingGlassIcon, ShoppingCartSimpleIcon } from '@/components/ui/data-display/icons'
 
   export interface MenuItem {
     activeIcon: Snippet

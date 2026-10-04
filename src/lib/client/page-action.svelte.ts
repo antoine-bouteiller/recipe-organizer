@@ -45,11 +45,11 @@ export const usePageAction = () => {
 }
 
 /** Alert expected non-validation failures once per error; Void projects validation errors into fields. */
-export const useFormActionError = (error: () => VoidActionError | null, message: string) => {
+export const useFormActionError = (error: () => VoidActionError | null, message: string | (() => string)) => {
   $effect(() => {
     const failure = error()
     if (failure) {
-      untrack(() => alertError(message, new Error(describe(failure.body))))
+      untrack(() => alertError(typeof message === 'string' ? message : message(), new Error(describe(failure.body))))
     }
   })
 }

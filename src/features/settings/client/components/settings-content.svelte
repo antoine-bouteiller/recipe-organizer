@@ -4,8 +4,8 @@
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import Card from '@/components/ui/data-display/card/card.svelte'
+  import { CaretRightIcon, CookieIcon, ThemeIcon, UserIcon, UsersIcon } from '@/components/ui/data-display/icons'
   import type { IconProps } from '@/components/ui/data-display/icons/icon-types'
-  import { CaretRightIcon, CookieIcon, ThemeIcon, UserIcon, UsersIcon } from '@/components/ui/data-display/icons/svelte'
   import { toggleTheme } from '@/lib/client/theme'
 
   import * as styles from './settings-content.css'

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { CheckIcon, PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CheckIcon, PlusIcon } from '@/components/ui/data-display/icons'
   import { useIsInShoppingList } from '@/hooks/use-is-in-shopping-list.svelte'
   import { addToShoppingList } from '@/stores/shopping-list.store.svelte'
 

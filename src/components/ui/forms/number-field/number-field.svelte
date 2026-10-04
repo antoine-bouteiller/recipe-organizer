@@ -1,5 +1,5 @@
 <script module lang="ts">
-  export interface NumberFieldProps {
+  interface NumberFieldProps {
     name: string
     value: number | undefined
     onChange: (value: number | undefined) => void
@@ -18,7 +18,7 @@
 
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { MinusIcon, PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { MinusIcon, PlusIcon } from '@/components/ui/data-display/icons'
 
   import { useFieldInvalid } from '../field/field-context.svelte'
   import FieldError from '../field/field-error.svelte'

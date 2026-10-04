@@ -1,8 +1,8 @@
 <script lang="ts">
   import Form from '@/components/ui/forms/form/form.svelte'
+  import { provideRecipeCatalog } from '@/features/recipe/client/contexts/recipe-catalog-context.svelte'
   import type { RecipeFormInput } from '@/features/recipe/schemas'
 
-  import RecipeCatalogProvider from '../contexts/recipe-catalog-provider.svelte'
   import type { RecipeFormState } from './recipe-form-state.svelte'
   import RecipeForm from './recipe-form.svelte'
 
@@ -33,6 +33,7 @@
   const recipes = [
     { cuisineTypes: [], id: 11, image: '', isMagimix: false, isSpice: false, isVegetarian: true, meals: [], name: 'Sauce tomate', servings: 4 },
   ]
+  provideRecipeCatalog(() => recipes)
 </script>
 
 <button
@@ -47,9 +48,7 @@
     pending = !pending
   }}>Basculer en attente</button
 >
-<RecipeCatalogProvider {recipes}>
-  <Form errors={{ 'ingredientGroups.1.ingredients.0.quantity': 'Quantité requise' }} onsubmit={(event) => event.preventDefault()}>
-    <RecipeForm {form} ingredientOptions={options} />
-    <output aria-label="Recette enregistrée">{JSON.stringify(data)}</output>
-  </Form>
-</RecipeCatalogProvider>
+<Form errors={{ 'ingredientGroups.1.ingredients.0.quantity': 'Quantité requise' }} onsubmit={(event) => event.preventDefault()}>
+  <RecipeForm {form} ingredientOptions={options} />
+  <output aria-label="Recette enregistrée">{JSON.stringify(data)}</output>
+</Form>

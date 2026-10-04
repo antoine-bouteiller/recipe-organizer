@@ -3,7 +3,7 @@
 
   import AddIngredientOption from './add-ingredient-option.svelte'
 
-  export interface AddIngredientProps {
+  interface AddIngredientProps {
     defaultValue?: string
     renderTrigger: DialogProps['renderTrigger']
   }

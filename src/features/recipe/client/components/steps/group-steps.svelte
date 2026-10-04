@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { PlusIcon } from '@/components/ui/data-display/icons'
   import FieldError from '@/components/ui/forms/field/field-error.svelte'
   import Field from '@/components/ui/forms/field/field.svelte'
   import type { RecipeFormInput } from '@/features/recipe/schemas'

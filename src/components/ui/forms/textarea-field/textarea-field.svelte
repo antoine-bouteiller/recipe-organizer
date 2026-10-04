@@ -1,7 +1,7 @@
 <script module lang="ts">
   import type { HTMLTextareaAttributes } from 'svelte/elements'
 
-  export type TextareaFieldProps = Pick<HTMLTextareaAttributes, 'aria-label' | 'disabled' | 'onkeydown' | 'placeholder' | 'required'> & {
+  type TextareaFieldProps = Pick<HTMLTextareaAttributes, 'aria-label' | 'disabled' | 'onkeydown' | 'placeholder' | 'required'> & {
     name: string
     value: string
     onChange: (value: string) => void

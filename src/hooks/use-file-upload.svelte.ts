@@ -10,6 +10,7 @@ export interface FileMetadata {
   type?: string
   url: string
 }
+/** @lintignore Exported for story hosts. */
 export interface FileWithPreview {
   file: File | FileMetadata
   id: string

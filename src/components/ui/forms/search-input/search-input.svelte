@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
 
-  import { MagnifyingGlassIcon } from '@/components/ui/data-display/icons/svelte'
+  import { MagnifyingGlassIcon } from '@/components/ui/data-display/icons'
 
   import * as styles from './search-input.css'
 

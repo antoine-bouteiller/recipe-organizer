@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
   import Toggle from '@/components/ui/actions/toggle/toggle.svelte'
-  import { FunnelSimpleIcon } from '@/components/ui/data-display/icons/svelte'
+  import { FunnelSimpleIcon } from '@/components/ui/data-display/icons'
   import SearchInput from '@/components/ui/forms/search-input/search-input.svelte'
   import Select from '@/components/ui/forms/select/select.svelte'
   import { CUISINE_TYPE_LABELS, CUISINE_TYPES, MEAL_LABELS, MEALS } from '@/features/recipe/constants'

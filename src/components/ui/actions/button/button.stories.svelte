@@ -3,7 +3,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
   import { expect, userEvent, within } from 'storybook/test'
 
-  import { PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { PlusIcon } from '@/components/ui/data-display/icons'
 
   import Button from './button.svelte'
 

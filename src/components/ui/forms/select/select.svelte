@@ -1,5 +1,5 @@
 <script lang="ts" generics="TValue extends string">
-  import { CheckIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CheckIcon } from '@/components/ui/data-display/icons'
   import Popover from '@/components/ui/overlays/popover/popover.svelte'
   import { useIsMobile } from '@/hooks/use-is-mobile.svelte'
 

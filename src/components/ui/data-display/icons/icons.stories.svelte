@@ -42,7 +42,7 @@
     UsersIcon,
     VideoIcon,
     XIcon,
-  } from './svelte'
+  } from '.'
 
   import * as styles from './icons.stories.css'
 

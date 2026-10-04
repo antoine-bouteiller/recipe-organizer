@@ -4,7 +4,7 @@
   import type { IconProps } from '@/components/ui/data-display/icons/icon-types'
   import type { TriggerProps } from '@/hooks/use-drawer.svelte'
 
-  export interface DeleteDialogProps {
+  interface DeleteDialogProps {
     actionLabel?: string
     deleteButtonLabel?: string
     description: string
@@ -19,7 +19,7 @@
 
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { TrashIcon } from '@/components/ui/data-display/icons/svelte'
+  import { TrashIcon } from '@/components/ui/data-display/icons'
   import Spinner from '@/components/ui/feedback/spinner/spinner.svelte'
 
   import Dialog from '../dialog/dialog.svelte'

@@ -5,7 +5,7 @@
   import type { RecipeIngredientGroupsProps } from './recipe-section.svelte'
   import type { SubrecipeInstructions } from './steps/recipe-steps.svelte'
 
-  export interface RecipeDetailsContentProps {
+  interface RecipeDetailsContentProps {
     readonly recipe: Recipe
     readonly subrecipes: readonly SubrecipeInstructions[]
     readonly quantityControls: Snippet

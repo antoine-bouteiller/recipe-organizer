@@ -8,7 +8,7 @@
 
   export type { RecipeFormState } from './recipe-form-state.svelte'
 
-  export interface RecipeFormProps {
+  interface RecipeFormProps {
     form: RecipeFormState
     initialImage?: FileMetadata
     initialVideo?: FileMetadata
@@ -20,7 +20,7 @@
 
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { PlusIcon, TrashIcon } from '@/components/ui/data-display/icons/svelte'
+  import { PlusIcon, TrashIcon } from '@/components/ui/data-display/icons'
   import ComboboxField from '@/components/ui/forms/combobox-field/combobox-field.svelte'
   import FieldError from '@/components/ui/forms/field/field-error.svelte'
   import Field from '@/components/ui/forms/field/field.svelte'

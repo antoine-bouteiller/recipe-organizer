@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Reader from './persisted-store.reader.svelte'
+  import Reader from './persisted-store-reader.example.svelte'
   import { persistedStore } from './persisted-store.svelte'
 
   const scenario: { earlyWrite?: boolean } = $props()

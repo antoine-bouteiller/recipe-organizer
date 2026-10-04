@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { PlusIcon } from '@/components/ui/data-display/icons'
 
   import AddIngredient from './add-ingredient.svelte'
 

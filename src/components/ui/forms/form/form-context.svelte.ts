@@ -1,6 +1,6 @@
 import { getContext, setContext } from 'svelte'
 
-export const FormErrorsContext = Symbol('form-errors')
+const FormErrorsContext = Symbol('form-errors')
 export interface FormErrors {
   readonly errors: Record<string, string>
 }

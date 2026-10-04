@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { MagnifyingGlassIcon } from '@/components/ui/data-display/icons/svelte'
+  import { MagnifyingGlassIcon } from '@/components/ui/data-display/icons'
   import type { ReducedRecipe } from '@/types/recipe'
 
   import RecipeSearchCard from './recipe-search-card.svelte'

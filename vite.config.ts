@@ -3,17 +3,20 @@ import { fileURLToPath } from 'node:url'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
-import { voidReact } from '@void/react/plugin'
+import { voidSvelte } from '@void/svelte/plugin'
 import type { Plugin, UserConfig } from 'vite-plus'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
 import { voidPlugin } from 'void'
 
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
-const restrictedReactImports = {
-  importNames: ['useMemo', 'useCallback'],
-  message: 'Rely on React Compiler instead of manual memoization with useMemo or useCallback.',
-  name: 'react',
+const parentRestriction = {
+  message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
+  regex: '^\\.\\./\\.\\.(/|$)',
+}
+const reactRestriction = {
+  group: ['react', 'react/*', 'react-dom', 'react-dom/*', '@void/react', '@void/react/*'],
+  message: 'The application runs on Svelte; do not import React runtime or adapter APIs.',
 }
 
 // Void's auth runtime passes its generated Drizzle adapter, so Better Auth's Kysely mode is dead weight in the Worker.
@@ -29,7 +32,7 @@ const betterAuthMinimal: Plugin = {
   },
 }
 
-// @void/react sets its browser entries as top-level inputs, which every environment inherits.
+// The Void page adapter sets its browser entries as top-level inputs, which every environment inherits.
 const browserEntries = ['pages-client', 'islands-client']
 const clientOnlyEntries: Plugin = {
   apply: 'build',
@@ -83,76 +86,26 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
     options: { reportUnusedDisableDirectives: 'error', typeAware: true, typeCheck: true },
     overrides: [
-      ...((): NonNullable<NonNullable<UserConfig['lint']>['overrides']> => {
-        const parentRestriction = {
-          message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
-          regex: '^\\.\\./\\.\\.(/|$)',
-        }
-        const svelteReactRestriction = {
-          group: ['react', 'react/*', 'react-dom', 'react-dom/*', '@void/react', '@void/react/*'],
-          message: 'Svelte components and rune modules must not import React runtime or adapter APIs.',
-        }
-        return [
-          {
-            files: ['**/*.svelte', '**/*.svelte.ts'],
-            rules: {
-              'no-restricted-imports': ['error', { patterns: [parentRestriction, svelteReactRestriction] }],
-              // Transitional: React Compiler rules still protect React files until cut-over.
-              'react/capitalized-calls': 'off',
-              'react/error-boundaries': 'off',
-              'react/globals': 'off',
-              'react/hooks': 'off',
-              'react/immutability': 'off',
-              'react/incompatible-library': 'off',
-              'react/invariant': 'off',
-              'react/preserve-manual-memoization': 'off',
-              'react/purity': 'off',
-              'react/refs': 'off',
-              'react/rule-suppression': 'off',
-              'react/set-state-in-effect': 'off',
-              'react/set-state-in-render': 'off',
-              'react/static-components': 'off',
-              'react/syntax': 'off',
-              'react/todo': 'off',
-              'react/unsupported-syntax': 'off',
-              'react/use-memo': 'off',
-              'react/void-use-memo': 'off',
-            },
-          },
-          ...features.flatMap((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']> => {
-            const patterns = [
-              parentRestriction,
-              ...features
-                .filter((other) => other !== feature)
-                .map((other) => ({
-                  group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
-                  message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
-                })),
-            ]
-            return [
-              {
-                files: [`src/features/${feature}/**/*.{ts,tsx,svelte}`],
-                rules: {
-                  'no-restricted-imports': ['error', { paths: [restrictedReactImports], patterns }],
-                },
-              },
-              {
-                // Matching overrides replace no-restricted-imports options, so keep both guards.
-                files: [`src/features/${feature}/**/*.svelte`, `src/features/${feature}/**/*.svelte.ts`],
-                rules: {
-                  'no-restricted-imports': ['error', { patterns: [...patterns, svelteReactRestriction] }],
-                },
-              },
-            ]
-          }),
-        ]
-      })(),
-      {
-        files: ['**/use-file-upload.ts'],
+      ...features.map((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']>[number] => ({
+        files: [`src/features/${feature}/**/*.{ts,svelte}`],
         rules: {
-          'react-hooks/exhaustive-deps': 'off',
+          'no-restricted-imports': [
+            'error',
+            {
+              patterns: [
+                parentRestriction,
+                reactRestriction,
+                ...features
+                  .filter((other) => other !== feature)
+                  .map((other) => ({
+                    group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
+                    message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
+                  })),
+              ],
+            },
+          ],
         },
-      },
+      })),
       {
         // CSS declaration and selector order determines the cascade.
         files: ['**/*.css.ts'],
@@ -168,7 +121,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
         },
       },
     ],
-    plugins: ['typescript', 'react', 'unicorn', 'import'],
+    plugins: ['typescript', 'unicorn', 'import'],
     rules: {
       complexity: ['error', 15],
       'default-case': 'error',
@@ -181,11 +134,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
           },
         },
       ],
-      'function-component-definition': 'off', // Conflicts with func-style
       'group-exports': 'off',
       'id-length': ['error', { exceptions: ['z', 'x', '$'] }],
-      'jsx-max-depth': 'off',
-      'jsx-props-no-spreading': 'off',
       'max-nested-calls': 'off',
       'max-params': 'off',
       'max-statements': 'off',
@@ -203,18 +153,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'no-nodejs-modules': 'off',
       'no-non-null-assertion': 'error',
       'no-null': 'off',
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [restrictedReactImports],
-          patterns: [
-            {
-              message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
-              regex: '^\\.\\./\\.\\.(/|$)',
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': ['error', { patterns: [parentRestriction, reactRestriction] }],
       'no-ternary': 'off',
       'no-unassigned-import': 'off',
       'no-underscore-dangle': 'off',
@@ -226,27 +165,6 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'prefer-modern-math-apis': 'error',
       'prefer-number-properties': 'error',
       'prefer-string-replace-all': 'error',
-      'react-in-jsx-scope': 'off',
-      'react/capitalized-calls': 'error',
-      'react/error-boundaries': 'error',
-      'react/globals': 'error',
-      'react/hooks': 'error',
-      'react/immutability': 'error',
-      'react/incompatible-library': 'error',
-      'react/invariant': 'error',
-      'react/jsx-no-constructed-context-values': 'off',
-      'react/preserve-manual-memoization': 'error',
-      'react/purity': 'error',
-      'react/refs': 'error',
-      'react/rule-suppression': 'error',
-      'react/set-state-in-effect': 'error',
-      'react/set-state-in-render': 'error',
-      'react/static-components': 'error',
-      'react/syntax': 'error',
-      'react/todo': 'error',
-      'react/unsupported-syntax': 'error',
-      'react/use-memo': 'error',
-      'react/void-use-memo': 'error',
       'recipe-oranizer/no-conditional-empty-object-spread': 'error',
       'recipe-oranizer/no-known-value-widening': 'error',
       'recipe-oranizer/no-low-signal-symbol-names': 'error',
@@ -257,7 +175,6 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'recipe-oranizer/no-use-shared-destructuring': 'error',
       'recipe-oranizer/vanilla-extract-theme-tokens': 'error',
       'sort-imports': 'off',
-      'style-prop-object': 'off',
     },
   },
   plugins: [
@@ -267,7 +184,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     ...(!process.env.VITEST && isPreview !== undefined
       ? [
           voidPlugin({ persistTo: '.wrangler/state' }),
-          voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true }),
+          voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true }),
           betterAuthMinimal,
           clientOnlyEntries,
         ]
@@ -288,8 +205,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
   },
   test: {
     coverage: {
-      exclude: ['**/*.stories.{tsx,svelte}', '**/*.css.ts'],
-      include: ['src/**/*.{ts,tsx,svelte}', 'pages/**/*.{ts,tsx,svelte}', 'tools/oxlint/rules/**/*.ts'],
+      exclude: ['**/*.stories.svelte', '**/*.css.ts'],
+      include: ['src/**/*.{ts,svelte}', 'pages/**/*.{ts,svelte}', 'tools/oxlint/rules/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
     },

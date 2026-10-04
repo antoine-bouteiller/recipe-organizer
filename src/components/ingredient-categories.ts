@@ -1,7 +1,7 @@
 import type { Component } from 'svelte'
 
+import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@/components/ui/data-display/icons'
 import type { IconProps } from '@/components/ui/data-display/icons/icon-types'
-import { CarrotIcon, CowIcon, FishIcon, PackageIcon, PepperIcon } from '@/components/ui/data-display/icons/svelte'
 import type { IngredientCategory } from '@/features/ingredients/categories'
 
 export const ingredientCategoryLabels = {

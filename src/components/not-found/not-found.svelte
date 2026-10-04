@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte'
 
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { CaretLeftIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CaretLeftIcon } from '@/components/ui/data-display/icons'
 
   import * as styles from './not-found.css'
 

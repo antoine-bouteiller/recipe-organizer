@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte'
   import type { HTMLButtonAttributes } from 'svelte/elements'
 
-  import { CaretUpDownIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CaretUpDownIcon } from '@/components/ui/data-display/icons'
   import type { TriggerProps } from '@/hooks/use-drawer.svelte'
 
   import * as styles from './select.shared.css'

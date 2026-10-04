@@ -1,7 +1,7 @@
 <script lang="ts" generics="TValue extends number | string | undefined">
   import type { Snippet } from 'svelte'
 
-  import { CheckIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CheckIcon } from '@/components/ui/data-display/icons'
   import Separator from '@/components/ui/layout/separator/separator.svelte'
   import Popover from '@/components/ui/overlays/popover/popover.svelte'
 

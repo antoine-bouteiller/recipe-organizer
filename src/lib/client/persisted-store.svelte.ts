@@ -1,5 +1,6 @@
 import { onMount } from 'svelte'
 
+/** @lintignore Exported for unit tests. */
 export const readSaved = <TValue>(key: string, initial: TValue): TValue | undefined => {
   const raw = localStorage.getItem(key)
   if (raw == null) {

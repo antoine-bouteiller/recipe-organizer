@@ -3,7 +3,7 @@
   import { untrack } from 'svelte'
 
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { PencilSimpleIcon } from '@/components/ui/data-display/icons/svelte'
+  import { PencilSimpleIcon } from '@/components/ui/data-display/icons'
   import FormDialog from '@/components/ui/overlays/form-dialog/form-dialog.svelte'
   import type { IngredientFormInput } from '@/features/ingredients/schemas'
   import { alertError } from '@/lib/client/alert-error'

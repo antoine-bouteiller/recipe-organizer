@@ -3,7 +3,7 @@
 
   import type { ReducedRecipe } from '@/types/recipe'
 
-  export interface RecipeListContentProps {
+  interface RecipeListContentProps {
     readonly canCreate: boolean
     readonly recipes: readonly ReducedRecipe[]
     readonly renderCardAction: Snippet<[ReducedRecipe]>
@@ -15,7 +15,7 @@
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import Badge from '@/components/ui/data-display/badge/badge.svelte'
-  import { BookIcon, PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { BookIcon, PlusIcon } from '@/components/ui/data-display/icons'
   import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/constants'
 
   import * as cardStyles from './recipe-card.css'

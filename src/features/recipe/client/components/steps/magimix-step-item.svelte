@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@/components/ui/data-display/icons/svelte'
+  import { SpinnerGapIcon, ThermometerIcon, TimerIcon } from '@/components/ui/data-display/icons'
   import Item from '@/components/ui/data-display/item/item.svelte'
   import { magimixProgramLabels } from '@/features/recipe/magimix'
   import type { MagimixProgramData } from '@/features/recipe/magimix'

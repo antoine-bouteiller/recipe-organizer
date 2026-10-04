@@ -2,7 +2,7 @@
   import { useRouter } from '@void/svelte'
   import { onMount, tick } from 'svelte'
 
-  import { ArrowElbowDownLeftIcon, MagnifyingGlassIcon } from '@/components/ui/data-display/icons/svelte'
+  import { ArrowElbowDownLeftIcon, MagnifyingGlassIcon } from '@/components/ui/data-display/icons'
   import Kbd from '@/components/ui/data-display/kbd/kbd.svelte'
   import ScrollArea from '@/components/ui/layout/scroll-area/scroll-area.svelte'
   import { loadRecipeList } from '@/features/recipe/client/api/get-all'

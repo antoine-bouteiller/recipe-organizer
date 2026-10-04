@@ -6,8 +6,8 @@ const config: KnipConfig = {
   compilers: { svelte: (text: string, filename: string) => svelte2tsx(text, { filename, isTsFile: true, mode: 'ts' }).code },
   entry: [
     'public/sw.js!',
-    '{src,tools}/**/*.test.{ts,tsx}',
-    'pages/**/*.{ts,tsx,svelte}!',
+    '{src,tools}/**/*.test.ts',
+    'pages/**/*.{ts,svelte}!',
     'routes/**/*.ts!',
     'middleware/**/*.ts!',
     'tools/oxlint/index.ts',
@@ -15,35 +15,22 @@ const config: KnipConfig = {
     'void.config.ts',
     'auth.ts!',
     'env.ts!',
-    // TODO: remove with the React cut-over; React stories and their helper stay compilable until ported.
-    'src/**/*.stories.tsx',
-    '.storybook/story-section.tsx',
   ],
   husky: {
     config: ['.vite-hooks/pre-commit', '.vite-hooks/commit-msg'],
   },
-  // TODO: remove with the React cut-over; Svelte ports have no consumers until their callers are ported.
-  ignore: [
-    'src/**/*.svelte',
-    'src/**/*.svelte.ts',
-    'src/components/ingredient-categories.ts',
-    'src/components/navigation/current-path.ts',
-    'src/components/ui/data-display/icons/icon-types.ts',
-    'src/components/ui/data-display/icons/svelte.ts',
-  ],
-  // TODO: drop `@void/svelte` with the React cut-over.
-  ignoreDependencies: ['cloudflare', 'oxc-transform-react', '@typescript/native', '@void/svelte'],
+  ignoreDependencies: ['cloudflare', '@typescript/native'],
   ignoreIssues: {
-    'pages/**/*.{ts,tsx,svelte}': ['exports', 'types'],
-    // TODO: remove with the React cut-over.
-    'src/**/*.stories.tsx': ['exports'],
+    'pages/**/*.{ts,svelte}': ['exports', 'types'],
+    // Svelte module scripts that only export snippet data still compile to an unused component default.
+    'src/components/navigation/menu-items.svelte': ['exports'],
     'src/db/schema/auth.ts': ['exports'],
     'tools/oxlint/index.ts': ['exports'],
     '{routes,middleware}/**/*.ts': ['exports'],
     '{void.config,env,auth}.ts': ['exports'],
   },
   includeEntryExports: true,
-  project: ['**/*.{ts,tsx,svelte}!', '!**/*.stories.*!', '!.storybook/**!', '!tools/**!'],
+  project: ['**/*.{ts,svelte}!', '!**/*.stories.*!', '!**/*.{example,story}.svelte!', '!.storybook/**!', '!tools/**!'],
   tags: ['-lintignore'],
 }
 

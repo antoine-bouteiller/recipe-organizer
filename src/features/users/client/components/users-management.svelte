@@ -4,7 +4,7 @@
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import Badge from '@/components/ui/data-display/badge/badge.svelte'
-  import { PlusIcon } from '@/components/ui/data-display/icons/svelte'
+  import { PlusIcon } from '@/components/ui/data-display/icons'
   import ItemGroup from '@/components/ui/data-display/item/item-group.svelte'
   import ItemSeparator from '@/components/ui/data-display/item/item-separator.svelte'
   import Item from '@/components/ui/data-display/item/item.svelte'

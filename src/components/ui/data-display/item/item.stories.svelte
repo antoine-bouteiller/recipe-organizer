@@ -3,7 +3,7 @@
   import { defineMeta } from '@storybook/addon-svelte-csf'
 
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { CheckIcon } from '@/components/ui/data-display/icons/svelte'
+  import { CheckIcon } from '@/components/ui/data-display/icons'
 
   import ItemGroup from './item-group.svelte'
   import ItemSeparator from './item-separator.svelte'

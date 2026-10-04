@@ -3,7 +3,7 @@
 
   import type { TriggerProps } from '@/hooks/use-drawer.svelte'
 
-  export interface PopoverProps {
+  interface PopoverProps {
     children: Snippet
     onOpenChange?: (open: boolean) => void
     open?: boolean

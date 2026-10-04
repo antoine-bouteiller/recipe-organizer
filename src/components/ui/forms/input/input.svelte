@@ -1,7 +1,7 @@
 <script module lang="ts">
   import type { HTMLInputAttributes } from 'svelte/elements'
 
-  export type InputProps = Pick<
+  type InputProps = Pick<
     HTMLInputAttributes,
     'aria-invalid' | 'aria-describedby' | 'aria-label' | 'disabled' | 'id' | 'name' | 'oninput' | 'placeholder' | 'required' | 'type' | 'value'
   > & { defaultValue?: HTMLInputAttributes['value'] }

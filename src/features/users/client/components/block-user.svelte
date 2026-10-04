@@ -1,6 +1,6 @@
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { ProhibitIcon } from '@/components/ui/data-display/icons/svelte'
+  import { ProhibitIcon } from '@/components/ui/data-display/icons'
   import DeleteDialog from '@/components/ui/overlays/delete-dialog/delete-dialog.svelte'
   import { alertError } from '@/lib/client/alert-error'
   import { usePageAction } from '@/lib/client/page-action.svelte'

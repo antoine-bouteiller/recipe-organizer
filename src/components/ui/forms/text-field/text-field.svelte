@@ -1,5 +1,5 @@
 <script module lang="ts">
-  export interface TextFieldProps {
+  interface TextFieldProps {
     name: string
     value: string
     onChange: (value: string) => void

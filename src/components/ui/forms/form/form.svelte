@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte'
   import type { HTMLFormAttributes } from 'svelte/elements'
 
-  export type FormProps = Pick<HTMLFormAttributes, 'action' | 'onsubmit'> & { errors?: Record<string, string>; children: Snippet }
+  type FormProps = Pick<HTMLFormAttributes, 'action' | 'onsubmit'> & { errors?: Record<string, string>; children: Snippet }
 </script>
 
 <script lang="ts">

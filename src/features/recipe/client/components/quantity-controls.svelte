@@ -1,5 +1,5 @@
 <script module lang="ts">
-  export interface QuantityControlsProps {
+  interface QuantityControlsProps {
     readonly recipeId: number
     readonly servings: number
     readonly variant?: 'default' | 'card'
@@ -8,7 +8,7 @@
 
 <script lang="ts">
   import Button from '@/components/ui/actions/button/button.svelte'
-  import { MinusIcon, PlusIcon, TrashIcon } from '@/components/ui/data-display/icons/svelte'
+  import { MinusIcon, PlusIcon, TrashIcon } from '@/components/ui/data-display/icons'
   import { useIsInShoppingList } from '@/hooks/use-is-in-shopping-list.svelte'
   import { addToShoppingList, removeFromShoppingList } from '@/stores/shopping-list.store.svelte'
 

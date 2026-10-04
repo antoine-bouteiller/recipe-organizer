@@ -3,7 +3,7 @@
   import { expect, userEvent, within } from 'storybook/test'
 
   import AppError from './app-error.svelte'
-  import Throwing from './throwing.private.svelte'
+  import Throwing from './throwing.example.svelte'
 
   const { Story } = defineMeta({ component: AppError, parameters: { layout: 'fullscreen' }, title: 'Feedback/App Error' })
 </script>
