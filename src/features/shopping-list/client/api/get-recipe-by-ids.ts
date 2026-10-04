@@ -6,7 +6,7 @@ const getRecipesByIds = (ids: readonly number[]) => readResponse(fetch('/api/sho
 
 const requests = new Map<string, ReturnType<typeof getRecipesByIds>>()
 
-/** One request per distinct selection; `use()` needs the same promise across renders. */
+/** One stable request per distinct selection; failed requests are evicted so callers can retry. */
 export const loadRecipesByIds = (ids: readonly number[]) => {
   const key = JSON.stringify(ids)
   let request = requests.get(key)
