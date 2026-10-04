@@ -83,29 +83,70 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
     options: { reportUnusedDisableDirectives: 'error', typeAware: true, typeCheck: true },
     overrides: [
-      ...features.map((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']>[number] => ({
-        files: [`src/features/${feature}/**/*.{ts,tsx}`],
-        rules: {
-          'no-restricted-imports': [
-            'error',
-            {
-              paths: [restrictedReactImports],
-              patterns: [
-                {
-                  message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
-                  regex: '^\\.\\./\\.\\.(/|$)',
-                },
-                ...features
-                  .filter((other) => other !== feature)
-                  .map((other) => ({
-                    group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
-                    message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
-                  })),
-              ],
+      ...((): NonNullable<NonNullable<UserConfig['lint']>['overrides']> => {
+        const parentRestriction = {
+          message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
+          regex: '^\\.\\./\\.\\.(/|$)',
+        }
+        const svelteReactRestriction = {
+          group: ['react', 'react/*', 'react-dom', 'react-dom/*', '@void/react', '@void/react/*'],
+          message: 'Svelte components and rune modules must not import React runtime or adapter APIs.',
+        }
+        return [
+          {
+            files: ['**/*.svelte', '**/*.svelte.ts'],
+            rules: {
+              'no-restricted-imports': ['error', { patterns: [parentRestriction, svelteReactRestriction] }],
+              // Transitional: React Compiler rules still protect React files until cut-over.
+              'react/capitalized-calls': 'off',
+              'react/error-boundaries': 'off',
+              'react/globals': 'off',
+              'react/hooks': 'off',
+              'react/immutability': 'off',
+              'react/incompatible-library': 'off',
+              'react/invariant': 'off',
+              'react/preserve-manual-memoization': 'off',
+              'react/purity': 'off',
+              'react/refs': 'off',
+              'react/rule-suppression': 'off',
+              'react/set-state-in-effect': 'off',
+              'react/set-state-in-render': 'off',
+              'react/static-components': 'off',
+              'react/syntax': 'off',
+              'react/todo': 'off',
+              'react/unsupported-syntax': 'off',
+              'react/use-memo': 'off',
+              'react/void-use-memo': 'off',
             },
-          ],
-        },
-      })),
+          },
+          ...features.flatMap((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']> => {
+            const patterns = [
+              parentRestriction,
+              ...features
+                .filter((other) => other !== feature)
+                .map((other) => ({
+                  group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
+                  message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
+                })),
+            ]
+            return [
+              {
+                files: [`src/features/${feature}/**/*.{ts,tsx,svelte}`],
+                rules: {
+                  'no-restricted-imports': ['error', { paths: [restrictedReactImports], patterns }],
+                },
+              },
+              {
+                // Matching overrides replace no-restricted-imports options, so keep both guards.
+                files: [`src/features/${feature}/**/*.svelte`, `src/features/${feature}/**/*.svelte.ts`],
+                rules: {
+                  'no-restricted-imports': ['error', { patterns: [...patterns, svelteReactRestriction] }],
+                },
+              },
+            ]
+          }),
+        ]
+      })(),
       {
         files: ['**/use-file-upload.ts'],
         rules: {
@@ -213,6 +254,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'recipe-oranizer/no-object-parameters': 'error',
       'recipe-oranizer/no-unknown-type-aliases': 'error',
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
+      'recipe-oranizer/no-use-shared-destructuring': 'error',
       'recipe-oranizer/vanilla-extract-theme-tokens': 'error',
       'sort-imports': 'off',
       'style-prop-object': 'off',
