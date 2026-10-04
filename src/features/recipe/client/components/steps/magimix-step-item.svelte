@@ -5,8 +5,6 @@
   import type { MagimixProgramData } from '@/features/recipe/magimix'
   import { capitalize } from '@/utils/string'
 
-  import * as styles from './magimix-step-item.css'
-
   const { program, rotationSpeed, temperature, time }: MagimixProgramData = $props()
   const formatTime = (value: number) => {
     const minutes = Math.floor(value / 60)
@@ -23,7 +21,14 @@
 
 <Item variant="outline">
   {#snippet title()}{magimixProgramLabels[program]}{/snippet}
-  {#snippet media()}<img alt="" class={styles.image} src={`/magimix/${program}.png`} />{/snippet}
+  {#snippet media()}<img alt="" class="magimix-step-item-image" src={`/magimix/${program}.png`} />{/snippet}
   <TimerIcon size="sm" /><span>{formatTime(time)}</span>/<SpinnerGapIcon size="sm" /><span>{capitalize(rotationSpeed)}</span>
   {#if temperature !== undefined}/<ThermometerIcon size="sm" /><span>{temperature}°C</span>{/if}
 </Item>
+
+<style>
+  .magimix-step-item-image {
+    height: 40px;
+    width: 40px;
+  }
+</style>

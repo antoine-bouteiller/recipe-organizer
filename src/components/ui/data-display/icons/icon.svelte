@@ -1,18 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
 
-  import type { IconProps, IconSize } from './icon-types'
-
-  import * as styles from './icon.css'
-
-  const iconRecipes = {
-    inherit: styles.element,
-    lg: styles.large,
-    md: styles.medium,
-    sm: styles.small,
-    xl: styles.extraLarge,
-    xs: styles.extraSmall,
-  } satisfies Record<IconSize, string>
+  import type { IconProps } from './icon-types'
 
   /** Private SVG root. It deliberately forwards only the closed public icon contract. */
   const { 'aria-hidden': ariaHidden, 'aria-label': ariaLabel, children, size = 'inherit' }: IconProps & { children: Snippet } = $props()
@@ -21,7 +10,14 @@
 <svg
   aria-hidden={ariaLabel === undefined ? (ariaHidden ?? true) : undefined}
   aria-label={ariaLabel}
-  class={iconRecipes[size]}
+  class={{
+    element: size === 'inherit',
+    large: size === 'lg',
+    medium: size === 'md',
+    small: size === 'sm',
+    'extra-large': size === 'xl',
+    'extra-small': size === 'xs',
+  }}
   fill="none"
   height="1em"
   role={ariaLabel === undefined ? undefined : 'img'}
@@ -31,3 +27,59 @@
 >
   {@render children()}
 </svg>
+
+<style>
+  .element {
+    color: currentColor;
+    flex-shrink: 0;
+    height: var(--owner-icon-size, 1em);
+    margin-inline: var(--owner-icon-margin-inline, 0px);
+    opacity: var(--owner-icon-opacity, 1);
+    width: var(--owner-icon-size, 1em);
+  }
+
+  .large {
+    color: currentColor;
+    flex-shrink: 0;
+    height: var(--owner-icon-size, 20px);
+    margin-inline: var(--owner-icon-margin-inline, 0px);
+    opacity: var(--owner-icon-opacity, 1);
+    width: var(--owner-icon-size, 20px);
+  }
+
+  .medium {
+    color: currentColor;
+    flex-shrink: 0;
+    height: var(--owner-icon-size, 18px);
+    margin-inline: var(--owner-icon-margin-inline, 0px);
+    opacity: var(--owner-icon-opacity, 1);
+    width: var(--owner-icon-size, 18px);
+  }
+
+  .small {
+    color: currentColor;
+    flex-shrink: 0;
+    height: var(--owner-icon-size, 16px);
+    margin-inline: var(--owner-icon-margin-inline, 0px);
+    opacity: var(--owner-icon-opacity, 1);
+    width: var(--owner-icon-size, 16px);
+  }
+
+  .extra-large {
+    color: currentColor;
+    flex-shrink: 0;
+    height: var(--owner-icon-size, 28px);
+    margin-inline: var(--owner-icon-margin-inline, 0px);
+    opacity: var(--owner-icon-opacity, 1);
+    width: var(--owner-icon-size, 28px);
+  }
+
+  .extra-small {
+    color: currentColor;
+    flex-shrink: 0;
+    height: var(--owner-icon-size, 12px);
+    margin-inline: var(--owner-icon-margin-inline, 0px);
+    opacity: var(--owner-icon-opacity, 1);
+    width: var(--owner-icon-size, 12px);
+  }
+</style>

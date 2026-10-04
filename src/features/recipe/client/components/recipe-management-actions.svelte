@@ -9,8 +9,6 @@
   import { alertError } from '@/lib/client/alert-error'
   import { getErrorMessage } from '@/lib/client/api-client'
 
-  import * as styles from './recipe-details.css'
-
   const { recipeId, recipeName }: { readonly recipeId: number; readonly recipeName: string } = $props()
   const router = useRouter()
   let pending = $state(false)
@@ -39,7 +37,7 @@
   {#snippet renderTrigger(props)}<Button {...props} aria-label="Gérer la recette" size="icon" variant="ghost"
       ><DotsThreeVerticalIcon weight="bold" /></Button
     >{/snippet}
-  <div class={styles.managementActions}>
+  <div class="recipe-details-management-actions">
     <Button align="start" asLink href={`/recipe/edit/${recipeId}`} variant="list-action" width="full"
       ><PencilSimpleIcon size="sm" />Modifier la recette</Button
     >
@@ -54,3 +52,19 @@
     </DeleteDialog>
   </div>
 </Popover>
+
+<style>
+  .recipe-details-management-actions {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  @media screen and (min-width: 768px) {
+    .recipe-details-management-actions {
+      padding: 0px;
+    }
+  }
+</style>

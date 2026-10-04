@@ -2,7 +2,6 @@ import { fileURLToPath } from 'node:url'
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { voidSvelte } from '@void/svelte/plugin'
 import type { Plugin, UserConfig } from 'vite-plus'
 import { defineConfig } from 'vite-plus'
@@ -56,7 +55,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       build: {
         rolldownOptions: {
           // Void links CSS per JS chunk; one shared style chunk yields one stylesheet instead of one per component.
-          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(?:\.ts)?(?:$|\?)|\.vanilla\.css/ }] } },
+          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(?:$|\?)/ }] } },
         },
       },
     },
@@ -85,42 +84,26 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     },
     jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
     options: { reportUnusedDisableDirectives: 'error', typeAware: true, typeCheck: true },
-    overrides: [
-      ...features.map((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']>[number] => ({
-        files: [`src/features/${feature}/**/*.{ts,svelte}`],
-        rules: {
-          'no-restricted-imports': [
-            'error',
-            {
-              patterns: [
-                parentRestriction,
-                reactRestriction,
-                ...features
-                  .filter((other) => other !== feature)
-                  .map((other) => ({
-                    group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
-                    message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
-                  })),
-              ],
-            },
-          ],
-        },
-      })),
-      {
-        // CSS declaration and selector order determines the cascade.
-        files: ['**/*.css.ts'],
-        rules: {
-          'sort-keys': 'off',
-        },
+    overrides: features.map((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']>[number] => ({
+      files: [`src/features/${feature}/**/*.{ts,svelte}`],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              parentRestriction,
+              reactRestriction,
+              ...features
+                .filter((other) => other !== feature)
+                .map((other) => ({
+                  group: [`@/features/${other}/client/**`, `@/features/${other}/server/**`, `../**/${other}/client/**`, `../**/${other}/server/**`],
+                  message: 'Features may only import the shared root modules of other features. Compose them in routes or app-owned components.',
+                })),
+            ],
+          },
+        ],
       },
-      {
-        // Numeric token scales are intentionally ordered by value.
-        files: ['src/styles/theme/**/*.ts'],
-        rules: {
-          'sort-keys': 'off',
-        },
-      },
-    ],
+    })),
     plugins: ['typescript', 'unicorn', 'import'],
     rules: {
       complexity: ['error', 15],
@@ -173,15 +156,12 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'recipe-oranizer/no-unknown-type-aliases': 'error',
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
       'recipe-oranizer/no-use-shared-destructuring': 'error',
-      'recipe-oranizer/vanilla-extract-theme-tokens': 'error',
       'sort-imports': 'off',
     },
   },
-  plugins: [
-    vanillaExtractPlugin(),
-    // Vitest cannot run the Worker environment.
-    // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
-    ...(!process.env.VITEST && isPreview !== undefined
+  // Vitest cannot run the Worker environment.
+  plugins:
+    !process.env.VITEST && isPreview !== undefined
       ? [
           voidPlugin({ persistTo: '.wrangler/state' }),
           voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true }),
@@ -189,8 +169,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
           clientOnlyEntries,
         ]
       : // The app adapter bundles its own Svelte plugin; tests and Storybook need a standalone one.
-        [svelte()]),
-  ],
+        [svelte()],
   resolve: {
     // Virtual island entries and Svelte files are outside tsconfig path resolution.
     alias: [
@@ -205,7 +184,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
   },
   test: {
     coverage: {
-      exclude: ['**/*.stories.svelte', '**/*.css.ts'],
+      exclude: ['**/*.stories.svelte'],
       include: ['src/**/*.{ts,svelte}', 'pages/**/*.{ts,svelte}', 'tools/oxlint/rules/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
@@ -214,7 +193,6 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       { extends: true, test: { globals: true, name: 'unit' } },
       {
         extends: true,
-        optimizeDeps: { include: ['@vanilla-extract/recipes/createRuntimeFn'] },
         plugins: [storybookTest({ configDir: '.storybook' })],
         test: {
           browser: {

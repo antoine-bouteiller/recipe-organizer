@@ -5,13 +5,11 @@
 
   import NotFound from './not-found.svelte'
 
-  import * as styles from './not-found.stories.css'
-
   const { Story } = defineMeta({ component: NotFound, title: 'Feedback/Not Found' })
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <NotFound />
     </StorySection>
@@ -38,3 +36,13 @@
 >
   {@render overview()}
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0;
+    width: 100%;
+  }
+</style>

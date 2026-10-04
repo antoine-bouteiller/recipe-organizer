@@ -5,8 +5,6 @@
 
   import Example from './textarea-field.example.svelte'
 
-  import * as styles from './textarea-field.stories.css'
-
   const { Story } = defineMeta({ component: Example, title: 'Forms/TextareaField' })
   const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const section = within(canvasElement).getByRole('region', { name: 'Default' })
@@ -17,7 +15,7 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Example />
     </StorySection>
@@ -31,3 +29,13 @@
 {/snippet}
 <Story name="Overview" asChild>{@render overview()}</Story>
 <Story name="Interaction" asChild {play} tags={['!dev']}>{@render overview()}</Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

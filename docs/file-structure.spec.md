@@ -31,7 +31,9 @@ module so feature ownership and import boundaries remain legible.
 | `[KD-2]` Runtime-code placement   | Page composition lives in `pages/` and Worker HTTP routes in `routes/api/`; all application source lives in `src/`, split into `client/` and `server/` folders inside features and `src/lib/`; only actual cross-runtime modules sit outside those folders.                                      | The folder names make runtime boundaries visible before an import is written.                                               |
 | `[KD-3]` Route and data placement | Void pages follow URL hierarchy and layout groups in `pages/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                                                         | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
 | `[KD-4]` Naming and imports       | Files use kebab-case except Void dynamic segments; source imports use `@/*` (resolved to `src/`) and same-directory dependencies are relative.                                                                                                                                                   | Filenames match the lint convention and import paths reveal which runtime folder a dependency belongs to.                   |
-| `[KD-5]` Styling compilation      | Vanilla-extract compiles owner-local `.css.ts` files; `src/styles/` exposes the public `theme` API while components retain private colocated recipes.                                                                                                                                            | Web, Storybook, and tests share typed theme references without generated utilities or component styling overrides.          |
+| `[KD-5.1]` Styling ownership      | Components, stories, and example hosts use scoped `<style>` blocks; `src/styles/theme/tokens.css` exposes semantic custom properties.                                                                                                                                                            | Native CSS shares tokens without styling plugins, a JavaScript theme facade, or caller overrides.                           |
+
+Superseded: ~~`[KD-5]` Vanilla Extract compilation and JavaScript theme API~~.
 
 ## 4. Principles & Intents
 
@@ -134,13 +136,14 @@ Their supporting hooks live in `src/hooks/`, icons in
 `src/components/ui/data-display/icons/`. `src/components/ui/` never imports app or feature code;
 app-specific presentation (TabBar, ScreenLayout, NotFound) lives directly under `src/components/`.
 
-Vanilla Extract compiles owner-local `*.css.ts` through web, Storybook, and test plugins.
-Consumers import the typed `theme` from `@/styles/theme`, including in
-template interpolations; raw shared CSS variable strings are not the public API.
-`src/styles/theme/index.ts` combines internal `tokens.css.ts` values with
-`theme.spacing(...)`; `src/styles/global.css.ts` owns layered reset/base rules.
-Layouts and Storybook load `global.css` and `styles.css`. Native styles retain font faces and
-layer order; component/app styles are unlayered. Recipes stay private and colocated.
+Components, stories, and existing example hosts keep presentation in scoped, unlayered `<style>`
+blocks. `src/styles/theme/tokens.css` declares semantic kebab-case custom properties, `.dark`
+overrides, and shared animations; no JavaScript theme facade or primitive palette API exists.
+`src/styles/global.css` imports tokens and owns layered reset/base and document rules, with layer
+order declared before those rules. Layouts and Storybook load `global.css` and `styles.css`;
+the latter retains fonts, layer order, and cross-document transitions. Spacing uses direct pixel
+lengths at the existing 4px base or native `calc()`. Finite presentation props use explicit literal
+unions and private local selectors; shared runtime/owner custom properties remain internal.
 Parent wrappers own external layout. Categories and story title prefixes remain Actions, Data Display,
 Feedback, Forms, Layout, Navigation, and Overlays. See
 [UI ownership](../src/styles/styling.spec.md) for the full contract.

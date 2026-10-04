@@ -26,8 +26,6 @@
   import FieldLabel from '../field/field-label.svelte'
   import Field from '../field/field.svelte'
 
-  import * as styles from './image-field.css'
-
   const { name, value, onChange, disabled, required, initialImage, label }: ImageFieldProps = $props()
   const platform = usePlatform()
   const invalid = useFieldInvalid(() => name)
@@ -46,11 +44,11 @@
   <FieldLabel for={id}>{label}</FieldLabel>
   <FieldLabel for={id} presentation="dropzone-image">
     {#if file}
-      <div class={styles.container}><img alt="Aperçu" class={styles.image} src={file.preview} /></div>
-      <div class={styles.removeButton}>
+      <div class="container"><img alt="Aperçu" class="image" src={file.preview} /></div>
+      <div class="remove-button">
         <button
           aria-label="Supprimer l'image"
-          class={styles.element}
+          class="element"
           {disabled}
           onclick={(event) => {
             event.preventDefault()
@@ -61,11 +59,11 @@
         >
       </div>
     {:else}
-      <div class={styles.uploadPrompt}>
-        <div aria-hidden="true" class={styles.uploadPromptIcon}><span class={styles.text}><ImageIcon size="sm" /></span></div>
-        <p class={styles.uploadPromptText}>Déposez votre image ou cliquez pour parcourir</p>
+      <div class="upload-prompt">
+        <div aria-hidden="true" class="upload-prompt-icon"><span class="text"><ImageIcon size="sm" /></span></div>
+        <p class="upload-prompt-text">Déposez votre image ou cliquez pour parcourir</p>
 
-        <div class={styles.keyboardShortcut}><KbdGroup><Kbd>{platform.current === 'macOS' ? '⌘' : 'Ctrl'}</Kbd><Kbd>V</Kbd></KbdGroup></div>
+        <div class="keyboard-shortcut"><KbdGroup><Kbd>{platform.current === 'macOS' ? '⌘' : 'Ctrl'}</Kbd><Kbd>V</Kbd></KbdGroup></div>
       </div>
     {/if}
   </FieldLabel>
@@ -73,7 +71,7 @@
     {...getInputProps()}
     aria-invalid={invalid() || upload.errors.length > 0 || undefined}
     aria-describedby={upload.errors.length ? `${id}-upload-error` : invalid() ? `${id}-error` : undefined}
-    class={styles.fileInput}
+    class="file-input"
     {disabled}
     {required}
     {id}
@@ -82,3 +80,98 @@
   {#if upload.errors.length}<Field invalid><FieldError id={`${id}-upload-error`}>{upload.errors.join(' ')}</FieldError></Field>{/if}
   <FieldError id={`${id}-error`} />
 </Field>
+
+<style>
+  .container {
+    inset: 0px;
+    position: absolute;
+  }
+
+  .image {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .upload-prompt {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 12px;
+    padding-inline: 16px;
+    text-align: center;
+  }
+
+  .upload-prompt-icon {
+    align-items: center;
+    background-color: var(--colors-background);
+    border-radius: var(--radius-full);
+    border-width: 1px;
+    display: flex;
+    flex-shrink: 0;
+    height: 44px;
+    justify-content: center;
+    margin-bottom: 8px;
+    width: 44px;
+  }
+
+  .text {
+    opacity: 0.6;
+  }
+
+  .upload-prompt-text {
+    font-size: var(--font-sizes-sm);
+    font-weight: var(--font-weights-medium);
+    margin-bottom: 6px;
+  }
+
+  .keyboard-shortcut {
+    display: none;
+  }
+
+  @media screen and (min-width: 768px) {
+    .keyboard-shortcut {
+      display: block;
+    }
+  }
+
+  .remove-button {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+  }
+
+  .element {
+    align-items: center;
+    background-color: color-mix(in srgb, var(--colors-scrim) 60%, transparent);
+    border-radius: var(--radius-full);
+    color: var(--colors-inverse-foreground);
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition-duration: 150ms;
+    transition-property: color, box-shadow;
+    transition-timing-function: var(--easings-in-out);
+    width: 32px;
+    z-index: 50;
+  }
+
+  .element:is(:focus-visible, [data-focus-visible]) {
+    border-color: var(--colors-ring);
+    box-shadow: var(--shadows-ring);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .element:hover {
+      background-color: color-mix(in srgb, var(--colors-scrim) 80%, transparent);
+    }
+  }
+
+  .file-input {
+    display: none;
+  }
+</style>

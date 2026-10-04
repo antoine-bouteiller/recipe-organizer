@@ -10,8 +10,6 @@
   import GoBackButton from './go-back-button.svelte'
   import ScreenLayout from './screen-layout.svelte'
 
-  import * as styles from './screen-layout.stories.css'
-
   const { Story } = defineMeta({ component: ScreenLayout, parameters: { layout: 'padded' }, title: 'Layout/Screen Layout' })
 
   const backgroundImage = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="640" height="360" fill="#0e6e7e"/></svg>')}`
@@ -22,8 +20,8 @@
 </script>
 
 {#snippet content()}
-  <section class={styles.section}>
-    <h2 class={styles.heading}>Content</h2>
+  <section class="section">
+    <h2 class="heading">Content</h2>
     {#each { length: 40 }, index (index)}
       <p>Item {index + 1}</p>
     {/each}
@@ -39,19 +37,19 @@
 {/snippet}
 
 {#snippet exampleFooter()}
-  <nav aria-label="Example navigation" class={styles.element}>Navigation slot</nav>
+  <nav aria-label="Example navigation" class="element">Navigation slot</nav>
 {/snippet}
 
 {#snippet overview()}
-  <div class={styles.storyLayout}>
-    <p class={styles.text}>Use the viewport toolbar to compare mobile headers and desktop scrolling.</p>
+  <div class="story-layout">
+    <p class="text">Use the viewport toolbar to compare mobile headers and desktop scrolling.</p>
     <StorySection title="Default">
-      <div class={styles.container}>
+      <div class="container">
         <ScreenLayout innerScrollId="story-content" outerScrollId="story-outer" title="Library">{@render content()}</ScreenLayout>
       </div>
     </StorySection>
     <StorySection title="With back action">
-      <div class={styles.container}>
+      <div class="container">
         <ScreenLayout backButton={back} title="Details">
           {#if requested}<p role="status">Back action requested.</p>{/if}
           {@render content()}
@@ -59,22 +57,22 @@
       </div>
     </StorySection>
     <StorySection title="With header action">
-      <div class={styles.container}>
+      <div class="container">
         <ScreenLayout headerEndItem={addItem} title="Library">{@render content()}</ScreenLayout>
       </div>
     </StorySection>
     <StorySection title="With long title">
-      <div class={styles.container}>
+      <div class="container">
         <ScreenLayout headerEndItem={addItem} title="A long recipe collection title that should truncate">{@render content()}</ScreenLayout>
       </div>
     </StorySection>
     <StorySection title="With footer">
-      <div class={styles.container}>
+      <div class="container">
         <ScreenLayout footer={exampleFooter} title="Library">{@render content()}</ScreenLayout>
       </div>
     </StorySection>
     <StorySection title="With background image">
-      <div class={styles.container}>
+      <div class="container">
         <ScreenLayout {backgroundImage} title="Library">{@render content()}</ScreenLayout>
       </div>
     </StorySection>
@@ -125,10 +123,63 @@
     await expect(detail.queryByRole('navigation')).not.toBeInTheDocument()
   }}
 >
-  <div class={styles.container} data-testid="home">
+  <div class="container" data-testid="home">
     <ScreenLayout footer={tabBar} title="Home">Content</ScreenLayout>
   </div>
-  <div class={styles.container} data-testid="detail">
+  <div class="container" data-testid="detail">
     <ScreenLayout backButton={back} title="Settings">Content</ScreenLayout>
   </div>
 </Story>
+
+<style>
+  .section {
+    padding-block: 16px;
+  }
+
+  .heading {
+    font-size: var(--font-sizes-xl);
+    font-weight: var(--font-weights-semibold);
+  }
+
+  .element {
+    align-items: center;
+    background-color: var(--colors-background);
+    border-color: var(--colors-border);
+    border-top-width: 1px;
+    bottom: 0;
+    display: flex;
+    height: 56px;
+    justify-content: center;
+    position: fixed;
+    width: 100%;
+  }
+
+  .story-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .text {
+    color: var(--colors-muted-foreground);
+    font-size: var(--font-sizes-sm);
+  }
+
+  .container {
+    border-color: var(--colors-border);
+    border-radius: var(--radius-lg);
+    border-width: 1px;
+    display: flex;
+    flex-direction: column;
+    height: 384px;
+    overflow: hidden;
+    position: relative;
+    transform: translateZ(0);
+  }
+
+  .section > :global(* + *) {
+    margin-top: 16px;
+  }
+</style>

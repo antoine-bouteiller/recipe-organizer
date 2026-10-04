@@ -6,8 +6,6 @@
   import FieldLabel from '../field/field-label.svelte'
   import Field from '../field/field.svelte'
 
-  import * as styles from './toggle-group-field.css'
-
   interface ToggleGroupFieldProps {
     name: string
     value: TValue[]
@@ -23,15 +21,15 @@
 
 <Field {name}>
   {#if label}<span {id}><FieldLabel>{label}</FieldLabel></span>{/if}
-  <div class={styles.wrapper}>
+  <div class="wrapper">
     <div
-      class={styles.group}
+      class="group"
       data-slot="toggle-group"
       role="group"
       aria-labelledby={label ? id : undefined}
       aria-describedby={invalid() ? `${id}-error` : undefined}
     >
-      {#each items as item (item.value)}<span class={styles.item}
+      {#each items as item (item.value)}<span class="item"
           ><Toggle
             {...{ 'aria-invalid': invalid() || undefined }}
             {disabled}
@@ -43,3 +41,22 @@
   </div>
   <FieldError id={`${id}-error`} />
 </Field>
+
+<style>
+  .wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .group {
+    display: flex;
+    gap: 2px;
+    width: fit-content;
+    --toggle-hit-min-width: auto;
+  }
+
+  .item {
+    flex-shrink: 0;
+  }
+</style>

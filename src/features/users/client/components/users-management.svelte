@@ -21,8 +21,6 @@
   import ApproveUser from './approve-user.svelte'
   import BlockUser from './block-user.svelte'
 
-  import * as styles from './users-management.css'
-
   const { users }: { users: Record<UserStatus, readonly User[]> } = $props()
   const userDefaultValues: Required<UserFormInput> = { email: '', role: 'user' }
   const roleOptions = [
@@ -65,9 +63,9 @@
 </script>
 
 {#snippet userList(status: UserStatus)}
-  <div class={styles.panel}>
+  <div class="users-management-panel">
     {#if filteredUsers[status].length === 0}
-      <p class={styles.emptyState}>{search ? 'Aucun utilisateur trouvé pour cette recherche.' : USER_TAB_LABELS[status].empty}</p>
+      <p class="users-management-empty-state">{search ? 'Aucun utilisateur trouvé pour cette recherche.' : USER_TAB_LABELS[status].empty}</p>
     {:else}
       <ItemGroup>
         {#each filteredUsers[status] as userItem, index (userItem.id)}
@@ -76,7 +74,7 @@
               {#if status === 'blocked' || status === 'pending'}<ApproveUser userId={userItem.id} />{/if}
               {#if status === 'active' || status === 'pending'}<BlockUser userEmail={userItem.email} userId={userItem.id} />{/if}
             {/snippet}
-            {#snippet title()}<span class={styles.userEmail}>{userItem.email}</span><Badge
+            {#snippet title()}<span class="users-management-user-email">{userItem.email}</span><Badge
                 variant={userItem.role === 'admin' ? 'default' : 'secondary'}>{roleLabels.get(userItem.role)}</Badge
               >{/snippet}
           </Item>
@@ -93,7 +91,7 @@
 {#snippet pendingContent()}{@render userList('pending')}{/snippet}
 {#snippet blockedContent()}{@render userList('blocked')}{/snippet}
 
-<div class={styles.searchBar}>
+<div class="users-management-search-bar">
   <SearchInput placeholder="Rechercher une recette, un ingrédient…" {search} setSearch={(next) => (search = next)} />
   <FormDialog
     errors={form.errors}
@@ -126,7 +124,7 @@
     />
   </FormDialog>
 </div>
-<div class={styles.tabs}>
+<div class="users-management-tabs">
   <Tabs
     items={[
       { content: activeContent, label: activeLabel, value: 'active' },
@@ -135,3 +133,40 @@
     ] satisfies { content: Snippet; label: Snippet; value: string }[]}
   />
 </div>
+
+<style>
+  .users-management-panel {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 16px;
+  }
+
+  .users-management-empty-state {
+    color: var(--colors-muted-foreground);
+    padding-block: 32px;
+    text-align: center;
+  }
+
+  .users-management-user-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .users-management-search-bar {
+    align-items: center;
+    background: var(--colors-muted);
+    display: flex;
+    flex-shrink: 0;
+    gap: 16px;
+    padding-bottom: 8px;
+  }
+
+  .users-management-tabs {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    margin-bottom: -16px;
+    min-height: 0px;
+  }
+</style>

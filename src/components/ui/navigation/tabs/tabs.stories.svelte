@@ -4,27 +4,25 @@
 
   import Tabs from './tabs.svelte'
 
-  import * as styles from './tabs.stories.css'
-
   const { Story } = defineMeta({ component: Tabs, title: 'Navigation/Tabs' })
 </script>
 
 {#snippet ingredientsLabel()}Ingredients{/snippet}
 {#snippet methodLabel()}Method{/snippet}
 {#snippet ingredientsContent()}
-  <section aria-label="Ingredients" class={styles.section}>
+  <section aria-label="Ingredients" class="section">
     <h2>Ingredients</h2>
     <p>2 tomatoes and fresh basil.</p>
   </section>
 {/snippet}
 {#snippet methodContent()}
-  <section aria-label="Method" class={styles.section}>
+  <section aria-label="Method" class="section">
     <h2>Method</h2>
     <p>Simmer for 20 minutes.</p>
   </section>
 {/snippet}
 {#snippet example()}
-  <div class={styles.container}>
+  <div class="container">
     <Tabs
       aria-label="Recipe details"
       items={[
@@ -49,3 +47,14 @@
     await expect(canvas.getByRole('region', { name: 'Method' })).toBeInTheDocument()
   }}>{@render example()}</Story
 >
+
+<style>
+  .container {
+    height: 256px;
+    width: 100%;
+  }
+
+  .section {
+    padding: 16px;
+  }
+</style>

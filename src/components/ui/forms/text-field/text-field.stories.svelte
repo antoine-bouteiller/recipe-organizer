@@ -6,8 +6,6 @@
   import ErrorsExample from './text-field.errors.example.svelte'
   import Example from './text-field.example.svelte'
 
-  import * as styles from './text-field.stories.css'
-
   const { Story } = defineMeta({ component: Example, title: 'Forms/TextField' })
   const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const section = within(canvasElement).getByRole('region', { name: 'Default' })
@@ -18,7 +16,7 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Example />
     </StorySection>
@@ -60,3 +58,13 @@
     await expect(input).toHaveValue('Edited step')
   }}><ErrorsExample /></Story
 >
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

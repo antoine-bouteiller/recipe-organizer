@@ -9,8 +9,6 @@
 
   import SearchPalette from './search-palette.private.svelte'
 
-  import * as styles from './search-bar.css'
-
   let open = $state(false)
   const platform = usePlatform()
   const down = (event: KeyboardEvent) => {
@@ -25,14 +23,33 @@
   })
 </script>
 
-<div class={styles.container}>
+<div class="search-bar-container">
   <Dialog bare onOpenChange={(next) => (open = next)} {open} title="Rechercher une recette">
     {#snippet renderTrigger(props)}<Button {...props} align="start" variant="outline" width="full">
         Recherche une recette...
-        <span class={styles.text}
-          ><KbdGroup><Kbd>{platform.current === 'macOS' ? '⌘' : 'Ctrl'}</Kbd><span class={styles.shortcutKey}><Kbd>K</Kbd></span></KbdGroup></span
+        <span class="search-bar-text"
+          ><KbdGroup><Kbd>{platform.current === 'macOS' ? '⌘' : 'Ctrl'}</Kbd><span class="search-bar-shortcut-key"><Kbd>K</Kbd></span></KbdGroup
+          ></span
         >
       </Button>{/snippet}
     <SearchPalette onClose={() => (open = false)} />
   </Dialog>
 </div>
+
+<style>
+  .search-bar-container {
+    width: 224px;
+  }
+
+  .search-bar-text {
+    display: flex;
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    translate: 0 -50%;
+  }
+
+  .search-bar-shortcut-key {
+    aspect-ratio: 1 / 1;
+  }
+</style>

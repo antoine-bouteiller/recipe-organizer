@@ -40,9 +40,6 @@
   import { useRecipeOptions } from '../hooks/use-recipe-options.svelte'
   import StepsField from './steps/steps-field.svelte'
 
-  import * as ingredientGroupStyles from './ingredient-group-field.css'
-  import * as styles from './recipe-form.css'
-
   const { form, initialImage, initialVideo, id, addNewIngredientOption, ingredientOptions }: RecipeFormProps = $props()
   const data = $derived(form.data)
   const pending = $derived(form.pending)
@@ -81,13 +78,13 @@
   items={cuisineTypeItems}
   label="Cuisines"
 />
-<div class={styles.container}>
+<div class="recipe-form-container">
   <Label>Sous-recettes liées</Label>
   <Field name="linkedRecipes">
     {#each linkedRecipes as linkedRecipe, index (linkedRecipe._key ?? linkedRecipe.id)}
-      <div class={styles.linkedRecipeRow}>
-        <div class={styles.linkedRecipeFields}>
-          <div class={styles.linkedRecipeSelect}>
+      <div class="recipe-form-linked-recipe-row">
+        <div class="recipe-form-linked-recipe-fields">
+          <div class="recipe-form-linked-recipe-select">
             <ComboboxField
               name={`linkedRecipes.${index}.id`}
               value={linkedRecipe.id}
@@ -98,7 +95,7 @@
               searchPlaceholder="Rechercher une sous-recette"
             />
           </div>
-          <div class={styles.linkedRecipeRatio}>
+          <div class="recipe-form-linked-recipe-ratio">
             <NumberField
               name={`linkedRecipes.${index}.ratio`}
               value={Number.isNaN(linkedRecipe.ratio) ? undefined : linkedRecipe.ratio}
@@ -145,15 +142,15 @@
   {initialVideo}
   label="Vidéo (optionnel)"
 />
-<div class={styles.ingredientGroupsSection}>
+<div class="recipe-form-ingredient-groups-section">
   <Label>Groupes d'ingrédients</Label>
   <Field name="ingredientGroups">
     {#each groups as group, groupIndex (group._key)}
       {@const updateGroup = (value: typeof group) => form.setData('ingredientGroups', replaceAt(groups, groupIndex, value))}
-      <div class={styles.ingredientGroupCard}>
+      <div class="recipe-form-ingredient-group-card">
         <Field name={`ingredientGroups.${groupIndex}`}>
           {#if groupIndex !== 0}
-            <div class={styles.groupNameField}>
+            <div class="recipe-form-group-name-field">
               <TextField
                 name={`ingredientGroups.${groupIndex}.groupName`}
                 value={group.groupName ?? ''}
@@ -162,7 +159,7 @@
                 label="Nom du groupe"
               />
             </div>
-            <div class={styles.groupRemoveButton}>
+            <div class="recipe-form-group-remove-button">
               <Button
                 aria-label="Supprimer le groupe d'ingrédients"
                 disabled={pending}
@@ -174,14 +171,14 @@
             </div>
           {/if}
           <Field name={`ingredientGroups.${groupIndex}.ingredients`}>
-            <div class={ingredientGroupStyles.container}>
+            <div class="ingredient-group-field-container">
               <Label>Ingrédients</Label>
               {#each group.ingredients as ingredient, ingredientIndex (ingredient._key)}
                 {@const path = `ingredientGroups.${groupIndex}.ingredients.${ingredientIndex}`}
                 {@const updateIngredient = (value: typeof ingredient) =>
                   updateGroup({ ...group, ingredients: replaceAt(group.ingredients, ingredientIndex, value) })}
-                <div class={ingredientGroupStyles.ingredientRow}>
-                  <div class={ingredientGroupStyles.ingredientFields}>
+                <div class="ingredient-group-field-ingredient-row">
+                  <div class="ingredient-group-field-ingredient-fields">
                     <ComboboxField
                       name={`${path}.id`}
                       value={ingredient.id}
@@ -217,7 +214,7 @@
                     variant="destructive-outline"><TrashIcon size="sm" /></Button
                   >
                 </div>
-                <div class={ingredientGroupStyles.mobileSeparator}><Separator /></div>
+                <div class="ingredient-group-field-mobile-separator"><Separator /></div>
               {/each}
               <FieldError />
               <Button
@@ -245,3 +242,92 @@
   </Field>
 </div>
 <LinkedRecipesProvider {linkedRecipeIds}><StepsField disabled={pending} {form} /></LinkedRecipesProvider>
+
+<style>
+  .ingredient-group-field-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+    width: 100%;
+  }
+
+  .ingredient-group-field-ingredient-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .ingredient-group-field-ingredient-fields {
+    align-items: flex-start;
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 768px) {
+    .ingredient-group-field-ingredient-fields {
+      flex-direction: row;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    .ingredient-group-field-mobile-separator {
+      display: none;
+    }
+  }
+
+  .recipe-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .recipe-form-linked-recipe-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .recipe-form-linked-recipe-fields {
+    display: flex;
+    flex: 1 1 0%;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .recipe-form-linked-recipe-select {
+    flex: 1 1 0%;
+    overflow: hidden;
+  }
+
+  .recipe-form-linked-recipe-ratio {
+    flex-shrink: 0;
+    width: 112px;
+  }
+
+  .recipe-form-ingredient-groups-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .recipe-form-ingredient-group-card {
+    border-radius: var(--radius-xl);
+    border-width: 1px;
+    padding: 16px;
+    position: relative;
+  }
+
+  .recipe-form-group-name-field {
+    padding-top: 8px;
+  }
+
+  .recipe-form-group-remove-button {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+</style>

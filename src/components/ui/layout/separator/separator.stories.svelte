@@ -4,21 +4,47 @@
 
   import Separator from './separator.svelte'
 
-  import * as styles from './separator.stories.css'
-
   const { Story } = defineMeta({ component: Separator, title: 'Layout/Separator' })
 </script>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
-      <div class={styles.contentColumn}>
-        <p class={styles.text}>Ingredients</p>
-        <div class={styles.separatorMargin}>
+      <div class="content-column">
+        <p class="text">Ingredients</p>
+        <div class="separator-margin">
           <Separator />
         </div>
-        <p class={styles.description}>Serves four people.</p>
+        <p class="description">Serves four people.</p>
       </div>
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+
+  .content-column {
+    width: 320px;
+  }
+
+  .text {
+    font-size: var(--font-sizes-sm);
+    font-weight: var(--font-weights-medium);
+  }
+
+  .separator-margin {
+    margin-block: 12px;
+  }
+
+  .description {
+    color: var(--colors-muted-foreground);
+    font-size: var(--font-sizes-sm);
+  }
+</style>

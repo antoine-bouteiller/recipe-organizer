@@ -14,8 +14,6 @@
 
   import { useRecipeQuantities } from '../hooks/use-recipe-quantities.svelte'
 
-  import * as styles from './quantity-controls.css'
-
   const { recipeId, servings, variant = 'default' }: QuantityControlsProps = $props()
   const membership = useIsInShoppingList(() => recipeId)
   const quantities = useRecipeQuantities(
@@ -28,7 +26,7 @@
   {#if !membership.current}
     <Button onclick={() => addToShoppingList(recipeId)} width="full"><PlusIcon weight="bold" />Ajouter à la liste</Button>
   {:else}
-    <div class={styles.container}>
+    <div class="quantity-controls-container">
       <Button
         onclick={quantities.decrementQuantity}
         disabled={quantities.quantity === 1}
@@ -36,7 +34,7 @@
         size="icon-xs"
         variant="secondary"><MinusIcon weight="bold" /></Button
       >
-      <span class={styles.text}>{quantities.quantity} couverts</span>
+      <span class="quantity-controls-text">{quantities.quantity} couverts</span>
       <Button onclick={quantities.incrementQuantity} aria-label="Ajouter un couvert" size="icon-xs" variant="secondary"
         ><PlusIcon weight="bold" /></Button
       >
@@ -46,10 +44,10 @@
     </div>
   {/if}
 {:else}
-  <div class={styles.controlsContainer}>
-    <div class={styles.labelGroup}>
-      <span class={styles.controlsLabel}>Couverts</span>
-      <div class={styles.adjustmentControls}>
+  <div class="quantity-controls-controls-container">
+    <div class="quantity-controls-label-group">
+      <span class="quantity-controls-controls-label">Couverts</span>
+      <div class="quantity-controls-adjustment-controls">
         <Button
           disabled={quantities.quantity === 1}
           onclick={quantities.decrementQuantity}
@@ -57,7 +55,7 @@
           size="icon-sm"
           variant="outline"><MinusIcon /></Button
         >
-        <span class={styles.quantityDisplay}>{quantities.quantity}</span>
+        <span class="quantity-controls-quantity-display">{quantities.quantity}</span>
         <Button onclick={quantities.incrementQuantity} aria-label="Ajouter un couvert" size="icon-sm"><PlusIcon /></Button>
       </div>
     </div>
@@ -68,3 +66,63 @@
     {/if}
   </div>
 {/if}
+
+<style>
+  .quantity-controls-container {
+    align-items: center;
+    background: var(--colors-primary);
+    border-radius: var(--radius-xl);
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 4px;
+    outline: 1;
+    outline-color: var(--colors-primary);
+    width: 100%;
+  }
+
+  .quantity-controls-text {
+    color: var(--colors-inverse-foreground);
+    font-size: var(--font-sizes-sm);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weights-bold);
+    min-width: 72px;
+    text-align: center;
+  }
+
+  .quantity-controls-controls-container {
+    align-items: center;
+    background: var(--colors-card);
+    border-radius: var(--radius-2xl);
+    border-width: 1px;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    padding: 8px;
+    padding-left: 16px;
+  }
+
+  .quantity-controls-label-group {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+  }
+
+  .quantity-controls-controls-label {
+    font-size: var(--font-sizes-sm);
+    font-weight: var(--font-weights-bold);
+  }
+
+  .quantity-controls-adjustment-controls {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+  }
+
+  .quantity-controls-quantity-display {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weights-bold);
+    min-width: 20px;
+    text-align: center;
+  }
+</style>

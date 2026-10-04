@@ -5,8 +5,6 @@
 
   import FormDialog from './form-dialog.svelte'
 
-  import * as styles from './form-dialog.stories.css'
-
   const { regression = false, nested = false }: { regression?: boolean; nested?: boolean } = $props()
   let open = $state(false)
   let title = $state('Tomato soup')
@@ -42,7 +40,7 @@
   >
     {#snippet renderTrigger(props)}<Button {...props} type="button">Edit recipe</Button>{/snippet}
     <TextField name="title" value={title} onChange={(next) => (title = next)} label="Recipe title" />
-    {#if regression}<div class={styles.container}>
+    {#if regression}<div class="container">
         {#each Array.from({ length: 20 }, (_, index) => index) as index (index)}<p>Long form content {index + 1}</p>{/each}
       </div>
       <Button onclick={complete} type="button" variant="outline">Complete save</Button>{/if}
@@ -55,3 +53,11 @@
     }}>{@render editor()}<Button type="submit">Save outer</Button></Form
   >
   <p role="status">Inner: {innerSubmits}; outer: {outerSubmits}</p>{:else}{@render editor()}{/if}
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+</style>

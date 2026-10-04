@@ -9,13 +9,11 @@
   import ItemSeparator from './item-separator.svelte'
   import Item from './item.svelte'
 
-  import * as styles from './item.stories.css'
-
   const { Story } = defineMeta({ component: Item, title: 'Data Display/Item' })
 </script>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Item>
         {#snippet media()}<CheckIcon />{/snippet}
@@ -24,7 +22,7 @@
       </Item>
     </StorySection>
     <StorySection title="Variants">
-      <div class={styles.variantList}>
+      <div class="variant-list">
         <Item>{#snippet media()}<CheckIcon />{/snippet}{#snippet title()}Default{/snippet}A standard item.</Item>
         <Item variant="outline">{#snippet media()}<CheckIcon />{/snippet}{#snippet title()}Outline{/snippet}An outlined item.</Item>
       </div>
@@ -46,3 +44,18 @@
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+
+  .variant-list {
+    display: grid;
+    gap: 12px;
+  }
+</style>

@@ -4,8 +4,6 @@
   import { useFormErrors } from '../form/form-context.svelte'
   import { provideField } from './field-context.svelte'
 
-  import * as styles from './field.css'
-
   const { children, invalid, name }: { children: Snippet; invalid?: boolean; name?: string } = $props()
   const form = useFormErrors()
   const error = $derived(name ? form.errors[name] : undefined)
@@ -20,4 +18,14 @@
   })
 </script>
 
-<div class={styles.field} data-invalid={isInvalid || undefined} data-slot="field">{@render children()}</div>
+<div class="field" data-invalid={isInvalid || undefined} data-slot="field">{@render children()}</div>
+
+<style>
+  .field {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+</style>

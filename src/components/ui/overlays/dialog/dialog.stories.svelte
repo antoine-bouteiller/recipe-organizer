@@ -8,8 +8,6 @@
   import DialogFormExample from './dialog-form.story.svelte'
   import Dialog from './dialog.svelte'
 
-  import * as styles from './dialog.stories.css'
-
   const { Story } = defineMeta({ component: Dialog, title: 'Overlays/Dialog' })
   const interaction = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement)
@@ -43,7 +41,7 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Responsive">
       <Dialog cancelLabel="Cancel" title="Edit recipe">
         {#snippet renderTrigger(props)}<Button {...props}>Edit recipe</Button>{/snippet}
@@ -86,3 +84,13 @@
     await expect(trigger).toHaveFocus()
   }}><DialogFormExample /></Story
 >
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

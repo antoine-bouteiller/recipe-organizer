@@ -4,8 +4,6 @@
   import { ArrowLeftIcon } from '@/components/ui/data-display/icons'
   import { alertError } from '@/lib/client/alert-error'
 
-  import * as styles from './login-layout.css'
-
   const { error, onSignIn }: { error?: string; onSignIn: () => void | Promise<unknown> } = $props()
   let pending = $state(false)
   const handleSignIn = async () => {
@@ -23,20 +21,57 @@
   }
 </script>
 
-<div class={styles.container}>
-  <div class={styles.formContainer}>
+<div class="login-layout-container">
+  <div class="login-layout-form-container">
     <Card>
       {#snippet title()}Connexion{/snippet}
       {#snippet description()}Connectez-vous pour accéder à vos recettes{/snippet}
-      <div class={styles.signInButtonContainer}>
-        {#if error}<p class={styles.error}>{error}</p>{/if}
+      <div class="login-layout-sign-in-button-container">
+        {#if error}<p class="login-layout-error">{error}</p>{/if}
         <Button onclick={handleSignIn} disabled={pending} variant="outline" width="full"
-          ><img alt="Google" class={styles.image} src="/google.svg" /> Connexion avec Google</Button
+          ><img alt="Google" class="login-layout-image" src="/google.svg" /> Connexion avec Google</Button
         >
       </div>
-      <div class={styles.backLinkContainer}>
+      <div class="login-layout-back-link-container">
         <Button asLink href="/" size="sm" variant="ghost"><ArrowLeftIcon size="sm" />Retour à l'accueil</Button>
       </div>
     </Card>
   </div>
 </div>
+
+<style>
+  .login-layout-container {
+    display: grid;
+    flex: 1 1 0%;
+    padding: 16px;
+    place-items: center;
+  }
+
+  .login-layout-form-container {
+    max-width: 384px;
+    width: 100%;
+  }
+
+  .login-layout-sign-in-button-container {
+    padding-bottom: 24px;
+    padding-inline: 24px;
+  }
+
+  .login-layout-error {
+    color: var(--colors-destructive-foreground);
+    font-size: var(--font-sizes-sm);
+    padding-bottom: 16px;
+  }
+
+  .login-layout-image {
+    height: 16px;
+  }
+
+  .login-layout-back-link-container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 24px;
+    padding-inline: 24px;
+  }
+</style>

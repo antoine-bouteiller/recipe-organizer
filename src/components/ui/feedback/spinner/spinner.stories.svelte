@@ -4,15 +4,23 @@
 
   import Spinner from './spinner.svelte'
 
-  import * as styles from './spinner.stories.css'
-
   const { Story } = defineMeta({ component: Spinner, title: 'Feedback/Spinner' })
 </script>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Spinner />
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

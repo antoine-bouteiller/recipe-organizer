@@ -5,8 +5,6 @@
   import { mobileMenuItems } from './menu-items.svelte'
   import TabBar from './tabbar.svelte'
 
-  import * as styles from './tabbar.stories.css'
-
   const { Story } = defineMeta({
     component: TabBar,
     globals: { viewport: { isRotated: false, value: 'mobile2' } },
@@ -29,10 +27,10 @@
 </script>
 
 {#snippet example()}
-  <div class={styles.container}>
-    <main class={styles.appSurface}>
+  <div class="container">
+    <main class="app-surface">
       <span>App surface</span>
-      <section class={styles.contentSurface}>Content surface</section>
+      <section class="content-surface">Content surface</section>
     </main>
     <div onclickcapture={navigate} role="presentation">
       <TabBar {currentPath} items={mobileMenuItems} />
@@ -68,3 +66,26 @@
 >
   {@render example()}
 </Story>
+
+<style>
+  .container {
+    background-color: var(--colors-background);
+    height: 192px;
+    position: relative;
+  }
+
+  .app-surface {
+    background-color: var(--colors-background);
+    color: var(--colors-foreground);
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .content-surface {
+    background-color: var(--colors-card);
+    color: var(--colors-card-foreground);
+    border-radius: var(--radius-2xl);
+    padding: 12px;
+  }
+</style>

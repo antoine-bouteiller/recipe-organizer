@@ -12,8 +12,6 @@
   import MagimixStepItem from './magimix-step-item.svelte'
   import { toggleBold } from './step-utils'
 
-  import * as styles from './steps-field.css'
-
   type Step = Extract<NonNullable<RecipeFormInput['stepGroups']>[number], { kind: 'steps' }>['steps'][number]
   const {
     disabled,
@@ -59,10 +57,10 @@
   }
 </script>
 
-<li class={styles.step}>
-  <span class={styles.number}>{index + 1}.</span>
-  <div class={styles.editor}>
-    <div class={styles.textStep}>
+<li class="steps-field-step">
+  <span class="steps-field-number">{index + 1}.</span>
+  <div class="steps-field-editor">
+    <div class="steps-field-text-step">
       <TextareaField
         name={`${path}.text`}
         value={step.text}
@@ -94,14 +92,14 @@
     </div>
     <Field name={`${path}.magimix`}>
       {#if step.magimix}
-        <div class={styles.magimixStep}>
+        <div class="steps-field-magimix-step">
           <MagimixStepDialog
             initialData={step.magimix}
             onSubmit={(value) => update({ ...step, magimix: value })}
             submitLabel="Enregistrer"
             title="Modifier le programme Magimix"
           >
-            {#snippet renderTrigger(props)}<button {...props} class={styles.magimixTrigger} {disabled} type="button"
+            {#snippet renderTrigger(props)}<button {...props} class="steps-field-magimix-trigger" {disabled} type="button"
                 >{#if step.magimix}<MagimixStepItem {...step.magimix} />{/if}</button
               >{/snippet}
           </MagimixStepDialog>
@@ -115,7 +113,7 @@
           >
         </div>
       {:else}
-        <div class={styles.addMagimix}>
+        <div class="steps-field-add-magimix">
           <MagimixStepDialog onSubmit={(value) => update({ ...step, magimix: value })} submitLabel="Ajouter" title="Ajouter un programme Magimix">
             {#snippet renderTrigger(props)}<Button {...props} {disabled} size="sm" type="button" variant="ghost"
                 >Magimix <PlusIcon size="sm" /></Button
@@ -126,7 +124,7 @@
       <FieldError />
     </Field>
   </div>
-  <div class={styles.controls}>
+  <div class="steps-field-controls">
     <Button aria-label="Monter l'étape" disabled={disabled || index === 0} onclick={() => move(-1)} size="icon-sm" type="button" variant="ghost"
       ><CaretUpIcon size="sm" /></Button
     >
@@ -143,3 +141,54 @@
     >
   </div>
 </li>
+
+<style>
+  .steps-field-step {
+    align-items: flex-start;
+    display: flex;
+    gap: 8px;
+  }
+
+  .steps-field-number {
+    color: var(--colors-muted-foreground);
+    font-size: var(--font-sizes-sm);
+    font-weight: var(--font-weights-semibold);
+    line-height: 34px;
+    min-width: 24px;
+  }
+
+  .steps-field-editor {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0px;
+  }
+
+  .steps-field-text-step {
+    align-items: flex-start;
+    display: flex;
+    gap: 4px;
+  }
+
+  .steps-field-magimix-step {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+  }
+
+  .steps-field-magimix-trigger {
+    cursor: pointer;
+    text-align: start;
+    width: 100%;
+  }
+
+  .steps-field-add-magimix {
+    align-self: flex-start;
+  }
+
+  .steps-field-controls {
+    display: flex;
+    flex-shrink: 0;
+  }
+</style>

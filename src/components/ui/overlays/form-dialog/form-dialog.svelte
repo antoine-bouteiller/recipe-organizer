@@ -23,8 +23,6 @@
   import { provideDialogFormFrame } from '../dialog/dialog-form.private.svelte'
   import Dialog from '../dialog/dialog.svelte'
 
-  import * as styles from './form-dialog.css'
-
   const { children, errors, pending, action, onsubmit, open, setOpen, submitLabel, title, renderTrigger }: FormDialogProps = $props()
   provideDialogFormFrame(() => ({ wrap }))
 </script>
@@ -32,7 +30,7 @@
 {#snippet wrap(content: Snippet)}
   <form
     {action}
-    class={styles.form}
+    class="form"
     novalidate
     onsubmit={(event) => {
       event.stopPropagation()
@@ -48,5 +46,17 @@
 {/snippet}
 <Dialog cancelDisabled={pending} cancelLabel="Annuler" onOpenChange={setOpen} {open} {title} {renderTrigger}>
   {#snippet footer()}<FormSubmit label={submitLabel} {pending} />{/snippet}
-  <div class={styles.fields}>{@render children()}</div>
+  <div class="fields">{@render children()}</div>
 </Dialog>
+
+<style>
+  .form {
+    display: contents;
+  }
+
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+</style>

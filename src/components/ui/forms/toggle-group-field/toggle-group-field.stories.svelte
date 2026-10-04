@@ -5,13 +5,11 @@
 
   import Example from './toggle-group-field.example.svelte'
 
-  import * as styles from './toggle-group-field.stories.css'
-
   const { Story } = defineMeta({ component: Example, title: 'Forms/ToggleGroupField' })
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Example />
     </StorySection>
@@ -74,3 +72,13 @@
   <section aria-label="Editable meals"><Example initialValue={['lunch']} /></section>
   <section aria-label="Disabled meals"><Example disabled initialValue={['lunch', 'dinner']} /></section>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

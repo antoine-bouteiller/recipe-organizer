@@ -5,13 +5,11 @@
 
   import Example from './select-field.example.svelte'
 
-  import * as styles from './select-field.stories.css'
-
   const { Story } = defineMeta({ component: Example, title: 'Forms/SelectField' })
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Example />
     </StorySection>
@@ -133,3 +131,13 @@
     await expect(trigger).toHaveFocus()
   }}
 />
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

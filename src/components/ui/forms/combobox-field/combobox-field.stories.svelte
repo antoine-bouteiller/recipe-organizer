@@ -5,8 +5,6 @@
 
   import Example from './combobox-field.example.svelte'
 
-  import * as styles from './combobox-field.stories.css'
-
   const { Story } = defineMeta({ component: Example, title: 'Forms/ComboboxField' })
   const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const trigger = within(within(canvasElement).getByRole('region', { name: 'Default' })).getByRole('button', {
@@ -32,7 +30,7 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Example />
     </StorySection>
@@ -68,3 +66,13 @@
     await expect(trigger).toHaveAccessibleName('Lunch')
   }}
 />
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>
