@@ -46,6 +46,7 @@ const clientOnlyEntries: Plugin = {
 }
 
 const viteConfig = defineConfig(({ isPreview }) => ({
+  build: { minify: true },
   environments: {
     client: {
       build: {
