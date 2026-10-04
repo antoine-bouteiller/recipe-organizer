@@ -13,7 +13,7 @@ publicHoistPattern:
   - '@oxlint/plugins'
 
 catalog:
-  '@storybook/svelte-vite': 10.6.0
+  '@storybook/svelte-vite': 10.6.1
   '@storybook/addon-svelte-csf': 5.1.5
   '@sveltejs/vite-plugin-svelte': 7.3.1
   svelte: 5.57.1
@@ -21,8 +21,8 @@ catalog:
   svelte2tsx: 0.7.61
   '@typescript/native': npm:typescript@7.0.2
   '@void/svelte': 0.23.0
-  storybook: 10.6.0
-  '@storybook/addon-vitest': 10.6.0
+  storybook: 10.6.1
+  '@storybook/addon-vitest': 10.6.1
   '@vitest/browser-playwright': 5.0.1
   playwright: 1.63.0
   '@commitlint/cli': 21.2.3
