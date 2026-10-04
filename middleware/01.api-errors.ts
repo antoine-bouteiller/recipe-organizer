@@ -1,3 +1,4 @@
+import '@/lib/server/zod-locale'
 import { defineMiddleware } from 'void'
 
 import { toApiErrorResponse, toApiValidationResponse } from '@/lib/server/api-error'

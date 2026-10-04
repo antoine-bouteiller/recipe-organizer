@@ -1,5 +1,5 @@
 import { FetchError } from 'void/client'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 
 const errorSchema = z.object({ error: z.string() })
 

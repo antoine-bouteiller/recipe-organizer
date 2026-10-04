@@ -1,7 +1,7 @@
 import * as z from 'zod'
 
 import { ingredientCategory } from '@/features/ingredients/categories'
-import { unitSlugSchema } from '@/utils/units'
+import { unitSlugSchema } from '@/utils/unit-slug-schema'
 
 export const ingredientSchema = z.object({
   category: z.enum(ingredientCategory),

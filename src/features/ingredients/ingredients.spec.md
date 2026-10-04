@@ -135,7 +135,7 @@ represent no parent without submitting a synthetic ID (`src/features/ingredients
 ### 8.4 Measurement contract
 
 `UNITS` defines each slug's dimension, optional parent, and scale factor; `unitSlugSchema` constrains
-stored preferences to that catalogue (`src/utils/units.ts`). `convert(quantity, fromSlug,
+stored preferences to that catalogue (`src/utils/units.ts`, `src/utils/unit-slug-schema.ts`). `convert(quantity, fromSlug,
 toSlug, ingredient)` follows this flow:
 
 ```text

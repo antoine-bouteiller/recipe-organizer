@@ -3,7 +3,7 @@ import { useEffect, useEffectEvent } from 'react'
 import type { VoidActionError } from 'void/pages-client'
 import { submitAction } from 'void/pages-client'
 import type { ActionUrl, ResolveActionBody, ResolveActionParams } from 'void/routes'
-import * as z from 'zod'
+import * as z from 'zod/mini'
 
 import { alertError } from '@/lib/client/alert-error'
 import { getErrorMessage } from '@/lib/client/api-client'

@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-import { unitSlugSchema } from '@/utils/units'
+import { unitSlugSchema } from '@/utils/unit-slug-schema'
 
 import { CUISINE_TYPES, MEALS } from './constants'
 import { allowedRotationSpeed, magimixProgram } from './magimix'
