@@ -3,14 +3,19 @@
 
   import { useField } from './field-context.svelte'
 
-  import * as styles from './field.css'
-
   const { children, id }: { children?: Snippet; id?: string } = $props()
   const field = useField()
 </script>
 
 {#if field.invalid && (children || field.error)}
-  <div class={styles.error} data-slot="field-error" {id} role="alert">
+  <div class="error" data-slot="field-error" {id} role="alert">
     {#if children}{@render children()}{:else}{field.error}{/if}
   </div>
 {/if}
+
+<style>
+  .error {
+    color: var(--colors-destructive-foreground);
+    font-size: var(--font-sizes-xs);
+  }
+</style>

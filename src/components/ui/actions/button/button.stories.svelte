@@ -7,8 +7,6 @@
 
   import Button from './button.svelte'
 
-  import * as styles from './button.stories.css'
-
   const { Story } = defineMeta({ component: Button, title: 'Actions/Button' })
 </script>
 
@@ -23,7 +21,7 @@
     await expect(canvas.getByRole('button', { name: 'Unavailable' })).toBeDisabled()
   }}
 >
-  <div class={styles.buttonGroup}>
+  <div class="button-group">
     <Button variant="secondary">Save recipe</Button>
     <Button disabled>Unavailable</Button>
   </div>
@@ -42,12 +40,12 @@
 </Story>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Button>Save changes</Button>
     </StorySection>
     <StorySection title="Variants">
-      <div class={styles.buttonGroup}>
+      <div class="button-group">
         <Button>Default</Button>
         <Button variant="secondary">Secondary</Button>
         <Button variant="outline">Outline</Button>
@@ -58,7 +56,7 @@
       </div>
     </StorySection>
     <StorySection title="Sizes">
-      <div class={styles.sizeOptions}>
+      <div class="size-options">
         <Button size="sm">Small</Button>
         <Button>Default</Button>
         <Button size="lg">Large</Button>
@@ -69,7 +67,7 @@
       </div>
     </StorySection>
     <StorySection title="Disabled">
-      <div class={styles.buttonGroup}>
+      <div class="button-group">
         <Button disabled>Unavailable</Button>
         <Button disabled variant="secondary">Secondary</Button>
         <Button disabled variant="outline">Outline</Button>
@@ -79,3 +77,26 @@
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .size-options {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>

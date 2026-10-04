@@ -14,37 +14,79 @@
 
   import MagimixStepItem from './magimix-step-item.svelte'
 
-  import * as styles from './recipe-steps.css'
-
   const { stepGroups, subrecipes }: { readonly stepGroups: readonly RecipeStepGroup[]; readonly subrecipes: readonly SubrecipeInstructions[] } =
     $props()
 </script>
 
 {#snippet stepList(steps: readonly RecipeStep[])}
   {#if steps.length > 0}
-    <ol class={styles.list}>
+    <ol class="recipe-steps-list">
       {#each steps as step}
-        <li class={styles.step}>
-          <p class={styles.text}>
+        <li class="recipe-steps-step">
+          <p class="recipe-steps-text">
             {#each parseBoldText(step.text) as segment}{#if segment.bold}<strong>{segment.text}</strong>{:else}{segment.text}{/if}{/each}
           </p>
-          {#if step.magimix}<div class={styles.magimix}><MagimixStepItem {...step.magimix} /></div>{/if}
+          {#if step.magimix}<div class="recipe-steps-magimix"><MagimixStepItem {...step.magimix} /></div>{/if}
         </li>
       {/each}
     </ol>
   {/if}
 {/snippet}
-<div class={styles.groups}>
+<div class="recipe-steps-groups">
   {#each stepGroups as group}
     {#if group.kind === 'steps'}
       {#if group.steps.length > 0}
         <div>
-          {#if group.groupName}<strong class={styles.groupName}>{group.groupName}</strong>{/if}{@render stepList(group.steps)}
+          {#if group.groupName}<strong class="recipe-steps-group-name">{group.groupName}</strong>{/if}{@render stepList(group.steps)}
         </div>
       {/if}
     {:else}
       {@const source = subrecipes.find((source) => source.id === group.recipeId)}
-      {#if source && source.steps.length > 0}<div><strong class={styles.groupName}>{source.name}</strong>{@render stepList(source.steps)}</div>{/if}
+      {#if source && source.steps.length > 0}<div>
+          <strong class="recipe-steps-group-name">{source.name}</strong>{@render stepList(source.steps)}
+        </div>{/if}
     {/if}
   {/each}
 </div>
+
+<style>
+  .recipe-steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    list-style-type: decimal;
+    max-width: 65ch;
+    padding-inline-start: 24px;
+    width: 100%;
+  }
+
+  .recipe-steps-step {
+    font-size: var(--font-sizes-sm);
+    line-height: 24px;
+    padding-inline-start: 4px;
+  }
+
+  .recipe-steps-step::marker {
+    color: var(--colors-muted-foreground);
+    font-weight: var(--font-weights-semibold);
+  }
+
+  .recipe-steps-text {
+    white-space: pre-line;
+  }
+
+  .recipe-steps-magimix {
+    margin-top: 8px;
+  }
+
+  .recipe-steps-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .recipe-steps-group-name {
+    display: block;
+    margin-bottom: 8px;
+  }
+</style>

@@ -8,14 +8,12 @@
 
   import StepEditor from './step-editor.svelte'
 
-  import * as styles from './steps-field.css'
-
   type Group = Extract<NonNullable<RecipeFormInput['stepGroups']>[number], { kind: 'steps' }>
   const { disabled, group, groupIndex, update }: { disabled: boolean; group: Group; groupIndex: number; update: (group: Group) => void } = $props()
 </script>
 
 <Field name={`stepGroups.${groupIndex}.steps`}>
-  <ol class={styles.list}>
+  <ol class="steps-field-list">
     {#each group.steps as step, index (step._key)}
       <StepEditor
         {disabled}
@@ -30,7 +28,7 @@
     {/each}
   </ol>
   <FieldError />
-  <div class={styles.addActions}>
+  <div class="steps-field-add-actions">
     <Button
       {disabled}
       onclick={() => update({ ...group, steps: [...group.steps, { _key: Math.random().toString(36).substring(7), text: '' }] })}
@@ -40,3 +38,17 @@
     >
   </div>
 </Field>
+
+<style>
+  .steps-field-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .steps-field-add-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>

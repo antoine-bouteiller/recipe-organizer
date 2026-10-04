@@ -7,8 +7,6 @@
 
   import Example from './video-field.example.svelte'
 
-  import * as styles from './video-field.stories.css'
-
   const video: FileMetadata = { id: 'recipe-video', name: 'tomato-soup.mp4', size: 1_572_864, type: 'video/mp4', url: 'data:video/mp4;base64,' }
   const { Story } = defineMeta({ component: Example, title: 'Forms/VideoField' })
   const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -27,7 +25,7 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Empty">
       <Example />
     </StorySection>
@@ -41,3 +39,13 @@
 {/snippet}
 <Story name="Overview" asChild>{@render overview()}</Story>
 <Story name="Interaction" asChild {play} tags={['!dev']}>{@render overview()}</Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

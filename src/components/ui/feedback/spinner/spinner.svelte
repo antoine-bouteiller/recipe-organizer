@@ -1,7 +1,12 @@
 <script lang="ts">
   import { CircleNotchIcon } from '@/components/ui/data-display/icons'
-
-  import * as styles from './spinner.css'
 </script>
 
-<span class={styles.spinner}><CircleNotchIcon aria-label="Loading" /></span>
+<span class="spinner"><CircleNotchIcon aria-label="Loading" /></span>
+
+<style>
+  .spinner {
+    --owner-icon-size: 18px;
+    animation: spin 1s linear infinite reverse;
+  }
+</style>

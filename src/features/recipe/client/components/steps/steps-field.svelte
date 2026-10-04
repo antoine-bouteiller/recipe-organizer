@@ -13,8 +13,6 @@
   import type { RecipeFormState } from '../recipe-form-state.svelte'
   import GroupSteps from './group-steps.svelte'
 
-  import * as styles from './steps-field.css'
-
   const { disabled, form }: { disabled: boolean; form: RecipeFormState } = $props()
   const linkedRecipes = useLinkedRecipes()
   const subrecipeOptions = useRecipeOptions(() => ({ filter: (recipe) => linkedRecipes.current.includes(recipe.id) }))
@@ -23,15 +21,15 @@
   const newKey = () => Math.random().toString(36).substring(7)
 </script>
 
-<div class={styles.container}>
+<div class="steps-field-container">
   <Label>Étapes</Label>
   <Field name="stepGroups">
     {#each groups as group, groupIndex (group._key)}
       {@const update = (value: typeof group) => setGroups(replaceAt(groups, groupIndex, value))}
-      <div class={styles.group}>
+      <div class="steps-field-group">
         {#if groupIndex > 0}
-          <div class={styles.groupHeader}>
-            <div class={styles.editor}>
+          <div class="steps-field-group-header">
+            <div class="steps-field-editor">
               {#if group.kind === 'steps'}
                 <TextField
                   name={`stepGroups.${groupIndex}.groupName`}
@@ -52,7 +50,7 @@
                 />
               {/if}
             </div>
-            <div class={styles.controls}>
+            <div class="steps-field-controls">
               <Button
                 aria-label="Monter le groupe"
                 disabled={disabled || groupIndex === 1}
@@ -84,7 +82,7 @@
       </div>
     {/each}
     <FieldError />
-    <div class={styles.addActions}>
+    <div class="steps-field-add-actions">
       <Button
         {disabled}
         onclick={() => setGroups([...groups, { _key: newKey(), kind: 'steps', steps: [] }])}
@@ -102,3 +100,46 @@
     </div>
   </Field>
 </div>
+
+<style>
+  .steps-field-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .steps-field-group {
+    border-radius: var(--radius-xl);
+    border-width: 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .steps-field-group-header {
+    align-items: flex-end;
+    display: flex;
+    gap: 8px;
+  }
+
+  .steps-field-editor {
+    display: flex;
+    flex: 1 1 0%;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0px;
+  }
+
+  .steps-field-controls {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .steps-field-add-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>

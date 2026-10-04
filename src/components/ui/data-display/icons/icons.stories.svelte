@@ -44,8 +44,6 @@
     XIcon,
   } from '.'
 
-  import * as styles from './icons.stories.css'
-
   const { Story } = defineMeta({ title: 'Data Display/Icons' })
 
   const icons = [
@@ -92,11 +90,11 @@
 </script>
 
 <Story name="Gallery" asChild>
-  <div class={styles.gallery}>
+  <div class="gallery">
     {#each icons as [name, Icon] (name)}
-      <div class={styles.iconCell}>
+      <div class="icon-cell">
         <Icon size="xl" />
-        <span class={styles.iconName}>{name}</span>
+        <span class="icon-name">{name}</span>
       </div>
     {/each}
   </div>
@@ -119,3 +117,35 @@
   <span data-testid="decorative"><ArrowLeftIcon /></span>
   <ArrowLeftIcon aria-label="Back" />
 </Story>
+
+<style>
+  .gallery {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media screen and (min-width: 640px) {
+    .gallery {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media screen and (min-width: 1024px) {
+    .gallery {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .icon-cell {
+    align-items: center;
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .icon-name {
+    font-size: var(--font-sizes-xs);
+  }
+</style>

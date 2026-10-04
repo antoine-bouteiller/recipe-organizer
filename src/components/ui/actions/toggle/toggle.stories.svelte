@@ -5,8 +5,6 @@
 
   import Toggle from './toggle.svelte'
 
-  import * as styles from './toggle.stories.css'
-
   const { Story } = defineMeta({ component: Toggle, title: 'Actions/Toggle' })
 </script>
 
@@ -29,13 +27,13 @@
     await expect(disabledRow).toHaveAttribute('aria-pressed', 'false')
   }}
 >
-  <div class={styles.container}>
+  <div class="container">
     <Toggle presentation="check-row">Tomatoes</Toggle><Toggle disabled presentation="check-row">Unavailable item</Toggle>
   </div>
 </Story>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Toggle aria-label="Bold text">Bold</Toggle>
     </StorySection>
@@ -53,3 +51,13 @@
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

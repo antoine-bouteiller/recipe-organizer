@@ -4,18 +4,16 @@
 
   import Badge from './badge.svelte'
 
-  import * as styles from './badge.stories.css'
-
   const { Story } = defineMeta({ component: Badge, title: 'Data Display/Badge' })
 </script>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Badge>New</Badge>
     </StorySection>
     <StorySection title="Variants">
-      <div class={styles.variantOptions}>
+      <div class="variant-options">
         <Badge>Default</Badge>
         <Badge variant="secondary">Secondary</Badge>
         <Badge variant="accent">Accent</Badge>
@@ -27,10 +25,33 @@
       </div>
     </StorySection>
     <StorySection title="Sizes">
-      <div class={styles.sizeOptions}>
+      <div class="size-options">
         <Badge size="sm">Small</Badge>
         <Badge>Default</Badge>
       </div>
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+
+  .variant-options {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .size-options {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+  }
+</style>

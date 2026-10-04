@@ -1,4 +1,4 @@
-export type IconSize = 'inherit' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type IconSize = 'inherit' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 type IconAccessibilityProps = { 'aria-hidden'?: true | 'true'; 'aria-label'?: never } | { 'aria-hidden'?: never; 'aria-label': string }
 

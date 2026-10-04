@@ -10,8 +10,6 @@
   import UploadExample from './file-upload.lifecycle.example.svelte'
   import Example from './image-field.example.svelte'
 
-  import * as styles from './image-field.stories.css'
-
   const paste = (files: File[] = [], text = '') => {
     const clipboardData = new DataTransfer()
     for (const file of files) {
@@ -48,7 +46,7 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Empty">
       <Example />
     </StorySection>
@@ -169,7 +167,7 @@
     await expect(disabledVideo.queryByRole('alert')).not.toBeInTheDocument()
   }}
 >
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Image upload"><Example /></StorySection>
     <StorySection title="Video upload"><VideoExample /></StorySection>
     <StorySection title="Disabled image upload"><Example disabled initialImage={image} /></StorySection>
@@ -208,3 +206,13 @@
     }
   }}><UploadExample /></Story
 >
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

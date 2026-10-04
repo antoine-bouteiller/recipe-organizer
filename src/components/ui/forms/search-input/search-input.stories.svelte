@@ -5,12 +5,10 @@
 
   import Example from './search-input.example.svelte'
 
-  import * as styles from './search-input.stories.css'
-
   const { Story } = defineMeta({ component: Example, title: 'Forms/SearchInput' })
 </script>
 
-{#snippet overview()}<div class={styles.storyLayout}>
+{#snippet overview()}<div class="story-layout">
     <StorySection title="Default"><Example /></StorySection>
     <StorySection title="With Custom Placeholder"><Example custom /></StorySection>
   </div>{/snippet}
@@ -26,3 +24,13 @@
     await expect(canvas.getByRole('status')).toHaveTextContent('Searching for tomato')
   }}>{@render overview()}</Story
 >
+
+<style>
+  .story-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

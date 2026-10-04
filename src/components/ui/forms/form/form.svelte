@@ -8,10 +8,17 @@
 <script lang="ts">
   import { provideFormErrors } from './form-context.svelte'
 
-  import * as styles from './form.css'
-
   const { action, children, errors, onsubmit }: FormProps = $props()
   provideFormErrors(() => errors)
 </script>
 
-<form {action} class={styles.form} data-slot="form" novalidate {onsubmit}>{@render children()}</form>
+<form {action} class="form" data-slot="form" novalidate {onsubmit}>{@render children()}</form>
+
+<style>
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+</style>

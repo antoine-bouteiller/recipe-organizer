@@ -6,8 +6,6 @@
 
   import DeleteDialog from './delete-dialog.svelte'
 
-  import * as styles from './delete-dialog.stories.css'
-
   const { Story } = defineMeta({ component: DeleteDialog, title: 'Overlays/DeleteDialog' })
 </script>
 
@@ -38,7 +36,7 @@
     await expect(trigger).toHaveFocus()
   }}
 >
-  <div class={styles.container}>
+  <div class="container">
     <DeleteDialog
       deleteButtonLabel="Delete recipe"
       description="This removes Tomato soup from your saved recipes. This action cannot be undone."
@@ -89,3 +87,9 @@
   </DeleteDialog>
   <Button onclick={() => completeDelete?.()}>Finish deletion</Button>
 </Story>
+
+<style>
+  .container > :global(* + *) {
+    margin-top: 12px;
+  }
+</style>

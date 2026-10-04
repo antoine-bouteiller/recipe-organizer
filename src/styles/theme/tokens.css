@@ -1,0 +1,143 @@
+:root {
+  --animations-skeleton: skeleton 2s -1s infinite linear;
+  --breakpoints-2xl: 1536px;
+  --breakpoints-lg: 1024px;
+  --breakpoints-md: 768px;
+  --breakpoints-sm: 640px;
+  --breakpoints-xl: 1280px;
+  --colors-accent: #dcefef;
+  --colors-accent-foreground: #0e6e7e;
+  --colors-background: #fff;
+  --colors-border: #e7ecea;
+  --colors-card: #fff;
+  --colors-card-foreground: #18302e;
+  --colors-destructive: oklch(63.7% 0.237 25.331);
+  --colors-destructive-foreground: oklch(50.5% 0.213 27.518);
+  --colors-destructive-subtle: oklch(88.5% 0.062 18.334);
+  --colors-destructive-subtle-foreground: oklch(57.7% 0.245 27.325);
+  --colors-foreground: #18302e;
+  --colors-highlight: #fff;
+  --colors-info: oklch(62.3% 0.214 259.815);
+  --colors-info-foreground: oklch(48.8% 0.243 264.376);
+  --colors-info-subtle: oklch(88.2% 0.059 254.128);
+  --colors-info-subtle-foreground: oklch(54.6% 0.245 262.881);
+  --colors-input: #e2e8e7;
+  --colors-inverse-foreground: #fff;
+  --colors-muted: #f3f4f1;
+  --colors-muted-foreground: #60716f;
+  --colors-neutral-subtle: oklch(92% 0.004 286.32);
+  --colors-neutral-subtle-foreground: oklch(37% 0.013 285.805);
+  --colors-popover: #fff;
+  --colors-popover-foreground: #18302e;
+  --colors-primary: #0e6e7e;
+  --colors-primary-foreground: #fff;
+  --colors-ring: #0e6e7e;
+  --colors-scrim: #000;
+  --colors-secondary: #eaf2f2;
+  --colors-secondary-foreground: #2a4644;
+  --colors-shadow: #000;
+  --colors-success: oklch(69.6% 0.17 162.48);
+  --colors-success-foreground: oklch(50.8% 0.118 165.612);
+  --colors-success-subtle: oklch(95% 0.052 163.051);
+  --colors-success-subtle-foreground: oklch(59.6% 0.145 163.225);
+  --colors-warning: oklch(76.9% 0.188 70.08);
+  --colors-warning-foreground: oklch(55.5% 0.163 48.998);
+  --colors-warning-subtle: oklch(96.2% 0.059 95.617);
+  --colors-warning-subtle-foreground: oklch(47.3% 0.137 46.201);
+  --easings-in: cubic-bezier(0.4, 0, 1, 1);
+  --easings-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easings-out: cubic-bezier(0, 0, 0.2, 1);
+  --easings-out-snappy: cubic-bezier(0.32, 0.72, 0, 1);
+  --font-sizes-xs: 12px;
+  --font-sizes-sm: 14px;
+  --font-sizes-base: 16px;
+  --font-sizes-lg: 18px;
+  --font-sizes-xl: 20px;
+  --font-sizes-2xl: 24px;
+  --font-sizes-3xl: 30px;
+  --font-sizes-4xl: 36px;
+  --font-sizes-5xl: 48px;
+  --font-weights-thin: 100;
+  --font-weights-extralight: 200;
+  --font-weights-light: 300;
+  --font-weights-normal: 400;
+  --font-weights-medium: 500;
+  --font-weights-semibold: 600;
+  --font-weights-bold: 700;
+  --font-weights-extrabold: 800;
+  --font-weights-black: 900;
+  --fonts-heading: 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', sans-serif;
+  --fonts-sans: 'Bricolage Grotesque', 'Bricolage Grotesque Fallback', sans-serif;
+  --letter-spacings-tighter: -0.05em;
+  --letter-spacings-tight: -0.025em;
+  --letter-spacings-normal: 0em;
+  --letter-spacings-wide: 0.025em;
+  --letter-spacings-wider: 0.05em;
+  --letter-spacings-widest: 0.1em;
+  --line-heights-none: 1;
+  --line-heights-tight: 1.25;
+  --line-heights-snug: 1.375;
+  --line-heights-normal: 1.5;
+  --line-heights-relaxed: 1.625;
+  --line-heights-loose: 2;
+  --radius-none: 0;
+  --radius-full: 9999px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
+  --radius-default: 10px;
+  --radius-lg: 8px;
+  --radius-md: 6px;
+  --radius-sm: 4px;
+  --radius-xl: 12px;
+  --radius-xs: 2px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --shadows-none: none;
+  --shadows-ring: 0 0 0 1px color-mix(in srgb, #0e6e7e 24%, transparent);
+  --shadows-invalid: 0 0 0 3px oklch(63.7% 0.237 25.331);
+  --shadows-ring-invalid: 0 0 0 1px color-mix(in srgb, oklch(63.7% 0.237 25.331) 24%, transparent);
+  --shadows-edge: 0 1px color-mix(in oklab, #000 4%, transparent);
+  --shadows-overlay: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadows-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadows-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadows-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadows-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadows-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadows-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  --colors-accent: color-mix(in srgb, #fff 8%, transparent);
+  --colors-accent-foreground: oklch(97% 0 none);
+  --colors-background: #0d1416;
+  --colors-border: color-mix(in srgb, #fff 6%, transparent);
+  --colors-card: #1b2426;
+  --colors-card-foreground: oklch(97% 0 none);
+  --colors-destructive-foreground: oklch(70.4% 0.191 22.216);
+  --colors-foreground: #fbfcfb;
+  --colors-info-foreground: oklch(70.7% 0.165 254.624);
+  --colors-input: color-mix(in srgb, #fff 8%, transparent);
+  --colors-muted: #0d1416;
+  --colors-muted-foreground: #8aa0a0;
+  --colors-popover: #1b2426;
+  --colors-popover-foreground: oklch(97% 0 none);
+  --colors-ring: oklch(55.6% 0 none);
+  --colors-secondary: color-mix(in srgb, #fff 8%, transparent);
+  --colors-secondary-foreground: oklch(96.7% 0.001 286.375);
+  --colors-success-foreground: oklch(76.5% 0.177 163.223);
+  --colors-warning-foreground: oklch(82.8% 0.189 84.429);
+  --shadows-edge: 0 -1px color-mix(in oklab, #fff 6%, transparent);
+}
+
+@keyframes skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

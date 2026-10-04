@@ -6,8 +6,6 @@
   import Example from './select.example.svelte'
   import Select from './select.svelte'
 
-  import * as styles from './select.stories.css'
-
   const items = [
     { label: 'Draft', value: 'draft' },
     { label: 'Published', value: 'published' },
@@ -33,10 +31,20 @@
   }
 </script>
 
-{#snippet overview()}<div class={styles.container}>
+{#snippet overview()}<div class="container">
     <StorySection title="Default"><Example /></StorySection>
     <StorySection title="Disabled"><Select disabled {items} onValueChange={() => undefined} value="draft" /></StorySection>
     <StorySection title="Empty"><Select items={[]} onValueChange={() => undefined} placeholder="No statuses available" value={null} /></StorySection>
   </div>{/snippet}
 <Story name="Overview" asChild {play}>{@render overview()}</Story>
 <Story name="Mobile" asChild {play} globals={{ viewport: { isRotated: false, value: 'mobile2' } }}>{@render overview()}</Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

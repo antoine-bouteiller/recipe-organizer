@@ -8,8 +8,6 @@
   import Dialog from '../dialog/dialog.svelte'
   import Popover from './popover.svelte'
 
-  import * as styles from './popover.stories.css'
-
   const { Story } = defineMeta({ component: Popover, title: 'Overlays/Popover' })
   const interaction = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement)
@@ -38,12 +36,12 @@
 </script>
 
 {#snippet overview()}
-  <div class={styles.storyLayout}>
+  <div class="story-layout">
     <StorySection title="Responsive">
       <Popover>
         {#snippet renderTrigger(props)}<Button {...props} variant="outline">Recipe actions</Button>{/snippet}
-        <div class={styles.container}>
-          <h2 class={styles.heading}>Recipe actions</h2>
+        <div class="container">
+          <h2 class="heading">Recipe actions</h2>
           <Button variant="ghost">Duplicate recipe</Button>
           <Button variant="ghost">Archive recipe</Button>
         </div>
@@ -110,3 +108,24 @@
     <Button>Controlled action</Button>
   </Popover>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 224px;
+  }
+
+  .heading {
+    font-weight: var(--font-weights-medium);
+  }
+
+  .story-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+</style>

@@ -5,18 +5,16 @@
   import KbdGroup from './kbd-group.svelte'
   import Kbd from './kbd.svelte'
 
-  import * as styles from './kbd.stories.css'
-
   const { Story } = defineMeta({ component: Kbd, title: 'Data Display/Kbd' })
 </script>
 
 <Story name="Overview" asChild>
-  <div class={styles.container}>
+  <div class="container">
     <StorySection title="Default">
       <Kbd>⌘</Kbd>
     </StorySection>
     <StorySection title="Shortcut">
-      <p class={styles.text}>
+      <p class="text">
         Save changes with
         <KbdGroup>
           <Kbd>⌘</Kbd>
@@ -26,3 +24,17 @@
     </StorySection>
   </div>
 </Story>
+
+<style>
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0px;
+    width: 100%;
+  }
+
+  .text {
+    font-size: var(--font-sizes-sm);
+  }
+</style>
