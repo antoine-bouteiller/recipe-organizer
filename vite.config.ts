@@ -3,38 +3,37 @@ import { fileURLToPath } from 'node:url'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { voidReact } from '@void/react/plugin'
-import type { Plugin } from 'vite-plus'
+import type { Plugin, UserConfig } from 'vite-plus'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
 import { voidPlugin } from 'void'
 
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
 const restrictedReactImports = {
-  name: 'react',
   importNames: ['useMemo', 'useCallback'],
   message: 'Rely on React Compiler instead of manual memoization with useMemo or useCallback.',
+  name: 'react',
 }
 
 // Void's auth runtime passes its generated Drizzle adapter, so Better Auth's Kysely mode is dead weight in the Worker.
 const betterAuthMinimal: Plugin = {
-  name: 'better-auth-minimal',
   apply: 'build',
   enforce: 'pre',
+  name: 'better-auth-minimal',
   resolveId(source, importer) {
     if (source === 'better-auth' && importer?.includes('/void/dist/')) {
       return this.resolve('better-auth/minimal', importer, { skipSelf: true })
     }
+    return null
   },
 }
 
 // @void/react sets its browser entries as top-level inputs, which every environment inherits.
 const browserEntries = ['pages-client', 'islands-client']
 const clientOnlyEntries: Plugin = {
-  name: 'client-only-entries',
   apply: 'build',
-  enforce: 'post',
   configEnvironment(name, config) {
-    const input = config.build?.rollupOptions?.input
+    const input = config.build?.rolldownOptions?.input
     if (name === 'client' || !input || typeof input !== 'object' || Array.isArray(input)) {
       return
     }
@@ -42,53 +41,46 @@ const clientOnlyEntries: Plugin = {
       delete input[entry]
     }
   },
+  enforce: 'post',
+  name: 'client-only-entries',
 }
 
 const viteConfig = defineConfig(({ isPreview }) => ({
-  plugins: [
-    vanillaExtractPlugin(),
-    // Vitest cannot run the Worker environment.
-    // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
-    ...(!process.env.VITEST && isPreview !== undefined
-      ? [
-          voidPlugin({ persistTo: '.wrangler/state' }),
-          voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true }),
-          betterAuthMinimal,
-          clientOnlyEntries,
-        ]
-      : []),
-  ],
-  server: { port: 3000 },
   environments: {
     client: {
       build: {
         rolldownOptions: {
           // Void links CSS per JS chunk; one shared style chunk yields one stylesheet instead of one per component.
-          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(\.ts)?($|\?)|\.vanilla\.css/ }] } },
+          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(?:\.ts)?(?:$|\?)|\.vanilla\.css/ }] } },
         },
       },
     },
   },
+  fmt: {
+    experimentalSortImports: {},
+    printWidth: 150,
+    semi: false,
+    singleQuote: true,
+    trailingComma: 'es5',
+  },
   lint: {
-    options: { typeAware: true, typeCheck: true, reportUnusedDisableDirectives: 'error' },
-    plugins: ['typescript', 'react', 'unicorn', 'import'],
-    jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
     categories: {
       correctness: 'error',
-      suspicious: 'error',
       perf: 'error',
       style: 'error',
+      suspicious: 'error',
     },
     env: {
-      builtin: true,
       browser: true,
+      builtin: true,
       commonjs: true,
       node: true,
       'shared-node-browser': true,
     },
-    ignorePatterns: ['vite.config.ts'],
+    jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
+    options: { reportUnusedDisableDirectives: 'error', typeAware: true, typeCheck: true },
     overrides: [
-      ...features.map((feature) => ({
+      ...features.map((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']>[number] => ({
         files: [`src/features/${feature}/**/*.{ts,tsx}`],
         rules: {
           'no-restricted-imports': [
@@ -97,8 +89,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
               paths: [restrictedReactImports],
               patterns: [
                 {
-                  regex: '^\\.\\./\\.\\.(/|$)',
                   message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
+                  regex: '^\\.\\./\\.\\.(/|$)',
                 },
                 ...features
                   .filter((other) => other !== feature)
@@ -132,48 +124,11 @@ const viteConfig = defineConfig(({ isPreview }) => ({
         },
       },
     ],
+    plugins: ['typescript', 'react', 'unicorn', 'import'],
     rules: {
-      // Restriction
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [restrictedReactImports],
-          patterns: [
-            {
-              regex: '^\\.\\./\\.\\.(/|$)',
-              message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
-            },
-          ],
-        },
-      ],
-      'default-case': 'error',
-      'no-empty': 'error',
-      'no-empty-function': 'error',
-      'no-console': 'error',
-      'no-unused-vars': 'error',
-      'no-unused-expressions': 'error',
-      'no-explicit-any': 'error',
-      'no-non-null-assertion': 'error',
-      'no-array-for-each': 'error',
-      'prefer-modern-math-apis': 'error',
-      'prefer-number-properties': 'error',
       complexity: ['error', 15],
-
-      // Suspicious
-      'react-in-jsx-scope': 'off',
-      'no-unneeded-ternary': 'off',
-      'style-prop-object': 'off',
-      'react/jsx-no-constructed-context-values': 'off',
-
-      // Pedantic
-      'no-deprecated': 'error',
-      'no-negated-condition': 'error',
-      'prefer-string-replace-all': 'error',
-
-      // Suspicious
-      'no-unassigned-import': 'off',
-
-      // Style
+      'default-case': 'error',
+      'exports-last': 'off',
       'filename-case': [
         'error',
         {
@@ -182,28 +137,52 @@ const viteConfig = defineConfig(({ isPreview }) => ({
           },
         },
       ],
-      'prefer-default-export': 'off',
-      'no-magic-numbers': 'off',
-      'sort-imports': 'off',
-      'one-var': 'off',
-      'no-namespace': 'off',
+      'function-component-definition': 'off', // Conflicts with func-style
+      'group-exports': 'off',
       'id-length': ['error', { exceptions: ['z', 'x', '$'] }],
-      'no-ternary': 'off',
-      'max-params': 'off',
       'jsx-max-depth': 'off',
       'jsx-props-no-spreading': 'off',
-      'max-statements': 'off',
-      'no-null': 'off',
-      'no-nodejs-modules': 'off',
-      'no-named-export': 'off',
-      'group-exports': 'off',
-      'no-duplicate-imports': ['error', { allowSeparateTypeImports: true }],
-      'exports-last': 'off',
-      'no-underscore-dangle': 'off',
       'max-nested-calls': 'off',
-      'function-component-definition': 'off', // conflict with func-style
-
-      // nusery
+      'max-params': 'off',
+      'max-statements': 'off',
+      'no-array-for-each': 'error',
+      'no-console': 'error',
+      'no-deprecated': 'error',
+      'no-duplicate-imports': ['error', { allowSeparateTypeImports: true }],
+      'no-empty': 'error',
+      'no-empty-function': 'error',
+      'no-explicit-any': 'error',
+      'no-magic-numbers': 'off',
+      'no-named-export': 'off',
+      'no-namespace': 'off',
+      'no-negated-condition': 'error',
+      'no-nodejs-modules': 'off',
+      'no-non-null-assertion': 'error',
+      'no-null': 'off',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [restrictedReactImports],
+          patterns: [
+            {
+              message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
+              regex: '^\\.\\./\\.\\.(/|$)',
+            },
+          ],
+        },
+      ],
+      'no-ternary': 'off',
+      'no-unassigned-import': 'off',
+      'no-underscore-dangle': 'off',
+      'no-unneeded-ternary': 'off',
+      'no-unused-expressions': 'error',
+      'no-unused-vars': 'error',
+      'one-var': 'off',
+      'prefer-default-export': 'off',
+      'prefer-modern-math-apis': 'error',
+      'prefer-number-properties': 'error',
+      'prefer-string-replace-all': 'error',
+      'react-in-jsx-scope': 'off',
       'react/capitalized-calls': 'error',
       'react/error-boundaries': 'error',
       'react/globals': 'error',
@@ -211,6 +190,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'react/immutability': 'error',
       'react/incompatible-library': 'error',
       'react/invariant': 'error',
+      'react/jsx-no-constructed-context-values': 'off',
       'react/preserve-manual-memoization': 'error',
       'react/purity': 'error',
       'react/refs': 'error',
@@ -223,7 +203,6 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'react/unsupported-syntax': 'error',
       'react/use-memo': 'error',
       'react/void-use-memo': 'error',
-
       'recipe-oranizer/no-conditional-empty-object-spread': 'error',
       'recipe-oranizer/no-known-value-widening': 'error',
       'recipe-oranizer/no-low-signal-symbol-names': 'error',
@@ -232,47 +211,56 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       'recipe-oranizer/no-unknown-type-aliases': 'error',
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
       'recipe-oranizer/vanilla-extract-theme-tokens': 'error',
+      'sort-imports': 'off',
+      'style-prop-object': 'off',
     },
   },
-  fmt: {
-    trailingComma: 'es5',
-    semi: false,
-    singleQuote: true,
-    printWidth: 150,
-    experimentalSortImports: {},
-  },
-  staged: {
-    '*': 'vp check --fix',
-  },
+  plugins: [
+    vanillaExtractPlugin(),
+    // Vitest cannot run the Worker environment.
+    // Vanilla Extract reloads this file mid-build without `isPreview`; voidPlugin() would then rewrite .void/entry.ts without deploy-only options.
+    ...(!process.env.VITEST && isPreview !== undefined
+      ? [
+          voidPlugin({ persistTo: '.wrangler/state' }),
+          voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true }),
+          betterAuthMinimal,
+          clientOnlyEntries,
+        ]
+      : []),
+  ],
   resolve: {
     // Virtual island entries sit outside the tsconfig project, so tsconfig paths don't resolve their imports.
     alias: [{ find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) }],
     tsconfigPaths: true,
   },
+  server: { port: 3000 },
+  staged: {
+    '*': 'vp check --fix',
+  },
   test: {
+    coverage: {
+      exclude: ['**/*.stories.tsx', '**/*.css.ts'],
+      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'tools/oxlint/rules/**/*.ts'],
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+    },
     projects: [
-      { extends: true, test: { name: 'unit', globals: true } },
+      { extends: true, test: { globals: true, name: 'unit' } },
       {
         extends: true,
-        plugins: [storybookTest({ configDir: '.storybook' })],
         optimizeDeps: { include: ['@vanilla-extract/recipes/createRuntimeFn'] },
+        plugins: [storybookTest({ configDir: '.storybook' })],
         test: {
-          name: 'storybook',
           browser: {
             enabled: true,
             headless: true,
-            provider: playwright({ contextOptions: { reducedMotion: 'reduce' } }),
             instances: [{ browser: 'chromium' }],
+            provider: playwright({ contextOptions: { reducedMotion: 'reduce' } }),
           },
+          name: 'storybook',
         },
       },
     ],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
-      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'tools/oxlint/rules/**/*.ts'],
-      exclude: ['**/*.stories.tsx', '**/*.css.ts'],
-    },
   },
 }))
 
