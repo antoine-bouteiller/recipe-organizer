@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vite-plus/test'
+import { assert, describe, expect, it } from 'vite-plus/test'
 import { ValidationError } from 'void/pages-protocol'
 
 import { recipeSchema } from '@/features/recipe/schemas'
@@ -39,13 +39,16 @@ describe('readRecipeFormData', () => {
     body.append('stepGroups[0][steps][0][_key]', 'step')
     body.append('stepGroups[0][steps][0][text]', 'Mélanger.')
     body.append('video', '')
-    expect(await read({ body })).toEqual({
+    const result = await read({ body })
+    expect(result).toEqual({
       ...values,
       cuisineTypes: [],
-      image: expect.objectContaining({ name: 'recipe.png', size: image.size, type: 'image/png' }),
+      image: expect.objectContaining({ name: 'recipe.png', size: 11, type: 'image/png' }),
       linkedRecipes: [],
       meals: [],
     })
+    assert(result instanceof Object && 'image' in result && result.image instanceof File)
+    expect(await result.image.text()).toBe('image bytes')
   })
 })
 
@@ -68,7 +71,7 @@ describe('recipe form validation', () => {
     }
   })
 
-  it('restores empty multipart collections without changing asset ids or blank optional values', async () => {
+  it('restores empty multipart collections and normalizes blanks while preserving asset ids', async () => {
     const body = new FormData()
     body.append('name', 'Empty recipe')
     body.append('servings', '4')

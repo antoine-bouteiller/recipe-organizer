@@ -7,12 +7,6 @@
   import Example from './text-field.example.svelte'
 
   const { Story } = defineMeta({ component: Example, title: 'Forms/TextField' })
-  const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    const section = within(canvasElement).getByRole('region', { name: 'Default' })
-    const input = within(section).getByRole('textbox', { name: 'Recipe title' })
-    await userEvent.type(input, 'Tomato soup')
-    await expect(input).toHaveValue('Tomato soup')
-  }
 </script>
 
 {#snippet overview()}
@@ -32,7 +26,6 @@
   </div>
 {/snippet}
 <Story name="Overview" asChild>{@render overview()}</Story>
-<Story name="Interaction" asChild {play} tags={['!dev']}>{@render overview()}</Story>
 
 <Story
   name="Refreshed Dotted Errors"

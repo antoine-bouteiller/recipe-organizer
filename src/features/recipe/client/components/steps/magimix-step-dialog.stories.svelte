@@ -25,11 +25,14 @@
     await expect(dialog.getByRole('textbox', { name: 'Minutes*' })).toHaveValue('1')
     await expect(dialog.getByRole('textbox', { name: 'Secondes*' })).toHaveValue('30')
     await expect(dialog.getByRole('textbox', { name: 'Température (°C) - Optionnel' })).toHaveValue('')
+    await userEvent.clear(dialog.getByRole('textbox', { name: 'Secondes*' }))
+    await userEvent.type(dialog.getByRole('textbox', { name: 'Secondes*' }), '45')
     await userEvent.click(dialog.getByRole('button', { name: 'Enregistrer' }))
+    await waitFor(() => expect(body.queryByRole('dialog')).not.toBeInTheDocument())
     await expect(JSON.parse(canvas.getByLabelText('Programme enregistré').textContent ?? '{}')).toEqual({
       program: 'steam',
       rotationSpeed: 'auto',
-      time: 90,
+      time: 105,
     })
   }
 </script>

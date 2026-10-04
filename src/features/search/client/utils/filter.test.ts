@@ -31,7 +31,7 @@ describe('filterRecipes', () => {
     expect(ids(filterRecipes(recipes, filters({ query: 'CREME' })))).toEqual([1])
   })
 
-  it('returns every recipe for an empty query', () => {
+  it('returns all non-spice recipes for an empty query', () => {
     expect(ids(filterRecipes(recipes, filters({ query: '' })))).toEqual([1, 2, 3])
   })
 
@@ -39,7 +39,7 @@ describe('filterRecipes', () => {
     expect(ids(filterRecipes(recipes, filters({ query: '   ' })))).toEqual([1, 2, 3])
   })
 
-  it('filters by the vegetarian flag', () => {
+  it('filters by the vegetarian flag while keeping spice recipes hidden', () => {
     expect(ids(filterRecipes(recipes, filters({ isVegetarian: true })))).toEqual([2])
   })
 
@@ -65,18 +65,11 @@ describe('filterRecipes', () => {
 
   it('combines query and filter predicates', () => {
     expect(ids(filterRecipes(recipes, filters({ cuisineTypes: ['french'], query: 'steak' })))).toEqual([3])
-  })
-
-  it('hides spice recipes by default', () => {
-    expect(ids(filterRecipes(recipes, filters({})))).toEqual([1, 2, 3])
+    expect(filterRecipes(recipes, filters({ cuisineTypes: ['italian'], query: 'steak' }))).toEqual([])
   })
 
   it('reveals spice recipes when the spice toggle is on', () => {
     expect(ids(filterRecipes(recipes, filters({ isSpice: true })))).toEqual([1, 2, 3, 4])
-  })
-
-  it('keeps spice recipes hidden even when they match other filters', () => {
-    expect(ids(filterRecipes(recipes, filters({ isVegetarian: true })))).toEqual([2])
   })
 })
 

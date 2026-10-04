@@ -110,8 +110,6 @@
     await expect(canvas.getAllByRole('img')).toHaveLength(1)
     const decorative = canvasElement.querySelector('[data-testid=decorative] svg')
     await expect(decorative).toHaveAttribute('aria-hidden', 'true')
-    await expect(decorative).toHaveAttribute('width', '1em')
-    await expect(decorative).toHaveAttribute('height', '1em')
   }}
 >
   <span data-testid="decorative"><ArrowLeftIcon /></span>

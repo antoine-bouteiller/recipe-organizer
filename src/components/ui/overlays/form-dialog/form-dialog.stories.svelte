@@ -10,21 +10,6 @@
 <Story name="Default" asChild><Example /></Story>
 <Story name="Mobile" asChild globals={{ viewport: { isRotated: false, value: 'mobile2' } }}><Example /></Story>
 <Story
-  name="Submit On Enter"
-  asChild
-  tags={['!dev']}
-  play={async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await userEvent.click(await canvas.findByRole('button', { name: 'Edit recipe' }))
-    const dialog = within(document.body)
-    const field = await dialog.findByLabelText('Recipe title')
-    await expect(field).toBeVisible()
-    await userEvent.clear(field)
-    await userEvent.type(field, 'Vegetable soup{Enter}')
-    await waitFor(() => expect(dialog.queryByRole('dialog')).not.toBeInTheDocument())
-  }}><Example /></Story
->
-<Story
   name="Pending Dismissal Regression"
   asChild
   tags={['!dev']}

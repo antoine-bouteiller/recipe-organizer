@@ -1,7 +1,7 @@
 <script module lang="ts">
   import StorySection from '@storybook-helpers/story-section.svelte'
   import { defineMeta } from '@storybook/addon-svelte-csf'
-  import { expect, userEvent, within } from 'storybook/test'
+  import { expect, spyOn, userEvent, within } from 'storybook/test'
 
   import { mobileMenuItems } from '@/components/navigation/menu-items.svelte'
   import TabBar from '@/components/navigation/tabbar.svelte'
@@ -13,10 +13,6 @@
   const { Story } = defineMeta({ component: ScreenLayout, parameters: { layout: 'padded' }, title: 'Layout/Screen Layout' })
 
   const backgroundImage = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="640" height="360" fill="#0e6e7e"/></svg>')}`
-</script>
-
-<script lang="ts">
-  let requested = $state(false)
 </script>
 
 {#snippet content()}
@@ -33,7 +29,7 @@
 {/snippet}
 
 {#snippet back()}
-  <GoBackButton onBack={() => (requested = true)} />
+  <GoBackButton />
 {/snippet}
 
 {#snippet exampleFooter()}
@@ -51,7 +47,6 @@
     <StorySection title="With back action">
       <div class="container">
         <ScreenLayout backButton={back} title="Details">
-          {#if requested}<p role="status">Back action requested.</p>{/if}
           {@render content()}
         </ScreenLayout>
       </div>
@@ -100,15 +95,20 @@
     const canvas = within(canvasElement)
     const backSection = within(canvas.getByRole('region', { name: 'With back action' }))
 
-    await userEvent.click(backSection.getByRole('button', { name: 'Retour' }))
-    await expect(backSection.getByRole('status')).toHaveTextContent('Back action requested.')
+    const back = spyOn(history, 'back').mockImplementation(() => undefined)
+    try {
+      await userEvent.click(backSection.getByRole('button', { name: 'Retour' }))
+      await expect(back).toHaveBeenCalledTimes(1)
+    } finally {
+      back.mockRestore()
+    }
   }}
 >
   {@render overview()}
 </Story>
 
 <Story
-  name="Scroll And Footer Semantics"
+  name="Retained Scroll IDs And Optional Navigation Slots"
   asChild
   tags={['!dev']}
   play={async ({ canvasElement }) => {

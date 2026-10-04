@@ -7,10 +7,10 @@
 
   const { Story } = defineMeta({ component: Example, title: 'Forms/TextareaField' })
   const play = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    const section = within(canvasElement).getByRole('region', { name: 'Default' })
-    const textarea = within(section).getByRole('textbox', { name: 'Étape' })
+    const canvas = within(canvasElement)
+    const textarea = canvas.getByRole('textbox', { name: 'Étape' })
     await userEvent.type(textarea, 'Ligne 1{enter}Ligne 2')
-    await expect(textarea).toHaveValue('Ligne 1\nLigne 2')
+    await expect(canvas.getByLabelText('Step draft').textContent).toBe('Ligne 1\nLigne 2')
   }
 </script>
 
@@ -28,7 +28,7 @@
   </div>
 {/snippet}
 <Story name="Overview" asChild>{@render overview()}</Story>
-<Story name="Interaction" asChild {play} tags={['!dev']}>{@render overview()}</Story>
+<Story name="Controlled multiline draft" args={{ showValue: true }} {play} tags={['!dev']} />
 
 <style>
   .container {

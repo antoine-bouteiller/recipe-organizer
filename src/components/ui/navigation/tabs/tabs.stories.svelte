@@ -42,9 +42,18 @@
     const canvas = within(canvasElement)
     const method = canvas.getByRole('link', { name: 'Method' })
     await expect(method).toHaveAttribute('href', '#method')
-    await userEvent.click(method)
-    await expect(window.location.hash).toBe('#method')
-    await expect(canvas.getByRole('region', { name: 'Method' })).toBeInTheDocument()
+    const originalUrl = window.location.href
+    const historyLength = history.length
+    try {
+      await userEvent.click(method)
+      await expect(window.location.hash).toBe('#method')
+      await expect(history.length).toBe(historyLength)
+      await userEvent.click(canvas.getByRole('link', { name: 'Ingredients' }))
+      await expect(window.location.hash).toBe('#ingredients')
+      await expect(history.length).toBe(historyLength)
+    } finally {
+      history.replaceState(history.state, '', originalUrl)
+    }
   }}>{@render example()}</Story
 >
 

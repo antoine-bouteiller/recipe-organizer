@@ -42,7 +42,7 @@ describe('assertSubrecipeGroups', () => {
     { linked: [8], recipeId: 1 },
     { linked: [7], recipeId: 7 },
   ])('rejects a sub-recipe outside links or pointing to itself (%o)', ({ linked, recipeId }) => {
-    expect(() => assertSubrecipeGroups(stepGroups, linked, recipeId)).toThrow()
+    expect(() => assertSubrecipeGroups(stepGroups, linked, recipeId)).toThrow(expect.objectContaining({ status: 400 }))
   })
 })
 
