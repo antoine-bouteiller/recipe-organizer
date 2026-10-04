@@ -26,8 +26,10 @@ const config: KnipConfig = {
   ignore: [
     'src/**/*.svelte',
     'src/**/*.svelte.ts',
-    'src/components/ui/data-display/icons/svelte.ts',
+    'src/components/ingredient-categories.ts',
+    'src/components/navigation/current-path.ts',
     'src/components/ui/data-display/icons/icon-types.ts',
+    'src/components/ui/data-display/icons/svelte.ts',
   ],
   // TODO: drop `@void/svelte` with the React cut-over.
   ignoreDependencies: ['cloudflare', 'oxc-transform-react', '@typescript/native', '@void/svelte'],
