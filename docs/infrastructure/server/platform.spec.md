@@ -79,7 +79,10 @@ default 404. No application catch-all exists because it would shadow assets such
 development requests.
 `voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true })`
 enables hydrated React pages, client transitions, and stale-while-revalidate navigation prefetching
-(fresh 30s, usable up to 1h). Non-GET navigation/actions flush the prefetch cache. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
+(fresh 30s, usable up to 1h). Non-GET navigation/actions flush the prefetch cache.
+Two build-only plugins trim the Worker: Void's auth runtime resolves `better-auth/minimal`, because it
+already passes its generated Drizzle adapter, and `@void/react`'s browser entries (`pages-client`,
+`islands-client`) build only in the client environment instead of shipping `react-dom/client` to the Worker. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
 a separate API process or proxy. Void reads the project-root `.env`.
 `.void/` (entry and route types) and `.void-wrangler.jsonc` are generated and
 git-ignored. `vp exec void prepare` regenerates route types before clean-tree checks.
@@ -238,3 +241,4 @@ N/A
 | 2026-10-02 | Document Void Pages rendering, islands, head configuration, and default 404s. | 3, 6, 8 |
 | 2026-10-03 | Remove the pass-through `/sw.js` fetch handler so requests skip worker startup. | 3, 7, 8.4 |
 | 2026-10-03 | Document hydrated pages, navigation prefetch, and retained document transitions. | 8.1, 8.8 |
+| 2026-10-03 | Drop Kysely and browser entries from the Worker bundle. | 8.1 |
