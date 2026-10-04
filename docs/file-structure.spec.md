@@ -36,7 +36,7 @@ module so feature ownership and import boundaries remain legible.
 ## 4. Principles & Intents
 
 - `[PI-1]` **Runtime first, then feature** — group product-domain code by feature within each runtime; share modules only when both runtimes need them.
-- `[PI-2]` **Runtime boundaries are visible** — code that requires React, the database or Worker bindings never presents as a pure utility.
+- `[PI-2]` **Runtime boundaries are visible** — code that requires Svelte, the database or Worker bindings never presents as a pure utility.
 - `[PI-3]` **Generated artefacts are tool-owned** — route and Worker type outputs are consumed, not edited.
 - `[PI-4]` **Public seams are explicit** — features never import other features; routes and app-owned components coordinate them, while genuinely shared hooks live outside features.
 
@@ -62,7 +62,7 @@ module so feature ownership and import boundaries remain legible.
 ### 8.1 Repository layout
 
 The repository root is the single Void project and deployment. `pages/` and `routes/api/`
-compose `@/features/<feature>/server/*` and `@/lib/server/*`; `src/` also owns React feature
+compose `@/features/<feature>/server/*` and `@/lib/server/*`; `src/` also owns Svelte feature
 presentation and browser services. Server folders never import browser components or the design
 system. Isomorphic modules cannot import server implementation.
 
@@ -70,7 +70,7 @@ system. Isomorphic modules cannot import server implementation.
 recipe-organizer/
 ├── docs/                       # Architecture and infrastructure specs
 ├── public/                     # Static assets and network-only sw.js
-├── pages/                      # layout.tsx; regular pages + optional server companions
+├── pages/                      # layout.svelte; regular pages + optional server companions
 ├── routes/api/                 # Remaining Void HTTP adapters
 ├── middleware/                 # API/action errors, API CSRF, shared page context
 ├── src/
@@ -102,13 +102,13 @@ recipe-organizer/
 ├── .void-wrangler.jsonc         # Generated runtime config (ignored)
 ├── env.ts
 ├── void.config.ts              # Runtime/deploy bindings and document head
-├── vite.config.ts              # Void/React plugins, checks, tests, formatting
+├── vite.config.ts              # Void/Svelte plugins, checks, tests, formatting
 ├── package.json
 └── AGENTS.md
 ```
 
-The root `pages/layout.tsx` wraps every page. Each route is a folder holding `index.tsx` and an optional
-`index.server.ts`; `[id]` is a dynamic segment. Pages export default components and import
+The root `pages/layout.svelte` wraps every page. Each route is a folder holding `index.svelte` and an optional
+`index.server.ts`; `[id]` is a dynamic segment. Pages are Svelte components and import
 feature components directly via `@/...`; server companions export loaders/actions.
 Features expose slots/render props for page-owned composition without feature-to-feature imports.
 The shopping-list page owns its reset button directly and needs no server companion.
@@ -146,8 +146,8 @@ Feedback, Forms, Layout, Navigation, and Overlays. See
 [UI ownership](../src/styles/styling.spec.md) for the full contract.
 
 Pages are unstyled composition: feature sections and app-shell components own markup/styles.
-AppHeader owns desktop navigation; `src/components/app-error/` owns the regular-layout React
-render-error boundary. DS Button renders `@void/react` `Link` through `asLink` + `href`;
+AppHeader owns desktop navigation; `src/components/app-error/` owns the regular-layout
+`<svelte:boundary>` render-error boundary. DS Button renders `@void/svelte` `Link` through `asLink` + `href`;
 TabBar takes `currentPath` and `href` items. ScreenLayout takes a `backButton` slot;
 GoBackButton defaults to `history.back()`. Retained inner/outer scroll IDs do not implement scroll
 restoration. Storybook has no router decorator. Pages/layouts compose header search and theme;
@@ -155,8 +155,8 @@ feature/auth policy does not move into `src/components/ui/`.
 
 ### Import and database boundaries
 
-Ordinary files use kebab-case except framework dynamic segments; `.tsx`
-contains JSX and specs use `.spec.md`. Source imports use `@/*` and same-directory
+Ordinary files use kebab-case except framework dynamic segments; `.svelte`
+contains components, `*.svelte.ts` contains rune modules, and specs use `.spec.md`. Source imports use `@/*` and same-directory
 dependencies are relative. Features may import only the root (isomorphic) modules of other features;
 pages or app-owned components coordinate their client and server code. Shared browser hooks live
 outside features.
@@ -204,3 +204,4 @@ N/A.
 | 2026-10-02 | Remove workspace packages: server, shared, and design system move into `src/` with `client/`/`server/` feature and lib folders; oxlint and scripts move to `tools/`. | 3, 6, 7, 8 | Drop package indirection for a single-deployment app. |
 | 2026-10-02 | Fold `src/design-system/` into `src/components/ui/`, `src/hooks/`, `src/utils/`, and `src/styles/`; move TabBar, ScreenLayout, and NotFound back to `src/components/`. | 8.1 | One component root; app-specific presentation sits with the app shell. |
 | 2026-10-03 | Replace browse wrapper entries with regular pages and direct component imports. | 3, 8.1 | Match hydrated route composition. |
+| 2026-10-04 | Replace `.tsx` pages/components with `.svelte` and `*.svelte.ts` rune modules. | 3, 8.1 | Match the shipped Svelte file conventions. |

@@ -91,7 +91,7 @@ stepGroups: z.array(ownGroup | subrecipeGroup).refine((groups) => groups[0]?.kin
 - Array order is group and step order; persistence stores 1-based indexes as `position`
   (`crud.spec.md` [CT-1]).
 - The first group is the default: always an own group, never named or removed.
-- `_key` is a form-only identity for stable React keys; it is not persisted.
+- `_key` is a form-only identity for stable keyed-each identities; it is not persisted.
 - Page actions carry `stepGroups` as one JSON-stringified field, like `ingredientGroups`; the
   transport is multipart when a file is present and JSON otherwise.
 
@@ -131,7 +131,7 @@ StepsField (controlled Void form arrays `stepGroups`)
 └── add: « Groupe » · « Sous-recette »
 ```
 
-- **Magimix dialog** uses local React state with supported program/speed choices and bounded numeric
+- **Magimix dialog** uses local `$state` with supported program/speed choices and bounded numeric
   controls (temperature 0–200, minutes 0–60, seconds 0–59), then converts time to total seconds.
   The recipe action validates the combined values on submission.
 - **Sub-recipe picker** reads eligible ids and names from `LinkedRecipesProvider`, derived from the

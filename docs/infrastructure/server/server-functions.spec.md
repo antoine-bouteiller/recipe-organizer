@@ -50,14 +50,14 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component            | Module type                     | Responsibility                             | Public API surface                                       |
-| -------------------- | ------------------------------- | ------------------------------------------ | -------------------------------------------------------- |
-| Server companion     | `pages/**/*.server.ts`          | Page reads, gates, mutations               | `loader`, `action`, `actions`, `InferProps`              |
-| Schema boundary      | Page/API handler                | Validate body, query, params, file entries | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
-| Client action helper | `src/lib/client/page-action.ts` | In-place refresh and failure alert         | `usePageAction()`                                        |
-| Response helper      | `src/lib/client/api-client.ts`  | Safe HTTP errors and login navigation      | `readResponse`, `getErrorMessage`                        |
-| Authorization        | Server auth helpers             | Gate page reads and protect writes         | `guardPage`, `withAuthGuard`                             |
-| API handlers         | `routes/api/**`                 | Remaining HTTP contracts                   | Named GET/POST exports                                   |
+| Component            | Module type                            | Responsibility                             | Public API surface                                       |
+| -------------------- | -------------------------------------- | ------------------------------------------ | -------------------------------------------------------- |
+| Server companion     | `pages/**/*.server.ts`                 | Page reads, gates, mutations               | `loader`, `action`, `actions`, `InferProps`              |
+| Schema boundary      | Page/API handler                       | Validate body, query, params, file entries | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
+| Client action helper | `src/lib/client/page-action.svelte.ts` | In-place refresh and failure alert         | `usePageAction()`                                        |
+| Response helper      | `src/lib/client/api-client.ts`         | Safe HTTP errors and login navigation      | `readResponse`, `getErrorMessage`                        |
+| Authorization        | Server auth helpers                    | Gate page reads and protect writes         | `guardPage`, `withAuthGuard`                             |
+| API handlers         | `routes/api/**`                        | Remaining HTTP contracts                   | Named GET/POST exports                                   |
 
 ## 8. Detailed Design
 
@@ -115,7 +115,7 @@ R2 cannot participate in a D1 batch.
 `usePageAction()` submits typed action URLs, body data, and required dynamic params through
 `submitAction(router, url, { data, method: 'POST', preserveState: true })`. It preserves URL/history,
 refreshes props in place, alerts expected failures, and returns `Promise<boolean>`.
-Callers own navigation/reset/close after success. Never await an action inside a React transition.
+Callers own navigation/reset/close after success. Callers await the helper.
 The DS `DeleteDialog` uses local loading state while awaiting its callback.
 
 ### 8.7 API route boundary
@@ -195,3 +195,4 @@ N/A
 | 2026-09-13 | Document Hono route groups under `src/server/routes/`.                                 | 4, 7, 8.1, 8.3, 8.5 | Match the server route layout and runtime-specific API placement.            |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts   | Reflect the completed page migration.                                        |
 | 2026-10-03 | Submit recipe deletion through the client router with history replacement.             | 8.9, 8.12           | Follow the guarded home redirect without preserving the deleted URL.         |
+| 2026-10-04 | Move the client action helper to `page-action.svelte.ts` for Svelte pages.             | 8.9                 | Match the shipped Svelte file conventions.                                   |

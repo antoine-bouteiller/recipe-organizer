@@ -55,7 +55,7 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 - `[C-4]` A child ingredient contributes only its greatest primary amount among siblings, not a sum
   (`src/features/shopping-list/client/utils/aggregate-shopping-list.ts`).
 - `[C-5]` Checkmarks are component-local state and reset when their `CartItem` unmounts
-  (`src/features/shopping-list/client/component/cart-item.tsx`).
+  (`src/features/shopping-list/client/component/cart-item.svelte`).
 
 ## 7. High-Level Components
 
@@ -86,15 +86,15 @@ persisted servings ───┘                                         │
 
 `shopping-list` holds `number[]` recipe identifiers; `recipe-quantities` holds
 `Record<number, number>` overrides. Both are data-only persisted stores with hydration-safe read hooks and
-exported mutation functions (`src/stores/shopping-list.store.ts`,
-`src/stores/recipe-quantities.store.ts`). A serving override defaults to the recipe's declared
+exported mutation functions (`src/stores/shopping-list.store.svelte.ts`,
+`src/stores/recipe-quantities.store.svelte.ts`). A serving override defaults to the recipe's declared
 `servings` only when its map entry is nullish. This refines the client-state specification's
 [persisted selection contract](../../../docs/infrastructure/client/client-state.spec.md).
 
 ### 8.2 Projection contract
 
 `loadRecipesByIds(ids)` calls typed `GET /api/shopping-list/recipes` with a JSON-stringified
-`ids` query value. A map retains one stable promise per distinct ID array for React `use()`;
+`ids` query value. A map retains one stable promise per distinct ID array;
 failed promises are removed (`src/features/shopping-list/client/api/get-recipe-by-ids.ts`).
 The hook makes no request for an empty selection. This is not a timed query cache.
 
@@ -135,19 +135,20 @@ fallback entry contain `quantity` and `unitSlug`
 
 ### 8.4 List interaction
 
-`pages/shopping-list/index.tsx` directly composes ScreenLayout, current-path TabBar,
+`pages/shopping-list/index.svelte` directly composes ScreenLayout, current-path TabBar,
 ShoppingList, and an inline reset button. It has no server companion: regular pages are not
 auto-prerendered, and device-local selected recipes cannot be loaded on the server.
 
-ShoppingList uses `useIsHydrated()`: SSR and hydration render neutral skeleton sections, then
-a Suspense boundary displays the same skeleton while selected recipe promises load. The hook reads
-hydration-safe persisted ID/quantity stores, calls React `use(loadRecipesByIds(ids))` for nonempty
-selection, and aggregates the projection. Empty groups render the French empty-list message;
-otherwise category headings and CartItems render (`src/features/shopping-list/client/component/shopping-list.tsx`).
+`useShoppingList()` uses `useIsHydrated()`: SSR, hydration, and recipe loading stay in an explicit `pending`
+state that ShoppingList renders as neutral skeleton sections. After mount the hook reads the persisted
+ID/quantity stores, calls `loadRecipesByIds(ids)` for a nonempty selection, and aggregates the projection
+on `success`; `error` shows a French retry alert whose button reruns the load. Empty groups render the
+French empty-list message; otherwise category headings and CartItems render
+(`src/features/shopping-list/client/component/shopping-list.svelte`).
 
 CartItem formats primary/fallback values, retains incompatible amounts visibly, and keeps checked
 state local to the mounted row. Reset clears only selected recipe IDs; serving overrides remain
-available later (`pages/shopping-list/index.tsx`).
+available later (`pages/shopping-list/index.svelte`).
 
 The list is derived from selection, quantity intent, and API records. No records or aggregates are
 persisted, but fulfilled request promises remain document-local snapshots until document reload.
@@ -158,8 +159,9 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                              | Sections affected | Reason                                |
-| ---------- | -------------------------------------------------------------------------------------- | ----------------- | ------------------------------------- |
-| 2026-09-13 | Update the projection citation to `src/server/routes/`.                                | 8.2               | Match the server route layout.        |
-| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
-| 2026-10-03 | Document regular page composition and inline reset without a server companion.         | 7, 8.4            | Match hydrated local-only browsing.   |
+| Date       | Amendment                                                                                                          | Sections affected | Reason                                      |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ | ----------------- | ------------------------------------------- |
+| 2026-09-13 | Update the projection citation to `src/server/routes/`.                                                            | 8.2               | Match the server route layout.              |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.                             | Updated contracts | Reflect the completed page migration.       |
+| 2026-10-03 | Document regular page composition and inline reset without a server companion.                                     | 7, 8.4            | Match hydrated local-only browsing.         |
+| 2026-10-04 | Replace React `use()`/Suspense loading with explicit pending/success/error state in the Svelte shopping-list hook. | 8.2, 8.4          | Match the shipped Svelte state conventions. |

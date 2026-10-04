@@ -23,7 +23,7 @@ application.
 
 - `[G-1]` Components expose semantic, accessible intent rather than caller-controlled CSS.
 - `[G-2]` Web, the design system, and Storybook compile owner-local Vanilla Extract styles against one shared token contract.
-- `[G-3]` Existing form, Lexical, and application dependency boundaries remain intact; shared navigation may depend on `@void/react` without depending on app or feature code.
+- `[G-3]` Existing form, Lexical, and application dependency boundaries remain intact; shared navigation may depend on `@void/svelte` without depending on app or feature code.
 
 ## 3. Key Design Decisions
 
@@ -32,7 +32,7 @@ application.
 | `[KD-1]` Shared styling infrastructure | `src/styles/theme/index.ts` exports the public `theme` API; internal `src/styles/theme/tokens.css.ts` owns the Vanilla Extract global token contract. | Consumers share typed theme references without generated infrastructure or a public token module.                              |
 | `[KD-2]` Component API                 | Each component uses a local minimal `Pick` of used native props plus its own semantic options.                                                        | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.                  |
 | `[KD-3]` Styling ownership             | Recipes are colocated with their visual owner and remain private.                                                                                     | Finite presentations are emitted independently of stories and cannot become caller override APIs.                              |
-| `[KD-4]` Integration seams             | Overlays pass typed trigger props to a `renderTrigger` callback; DS navigation uses `@void/react` `Link` with `href`.                                 | Typed links preserve router navigation while trigger props carry handlers, refs, and ARIA state without shared recipe exports. |
+| `[KD-4]` Integration seams             | Overlays pass typed trigger props to a `renderTrigger` snippet; DS navigation uses `@void/svelte` `Link` with `href`.                                 | Typed links preserve router navigation while trigger props carry handlers, refs, and ARIA state without shared recipe exports. |
 | `[KD-5]` Theme variable names          | `tokens.css.ts` uses Vanilla Extract's `createThemeContract` variable generation.                                                                     | Scoped generated names remain an internal implementation detail rather than a custom raw-CSS compatibility API.                |
 
 ## 4. Principles & Intents
@@ -45,9 +45,9 @@ application.
 
 ## 5. Non-Goals
 
-- `[NG-1]` A generic `Box`/`Flex`, JSX style-prop, or public recipe/styled-factory API.
+- `[NG-1]` A generic `Box`/`Flex`, inline style-prop, or public recipe/styled-factory API.
 - `[NG-2]` A consumer API for arbitrary CSS variables, class strings, runtime geometry, or direct DOM styling.
-- `[NG-3]` Adopting a headless primitive library, or replacing Void navigation or TanStack Form, Lexical, React Compiler, or app-owned feature dependencies.
+- `[NG-3]` Adopting a headless primitive library, or replacing Void navigation, Lexical, or app-owned feature dependencies.
 
 ## 6. Detailed Design
 
@@ -110,10 +110,10 @@ than preserving unused ones. Inline single-use components into their owners, exc
 route styling, hook lifecycle, provider, registry, or lazy-loading boundaries. Count actual call sites,
 including internal composition, rather than importing files.
 
-Component styling remains owner-local rather than a public `className`, `style`, or CSS-bag API.
+Component styling remains owner-local rather than a public `class`, `style`, or CSS-bag API.
 Where composition is needed, an overlay passes its `TriggerProps` (handlers, ARIA state, and ref)
-to a `renderTrigger` callback that spreads them onto an existing component such as Button or
-`SelectButton`. Button renders the actual `@void/react` Link through `asLink` + `href`.
+to a `renderTrigger` snippet that spreads them onto an existing component such as Button or
+`SelectButton`. Button renders the actual `@void/svelte` Link through `asLink` + `href`.
 
 A component may add a finite named `variant`, `size`, or narrowly proven local-layout control when it
 has actual callers and a story. It must not add a `custom`/`unstyled` variant or universal spacing,
@@ -140,7 +140,7 @@ scoped to editor-generated DOM and excludes interactive decorators.
 
 ### 6.4 Navigation and form integrations
 
-The design system may depend on `@void/react` for actual navigation Links, but never imports app
+The design system may depend on `@void/svelte` for actual navigation Links, but never imports app
 or feature policy. Button navigates with `asLink` + `href` and optional `viewTransition`, for example
 `<Button asLink href="/recipe/new" />`; it renders the actual Void `Link`, not a click-driven button.
 TabBar takes `currentPath` and items with `label`, `href`, and inactive/active icons.
@@ -153,7 +153,7 @@ Unhydrated static tabs retain native hash behavior.
 ScreenLayout accepts a `backButton` slot, usually DS `GoBackButton`, whose default handler calls
 `history.back()`. Scroll IDs remain
 `screen-inner`/`screen-outer`, but there is no managed scroll-container restoration.
-DS NotFound provides a Void home Link by default. The root layout owns pathname-keyed React render-error
+DS NotFound provides a Void home Link by default. The root layout owns pathname-keyed `<svelte:boundary>` render-error
 boundaries; unknown URLs use Void's default 404.
 
 The app's SearchBar owns the single-use command palette with shared Dialog/ScrollArea and native
@@ -165,7 +165,7 @@ Form dialogs keep a private form-aware composition so body and submit footer sha
 Public dialogs do not expose content-render or panel-style props, and forms have no styling escape
 hatch. This preserves Enter submission, async disable/cancellation, errors, focus return, and nested
 submit-propagation handling. DeleteDialog tracks loading through local state while awaiting
-`onDelete`; action callbacks must not be awaited inside a React transition.
+`onDelete`; callers own the awaited action.
 
 ### 6.5 Visual role map
 
@@ -199,7 +199,7 @@ role at the token owner and review its consumers rather than introducing local c
 ## 7. Compatibility and Review Criteria
 
 Existing dependency direction remains: the design system does not import web, app, feature, or
-router-policy code, while its reusable navigation may use `@void/react` Links. Feature schemas, queries,
+router-policy code, while its reusable navigation may use `@void/svelte` Links. Feature schemas, queries,
 mutations, domain presentation, menus/filtering, and recipe/auth policy stay app-owned. Use actual
 Links for navigation; do not substitute click-driven buttons.
 
@@ -210,27 +210,28 @@ uses feature-owned DOM rather than a shared-component override.
 
 ## Changelog
 
-| Date       | Amendment                                                                                            | Sections affected | Reason                                                                                   |
-| ---------- | ---------------------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------- |
-| 2026-09-17 | Add the semantic shape, surface, border, and contrast role map.                                      | §6.5              | Keep shared controls coherent while recording intentional navigation/media exceptions.   |
-| 2026-09-17 | Replace Panda generation with Vanilla Extract.                                                       | §2–§6.1           | Remove generated styling infrastructure.                                                 |
-| 2026-09-17 | Replace size/spacing scales with `theme.spacing`.                                                    | §6.1              | Support numeric CSS shorthand without enumerated tokens.                                 |
-| 2026-09-17 | Publish the combined `theme` API and remove public token subpaths.                                   | §3, §4, §6.1      | Give `.css.ts` consumers one typed import while keeping token internals private.         |
-| 2026-09-17 | Keep the palette private; expose semantic badge and contrast colors.                                 | §6.1              | Preserve appearance without exposing primitive color scales.                             |
-| 2026-09-17 | Generalize subtle color roles and source all dark overrides from primitives.                         | §6.1              | Remove badge-specific naming and reuse the private palette without visual changes.       |
-| 2026-09-17 | Move shared reset and base rules into global Vanilla Extract styles.                                 | §6.1              | Use typed theme references while preserving cascade and reduced-motion behavior.         |
-| 2026-09-17 | Consolidate reset/base rules in `src/design-system/global.css.ts`.                                   | §6.1              | Keep shared global styles in one module and public entrypoint.                           |
-| 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.                                    | §3, §4, §6.1      | Keep generated raw variable names internal to the typed theme contract.                  |
-| 2026-09-18 | Add safe-area/reset tokens, consolidate shadows, normalize unmatched sizes, and prune unused resets. | §6.1, §6.5        | Enforce a minimal token vocabulary while preserving native semantics and focus contrast. |
-| 2026-09-18 | Allow typed TanStack Router navigation in reusable DS components.                                    | §3, §6.4, §7      | Move router-only navigation/layout/error components into DS without moving app policy.   |
-| 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4              | Routes compose styled components rather than owning styles.                              |
-| 2026-09-18 | Consolidate focus shadows on `shadows.ring`.                                                         | §6.5              | Remove the redundant focus token and use the same ring across controls.                  |
-| 2026-09-19 | Add the warning-subtle color pair for spice badges.                                                  | §6.1              | Give spices a readable amber category treatment.                                         |
-| 2026-09-19 | Retain production-backed APIs and inline single-use navigation, errors, and command UI.              | §6.2, §6.4        | Reduce ownership without breaking framework or route-styling boundaries.                 |
-| 2026-09-19 | Share subtle badges and check-row toggles instead of feature-local controls.                         | §6.5              | Keep semantic styling and accessible control state in the design system.                 |
-| 2026-09-28 | Remove Base UI; compose overlays through `renderTrigger` and native elements.                        | §2–§6.4           | Own every primitive natively and drop the dependency.                                    |
-| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.               | Updated contracts | Reflect the completed page migration.                                                    |
-| 2026-10-03 | Document direct back-button composition and both layout error boundaries.                            | §6.4              | Match hydrated route composition.                                                        |
+| Date       | Amendment                                                                                            | Sections affected  | Reason                                                                                   |
+| ---------- | ---------------------------------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------- |
+| 2026-09-17 | Add the semantic shape, surface, border, and contrast role map.                                      | §6.5               | Keep shared controls coherent while recording intentional navigation/media exceptions.   |
+| 2026-09-17 | Replace Panda generation with Vanilla Extract.                                                       | §2–§6.1            | Remove generated styling infrastructure.                                                 |
+| 2026-09-17 | Replace size/spacing scales with `theme.spacing`.                                                    | §6.1               | Support numeric CSS shorthand without enumerated tokens.                                 |
+| 2026-09-17 | Publish the combined `theme` API and remove public token subpaths.                                   | §3, §4, §6.1       | Give `.css.ts` consumers one typed import while keeping token internals private.         |
+| 2026-09-17 | Keep the palette private; expose semantic badge and contrast colors.                                 | §6.1               | Preserve appearance without exposing primitive color scales.                             |
+| 2026-09-17 | Generalize subtle color roles and source all dark overrides from primitives.                         | §6.1               | Remove badge-specific naming and reuse the private palette without visual changes.       |
+| 2026-09-17 | Move shared reset and base rules into global Vanilla Extract styles.                                 | §6.1               | Use typed theme references while preserving cascade and reduced-motion behavior.         |
+| 2026-09-17 | Consolidate reset/base rules in `src/design-system/global.css.ts`.                                   | §6.1               | Keep shared global styles in one module and public entrypoint.                           |
+| 2026-09-17 | Use native Vanilla Extract generation for shared theme variables.                                    | §3, §4, §6.1       | Keep generated raw variable names internal to the typed theme contract.                  |
+| 2026-09-18 | Add safe-area/reset tokens, consolidate shadows, normalize unmatched sizes, and prune unused resets. | §6.1, §6.5         | Enforce a minimal token vocabulary while preserving native semantics and focus contrast. |
+| 2026-09-18 | Allow typed TanStack Router navigation in reusable DS components.                                    | §3, §6.4, §7       | Move router-only navigation/layout/error components into DS without moving app policy.   |
+| 2026-09-18 | Keep route presentation in feature sections and the app shell.                                       | §6.4               | Routes compose styled components rather than owning styles.                              |
+| 2026-09-18 | Consolidate focus shadows on `shadows.ring`.                                                         | §6.5               | Remove the redundant focus token and use the same ring across controls.                  |
+| 2026-09-19 | Add the warning-subtle color pair for spice badges.                                                  | §6.1               | Give spices a readable amber category treatment.                                         |
+| 2026-09-19 | Retain production-backed APIs and inline single-use navigation, errors, and command UI.              | §6.2, §6.4         | Reduce ownership without breaking framework or route-styling boundaries.                 |
+| 2026-09-19 | Share subtle badges and check-row toggles instead of feature-local controls.                         | §6.5               | Keep semantic styling and accessible control state in the design system.                 |
+| 2026-09-28 | Remove Base UI; compose overlays through `renderTrigger` and native elements.                        | §2–§6.4            | Own every primitive natively and drop the dependency.                                    |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.               | Updated contracts  | Reflect the completed page migration.                                                    |
+| 2026-10-03 | Document direct back-button composition and both layout error boundaries.                            | §6.4               | Match hydrated route composition.                                                        |
+| 2026-10-04 | Move DS composition to Svelte: `renderTrigger` snippets, `@void/svelte` Link, `<svelte:boundary>`.   | §3, §6.2, §6.4, §7 | Match the shipped Svelte conventions.                                                    |
 
 ## 8. Open Questions
 

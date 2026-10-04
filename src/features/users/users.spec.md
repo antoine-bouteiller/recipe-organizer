@@ -119,7 +119,7 @@ invalidation. `runPageAction` displays French expected-error feedback at the fea
 
 The page passes loader-owned lists into `UsersManagement`, which renders panels in `active`,
 `pending`, `blocked` order with hash anchors. A shared case-insensitive search matches email or role
-(`src/features/users/client/components/users-management.tsx`). The tab labels remain `Actifs`, `En attente`,
+(`src/features/users/client/components/users-management.svelte`). The tab labels remain `Actifs`, `En attente`,
 and `Bloqués`.
 
 `Tabs` makes the panels available in one screen. Active rows expose blocking; pending rows
@@ -133,8 +133,7 @@ creation explicitly clears email/restores the default role and closes its dialog
 to submitted data, so `reset()` alone would retain the created user);
 expected failure leaves values editable. The form retains its French user and administrator role labels.
 `ApproveUser` tracks pending explicitly while awaiting its page action; confirmation dialogs use the
-same explicit pending lifecycle. Actions are not awaited inside React transitions because Void resolves
-navigation after the updated page commits. `BlockUser` uses a confirmation dialog whose
+same explicit pending lifecycle. `BlockUser` uses a confirmation dialog whose
 action is labelled `Bloquer` and identifies the target email (`src/features/users/client/components/`).
 
 The loader redirect is a navigation affordance, not a substitute for the authoritative action guard.
