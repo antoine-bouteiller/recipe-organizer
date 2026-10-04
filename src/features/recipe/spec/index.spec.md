@@ -125,6 +125,7 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                      | Sections affected | Reason                             |
-| ---------- | -------------------------------------------------------------- | ----------------- | ---------------------------------- |
-| 2026-10-03 | Document regular hydrated recipe pages with client navigation. | CT-2              | Match the shared page render mode. |
+| Date       | Amendment                                                      | Sections affected | Reason                                     |
+| ---------- | -------------------------------------------------------------- | ----------------- | ------------------------------------------ |
+| 2026-10-03 | Document regular hydrated recipe pages with client navigation. | CT-2              | Match the shared page render mode.         |
+| 2026-10-04 | Document Svelte pages (`index.svelte`) for recipe routes.      | CT-2              | Match the shipped Svelte file conventions. |

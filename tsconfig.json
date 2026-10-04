@@ -4,10 +4,9 @@
   "compilerOptions": {
     "target": "es2023",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["node", "vite-plus/client", "void/env"],
+    "types": ["node", "svelte", "vite-plus/client", "void/env"],
     "module": "esnext",
     "skipLibCheck": true,
-    "jsx": "react-jsx",
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -28,17 +27,21 @@
       "void/routes": ["./.void/routes.d.ts"]
     }
   },
+  "files": [],
   "include": [
     "src",
     "pages",
     "routes",
     "middleware",
     "tools",
+    ".storybook",
     "auth.ts",
     "env.ts",
     "void.config.ts",
     "vite.config.ts",
     "drizzle.config.ts",
-    ".void/routes.d.ts"
+    ".void/routes.d.ts",
+    ".void/db.d.ts",
+    ".void/env.d.ts"
   ]
 }

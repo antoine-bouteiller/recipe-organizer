@@ -117,7 +117,7 @@ session cookies directly.
 
 ### 8.5 Login and sign-out contract
 
-The regular login page in `pages/auth/login/index.tsx` starts
+The regular login page in `pages/auth/login/index.svelte` starts
 `auth.signIn.social` (`void/client`) with provider `google`, callback `/`, and error callback `/auth/login`.
 It displays French messages for pending, blocked, or unverified-email codes and a generic fallback.
 Its server loader redirects any resolved identity to `/`; otherwise it passes the error query prop.

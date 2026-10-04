@@ -49,9 +49,9 @@ history of opened results, making repeat visits quick without duplicating recipe
 - `[C-1]` Results are limited to `listRecipes`' card projection; ingredient names are not present
   (`src/features/recipe/server/queries.ts`).
 - `[C-2]` Deleted recent IDs are skipped; if none resolve, rendering falls back to the supplied
-  non-spice catalogue (`src/features/search/client/components/recent-recipes.tsx`).
+  non-spice catalogue (`src/features/search/client/components/recent-recipes.svelte`).
 - `[C-3]` Search is a regular hydrated page; the loader supplies recipes and RecipeSearch
-  owns local filtering/recents (`pages/search/index.server.ts`, `search/index.tsx`).
+  owns local filtering/recents (`pages/search/index.server.ts`, `search/index.svelte`).
 
 ## 7. High-Level Components
 
@@ -64,20 +64,20 @@ local filter state ──▶ filterRecipes() ──▶ results / empty state
        └── no active filters ──▶ recent ID store ──▶ resolved cards
 ```
 
-| Component        | Module type                            | Responsibility                                                     | Public API surface                  |
-| ---------------- | -------------------------------------- | ------------------------------------------------------------------ | ----------------------------------- |
-| Search route     | Void hydrated page                     | Read recipe props and compose RecipeSearch                         | `/search`                           |
-| Filter utilities | Pure feature utility                   | Normalise names and apply text/attribute predicates                | `filterRecipes`, `hasActiveFilters` |
-| Search results   | React component                        | Render matched rows, count, clear action, and shopping-list action | `SearchResults`                     |
-| Recent recipes   | Persisted TanStack Store and component | Retain IDs and resolve them to live recipe rows                    | `addRecentRecipe`, `RecentRecipes`  |
-| Search card      | React component                        | Link a row to a recipe and record its opening                      | `RecipeSearchCard`                  |
+| Component        | Module type                        | Responsibility                                                     | Public API surface                  |
+| ---------------- | ---------------------------------- | ------------------------------------------------------------------ | ----------------------------------- |
+| Search route     | Void hydrated page                 | Read recipe props and compose RecipeSearch                         | `/search`                           |
+| Filter utilities | Pure feature utility               | Normalise names and apply text/attribute predicates                | `filterRecipes`, `hasActiveFilters` |
+| Search results   | Svelte component                   | Render matched rows, count, clear action, and shopping-list action | `SearchResults`                     |
+| Recent recipes   | Persisted rune store and component | Retain IDs and resolve them to live recipe rows                    | `addRecentRecipe`, `RecentRecipes`  |
+| Search card      | Svelte component                   | Link a row to a recipe and record its opening                      | `RecipeSearchCard`                  |
 
 ## 8. Detailed Design
 
 ### 8.1 Search route
 
 The `pages/search/index.server.ts` loader directly calls `listRecipes(getDb())`.
-`pages/search/index.tsx` imports RecipeSearch directly and passes `recipes`.
+`pages/search/index.svelte` imports RecipeSearch directly and passes `recipes`.
 The root layout supplies the search palette and theme controls.
 
 `RecipeSearch` maintains one local `SearchFilters` value: query text, cuisine and meal arrays,
@@ -111,24 +111,24 @@ predicates; `hasActiveFilters()` treats every non-empty or enabled filter as act
 
 `SearchResults` renders a French no-match state with an action that resets all filters. Matched rows
 retain list order, show a count, and offer a shopping-list action when appropriate
-(`src/features/search/client/components/search-results.tsx`). The server list projection orders rows by
+(`src/features/search/client/components/search-results.svelte`). The server list projection orders rows by
 name, so the feature does not impose a competing sort (`src/features/recipe/server/queries.ts`).
 
 The result action consults shopping-list membership: an included recipe shows a confirmation marker;
 an absent recipe exposes an add control. That control is independent of card navigation, which
-continues to capture the recent-recipe visit (`src/features/search/client/components/search-results.tsx`; `src/features/search/client/components/recipe-search-card.tsx`).
+continues to capture the recent-recipe visit (`src/features/search/client/components/search-results.svelte`; `src/features/search/client/components/recipe-search-card.svelte`).
 
 ### 8.4 Recent recipes
 
 The store persists `number[]` under `recent-recipes`. `addRecentRecipe(id)` prepends an ID, removes
 its prior occurrence, and retains ten entries; a separate action clears the history
-(`src/stores/recent-recipes.store.ts`). `RecentRecipes` resolves IDs in stored order against the
+(`src/stores/recent-recipes.store.svelte.ts`). `RecentRecipes` resolves IDs in stored order against the
 loader-provided catalogue, omits stale IDs, and displays the supplied catalogue when resolution yields no rows
-(`src/features/search/client/components/recent-recipes.tsx`).
+(`src/features/search/client/components/recent-recipes.svelte`).
 
 The store exposes its array through a hydration-safe store read hook, keeping persistence mechanics outside the page
-component (`src/stores/recent-recipes.store.ts`). The visible history header includes the French
-clear control only when at least one recent row resolves (`src/features/search/client/components/recent-recipes.tsx`).
+component (`src/stores/recent-recipes.store.svelte.ts`). The visible history header includes the French
+clear control only when at least one recent row resolves (`src/features/search/client/components/recent-recipes.svelte`).
 
 No active filter selects the recent-recipes branch. A resolved history retains its stored recency
 order; an empty or entirely stale history renders the non-spice catalogue supplied by the route.
@@ -138,11 +138,11 @@ This keeps the default screen populated without promoting stale browser state in
 
 Every search card uses a Void Link to `/recipe/<id>` and records the ID on activation.
 Links use client navigation with `prefetch` on hover, touchstart, and focus
-(`src/features/search/client/components/recipe-search-card.tsx`). The card renders the recipe image,
-name, and attribute badges from the recipe projection (`src/features/search/client/components/recipe-search-card.tsx`).
+(`src/features/search/client/components/recipe-search-card.svelte`). The card renders the recipe image,
+name, and attribute badges from the recipe projection (`src/features/search/client/components/recipe-search-card.svelte`).
 
 The optional action slot lets filtered results add a recipe to the shopping list without changing the
-navigation contract (`src/features/search/client/components/search-results.tsx`; `src/features/search/client/components/recipe-search-card.tsx`).
+navigation contract (`src/features/search/client/components/search-results.svelte`; `src/features/search/client/components/recipe-search-card.svelte`).
 
 ## 9. Open Questions
 
@@ -150,6 +150,7 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                               | Sections affected | Reason                        |
-| ---------- | ------------------------------------------------------- | ----------------- | ----------------------------- |
-| 2026-10-03 | Document hydrated search composition and card prefetch. | 3, 6–8            | Match Void client navigation. |
+| Date       | Amendment                                                                              | Sections affected | Reason                                     |
+| ---------- | -------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------ |
+| 2026-10-03 | Document hydrated search composition and card prefetch.                                | 3, 6–8            | Match Void client navigation.              |
+| 2026-10-04 | Update search components and the recent-recipes store to Svelte files and rune stores. | 7–8               | Match the shipped Svelte file conventions. |

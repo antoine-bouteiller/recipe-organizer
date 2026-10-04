@@ -53,7 +53,7 @@ consistent ingredient vocabulary across the product.
 - `[C-2]` A conversion returns no value when a unit chain is malformed, input is non-finite, or density/count
   weight needed to bridge dimensions is absent or non-positive (`src/utils/unit-converter.ts`).
 - `[C-3]` The category index supports category-oriented access but the settings search filters the fetched
-  list in the browser (`src/db/schema/ingredient.ts`; `src/features/ingredients/client/components/ingredients-management.tsx`).
+  list in the browser (`src/db/schema/ingredient.ts`; `src/features/ingredients/client/components/ingredients-management.svelte`).
 
 ## 7. High-Level Components
 
@@ -70,7 +70,7 @@ Shopping list ──▶ unit converter
 | Component               | Module type                        | Responsibility                                          | Public API surface                                                |
 | ----------------------- | ---------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------- |
 | Catalogue boundary      | Server query, page actions and API | List and mutate ingredient rows                         | `listIngredients`, update/delete actions, `POST /api/ingredients` |
-| Settings management     | Route and React components         | Search, display, and authority-gated management UI      | `/settings/ingredients`, `AddIngredient`                          |
+| Settings management     | Route and Svelte components        | Search, display, and authority-gated management UI      | `/settings/ingredients`, `AddIngredient`                          |
 | Form and option adapter | Shared feature components and hook | Collect metadata and expose `{ label, value }` choices  | `IngredientForm`, `useIngredientOptions`                          |
 | Measurement contract    | Schema and utility                 | Define usable units and transform compatible quantities | `unitSlugSchema`, `convert()`                                     |
 
@@ -101,7 +101,7 @@ update require `withAuthGuard`; delete requires `withAuthGuard(handler, 'admin')
 validate name, category, optional parent, non-negative conversion metadata, unit slug, and mutation ID
 (`src/features/ingredients/schemas.ts`). Successful actions rerun the settings loader. API creation
 calls `router.refresh()` to reload whichever page owns the catalogue; it does not depend on a browser
-query cache (`src/features/ingredients/client/components/add-ingredient.tsx`). Expected failures retain form
+query cache (`src/features/ingredients/client/components/add-ingredient.svelte`). Expected failures retain form
 values and display French error feedback.
 
 ### 8.2 Settings management
@@ -109,9 +109,9 @@ values and display French error feedback.
 The regular Void page wraps its content in `IngredientCatalogProvider ingredients={ingredients}`.
 The management view filters name and stored category case-insensitively and shows distinct French empty
 messages for an empty query and an unmatched query. It always shows addition; edit and deletion controls
-appear only for loader-resolved administrators (`src/features/ingredients/client/components/ingredients-management.tsx`).
+appear only for loader-resolved administrators (`src/features/ingredients/client/components/ingredients-management.svelte`).
 Category badges pair the central icon with the French label on medium and wider viewports
-(`src/components/ingredient-category.tsx`).
+(`src/components/ingredient-categories.ts`).
 
 The management list remains a catalogue view: each row carries the ingredient name and category
 badge, while editing metadata lives in the dialog flow. The empty state distinguishes a catalogue
@@ -121,16 +121,16 @@ in either case.
 ### 8.3 Form and option adapter
 
 One form renders name, category, parent, density, item weight, and preferred unit. Its empty unit
-choice represents no preference, and parent choices permit no parent (`src/features/ingredients/client/components/ingredient-form.tsx`).
+choice represents no preference, and parent choices permit no parent (`src/features/ingredients/client/components/ingredient-form.svelte`).
 Add accepts a name for prefill; add and edit dynamically validate and close on successful mutation
-(`src/features/ingredients/client/components/add-ingredient.tsx`; `src/features/ingredients/client/components/edit-ingredient.tsx`).
+(`src/features/ingredients/client/components/add-ingredient.svelte`; `src/features/ingredients/client/components/edit-ingredient.svelte`).
 `useIngredientOptions` maps provider-supplied loader rows to the unchanged combobox contract
-`{ label: name, value: id }` (`src/features/ingredients/client/hooks/use-ingredient-options.ts`).
+`{ label: name, value: id }` (`src/features/ingredients/client/hooks/use-ingredient-options.svelte.ts`).
 `AddIngredient` and `renderAddIngredientOption` retain their export names and prefill/trigger props;
 TanStack Form still owns field state and validation.
 
 The editing form maps a stored null parent to an absent form selection, allowing the combobox to
-represent no parent without submitting a synthetic ID (`src/features/ingredients/client/components/edit-ingredient.tsx`).
+represent no parent without submitting a synthetic ID (`src/features/ingredients/client/components/edit-ingredient.svelte`).
 
 ### 8.4 Measurement contract
 

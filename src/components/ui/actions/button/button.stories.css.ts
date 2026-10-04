@@ -16,20 +16,6 @@ export const buttonGroup = style({
   gap: theme.spacing(3),
 })
 
-export const comparisonRow = style({
-  alignItems: 'center',
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: theme.spacing(4),
-})
-
-export const searchRow = style({
-  alignItems: 'center',
-  display: 'flex',
-  gap: theme.spacing(4),
-  width: theme.spacing(60),
-})
-
 export const sizeOptions = style({
   alignItems: 'center',
   display: 'flex',
