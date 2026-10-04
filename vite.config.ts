@@ -48,7 +48,7 @@ const clientOnlyEntries: Plugin = {
   name: 'client-only-entries',
 }
 
-const viteConfig = defineConfig(({ isPreview }) => ({
+const viteConfig = defineConfig({
   build: { minify: true },
   environments: {
     client: {
@@ -160,21 +160,22 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     },
   },
   // Vitest cannot run the Worker environment.
-  plugins:
-    !process.env.VITEST && isPreview !== undefined
-      ? [
-          voidPlugin({ persistTo: '.wrangler/state' }),
-          voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true }),
-          betterAuthMinimal,
-          clientOnlyEntries,
-        ]
-      : // The app adapter bundles its own Svelte plugin; tests and Storybook need a standalone one.
-        [svelte()],
+  plugins: process.env.VITEST
+    ? [svelte()]
+    : [
+        voidPlugin({ persistTo: '.wrangler/state' }),
+        voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true }),
+        betterAuthMinimal,
+        clientOnlyEntries,
+      ],
   resolve: {
     // Virtual island entries and Svelte files are outside tsconfig path resolution.
     alias: [
       { find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
-      { find: /^@storybook-helpers\//, replacement: fileURLToPath(new URL('.storybook/', import.meta.url)) },
+      {
+        find: /^@storybook-helpers\//,
+        replacement: fileURLToPath(new URL('.storybook/', import.meta.url)),
+      },
     ],
     tsconfigPaths: true,
   },
@@ -206,6 +207,6 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       },
     ],
   },
-}))
+})
 
 export default viteConfig
