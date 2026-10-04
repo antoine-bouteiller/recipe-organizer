@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url'
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { voidReact } from '@void/react/plugin'
 import type { Plugin, UserConfig } from 'vite-plus'
@@ -62,6 +63,7 @@ const viteConfig = defineConfig(({ isPreview }) => ({
     printWidth: 150,
     semi: false,
     singleQuote: true,
+    svelte: true,
     trailingComma: 'es5',
   },
   lint: {
@@ -227,11 +229,15 @@ const viteConfig = defineConfig(({ isPreview }) => ({
           betterAuthMinimal,
           clientOnlyEntries,
         ]
-      : []),
+      : // The app adapter bundles its own Svelte plugin; tests and Storybook need a standalone one.
+        [svelte()]),
   ],
   resolve: {
-    // Virtual island entries sit outside the tsconfig project, so tsconfig paths don't resolve their imports.
-    alias: [{ find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) }],
+    // Virtual island entries and Svelte files are outside tsconfig path resolution.
+    alias: [
+      { find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
+      { find: /^@storybook-helpers\//, replacement: fileURLToPath(new URL('.storybook/', import.meta.url)) },
+    ],
     tsconfigPaths: true,
   },
   server: { port: 3000 },
@@ -240,8 +246,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
   },
   test: {
     coverage: {
-      exclude: ['**/*.stories.tsx', '**/*.css.ts'],
-      include: ['src/**/*.{ts,tsx}', 'pages/**/*.{ts,tsx}', 'tools/oxlint/rules/**/*.ts'],
+      exclude: ['**/*.stories.{tsx,svelte}', '**/*.css.ts'],
+      include: ['src/**/*.{ts,tsx,svelte}', 'pages/**/*.{ts,tsx,svelte}', 'tools/oxlint/rules/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
     },

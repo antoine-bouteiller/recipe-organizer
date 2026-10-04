@@ -4,7 +4,7 @@
   "compilerOptions": {
     "target": "es2023",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["node", "vite-plus/client", "void/env"],
+    "types": ["node", "svelte", "vite-plus/client", "void/env"],
     "module": "esnext",
     "skipLibCheck": true,
     "jsx": "react-jsx",
