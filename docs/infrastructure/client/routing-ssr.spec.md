@@ -34,7 +34,7 @@ All pages hydrate after SSR on first load and use Void client navigation, avoidi
 - `[PI-1]` **Compose, do not own domain logic** — loaders and actions call server helpers; pages wire feature components.
 - `[PI-2]` **Gates precede screens** — protected loaders return `guardPage` redirects before reading protected data; writes enforce their own authorization.
 - `[PI-3]` **URLs are input** — server loaders/actions parse dynamic IDs and read search values before use.
-- `[PI-4]` **Use actual navigation links** — Button `asLink` with `href` renders `@void/react` `Link`; navigation policy stays app-owned.
+- `[PI-4]` **Use actual navigation links** — Button `asLink` with `href` renders `@void/svelte` `Link`; navigation policy stays app-owned.
 
 ## 5. Non-Goals
 
@@ -53,8 +53,8 @@ All pages hydrate after SSR on first load and use Void client navigation, avoidi
 
 | Component         | Module type                     | Responsibility                                               | Public API surface                          |
 | ----------------- | ------------------------------- | ------------------------------------------------------------ | ------------------------------------------- |
-| Root layout       | `pages/layout.tsx`              | Hydrated shell, search/theme controls, render-error boundary | `useShared()`, children                     |
-| Page components   | `pages/**/*.tsx`                | Compose loader props and feature slots                       | Default page export                         |
+| Root layout       | `pages/layout.svelte`           | Hydrated shell, search/theme controls, render-error boundary | `useShared()`, children                     |
+| Page components   | `pages/**/index.svelte`         | Compose loader props and feature slots                       | Svelte page component, `$props()`           |
 | Server companions | `pages/**/*.server.ts`          | Reads, gates, mutations                                      | `loader`, `action`, `actions`, `InferProps` |
 | Page context      | `middleware/03.page-context.ts` | Request identity and navigation path                         | `{ authUser, pathname }`                    |
 | API handlers      | `routes/api/**`                 | Remaining HTTP, auth, health, media                          | Named HTTP methods                          |
@@ -64,18 +64,18 @@ All pages hydrate after SSR on first load and use Void client navigation, avoidi
 ### 8.1 Pages and shared context
 
 Void generates the Worker entry from `pages/**`, `routes/api/**`, and global `middleware/**`.
-`vite.config.ts` uses `voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true })` alongside
+`vite.config.ts` uses `voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true })` alongside
 `voidPlugin` and `appType: 'mpa'`. One dev server on port 3000 serves rendered pages and the API.
 
 `03.page-context.ts` excludes API and file-extension paths, resolves `getApiUser()`, and sets
 `shared = { authUser: user ? { email, role } : null, pathname }`. Layouts use `useShared()` to
-mark navigation; pages use identity only for affordances, not write authorization.
+mark navigation (the adapter mutates the returned object in place, so it is never destructured; lint rule `recipe-oranizer/no-use-shared-destructuring`); pages use identity only for affordances, not write authorization.
 The resolver reads the session that Void's auth middleware already resolved for the request.
 
 ### 8.2 Page contract
 
-The root `pages/layout.tsx` wraps `/`, `/search`, `/shopping-list`, `/recipe/[id]`, `/auth/login`, `/settings`,
-`/settings/account`, `/settings/ingredients`, `/settings/users`, `/recipe/new`, and `/recipe/edit/[id]`. Pages export default components from `index.tsx`.
+The root `pages/layout.svelte` wraps `/`, `/search`, `/shopping-list`, `/recipe/[id]`, `/auth/login`, `/settings`,
+`/settings/account`, `/settings/ingredients`, `/settings/users`, `/recipe/new`, and `/recipe/edit/[id]`. Each page is an `index.svelte` component.
 Optional server companions export `defineHandler` loaders/actions and `InferProps<typeof loader>`
 types. Home and search read `listRecipes(getDb())`; recipe details read the recipe and embedded
 sub-recipe instructions in the loader. Shopping-list data depends on localStorage; its page needs
@@ -93,7 +93,7 @@ enforce owner-or-admin checks. A missing or invalid recipe ID returns `recipe: n
 
 ### 8.4 Screen and layout boundary
 
-The root layout composes `AppHeader` and `AppMain`, imports search/theme controls directly and wraps children in `AppErrorBoundary` keyed by pathname.
+The root layout composes `AppHeader` and `AppMain`, imports search/theme controls directly and wraps children in `AppError` keyed by pathname.
 
 Pages import feature components directly via `@/...`. Features expose slots/render props, such as
 `renderCardAction`, `quantityControls`, `renderIngredientGroups`, and `backButton`, for plain
@@ -105,7 +105,7 @@ feature and app-shell owners retain CSS.
 Unknown URLs use Void's default 404. An in-app catch-all page is deliberately absent: it shadowed
 static assets such as `/manifest.json`. Missing recipes instead render DS `NotFound` within the page.
 The root layout handles client render errors with French recovery text, a home link, and
-development-only Error details; server loader failures are not handled by that React boundary.
+development-only Error details; server loader failures are not handled by that `<svelte:boundary>`; the layout keys it by `shared.pathname` so navigation resets it.
 `01.api-errors.ts` maps thrown page-action errors as well as API errors to JSON `{ error }`, and loads
 the French Zod locale for server validation messages. Browser code imports only `zod/mini`.
 
@@ -136,7 +136,7 @@ passed directly on recipe details. Storybook needs no router decorator.
 | Shared context     | `{ authUser, pathname }`              | `useShared()`                       |
 | URL input          | Parsed params and request query       | Loader/action                       |
 | Data readiness     | Direct server read → loader props     | Default page component              |
-| Local-only loading | Hydration gate + Suspense             | Shopping-list skeleton              |
+| Local-only loading | Hydration gate + pending state        | Shopping-list skeleton              |
 | Access             | `guardPage` redirect Response         | Protected loader/action             |
 | Mutation           | `action` or named `actions`           | `usePageAction()` or `submitAction` |
 | HTTP endpoint      | Typed same-origin `void/client` fetch | Remaining API consumers             |
@@ -146,8 +146,8 @@ passed directly on recipe details. Storybook needs no router decorator.
 Loaders read server data, not browser storage, and do not perform mutations. Actions validate and
 authorize writes. Regular-page clients call `usePageAction()`, which submits POST through
 `submitAction` with `preserveState: true`, keeps the URL/history entry, refreshes page props in place,
-alerts expected failure, and resolves a success boolean. Never await an action inside a React transition:
-submission owns the asynchronous refresh lifecycle. Callers choose subsequent navigation or dialog closing.
+alerts expected failure, and resolves a success boolean. Callers await the action; submission owns the
+asynchronous refresh lifecycle, and callers choose subsequent navigation or dialog closing.
 
 Recipe deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
 from `void/pages-client`. The guarded action deletes the recipe and redirects home; replacement
@@ -175,16 +175,17 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                              | Sections affected | Reason                                                                     |
-| ---------- | -------------------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------------------- |
-| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers.         | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                                 |
-| 2026-09-13 | Dispatch media through the API catch-all.                                              | 7, 8.5            | Give all API endpoints the same Hono boundary.                             |
-| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry.         | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                    |
-| 2026-09-16 | Document Base UI render composition with the actual router Link.                       | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
-| 2026-09-18 | Move reusable router-only presentation into the design system.                         | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
-| 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.             | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
-| 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.                       | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |
-| 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.          | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |
-| 2026-09-28 | Replace Base UI render composition with Button `asLink`.                               | 4, 8.5            | Base UI is no longer a dependency.                                         |
-| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                                      |
-| 2026-10-03 | Document hydrated layouts, client navigation, prefetch, and delete redirects.          | 2–3, 6–8          | Keep recipe visits responsive and deletion history safe.                   |
+| Date       | Amendment                                                                                                      | Sections affected | Reason                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------------------- |
+| 2026-09-13 | Route the API catch-all through Hono RPC while retaining media route handlers.                                 | 7, 8.5, 8.7       | Reflect the migrated API adapter boundary.                                 |
+| 2026-09-13 | Dispatch media through the API catch-all.                                                                      | 7, 8.5            | Give all API endpoints the same Hono boundary.                             |
+| 2026-09-13 | Replace SSR and file-route API adapters with the browser SPA and Worker entry.                                 | 2–3, 7–8          | Make browser routing and direct Hono dispatch explicit.                    |
+| 2026-09-16 | Document Base UI render composition with the actual router Link.                                               | 4, 8.5            | Preserve routing behavior without bespoke native-anchor adapters.          |
+| 2026-09-18 | Move reusable router-only presentation into the design system.                                                 | 4, 8.4–8.5        | Keep typed links and router behavior in DS while app routes retain policy. |
+| 2026-09-18 | Keep routes as unstyled composition of feature sections and the app shell.                                     | 8.4–8.5           | Colocate presentation and styles without moving routing contracts.         |
+| 2026-09-18 | Document optional query prefetch and inline isLoading skeletons.                                               | 8.2–8.4, 8.6–8.7  | Match current query APIs and page-owned loading feedback.                  |
+| 2026-09-19 | Inline single-use desktop navigation and error rendering in their app owners.                                  | 8.4–8.5           | Remove unused DS abstractions while retaining typed links and safe errors. |
+| 2026-09-28 | Replace Base UI render composition with Button `asLink`.                                                       | 4, 8.5            | Base UI is no longer a dependency.                                         |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.                         | Updated contracts | Reflect the completed page migration.                                      |
+| 2026-10-03 | Document hydrated layouts, client navigation, prefetch, and delete redirects.                                  | 2–3, 6–8          | Keep recipe visits responsive and deletion history safe.                   |
+| 2026-10-04 | Migrate pages, layout, and boundary conventions to Svelte (`voidSvelte`, `index.svelte`, `<svelte:boundary>`). | 3, 7–8            | Match the shipped Svelte file/API conventions.                             |

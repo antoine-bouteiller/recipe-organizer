@@ -2,7 +2,7 @@
 
 Create and organize recipes, manage ingredients, and generate shopping lists. Supports Google sign-in, desktop and mobile layouts, and PWA installation (requires connectivity).
 
-Built with React, Void Pages with islands, and Drizzle on Cloudflare Workers, with D1 for data and R2 for images.
+Built with Svelte 5, Void Pages, and Drizzle on Cloudflare Workers, with D1 for data and R2 for images.
 
 ## Get started
 
@@ -31,6 +31,7 @@ Open http://localhost:3000. One Vite server serves server-rendered pages and `/a
 
 ```bash
 vp check               # Formatting, linting, and type checks
+vp run check:svelte    # Svelte type checks (svelte-check)
 vp test                # Tests
 vp run storybook       # Component explorer on port 6006
 pnpm build             # Build the web app and Worker

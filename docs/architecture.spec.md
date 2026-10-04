@@ -43,7 +43,7 @@ so there is no second service to operate.
 | `[KD-4]` ORM                      | Drizzle with `defineRelations`                                                                                                                                            | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                           |
 | `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                                                                                                                          | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                 |
 | `[KD-6]` Membership               | New accounts land `pending` until an admin approves                                                                                                                       | The product is private by intent, and OAuth alone would let any Google account in.                                                                                |
-| `[KD-7]` Server-state vs UI-state | Loader props own page data; persisted `useSyncExternalStore` stores own durable browser intent                                                                            | Page actions refresh server snapshots; persisted IDs/quantities remain device-local rather than stale copies of rows.                                             |
+| `[KD-7]` Server-state vs UI-state | Loader props own page data; persisted rune stores own durable browser intent                                                                                              | Page actions refresh server snapshots; persisted IDs/quantities remain device-local rather than stale copies of rows.                                             |
 | `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write                                                                                                           | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                             |
 | `[KD-9]` Rich instructions        | Lexical with custom nodes                                                                                                                                                 | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.             |
 | `[KD-10]` Module boundary         | Features split by runtime: `src/features/<feature>/client/`, `src/features/<feature>/server/`, narrowly shared contracts at the feature root, `pages/`, and `routes/api/` | Runtime-specific imports stay isolated while each domain retains clear ownership; feature specs sit at the feature root because they describe both runtime sides. |
@@ -161,7 +161,7 @@ missing recipe pages show in-page `NotFound`. No application catch-all shadows a
 A regular-page form calls `usePageAction()` with typed data (recipe file entries pass through
 `readRecipeFormData`). The action authorizes and validates before domain writes; recipe helpers
 check owner-or-admin. Success refreshes loader props in place without changing URL/history;
-callers choose navigation or dialog effects. Never await a page action inside a React transition.
+callers choose navigation or dialog effects. Callers await the page action.
 Thrown action/API failures share safe JSON errors and client alerts.
 
 Recipe-details deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`;
@@ -195,3 +195,4 @@ possession of a URL is never a capability derived from guessing.
 | 2026-10-02 | Root the Void app and package Worker implementation as `server`. | 3, 7–8 | Keep one deployment with explicit source-package boundaries. |
 | 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration. |
 | 2026-10-03 | Document hydrated browsing, client navigation, prefetch, and redirecting deletion. | 2–3, 6–8 | Reflect the completed navigation migration. |
+| 2026-10-04 | Migrate the UI runtime from React to Svelte 5 (`@void/svelte`); persisted stores become rune stores. | 2, 8 | Match the shipped Svelte file/API conventions. |

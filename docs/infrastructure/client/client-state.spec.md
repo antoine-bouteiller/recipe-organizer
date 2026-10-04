@@ -26,7 +26,7 @@ of Worker-owned data while preserving responsive, device-local interactions.
 | --------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `[KD-1]` Server records     | Void loader props own page data; small remaining APIs serve browser-only reads.                | Server data comes from authoritative reads without a browser query cache.        |
 | `[KD-2]` Refresh identity   | Page actions refresh the current loader props in place.                                        | URL/history and local UI state survive refresh; there are no central query keys. |
-| `[KD-3]` Durable UI state   | A custom `useSyncExternalStore` store persists data-only selections through `persistedStore`.  | IDs and quantities survive reload without copying server entities.               |
+| `[KD-3]` Durable UI state   | A custom rune store persists data-only selections through `persistedStore`.                    | IDs and quantities survive reload without copying server entities.               |
 | `[KD-4]` Shareable state    | URL params/query/hash remain navigation input; search filters stay component-local.            | Only intentionally navigable values affect history.                              |
 | `[KD-5]` Browser preference | Head script resolves the theme cookie, else system preference; toggle writes cookie and class. | SSR documents receive the theme before first paint without loader theme props.   |
 
@@ -56,15 +56,15 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 ## 7. High-Level Components
 
-| Component           | Module type                                 | Responsibility                                    | Public API surface              |
-| ------------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------- |
-| Page data           | `pages/**/*.server.ts`                      | Read records and return typed props               | `loader`, `InferProps`          |
-| Page actions        | Pages + `src/lib/client/page-action.ts`     | Mutate and refresh regular-page props             | `usePageAction()`               |
-| Persisted stores    | `src/stores/*.store.ts`                     | Durable IDs and quantities                        | Read hooks and exported actions |
-| Persistence adapter | `src/lib/client/persisted-store.ts`         | Initial SSR snapshot and localStorage persistence | `persistedStore<T>()`           |
-| Theme               | `void.config.ts`, `src/lib/client/theme.ts` | Resolve before paint and toggle                   | `ui-theme`, `toggleTheme`       |
-| Hydration gate      | `src/hooks/use-is-hydrated.ts`              | Distinguish SSR/hydration from client-only intent | `useIsHydrated()`               |
-| Feature context     | `src/features/*/contexts/*`                 | Thread loader catalogues                          | Feature provider and hook       |
+| Component           | Module type                                    | Responsibility                                    | Public API surface              |
+| ------------------- | ---------------------------------------------- | ------------------------------------------------- | ------------------------------- |
+| Page data           | `pages/**/*.server.ts`                         | Read records and return typed props               | `loader`, `InferProps`          |
+| Page actions        | Pages + `src/lib/client/page-action.svelte.ts` | Mutate and refresh regular-page props             | `usePageAction()`               |
+| Persisted stores    | `src/stores/*.store.svelte.ts`                 | Durable IDs and quantities                        | Read hooks and exported actions |
+| Persistence adapter | `src/lib/client/persisted-store.svelte.ts`     | Initial SSR snapshot and localStorage persistence | `persistedStore<T>()`           |
+| Theme               | `void.config.ts`, `src/lib/client/theme.ts`    | Resolve before paint and toggle                   | `ui-theme`, `toggleTheme`       |
+| Hydration gate      | `src/hooks/use-is-hydrated.svelte.ts`          | Distinguish SSR/hydration from client-only intent | `useIsHydrated()`               |
+| Feature context     | `src/features/*/contexts/*`                    | Thread loader catalogues                          | Feature provider and hook       |
 
 ## 8. Detailed Design
 
@@ -94,12 +94,12 @@ The shopping-list hook combines IDs, quantity overrides, and `loadRecipesByIds(i
 `persistedStore<T>(key, initial)` holds a module-level value read from saved JSON when storage exists, otherwise
 the initial value, and serializes later changes. It discards malformed JSON and values whose
 array/non-array shape differs from the initial value (including old wrapped array stores).
-`useValue()` uses `useSyncExternalStore`: its server snapshot is always `initial`, including
-hydration, then React reads the saved client snapshot. This prevents hydration mismatches.
+`useValue()` returns `initial` during SSR and hydration; the saved value is read after client mount
+and shared by every reader. This prevents hydration mismatches.
 
 `useIsHydrated()` likewise returns false for SSR/hydration and true on the client.
 Shopping-list UI uses that gate before reading selected-recipe promises, rendering a neutral
-skeleton on the server and a Suspense skeleton while selected recipes load.
+skeleton on the server and an explicit pending state while selected recipes load.
 
 | State question                     | Placement                          | Reason                                  |
 | ---------------------------------- | ---------------------------------- | --------------------------------------- |
@@ -114,7 +114,7 @@ skeleton on the server and a Suspense skeleton while selected recipes load.
 
 Regular-page callers use `usePageAction()` for page-owned mutations. It preserves URL/history,
 refreshes props with local state preserved, alerts expected failures, and returns a success boolean.
-Callers own navigation and closing effects; never await an action inside a React transition.
+Callers await the action and own navigation and closing effects.
 
 Inline ingredient creation retains `POST /api/ingredients`; `AddIngredient` calls
 `router.refresh()` after success to refresh the catalogue props, then resets and closes its form.
@@ -147,7 +147,7 @@ another global server-data owner.
 
 The header palette's `loadRecipeList()` fetches once on first open per document and clears rejected
 promises. Shopping-list `loadRecipesByIds` retains promises keyed by serialized selections.
-These are stable promises for React `use()`, not a query-cache lifecycle or persisted entity storage.
+The shopping-list hook and palette track explicit pending/success/error state from these promises; they are not a query-cache lifecycle or persisted entity storage.
 
 ### 8.8 Outcome and acceptance
 
@@ -165,10 +165,11 @@ N/A
 
 ## Changelog
 
-| Date       | Amendment                                                                              | Sections affected | Reason                                                           |
-| ---------- | -------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------- |
-| 2026-09-13 | Specify Hono RPC clients as TanStack Query's server-data source.                       | 3, 8.5            | Reflect the migrated query and mutation wrappers.                |
-| 2026-09-13 | Use an explicit browser Query provider.                                                | 3, 7, 8.1–8.2     | Replace the SSR-query bridge and isomorphic preference boundary. |
-| 2026-09-18 | Describe current query prefetch and page-owned loading.                                | 8.2               | Match the query API and inline isLoading skeletons.              |
-| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries. | Updated contracts | Reflect the completed page migration.                            |
-| 2026-10-03 | Document navigation prefetch freshness and redirecting recipe deletion.                | 3, 6, 8.5         | Distinguish navigation caching from durable browser intent.      |
+| Date       | Amendment                                                                                            | Sections affected | Reason                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------- | ----------------- | ---------------------------------------------------------------- |
+| 2026-09-13 | Specify Hono RPC clients as TanStack Query's server-data source.                                     | 3, 8.5            | Reflect the migrated query and mutation wrappers.                |
+| 2026-09-13 | Use an explicit browser Query provider.                                                              | 3, 7, 8.1–8.2     | Replace the SSR-query bridge and isomorphic preference boundary. |
+| 2026-09-18 | Describe current query prefetch and page-owned loading.                                              | 8.2               | Match the query API and inline isLoading skeletons.              |
+| 2026-10-02 | Document Void Pages loaders/actions, islands, and current navigation/state boundaries.               | Updated contracts | Reflect the completed page migration.                            |
+| 2026-10-03 | Document navigation prefetch freshness and redirecting recipe deletion.                              | 3, 6, 8.5         | Distinguish navigation caching from durable browser intent.      |
+| 2026-10-04 | Replace `useSyncExternalStore` stores and React `use()` with rune stores and explicit pending state. | 3, 7–8            | Match the shipped Svelte state conventions.                      |
