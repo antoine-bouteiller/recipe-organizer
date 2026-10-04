@@ -194,7 +194,8 @@ const viteConfig = defineConfig({
       { extends: true, test: { globals: true, name: 'unit' } },
       {
         extends: true,
-        plugins: [storybookTest({ configDir: '.storybook' })],
+        // Play functions assume the mobile layout unless a story pins its own viewport.
+        plugins: [storybookTest({ configDir: '.storybook', initialGlobals: { viewport: { isRotated: false, value: 'mobile2' } } })],
         test: {
           browser: {
             enabled: true,
