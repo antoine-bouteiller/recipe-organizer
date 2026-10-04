@@ -76,13 +76,13 @@
 
   const submit = async (event: SubmitEvent) => {
     event.preventDefault()
-    if (form.pending || !initial) {
+    if (form.pending || !recipe) {
       return
     }
     try {
       await form.post()
       if (form.wasSuccessful) {
-        await router.visit(`/recipe/${initial.id}`, { replace: true })
+        await router.visit(`/recipe/${recipe.id}`, { replace: true })
       }
     } catch (error) {
       alertError(errorMessage(), error)
@@ -90,16 +90,16 @@
   }
 </script>
 
-{#if initial}
+{#if recipe}
   <ScreenLayout title="Modifier la recette">
     <Form errors={form.errors} onsubmit={submit}>
       <RecipeForm
         addNewIngredientOption={renderAddIngredientOption}
         form={recipeForm}
-        id={initial.id}
+        id={recipe.id}
         ingredientOptions={ingredientOptions.current}
-        initialImage={{ id: initial.image, url: initial.image }}
-        initialVideo={initial.video ? { id: initial.video, url: getVideoUrl(initial.video) } : undefined}
+        initialImage={{ id: recipe.image, url: recipe.image }}
+        initialVideo={recipe.video ? { id: recipe.video, url: getVideoUrl(recipe.video) } : undefined}
       />
       <RecipeFormActions>
         <Button disabled={form.pending} onclick={() => history.back()} type="button" variant="outline">Annuler</Button>
