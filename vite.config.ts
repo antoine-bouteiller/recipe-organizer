@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { voidReact } from '@void/react/plugin'
+import type { Plugin } from 'vite-plus'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
 import { voidPlugin } from 'void'
@@ -14,6 +15,35 @@ const restrictedReactImports = {
   message: 'Rely on React Compiler instead of manual memoization with useMemo or useCallback.',
 }
 
+// Void's auth runtime passes its generated Drizzle adapter, so Better Auth's Kysely mode is dead weight in the Worker.
+const betterAuthMinimal: Plugin = {
+  name: 'better-auth-minimal',
+  apply: 'build',
+  enforce: 'pre',
+  resolveId(source, importer) {
+    if (source === 'better-auth' && importer?.includes('/void/dist/')) {
+      return this.resolve('better-auth/minimal', importer, { skipSelf: true })
+    }
+  },
+}
+
+// @void/react sets its browser entries as top-level inputs, which every environment inherits.
+const browserEntries = ['pages-client', 'islands-client']
+const clientOnlyEntries: Plugin = {
+  name: 'client-only-entries',
+  apply: 'build',
+  enforce: 'post',
+  configEnvironment(name, config) {
+    const input = config.build?.rollupOptions?.input
+    if (name === 'client' || !input || typeof input !== 'object' || Array.isArray(input)) {
+      return
+    }
+    for (const entry of browserEntries) {
+      delete input[entry]
+    }
+  },
+}
+
 const viteConfig = defineConfig(({ isPreview }) => ({
   plugins: [
     vanillaExtractPlugin(),
@@ -23,6 +53,8 @@ const viteConfig = defineConfig(({ isPreview }) => ({
       ? [
           voidPlugin({ persistTo: '.wrangler/state' }),
           voidReact({ prefetch: { cacheFor: ['30s', '1h'] }, react: { compiler: true }, viewTransitions: true }),
+          betterAuthMinimal,
+          clientOnlyEntries,
         ]
       : []),
   ],
