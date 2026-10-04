@@ -51,13 +51,13 @@ All pages hydrate after SSR on first load and use Void client navigation, avoidi
 
 ## 7. High-Level Components
 
-| Component         | Module type                     | Responsibility                                                                  | Public API surface                          |
-| ----------------- | ------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------- |
-| Root layout       | `pages/layout.tsx`              | Hydrated shell, search/theme controls, French Zod locale, render-error boundary | `useShared()`, children                     |
-| Page components   | `pages/**/*.tsx`                | Compose loader props and feature slots                                          | Default page export                         |
-| Server companions | `pages/**/*.server.ts`          | Reads, gates, mutations                                                         | `loader`, `action`, `actions`, `InferProps` |
-| Page context      | `middleware/03.page-context.ts` | Request identity and navigation path                                            | `{ authUser, pathname }`                    |
-| API handlers      | `routes/api/**`                 | Remaining HTTP, auth, health, media                                             | Named HTTP methods                          |
+| Component         | Module type                     | Responsibility                                               | Public API surface                          |
+| ----------------- | ------------------------------- | ------------------------------------------------------------ | ------------------------------------------- |
+| Root layout       | `pages/layout.tsx`              | Hydrated shell, search/theme controls, render-error boundary | `useShared()`, children                     |
+| Page components   | `pages/**/*.tsx`                | Compose loader props and feature slots                       | Default page export                         |
+| Server companions | `pages/**/*.server.ts`          | Reads, gates, mutations                                      | `loader`, `action`, `actions`, `InferProps` |
+| Page context      | `middleware/03.page-context.ts` | Request identity and navigation path                         | `{ authUser, pathname }`                    |
+| API handlers      | `routes/api/**`                 | Remaining HTTP, auth, health, media                          | Named HTTP methods                          |
 
 ## 8. Detailed Design
 
@@ -93,8 +93,7 @@ enforce owner-or-admin checks. A missing or invalid recipe ID returns `recipe: n
 
 ### 8.4 Screen and layout boundary
 
-The root layout composes `AppHeader` and `AppMain`, imports search/theme controls directly, loads the
-French Zod locale, and wraps children in `AppErrorBoundary` keyed by pathname.
+The root layout composes `AppHeader` and `AppMain`, imports search/theme controls directly and wraps children in `AppErrorBoundary` keyed by pathname.
 
 Pages import feature components directly via `@/...`. Features expose slots/render props, such as
 `renderCardAction`, `quantityControls`, `renderIngredientGroups`, and `backButton`, for plain
@@ -107,7 +106,8 @@ Unknown URLs use Void's default 404. An in-app catch-all page is deliberately ab
 static assets such as `/manifest.json`. Missing recipes instead render DS `NotFound` within the page.
 The root layout handles client render errors with French recovery text, a home link, and
 development-only Error details; server loader failures are not handled by that React boundary.
-`01.api-errors.ts` maps thrown page-action errors as well as API errors to JSON `{ error }`.
+`01.api-errors.ts` maps thrown page-action errors as well as API errors to JSON `{ error }`, and loads
+the French Zod locale for server validation messages. Browser code imports only `zod/mini`.
 
 All pages use Void client navigation after SSR on first load. Shared CSS still enables
 `@view-transition { navigation: auto }` in `src/styles/styles.css`. The head script in

@@ -1,8 +1,23 @@
-import * as z from 'zod'
-
 export type Dimension = 'mass' | 'volume' | 'count' | 'length'
 
-const unitSlugs = ['g', 'kg', 'ml', 'l', 'tbsp', 'tsp', 'piece', 'pinch', 'cube', 'bottle', 'sheet', 'box', 'can', 'handful', 'packet', 'cm'] as const
+export const unitSlugs = [
+  'g',
+  'kg',
+  'ml',
+  'l',
+  'tbsp',
+  'tsp',
+  'piece',
+  'pinch',
+  'cube',
+  'bottle',
+  'sheet',
+  'box',
+  'can',
+  'handful',
+  'packet',
+  'cm',
+] as const
 
 export type UnitSlug = (typeof unitSlugs)[number]
 
@@ -34,8 +49,6 @@ export const UNITS = {
   tsp: { dimension: 'volume', factor: 5, name: 'tsp', parent: 'ml', slug: 'tsp' },
 } as const satisfies Record<UnitSlug, Unit>
 /* eslint-enable id-length */
-
-export const unitSlugSchema = z.enum(unitSlugs)
 
 export const unitOptions: { label: string; value: UnitSlug }[] = Object.values(UNITS).map((unit) => ({
   label: unit.name,

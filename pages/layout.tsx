@@ -1,6 +1,5 @@
 import '@/styles/global.css'
 import '@/styles/styles.css'
-import '@/lib/client/zod-locale'
 import { useShared } from '@void/react'
 import type { ReactNode } from 'react'
 
