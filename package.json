@@ -8,7 +8,7 @@
     "build": "vp build",
     "dev": "vp dev",
     "check": "vp check --fix && vp run check:svelte",
-    "check:svelte": "rm -rf .svelte-check && svelte-check --tsgo --fail-on-warnings --tsconfig ./tsconfig.svelte.json",
+    "check:svelte": "rm -rf .svelte-check && svelte-check --tsgo --fail-on-warnings --tsconfig ./tsconfig.json",
     "test:coverage": "vp test run --coverage",
     "serve": "vp preview",
     "analyze": "ANALYZE=1 vp build",

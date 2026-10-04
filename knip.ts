@@ -6,7 +6,6 @@ const config: KnipConfig = {
   compilers: { svelte: (text: string, filename: string) => svelte2tsx(text, { filename, isTsFile: true, mode: 'ts' }).code },
   entry: [
     'public/sw.js!',
-    '{src,tools}/**/*.test.ts',
     'pages/**/*.{ts,svelte}!',
     'routes/**/*.ts!',
     'middleware/**/*.ts!',

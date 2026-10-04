@@ -27,17 +27,21 @@
       "void/routes": ["./.void/routes.d.ts"]
     }
   },
+  "files": [],
   "include": [
     "src",
     "pages",
     "routes",
     "middleware",
     "tools",
+    ".storybook",
     "auth.ts",
     "env.ts",
     "void.config.ts",
     "vite.config.ts",
     "drizzle.config.ts",
-    ".void/routes.d.ts"
+    ".void/routes.d.ts",
+    ".void/db.d.ts",
+    ".void/env.d.ts"
   ]
 }
