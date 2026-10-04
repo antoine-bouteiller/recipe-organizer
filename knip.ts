@@ -1,9 +1,9 @@
 import type { KnipConfig } from 'knip'
-import { compile } from 'svelte/compiler'
+import { svelte2tsx } from 'svelte2tsx'
 
 const config: KnipConfig = {
-  // The default Svelte compiler only reads <script> blocks; compiling keeps template references such as `styles.x`.
-  compilers: { svelte: (text: string, filename: string) => compile(text, { filename, generate: 'client' }).js.code },
+  // The default Svelte compiler only reads <script> blocks; svelte2tsx keeps template references and type-only imports.
+  compilers: { svelte: (text: string, filename: string) => svelte2tsx(text, { filename, isTsFile: true, mode: 'ts' }).code },
   entry: [
     'public/sw.js!',
     '{src,tools}/**/*.test.{ts,tsx}',
@@ -23,7 +23,12 @@ const config: KnipConfig = {
     config: ['.vite-hooks/pre-commit', '.vite-hooks/commit-msg'],
   },
   // TODO: remove with the React cut-over; Svelte ports have no consumers until their callers are ported.
-  ignore: ['src/**/*.svelte.ts'],
+  ignore: [
+    'src/**/*.svelte',
+    'src/**/*.svelte.ts',
+    'src/components/ui/data-display/icons/svelte.ts',
+    'src/components/ui/data-display/icons/icon-types.ts',
+  ],
   // TODO: drop `@void/svelte` with the React cut-over.
   ignoreDependencies: ['cloudflare', 'oxc-transform-react', '@typescript/native', '@void/svelte'],
   ignoreIssues: {

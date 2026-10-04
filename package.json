@@ -55,6 +55,7 @@
     "playwright": "catalog:",
     "storybook": "catalog:",
     "svelte-check": "catalog:",
+    "svelte2tsx": "catalog:",
     "typescript": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:",
