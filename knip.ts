@@ -22,6 +22,8 @@ const config: KnipConfig = {
   husky: {
     config: ['.vite-hooks/pre-commit', '.vite-hooks/commit-msg'],
   },
+  // TODO: remove with the React cut-over; Svelte ports have no consumers until their callers are ported.
+  ignore: ['src/**/*.svelte.ts'],
   // TODO: drop `@void/svelte` with the React cut-over.
   ignoreDependencies: ['cloudflare', 'oxc-transform-react', '@typescript/native', '@void/svelte'],
   ignoreIssues: {
