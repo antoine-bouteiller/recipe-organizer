@@ -1,4 +1,4 @@
-import { useIsHydrated } from '@/hooks/use-is-hydrated.svelte'
+import { onMount } from 'svelte'
 
 export const readSaved = <TValue>(key: string, initial: TValue): TValue | undefined => {
   const raw = localStorage.getItem(key)
@@ -15,22 +15,32 @@ export const readSaved = <TValue>(key: string, initial: TValue): TValue | undefi
 }
 
 export const persistedStore = <TValue>(key: string, initial: TValue) => {
-  const hasStorage = typeof localStorage !== 'undefined'
-  // Server modules never write, so this singleton stays `initial` across SSR requests.
-  let value = $state.raw((hasStorage && readSaved(key, initial)) || initial)
+  let value = $state.raw(initial)
+  let hydrated = false
 
   const setState = (update: (previous: TValue) => TValue) => {
+    // Never run user updates on the server or overwrite saved data before the first mount.
+    if (typeof globalThis.window === 'undefined' || !hydrated) {
+      return
+    }
     value = update(value)
-    if (hasStorage) {
+    if (typeof localStorage !== 'undefined') {
       localStorage.setItem(key, JSON.stringify(value))
     }
   }
-  /** Call during component setup; server HTML and hydration read `initial`, then the saved value after mount. */
+  /** Call during component setup; each reader stays neutral until mount, then shares the saved value. */
   const useValue = () => {
-    const hydration = useIsHydrated()
+    let mounted = $state(false)
+    onMount(() => {
+      if (!hydrated) {
+        value = (typeof localStorage !== 'undefined' && readSaved(key, initial)) || initial
+        hydrated = true
+      }
+      mounted = true
+    })
     return {
       get current() {
-        return hydration.current ? value : initial
+        return mounted ? value : initial
       },
     }
   }

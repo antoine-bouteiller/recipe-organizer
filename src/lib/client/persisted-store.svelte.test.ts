@@ -40,17 +40,30 @@ describe('readSaved (VC-5)', () => {
 })
 
 describe('persistedStore (VC-5)', () => {
-  it('applies updates to the stored value and saves the same JSON shape', () => {
-    storage.set('shopping-list', '[3]')
-    const { setState } = persistedStore<number[]>('shopping-list', [])
-    setState((ids) => [...ids, 5])
-    expect(storage.get('shopping-list')).toBe('[3,5]')
+  it('does not access available storage while constructing a server store', () => {
+    const getItem = vi.fn(() => '[3]')
+    vi.stubGlobal('localStorage', { getItem })
+
+    const { useValue } = persistedStore<number[]>('shopping-list', [])
+
+    expect(useValue().current).toEqual([])
+    expect(getItem).not.toHaveBeenCalled()
   })
 
-  it('starts updates from the initial value when storage holds stale data', () => {
-    storage.set('recipe-quantities', '[1]')
-    const { setState } = persistedStore<Record<number, number>>('recipe-quantities', {})
-    setState((quantities) => ({ ...quantities, 2: 4 }))
-    expect(storage.get('recipe-quantities')).toBe('{"2":4}')
+  it('does not run server updates that could mutate the shared initial snapshot', () => {
+    vi.stubGlobal('localStorage', undefined)
+    const initial: number[] = []
+    const { setState, useValue } = persistedStore('shopping-list', initial)
+    const snapshot = useValue()
+    const update = vi.fn((ids: number[]) => {
+      ids.push(3)
+      return ids
+    })
+
+    setState(update)
+
+    expect(snapshot.current).toEqual([])
+    expect(update).not.toHaveBeenCalled()
+    expect(useValue().current).toEqual([])
   })
 })
