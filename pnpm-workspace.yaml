@@ -47,12 +47,3 @@ peerDependencyRules:
   allowedVersions:
     vite: '*'
     vitest: '*'
-
-minimumReleaseAgeExclude:
-  - '@void/deploy-cloudflare@0.23.0'
-  - '@void/deploy-core@0.23.0'
-  - '@void/edge@0.23.0'
-  - '@void/isr@0.23.0'
-  - '@void/platform@0.23.0'
-  - void@0.23.0
-  - '@void/svelte@0.23.0'
