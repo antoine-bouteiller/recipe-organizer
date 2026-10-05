@@ -1,7 +1,29 @@
 #!/bin/sh
 set -e
 pnpm i --frozen-lockfile --silent
-vp staged
-vp run check:svelte
-pnpm knip
-pnpm knip:production
+
+logs=$(mktemp -d)
+trap 'rm -rf "$logs"' EXIT
+
+run() {
+  name=$1
+  shift
+  "$@" >"$logs/$name" 2>&1 &
+  eval "pid_$name=$!"
+}
+
+run staged vp staged
+run svelte vp run check:svelte
+run knip pnpm knip
+run knip_production pnpm knip:production
+
+failed=0
+for name in staged svelte knip knip_production; do
+  eval "pid=\$pid_$name"
+  if ! wait "$pid"; then
+    echo "✗ $name"
+    cat "$logs/$name"
+    failed=1
+  fi
+done
+exit $failed
