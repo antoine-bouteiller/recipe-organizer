@@ -94,7 +94,10 @@ const viteConfig = defineConfig({
       node: true,
       'shared-node-browser': true,
     },
-    jsPlugins: [{ name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' }],
+    jsPlugins: [
+      { name: 'recipe-oranizer', specifier: './tools/oxlint/index.ts' },
+      { name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' },
+    ],
     options: { reportUnusedDisableDirectives: 'error', typeAware: true, typeCheck: true },
     overrides: features.map((feature): NonNullable<NonNullable<UserConfig['lint']>['overrides']>[number] => ({
       files: [`src/features/${feature}/**/*.{ts,svelte}`],
@@ -169,6 +172,7 @@ const viteConfig = defineConfig({
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
       'recipe-oranizer/no-use-shared-destructuring': 'error',
       'sort-imports': 'off',
+      'vite-plus/prefer-vite-plus-imports': 'error',
     },
   },
   // Vitest cannot run the Worker environment.
