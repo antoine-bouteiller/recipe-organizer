@@ -55,7 +55,19 @@ const viteConfig = defineConfig({
       build: {
         rolldownOptions: {
           // Void links CSS per JS chunk; one shared style chunk yields one stylesheet instead of one per component.
-          output: { codeSplitting: { groups: [{ name: 'styles', test: /\.css(?:$|\?)/ }] } },
+          output: {
+            codeSplitting: {
+              groups: [
+                { name: 'styles', test: /\.css(?:$|\?)/ },
+                // Void only modulepreloads the pages-client graph, so each extra layout/page chunk adds a request round trip.
+                { name: 'vendor', test: /node_modules[\\/]|preload-helper/ },
+                // 3 keeps pair-only code (the recipe form shared by new and edit) out of every page's first load.
+                { minShareCount: 3, name: 'shared' },
+                // Rolldown has no minimum chunk size; this folds tiny pair-shared modules into one chunk instead.
+                { maxModuleSize: 1024, minShareCount: 2, name: 'shared' },
+              ],
+            },
+          },
         },
       },
     },
