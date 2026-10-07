@@ -31,7 +31,7 @@ catalog:
   '@types/node': 25.9.9
   drizzle-kit: 1.0.0-rc.3
   drizzle-orm: 1.0.0-rc.3
-  knip: 6.39.0
+  knip: 6.40.0
   typescript: 6.0.3
   vite-plus: 1.0.0
   void: 0.26.0
