@@ -23,22 +23,22 @@ catalog:
   '@void/svelte': 0.26.0
   storybook: 10.6.1
   '@storybook/addon-vitest': 10.6.1
-  '@vitest/browser-playwright': 5.0.1
+  '@vitest/browser-playwright': 5.0.3
   playwright: 1.63.0
   '@commitlint/cli': 21.2.3
   '@commitlint/config-conventional': 21.2.3
-  '@vitest/coverage-v8': 5.0.1
+  '@vitest/coverage-v8': 5.0.3
   '@types/node': 25.9.9
   drizzle-kit: 1.0.0-rc.3
   drizzle-orm: 1.0.0-rc.3
   knip: 6.40.0
   typescript: 6.0.3
-  vite-plus: 1.0.0
+  vite-plus: 1.1.0
   void: 0.26.0
   wrangler: 4.148.0
   zod: 4.6.5
-  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
-  vitest: 5.0.1
+  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  vitest: 5.0.3
 
 peerDependencyRules:
   allowAny:
