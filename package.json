@@ -23,7 +23,7 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
-    "@void/svelte": "catalog:",
+    "@tanstack/svelte-query": "catalog:",
     "drizzle-orm": "catalog:",
     "svelte": "catalog:",
     "void": "catalog:",

@@ -25,13 +25,13 @@ module so feature ownership and import boundaries remain legible.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                                                                                                                                                                                                           | Rationale                                                                                                                   |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Ownership boundary       | A product domain spans `src/features/<feature>/client/` for UI and browser-only API readers, `src/features/<feature>/server/` for server domain utilities, isomorphic contracts at the feature root, `pages/` for Void loaders/actions, and `routes/api/<feature>/` for remaining HTTP handlers. | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
-| `[KD-2]` Runtime-code placement   | Page composition lives in `pages/` and Worker HTTP routes in `routes/api/`; all application source lives in `src/`, split into `client/` and `server/` folders inside features and `src/lib/`; only actual cross-runtime modules sit outside those folders.                                      | The folder names make runtime boundaries visible before an import is written.                                               |
-| `[KD-3]` Route and data placement | Void pages follow URL hierarchy and layout groups in `pages/`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                                                                         | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
-| `[KD-4]` Naming and imports       | Files use kebab-case except Void dynamic segments; source imports use `@/*` (resolved to `src/`) and same-directory dependencies are relative.                                                                                                                                                   | Filenames match the lint convention and import paths reveal which runtime folder a dependency belongs to.                   |
-| `[KD-5.1]` Styling ownership      | Components, stories, and example hosts use scoped `<style>` blocks; `src/styles/theme/tokens.css` exposes semantic custom properties.                                                                                                                                                            | Native CSS shares tokens without styling plugins, a JavaScript theme facade, or caller overrides.                           |
+| Decision                          | Choice                                                                                                                                                                                                                                                                                 | Rationale                                                                                                                   |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Ownership boundary       | A product domain spans `src/features/<feature>/client/` for UI and query/mutation API options, `src/features/<feature>/server/` for server domain utilities, isomorphic contracts at the feature root, `src/pages/` for client screens, and `routes/api/<feature>/` for HTTP handlers. | Runtime-specific code remains isolated while each domain has explicit ownership.                                            |
+| `[KD-2]` Runtime-code placement   | Screen composition lives in `src/pages/` and Worker HTTP routes in `routes/api/`; all application source lives in `src/`, split into `client/` and `server/` folders inside features and `src/lib/`; only actual cross-runtime modules sit outside those folders.                      | The folder names make runtime boundaries visible before an import is written.                                               |
+| `[KD-3]` Route and data placement | Client screens follow URL hierarchy in `src/pages/`, registered in `src/lib/client/router/routes.ts`; Drizzle schema and history artefacts remain in `src/db/schema/` and `src/db/migrations/`.                                                                                        | URL and database layouts remain independently navigable and tooling finds generated database artefacts in stable locations. |
+| `[KD-4]` Naming and imports       | Files use kebab-case except Void dynamic segments; source imports use `@/*` (resolved to `src/`) and same-directory dependencies are relative.                                                                                                                                         | Filenames match the lint convention and import paths reveal which runtime folder a dependency belongs to.                   |
+| `[KD-5.1]` Styling ownership      | Components, stories, and example hosts use scoped `<style>` blocks; `src/styles/theme/tokens.css` exposes semantic custom properties.                                                                                                                                                  | Native CSS shares tokens without styling plugins, a JavaScript theme facade, or caller overrides.                           |
 
 Superseded: ~~`[KD-5]` Vanilla Extract compilation and JavaScript theme API~~.
 
@@ -49,7 +49,7 @@ Superseded: ~~`[KD-5]` Vanilla Extract compilation and JavaScript theme API~~.
 
 ## 6. Caveats
 
-- `[C-1]` Generated `.void/` and `.void-wrangler.jsonc` files are tool-owned and do not accept hand edits; regenerate page/API metadata with `vp exec void prepare`.
+- `[C-1]` Generated `.void/` and `.void-wrangler.jsonc` files are tool-owned and do not accept hand edits; regenerate API metadata with `vp exec void prepare`.
 - `[C-2]` Worker-only imports, including `cloudflare:workers`, stay on server execution paths; importing them into client-rendered components breaks the runtime boundary (`src/lib/server/db.ts`).
 - `[C-3]` `migrations_tmp/` belongs to Wrangler (`tools/wrangler.jsonc`), while authored Drizzle schema history belongs in `src/db/migrations/`.
 
@@ -63,32 +63,35 @@ Superseded: ~~`[KD-5]` Vanilla Extract compilation and JavaScript theme API~~.
 
 ### 8.1 Repository layout
 
-The repository root is the single Void project and deployment. `pages/` and `routes/api/`
-compose `@/features/<feature>/server/*` and `@/lib/server/*`; `src/` also owns Svelte feature
-presentation and browser services. Server folders never import browser components or the design
+The repository root is the single Void project and deployment. `routes/api/` composes
+`@/features/<feature>/server/*` and `@/lib/server/*`; `src/pages/` composes Svelte feature
+presentation and client query/mutation options. Server folders never import browser components or the design
 system. Isomorphic modules cannot import server implementation.
 
 ```text
 recipe-organizer/
 ├── docs/                       # Architecture and infrastructure specs
 ├── public/                     # Static assets and network-only sw.js
-├── pages/                      # layout.svelte; regular pages + optional server companions
-├── routes/api/                 # Remaining Void HTTP adapters
-├── middleware/                 # API/action errors, API CSRF, shared page context
+├── index.html                  # Static document shell, metadata and inline scripts
+├── routes/api/                 # Void data/mutation, session, auth, health and media HTTP
+├── middleware/                 # API errors, CSRF; SPA fallback only if needed
 ├── src/
+│   ├── main.ts                 # CSS, French Zod locale and Svelte mount
+│   ├── app.svelte              # Query provider, header/main and route error boundary
+│   ├── pages/<route>/          # index.svelte screens, explicitly registered
 │   ├── components/             # App shell, error boundary, navigation, screen layout, not-found
 │   │   └── ui/                 # Owned UI component families and stories
 │   ├── db/
 │   │   ├── schema/             # Drizzle tables and relations
 │   │   └── migrations/
 │   ├── features/<feature>/
-│   │   ├── client/             # Components, catalogue contexts, API readers
+│   │   ├── client/             # Components, catalogue contexts, client/api query/mutation options
 │   │   ├── server/             # Queries and aggregate writes
 │   │   ├── *.ts                # Cross-runtime schemas and constants
 │   │   └── *.spec.md
-│   ├── hooks/                  # Shared browser/hydration hooks
+│   ├── hooks/                  # Shared browser hooks
 │   ├── lib/
-│   │   ├── client/             # API response, page action, persistence, theme
+│   │   ├── client/             # Router, query client/keys, form rune, API response, persistence, theme
 │   │   └── server/             # Auth, D1, R2, cache, errors, env.d.ts
 │   ├── stores/                 # Durable IDs and quantities
 │   ├── styles/                 # Theme, global styles, fonts, styling spec
@@ -103,30 +106,31 @@ recipe-organizer/
 ├── .wrangler/state/            # Local runtime persistence (ignored)
 ├── .void-wrangler.jsonc         # Generated runtime config (ignored)
 ├── env.ts
-├── void.config.ts              # Runtime/deploy bindings and document head
+├── void.config.ts              # Runtime/deploy bindings (document head is in index.html)
 ├── vite.config.ts              # Void/Svelte plugins, checks, tests, formatting
 ├── package.json
 └── AGENTS.md
 ```
 
-The root `pages/layout.svelte` wraps every page. Each route is a folder holding `index.svelte` and an optional
-`index.server.ts`; `[id]` is a dynamic segment. Pages are Svelte components and import
-feature components directly via `@/...`; server companions export loaders/actions.
-Features expose slots/render props for page-owned composition without feature-to-feature imports.
-The shopping-list page owns its reset button directly and needs no server companion.
+Screens live in `src/pages/<route>/index.svelte` and import feature components directly via `@/...`.
+They are registered explicitly in `src/lib/client/router/routes.ts` with pattern, optional access,
+lazy component and preload. `router.svelte.ts` exposes `router.current`, `navigate(href, { replace })`,
+`preload` and `start`; `preload.ts` exposes the `preloadLink('intent' | 'viewport')` attachment.
+The shopping-list screen owns its reset button inline; its selection stays device-local.
 
-A feature spans `src/features/<feature>/client/` UI and browser-only calls, page composition under
-`pages/`, remaining `routes/api/<feature>/` HTTP adapters, `src/features/<feature>/server/`
-helpers, and narrowly shared contracts at the feature root. Specs stay at the feature root and
-describe both runtimes.
-Loaders read server helpers directly; browser runtime imports never reach Worker-bound code.
-Type-only imports may derive projection types from server helper return types.
-Remaining HTTP clients use typed `void/client` fetch; `vp exec void prepare` regenerates ignored
-page/action/API route metadata before clean-tree checks.
+A feature spans client UI and `client/api/<operation>.ts` query/mutation options, screen composition
+under `src/pages/`, HTTP adapters under `routes/api/`, server helpers and isomorphic root contracts.
+Client options export `queryOptions`/`mutationOptions` using `readResponse(fetch(...))` from
+`void/client`. Shared infrastructure is `src/lib/client/query-client.ts`,
+`query-keys.ts` (including session), and `form.svelte.ts`.
+Runtime browser imports never reach Worker-bound code; type-only imports may derive projection
+types from server helper return types. `vp exec void prepare` regenerates ignored API metadata.
 
-The document head in `void.config.ts` owns metadata, manifest/favicon, theme initialization,
-service-worker registration, and the backward cross-document transition hook.
-`public/sw.js` registers without a fetch handler, offline support, or legacy cleanup.
+`index.html` owns metadata, manifest/favicon, theme initialization, service-worker registration,
+and backward cross-document transition scripts. `src/main.ts` mounts `src/app.svelte`, whose
+QueryClientProvider wraps AppHeader and AppMain, then pathname-keyed AppError and the route component.
+There is no root `pages/`, page-context middleware, server page guard or page-action adapter.
+`public/sw.js` registers without a fetch handler, offline support or legacy cleanup.
 
 ### Component and styling ownership
 
@@ -140,7 +144,7 @@ Components, stories, and existing example hosts keep presentation in scoped, unl
 blocks. `src/styles/theme/tokens.css` declares semantic kebab-case custom properties, `.dark`
 overrides, and shared animations; no JavaScript theme facade or primitive palette API exists.
 `src/styles/global.css` imports tokens and owns layered reset/base and document rules, with layer
-order declared before those rules. Layouts and Storybook load `global.css` and `styles.css`;
+order declared before those rules. `src/main.ts` and Storybook load `global.css` and `styles.css`;
 the latter retains fonts, layer order, and cross-document transitions. Spacing uses direct pixel
 lengths at the existing 4px base or native `calc()`. Finite presentation props use explicit literal
 unions and private local selectors; shared runtime/owner custom properties remain internal.
@@ -149,11 +153,13 @@ Feedback, Forms, Layout, Navigation, and Overlays. See
 [UI ownership](../src/styles/styling.spec.md) for the full contract.
 
 Pages are unstyled composition: feature sections and app-shell components own markup/styles.
-AppHeader owns desktop navigation; `src/components/app-error/` owns the regular-layout
-`<svelte:boundary>` render-error boundary. DS Button renders `@void/svelte` `Link` through `asLink` + `href`;
-TabBar takes `currentPath` and `href` items. ScreenLayout takes a `backButton` slot;
-GoBackButton defaults to `history.back()`. Retained inner/outer scroll IDs do not implement scroll
-restoration. Storybook has no router decorator. Pages/layouts compose header search and theme;
+AppHeader owns desktop navigation; `src/components/app-error/` owns the pathname-keyed
+`<svelte:boundary>` render-error boundary in `src/app.svelte`. DS Button renders a plain `<a>`
+through `asLink` + `href`, forwarding `data-view-transition` and an optional caller-supplied preload
+attachment without importing app code. TabBar takes `currentPath` and `href` items. ScreenLayout
+has a `backButton` slot; GoBackButton defaults to `history.back()`. The router restores document
+and inner/outer scroll IDs on traversal. Storybook has no router decorator; query-dependent hosts
+supply a fresh QueryClient and stubbed mutations. The app shell composes header search and theme;
 feature/auth policy does not move into `src/components/ui/`.
 
 ### Import and database boundaries
@@ -161,7 +167,7 @@ feature/auth policy does not move into `src/components/ui/`.
 Ordinary files use kebab-case except framework dynamic segments; `.svelte`
 contains components, `*.svelte.ts` contains rune modules, and specs use `.spec.md`. Source imports use `@/*` and same-directory
 dependencies are relative. Features may import only the root (isomorphic) modules of other features;
-pages or app-owned components coordinate their client and server code. Shared browser hooks live
+screens and app-owned components coordinate client features; API handlers coordinate server helpers. Shared browser hooks live
 outside features.
 
 Database table modules live in `src/db/schema/`, Drizzle history in
@@ -173,7 +179,7 @@ runtime generated files and local persistence remain at root. Worker-only import
 
 - `[SO-1]` Root framework adapters compose client and server source from `src/` without
   introducing another deployment — demonstrated by `[VC-1]` and `[VC-2]`.
-- `[VC-1]` Root development and production preview render deep page URLs, health JSON, and
+- `[VC-1]` Root development and production preview serve the static shell at deep screen URLs, health JSON, and
   unknown API JSON 404s — demonstrates `[SO-1]`.
 - `[VC-2]` Server modules resolve in API handlers; browser runtime imports do not reach
   server implementation. Drizzle history and local runtime persistence survive relocation — demonstrates `[SO-1]`.

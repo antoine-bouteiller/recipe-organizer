@@ -1,41 +1,39 @@
 <script lang="ts">
-  import { useForm } from '@void/svelte'
+  import { createMutation } from '@tanstack/svelte-query'
   import { untrack } from 'svelte'
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import { PencilSimpleIcon } from '@/components/ui/data-display/icons'
   import FormDialog from '@/components/ui/overlays/form-dialog/form-dialog.svelte'
+  import { updateIngredientMutation } from '@/features/ingredients/client/api/update'
   import type { IngredientFormInput } from '@/features/ingredients/schemas'
   import { alertError } from '@/lib/client/alert-error'
-  import { useFormActionError } from '@/lib/client/page-action.svelte'
+  import { createForm } from '@/lib/client/form.svelte'
   import type { Ingredient } from '@/types/ingredient'
 
   import IngredientForm from './ingredient-form.svelte'
 
   const { ingredient }: { ingredient: Ingredient } = $props()
   let open = $state(false)
-  const initialValues = untrack(() => ({
-    category: ingredient.category,
-    countWeightG: ingredient.countWeightG,
-    densityGPerMl: ingredient.densityGPerMl,
-    id: ingredient.id,
-    name: ingredient.name,
-    parentId: ingredient.parentId ?? undefined,
-    preferredUnitSlug: ingredient.preferredUnitSlug,
-  }))
-  const form = useForm('/settings/ingredients?update', initialValues)
-  useFormActionError(() => form.error, "Erreur lors de la mise à jour de l'ingrédient")
+  const toFormValues = (source: Ingredient): IngredientFormInput => ({
+    category: source.category,
+    countWeightG: source.countWeightG,
+    densityGPerMl: source.densityGPerMl,
+    name: source.name,
+    parentId: source.parentId ?? undefined,
+    preferredUnitSlug: source.preferredUnitSlug,
+  })
+  const form = createForm(untrack(() => toFormValues(ingredient)))
+  const mutation = createMutation(() => updateIngredientMutation(ingredient.id))
   const setData = <TKey extends keyof IngredientFormInput>(key: TKey, value: IngredientFormInput[TKey]) => {
     Object.assign(form.data, { [key]: value })
   }
   // A refreshed row supplies the next edit, without replacing an open invalid draft.
   $effect(() => {
-    const next = { ...ingredient, parentId: ingredient.parentId ?? undefined }
+    const next = toFormValues(ingredient)
     untrack(() => {
       if (!open && !form.pending) {
-        Object.assign(form.data, next)
-        form.clearErrors()
-        form.clearError()
+        form.reset(next)
       }
     })
   })
@@ -45,8 +43,7 @@
       return
     }
     try {
-      await form.post({ preserveState: true })
-      if (form.wasSuccessful) {
+      if (await form.submit((body) => mutation.mutateAsync(body))) {
         open = false
       }
     } catch (error) {

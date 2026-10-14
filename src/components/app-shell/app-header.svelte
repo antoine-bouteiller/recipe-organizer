@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Link } from '@void/svelte'
   import type { Snippet } from 'svelte'
 
   import { isCurrentPath } from '@/components/navigation/current-path'
   import { desktopMenuItems } from '@/components/navigation/menu-items.svelte'
+  import { preloadLink } from '@/lib/client/router/preload'
 
   interface Props {
     children?: Snippet
@@ -17,14 +17,15 @@
   <div class="navbar" data-slot="navbar">
     <nav class="navigation" data-slot="navbar-items">
       {#each desktopMenuItems as item (item.href)}
-        <Link
+        <a
           aria-current={isCurrentPath(currentPath, item.href) ? 'page' : undefined}
           class="app-navbar-item"
           data-slot="navbar-item"
           href={item.href}
+          {@attach preloadLink('viewport')}
         >
           {item.label}
-        </Link>
+        </a>
       {/each}
     </nav>
     <div class="actions" data-slot="navbar-actions">

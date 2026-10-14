@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useForm } from '@void/svelte'
+  import { createMutation } from '@tanstack/svelte-query'
   import type { Snippet } from 'svelte'
 
   import Button from '@/components/ui/actions/button/button.svelte'
@@ -13,15 +13,17 @@
   import TextField from '@/components/ui/forms/text-field/text-field.svelte'
   import Tabs from '@/components/ui/navigation/tabs/tabs.svelte'
   import FormDialog from '@/components/ui/overlays/form-dialog/form-dialog.svelte'
+  import { createUserMutation } from '@/features/users/client/api/create'
   import type { UserFormInput, UserStatus } from '@/features/users/schemas'
   import { alertError } from '@/lib/client/alert-error'
-  import { useFormActionError } from '@/lib/client/page-action.svelte'
+  import { createForm } from '@/lib/client/form.svelte'
   import type { User } from '@/types/user'
 
   import ApproveUser from './approve-user.svelte'
   import BlockUser from './block-user.svelte'
 
-  const { users }: { users: Record<UserStatus, readonly User[]> } = $props()
+  type ListedUser = Pick<User, 'email' | 'id' | 'role'>
+  const { users }: { users: Record<UserStatus, readonly ListedUser[]> } = $props()
   const userDefaultValues: Required<UserFormInput> = { email: '', role: 'user' }
   const roleOptions = [
     { label: 'Utilisateur', value: 'user' },
@@ -39,21 +41,19 @@
   let open = $state(false)
   let search = $state('')
   const query = $derived(search.trim().toLowerCase())
-  const filterUsers = (items: readonly User[]) =>
+  const filterUsers = (items: readonly ListedUser[]) =>
     items.filter((userItem) => userItem.email.toLowerCase().includes(query) || userItem.role.toLowerCase().includes(query))
   const filteredUsers = $derived({ active: filterUsers(users.active), blocked: filterUsers(users.blocked), pending: filterUsers(users.pending) })
-  const form = useForm('/settings/users?create', userDefaultValues)
-  useFormActionError(() => form.error, "Erreur lors de la création de l'utilisateur")
+  const form = createForm(userDefaultValues)
+  const mutation = createMutation(() => createUserMutation())
   const submit = async (event: SubmitEvent) => {
     event.preventDefault()
     if (form.pending) {
       return
     }
     try {
-      await form.post({ preserveState: true })
-      if (form.wasSuccessful) {
-        form.data.email = ''
-        form.data.role = 'user'
+      if (await form.submit((body) => mutation.mutateAsync(body))) {
+        form.reset()
         open = false
       }
     } catch (error) {

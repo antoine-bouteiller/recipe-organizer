@@ -35,7 +35,7 @@ serving `index.spec.md` [G-2] and [G-4].
 | `[KD-4]` Asset delivery          | Image and video route handlers stream R2 objects through the shared cache boundary.                                                                                               | Media remains private to application routing while retaining cacheable delivery.              |
 
 The instruction renderer receives step groups and delegates to `RecipeStepGroups` (`editor.spec.md`
-[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. The detail control submits its page action for deletion while CRUD retains authorization and graph removal.
+[CT-4]); it does not interpret Magimix data, bold markdown, or sub-recipe groups itself. The detail control submits the recipe DELETE mutation while CRUD retains authorization and graph removal.
 
 ## Outcome
 
@@ -56,35 +56,36 @@ The instruction renderer receives step groups and delegates to `RecipeStepGroups
 | Detail recipe         | Reduced fields plus ingredient graph, links, stepGroups, video | Cooking view          | `getRecipeDetails(db, id)`          |
 | Embedded instructions | ID, name, default-group steps                                  | Sub-recipe section    | `getSubrecipeInstructions(db, ids)` |
 
-`src/features/recipe/server/queries.ts` owns these projections. Home/search loaders read the list
-directly; the palette alone retains `GET /api/recipes`. Detail loader reads the recipe, extracts
-sub-recipe IDs from its step groups, and resolves names/default steps before returning props.
+`src/features/recipe/server/queries.ts` owns these projections. Home/search and the palette share
+`recipeList` query options for `GET /api/recipes`. `GET /api/recipes/<id>` reads the recipe, extracts
+sub-recipe IDs and resolves names/default steps before returning `{ recipe, subrecipes }`.
 No browser instructions request remains.
 
 - Steps use `RecipeStepGroup`/`RecipeStep` (`editor.spec.md` [CT-1]) mapped from rows.
 - The list is name-ordered, maps image keys to display URLs, and normalizes absent flag arrays.
 - Detail orders default ingredient groups first and includes linked recipes' default groups.
-- Missing/invalid detail IDs return `recipe: null` for in-page NotFound. Missing instruction
+- Missing detail recipes return HTTP 404 for in-page NotFound; API params are validated independently. Missing instruction
   sources are omitted and the renderer hides missing or empty sub-recipe sections.
 
 ### `[CT-2]` Navigation and cards
 
 ```text
-home/search loader ──► list props ──► cards ──► /recipe/<id> loader
+home/search recipeList query ──► cards ──► /recipe/<id> code + query preload
                                                    │
-                              detail + subrecipe props ──► hydrated cooking view
+                              detail + subrecipe query ──► client cooking view
 ```
 
 Home composes `RecipeListContent` with `renderCardAction` for quantity/membership.
 Detail composes `RecipeDetailsContent` with `quantityControls` and `renderIngredientGroups`.
 Pages import components directly; slots remain plain composition. Metadata and preparation
-are server-rendered on first load with the rest of the hydrated page.
+render on the client after the router awaits code and query data.
 
-Void card links use client navigation. Home links use `prefetch={['visible', 'hover']}`;
-search links use `prefetch` for hover, touchstart, and focus. The navigation cache is fresh for 30s,
-usable up to 1h with background revalidation, and flushed on non-GET navigation/actions.
-Controls remain outside links. Header SearchBar opens with ⌘K/Ctrl+K, loads the list on first open,
-filters locally, and navigates with `router.visit`. Full search uses loader-fed recipes and local filters/recents.
+Plain card anchors use client navigation. Home links use `preloadLink('viewport')`;
+search links use `preloadLink('intent')` for pointerenter, touchstart and focus. Route preloads ensure
+query data with 5-minute staleTime and 24-hour gcTime; stale cached data commits immediately with
+background refresh. Recipe mutations invalidate `allRecipes`.
+Controls remain outside links. Header SearchBar opens with ⌘K/Ctrl+K, reads the shared recipe-list
+query, filters locally and uses `router.navigate`. Full search uses the same cache and local filters/recents.
 
 ### `[CT-3]` Cooking view and quantities
 
@@ -96,13 +97,14 @@ filters locally, and navigates with `router.visit`. Full search uses loader-fed 
   detail page show decrement, quantity, increment, and membership toggle. A missing recipe id yields
   no mutation.
 - Edit and delete actions show only for an authenticated viewer; CRUD enforces owner-or-admin.
-- Home, details, and search are regular hydrated pages in the root layout; search receives the same list projection. Browse loaders do not gate membership; edit/create affordances derive from shared identity. The regular edit loader gates membership and reads recipe, ingredients, and recipe list directly.
-- The page passes GoBackButton through the `backButton` slot. Mobile tabs remain native hash anchors in static
-  HTML; hydrated DS Tabs scroll and replace the hash without extra history entries.
-- Management actions call `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
-  from `void/pages-client` for deletion. The guarded action retains owner-or-admin policy and redirects
-  home; replacement keeps Back from reopening the deleted recipe. `usePageAction()` is not used because
-  its `preserveState` keeps the old URL on redirects. Failed results alert via `alertError`.
+- Home, details and search are SPA screens sharing the list/detail query projections. Browse APIs
+  do not gate membership; edit/create affordances derive from `['session']`. The edit route's member
+  guard chooses the screen, then preloads recipe detail, ingredients and recipe list; the API authorizes writes.
+- The page passes GoBackButton through the `backButton` slot. Mobile tabs remain native hash anchors;
+  mounted DS Tabs scroll and replace the hash without extra history entries.
+- Management controls await feature DELETE mutation options. The API retains owner-or-admin policy;
+  success invalidates `allRecipes` and calls `router.navigate('/', { replace: true })` so Back cannot
+  reopen the deleted recipe. Failures alert via `alertError`.
 
 ### `[CT-4]` Media handlers
 

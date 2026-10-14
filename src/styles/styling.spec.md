@@ -22,17 +22,17 @@ without a styling runtime or a dependency from the design system back to the app
 
 - `[G-1]` Components expose semantic, accessible intent rather than caller-controlled CSS.
 - `[G-2]` Web, the design system, and Storybook use owner-local scoped CSS against one shared semantic token contract.
-- `[G-3]` Existing form, Lexical, and application dependency boundaries remain intact; shared navigation may depend on `@void/svelte` without depending on app or feature code.
+- `[G-3]` Existing form, Lexical, and application dependency boundaries remain intact; shared navigation uses plain anchors and never imports app or feature code.
 
 ## 3. Key Design Decisions
 
-| Decision                                 | Choice                                                                                                                        | Rationale                                                                                                                      |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1.1]` Shared styling infrastructure | `src/styles/theme/tokens.css` owns semantic custom properties; `src/styles/global.css` activates tokens and reset/base rules. | Native CSS needs no JavaScript theme facade or styling plugin.                                                                 |
-| `[KD-2]` Component API                   | Each component uses a local minimal `Pick` of used native props plus its own semantic options.                                | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.                  |
-| `[KD-3.1]` Styling ownership             | Scoped `<style>` blocks stay with their DOM owner; finite props use explicit literal unions and local selectors.              | Presentation remains private rather than a caller override API.                                                                |
-| `[KD-4]` Integration seams               | Overlays pass typed trigger props to a `renderTrigger` snippet; DS navigation uses `@void/svelte` `Link` with `href`.         | Typed links preserve router navigation while trigger props carry handlers, refs, and ARIA state without shared recipe exports. |
-| `[KD-5.1]` Theme variable names          | `tokens.css` declares `--<category>-<token>` names in kebab-case.                                                             | One semantic vocabulary is shared by native component and global CSS.                                                          |
+| Decision                                 | Choice                                                                                                                                                | Rationale                                                                                                                  |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1.1]` Shared styling infrastructure | `src/styles/theme/tokens.css` owns semantic custom properties; `src/styles/global.css` activates tokens and reset/base rules.                         | Native CSS needs no JavaScript theme facade or styling plugin.                                                             |
+| `[KD-2]` Component API                   | Each component uses a local minimal `Pick` of used native props plus its own semantic options.                                                        | A component can preserve its accessibility and visual contract without arbitrary styling or root replacement.              |
+| `[KD-3.1]` Styling ownership             | Scoped `<style>` blocks stay with their DOM owner; finite props use explicit literal unions and local selectors.                                      | Presentation remains private rather than a caller override API.                                                            |
+| `[KD-4]` Integration seams               | Overlays pass typed trigger props to a `renderTrigger` snippet; DS navigation uses plain anchors with `href` and caller-supplied preload attachments. | Anchors preserve native navigation while trigger props carry handlers, refs, and ARIA state without shared recipe exports. |
+| `[KD-5.1]` Theme variable names          | `tokens.css` declares `--<category>-<token>` names in kebab-case.                                                                                     | One semantic vocabulary is shared by native component and global CSS.                                                      |
 
 Superseded: ~~`[KD-1]` JavaScript theme infrastructure~~, ~~`[KD-3]` private Vanilla Extract recipes~~, and ~~`[KD-5]` generated variable names~~.
 
@@ -48,14 +48,14 @@ Superseded: ~~`[KD-1]` JavaScript theme infrastructure~~, ~~`[KD-3]` private Van
 
 - `[NG-1]` A generic `Box`/`Flex`, inline style-prop, or public recipe/styled-factory API.
 - `[NG-2]` A consumer API for arbitrary CSS variables, class strings, runtime geometry, or direct DOM styling.
-- `[NG-3]` Adopting a headless primitive library, or replacing Void navigation, Lexical, or app-owned feature dependencies.
+- `[NG-3]` Adopting a headless primitive library, or owning router policy, Lexical, or app-owned feature dependencies.
 
 ## 6. Detailed Design
 
 ### 6.1 Infrastructure and compilation boundary
 
 ```text
-pages/layout.svelte + .storybook/preview.ts
+src/main.ts + .storybook/preview.ts
   -> @/styles/global.css -> ./theme/tokens.css
   -> @/styles/styles.css
 component / story / example.svelte -> scoped, unlayered <style>
@@ -84,8 +84,8 @@ global view-transition keyframes, and important reduced-motion overrides. `style
 font faces, layer order, and cross-document view-transition activation. Owner rules are unlayered.
 
 Native semantic token use is a documented review contract; no token lint rule or CSS lint framework
-is configured. The shared CSS build chunk must include native and Svelte virtual CSS so initial SSR
-and client navigation both receive owner styles.
+is configured. The shared CSS build chunk must include native and Svelte virtual CSS so initial SPA mounting
+and lazy screen navigation both receive owner styles.
 
 ### 6.2 Component API guidance
 
@@ -101,7 +101,8 @@ including internal composition, rather than importing files.
 Component styling remains owner-local rather than a public `class`, `style`, or CSS-bag API.
 Where composition is needed, an overlay passes its `TriggerProps` (handlers, ARIA state, and ref)
 to a `renderTrigger` snippet that spreads them onto an existing component such as Button or
-`SelectButton`. Button renders the actual `@void/svelte` Link through `asLink` + `href`.
+`SelectButton`. Button renders a plain `<a>` through `asLink` + `href`, forwards `viewTransition` as
+`data-view-transition`, and accepts an optional caller-supplied preload attachment.
 
 A component may add a finite named `variant`, `size`, or narrowly proven local-layout control when it
 has actual callers and a story. It must not add a `custom`/`unstyled` variant or universal spacing,
@@ -130,8 +131,7 @@ scoped to editor-generated DOM and excludes interactive decorators.
 
 Scoped selectors target owned DOM. Use narrowly named, anchored `:global()` only for child roots,
 rendered snippets, generated content, and global property/animation names; do not globalize blocks
-merely to suppress warnings. Button's forwarded Void Link class uses an owner-specific global
-selector because the anchor is compiled by the adapter. `.dark` ancestors are global while their
+merely to suppress warnings. Button owns and scopes its anchor directly; no adapter-generated anchor requires a global selector. `.dark` ancestors are global while their
 local owner remains scoped. Snippet content belongs to its declaring component, and portaled DOM
 retains its scope classes but cannot depend on an ancestor left behind. Select owns its placeholder;
 its shared trigger owns the text container and icon. Story CSF content must receive effective scoped
@@ -142,24 +142,28 @@ and scroll-driven clipping. Geometry stays in existing hooks/DOM updates, not re
 
 ### 6.4 Navigation and form integrations
 
-The design system may depend on `@void/svelte` for actual navigation Links, but never imports app
-or feature policy. Button navigates with `asLink` + `href` and optional `viewTransition`, for example
-`<Button asLink href="/recipe/new" />`; it renders the actual Void `Link`, not a click-driven button.
-TabBar takes `currentPath` and items with `label`, `href`, and inactive/active icons.
-`isCurrentPath` matches `/` exactly and other items at their path or descendants; desktop AppHeader
-navigation uses the same matcher. Pages pass current path explicitly. Storybook needs no router decorator.
+The design system never imports app, feature or router policy. Button navigates with
+`asLink` + `href` and optional `viewTransition`, rendering a plain `<a>` with
+`data-view-transition`, not a click-driven button. Its optional `preload` prop is an attachment:
+callers pass `preloadLink('intent' | 'viewport')` from app router code, keeping that import out of
+`src/components/ui/`. Header/tab links and home cards choose viewport; search cards choose intent.
+TabBar takes currentPath and items with label/href/inactive/active icons. `isCurrentPath` matches
+home exactly and other paths or descendants; callers read `router.current.url.pathname`.
+Storybook needs no router decorator. Query-dependent interaction hosts use a fresh QueryClient and
+stub mutation functions, without page-protocol/router adapters.
 
-Tabs are native hash anchors with scroll-snap panels. Once hydrated, clicks scroll the matching
+Tabs are native hash anchors with scroll-snap panels. Once mounted, clicks scroll the matching
 panel and replace the URL hash with `history.replaceState`; tab changes do not push history entries.
-Unhydrated static tabs retain native hash behavior.
+Tabs retain native hash behavior before their click handler mounts.
 ScreenLayout accepts a `backButton` slot, usually DS `GoBackButton`, whose default handler calls
 `history.back()`. Scroll IDs remain
-`screen-inner`/`screen-outer`, but there is no managed scroll-container restoration.
-DS NotFound provides a Void home Link by default. The root layout owns pathname-keyed `<svelte:boundary>` render-error
-boundaries; unknown URLs use Void's default 404.
+`screen-inner`/`screen-outer`; the router restores their offsets and document scroll by history key
+on traversal and resets them on push/replace. DS NotFound provides a plain home anchor by default.
+`src/app.svelte` owns pathname-keyed `<svelte:boundary>` render-error boundaries; unknown document
+paths render in-app NotFound with HTTP 200 from the static-shell fallback.
 
 The app's SearchBar owns the single-use command palette with shared Dialog/ScrollArea and native
-ARIA combobox/listbox semantics. Pages/layouts own theme/search composition and recipe/auth policy.
+ARIA combobox/listbox semantics. The app shell owns theme/search composition and recipe/auth policy.
 Pages remain unstyled composition of feature sections and app-shell components; they own
 cross-feature coordination rather than intermediary page wrappers.
 
@@ -167,7 +171,7 @@ Form dialogs keep a private form-aware composition so body and submit footer sha
 Public dialogs do not expose content-render or panel-style props, and forms have no styling escape
 hatch. This preserves Enter submission, async disable/cancellation, errors, focus return, and nested
 submit-propagation handling. DeleteDialog tracks loading through local state while awaiting
-`onDelete`; callers own the awaited action.
+`onDelete`; callers own the awaited mutation.
 
 ### 6.5 Visual role map
 
@@ -201,9 +205,9 @@ role at the token owner and review its consumers rather than introducing local c
 ## 7. Compatibility and Review Criteria
 
 Existing dependency direction remains: the design system does not import web, app, feature, or
-router-policy code, while its reusable navigation may use `@void/svelte` Links. Feature schemas, queries,
+router-policy code; reusable navigation uses plain anchors and caller-supplied attachments. Feature schemas, queries,
 mutations, domain presentation, menus/filtering, and recipe/auth policy stay app-owned. Use actual
-Links for navigation; do not substitute click-driven buttons.
+anchors for navigation; do not substitute click-driven buttons.
 
 When changing a reusable component, review all named/compound exports and forwarding paths, actual
 callers, and typed spreads. Add or update a colocated story for every supported presentation. Verify

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { setContext } from 'svelte'
-  import { createSsrRouter } from 'void/pages-client'
-  import type { VoidRouter } from 'void/pages-client'
+  import { trackInvalidations } from '@storybook-helpers/stub-fetch'
+  import { useQueryClient } from '@tanstack/svelte-query'
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import IngredientCatalogProvider from '@/features/ingredients/client/contexts/ingredient-catalog-provider.svelte'
@@ -11,16 +10,12 @@
 
   let refreshes = $state(0)
   let ingredients: Ingredient[] = $state([])
-  const router: VoidRouter = {
-    ...createSsrRouter('/settings/ingredients'),
-    refresh: async () => {
-      refreshes += 1
-      ingredients = [
-        { category: 'vegetables', countWeightG: null, densityGPerMl: null, id: 2, name: 'Courgette', parentId: null, preferredUnitSlug: null },
-      ]
-    },
-  }
-  setContext('__void_router', router)
+  trackInvalidations(useQueryClient(), 'ingredients', () => {
+    refreshes += 1
+    ingredients = [
+      { category: 'vegetables', countWeightG: null, densityGPerMl: null, id: 2, name: 'Courgette', parentId: null, preferredUnitSlug: null },
+    ]
+  })
 </script>
 
 <p role="status">Actualisations: {refreshes}</p>

@@ -12,7 +12,7 @@ Cooks need a focused way to find a recipe by name and narrow the catalogue by me
 recipe characteristics. The search screen combines instant local filtering with a browser-local
 history of opened results, making repeat visits quick without duplicating recipe records.
 
-- `[G-1]` Let a cook narrow the loader-provided recipe catalogue through accent-insensitive text and combined filters.
+- `[G-1]` Let a cook narrow the query-backed recipe catalogue through accent-insensitive text and combined filters.
 - `[G-2]` Make an unfiltered search screen useful by presenting recently opened recipes in recency order.
 - `[G-3]` Keep discovery responsive while preserving the recipe list as the authoritative server-data contract.
 
@@ -20,15 +20,15 @@ history of opened results, making repeat visits quick without duplicating recipe
 
 | Decision                    | Choice                                                                                                              | Rationale                                                                                                           |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Filtering location | The RecipeSearch component filters the loader's recipe-list props.                                                  | Typing and toggle changes produce no Worker round trip, and the list remains available to an already-loaded client. |
+| `[KD-1]` Filtering location | RecipeSearch filters the shared `recipeList` query's rows.                                                          | Typing and toggle changes produce no Worker round trip, and the list remains available to an already-loaded client. |
 | `[KD-2]` Text comparison    | Both query and recipe name use NFD diacritic removal and lowercase comparison.                                      | French names match regardless of case or accents without an i18n dependency.                                        |
 | `[KD-3]` Filter semantics   | Selected meals and cuisines are each AND-combined; vegetarian, Magimix, and spice values act as boolean predicates. | Multiple selections consistently narrow results while the spice toggle controls whether spice recipes are visible.  |
-| `[KD-4]` Recent state       | The persisted store retains recipe IDs only, most-recent-first, capped at ten.                                      | IDs avoid stale recipe snapshots and resolve against the loader-provided catalogue.                                 |
+| `[KD-4]` Recent state       | The persisted store retains recipe IDs only, most-recent-first, capped at ten.                                      | IDs avoid stale recipe snapshots and resolve against the query-backed catalogue.                                    |
 | `[KD-5]` Default content    | No active filters displays resolved recents, falling back to non-spice catalogue rows.                              | The screen supports repeat discovery without presenting an empty first-use state.                                   |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **Server records stay in loader props** — refine architecture [PI-4]; the search store contains IDs,
+- `[PI-1]` **Server records stay in the query cache** — refine architecture [PI-4]; the search store contains IDs,
   never recipe objects.
 - `[PI-2]` **Filters stay local** — query text and selections describe one screen interaction and do not
   become URL state.
@@ -50,13 +50,13 @@ history of opened results, making repeat visits quick without duplicating recipe
   (`src/features/recipe/server/queries.ts`).
 - `[C-2]` Deleted recent IDs are skipped; if none resolve, rendering falls back to the supplied
   non-spice catalogue (`src/features/search/client/components/recent-recipes.svelte`).
-- `[C-3]` Search is a regular hydrated page; the loader supplies recipes and RecipeSearch
-  owns local filtering/recents (`pages/search/index.server.ts`, `search/index.svelte`).
+- `[C-3]` Search is a SPA screen; its registry preload ensures `recipeList`, and RecipeSearch
+  owns local filtering/recents (`src/pages/search/index.svelte`).
 
 ## 7. High-Level Components
 
 ```text
-/search Void loader ──▶ listRecipes(getDb()) ──▶ recipe props
+/search preload ──▶ recipeList query (GET /api/recipes) ──▶ cached rows
        │                                              │
        ▼                                              ▼
 local filter state ──▶ filterRecipes() ──▶ results / empty state
@@ -66,7 +66,7 @@ local filter state ──▶ filterRecipes() ──▶ results / empty state
 
 | Component        | Module type                        | Responsibility                                                     | Public API surface                  |
 | ---------------- | ---------------------------------- | ------------------------------------------------------------------ | ----------------------------------- |
-| Search route     | Void hydrated page                 | Read recipe props and compose RecipeSearch                         | `/search`                           |
+| Search route     | SPA screen                         | Observe the recipe-list query and compose RecipeSearch             | `/search`                           |
 | Filter utilities | Pure feature utility               | Normalise names and apply text/attribute predicates                | `filterRecipes`, `hasActiveFilters` |
 | Search results   | Svelte component                   | Render matched rows, count, clear action, and shopping-list action | `SearchResults`                     |
 | Recent recipes   | Persisted rune store and component | Retain IDs and resolve them to live recipe rows                    | `addRecentRecipe`, `RecentRecipes`  |
@@ -76,9 +76,12 @@ local filter state ──▶ filterRecipes() ──▶ results / empty state
 
 ### 8.1 Search route
 
-The `pages/search/index.server.ts` loader directly calls `listRecipes(getDb())`.
-`pages/search/index.svelte` imports RecipeSearch directly and passes `recipes`.
-The root layout supplies the search palette and theme controls.
+The `/search` entry in `src/lib/client/router/routes.ts` preloads `recipeList` with
+`queryClient.ensureQueryData`. `src/pages/search/index.svelte` observes the same query and passes
+`recipes` to RecipeSearch. The palette shares its cache; the app shell supplies search/theme controls.
+Feature API options call `readResponse(fetch(...))` from `void/client`; recipe mutations invalidate
+`allRecipes`. Queries use 5-minute staleTime and 24-hour gcTime; stale cached visits render immediately
+while refreshing in the background.
 
 `RecipeSearch` maintains one local `SearchFilters` value: query text, cuisine and meal arrays,
 and vegetarian/Magimix/spice booleans. SearchFilters owns the collapsible single-select controls
@@ -86,8 +89,8 @@ and vegetarian/Magimix/spice booleans. SearchFilters owns the collapsible single
 `EMPTY_FILTERS` provides empty selections and disabled booleans; clear restores that value.
 
 Active filters show filtered results; without filters RecipeSearch passes non-spice catalogue rows
-to RecentRecipes. SSR/hydration read the initial recent-ID snapshot, then saved browser recents
-resolve against loader props without a hydration mismatch.
+to RecentRecipes. Saved browser recents
+resolve against query-backed rows; retained store snapshot paths run only on the client.
 
 ### 8.2 Filter utilities
 
@@ -123,10 +126,10 @@ continues to capture the recent-recipe visit (`src/features/search/client/compon
 The store persists `number[]` under `recent-recipes`. `addRecentRecipe(id)` prepends an ID, removes
 its prior occurrence, and retains ten entries; a separate action clears the history
 (`src/stores/recent-recipes.store.svelte.ts`). `RecentRecipes` resolves IDs in stored order against the
-loader-provided catalogue, omits stale IDs, and displays the supplied catalogue when resolution yields no rows
+query-backed catalogue, omits stale IDs, and displays the supplied catalogue when resolution yields no rows
 (`src/features/search/client/components/recent-recipes.svelte`).
 
-The store exposes its array through a hydration-safe store read hook, keeping persistence mechanics outside the page
+The store exposes its array through a browser store read hook, keeping persistence mechanics outside the page
 component (`src/stores/recent-recipes.store.svelte.ts`). The visible history header includes the French
 clear control only when at least one recent row resolves (`src/features/search/client/components/recent-recipes.svelte`).
 
@@ -136,8 +139,8 @@ This keeps the default screen populated without promoting stale browser state in
 
 ### 8.5 Search card
 
-Every search card uses a Void Link to `/recipe/<id>` and records the ID on activation.
-Links use client navigation with `prefetch` on hover, touchstart, and focus
+Every search card uses a plain anchor to `/recipe/<id>` and records the ID on activation.
+Links use client navigation with `preloadLink('intent')` on pointerenter, touchstart and focus
 (`src/features/search/client/components/recipe-search-card.svelte`). The card renders the recipe image,
 name, and attribute badges from the recipe projection (`src/features/search/client/components/recipe-search-card.svelte`).
 

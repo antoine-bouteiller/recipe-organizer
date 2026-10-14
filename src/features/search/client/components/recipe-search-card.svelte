@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { Link } from '@void/svelte'
   import type { Snippet } from 'svelte'
 
   import Badge from '@/components/ui/data-display/badge/badge.svelte'
   import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/constants'
+  import { preloadLink } from '@/lib/client/router/preload'
   import { addRecentRecipe } from '@/stores/recent-recipes.store.svelte'
   import type { ReducedRecipe } from '@/types/recipe'
 
@@ -11,11 +11,11 @@
 </script>
 
 <div class="stagger-in-45 recipe-search-card-container" style:--stagger={Math.min(index, 10)}>
-  <Link
+  <a
     class={['recipe-search-card-link', action ? 'with-action' : 'without-action']}
     href={`/recipe/${recipe.id}`}
     onclick={() => addRecentRecipe(recipe.id)}
-    prefetch
+    {@attach preloadLink('intent')}
   >
     <img src={recipe.image} alt={recipe.name} class="recipe-search-card-image" decoding="async" loading={index < 6 ? 'eager' : 'lazy'} />
     <div class="recipe-search-card-content">
@@ -28,7 +28,7 @@
         {#each recipe.cuisineTypes as cuisineType (cuisineType)}<Badge size="sm" variant="accent">{CUISINE_TYPE_LABELS[cuisineType]}</Badge>{/each}
       </div>
     </div>
-  </Link>
+  </a>
   {#if action}<div class="recipe-search-card-action">{@render action()}</div>{/if}
 </div>
 

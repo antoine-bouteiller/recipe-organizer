@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Link } from '@void/svelte'
+  import { preloadLink } from '@/lib/client/router/preload'
 
   import { isCurrentPath } from './current-path'
   import type { MenuItem } from './menu-items.svelte'
@@ -14,12 +14,13 @@
 
 <nav class="element" data-slot="tab-bar">
   {#each items as item (item.href)}
-    <Link
+    <a
       aria-current={isCurrentPath(currentPath, item.href) ? 'page' : undefined}
       class="app-tab-bar-item"
       data-slot="tab-bar-item"
+      data-view-transition="false"
       href={item.href}
-      viewTransition={false}
+      {@attach preloadLink('viewport')}
     >
       <span aria-hidden="true" class="icon-slot" data-slot="tab-bar-item-icon-inactive">
         {@render item.icon()}
@@ -28,7 +29,7 @@
         {@render item.activeIcon()}
       </span>
       {item.label}
-    </Link>
+    </a>
   {/each}
 </nav>
 

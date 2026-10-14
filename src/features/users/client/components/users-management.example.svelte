@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { setContext } from 'svelte'
-  import { createSsrRouter, VoidActionError } from 'void/pages-client'
-  import type { VoidRouter } from 'void/pages-client'
+  import { json, stubFetch } from '@storybook-helpers/stub-fetch'
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import type { UserStatus } from '@/features/users/schemas'
@@ -28,28 +26,24 @@
   })
   let requests = $state(0)
   let complete: (() => void) | undefined = $state()
-  const router: VoidRouter = {
-    ...createSsrRouter('/settings/users'),
-    visit: async (_url, options) => {
-      requests += 1
-      if (failure === 'expected') {
-        throw new VoidActionError({ body: { error: 'Adresse déjà utilisée' }, status: 409, statusText: 'Conflict', url: '/settings/users?create' })
-      }
-      if (failure === 'thrown') {
-        throw new Error('Service indisponible')
-      }
-      const data = options?.data as { email?: string }
-      if (data.email === 'invalide') {
-        return { errors: { email: 'Adresse e-mail invalide' } }
-      }
-      await new Promise<void>((resolve) => {
-        complete = resolve
-      })
-      complete = undefined
-      return {}
-    },
-  }
-  setContext('__void_router', router)
+  stubFetch(async (request) => {
+    requests += 1
+    if (failure === 'expected') {
+      return json({ error: 'Adresse déjà utilisée' }, 409)
+    }
+    if (failure === 'thrown') {
+      throw new Error('Service indisponible')
+    }
+    const data: { email?: string } = await request.json()
+    if (data.email === 'invalide') {
+      return json({ error: 'Invalid Schema', errors: { email: 'Adresse e-mail invalide' } }, 400)
+    }
+    await new Promise<void>((resolve) => {
+      complete = resolve
+    })
+    complete = undefined
+    return new Response(null, { status: 204 })
+  })
 </script>
 
 <Button onclick={() => complete?.()}>Terminer la création</Button>

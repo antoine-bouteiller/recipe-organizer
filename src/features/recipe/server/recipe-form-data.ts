@@ -1,7 +1,6 @@
-import { ValidationError } from 'void/pages-protocol'
 import type * as z from 'zod'
 
-import { HttpError } from '@/lib/server/http-error'
+import { FieldValidationError, HttpError } from '@/lib/server/http-error'
 
 const numericFields = new Set(['id', 'recipeId', 'quantity', 'ratio', 'servings', 'temperature', 'time'])
 const optionalFields = new Set(['image', 'video', 'groupName', 'unitSlug', 'magimix', 'temperature'])
@@ -47,7 +46,7 @@ const insertField = (root: MultipartObject, path: string[], value: MultipartValu
 }
 
 const restoreEmptyArrays = (root: MultipartObject) => {
-  // Void omits empty arrays, including the default group's empty steps.
+  // Multipart bodies omit empty arrays, including the default group's empty steps.
   for (const key of ['cuisineTypes', 'meals', 'ingredientGroups', 'linkedRecipes', 'stepGroups']) {
     root[key] ??= []
   }
@@ -99,7 +98,7 @@ export const readRecipeFormData = async (context: FormRequestContext): Promise<u
 export const validateRecipeForm = <TSchema extends z.ZodType>(schema: TSchema, data: unknown): z.output<TSchema> => {
   const result = schema.safeParse(data)
   if (!result.success) {
-    throw new ValidationError(Object.fromEntries(result.error.issues.map((issue) => [issue.path.join('.'), issue.message])))
+    throw new FieldValidationError(Object.fromEntries(result.error.issues.map((issue) => [issue.path.join('.'), issue.message])))
   }
   return result.data
 }

@@ -2,7 +2,7 @@
 
 Create and organize recipes, manage ingredients, and generate shopping lists. Supports Google sign-in, desktop and mobile layouts, and PWA installation (requires connectivity).
 
-Built with Svelte 5, Void Pages, and Drizzle on Cloudflare Workers, with D1 for data and R2 for images.
+Built with a Svelte 5 SPA over the Void API, TanStack Svelte Query, and Drizzle on Cloudflare Workers, with D1 for data and R2 for images.
 
 ## Get started
 
@@ -25,7 +25,7 @@ pnpm db:migrate:local
 pnpm dev
 ```
 
-Open http://localhost:3000. One Vite server serves server-rendered pages and `/api/*` from the same origin; local data is stored in `.wrangler/state`.
+Open http://localhost:3000. One Vite server serves the static SPA shell and `/api/*` from the same origin; local data is stored in `.wrangler/state`.
 
 ## Commands
 
@@ -41,9 +41,10 @@ pnpm db:migrate:local  # Apply local database migrations
 
 ## Project layout
 
-- `pages/` — Void page components, layouts, loaders, actions, and island wrappers
-- `src/features/<feature>/` — `client/` components and hooks, `server/` domain helpers, and shared schemas at the root
-- `src/lib/` — `client/` browser services and `server/` auth, D1, R2, and errors
+- `index.html`, `src/main.ts`, `src/app.svelte` — Static document shell and Svelte query-provider mount
+- `src/pages/` — Client screens registered in `src/lib/client/router/routes.ts`
+- `src/features/<feature>/` — `client/` components, hooks and `api/` query/mutation options, `server/` domain helpers, and shared schemas at the root
+- `src/lib/` — `client/` router, query client/keys, form state and browser services; `server/` auth, D1, R2, and errors
 - `src/db/` — Drizzle schema and migrations
 - `src/components/ui/` — Owned UI components and Storybook stories
 - `src/styles/` — Theme, global styles, and fonts
@@ -54,10 +55,11 @@ pnpm db:migrate:local  # Apply local database migrations
 
 See the [project structure](docs/file-structure.spec.md) and [styling guidelines](src/styles/styling.spec.md) for details.
 
-Home, search, shopping list, and recipe details are island pages: the document is server-rendered and
-only interactive controls hydrate. Login, settings, and recipe editors are regular hydrated pages.
-Loaders read server helpers directly; page actions handle writes and refresh props in place.
-Unknown URLs return Void's default 404; missing recipes show in-page recovery.
+Every document URL receives the same static SPA shell; there is no SSR. The in-house Navigation API
+router preloads screen code and query data before committing. Server records live in a document-local
+query cache (fresh for 5 minutes, retained unused for 24 hours); API mutations invalidate affected keys.
+Client guards choose screens, while the API authorizes protected reads and writes. Unknown document
+URLs render in-app NotFound with HTTP 200; missing recipes return API 404 with in-page recovery.
 Local development always supplies an active admin identity, so it does not exercise Google sign-in.
 
 ## Deploy
@@ -71,7 +73,7 @@ pnpm deploy
 ```
 
 Void builds and deploys the Worker and web assets together. `pnpm build` outputs
-`dist/client` and `dist/ssr`; the latter is the Worker bundle, including page rendering.
+`dist/client` and `dist/ssr`; the latter is the API/middleware Worker bundle, not server page rendering.
 CI deploys with `vp exec void deploy --platform cloudflare` and then runs the
 Drizzle-kit database migration step. Authentication secrets (`BETTER_AUTH_SECRET`, `GOOGLE_CLIENT_ID`,
 `GOOGLE_CLIENT_SECRET`) remain dashboard-managed,

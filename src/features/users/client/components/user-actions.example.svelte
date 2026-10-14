@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { setContext } from 'svelte'
-  import { createSsrRouter, VoidActionError } from 'void/pages-client'
-  import type { VoidRouter } from 'void/pages-client'
+  import { json, stubFetch } from '@storybook-helpers/stub-fetch'
 
   import Button from '@/components/ui/actions/button/button.svelte'
 
@@ -11,21 +9,14 @@
   const { blocked, failure }: { blocked?: boolean; failure?: boolean } = $props()
   let requests = $state(0)
   let complete: (() => void) | undefined = $state()
-  const router: VoidRouter = {
-    ...createSsrRouter('/settings/users'),
-    visit: async () => {
-      requests += 1
-      await new Promise<void>((resolve) => {
-        complete = resolve
-      })
-      complete = undefined
-      if (failure) {
-        throw new VoidActionError({ body: { error: 'Service indisponible' }, status: 500, statusText: 'Server Error', url: '/settings/users' })
-      }
-      return {}
-    },
-  }
-  setContext('__void_router', router)
+  stubFetch(async () => {
+    requests += 1
+    await new Promise<void>((resolve) => {
+      complete = resolve
+    })
+    complete = undefined
+    return failure ? json({ error: 'Service indisponible' }, 500) : new Response(null, { status: 204 })
+  })
 </script>
 
 <Button onclick={() => complete?.()}>Terminer l'action</Button>

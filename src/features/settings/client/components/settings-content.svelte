@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Link } from '@void/svelte'
   import type { Component } from 'svelte'
 
   import Button from '@/components/ui/actions/button/button.svelte'
@@ -49,7 +48,7 @@
 </div>
 <div class="settings-content-sections">
   {#each visibleSections as section (section.id)}
-    <Link href={section.path}
+    <a href={section.path}
       ><div class="settings-content-section-link">
         <Card
           ><div class="settings-content-section-card">
@@ -63,7 +62,7 @@
             <span class="settings-content-section-caret"><CaretRightIcon size="lg" /></span>
           </div></Card
         >
-      </div></Link
+      </div></a
     >
   {/each}
 </div>

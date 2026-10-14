@@ -12,8 +12,5 @@ export const ingredientSchema = z.object({
   preferredUnitSlug: unitSlugSchema.nullable().optional(),
 })
 
-export const updateIngredientSchema = ingredientSchema.extend({ id: z.number() })
-export const deleteIngredientSchema = z.object({ id: z.number() })
-
 type IngredientFormValues = z.infer<typeof ingredientSchema>
 export type IngredientFormInput = Partial<IngredientFormValues>

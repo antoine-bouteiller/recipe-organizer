@@ -1,13 +1,15 @@
 <script lang="ts">
+  import { createMutation } from '@tanstack/svelte-query'
+
   import DeleteDialog from '@/components/ui/overlays/delete-dialog/delete-dialog.svelte'
+  import { deleteIngredientMutation } from '@/features/ingredients/client/api/delete'
   import { alertError } from '@/lib/client/alert-error'
-  import { usePageAction } from '@/lib/client/page-action.svelte'
 
   const { ingredientId, ingredientName }: { ingredientId: number; ingredientName: string } = $props()
-  const runPageAction = usePageAction()
+  const mutation = createMutation(() => deleteIngredientMutation())
   const handleDelete = async () => {
     try {
-      await runPageAction('/settings/ingredients?delete', { data: { id: ingredientId } }, "Erreur lors de la suppression de l'ingrédient")
+      await mutation.mutateAsync(ingredientId)
     } catch (error) {
       alertError("Erreur lors de la suppression de l'ingrédient", error)
     }

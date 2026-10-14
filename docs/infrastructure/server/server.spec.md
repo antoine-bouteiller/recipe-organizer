@@ -11,7 +11,7 @@ related: []
 ## 2. Problem Statement
 
 The Worker needs a coherent server boundary for persistence, media, Void HTTP, and identity so
-feature modules can serve private recipe data without operating a separate backend. This sub-umbrella
+feature modules can serve recipe data and guarded writes to a static Svelte SPA without a separate backend. This sub-umbrella
 refines the Worker, storage, and identity goals in the architecture umbrella [G-1], [G-2], and
 [G-3] (`docs/architecture.spec.md:18-22`) into four independently specified responsibilities.
 
@@ -51,12 +51,12 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component  | Module type                        | Responsibility                                                      | Public API surface                             |
-| ---------- | ---------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------- |
-| Platform   | Worker configuration and utilities | Bindings, media transformation, edge cache, network-only PWA worker | bindings, R2 helpers                           |
-| Data layer | Library                            | Typed D1 schema, relations, and client                              | `getDb()`                                      |
-| Void API   | Convention and library             | Validated RPC, errors, query integration                            | Void file routes, API client, option factories |
-| Auth       | Library and routes                 | Google identity, sessions, membership guards                        | `auth.ts`, `withAuthGuard(handler, role?)`     |
+| Component  | Module type                        | Responsibility                                                                  | Public API surface                                     |
+| ---------- | ---------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Platform   | Worker configuration and utilities | API Worker/static-shell boundary, bindings, media, edge cache, network-only PWA | bindings, R2 helpers                                   |
+| Data layer | Library                            | Typed D1 schema, relations, and client                                          | `getDb()`                                              |
+| Void API   | Convention and library             | Validated reads/writes, field errors and query integration                      | API file routes, typed fetch, feature option factories |
+| Auth       | Library and routes                 | Google identity, sessions, membership guards                                    | `auth.ts`, `withAuthGuard(handler, role?)`             |
 
 | Leaf                                             | Depends on                                                  | Rationale                                                                 |
 | ------------------------------------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------------- |

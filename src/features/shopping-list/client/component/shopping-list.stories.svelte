@@ -6,7 +6,6 @@
   import { setRecipesQuantities } from '@/stores/recipe-quantities.store.svelte'
   import { addToShoppingList, resetShoppingList } from '@/stores/shopping-list.store.svelte'
 
-  import { loadRecipesByIds } from '../api/get-recipe-by-ids'
   import type { ShoppingListRecipe } from '../utils/aggregate-shopping-list'
   import ShoppingList from './shopping-list.svelte'
 
@@ -56,8 +55,9 @@
       resolveNew(response([recipe(61002, 'Tomates')]))
       await expect(await canvas.findByRole('button', { name: 'Tomates 100 g' })).toBeVisible()
       resolveOld(response([recipe(61001, 'Carottes')]))
-      // Wait for the real transport to settle, then inspect the public UI, not the request callback.
-      await loadRecipesByIds([61001])
+      // Let the superseded response settle, then inspect the public UI, not the request callback.
+      await oldRequest
+      await tick()
       await tick()
       await expect(canvas.getByRole('button', { name: 'Tomates 100 g' })).toBeVisible()
       await expect(canvas.queryByRole('button', { name: /Carottes 100/ })).not.toBeInTheDocument()

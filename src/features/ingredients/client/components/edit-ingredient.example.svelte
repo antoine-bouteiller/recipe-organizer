@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { setContext } from 'svelte'
-  import { createSsrRouter } from 'void/pages-client'
-  import type { VoidRouter } from 'void/pages-client'
+  import { json, stubFetch } from '@storybook-helpers/stub-fetch'
 
   import Button from '@/components/ui/actions/button/button.svelte'
   import IngredientCatalogProvider from '@/features/ingredients/client/contexts/ingredient-catalog-provider.svelte'
@@ -18,18 +16,14 @@
     parentId: null,
     preferredUnitSlug: null,
   })
-  const router: VoidRouter = {
-    ...createSsrRouter('/settings/ingredients'),
-    visit: async (_url, options) => {
-      const data = options?.data as Ingredient
-      if (data.name.length < 2) {
-        return { errors: { name: 'Le nom doit comporter au moins 2 caractères' } }
-      }
-      ingredient = { ...data, parentId: data.parentId ?? null }
-      return {}
-    },
-  }
-  setContext('__void_router', router)
+  stubFetch(async (request) => {
+    const data: Omit<Ingredient, 'id'> = await request.json()
+    if (data.name.length < 2) {
+      return json({ error: 'Invalid Schema', errors: { name: 'Le nom doit comporter au moins 2 caractères' } }, 400)
+    }
+    ingredient = { ...data, id: ingredient.id, parentId: data.parentId ?? null }
+    return new Response(null, { status: 204 })
+  })
 </script>
 
 <Button onclick={() => (ingredient = { ...ingredient, name: 'Courgette' })}>Actualiser l'ingrédient</Button>

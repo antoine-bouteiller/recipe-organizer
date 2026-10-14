@@ -4,6 +4,8 @@ import { MINIMAL_VIEWPORTS } from 'storybook/viewport'
 import '@/styles/global.css'
 import '@/styles/styles.css'
 
+import QueryClientProvider from './query-client-provider.svelte'
+
 const preview: Preview = {
   decorators: [
     (story, context) => {
@@ -11,6 +13,7 @@ const preview: Preview = {
       document.documentElement.classList.toggle('dark', context.globals.theme === 'dark')
       return story()
     },
+    () => ({ Component: QueryClientProvider }),
   ],
   globalTypes: {
     theme: {

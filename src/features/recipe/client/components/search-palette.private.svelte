@@ -1,21 +1,22 @@
 <script lang="ts">
-  import { useRouter } from '@void/svelte'
+  import { createQuery } from '@tanstack/svelte-query'
   import { onMount, tick } from 'svelte'
 
   import { ArrowElbowDownLeftIcon, MagnifyingGlassIcon } from '@/components/ui/data-display/icons'
   import Kbd from '@/components/ui/data-display/kbd/kbd.svelte'
   import ScrollArea from '@/components/ui/layout/scroll-area/scroll-area.svelte'
-  import { loadRecipeList } from '@/features/recipe/client/api/get-all'
+  import { recipeListQuery } from '@/features/recipe/client/api/get-all'
   import { alertError } from '@/lib/client/alert-error'
+  import { router } from '@/lib/client/router/router.svelte'
   import type { ReducedRecipe } from '@/types/recipe'
   import { normalize } from '@/utils/normalize'
 
   const { onClose }: { onClose: () => void } = $props()
-  const router = useRouter()
   const listId = $props.id()
-  let recipes = $state<ReducedRecipe[]>([])
-  let pending = $state(true)
-  let failed = $state(false)
+  const recipeList = createQuery(() => recipeListQuery())
+  const recipes = $derived(recipeList.data ?? [])
+  const pending = $derived(recipeList.isPending)
+  const failed = $derived(recipeList.isError && !recipeList.data)
   let query = $state('')
   let highlightedIndex = $state(0)
   let input: HTMLInputElement | undefined = undefined
@@ -25,7 +26,7 @@
   const select = async (recipe: ReducedRecipe) => {
     onClose()
     try {
-      await router.visit(`/recipe/${recipe.id}`)
+      await router.navigate(`/recipe/${recipe.id}`)
     } catch (error) {
       alertError('Erreur lors de l’ouverture de la recette', error)
     }
@@ -37,20 +38,6 @@
         input?.focus()
       }
     })
-    void loadRecipeList().then(
-      (loaded) => {
-        if (active) {
-          recipes = loaded
-          pending = false
-        }
-      },
-      () => {
-        if (active) {
-          failed = true
-          pending = false
-        }
-      }
-    )
     return () => {
       active = false
     }

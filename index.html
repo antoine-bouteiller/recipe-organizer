@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#0e6e7e" />
+    <title>Recipe Organizer</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/favicon.ico" />
+    <script>
+      document.documentElement.className =
+        /(?:^|; )ui-theme=dark(?:;|$)/.test(document.cookie) ||
+        (!/(?:^|; )ui-theme=/.test(document.cookie) && matchMedia('(prefers-color-scheme: dark)').matches)
+          ? 'dark'
+          : 'light'
+    </script>
+    <script>
+      // Document navigations (sign-in, sign-out, no Navigation API) need both snapshots tagged; the router tags its own transitions.
+      ;(() => {
+        const navigation = globalThis.navigation
+        if (!navigation) return
+        const isBack = (activation) => activation?.navigationType === 'traverse' && activation.entry.index < (activation.from?.index ?? 0)
+        addEventListener('pageswap', (event) => {
+          if (event.viewTransition && isBack(event.activation)) event.viewTransition.types.add('back')
+        })
+        addEventListener('pagereveal', (event) => {
+          if (event.viewTransition && isBack(navigation.activation)) event.viewTransition.types.add('back')
+        })
+      })()
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' }).catch(() => undefined)
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

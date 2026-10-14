@@ -2,7 +2,6 @@ import { fileURLToPath } from 'node:url'
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { voidSvelte } from '@void/svelte/plugin'
 import type { Plugin, UserConfig } from 'vite-plus'
 import { defineConfig } from 'vite-plus'
 import { playwright } from 'vite-plus/test/browser-playwright'
@@ -31,24 +30,9 @@ const betterAuthMinimal: Plugin = {
   },
 }
 
-// The Void page adapter sets its browser entries as top-level inputs, which every environment inherits.
-const browserEntries = ['pages-client', 'islands-client']
-const clientOnlyEntries: Plugin = {
-  apply: 'build',
-  configEnvironment(name, config) {
-    const input = config.build?.rolldownOptions?.input
-    if (name === 'client' || !input || typeof input !== 'object' || Array.isArray(input)) {
-      return
-    }
-    for (const entry of browserEntries) {
-      delete input[entry]
-    }
-  },
-  enforce: 'post',
-  name: 'client-only-entries',
-}
-
 const viteConfig = defineConfig({
+  // The Worker, not Vite, answers unmatched document requests with the SPA shell.
+  appType: 'mpa',
   build: { minify: true },
   environments: {
     client: {
@@ -59,7 +43,6 @@ const viteConfig = defineConfig({
             codeSplitting: {
               groups: [
                 { name: 'styles', test: /\.css(?:$|\?)/ },
-                // Void only modulepreloads the pages-client graph, so each extra layout/page chunk adds a request round trip.
                 { name: 'vendor', test: /node_modules[\\/]|preload-helper/ },
                 // 3 keeps pair-only code (the recipe form shared by new and edit) out of every page's first load.
                 { minShareCount: 3, name: 'shared' },
@@ -170,22 +153,14 @@ const viteConfig = defineConfig({
       'recipe-oranizer/no-object-parameters': 'error',
       'recipe-oranizer/no-unknown-type-aliases': 'error',
       'recipe-oranizer/no-unsafe-dictionary-type': 'error',
-      'recipe-oranizer/no-use-shared-destructuring': 'error',
       'sort-imports': 'off',
       'vite-plus/prefer-vite-plus-imports': 'error',
     },
   },
   // Vitest cannot run the Worker environment.
-  plugins: process.env.VITEST
-    ? [svelte()]
-    : [
-        voidPlugin({ persistTo: '.wrangler/state' }),
-        voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true }),
-        betterAuthMinimal,
-        clientOnlyEntries,
-      ],
+  plugins: process.env.VITEST ? [svelte()] : [svelte(), voidPlugin({ persistTo: '.wrangler/state' }), betterAuthMinimal],
   resolve: {
-    // Virtual island entries and Svelte files are outside tsconfig path resolution.
+    // Svelte files are outside tsconfig path resolution.
     alias: [
       { find: /^@\//, replacement: fileURLToPath(new URL('src/', import.meta.url)) },
       {
@@ -202,7 +177,7 @@ const viteConfig = defineConfig({
   test: {
     coverage: {
       exclude: ['**/*.stories.svelte'],
-      include: ['src/**/*.{ts,svelte}', 'pages/**/*.{ts,svelte}', 'tools/oxlint/rules/**/*.ts'],
+      include: ['src/**/*.{ts,svelte}', 'tools/oxlint/rules/**/*.ts'],
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
     },

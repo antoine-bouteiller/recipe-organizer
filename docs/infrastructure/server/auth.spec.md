@@ -32,8 +32,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
   identity is distinct from application membership.
 - `[PI-2]` **Server-side secrets** — refine architecture [C-7]; OAuth credentials and session
   secret only enter server-side factory configuration.
-- `[PI-3]` **Guard before effects** — refine server-functions [KD-2]; shared page context may inform UI,
-  but protected page actions and APIs repeat their authorization decision.
+- `[PI-3]` **Guard before effects** — refine server-functions [KD-2]; the session query may inform UI,
+  but protected APIs make their own authorization decision.
 
 ## 5. Non-Goals
 
@@ -57,13 +57,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 7. High-Level Components
 
-| Component                 | Module type                 | Responsibility                                               | Public API surface                                           |
-| ------------------------- | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Auth config               | Root `auth.ts`              | Customize Void auth with secrets, Google, and table mappings | `defineAuth(...)`                                            |
-| Membership hooks          | Auth configuration          | Set pending accounts and reject inactive sessions            | `databaseHooks`                                              |
-| Auth user resolver        | Server helper               | Map Void's request user or development identity              | `getApiUser()`                                               |
-| Guard wrapper             | Handler wrapper / page gate | Enforce presence, status, and optional role                  | `withAuthGuard(handler, role?)`, `guardPage(context, role?)` |
-| Browser client and routes | Client library and routes   | Start sign-in, sign out, surface login outcomes              | `auth` (`void/client`), `/auth/login`, `/api/auth/*`         |
+| Component                 | Module type               | Responsibility                                               | Public API surface                                   |
+| ------------------------- | ------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
+| Auth config               | Root `auth.ts`            | Customize Void auth with secrets, Google, and table mappings | `defineAuth(...)`                                    |
+| Membership hooks          | Auth configuration        | Set pending accounts and reject inactive sessions            | `databaseHooks`                                      |
+| Auth user resolver        | Server helper             | Map Void's request user or development identity              | `getApiUser()`                                       |
+| Guard wrapper             | API handler wrapper       | Enforce presence, status, and optional role                  | `withAuthGuard(handler, role?)`                      |
+| Browser client and routes | Client library and routes | Start sign-in, sign out, surface login outcomes              | `auth` (`void/client`), `/auth/login`, `/api/auth/*` |
 
 ## 8. Detailed Design
 
@@ -89,23 +89,26 @@ provide them.
 
 ### 8.3 User resolution and guard
 
-`getApiUser()` resolves a fixed active admin identity in development. In production it maps
-`getUser()` from `void/auth`, which Void's auth middleware resolved once for the request before
-app middleware; Void also appends refreshed or expired session cookies to the response.
+`getApiUser()` resolves a fixed active admin identity in development. Production maps
+`getUser()` from `void/auth`, resolved by Void's auth middleware once per request;
+Void appends refreshed or expired session cookies to the response.
 
-`middleware/03.page-context.ts` sets `shared = { authUser: { email, role } | null, pathname }`
-for non-API, non-file-extension paths. Shared identity controls affordances, not authorization.
+```text
+GET /api/session → { email, role, status } | null → queryKeys.session = ['session']
+```
 
-`guardPage(context, role?)` returns an allowed user or a redirect Response: missing identity →
-`/auth/login`; blocked/pending → login with the matching account error; non-admin when admin is
-required → `/settings`. Protected loaders return that Response before reading their data.
-Recipe create/edit actions also call the gate.
+The session response omits ID, including the development identity. Router guards ensure this query:
+member requires active; anonymous redirects to `/auth/login`; pending/blocked to
+`/auth/login?error=account_<status>`; admin sends active non-admins to `/settings`;
+guest sends active members to `/`. Redirects replace history. These checks choose screens only;
+no page-context middleware or server page guard remains. Hard loads show the static shell until
+session resolution, rather than returning a server redirect before rendering.
 
 `withAuthGuard(handler, role?)` authorizes before handler validation and sets `apiUser`
-(`user` is reserved by Void). It throws `HttpError` for missing identity
-(`401 unauthorized`), blocked/pending membership (`403 account_blocked` / `account_pending`),
-or failed admin requirement (`403 Permission denied`). Settings actions, recipe deletion,
-and inline ingredient API creation use this wrapper.
+(`user` is reserved by Void). Missing identity throws `401 unauthorized`; pending/blocked
+membership throws `403 account_pending`/`account_blocked`; insufficient admin role throws
+`403 Permission denied`. Every guarded API read/write retains this server check;
+recipe mutation helpers also enforce owner-or-admin.
 
 ### 8.4 OAuth and HTTP route contract
 
@@ -117,20 +120,21 @@ session cookies directly.
 
 ### 8.5 Login and sign-out contract
 
-The regular login page in `pages/auth/login/index.svelte` starts
-`auth.signIn.social` (`void/client`) with provider `google`, callback `/`, and error callback `/auth/login`.
-It displays French messages for pending, blocked, or unverified-email codes and a generic fallback.
-Its server loader redirects any resolved identity to `/`; otherwise it passes the error query prop.
-Account sign-out calls `auth.signOut()` then uses `location.assign('/auth/login')`.
-Protected calls become anonymous when the session is absent.
+The login screen in `src/pages/auth/login/index.svelte` starts
+`auth.signIn.social` (`void/client`) with provider Google, callback `/` and error callback
+`/auth/login`. It reads the URL error query and displays French pending, blocked or unverified-email
+messages with a generic fallback. The client guest guard redirects active members to `/`.
+OAuth reloads the document, resetting the in-memory query cache and session query.
+Account sign-out calls `auth.signOut()` then `location.assign('/auth/login')`; no key invalidation
+is required because this resets the document cache.
 
-Browse loaders are not guarded: recipe list/search/details remain readable without identity;
-creation/settings/editor pages require membership and users administration requires admin.
-This is the shipped read-access boundary, distinct from private-group product intent.
+Recipe list/search/detail and ingredient-list APIs remain public; creation/settings/editor screens
+require membership, and users administration requires admin. The server independently protects
+writes and directory reads; this read-access boundary is distinct from private-group product intent.
 
 ### 8.6 Interaction boundary
 
-Auth owns identity, membership status, and role. Void loaders/actions/API handlers consume `guardPage` or `withAuthGuard(handler, role?)` and
+Auth owns identity, membership status, and role. Void API handlers consume `withAuthGuard(handler, role?)` and
 enforce resource ownership; the data layer owns storage mechanics; platform owns Worker secret provisioning.
 This division refines the server umbrella dependency direction [KD-2].
 

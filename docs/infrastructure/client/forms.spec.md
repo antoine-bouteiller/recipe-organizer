@@ -20,12 +20,12 @@ feature from independently composing field state, error presentation, and submis
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                                              | Rationale                                                                                                           |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Form composition    | Page-backed forms use `useForm` from `@void/svelte`; API ingredient creation and local Magimix dialogs use `$state` | One controlled field vocabulary without a second form framework.                                                    |
-| `[KD-2]` Validation contract | Page actions and API routes validate on the server; browser forms do not run Zod schemas                            | Editable drafts remain intact on failure; the Worker owns the trust boundary.                                       |
-| `[KD-3]` Error projection    | `form.errors` uses dotted paths through `provideFormErrors`; controls look up their `name`                          | Shared field errors and `aria-invalid` without application dependencies in UI components.                           |
-| `[KD-4]` File transport      | Void sends structured JSON, or bracket-key multipart when any value is a file                                       | The recipe server reader reconstructs multipart and normalizes only that transport before strict schema validation. |
+| Decision                     | Choice                                                                                     | Rationale                                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Form composition    | Server-backed forms use app-owned `createForm`; local Magimix dialogs retain `$state`      | One controlled field vocabulary without a second form framework.                                                    |
+| `[KD-2]` Validation contract | API routes validate on the server; browser forms do not run Zod schemas                    | Editable drafts remain intact on failure; the Worker owns the trust boundary.                                       |
+| `[KD-3]` Error projection    | `form.errors` uses dotted paths through `provideFormErrors`; controls look up their `name` | Shared field errors and `aria-invalid` without application dependencies in UI components.                           |
+| `[KD-4]` File transport      | `createForm` sends structured JSON, or bracket-key multipart when any value is a `File`    | The recipe server reader reconstructs multipart and normalizes only that transport before strict schema validation. |
 
 ## 4. Principles & Intents
 
@@ -46,12 +46,11 @@ feature from independently composing field state, error presentation, and submis
 
 ## 6. Caveats
 
-- `[C-1]` Void multipart converts numbers to strings, `null`/`undefined` to empty strings, and omits
+- `[C-1]` Bracket-key multipart converts numbers to strings, `null`/`undefined` to empty strings, and omits
   empty arrays. The recipe reader restores collections and optional values; JSON validation stays strict.
-- `[C-4]` Named-action form submissions can add `?actionName` history entries. Edit success replaces
-  the current entry with `/recipe/<id>` rather than using Back.
-- `[C-5]` Void updates reset defaults to submitted data after success. User creation clears email and
-  restores the default role explicitly; resetting alone would retain the created user.
+- `[C-4]` Mutations add no action URL/history entries. Edit success replaces the current entry with
+  `/recipe/<id>` rather than using Back; creation replaces it with `/`.
+- `[C-5]` User creation calls `reset()` with empty email and the default role after success.
 - `[C-2]` File previews use browser resources and upload acceptance is a user-experience check;
   server validation and storage controls remain required.
 - `[C-3]` Nested dialog forms stop submit propagation because a dialog can render within a page
@@ -59,29 +58,30 @@ feature from independently composing field state, error presentation, and submis
 
 ## 7. High-Level Components
 
-| Component         | Location                                         | Responsibility                            | Public API                                               |
-| ----------------- | ------------------------------------------------ | ----------------------------------------- | -------------------------------------------------------- |
-| Form state        | `@void/svelte` / feature components              | Page action state, or local `$state`      | `useForm(url, defaults, { params })`, `$state`           |
-| Controlled fields | `src/components/ui/forms/*-field/`               | Translate values into accessible controls | `name`, `value`, `onChange`, existing presentation props |
-| UI wrappers       | `src/components/ui/forms/{form,field}/`          | Project dotted-path errors into controls  | `Form`, `provideFormErrors`, `Field`, `useFieldInvalid`  |
-| Submit            | `src/components/ui/forms/form-submit/`           | Disable and indicate submission           | `label`, `pending`                                       |
-| File adapter      | `src/hooks/use-file-upload.svelte.ts`            | Select, validate, preview, remove files   | `useFileUpload`, `FileMetadata`                          |
-| Dialog            | `src/components/ui/overlays/form-dialog/`        | Private form frame and dialog chrome      | `FormDialog`                                             |
-| Recipe transport  | `src/features/recipe/server/recipe-form-data.ts` | Read JSON or Void multipart and validate  | `readRecipeFormData`, `validateRecipeForm`               |
+| Component         | Location                                             | Responsibility                                  | Public API                                               |
+| ----------------- | ---------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------- |
+| Form state        | `src/lib/client/form.svelte.ts` / feature components | Reactive drafts, errors and pending state       | `createForm(initial)`, `$state`                          |
+| Controlled fields | `src/components/ui/forms/*-field/`                   | Translate values into accessible controls       | `name`, `value`, `onChange`, existing presentation props |
+| UI wrappers       | `src/components/ui/forms/{form,field}/`              | Project dotted-path errors into controls        | `Form`, `provideFormErrors`, `Field`, `useFieldInvalid`  |
+| Submit            | `src/components/ui/forms/form-submit/`               | Disable and indicate submission                 | `label`, `pending`                                       |
+| File adapter      | `src/hooks/use-file-upload.svelte.ts`                | Select, validate, preview, remove files         | `useFileUpload`, `FileMetadata`                          |
+| Dialog            | `src/components/ui/overlays/form-dialog/`            | Private form frame and dialog chrome            | `FormDialog`                                             |
+| Recipe transport  | `src/features/recipe/server/recipe-form-data.ts`     | Read JSON or bracket-key multipart and validate | `readRecipeFormData`, `validateRecipeForm`               |
 
 ## 8. Detailed Design
 
 ### 8.1 Controlled field contract
 
 ```svelte
-const form = useForm('/recipe/new', recipeDefaultValues)
+const form = createForm(recipeDefaultValues)
 <Form errors={form.errors} onsubmit={submit}>
   <TextField name="name" value={form.data.name ?? ''} onChange={(value) => (form.data.name = value)} label="Nom de la recette" />
   <FormSubmit label="Créer la recette" pending={form.pending} />
 </Form>
 ```
 
-`submit` is a native `onsubmit` handler that prevents default and awaits `form.post()`. Recipe pages
+`submit` is a native `onsubmit` handler that prevents default and awaits
+`form.submit((body) => mutation.mutateAsync(body))`. Recipe pages
 adapt `form.data` to `RecipeFormState` (`data`, `pending`, `setData`), where `setData` assigns `form.data[key]`.
 
 Fields are ordinary controlled components, not registrations or context-bound state owners.
@@ -91,25 +91,37 @@ with controls, and `useFieldInvalid(name)` supplies control-level `aria-invalid`
 
 ### 8.2 Validation and transport
 
-Recipe actions expose their partial draft schema through the handler's `__validators.body` metadata
-for generated Void form typing. They do not invoke Void's JSON-only `withValidator` body reader.
-Instead they read structured JSON unchanged, or reconstruct bracket-key multipart, then validate
-against `recipeSchema` / `updateRecipeSchema`. Multipart-only normalization converts numeric
-fields, restores omitted empty arrays (including nested ingredients and steps), and restores blank
-optional assets, units, and Magimix values. Numeric-looking file metadata ids remain strings.
-Required empty numbers do not become zero. JSON numbers, required arrays, and null handling retain
-strict schema semantics. Schema failures become `ValidationError` from `void/pages-protocol` with
-last-issue-per-dotted-path messages, which Void projects into `form.errors`.
+```ts
+// src/lib/client/form.svelte.ts
+export interface AppForm<TData extends Record<string, unknown>> {
+  readonly data: TData // deeply reactive $state
+  readonly errors: Record<string, string>
+  readonly pending: boolean
+  submit: (send: (body: FormData | TData) => Promise<unknown>) => Promise<boolean>
+  reset: (values?: TData) => void
+}
+export const createForm: <TData extends Record<string, unknown>>(initial: TData) => AppForm<TData>
 
-Settings ingredient update and user creation use `withValidator`; editable ingredient body schemas
-are partial inputs piped into the strict ingredient schema, so route typing admits incomplete drafts
-without relaxing server writes. Browser forms never parse schemas. Inline ingredient creation uses
-`$state` and typed `void/client` fetch through `readResponse`; API failures preserve the draft and
-show the existing French alert, and success refreshes catalogues and closes/reset the dialog.
+// 400 validation response from API writes
+type FieldErrors = { error: string; errors: Record<string, string> }
+```
+
+`submit` sends JSON unless any nested value is a File; then it produces bracket-key multipart
+under [C-1]. `readMultipart` in `src/features/recipe/server/recipe-form-data.ts` reconstructs it.
+Recipe handlers keep `readRecipeFormData` and `validateRecipeForm`, validating against
+`recipeSchema` / `updateRecipeSchema` after transport-specific normalization. JSON stays strict;
+multipart restores numeric fields, omitted collections, blank optional assets, units and Magimix
+values. Numeric-looking file metadata IDs remain strings; required empty numbers do not become zero.
+
+`validateRecipeForm` throws `FieldValidationError` from `src/lib/server/http-error.ts`.
+API mapping returns the envelope above with dotted body paths. `withValidator` failures project
+body-slot issues into the same `errors` record while retaining the existing `error` string.
+Browser forms never parse schemas. Typed `void/client` fetch through `readResponse` preserves
+validation details for `createForm`; field failures keep drafts editable.
 
 ### 8.3 Arrays and local dialogs
 
-Void `setData` accepts top-level keys only. Recipe views replace entire nested collections using
+The `RecipeFormState` adapter's `setData` accepts top-level keys. Recipe views replace entire nested collections using
 immutable `replaceAt`, `removeAt`, and `moveAt` helpers. Unsaved rows carry stable `_key` values,
 including linked recipes. The default own-steps group remains first and cannot be removed or moved.
 Textarea bold shortcuts retain selection after immutable updates; eligible sub-recipes still derive
@@ -117,7 +129,7 @@ from the current positive linked-recipe ids.
 
 The Magimix dialog uses local `$state`, bounded numeric controls, supported program/speed options,
 and converts minutes/seconds to total seconds. Recipe submission owns server validation of Magimix
-values; the dialog has no action or client Zod validation. Opening an edit dialog restores its current
+values; the dialog has no API mutation or client Zod validation. Opening an edit dialog restores its current
 program data, not stale initial values.
 
 ### 8.4 File interaction
@@ -125,23 +137,24 @@ program data, not stale initial values.
 Image/video fields expose a browser `File`, retained `{ id, url }` metadata, or `undefined` when
 removed. `useFileUpload` retains picker/paste, preview, type and size checks. Paste ignores focused
 textareas/contenteditable elements. Browser file acceptance is not authorization or server validation.
-Void sends multipart only when a file exists anywhere in the form; unchanged assets travel as JSON
+`createForm` sends multipart only when a `File` exists anywhere in the form; unchanged assets travel as JSON
 metadata otherwise. Existing video removal semantics remain unchanged by this migration.
 
 ### 8.5 Submit and error lifecycle
 
 `Form` accepts a native `action` and/or an `onsubmit` handler. `FormDialog` receives
-`errors`, `pending`, `action`/`onsubmit`, children, open/setOpen, title, submit label, and a `renderTrigger` snippet.
-Its private wrapper stops submit propagation, preserving nested recipe-dialog isolation. Pending state
-disables submit and cancellation. Submit handlers await `form.post()` directly.
+`errors`, `pending`, `action`/`onsubmit`, children, open/setOpen, title, submit label and a
+`renderTrigger` snippet. Its private wrapper stops submit propagation, preserving nested
+recipe-dialog isolation. Pending state disables submit and cancellation.
 
-Server validation appears after submission, with drafts retained and editable. Non-validation
-expected `form.error` failures use `useFormActionError` with the existing French feature message;
-authentication/server failures follow Void's error boundary behavior. Successful creation replaces
-navigation to `/`; successful editing replaces navigation to `/recipe/<id>`. Edit Cancel still goes
-Back. Settings dialogs close on `wasSuccessful`; user creation clears fields explicitly because
-Void's reset defaults become the last submitted data. Button-only approval/block/deletion mutations
-retain `usePageAction` for in-place prop refresh without adding history entries.
+`form.submit(send)` resolves true on success. A 400 carrying `errors` fills the field-error
+record and resolves false; all other failures reject and callers use `alertError` with the
+existing French feature message. Drafts remain editable after validation failure.
+Callers await mutations and own closing/navigation. Recipe creation replaces navigation to `/`;
+editing replaces it to `/recipe/<id>`; edit Cancel still goes Back.
+Settings dialogs close after success; user creation calls `reset()` with empty email/default role.
+Button-only approval, blocking and deletion use feature mutation options and key invalidation,
+without action URL/history entries. No page-action adapter remains.
 
 ### 8.6 Verification
 
