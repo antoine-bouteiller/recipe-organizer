@@ -12,19 +12,18 @@
 </script>
 
 <script lang="ts">
-  import { useRouter } from '@void/svelte'
+  import { createMutation } from '@tanstack/svelte-query'
   import { untrack } from 'svelte'
-  import { fetch } from 'void/client'
 
   import FormDialog from '@/components/ui/overlays/form-dialog/form-dialog.svelte'
+  import { createIngredientMutation } from '@/features/ingredients/client/api/create'
   import type { IngredientFormInput } from '@/features/ingredients/schemas'
   import { alertError } from '@/lib/client/alert-error'
-  import { readResponse } from '@/lib/client/api-client'
 
   import IngredientForm, { getIngredientDefaultValues } from './ingredient-form.svelte'
 
   const { defaultValue, renderTrigger }: AddIngredientProps = $props()
-  const router = useRouter()
+  const mutation = createMutation(() => createIngredientMutation())
   let open = $state(false)
   let ingredientData = $state(untrack(() => getIngredientDefaultValues(defaultValue)))
   let pending = $state(false)
@@ -38,8 +37,7 @@
     }
     pending = true
     try {
-      await readResponse(fetch('/api/ingredients', { body: ingredientData, method: 'POST' }))
-      await router.refresh()
+      await mutation.mutateAsync($state.snapshot(ingredientData))
       ingredientData = getIngredientDefaultValues(defaultValue)
       open = false
     } catch (error) {

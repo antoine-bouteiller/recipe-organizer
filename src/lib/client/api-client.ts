@@ -3,8 +3,8 @@ import * as z from 'zod/mini'
 
 const errorSchema = z.object({ error: z.string() })
 
-/** Reads the `{ error }` message of a failed API or page-action response. */
-export const getErrorMessage = (body: unknown) => {
+/** Reads the `{ error }` message of a failed API response. */
+const getErrorMessage = (body: unknown) => {
   const parsed = errorSchema.safeParse(body)
   return parsed.success ? parsed.data.error : 'Une erreur est survenue'
 }

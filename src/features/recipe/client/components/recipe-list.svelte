@@ -11,16 +11,14 @@
 </script>
 
 <script lang="ts">
-  import { Link } from '@void/svelte'
-
   import Button from '@/components/ui/actions/button/button.svelte'
   import Badge from '@/components/ui/data-display/badge/badge.svelte'
   import { BookIcon, PlusIcon } from '@/components/ui/data-display/icons'
   import { CUISINE_TYPE_LABELS, MAGIMIX_LABEL, MEAL_LABELS, SPICE_LABEL, VEGETARIAN_LABEL } from '@/features/recipe/constants'
+  import { preloadLink } from '@/lib/client/router/preload'
 
   const { canCreate, recipes, renderCardAction }: RecipeListContentProps = $props()
   const visibleRecipes = $derived(recipes.filter((recipe) => !recipe.isSpice))
-  const recipePrefetch = ['visible', 'hover'] as const
 </script>
 
 {#if visibleRecipes.length === 0}
@@ -34,7 +32,7 @@
     {#each visibleRecipes as recipe, index (recipe.id)}
       <article class="recipe-card-card">
         <img alt={recipe.name} class="recipe-card-image" decoding="async" loading={index < 6 ? 'eager' : 'lazy'} src={recipe.image} />
-        <Link class="recipe-card-recipe-link" href={`/recipe/${recipe.id}`} prefetch={recipePrefetch}>
+        <a class="recipe-card-recipe-link" href={`/recipe/${recipe.id}`} {@attach preloadLink('viewport')}>
           <div class="recipe-card-tags">
             {#if recipe.isVegetarian}<Badge size="sm" variant="secondary">{VEGETARIAN_LABEL}</Badge>{/if}
             {#if recipe.isMagimix}<Badge size="sm" variant="secondary">{MAGIMIX_LABEL}</Badge>{/if}
@@ -44,7 +42,7 @@
               >{/each}
           </div>
           <h2 class="recipe-card-heading">{recipe.name}</h2>
-        </Link>
+        </a>
         {@render renderCardAction(recipe)}
       </article>
     {/each}

@@ -19,7 +19,7 @@ related:
 A small, closed group of French-speaking home cooks needs one place to write, find, scale and shop
 their recipes, including rich instructions that embed Magimix programs and reusable sub-recipes.
 Off-the-shelf recipe apps neither model those instructions nor allow a private, invitation-controlled
-membership. Recipe Organizer is server-rendered Void Pages with client navigation and a same-origin Void API served from one
+membership. Recipe Organizer is a Svelte SPA over a same-origin Void API served from one
 Cloudflare deployment, with all state — relational data, blobs, sessions — kept inside one provider
 so there is no second service to operate.
 
@@ -35,19 +35,19 @@ so there is no second service to operate.
 
 ## 3. Key Design Decisions
 
-| Decision                          | Choice                                                                                                                                                                    | Rationale                                                                                                                                                         |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Runtime                  | Void Pages and API on one Cloudflare deployment                                                                                                                           | The Worker renders page documents and serves API/static assets together; no separate deployment needs synchronization.                                            |
-| `[KD-2]` Render mode              | SSR on first load with regular hydrated pages and Void client navigation throughout                                                                                       | Client navigation avoids full-document recipe visits; initial store snapshots make hydration safe.                                                                |
-| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                                                                                                                       | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                            |
-| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                                                                                                                            | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                           |
-| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                                                                                                                          | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                 |
-| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                                                                                                                       | The product is private by intent, and OAuth alone would let any Google account in.                                                                                |
-| `[KD-7]` Server-state vs UI-state | Loader props own page data; persisted rune stores own durable browser intent                                                                                              | Page actions refresh server snapshots; persisted IDs/quantities remain device-local rather than stale copies of rows.                                             |
-| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write                                                                                                           | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                             |
-| `[KD-9]` Rich instructions        | Lexical with custom nodes                                                                                                                                                 | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.             |
-| `[KD-10]` Module boundary         | Features split by runtime: `src/features/<feature>/client/`, `src/features/<feature>/server/`, narrowly shared contracts at the feature root, `pages/`, and `routes/api/` | Runtime-specific imports stay isolated while each domain retains clear ownership; feature specs sit at the feature root because they describe both runtime sides. |
-| `[KD-11]` PWA registration        | A minimal network-only service worker remains registered at `/sw.js`, without offline support or legacy cleanup                                                           | This is a user requirement for Samsung PWA installation, not a universal browser-installability claim. It provides no offline caching, replay, or fallback.       |
+| Decision                          | Choice                                                                                                                                                                        | Rationale                                                                                                                                                         |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Runtime                  | Static SPA and Void API on one Cloudflare deployment                                                                                                                          | The static shell and API deploy together; no separate deployment needs synchronization.                                                                           |
+| `[KD-2]` Render mode              | Static `index.html` mounts Svelte; in-house Navigation API router commits loaded screens                                                                                      | No server data work precedes first paint; code/data preload and cached queries keep visits immediate.                                                             |
+| `[KD-3]` Storage                  | D1 for rows, R2 for blobs, both via Worker bindings                                                                                                                           | Bindings need no connection pool or credential rotation, which suits an isolate that may be recycled between requests.                                            |
+| `[KD-4]` ORM                      | Drizzle with `defineRelations`                                                                                                                                                | Relational queries stay type-safe end to end, and `batch([...])` supplies the multi-statement atomicity D1 lacks in a single statement.                           |
+| `[KD-5]` Identity                 | Google OAuth 2.0 only, encrypted cookie sessions                                                                                                                              | The audience already has Google accounts; storing no passwords removes the largest class of credential liability from the system.                                 |
+| `[KD-6]` Membership               | New accounts land `pending` until an admin approves                                                                                                                           | The product is private by intent, and OAuth alone would let any Google account in.                                                                                |
+| `[KD-7]` Server-state vs UI-state | TanStack Svelte Query owns server records; persisted rune stores own durable browser intent                                                                                   | Mutations invalidate central keys; persisted IDs/quantities remain device-local rather than stale copies of rows.                                                 |
+| `[KD-8]` Image pipeline           | Cloudflare Images transform to WebP 640/q80 before the R2 write                                                                                                               | Paying the transform once at upload keeps R2 small and every read cheap, without a resizing service on the read path.                                             |
+| `[KD-9]` Rich instructions        | Lexical with custom nodes                                                                                                                                                     | Magimix programs and sub-recipe references are first-class document nodes, which a Markdown or HTML field cannot represent without a parallel parser.             |
+| `[KD-10]` Module boundary         | Features split by runtime: `src/features/<feature>/client/`, `src/features/<feature>/server/`, narrowly shared contracts at the feature root, `src/pages/`, and `routes/api/` | Runtime-specific imports stay isolated while each domain retains clear ownership; feature specs sit at the feature root because they describe both runtime sides. |
+| `[KD-11]` PWA registration        | A minimal network-only service worker remains registered at `/sw.js`, without offline support or legacy cleanup                                                               | This is a user requirement for Samsung PWA installation, not a universal browser-installability claim. It provides no offline caching, replay, or fallback.       |
 
 ## 4. Principles & Intents
 
@@ -58,7 +58,7 @@ so there is no second service to operate.
 - `[PI-3]` **Validate at the trust boundary** — every write parses its input with Zod inside its
   Void route, never relying on client-side validation.
 - `[PI-4]` **Never duplicate server data in a store** — stores hold identifiers and selections; the
-  data behind them comes from loaders or the remaining HTTP reads.
+  data behind them lives only in the query cache and comes from API reads.
 - `[PI-5]` **Features are self-contained** — cross-feature use goes through a feature's public API,
   not into its internals.
 - `[PI-6]` **Design system is owned** — UI primitives live in the repository and are edited in place
@@ -66,7 +66,7 @@ so there is no second service to operate.
 
 ## 5. Non-Goals
 
-- `[NG-1]` Public sharing and discovery are outside private-group product intent. Shipped browse loaders are not membership-gated; protected writes and app pages require membership.
+- `[NG-1]` Public sharing and discovery are outside private-group product intent. Browse APIs are not membership-gated; protected writes and app screens require membership.
 - `[NG-2]` Identity providers other than Google, and password or email-link authentication.
 - `[NG-3]` Analytical or reporting workloads over D1.
 - `[NG-4]` Offline functionality: reads and writes require connectivity; the registered worker has no offline UI, session fallback, precaching, runtime caching, or fallback response.
@@ -79,10 +79,12 @@ so there is no second service to operate.
   such as the database client must not be held across requests.
 - `[C-2]` D1 is SQLite: no cross-database joins, limited concurrency, and multi-row atomicity only
   through `batch([...])`.
-- `[C-3]` Void route metadata is generated; run `vp exec void prepare` after adding/moving pages or API routes.
+- `[C-3]` Void route metadata is generated; run `vp exec void prepare` after adding/moving API routes.
 - `[C-4]` The development bypass in the auth guard yields a fake admin, so development builds
   exercise no OAuth path.
-- `[C-5]` Shopping-list reads retain a promise per selected-ID array within each document, without TTL or write invalidation. Inner scroll-container restoration is not managed.
+- `[C-5]` The query cache is in-memory per document, fresh for 5 minutes and retained unused for 24 hours;
+  writes invalidate affected keys. The Navigation API router restores document and ScreenLayout scroll
+  on traversal; unsupported browsers use full document navigation without client cache continuity.
 - `[C-6]` Google's userinfo response shape is an external contract; only `id` and `email` are
   persisted, but a change in that payload breaks sign-in.
 - `[C-7]` Session encryption, OAuth client credentials and their rotation are Cloudflare Worker
@@ -91,38 +93,37 @@ so there is no second service to operate.
 ## 7. High-Level Components
 
 ```text
-Browser document / regular page navigation
-        │ page request or action
+Static index.html → src/main.ts → src/app.svelte
+  QueryClientProvider → AppHeader + AppMain → pathname-keyed AppError → route screen
+        │ Navigation API router · query cache · local intent stores · forms
+        │ typed same-origin API queries/mutations
         ▼
-Cloudflare Worker: Void Pages + middleware + API + ASSETS
-        ├─ loaders/actions ──► server helpers ──► D1
-        ├─ auth ──► Better Auth / Google
-        └─ media ──► R2 / Images
-        │ server-rendered HTML + props
-        ▼
-Hydrated browse / app pages · local stores · forms
+Cloudflare Worker: Void API + middleware + ASSETS
+        ├─ guarded handlers → server helpers → D1
+        ├─ auth → Better Auth / Google
+        └─ media → R2 / Images
 Manifest/icons · network-only service worker
 ```
 
-| Component         | Module type          | Responsibility                                          | Public API surface                         |
-| ----------------- | -------------------- | ------------------------------------------------------- | ------------------------------------------ |
-| Repository layout | Convention           | Runtime and ownership placement                         | Root adapters, `src/`, and `tools/`        |
-| Platform          | Worker configuration | Pages/API entry, bindings, media/cache, PWA/head, CI    | `void.config.ts`, R2 helpers               |
-| Data layer        | Library              | Drizzle schema, relations, client, migrations           | `getDb()`, schema exports                  |
-| Void Pages/API    | Library + convention | Reads, actions, validation, remaining HTTP              | `loader`, `action`, `actions`, typed fetch |
-| Auth              | Infrastructure       | Google sessions, status/role enforcement                | `getApiUser`, `guardPage`, `withAuthGuard` |
-| Routing & SSR     | Convention           | File matching, shared context, render/layout boundaries | `pages/`, `useShared()`, `Link`            |
-| Forms             | Library              | TanStack Form and Zod composition                       | `useAppForm`, `withForm`, fields           |
-| Client state      | Library              | Durable intent separated from server props              | `persistedStore`, `usePageAction`          |
-| Features          | Runtime directories  | Recipe, ingredients, search, shopping list, users       | Components and server helpers              |
+| Component         | Module type          | Responsibility                                             | Public API surface                           |
+| ----------------- | -------------------- | ---------------------------------------------------------- | -------------------------------------------- |
+| Repository layout | Convention           | Runtime and ownership placement                            | Root adapters, `src/`, and `tools/`          |
+| Platform          | Worker configuration | API entry, static fallback, bindings, media/cache, PWA, CI | `void.config.ts`, R2 helpers                 |
+| Data layer        | Library              | Drizzle schema, relations, client, migrations              | `getDb()`, schema exports                    |
+| Void API          | Library + convention | Queries, mutations, validation and HTTP                    | Named HTTP methods, typed fetch              |
+| Auth              | Infrastructure       | Google sessions, status/role enforcement                   | `getApiUser`, `withAuthGuard`, session API   |
+| Client routing    | Convention           | Matching, client guards, preload, transitions and scroll   | `routes`, `router`, `preloadLink`            |
+| Forms             | Library              | Reactive drafts, server validation and file transport      | `createForm`, controlled fields              |
+| Client state      | Library              | Query cache separated from durable intent                  | `queryClient`, `queryKeys`, `persistedStore` |
+| Features          | Runtime directories  | Recipe, ingredients, search, shopping list, users          | Components and server helpers                |
 
 Leaf execution order:
 
-| Leaf                                                              | Depends on                       | Rationale                                 |
-| ----------------------------------------------------------------- | -------------------------------- | ----------------------------------------- |
-| [`file-structure`](./file-structure.spec.md)                      | —                                | Names directories and boundaries          |
-| [`infrastructure/server`](./infrastructure/server/server.spec.md) | `file-structure`                 | Runtime, storage, validation, identity    |
-| [`infrastructure/client`](./infrastructure/client/client.spec.md) | `infrastructure/server` `[KD-3]` | Pages, forms, stores use server contracts |
+| Leaf                                                              | Depends on                       | Rationale                                               |
+| ----------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------- |
+| [`file-structure`](./file-structure.spec.md)                      | —                                | Names directories and boundaries                        |
+| [`infrastructure/server`](./infrastructure/server/server.spec.md) | `file-structure`                 | Runtime, storage, validation, identity                  |
+| [`infrastructure/client`](./infrastructure/client/client.spec.md) | `infrastructure/server` `[KD-3]` | Screens, queries, forms and stores use server contracts |
 
 Feature specs remain under `src/features/` and cover each domain across pages, components,
 server helpers, and shared schemas rather than implying one shared runtime directory.
@@ -136,37 +137,44 @@ server helpers, and shared schemas rather than implying one shared runtime direc
 | Data layer        | [`infrastructure/server/data-layer.spec.md`](./infrastructure/server/data-layer.spec.md)                                                                                                                                                                                                           |
 | Void API          | [`infrastructure/server/server-functions.spec.md`](./infrastructure/server/server-functions.spec.md)                                                                                                                                                                                               |
 | Auth              | [`infrastructure/server/auth.spec.md`](./infrastructure/server/auth.spec.md)                                                                                                                                                                                                                       |
-| Routing & SSR     | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
+| Client routing    | [`infrastructure/client/routing-ssr.spec.md`](./infrastructure/client/routing-ssr.spec.md)                                                                                                                                                                                                         |
 | Forms             | [`infrastructure/client/forms.spec.md`](./infrastructure/client/forms.spec.md)                                                                                                                                                                                                                     |
 | Client state      | [`infrastructure/client/client-state.spec.md`](./infrastructure/client/client-state.spec.md)                                                                                                                                                                                                       |
 | Feature modules   | [`recipe`](../src/features/recipe/spec/index.spec.md), [`ingredients`](../src/features/ingredients/ingredients.spec.md), [`search`](../src/features/search/search.spec.md), [`shopping-list`](../src/features/shopping-list/shopping-list.spec.md), [`users`](../src/features/users/users.spec.md) |
 
 ### 8.1 Request lifecycle
 
-Void matches `pages/` and runs global middleware. `03.page-context.ts` resolves shared
-`{ authUser, pathname }`; protected loaders return `guardPage` redirects before reads.
-Loaders import `@/features/<feature>/server/*` and `@/lib/server/*` directly and return typed props for SSR.
-One root hydrated layout wraps every page with a pathname-keyed `AppErrorBoundary`.
-Pages import feature components directly; persisted stores use initial SSR/hydration snapshots,
-then saved localStorage values. Shopping-list content is gated with `useIsHydrated`.
-Void client navigation uses prefetched loader props: fresh for 30s, usable up to 1h with background
-revalidation; non-GET navigation/actions flush the prefetch cache.
+Non-file, non-`/api` document paths receive the same static `index.html`, with no session lookup,
+D1 read or SSR before first paint. `src/main.ts` loads shared CSS, sets the French Zod locale and
+mounts `src/app.svelte`: QueryClientProvider wraps AppHeader (search/theme) and AppMain, with
+pathname-keyed AppError around the current route component.
 
-Only auth, image/video, health, recipe-list palette reads, shopping-list projection reads, and inline
-ingredient POST remain APIs. Static assets remain available and unknown URLs use Void's default 404;
-missing recipe pages show in-page `NotFound`. No application catch-all shadows assets.
+The in-house router in `src/lib/client/router/` owns a pattern/access/component/preload registry.
+It ensures `['session']`, chooses screens through client guards, and awaits lazy code and
+`ensureQueryData` preloads before committing. Cached stale records commit immediately and refresh
+in the background. Header/tab links and home cards preload on viewport; search cards preload on
+intent. Server records live only in the TanStack Svelte Query cache, with 5-minute staleTime and
+24-hour gcTime; persisted stores hold only IDs/quantities/preferences. Local-only shopping-list
+selection precedes its query. Existing mount/snapshot compatibility paths are always-client.
+
+All data reaches the browser through `/api/**`; protected APIs independently authorize.
+Unknown document paths render in-app NotFound with HTTP 200, while static assets remain intact
+and unknown API paths return JSON 404. Missing recipes return API 404 with in-page recovery.
 
 ### 8.2 Write lifecycle
 
-A regular-page form calls `usePageAction()` with typed data (recipe file entries pass through
-`readRecipeFormData`). The action authorizes and validates before domain writes; recipe helpers
-check owner-or-admin. Success refreshes loader props in place without changing URL/history;
-callers choose navigation or dialog effects. Callers await the page action.
-Thrown action/API failures share safe JSON errors and client alerts.
+Feature `src/features/<feature>/client/api/<operation>.ts` exports query/mutation options using
+`readResponse(fetch(...))` from `void/client`. Forms use app-owned `createForm`, sending JSON
+unless a nested File requires bracket-key multipart. API handlers validate and authorize before
+domain writes; recipe helpers check owner-or-admin. Invalid write bodies return
+`400 { error, errors }` with dotted field paths; other failures retain safe errors and French alerts.
 
-Recipe-details deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`;
-the guarded action redirects home, replacing the deleted recipe's history entry. Inline `AddIngredient` retains `POST /api/ingredients` and awaits
-`router.refresh()` before reset/close. D1 batching and R2 effect ordering remain feature-owned.
+Mutation success invalidates `allRecipes` for recipe writes; `allIngredients` and `allRecipes`
+for ingredient writes; `allUsers` for user writes. Callers await mutations and choose dialog/reset
+or navigation effects. Recipe create/delete uses `router.navigate('/', { replace: true })`;
+update replaces navigation to `/recipe/<id>`, so Back cannot reopen deleted recipes.
+Sign-out reloads `/auth/login`, resetting the cache. D1 batching and R2 effect ordering remain
+feature-owned. Client guards choose screens only; the Worker remains the authorization boundary.
 
 ### 8.3 Trust boundary
 

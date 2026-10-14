@@ -22,25 +22,25 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 ## 3. Key Design Decisions
 
-| Decision                    | Choice                                                                                         | Rationale                                                                        |
-| --------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `[KD-1]` Server records     | Void loader props own page data; small remaining APIs serve browser-only reads.                | Server data comes from authoritative reads without a browser query cache.        |
-| `[KD-2]` Refresh identity   | Page actions refresh the current loader props in place.                                        | URL/history and local UI state survive refresh; there are no central query keys. |
-| `[KD-3]` Durable UI state   | A custom rune store persists data-only selections through `persistedStore`.                    | IDs and quantities survive reload without copying server entities.               |
-| `[KD-4]` Shareable state    | URL params/query/hash remain navigation input; search filters stay component-local.            | Only intentionally navigable values affect history.                              |
-| `[KD-5]` Browser preference | Head script resolves the theme cookie, else system preference; toggle writes cookie and class. | SSR documents receive the theme before first paint without loader theme props.   |
+| Decision                    | Choice                                                                                         | Rationale                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `[KD-1]` Server records     | `@tanstack/svelte-query` owns all server records, including session.                           | One in-memory query cache shares authoritative API reads across screens. |
+| `[KD-2]` Refresh identity   | Feature mutation options invalidate the central query-key tree.                                | Active queries refetch; UI intent survives without copied entity stores. |
+| `[KD-3]` Durable UI state   | A custom rune store persists data-only selections through `persistedStore`.                    | IDs and quantities survive reload without copying server entities.       |
+| `[KD-4]` Shareable state    | URL params/query/hash remain navigation input; search filters stay component-local.            | Only intentionally navigable values affect history.                      |
+| `[KD-5]` Browser preference | Head script resolves the theme cookie, else system preference; toggle writes cookie and class. | The static document receives its theme before first paint.               |
 
 ## 4. Principles & Intents
 
-- `[PI-1]` **One source per value** — loader props, HTTP response, URL, cookie, store, local state, or feature context has one owner.
+- `[PI-1]` **One source per value** — query cache, URL, cookie, store, local state, or feature context has one owner.
 - `[PI-2]` **Persist intent, not records** — stores contain identifiers and quantities; server reads supply records.
-- `[PI-3]` **Context stays local** — feature context threads loader catalogues within a feature subtree;
-  Void shared context carries cross-cutting identity and pathname.
+- `[PI-3]` **Context stays local** — feature context threads query-backed catalogues within a feature subtree;
+  session queries and router location carry cross-cutting identity and pathname.
 
 ## 5. Non-Goals
 
-- `[NG-1]` A global store containing server records; this refines `client.spec.md` `[NG-1]`.
-- `[NG-2]` Session tokens or authorization state in a browser store; those remain under
+- `[NG-1]` A global entity store alongside the query cache; this refines `client.spec.md` `[NG-1]`.
+- `[NG-2]` Session tokens or authoritative authorization state in a browser store; those remain under
   `../server/auth.spec.md`.
 - `[NG-3]` Durable storage for transient control state such as hover, dialog visibility, or a draft
   interaction.
@@ -49,115 +49,145 @@ of Worker-owned data while preserving responsive, device-local interactions.
 
 - `[C-1]` `persistedStore` handles absent storage and malformed JSON with the initial value, but does not catch
   localStorage read/write exceptions. Validation checks array-versus-non-array shape, not full schemas.
-- `[C-2]` Rendered props remain snapshots until navigation, page refresh, or action refresh. Void's navigation
-  prefetch cache is fresh for 30s and usable up to 1h with background revalidation; non-GET navigation/actions flush it.
-- `[C-3]` Shopping-list requests retain one fulfilled promise per distinct selected-ID array within the
-  document; they have no TTL or mutation invalidation. Failed promises are removed so a later render can retry.
+- `[C-2]` Queries are fresh for 5 minutes and retained unused for 24 hours. Stale cached route data
+  commits immediately while refreshing in the background; no cache persists across documents.
+- `[C-3]` Selected-recipe queries share recipe-key invalidation. Empty shopping-list selection makes
+  no request; local selection still precedes its data query.
 
 ## 7. High-Level Components
 
-| Component           | Module type                                    | Responsibility                                    | Public API surface              |
-| ------------------- | ---------------------------------------------- | ------------------------------------------------- | ------------------------------- |
-| Page data           | `pages/**/*.server.ts`                         | Read records and return typed props               | `loader`, `InferProps`          |
-| Page actions        | Pages + `src/lib/client/page-action.svelte.ts` | Mutate and refresh regular-page props             | `usePageAction()`               |
-| Persisted stores    | `src/stores/*.store.svelte.ts`                 | Durable IDs and quantities                        | Read hooks and exported actions |
-| Persistence adapter | `src/lib/client/persisted-store.svelte.ts`     | Initial SSR snapshot and localStorage persistence | `persistedStore<T>()`           |
-| Theme               | `void.config.ts`, `src/lib/client/theme.ts`    | Resolve before paint and toggle                   | `ui-theme`, `toggleTheme`       |
-| Hydration gate      | `src/hooks/use-is-hydrated.svelte.ts`          | Distinguish SSR/hydration from client-only intent | `useIsHydrated()`               |
-| Feature context     | `src/features/*/contexts/*`                    | Thread loader catalogues                          | Feature provider and hook       |
+| Component           | Module type                                | Responsibility                            | Public API surface                |
+| ------------------- | ------------------------------------------ | ----------------------------------------- | --------------------------------- |
+| Query client        | `src/lib/client/query-client.ts`           | Shared in-memory server-record cache      | `queryClient`                     |
+| Query keys          | `src/lib/client/query-keys.ts`             | Cache identity and invalidation prefixes  | `queryKeys`                       |
+| Feature API options | `src/features/*/client/api/<operation>.ts` | Typed reads/writes and invalidation       | `queryOptions`, `mutationOptions` |
+| Persisted stores    | `src/stores/*.store.svelte.ts`             | Durable IDs and quantities                | Read hooks and exported actions   |
+| Persistence adapter | `src/lib/client/persisted-store.svelte.ts` | Device-local persistence                  | `persistedStore<T>()`             |
+| Theme               | `index.html`, `src/lib/client/theme.ts`    | Resolve before paint and toggle           | `ui-theme`, `toggleTheme`         |
+| Mount gate          | `src/hooks/use-is-hydrated.svelte.ts`      | Retained always-client compatibility hook | `useIsHydrated()`                 |
+| Feature context     | Feature client providers                   | Thread query-backed catalogues            | Feature provider and hook         |
 
 ## 8. Detailed Design
 
 ### 8.1 Placement rule
 
-Database-backed page values arrive as loader props. Browser-only records use the remaining typed
-HTTP clients, not persisted stores. URL values belong to navigation; device-local durable intent
-belongs to stores; theme belongs to a cookie and the document class. Short-lived filters/dialog state
-belongs to components; deep feature-only catalogue access belongs to a feature provider.
+Database-backed values live only in the query cache, consumed through feature query options.
+URL values belong to navigation; device-local durable intent belongs to stores; theme belongs to
+a cookie and the document class. Short-lived filters/dialog state belongs to components; deep
+feature-only catalogue access belongs to a feature provider, not another server-data owner.
 
-### 8.2 Loader data and routing
+### 8.2 Query data and routing
 
-Loaders call server exports directly. Home and search receive the name-ordered recipe catalogue;
-details receives the recipe and embedded instructions; editor pages provide ingredients and recipes
-through catalogue providers. Regular page actions rerun page data without maintaining a parallel cache.
-Browse documents receive new loader snapshots on navigation.
+```ts
+// src/lib/client/query-client.ts
+export const queryClient: QueryClient
+// defaultOptions.queries: { staleTime: 5 * 60_000, gcTime: 24 * 60 * 60_000 }
+
+// src/lib/client/query-keys.ts
+export const queryKeys: {
+  session: readonly ['session']
+  allIngredients: readonly ['ingredients']
+  ingredientList: () => readonly ['ingredients', 'list']
+  allRecipes: readonly ['recipes']
+  recipeList: () => readonly ['recipes', 'list', 'all']
+  recipeListByIds: (ids: readonly number[]) => readonly ['recipes', 'list', readonly number[]]
+  recipeDetail: (id: number) => readonly ['recipes', 'detail', number]
+  allUsers: readonly ['users']
+  userList: (status: 'active' | 'blocked' | 'pending') => readonly ['users', 'list', string]
+}
+```
+
+Each feature owns `client/api/<operation>.ts` exporting query or mutation options that call
+`readResponse(fetch(...))` from `void/client`. Home, search and palette share `recipeList`;
+details queries include embedded instructions. Editor preloads supply ingredient and recipe
+catalogues through feature providers. The router awaits `ensureQueryData` before committing;
+cached stale data renders immediately and refreshes in the background.
+`GET /api/session` returns `{ email, role, status } | null` under `['session']`; one document-local
+session read is shared by guards and affordances, rather than resolving identity per document route.
 
 ### 8.3 Persisted selection and derived data
 
 `shopping-list` persists recipe IDs, `recipe-quantities` serving overrides, and `recent-recipes`
 recent IDs. Hooks expose data-only store snapshots and exported functions call the store's `setState(...)`.
-The shopping-list hook combines IDs, quantity overrides, and `loadRecipesByIds(ids)`, then runs
+The shopping-list hook combines IDs, quantity overrides, and the `recipeListByIds(ids)` query, then runs
 `aggregateShoppingList`. No recipe or aggregate records are written to localStorage.
 
 ### 8.4 Persistent-store contract
 
-`persistedStore<T>(key, initial)` holds a module-level value read from saved JSON when storage exists, otherwise
-the initial value, and serializes later changes. It discards malformed JSON and values whose
+`persistedStore<T>(key, initial)` holds a module-level value read from saved JSON when storage exists,
+otherwise the initial value, and serializes later changes. It discards malformed JSON and values whose
 array/non-array shape differs from the initial value (including old wrapped array stores).
-`useValue()` returns `initial` during SSR and hydration; the saved value is read after client mount
-and shared by every reader. This prevents hydration mismatches.
 
-`useIsHydrated()` likewise returns false for SSR/hydration and true on the client.
-Shopping-list UI uses that gate before reading selected-recipe promises, rendering a neutral
-skeleton on the server and an explicit pending state while selected recipes load.
+The retained initial-snapshot and `useIsHydrated()` paths now run only on the client; simplifying
+them is out of scope. Shopping-list UI reads device-local selection before querying selected recipes
+and retains explicit pending/error state for this local-only load.
 
-| State question                     | Placement                          | Reason                                  |
-| ---------------------------------- | ---------------------------------- | --------------------------------------- |
-| Is the Worker the source of truth? | Loader props / remaining HTTP read | Server read determines current records. |
-| Is it navigable?                   | URL input                          | Links/history carry the value.          |
-| Is it browser-wide preference?     | Cookie and document class          | Theme applies before first paint.       |
-| Is it durable personal intent?     | Persisted store                    | Survives reload on one device.          |
-| Is it a short interaction?         | Component state                    | No durable/global ownership needed.     |
-| Does one feature subtree need it?  | Feature context                    | Avoids unrelated global wiring.         |
+| State question                     | Placement                 | Reason                               |
+| ---------------------------------- | ------------------------- | ------------------------------------ |
+| Is the Worker the source of truth? | Query cache               | API reads determine current records. |
+| Is it navigable?                   | URL input                 | Links/history carry the value.       |
+| Is it browser-wide preference?     | Cookie and document class | Theme applies before first paint.    |
+| Is it durable personal intent?     | Persisted store           | Survives reload on one device.       |
+| Is it a short interaction?         | Component state           | No durable/global ownership needed.  |
+| Does one feature subtree need it?  | Feature context           | Avoids unrelated global wiring.      |
 
 ### 8.5 Refresh and mutation boundary
 
-Regular-page callers use `usePageAction()` for page-owned mutations. It preserves URL/history,
-refreshes props with local state preserved, alerts expected failures, and returns a success boolean.
-Callers await the action and own navigation and closing effects.
+Callers use `createMutation` with feature mutation options. `onSuccess` invalidates affected
+prefixes; callers await mutations before closing/resetting or navigating.
 
-Inline ingredient creation retains `POST /api/ingredients`; `AddIngredient` calls
-`router.refresh()` after success to refresh the catalogue props, then resets and closes its form.
-The settings ingredient page owns update/delete actions. Recipe-details deletion uses
-`submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })` to follow the home redirect
-and replace the deleted recipe's history entry. It does not use `usePageAction()`: that helper's
-`preserveState: true` keeps the old URL even when the action redirects. Failed results use `alertError`.
+| Mutation                          | Invalidates                    | Then                                                  |
+| --------------------------------- | ------------------------------ | ----------------------------------------------------- |
+| Create recipe                     | `allRecipes`                   | navigate to `/` with replace                          |
+| Update recipe                     | `allRecipes`                   | navigate to `/recipe/<id>` with replace               |
+| Delete recipe                     | `allRecipes`                   | navigate to `/` with replace so Back cannot reopen it |
+| Create, update, delete ingredient | `allIngredients`, `allRecipes` | close the dialog                                      |
+| Create, approve, block user       | `allUsers`                     | close the dialog or stay                              |
+| Sign out                          | none                           | `location.assign('/auth/login')` resets the cache     |
+
+Ingredient writes invalidate recipes because detail and shopping-list rows embed ingredient names.
+Sign-in uses the OAuth redirect and reloads the document, resetting session and the in-memory cache.
+No persisted query cache or browser write queue exists.
 
 ### 8.6 Cookie, URL, local, and feature state
 
-The inline head script in `void.config.ts` reads `ui-theme`, using `prefers-color-scheme` only
+The inline head script in `index.html` reads `ui-theme`, using `prefers-color-scheme` only
 when the cookie is absent, and sets the light/dark document class before paint.
-`toggleTheme()` flips that class and writes the cookie; no theme value travels through page props.
+`toggleTheme()` flips that class and writes the cookie; no theme value travels through server props.
 Session cookies remain server-authentication state.
 
-Filters stay in `RecipeSearch` local state. Tabs expose native hash links; their hydrated handler
-scrolls and replaces history. Feature catalogue providers accept loader props and do not create
+Filters stay in `RecipeSearch` local state. Tabs expose native hash links; their mounted handler
+scrolls and replaces history. Feature catalogue providers accept query-backed rows and do not create
 another global server-data owner.
 
 ### 8.7 State contract summary
 
-| Owner                  | Read surface                        | Write or refresh surface             |
-| ---------------------- | ----------------------------------- | ------------------------------------ |
-| Worker record          | Loader props / remaining API client | Page action or explicit page refresh |
-| Durable browser intent | Store read hook                     | Exported store action                |
-| URL value              | Page request / document URL         | Link or navigation                   |
-| Theme preference       | Document class                      | Cookie-backed `toggleTheme`          |
-| Ephemeral interaction  | Component hook                      | Event handler                        |
-| Feature subtree value  | Feature context hook                | Loader-fed provider                  |
+| Owner                  | Read surface          | Write or refresh surface                      |
+| ---------------------- | --------------------- | --------------------------------------------- |
+| Worker record          | Feature query options | Feature mutation options and key invalidation |
+| Session affordance     | Session query         | OAuth/sign-out document reload                |
+| Durable browser intent | Store read hook       | Exported store action                         |
+| URL value              | `router.current.url`  | Anchor or `router.navigate`                   |
+| Theme preference       | Document class        | Cookie-backed `toggleTheme`                   |
+| Ephemeral interaction  | Component state       | Event handler                                 |
+| Feature subtree value  | Feature context hook  | Query-fed provider                            |
 
-The header palette's `loadRecipeList()` fetches once on first open per document and clears rejected
-promises. Shopping-list `loadRecipesByIds` retains promises keyed by serialized selections.
-The shopping-list hook and palette track explicit pending/success/error state from these promises; they are not a query-cache lifecycle or persisted entity storage.
+The palette and shopping list share the query cache and its invalidation rather than retaining
+independent fulfilled promises. Their loading/error feedback does not persist records or aggregates.
 
 ### 8.8 Outcome and acceptance
 
-- `[SO-1]` Server records and personal browser intent have separate owners without hydration mismatch — demonstrated by `[VC-1]`.
-- `[SO-2]` Writes refresh regular-page props without replacing navigation history — demonstrated by `[VC-2]`.
-- `[VC-1]` Reload with saved quantities/selection/recents: server and hydration use initial snapshots,
-  then saved values appear; shopping list shows its skeleton before client selection resolves —
+- `[SO-1]` Server records and personal browser intent have separate owners; query data is document-local
+  and selections survive reload — demonstrated by `[VC-1]`.
+- `[SO-2]` Writes invalidate all affected cached projections without unwanted history entries —
+  demonstrated by `[VC-2]`.
+- `[VC-1]` Reload with saved quantities/selection/recents: saved intent appears and API records are
+  queried anew. Revisit a stale cached route: it renders immediately with a background refetch —
   demonstrates `[SO-1]`.
-- `[VC-2]` Update a regular-page record: refreshed props reflect the write with unchanged URL/history;
-  add an ingredient inline and verify refreshed catalogue options — demonstrates `[SO-2]`.
+- `[VC-2]` Create/update/delete a recipe: home, search and affected detail reflect the write.
+  Rename an ingredient: catalogue, recipe detail and shopping list update without reload while
+  entered editor values survive. User mutations refresh all status panels. Delete replaces
+  navigation home so Back cannot reopen the recipe — demonstrates `[SO-2]`.
 
 ## 9. Open Questions
 

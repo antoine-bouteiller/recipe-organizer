@@ -1,5 +1,5 @@
 ---
-title: Void Pages and Feature API
+title: Void Feature API
 status: amended
 author: Antoine Bouteiller
 date: 2026-08-14
@@ -9,28 +9,28 @@ related: [docs/infrastructure/server/data-layer.spec.md, docs/infrastructure/ser
 
 ## 2. Problem Statement
 
-Pages and forms need a typed Worker boundary that validates untrusted input, applies membership
-and ownership policy, performs persistence effects, and refreshes server data. Void page loaders
-read server helpers directly; page actions own page mutations; a small API remains for browser-only
-data, auth, health, and media. This refines architecture [PI-2], [PI-3], and [PI-4].
+Screens and forms need a typed Worker boundary that validates untrusted input, applies membership
+and ownership policy, and performs persistence effects. All server data and mutations use the
+same-origin Void API; client query options cache reads and mutation options invalidate keys.
+This refines architecture [PI-2], [PI-3], and [PI-4].
 
 N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                     | Choice                                                                                     | Rationale                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| `[KD-1]` Declaration         | Pages export loaders and actions; remaining API files export HTTP methods.                 | Page data need not make a duplicate HTTP request; APIs serve independent browser consumers. |
-| `[KD-2]` Trust sequence      | Protected handlers authorize, validate, check ownership where applicable, then write.      | UI gates cannot authorize persistence.                                                      |
-| `[KD-3]` Wire transport      | Actions accept typed body entries including files; API POST uses JSON where needed.        | Shared schemas validate structured inputs at the Worker.                                    |
-| `[KD-4]` Error envelope      | API and thrown action failures share JSON `{ error }`; clients provide redirects/alerts.   | Internal faults remain safe application messages.                                           |
-| `[KD-5]` Refresh integration | `usePageAction()` refreshes regular-page props with URL/history and local state preserved. | No query-option factories or cache invalidation are required.                               |
+| Decision                     | Choice                                                                                       | Rationale                                                             |
+| ---------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `[KD-1]` Declaration         | `routes/api/**` files export named HTTP methods.                                             | One API surface serves every screen and independent browser consumer. |
+| `[KD-2]` Trust sequence      | Protected handlers authorize, validate, check ownership where applicable, then write.        | UI gates cannot authorize persistence.                                |
+| `[KD-3]` Wire transport      | Writes accept JSON or bracket-key multipart when a File is present.                          | Shared schemas validate structured inputs at the Worker.              |
+| `[KD-4]` Error envelope      | API failures use `{ error }`; invalid write bodies add dotted-path `errors` with status 400. | Internal faults remain safe application messages.                     |
+| `[KD-5]` Refresh integration | Feature mutation options invalidate affected central query-key prefixes.                     | Active queries refetch while browser intent and local drafts survive. |
 
 ## 4. Principles & Intents
 
 - `[PI-1]` **Validate inside the Worker** — client validation never authorizes writes.
-- `[PI-2]` **Page owns its mutation** — server companions compose domain helpers; APIs remain only for independent HTTP consumers.
-- `[PI-3]` **Control flow is semantic** — page gates return redirects, API status codes remain HTTP errors, and ordinary failures share a safe envelope.
+- `[PI-2]` **Feature owns its mutation** — API handlers compose domain helpers; client options own cache invalidation.
+- `[PI-3]` **Control flow is semantic** — client guards choose screens, API status codes express authorization and failures, and ordinary failures share a safe envelope.
 
 ## 5. Non-Goals
 
@@ -46,139 +46,158 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 - `[C-2]` Void RPC crosses an HTTP boundary, so route contracts use JSON or multipart data rather
   than Worker objects or streams.
 - `[C-3]` R2 effects cannot join D1 batching; write ordering explicitly limits inconsistent states.
-- `[C-4]` Void generates page/action/API types in `.void/`; run `vp exec void prepare` after route changes and before clean-tree checks.
+- `[C-4]` Void generates API types in `.void/`; run `vp exec void prepare` after route changes and before clean-tree checks.
 
 ## 7. High-Level Components
 
-| Component            | Module type                            | Responsibility                             | Public API surface                                       |
-| -------------------- | -------------------------------------- | ------------------------------------------ | -------------------------------------------------------- |
-| Server companion     | `pages/**/*.server.ts`                 | Page reads, gates, mutations               | `loader`, `action`, `actions`, `InferProps`              |
-| Schema boundary      | Page/API handler                       | Validate body, query, params, file entries | Zod, `defineHandler.withValidator`, `readRecipeFormData` |
-| Client action helper | `src/lib/client/page-action.svelte.ts` | In-place refresh and failure alert         | `usePageAction()`                                        |
-| Response helper      | `src/lib/client/api-client.ts`         | Safe HTTP errors and login navigation      | `readResponse`, `getErrorMessage`                        |
-| Authorization        | Server auth helpers                    | Gate page reads and protect writes         | `guardPage`, `withAuthGuard`                             |
-| API handlers         | `routes/api/**`                        | Remaining HTTP contracts                   | Named GET/POST exports                                   |
+| Component              | Module type                                | Responsibility                                 | Public API surface                         |
+| ---------------------- | ------------------------------------------ | ---------------------------------------------- | ------------------------------------------ |
+| API handlers           | `routes/api/**`                            | Reads, writes, session, auth, health and media | Named GET/POST/PUT/PATCH/DELETE exports    |
+| Schema boundary        | API handler                                | Validate body, query, params and files         | Zod, `withValidator`, `readRecipeFormData` |
+| Feature client options | `src/features/*/client/api/<operation>.ts` | Requests and cache invalidation                | `queryOptions`, `mutationOptions`          |
+| Response helper        | `src/lib/client/api-client.ts`             | Safe HTTP errors and login navigation          | `readResponse`, `getErrorMessage`          |
+| Authorization          | Server auth helpers                        | Protect reads and writes                       | `withAuthGuard`                            |
+| Validation error       | `src/lib/server/http-error.ts`             | Dotted field messages                          | `FieldValidationError`                     |
 
 ## 8. Detailed Design
 
 ### 8.1 Function declaration and placement
 
-Void pages live under `pages/` with server companions exporting `defineHandler` loaders and
-`action` or named `actions`. They import domain reads/writes from `@/features/<feature>/server/*`.
-Shared schemas live at the `src/features/<feature>/` root; server persistence helpers live in
-`src/features/<feature>/server/`. Browser components receive loader props rather than importing
-Worker-bound helpers at runtime.
+Void API files export named HTTP methods and import domain reads/writes from
+`@/features/<feature>/server/*` and `@/lib/server/*`. Shared schemas live at the feature root;
+server persistence helpers stay in `server/`. Browser screens under `src/pages/` consume
+feature query/mutation options, never Worker-bound runtime helpers. No page-action compatibility
+path or server page companions remain.
 
 ### 8.2 Validation and FormData contract
 
-JSON/query/params use `defineHandler.withValidator` and shared Zod schemas. Recipe forms serialize
-with `objectToFormData`, convert to entries for `usePageAction`, and server actions call
-`readRecipeFormData` before `recipeSchema`/`updateRecipeSchema` parsing. That reader accepts
-Void action bodies as well as multipart requests; files remain raw while other structured values
-JSON-round-trip. Edit actions verify the body ID matches the page ID.
+JSON/query/params use `defineHandler.withValidator` and shared Zod schemas. Recipe POST/PUT
+handlers keep `readRecipeFormData` and `validateRecipeForm`: JSON remains structured and strict;
+bracket-key multipart is reconstructed and normalized only for that transport. File values remain
+binary. PUT validates the path ID and rejects a submitted body ID that does not match it.
+
+```ts
+// src/lib/server/http-error.ts
+export class FieldValidationError extends Error {
+  readonly errors: Record<string, string>
+}
+```
+
+`validateRecipeForm` throws this error rather than a framework page-protocol validation error.
 
 ### 8.3 Authorization and ownership contract
 
-Protected loaders return `guardPage(context, role?)` redirects before data reads.
-Recipe create/edit actions repeat that gate. Settings actions and recipe deletion wrap handlers in
-`withAuthGuard(handler, role?)`, which authorizes before handler validation and sets `apiUser`.
-Missing identity throws JSON 401; inactive membership throws its JSON 403 code; an admin requirement
-failure throws 403. Recipe write/delete helpers independently check owner-or-admin authorization.
+Writes use `withAuthGuard` with the member/admin guard in section 8.7; directory reads require
+admin as well. Authorization runs before handler validation and sets `apiUser`. Missing identity
+returns 401; inactive membership and insufficient role return 403. Recipe mutation helpers
+independently enforce owner-or-admin. Client router guards only choose screens and do not replace
+any of these checks.
 
 ### 8.4 Error contract
 
-`middleware/01.api-errors.ts` maps thrown API errors and errors from non-GET page requests through
-`toApiErrorResponse`. API-only validator responses also pass through `toApiValidationResponse`.
+`middleware/01.api-errors.ts` maps thrown API errors through `toApiErrorResponse`;
+validator responses pass through `toApiValidationResponse`.
 
-| Failure           | HTTP response                                                  |
-| ----------------- | -------------------------------------------------------------- |
-| `HttpError`       | Its status and `{ error }` message                             |
-| Thrown `ZodError` | 400 schema error envelope                                      |
-| Unknown API path  | `404 { error: 'not_found' }`                                   |
-| Unexpected error  | Logged server-side; `500 { error: 'Une erreur est survenue' }` |
+| Failure                                      | HTTP response                                                    |
+| -------------------------------------------- | ---------------------------------------------------------------- |
+| `FieldValidationError` or invalid write body | `400 { error: string, errors: Record<string, string> }`          |
+| `HttpError`                                  | Its status and `{ error }` message                               |
+| Thrown `ZodError`                            | 400 schema error envelope; body validation includes field errors |
+| Unknown API path                             | `404 { error: 'not_found' }`                                     |
+| Unexpected error                             | Logged server-side; `500 { error: 'Une erreur est survenue' }`   |
 
-`readResponse` catches typed `FetchError`: 401 uses `location.assign('/auth/login')`;
-blocked/pending 403 adds the login error query; 400 becomes `Invalid Schema`; other statuses,
-including 404 and ordinary permission 403, throw safe Errors rather than page-control exceptions.
-Non-HTTP failures propagate unchanged. `usePageAction` also describes validation `errors` records
-returned by action submission and alerts an unsuccessful result.
+Field-error keys are dotted body paths. `toApiValidationResponse` builds `errors` from
+`withValidator` body-slot issues and preserves the existing `error` string.
+`readResponse` preserves those details for `createForm`. It handles typed `FetchError`:
+401 uses `location.assign('/auth/login')`; blocked/pending 403 adds the account-error query;
+ordinary 403/404 and other failures throw safe errors. Non-HTTP failures propagate unchanged.
+Browser forms resolve false for 400 field errors and alert other rejected failures.
 
 ### 8.5 Effects and ordering
 
-Actions validate/authorize before effects and delegate aggregate writes to server helpers.
+API mutations validate/authorize before effects and delegate aggregate writes to server helpers.
 D1 batching and R2 ordering follow the feature/data-layer contracts. Recipe deletion uses
 `src/features/recipe/server/recipe-delete.ts`; create/update use `recipe-mutations.ts`.
 R2 cannot participate in a D1 batch.
 
-### 8.6 Page-action client contract
+### 8.6 Query and mutation client contract
 
-`usePageAction()` submits typed action URLs, body data, and required dynamic params through
-`submitAction(router, url, { data, method: 'POST', preserveState: true })`. It preserves URL/history,
-refreshes props in place, alerts expected failures, and returns `Promise<boolean>`.
-Callers own navigation/reset/close after success. Callers await the helper.
-The DS `DeleteDialog` uses local loading state while awaiting its callback.
+Feature `client/api/<operation>.ts` modules export `queryOptions`/`mutationOptions` calling
+`readResponse(fetch(...))` from `void/client`. Screens use `createQuery` and `createMutation`;
+the router preloads with `queryClient.ensureQueryData`. Mutation `onSuccess` invalidates keys
+according to `docs/infrastructure/client/client-state.spec.md` section 8.5. Callers await writes
+and own subsequent reset/close/navigation; DeleteDialog awaits its callback with local pending state.
 
 ### 8.7 API route boundary
 
-The remaining routes are:
+| Route file                            | Method | Guard  | Body/query                          | Response                                     |
+| ------------------------------------- | ------ | ------ | ----------------------------------- | -------------------------------------------- |
+| `routes/api/session.ts`               | GET    | none   |                                     | `{ email, role, status } \| null`            |
+| `routes/api/recipes/index.ts`         | GET    | none   |                                     | `listRecipes` result                         |
+| `routes/api/recipes/index.ts`         | POST   | member | recipe form, JSON or multipart      | `{ id }`                                     |
+| `routes/api/recipes/[id].ts`          | GET    | none   |                                     | `{ recipe, subrecipes }`; missing recipe 404 |
+| `routes/api/recipes/[id].ts`          | PUT    | member | update form, JSON or multipart      | `{ id }`                                     |
+| `routes/api/recipes/[id].ts`          | DELETE | member |                                     | empty                                        |
+| `routes/api/ingredients/index.ts`     | GET    | none   |                                     | `listIngredients` result                     |
+| `routes/api/ingredients/index.ts`     | POST   | member | `ingredientSchema`                  | empty                                        |
+| `routes/api/ingredients/[id].ts`      | PUT    | member | `updateIngredientSchema` minus `id` | empty                                        |
+| `routes/api/ingredients/[id].ts`      | DELETE | admin  |                                     | empty                                        |
+| `routes/api/users/index.ts`           | GET    | admin  | `?status=active\|pending\|blocked`  | `listUsers` result                           |
+| `routes/api/users/index.ts`           | POST   | admin  | `userSchema`                        | empty                                        |
+| `routes/api/users/[id].ts`            | PATCH  | admin  | `{ status: 'active' \| 'blocked' }` | empty                                        |
+| `routes/api/shopping-list/recipes.ts` | GET    | none   | `?ids=[…]`                          | existing selected-recipe projection          |
 
-| Route                            | Consumer                                         |
-| -------------------------------- | ------------------------------------------------ |
-| `/api/auth/*`                    | Void auth (Better Auth) sign-in/session protocol |
-| `/api/image/*`, `/api/video/*`   | Media reads; video HEAD handled through GET      |
-| `GET /api/health`                | Liveness                                         |
-| `GET /api/recipes`               | Header search palette, fetched on first open     |
-| `GET /api/shopping-list/recipes` | IDs selected in localStorage                     |
-| `POST /api/ingredients`          | Inline `AddIngredient`; then `router.refresh()`  |
+`/api/session` calls `getApiUser()` and omits its ID, including for the development admin identity.
+Auth `/api/auth/*`, image/video streaming (including video HEAD through GET), and health remain
+unchanged. Handlers use existing server helpers, including `getRecipeDetails`,
+`getSubrecipeInstructions`, `createRecipe`, `updateRecipe` and `deleteRecipe`.
 
-API clients use same-origin typed `void/client` fetch through `readResponse`.
-`02.csrf.ts` rejects cross-origin form-encoded requests (Origin / Sec-Fetch-Site) only to `/api/*` except auth; it does not wrap page-action URLs.
-Void generates one Worker from pages, API routes, and middleware; its asset serving and default 404
-remain intact without an application catch-all.
+`02.csrf.ts` rejects cross-origin form-encoded API writes except auth; it also covers PUT, PATCH
+and DELETE with form or missing content types. Void generates one API/middleware Worker;
+the SPA fallback serves only non-file, non-`/api` document paths and never shadows static assets.
 
 ### 8.8 Read contract
 
-Loaders return serializable props typed with `InferProps`. Recipe list/detail types derive from
-server query return types; no separate query-option layer exists. Missing detail recipes use
-`recipe: null`; embedded instructions resolve in the detail loader and absent sources are omitted.
-
-The header palette retains a stable promise per document, initialized on first open.
-Shopping-list reads retain one promise per serialized ID selection; rejected promises are removed.
-These browser-only reads have no timed freshness or mutation invalidation lifecycle.
+Recipe list/detail types derive from server query return types. Detail GET resolves the recipe and
+embedded sub-recipe instructions together; absent instruction sources are omitted. A missing recipe
+is HTTP 404, not successful null data. Palette and shopping-list reads share the central query-key
+tree, freshness and invalidation. Query defaults and session identity live in the client-state leaf.
 
 ### 8.9 Mutation contract
 
-Regular-page forms submit page actions, then use refreshed props and caller-owned UI effects.
-Recipe deletion calls `submitAction(router, '/recipe/<id>', { method: 'POST', replace: true })`
-from `void/pages-client`. The guarded action deletes the aggregate and redirects home; replacement
-keeps Back from reopening the deleted recipe. It bypasses `usePageAction()` because `preserveState`
-keeps the old URL on redirects. Failed results alert via `alertError`.
-
-Inline ingredient creation uses the remaining API POST; success awaits `router.refresh()` before
-form reset and dialog closing. Settings ingredient update/delete use page actions.
+Recipe create/update/delete invalidates `allRecipes`. Creation and deletion replace navigation
+to `/`; update replaces it to `/recipe/<id>`. Back cannot reopen a deleted recipe.
+Ingredient create/update/delete invalidates `allIngredients` and `allRecipes`, because recipe and
+shopping-list projections embed ingredient names; callers close dialogs after success.
+User create/approve/block invalidates `allUsers`, then closes the dialog or stays.
+Sign-out uses `location.assign('/auth/login')` without invalidation, resetting the document cache.
 
 ### 8.10 Failure and retry boundary
 
 There is no browser write queue or automatic mutation retry. Callers may explicitly resubmit.
-Required D1 work resolves before success. `usePageAction` reports unsuccessful results as false;
-HTTP clients throw safe errors. Loader errors remain server responses, not API JSON success values.
+Required D1 work resolves before success. HTTP clients throw safe failures; `createForm` converts
+400 field-error responses to editable errors and false, while other failures reject for caller alerts.
+API errors are not JSON success values.
 
 ### 8.11 Contract sketch
 
-`loader(context) -> props | redirect Response`;
-`action(context) -> result | redirect Response`.
-For example, `/search` returns `{ recipes }` from a direct D1 read and
-`/recipe/edit/[id]` validates an action body before replacing the aggregate.
-`GET /api/recipes -> ReducedRecipe[]` remains an independent palette read.
+```text
+queryOptions → readResponse(fetch(GET /api/...)) → query cache → screen
+createForm.submit → mutationOptions → guarded API → validation/ownership → D1/R2
+                                   → invalidate affected keys → caller close/navigation
+```
 
 ### 8.12 Outcome and acceptance
 
-- `[SO-1]` Direct loader reads and guarded page actions replace page-specific HTTP clients while
-  remaining APIs preserve safe typed responses — demonstrated by `[VC-1]` and `[VC-2]`.
-- `[VC-1]` A protected loader redirects before reading data; a guarded action/API rejects missing,
-  inactive, or insufficient-role callers and invalid authorized input before persistence — demonstrates `[SO-1]`.
-- `[VC-2]` An in-place page write refreshes its props without changing URL/history; the palette fetches
-  on opening, shopping-list reads selected IDs, and an unknown API returns JSON 404 — demonstrates `[SO-1]`.
+- `[SO-1]` The same-origin API supplies every query and mutation with safe typed responses and
+  authoritative authorization — demonstrated by `[VC-1]` and `[VC-2]`.
+- `[VC-1]` Call every section 8.7 endpoint with sufficient and insufficient production-like identity:
+  missing identity returns 401 on guarded writes, insufficient role returns 403, missing recipe
+  returns 404, and invalid bodies return 400 dotted field errors before persistence — demonstrates `[SO-1]`.
+- `[VC-2]` Recipe writes refresh home/search/detail; ingredient writes refresh catalogue/detail/shopping
+  list; user transitions refresh all status panels without reload. Delete replaces navigation home;
+  the palette shares recipe-list data, selected-ID queries reflect invalidation, and unknown APIs
+  return JSON 404 — demonstrates `[SO-1]`.
 
 ## 9. Open Questions
 

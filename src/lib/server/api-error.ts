@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-import { HttpError } from './http-error'
+import { FieldValidationError, HttpError } from './http-error'
 
 const fallbackMessage = 'Une erreur est survenue'
 
@@ -12,13 +12,26 @@ const voidValidationBodySchema = z.union([
   z.object({ error: z.literal('Invalid JSON body') }),
 ])
 
-const formatValidationBody = (body: z.infer<typeof voidValidationBodySchema>) =>
+type VoidValidationBody = z.infer<typeof voidValidationBodySchema>
+
+const formatValidationBody = (body: VoidValidationBody) =>
   'issues' in body
     ? body.issues.flatMap(({ issues, slot }) => issues.map(({ message, path }) => `${[slot, path].filter(Boolean).join('.')}: ${message}`)).join('; ')
     : body.error
 
+const bodyFieldErrors = (body: VoidValidationBody): Record<string, string> =>
+  'issues' in body
+    ? Object.fromEntries(
+        body.issues.flatMap(({ issues, slot }) => (slot === 'body' ? issues.flatMap(({ message, path }) => (path ? [[path, message]] : [])) : []))
+      )
+    : {}
+
 /** Maps an error thrown by an API handler to the API's JSON error contract. */
 export const toApiErrorResponse = (error: unknown): Response => {
+  if (error instanceof FieldValidationError) {
+    const details = Object.entries(error.errors).map(([path, message]) => `${path}: ${message}`)
+    return Response.json({ error: `Invalid Schema; ${details.join('; ')}`, errors: error.errors }, { status: 400 })
+  }
   if (error instanceof HttpError) {
     return Response.json({ error: error.message || fallbackMessage }, { status: error.status })
   }
@@ -36,5 +49,5 @@ export const toApiValidationResponse = (body: unknown): Response | undefined => 
   if (!parsed.success) {
     return undefined
   }
-  return Response.json({ error: `Invalid Schema; ${formatValidationBody(parsed.data)}` }, { status: 400 })
+  return Response.json({ error: `Invalid Schema; ${formatValidationBody(parsed.data)}`, errors: bodyFieldErrors(parsed.data) }, { status: 400 })
 }

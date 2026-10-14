@@ -12,3 +12,14 @@ export class HttpError extends Error {
     return new Response(this.message, { status: this.status })
   }
 }
+
+/** A request body that failed validation; `errors` maps each dotted body path to its message. */
+export class FieldValidationError extends Error {
+  override readonly name = 'FieldValidationError'
+  readonly errors: Record<string, string>
+
+  constructor(errors: Record<string, string>) {
+    super('Invalid Schema')
+    this.errors = errors
+  }
+}

@@ -17,13 +17,13 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ## 3. Key Design Decisions
 
-| Decision                      | Choice                                                                                            | Rationale                                                                                                                                        |
-| ----------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `[KD-1]` Worker runtime       | Void generates the Cloudflare Worker entry from pages, API file routes, and global middleware.    | One deployment serves the same-origin API, OAuth routes, and media while its ASSETS binding serves static assets and pages render on the Worker. |
-| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `STORAGE`; Images is `IMAGES`.                                                  | Named bindings make provider services available without application-managed credentials.                                                         |
-| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                                            |
-| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                                     |
-| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker without a fetch handler.                   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior.              |
+| Decision                      | Choice                                                                                            | Rationale                                                                                                                           |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Worker runtime       | Void generates the Cloudflare Worker entry from API file routes and global middleware.            | One deployment serves the same-origin API, OAuth routes, and media while its ASSETS binding serves static assets and the SPA shell. |
+| `[KD-2]` Capability bindings  | D1 is `DB`; R2 is `STORAGE`; Images is `IMAGES`.                                                  | Named bindings make provider services available without application-managed credentials.                                            |
+| `[KD-3]` Media representation | Images become WebP at width 640 and quality 80 before their R2 write; video remains source bytes. | Canonical image bytes limit storage and read transfer while preserving video content.                                               |
+| `[KD-4]` Media delivery       | R2 reads pass through the edge cache with explicit freshness headers.                             | Repeat reads avoid object-store work at an edge and clients can reuse boundedly fresh bytes.                                        |
+| `[KD-5]` PWA registration     | `/sw.js` remains registered as a minimal module worker without a fetch handler.                   | Registration meets the user-required Samsung PWA installation path without restoring offline caching, replay, or fallback behavior. |
 
 ## 4. Principles & Intents
 
@@ -63,34 +63,33 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 ### 8.1 Worker configuration
 
-Void owns the project rooted at the repository root. `void.config.ts` declares the compatibility
-date and `nodejs_compat`, Images `IMAGES`, D1/R2 binding inference (R2 uses the default `STORAGE`), routes, and
-disabled ISR. `void.lock.json` records the `recipe-organizer` Worker name, account, D1 `DB`, and
-R2 `STORAGE`; remove a recorded value from its `resolved` object, not just from the config. Observability records invocation logs;
-trace ingestion is disabled. `keep_vars` preserves dashboard-managed variables and auth secrets.
+Void owns the project rooted at the repository root. `void.config.ts` keeps `cloudflare`,
+`inference`, `worker`, the compatibility date and `nodejs_compat`, capability bindings and
+the immutable `/assets/*` header. It drops `head` and `routing.isr`: the static document head
+belongs to `index.html`. `void.lock.json` records the Worker name, account, D1 `DB` and
+R2 `STORAGE`; remove a recorded value from its `resolved` object, not just the config.
+Observability records invocation logs; trace ingestion is disabled. `keep_vars` preserves
+dashboard-managed variables and auth secrets.
 
-Global middleware makes every request Worker-first, including static assets. Generated asset
-configuration uses `run_worker_first: ['/**']` and `not_found_handling: 'none'`; the Worker serves
-assets through `ASSETS`. Void Pages renders matched document URLs; unknown pages retain Void's
-default 404. No application catch-all exists because it would shadow assets such as
-`/manifest.json`. Unknown API paths retain the JSON 404 contract.
+The API/middleware Worker serves static assets through ASSETS and the same `index.html` fallback
+for non-file, non-`/api` document paths. If Void's generated fallback does not provide that
+boundary, `middleware/03.spa-fallback.ts` supplies it. `/manifest.json` and API routes retain
+their own responses; unknown document paths render in-app NotFound with HTTP 200 and unknown APIs
+return JSON 404. Shell delivery performs no session lookup, D1 query or SSR.
 
-`vite.config.ts` uses `voidPlugin({ persistTo: '.wrangler/state' })`; the Worker answers unmatched
-development requests.
-`voidSvelte({ prefetch: { cacheFor: ['30s', '1h'] }, viewTransitions: true })`
-enables hydrated Svelte pages, client transitions, and stale-while-revalidate navigation prefetching
-(fresh 30s, usable up to 1h). Non-GET navigation/actions flush the prefetch cache.
-Two build-only plugins trim the Worker: Void's auth runtime resolves `better-auth/minimal`, because it
-already passes its generated Drizzle adapter, and the adapter's browser entries (`pages-client`,
-`islands-client`) build only in the client environment instead of shipping the Svelte pages client to the Worker. `pnpm dev` runs one Vite server on `http://localhost:3000` for rendered pages and the same-origin API, without
-a separate API process or proxy. Void reads the project-root `.env`.
-`.void/` (entry and route types) and `.void-wrangler.jsonc` are generated and
-git-ignored. `vp exec void prepare` regenerates route types before clean-tree checks.
+`vite.config.ts` retains `voidPlugin({ persistTo: '.wrangler/state' })`, `betterAuthMinimal` and
+`appType: 'mpa'`, because the Worker owns unmatched requests. Svelte uses `svelte()` in every
+environment; there is no Void Svelte adapter or client-only page-entry plugin.
+`@tanstack/svelte-query` supplies the browser cache. `pnpm dev` runs one Vite server on
+`http://localhost:3000` for the static shell and same-origin API, with no separate API process/proxy.
+Void reads project-root `.env`. Generated `.void/` and `.void-wrangler.jsonc` stay ignored;
+`vp exec void prepare` regenerates API route types before checks.
 
-`src/lib/server/env.d.ts` declares the non-D1 bindings on `Cloudflare.Env` and keeps them in sync with
-`void.config.ts` and `void.lock.json`; secrets come from `env.ts`, runtime types from Void's `@cloudflare/workers-types`.
-The tooling-only `tools/wrangler.jsonc` supports local D1 migrations and dump/import;
-keep its resource IDs synchronized with `void.lock.json`. Drizzle-kit alone owns migrations.
+`src/lib/server/env.d.ts` declares non-D1 bindings on `Cloudflare.Env`, synchronized with
+`void.config.ts`/`void.lock.json`; secrets come from `env.ts`, runtime types from Void.
+Tooling-only `tools/wrangler.jsonc` supports D1 migration and dump/import with IDs synchronized
+to `void.lock.json`. Drizzle-kit alone owns migrations; schema, auth config, R2 routes and
+deployment target are unchanged.
 
 ### 8.2 Media write contract
 
@@ -109,7 +108,7 @@ responses use `public, max-age=31536000, immutable`; video GET and HEAD response
 
 ### 8.4 PWA registration
 
-The inline head script in `void.config.ts` progressively registers `public/sw.js` at `/sw.js` with
+The inline head script in `index.html` progressively registers `public/sw.js` at `/sw.js` with
 `navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'module' })`. This registered worker
 is required by the user for Samsung PWA installation; it is not a claim that every browser requires
 a worker to install the manifest. Registration failure does not block application rendering.
@@ -151,15 +150,15 @@ that endpoint.
 
 ### 8.8 Runtime configuration boundary
 
-The Void configuration uses one Worker name and a generated page/API entry. D1, R2, and Images
+The Void configuration uses one Worker name and a generated API/middleware entry. D1, R2, and Images
 remain separately named capabilities. Auth secrets stay dashboard-managed through `keep_vars`.
 
-`void.config.ts` also owns the French HTML language, title, viewport/safe-area metadata,
-theme-color, manifest/favicon links, and progressive service-worker registration.
-An inline script sets the theme class before paint from `ui-theme`, else system preference.
-The backward-transition script handles client transitions and `pageswap`/`pagereveal` document
-traversals. Shared `@view-transition { navigation: auto }` CSS remains for document navigation,
-including login redirects and reloads. No inner scroll-container restoration is implemented.
+The static `index.html` owns French HTML language, title, viewport/safe-area metadata, theme-color,
+manifest/favicon links and progressive service-worker registration. Its inline theme script sets
+the document class before paint from `ui-theme`, else system preference. The retained backward
+document-transition script handles `pageswap`/`pagereveal`; shared cross-document view-transition
+CSS remains for redirects/reloads. The in-house Navigation API router owns client commit transitions,
+tags backward traversal `back` and restores document/ScreenLayout scroll by history key.
 
 ### 8.9 Failure behavior
 
@@ -185,7 +184,7 @@ is available.
 
 `pnpm build` builds the web project's browser assets and Worker bundle into
 `dist/client` and `dist/ssr`; `pnpm serve` runs `vp preview`.
-The `dist/ssr` directory contains the Worker bundle, including server page rendering.
+The `dist/ssr` directory contains the API/middleware Worker bundle; its name does not imply page SSR.
 
 `pnpm deploy` and production CI use `vp exec void deploy --platform cloudflare` with
 `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
@@ -214,10 +213,10 @@ are not automatically garbage-collected on retry. Refresh the app after migratio
 
 ### 8.13 Outcome and acceptance
 
-- `[SO-1]` One Void project serves rendered pages and API from the same origin while preserving storage
+- `[SO-1]` One Void project serves a static SPA shell and API from the same origin while preserving storage
   and secret authorities — demonstrated by `[VC-1]` and `[VC-2]`.
-- `[VC-1]` Given the local server or a production-build preview, the root page renders,
-  `GET /api/health` returns JSON 200, and a hard reload of a deep page URL renders its document;
+- `[VC-1]` Given the local server or a production-build preview, the root document serves the static shell,
+  `GET /api/health` returns JSON 200, and hard reloads of `/recipe/1` and `/settings` serve the same shell;
   an unknown `/api/*` URL returns JSON 404 rather than HTML — demonstrates `[SO-1]`.
 - `[VC-2]` Deployment targets the configured Worker/resources and preserves dashboard-managed
   variables without applying Void migrations — demonstrates `[SO-1]`.

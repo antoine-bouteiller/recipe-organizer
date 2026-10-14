@@ -22,7 +22,7 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 | Decision                      | Choice                                                                                                             | Rationale                                                                                                                                  |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | `[KD-1]` Durable intent       | Two persisted stores hold selected recipe IDs and serving overrides separately.                                    | Selection and quantity intent have independent lifetimes: removing a recipe does not discard its chosen serving count.                     |
-| `[KD-2]` Recipe projection    | A GET server function returns selected recipes with direct and linked ingredient lines.                            | The Worker supplies relationally consistent source data while the browser retains the user-specific serving choice.                        |
+| `[KD-2]` Recipe projection    | A GET API query returns selected recipes with direct and linked ingredient lines.                                  | The Worker supplies relationally consistent source data while the browser retains the user-specific serving choice.                        |
 | `[KD-3]` Aggregation location | The browser scales, converts, rolls up, and groups the projection in a pure derivation.                            | Serving overrides live on the device, and a pure computation makes each rendered list correspond directly to its selection and quantities. |
 | `[KD-4]` Unit result          | Each ingredient has one preferred primary unit plus residual fallback lines.                                       | Conversion failures remain visible to the shopper instead of being silently dropped or inaccurately summed.                                |
 | `[KD-5]` Ingredient hierarchy | Child ingredients disappear from the displayed list and contribute their largest primary quantity to their parent. | A parent purchase can satisfy a child variant, while selecting the largest child quantity avoids double-counting variants.                 |
@@ -48,7 +48,8 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 
 ## 6. Caveats
 
-- `[C-1]` Each distinct selected-ID array retains one request promise per document, with no TTL or mutation invalidation; failed promises are evicted, refining architecture [C-5].
+- `[C-1]` Selected-ID queries use `queryKeys.recipeListByIds(ids)`, 5-minute staleTime and 24-hour gcTime;
+  recipe and ingredient writes invalidate `allRecipes`, refining architecture [C-5].
 - `[C-2]` A missing selected recipe produces no projection row and therefore no shopping-list lines.
 - `[C-3]` `convert` returns `null` for incompatible dimensions or absent conversion metadata; those
   amounts remain fallback lines (`src/features/shopping-list/client/utils/aggregate-shopping-list.ts`).
@@ -61,7 +62,7 @@ projection. This fulfils architecture [G-4] and refines its client-state boundar
 
 ```text
 persisted recipe IDs ─┐
-                       ├─> stable request promise ─> recipe projection ─┐
+                       ├─> selected-recipe query cache ─> recipe projection ─┐
 persisted servings ───┘                                         │
                                                                   v
                                                          aggregateShoppingList
@@ -71,21 +72,21 @@ persisted servings ───┘                                         │
                                                        category sections and cart items
 ```
 
-| Component          | Module type                       | Responsibility                                           | Public API surface                                 |
-| ------------------ | --------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
-| Selection store    | Persisted TanStack Store          | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
-| Quantity store     | Persisted TanStack Store          | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
-| Recipe projection  | Feature GET API                   | Read selected recipes and flattened linked-recipe lines  | `loadRecipesByIds(ids)`                            |
-| Aggregator         | Pure feature utility              | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
-| Shopping-list hook | Feature hook                      | Join stores, API projection, and derived output          | `useShoppingList()`                                |
-| List screen        | Void hydrated page and components | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
+| Component          | Module type               | Responsibility                                           | Public API surface                                 |
+| ------------------ | ------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
+| Selection store    | Persisted rune store      | Preserve selected recipe identifiers                     | `useShoppingListIds`, add, remove, reset           |
+| Quantity store     | Persisted rune store      | Preserve per-recipe serving overrides                    | `useRecipeQuantitiesState`, `setRecipesQuantities` |
+| Recipe projection  | Feature GET API           | Read selected recipes and flattened linked-recipe lines  | `recipeListByIds(ids)` query options               |
+| Aggregator         | Pure feature utility      | Scale, aggregate, convert, roll up, and categorize lines | `aggregateShoppingList()`                          |
+| Shopping-list hook | Feature hook              | Join stores, API projection, and derived output          | `useShoppingList()`                                |
+| List screen        | SPA screen and components | Render loading, empty, grouped, and checked-item states  | `/shopping-list`, `ShoppingList`, `CartItem`       |
 
 ## 8. Detailed Design
 
 ### 8.1 Durable selection and serving intent
 
 `shopping-list` holds `number[]` recipe identifiers; `recipe-quantities` holds
-`Record<number, number>` overrides. Both are data-only persisted stores with hydration-safe read hooks and
+`Record<number, number>` overrides. Both are data-only persisted stores with browser read hooks and
 exported mutation functions (`src/stores/shopping-list.store.svelte.ts`,
 `src/stores/recipe-quantities.store.svelte.ts`). A serving override defaults to the recipe's declared
 `servings` only when its map entry is nullish. This refines the client-state specification's
@@ -93,10 +94,11 @@ exported mutation functions (`src/stores/shopping-list.store.svelte.ts`,
 
 ### 8.2 Projection contract
 
-`loadRecipesByIds(ids)` calls typed `GET /api/shopping-list/recipes` with a JSON-stringified
-`ids` query value. A map retains one stable promise per distinct ID array;
-failed promises are removed (`src/features/shopping-list/client/api/get-recipe-by-ids.ts`).
-The hook makes no request for an empty selection. This is not a timed query cache.
+`src/features/shopping-list/client/api/get-recipe-by-ids.ts` exports query options for typed
+`GET /api/shopping-list/recipes` through `readResponse(fetch(...))` from `void/client`, with
+JSON-stringified `ids`. The key is `queryKeys.recipeListByIds(ids)`, beneath `allRecipes`.
+The hook makes no request for empty selection. Recipe mutations and ingredient mutations invalidate
+`allRecipes`, so embedded ingredient names and selected-recipe rows refetch together.
 
 | Field                          | Meaning                                                              |
 | ------------------------------ | -------------------------------------------------------------------- |
@@ -135,23 +137,23 @@ fallback entry contain `quantity` and `unitSlug`
 
 ### 8.4 List interaction
 
-`pages/shopping-list/index.svelte` directly composes ScreenLayout, current-path TabBar,
-ShoppingList, and an inline reset button. It has no server companion: regular pages are not
-auto-prerendered, and device-local selected recipes cannot be loaded on the server.
+`src/pages/shopping-list/index.svelte` composes ScreenLayout, current-path TabBar, ShoppingList
+and an inline reset button. Its registered route has no data preload, because selected IDs live in
+localStorage; they cannot be known before browser selection resolves.
 
-`useShoppingList()` uses `useIsHydrated()`: SSR, hydration, and recipe loading stay in an explicit `pending`
-state that ShoppingList renders as neutral skeleton sections. After mount the hook reads the persisted
-ID/quantity stores, calls `loadRecipesByIds(ids)` for a nonempty selection, and aggregates the projection
-on `success`; `error` shows a French retry alert whose button reruns the load. Empty groups render the
-French empty-list message; otherwise category headings and CartItems render
-(`src/features/shopping-list/client/component/shopping-list.svelte`).
+`useShoppingList()` retains `useIsHydrated()` as an always-client compatibility gate; simplifying
+the hook is out of scope. After mount it reads ID/quantity stores, queries a nonempty selection with
+`recipeListByIds(ids)` and derives output with `aggregateShoppingList`. Local-only recipe loading
+retains pending skeleton sections; error feedback is French with a query-refetch retry button.
+Empty groups show the French empty-list message; nonempty groups render category headings and
+CartItems (`src/features/shopping-list/client/component/shopping-list.svelte`).
 
 CartItem formats primary/fallback values, retains incompatible amounts visibly, and keeps checked
 state local to the mounted row. Reset clears only selected recipe IDs; serving overrides remain
-available later (`pages/shopping-list/index.svelte`).
+available later (`src/pages/shopping-list/index.svelte`).
 
 The list is derived from selection, quantity intent, and API records. No records or aggregates are
-persisted, but fulfilled request promises remain document-local snapshots until document reload.
+persisted, but query records remain in the document-local cache and refresh through shared invalidation.
 
 ## 9. Open Questions
 

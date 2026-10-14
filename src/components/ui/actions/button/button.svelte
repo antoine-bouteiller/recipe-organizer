@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Link } from '@void/svelte'
   import type { Snippet } from 'svelte'
+  import type { Attachment } from 'svelte/attachments'
   import type { HTMLButtonAttributes } from 'svelte/elements'
 
   type ButtonProps = Pick<HTMLButtonAttributes, 'aria-label' | 'disabled' | 'type'> & {
@@ -10,8 +10,8 @@
     variant?: 'default' | 'destructive' | 'destructive-ghost' | 'destructive-outline' | 'ghost' | 'list-action' | 'outline' | 'secondary'
     width?: 'auto' | 'full'
   } & (
-      | { asLink: true; href: string; onclick?: never; ref?: never; viewTransition?: boolean }
-      | ({ asLink?: false; href?: never; ref?: HTMLButtonElement; viewTransition?: never } & Pick<
+      | { asLink: true; href: string; onclick?: never; preload?: Attachment<HTMLAnchorElement>; ref?: never; viewTransition?: boolean }
+      | ({ asLink?: false; href?: never; preload?: never; ref?: HTMLButtonElement; viewTransition?: never } & Pick<
           HTMLButtonAttributes,
           'aria-expanded' | 'aria-haspopup' | 'onclick' | 'onpointerdown'
         >)
@@ -21,9 +21,12 @@
     align = 'center',
     asLink,
     children,
+    disabled,
     href,
+    preload,
     ref = $bindable(),
     size = 'default',
+    type,
     variant = 'default',
     viewTransition,
     width = 'auto',
@@ -35,11 +38,15 @@
 </script>
 
 {#if asLink && href !== undefined}
-  <Link {...rest} class={linkClass} {href} {viewTransition}>{@render children?.()}</Link>
+  <a aria-label={rest['aria-label']} class={linkClass} data-view-transition={viewTransition === false ? 'false' : undefined} {href} {@attach preload}
+    >{@render children?.()}</a
+  >
 {:else}
   <button
     {...rest}
     bind:this={ref}
+    {disabled}
+    {type}
     class={[
       'button',
       {

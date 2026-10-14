@@ -1,7 +1,8 @@
 import { assert, describe, expect, it } from 'vite-plus/test'
-import { ValidationError } from 'void/pages-protocol'
 
 import { recipeSchema } from '@/features/recipe/schemas'
+import { toRequestBody } from '@/lib/client/form-body'
+import { FieldValidationError } from '@/lib/server/http-error'
 
 import { readRecipeFormData, validateRecipeForm } from './recipe-form-data'
 
@@ -52,6 +53,22 @@ describe('readRecipeFormData', () => {
   })
 })
 
+describe('client form transport', () => {
+  it('round-trips a draft with a file through multipart', async () => {
+    const image = new File(['image bytes'], 'recipe.png', { type: 'image/png' })
+    const draft = { ...values, cuisineTypes: [], image, linkedRecipes: [], meals: [], video: undefined }
+    const body = toRequestBody(draft)
+    assert(body instanceof FormData)
+    expect(await read({ body })).toEqual({ ...draft, image: expect.objectContaining({ name: 'recipe.png', size: 11 }) })
+  })
+
+  it('sends a draft without files as JSON', async () => {
+    const body = toRequestBody(values)
+    expect(body).toBe(values)
+    expect(await read({ body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } })).toEqual(values)
+  })
+})
+
 describe('recipe form validation', () => {
   const valid = { ...values, cuisineTypes: [], image: { id: 'photo', url: 'photo' }, meals: [] }
   it('keeps JSON validation strict and projects numeric errors by dotted field path', () => {
@@ -63,8 +80,8 @@ describe('recipe form validation', () => {
       })
       expect.unreachable('Expected validation failure')
     } catch (error) {
-      expect(error).toBeInstanceOf(ValidationError)
-      if (!(error instanceof ValidationError)) {
+      expect(error).toBeInstanceOf(FieldValidationError)
+      if (!(error instanceof FieldValidationError)) {
         throw error
       }
       expect(error.errors).toEqual({ 'ingredientGroups.0.ingredients.0.quantity': expect.any(String), servings: expect.any(String) })

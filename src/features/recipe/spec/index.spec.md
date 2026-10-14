@@ -23,7 +23,7 @@ shopping-list features.
   consume without duplicating recipe state.
 
 - `[NG-1]` Collaborative, concurrent editing of one recipe.
-- `[NG-2]` Public sharing/discovery, refining `docs/architecture.spec.md` [NG-1]; shipped browse loaders themselves are not membership-gated.
+- `[NG-2]` Public sharing/discovery, refining `docs/architecture.spec.md` [NG-1]; browse APIs themselves are not membership-gated.
 - `[NG-3]` Persisting per-user serving quantities or shopping-list membership on the recipe row.
 - `[NG-4]` Treating a sub-recipe step as an ownership relation; it is a view onto a linked recipe.
 
@@ -41,7 +41,7 @@ shopping-list features.
 | Decision                    | Choice                                                                                                                                                                                      | Rationale                                                                                                                                   |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `[KD-1]` Recipe aggregate   | A recipe owns its ingredient groups, ingredient rows, linked-recipe ratios, ordered steps, and media keys.                                                                                  | The cooking document stays coherent when it is read, replaced, or deleted.                                                                  |
-| `[KD-2]` Write authority    | Guarded page actions validate form data, decide ownership, derive flags, and persist the aggregate.                                                                                         | Browser state cannot be trusted to authorize writes or derive durable recipe facts.                                                         |
+| `[KD-2]` Write authority    | Guarded API mutations validate form data, decide ownership, derive flags, and persist the aggregate.                                                                                        | Browser state cannot be trusted to authorize writes or derive durable recipe facts.                                                         |
 | `[KD-3]` Read model         | List queries return card-sized recipes; detail queries return ingredients, links, and steps.                                                                                                | Each surface receives enough data without making routine browsing carry the full document.                                                  |
 | `[KD-4]` Preparation format | Preparation is ordered step groups, like ingredient groups: own groups of text steps (bold-only markdown) with an optional Magimix program, or `subrecipe` groups. Supersedes Lexical JSON. | The server can validate, query, and derive flags from typed steps; sub-recipe references get a real foreign key; recipe code drops Lexical. |
 | `[KD-5]` Client selections  | Shopping-list membership and serving quantities stay in client stores keyed by recipe id.                                                                                                   | These choices are personal, immediate UI state rather than recipe data.                                                                     |
@@ -76,11 +76,11 @@ recipe (`crud.spec.md` [KD-5]), so both reuses describe one declared relation.
 
 ### `[CT-1]` Leaf inventory
 
-| Leaf                           | Owns                                                                                                              | Key contracts                                        |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`crud`](./crud.spec.md)       | `pages/recipe/**`, `pages/recipe/**`, `src/features/recipe/server/**`, `src/db/schema/recipe*.ts`                 | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
-| [`editor`](./editor.spec.md)   | `RecipeStep` schema and Magimix constants in `src/features/recipe/`, `StepsField`, `RecipeSteps`, `parseBoldText` | step model [CT-1], bold text [CT-2], renderer [CT-4] |
-| [`display`](./display.spec.md) | list/detail/instructions queries, cards, search, cooking view, media handlers                                     | projections [CT-1], cooking view [CT-3]              |
+| Leaf                           | Owns                                                                                                                                             | Key contracts                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| [`crud`](./crud.spec.md)       | `src/pages/recipe/**`, `routes/api/recipes/**`, `src/features/recipe/client/api/**`, `src/features/recipe/server/**`, `src/db/schema/recipe*.ts` | step tables [CT-1], write flow [CT-2], flags [CT-3]  |
+| [`editor`](./editor.spec.md)   | `RecipeStep` schema and Magimix constants in `src/features/recipe/`, `StepsField`, `RecipeSteps`, `parseBoldText`                                | step model [CT-1], bold text [CT-2], renderer [CT-4] |
+| [`display`](./display.spec.md) | list/detail/instructions queries, cards, search, cooking view, media handlers                                                                    | projections [CT-1], cooking view [CT-3]              |
 
 Dependencies: `crud.spec.md` [CT-1] persists `editor.spec.md` [CT-1]; `display.spec.md` [CT-1]
 returns it; `display.spec.md` [CT-3] renders it through `editor.spec.md` [CT-4].
@@ -93,9 +93,11 @@ returns it; `display.spec.md` [CT-3] renders it through `editor.spec.md` [CT-4].
 | List projection and derived flags                 | Recipe query contract     | Cards and search      |
 | Quantity and shopping-list selection              | Client stores             | Quantity controls     |
 
-Server helpers expose list/detail/sub-recipe projections and aggregate writes; Void loaders/actions
-compose them. Features expose loader-fed components with slots/render props and the shared
-`recipeStepSchema` and `RecipeStepGroup`. Home/details and new/edit are regular hydrated pages with Void client navigation. Ingredients contribute
+Server helpers expose list/detail/sub-recipe projections and aggregate writes; Void API handlers
+compose them. Feature `client/api/<operation>.ts` modules export query/mutation options using typed
+`readResponse(fetch(...))` from `void/client`; components consume query-backed data with slots/render
+props and shared `recipeStepSchema`/`RecipeStepGroup`. Home/details and new/edit are SPA screens
+under `src/pages/`, preloaded and committed by the Navigation API router. Ingredients contribute
 catalogue ids and units; search consumes the list projection; shopping-list state consumes recipe
 ids; none reach into recipe internals.
 
@@ -114,7 +116,7 @@ ids; none reach into recipe internals.
 
 - `[C-1]` A recipe cannot be deleted while another recipe links to it or embeds its step group.
 - `[C-2]` Media objects live outside D1; stale-object cleanup is best effort after a successful write.
-- `[C-3]` The detail loader resolves embedded sub-recipe names/default steps together with the recipe; missing or empty sources render no sub-recipe section, without an independent browser instructions request.
+- `[C-3]` The detail API resolves embedded sub-recipe names/default steps together with the recipe; missing or empty sources render no sub-recipe section, without an independent browser instructions request.
 - `[C-4]` _Superseded by [KD-4]:_ Magimix detection no longer depends on a serialized marker.
 - `[C-5]` The form submits the full ingredient, link, and step graph on each write, trading row-level
   edits for a predictable aggregate.

@@ -5,7 +5,7 @@ export const userSchema = z.object({
   role: z.enum(['user', 'admin']),
 })
 
-const userStatusSchema = z.enum(['pending', 'active', 'blocked'])
+export const userStatusSchema = z.enum(['pending', 'active', 'blocked'])
 export const userIdSchema = z.object({ id: z.string() })
 
 export type UserStatus = z.infer<typeof userStatusSchema>

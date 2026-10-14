@@ -68,6 +68,7 @@ export const createRecipe = async (db: ReturnType<typeof getDb>, user: ApiUser, 
     await db.delete(recipe).where(eq(recipe.id, createdRecipe.id))
     throw error
   }
+  return createdRecipe.id
 }
 
 export const updateRecipe = async (db: ReturnType<typeof getDb>, user: ApiUser, data: z.infer<typeof updateRecipeSchema>) => {

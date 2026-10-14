@@ -23,7 +23,7 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 | `[KD-2]` Relation model     | Tables and `defineRelations` form one typed graph.                                           | Nested reads declare their traversal explicitly and relation names remain type-checked.    |
 | `[KD-3]` Referential policy | Foreign-key removal uses restrict semantics; dependent deletion is explicit and child-first. | The write path makes destructive scope visible and avoids implicit cascades.               |
 | `[KD-4]` Atomic write unit  | Related independent statements use D1 `batch([...])`.                                        | D1 batches provide the multi-statement atomicity required by graph updates.                |
-| `[KD-5]` Read projections   | Server query helpers supply loader props and remaining API reads.                            | One server projection serves browsing without a client query-key namespace.                |
+| `[KD-5]` Read projections   | Server query helpers supply API query projections.                                           | One server projection serves browsing; client query options own cache identity.            |
 
 ## 4. Principles & Intents
 
@@ -44,7 +44,8 @@ N/A — goals remain owned by `docs/architecture.spec.md`.
 
 - `[C-1]` D1 is SQLite and has the limitations called out by architecture [C-2].
 - `[C-2]` A batch is atomic but statement ordering still matters for restrict foreign keys.
-- `[C-3]` Page data is a loader snapshot; actions refresh it, but independent browser-only request promises have no general invalidation lifecycle.
+- `[C-3]` Client query records may be stale for up to the query freshness policy; feature mutations
+  invalidate affected keys. The data layer does not own browser cache state.
 - `[C-4]` Schema evolution includes committed Drizzle SQL and platform schema-application
   configuration; this specification defines the resulting schema contract, not an execution procedure.
 
@@ -92,11 +93,12 @@ points to a missing object.
 ### 8.5 Query-key contract
 
 `src/features/recipe/server/queries.ts` owns `listRecipes(db)`, `getRecipeDetails(db, id)`,
-and `getSubrecipeInstructions(db, ids)`. Pages call these directly; the remaining recipe-list API
-reuses `listRecipes`. List reads select card fields, order by name, and map image keys to URLs.
+and `getSubrecipeInstructions(db, ids)`. Recipe APIs call these helpers;
+list reads reuse `listRecipes`. List reads select card fields, order by name, and map image keys to URLs.
 Detail reads include ingredients/links/ordered step groups; embedded instruction reads resolve each
 source's name and default steps. Missing rows remain optional server results.
-No central client query-key namespace or query-option factory participates.
+`src/lib/client/query-keys.ts` and feature `client/api/` options identify/cache the HTTP projections;
+server helpers remain independent of client infrastructure.
 
 ### 8.6 Interaction boundary
 
@@ -128,10 +130,12 @@ them as database success.
 
 ### 8.9 Cache invalidation boundary
 
-The data layer does not own a browser cache. Regular-page action submission refreshes loader props;
-navigation reads a new document snapshot. Durable stores hold IDs and quantities, not rows.
-Browser-only palette/shopping-list reads retain stable request promises within a document with no
-timed freshness or shared mutation invalidation. The database helper does not patch those promises.
+The data layer does not own the browser cache. Feature client mutation options invalidate
+`allRecipes` for recipe writes, `allIngredients` and `allRecipes` for ingredient writes, and
+`allUsers` for user writes. The query cache holds all server records with 5-minute staleTime and
+24-hour gcTime; palette and selected-recipe reads share its invalidation. Durable stores contain
+IDs and quantities, not rows. Database helpers neither import query infrastructure nor patch cache
+records; D1 schema and migration authority are unchanged.
 
 ### 8.10 Failure behavior
 

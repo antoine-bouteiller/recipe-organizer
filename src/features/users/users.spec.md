@@ -20,14 +20,14 @@ and refines its identity and membership decisions [KD-5] and [KD-6].
 
 ## 3. Key Design Decisions
 
-| Decision                         | Choice                                                                                                          | Rationale                                                                                                            |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `[KD-1]` Authorization           | The page loader calls `guardPage(context, 'admin')`; every named action uses `withAuthGuard(handler, 'admin')`. | The Worker remains the enforcement boundary while the route avoids presenting an unavailable screen.                 |
-| `[KD-2]` Membership model        | A user has `user` or `admin` role and `pending`, `active`, or `blocked` status.                                 | Role grants administrative capability; status expresses admission independently of capability.                       |
-| `[KD-3]` Administrative creation | An administrator-created account receives a generated ID and the schema's active status.                        | A pre-approved invitation path does not depend on an OAuth callback to establish membership.                         |
-| `[KD-4]` Lifecycle actions       | Approve sets `active`; block sets `blocked`; no delete operation exists.                                        | Reversible state transitions preserve an account's identity and allow an administrator to restore access.            |
-| `[KD-5]` List coherence          | Successful page actions rerun the loader's three status lists.                                                  | A status transition moves a person between lists, so all panels receive the fresh persisted state.                   |
-| `[KD-6]` Directory interaction   | The loader reads three status lists and presents them in hash-linked tabs with shared search.                   | Administrators can inspect all admission states without a route change while retaining a compact mobile interaction. |
+| Decision                         | Choice                                                                                                | Rationale                                                                                                            |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `[KD-1]` Authorization           | The router applies an admin screen guard; every directory API uses `withAuthGuard(handler, 'admin')`. | The Worker remains the enforcement boundary while the route avoids presenting an unavailable screen.                 |
+| `[KD-2]` Membership model        | A user has `user` or `admin` role and `pending`, `active`, or `blocked` status.                       | Role grants administrative capability; status expresses admission independently of capability.                       |
+| `[KD-3]` Administrative creation | An administrator-created account receives a generated ID and the schema's active status.              | A pre-approved invitation path does not depend on an OAuth callback to establish membership.                         |
+| `[KD-4]` Lifecycle actions       | Approve sets `active`; block sets `blocked`; no delete operation exists.                              | Reversible state transitions preserve an account's identity and allow an administrator to restore access.            |
+| `[KD-5]` List coherence          | Successful create/approve/block mutations invalidate `allUsers`.                                      | A status transition moves a person between lists, so all panels receive the fresh persisted state.                   |
+| `[KD-6]` Directory interaction   | The route preloads three status queries and presents them in hash-linked tabs with shared search.     | Administrators can inspect all admission states without a route change while retaining a compact mobile interaction. |
 
 ## 4. Principles & Intents
 
@@ -57,7 +57,7 @@ and refines its identity and membership decisions [KD-5] and [KD-6].
 - `[C-3]` Blocking an administrator, including the last administrator, is a permitted state
   transition; the directory does not impose a minimum-admin invariant.
 - `[C-4]` A status update for an absent ID succeeds as an empty database update; the mutation still
-  reruns the page loader.
+  invalidates the user queries.
 
 ## 7. High-Level Components
 
@@ -65,21 +65,21 @@ and refines its identity and membership decisions [KD-5] and [KD-6].
 Administrator
    │ /settings/users
    v
-page guard ──> loader: active / pending / blocked ──> status tabs + search
+client admin guard ──> userList queries: active / pending / blocked ──> status tabs + search
                                                           │
-                                      named actions: guard → validate → D1
+                                      API mutations: admin guard → validate → D1
                                                           │
-                                                rerun loader → fresh props
+                                                allUsers invalidation → fresh panels
 ```
 
-| Component          | Module type                   | Responsibility                                     | Public API surface                        |
-| ------------------ | ----------------------------- | -------------------------------------------------- | ----------------------------------------- |
-| User schema        | Drizzle schema                | Store identity, role, and admission status         | `user` table                              |
-| Directory boundary | Server query and page actions | List and transition user records                   | `listUsers`, create/approve/block actions |
-| Guard              | Server handler wrapper        | Require an active administrator                    | `withAuthGuard(handler, 'admin')`         |
-| User form          | Feature form component        | Capture email and role for administrative creation | `UsersManagement` with Void `useForm`     |
-| Lifecycle controls | Feature components            | Confirm blocking and initiate approval             | `ApproveUser`, `BlockUser`                |
-| Directory route    | File route                    | Preload, filter, and partition lists by status     | `/settings/users`                         |
+| Component          | Module type                    | Responsibility                                     | Public API surface                        |
+| ------------------ | ------------------------------ | -------------------------------------------------- | ----------------------------------------- |
+| User schema        | Drizzle schema                 | Store identity, role, and admission status         | `user` table                              |
+| Directory boundary | Server query and API mutations | List and transition user records                   | `listUsers`, create/approve/block actions |
+| Guard              | Server handler wrapper         | Require an active administrator                    | `withAuthGuard(handler, 'admin')`         |
+| User form          | Feature form component         | Capture email and role for administrative creation | `UsersManagement` with app `createForm`   |
+| Lifecycle controls | Feature components             | Confirm blocking and initiate approval             | `ApproveUser`, `BlockUser`                |
+| Directory route    | File route                     | Preload, filter, and partition lists by status     | `/settings/users`                         |
 
 ## 8. Detailed Design
 
@@ -92,7 +92,7 @@ account hook assigns `pending` as part of session admission
 ([auth specification](../../../docs/infrastructure/server/auth.spec.md#82-account-and-session-admission)).
 An administrative create request accepts only email and role, generates `crypto.randomUUID()` on the
 server, and supplies the required display name from the email
-(`pages/settings/users/index.server.ts`).
+(`routes/api/users/index.ts`).
 
 | Status    | Meaning in this feature                            | Available lifecycle control |
 | --------- | -------------------------------------------------- | --------------------------- |
@@ -102,22 +102,22 @@ server, and supplies the required display name from the email
 
 ### 8.2 Server-function and authorization contract
 
-`listUsers(db, status)` orders results by email. The regular page loader gates access with
-`guardPage(context, 'admin')` before reading all three statuses and returning
-`{ users: { active, pending, blocked } }` (`src/features/users/server/queries.ts`,
-`pages/settings/users/index.server.ts`). Anonymous visitors redirect to `/auth/login`, pending/blocked
-visitors to that page with their error code, and active non-admin visitors to `/settings`.
+`listUsers(db, status)` orders results by email. `GET /api/users?status=active|pending|blocked`
+requires admin and returns the list for that status. `src/pages/settings/users/index.svelte` is
+registered with admin access and preloads all three `userList(status)` queries through
+`queryClient.ensureQueryData`. Client redirects follow the auth leaf; API guards independently
+reject unauthorized reads/writes before validation or persistence.
 
-Named actions are `/settings/users?create`, `?approve`, and `?block`. Create accepts `{ email, role }`;
-approve/block accept `{ id }` through the shared schemas. Each action uses
-`withAuthGuard(handler, 'admin')`, rejecting unauthorized direct requests before validation/persistence.
-Approve writes `status: 'active'`; block writes `status: 'blocked'`; create uses a generated ID and
-active schema default. Returning void reruns the loader, updating every panel without Query cache
-invalidation. `runPageAction` displays French expected-error feedback at the feature boundary.
+`POST /api/users` accepts `userSchema` (`{ email, role }`), generates the ID and uses the active
+schema default. `PATCH /api/users/<id>` accepts `{ status: 'active' | 'blocked' }` for
+approval/blocking. Both return empty responses and use `withAuthGuard(handler, 'admin')`.
+Invalid bodies return `400 { error, errors }` with dotted field paths.
+Feature `client/api/<operation>.ts` options use `readResponse(fetch(...))` from `void/client`;
+create/approve/block mutation `onSuccess` invalidates `allUsers`, refreshing every status panel.
 
 ### 8.3 Directory route and search
 
-The page passes loader-owned lists into `UsersManagement`, which renders panels in `active`,
+The screen passes query-backed lists into `UsersManagement`, which renders panels in `active`,
 `pending`, `blocked` order with hash anchors. A shared case-insensitive search matches email or role
 (`src/features/users/client/components/users-management.svelte`). The tab labels remain `Actifs`, `En attente`,
 and `Bloqués`.
@@ -128,25 +128,24 @@ status from a search with no match.
 
 ### 8.4 Administrative controls
 
-`UsersManagement` uses Void `useForm` with server-only validation through the create action. A successful
-creation explicitly clears email/restores the default role and closes its dialog (Void resets defaults
-to submitted data, so `reset()` alone would retain the created user);
-expected failure leaves values editable. The form retains its French user and administrator role labels.
-`ApproveUser` tracks pending explicitly while awaiting its page action; confirmation dialogs use the
-same explicit pending lifecycle. `BlockUser` uses a confirmation dialog whose
-action is labelled `Bloquer` and identifies the target email (`src/features/users/client/components/`).
+`UsersManagement` uses app-owned `createForm` with server-only validation through the create
+mutation. A successful creation calls `reset()` with empty email/default role and closes the dialog;
+field validation failures preserve editable values, while other failures use French alerts.
+The existing French user/administrator labels remain. ApproveUser and confirmation dialogs track
+pending while awaiting their mutations. BlockUser identifies the target email and retains `Bloquer`
+as its confirmation action.
 
-The loader redirect is a navigation affordance, not a substitute for the authoritative action guard.
-Loader refresh occurs after the guarded write resolves, so every status tab reflects persisted membership.
+Client guards choose screens, not authorization. Callers await guarded writes and key invalidation
+before closing/resetting; status panels observe persisted membership without a full reload.
 
 ## Outcome and acceptance
 
-- `[SO-1]` Only active administrators can read the directory or perform lifecycle actions.
-  `[VC-1]` Anonymous/non-admin page requests redirect appropriately; direct unauthorized actions fail
-  before touching data. An administrator receives all three lists as server-rendered HTML.
-- `[SO-2]` Status lists refresh together after mutations without a browser Query cache.
+- `[SO-1]` Only active administrators can read the directory or perform lifecycle mutations.
+  `[VC-1]` Anonymous/non-admin client routes redirect appropriately; direct unauthorized API requests fail
+  before touching data. An administrator receives all three preloaded status queries.
+- `[SO-2]` Status lists refresh together after mutations invalidate `allUsers`.
   `[VC-2]` Create a throwaway email, block it, then approve it from the blocked panel: it moves to the
-  expected status panel after each action without a full reload.
+  expected status panel after each mutation without a full reload.
 - `[SO-3]` Existing French search, validation and dialog behavior remains available.
   `[VC-3]` Server validation rejects invalid email and preserves the draft; successful creation closes/resets the form; email/role
   search filters every tab and confirmation identifies the user being blocked.

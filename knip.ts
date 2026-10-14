@@ -6,7 +6,7 @@ const config: KnipConfig = {
   compilers: { svelte: (text: string, filename: string) => svelte2tsx(text, { filename, isTsFile: true, mode: 'ts' }).code },
   entry: [
     'public/sw.js!',
-    'pages/**/*.{ts,svelte}!',
+    'index.html',
     'routes/**/*.ts!',
     'middleware/**/*.ts!',
     'tools/oxlint/index.ts',
@@ -20,7 +20,6 @@ const config: KnipConfig = {
   },
   ignoreDependencies: ['cloudflare', '@typescript/native'],
   ignoreIssues: {
-    'pages/**/*.{ts,svelte}': ['exports', 'types'],
     // Svelte module scripts that only export snippet data still compile to an unused component default.
     'src/components/navigation/menu-items.svelte': ['exports'],
     'src/db/schema/auth.ts': ['exports'],

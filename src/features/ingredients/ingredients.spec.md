@@ -24,7 +24,7 @@ consistent ingredient vocabulary across the product.
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `[KD-1]` Ingredient identity   | An ingredient is a relational row with a name, category, optional parent, conversion metadata, and preferred unit.         | One row supplies both the human-facing catalogue and the metadata required wherever the ingredient appears. |
 | `[KD-2]` Write authority       | Authenticated members create and edit; only administrators delete.                                                         | Collaborative maintenance stays lightweight while deletion receives stronger protection.                    |
-| `[KD-3]` Read coherence        | Page loaders supply the catalogue; actions reload props and API creation refreshes the owning page.                        | Settings and recipe-form consumers observe the refreshed list following a write.                            |
+| `[KD-3]` Read coherence        | The ingredient-list query supplies the catalogue; mutations invalidate `allIngredients` and `allRecipes`.                  | Settings and recipe-form consumers observe the refreshed list following a write.                            |
 | `[KD-4]` Unit conversion       | Conversion first reaches a canonical unit, then bridges dimensions through grams only when ingredient metadata permits it. | Explicit density and count weight prevent fabricated equivalences between volume, mass, and count.          |
 | `[KD-5]` Presentation metadata | Category labels and icons are central mappings; the form and settings list consume them.                                   | French presentation remains consistent while stored category values remain stable identifiers.              |
 
@@ -58,25 +58,25 @@ consistent ingredient vocabulary across the product.
 ## 7. High-Level Components
 
 ```text
-Settings page ──loader──▶ listIngredients ──▶ D1 ingredient rows
-      │                         ▲
-      ├── Edit / Delete actions ─┘ (loader runs again)
-      └── Add dialog ── POST /api/ingredients ── router.refresh()
+Settings screen ──ingredientList query──▶ GET /api/ingredients ──▶ D1 rows
+      │
+      └── Add / Edit / Delete mutations ──▶ guarded API ──▶ D1
+                                      └── allIngredients + allRecipes invalidation
 
-Recipe forms ──▶ loader catalogue → ingredient options
+Recipe forms ──▶ query-backed catalogue → ingredient options
 Shopping list ──▶ unit converter
 ```
 
-| Component               | Module type                        | Responsibility                                          | Public API surface                                                |
-| ----------------------- | ---------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------- |
-| Catalogue boundary      | Server query, page actions and API | List and mutate ingredient rows                         | `listIngredients`, update/delete actions, `POST /api/ingredients` |
-| Settings management     | Route and Svelte components        | Search, display, and authority-gated management UI      | `/settings/ingredients`, `AddIngredient`                          |
-| Form and option adapter | Shared feature components and hook | Collect metadata and expose `{ label, value }` choices  | `IngredientForm`, `useIngredientOptions`                          |
-| Measurement contract    | Schema and utility                 | Define usable units and transform compatible quantities | `unitSlugSchema`, `convert()`                                     |
+| Component               | Module type                        | Responsibility                                          | Public API surface                                     |
+| ----------------------- | ---------------------------------- | ------------------------------------------------------- | ------------------------------------------------------ |
+| Catalogue boundary      | Server query and API options       | List and mutate ingredient rows                         | `listIngredients`, GET/POST/PUT/DELETE ingredient APIs |
+| Settings management     | Route and Svelte components        | Search, display, and authority-gated management UI      | `/settings/ingredients`, `AddIngredient`               |
+| Form and option adapter | Shared feature components and hook | Collect metadata and expose `{ label, value }` choices  | `IngredientForm`, `useIngredientOptions`               |
+| Measurement contract    | Schema and utility                 | Define usable units and transform compatible quantities | `unitSlugSchema`, `convert()`                          |
 
 ## 8. Detailed Design
 
-### 8.1 Catalogue loader and mutation contract
+### 8.1 Catalogue query and mutation contract
 
 The ingredient shape is `{ id, name, category, parentId, densityGPerMl, countWeightG,
 preferredUnitSlug }`. `category` is one of `meat`, `fish`, `vegetables`, `spices`, or `other`; the
@@ -91,25 +91,29 @@ row defaults to `other` and indexes that column (`src/db/schema/ingredient.ts`).
 | `countWeightG`      | Count-to-mass fact               | Nullable, finite value at least zero    |
 | `preferredUnitSlug` | Shopping-list display preference | Nullable unit from `UNITS`              |
 
-`listIngredients(db)` returns rows in ascending name order. The settings loader calls `guardPage`
-before reading and returns `{ ingredients, isAdmin }`; recipe loaders can reuse the same server query
-(`src/features/ingredients/server/queries.ts`, `pages/settings/ingredients/index.server.ts`).
+`GET /api/ingredients` is public and returns `listIngredients(db)` in ascending name order.
+The member-only settings route and recipe-editor routes preload `ingredientList` using
+`ensureQueryData`; providers receive query-backed rows and administration affordances read
+`['session']`, not server page props.
 
-Creation keeps `POST /api/ingredients` for both settings and inline recipe-editor use. Update and delete
-are named actions at `/settings/ingredients?update` and `/settings/ingredients?delete`. Creation and
-update require `withAuthGuard`; delete requires `withAuthGuard(handler, 'admin')`. The shared schemas
-validate name, category, optional parent, non-negative conversion metadata, unit slug, and mutation ID
-(`src/features/ingredients/schemas.ts`). Successful actions rerun the settings loader. API creation
-calls `router.refresh()` to reload whichever page owns the catalogue; it does not depend on a browser
-query cache (`src/features/ingredients/client/components/add-ingredient.svelte`). Expected failures retain form
-values and display French error feedback.
+`POST /api/ingredients` requires member and accepts `ingredientSchema`.
+`PUT /api/ingredients/<id>` requires member and accepts `updateIngredientSchema` minus body `id`.
+`DELETE /api/ingredients/<id>` requires admin. All mutations return empty responses and use
+`withAuthGuard` before validation/persistence; invalid bodies return `400 { error, errors }`
+with dotted field paths. Shared schemas preserve existing metadata and unit constraints.
+
+Feature `client/api/<operation>.ts` modules export query/mutation options using typed
+`readResponse(fetch(...))` from `void/client`. Every ingredient mutation invalidates
+`allIngredients` and `allRecipes`, because detail and shopping-list rows embed ingredient names.
+Callers await mutations before resetting/closing; field errors preserve drafts and other failures
+use existing French alerts. Query refresh does not discard recipe-editor values.
 
 ### 8.2 Settings management
 
-The regular Void page wraps its content in `IngredientCatalogProvider ingredients={ingredients}`.
+The SPA screen wraps its content in `IngredientCatalogProvider ingredients={ingredients}`.
 The management view filters name and stored category case-insensitively and shows distinct French empty
 messages for an empty query and an unmatched query. It always shows addition; edit and deletion controls
-appear only for loader-resolved administrators (`src/features/ingredients/client/components/ingredients-management.svelte`).
+appear only for session-query administrators (`src/features/ingredients/client/components/ingredients-management.svelte`).
 Category badges pair the central icon with the French label on medium and wider viewports
 (`src/components/ingredient-categories.ts`).
 
@@ -124,10 +128,10 @@ One form renders name, category, parent, density, item weight, and preferred uni
 choice represents no preference, and parent choices permit no parent (`src/features/ingredients/client/components/ingredient-form.svelte`).
 Add accepts a name for prefill; add and edit dynamically validate and close on successful mutation
 (`src/features/ingredients/client/components/add-ingredient.svelte`; `src/features/ingredients/client/components/edit-ingredient.svelte`).
-`useIngredientOptions` maps provider-supplied loader rows to the unchanged combobox contract
+`useIngredientOptions` maps provider-supplied query rows to the unchanged combobox contract
 `{ label: name, value: id }` (`src/features/ingredients/client/hooks/use-ingredient-options.svelte.ts`).
 `AddIngredient` and `renderAddIngredientOption` retain their export names and prefill/trigger props;
-TanStack Form still owns field state and validation.
+App-owned `createForm` owns field data/errors/pending; the API owns validation.
 
 The editing form maps a stored null parent to an absent form selection, allowing the combobox to
 represent no parent without submitting a synthetic ID (`src/features/ingredients/client/components/edit-ingredient.svelte`).
@@ -150,9 +154,10 @@ conversion rather than guessing (`src/utils/unit-converter.ts`).
 
 ## Outcome and acceptance
 
-- `[SO-1]` Settings and inline recipe forms use loader-owned ingredient lists without a Query cache.
-  `[VC-1]` Given either page, adding an ingredient refreshes its list and parent-picker options.
-- `[SO-2]` Guarded page actions preserve edit/delete authority and fresh management rows.
+- `[SO-1]` Settings and inline recipe forms share query-backed ingredient lists.
+  `[VC-1]` Given either page, adding an ingredient refreshes its list and parent-picker options; renaming refreshes open
+  recipe details and shopping-list ingredient names through `allRecipes` invalidation.
+- `[SO-2]` Guarded API mutations preserve edit/delete authority and fresh management rows.
   `[VC-2]` Updating a throwaway ingredient displays its new name; deleting it removes the row. Direct
   anonymous writes fail, and direct non-admin deletion fails even when bypassing the hidden control.
 - `[SO-3]` Existing French forms and metadata contracts remain unchanged.

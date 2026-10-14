@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vite-plus/test'
 import * as z from 'zod'
 
 import { toApiErrorResponse, toApiValidationResponse } from './api-error'
-import { HttpError } from './http-error'
+import { FieldValidationError, HttpError } from './http-error'
 
 const readContract = async (response: Response | undefined) => ({ body: await response?.json(), status: response?.status })
 
@@ -11,6 +11,15 @@ describe('toApiErrorResponse', () => {
     expect(await readContract(toApiErrorResponse(new HttpError(403, 'account_blocked')))).toEqual({
       body: { error: 'account_blocked' },
       status: 403,
+    })
+  })
+
+  it('reports field validation errors by body path', async () => {
+    const errors = { 'ingredientGroups.0.name': 'Too short', servings: 'Expected number' }
+
+    expect(await readContract(toApiErrorResponse(new FieldValidationError(errors)))).toEqual({
+      body: { error: 'Invalid Schema; ingredientGroups.0.name: Too short; servings: Expected number', errors },
+      status: 400,
     })
   })
 
@@ -37,15 +46,24 @@ describe('toApiErrorResponse', () => {
 })
 
 describe('toApiValidationResponse', () => {
-  it('reports validator issues as a schema error', async () => {
-    const body = { error: 'Validation failed', issues: [{ issues: [{ message: 'Invalid email', path: 'email' }], slot: 'body' }] }
+  it('reports validator issues as a schema error with body field errors', async () => {
+    const body = {
+      error: 'Validation failed',
+      issues: [
+        { issues: [{ message: 'Invalid email', path: 'email' }], slot: 'body' },
+        { issues: [{ message: 'Expected number', path: 'id' }], slot: 'params' },
+      ],
+    }
 
-    expect(await readContract(toApiValidationResponse(body))).toEqual({ body: { error: 'Invalid Schema; body.email: Invalid email' }, status: 400 })
+    expect(await readContract(toApiValidationResponse(body))).toEqual({
+      body: { error: 'Invalid Schema; body.email: Invalid email; params.id: Expected number', errors: { email: 'Invalid email' } },
+      status: 400,
+    })
   })
 
   it('reports an unreadable JSON body as a schema error', async () => {
     expect(await readContract(toApiValidationResponse({ error: 'Invalid JSON body' }))).toEqual({
-      body: { error: 'Invalid Schema; Invalid JSON body' },
+      body: { error: 'Invalid Schema; Invalid JSON body', errors: {} },
       status: 400,
     })
   })
