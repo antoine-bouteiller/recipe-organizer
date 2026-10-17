@@ -18,7 +18,7 @@ catalog:
   '@sveltejs/vite-plugin-svelte': 7.3.1
   svelte: 5.57.2
   svelte-check: 4.7.6
-  svelte2tsx: 0.7.61
+  svelte2tsx: 0.7.62
   '@typescript/native': npm:typescript@7.0.2
   '@tanstack/svelte-query': 6.3.3
   storybook: 10.6.2
