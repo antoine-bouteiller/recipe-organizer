@@ -1,29 +1,21 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  dependencyDashboard: false,
-  extends: [
-    'config:recommended',
-    ':disableRateLimiting',
-    ':ignoreUnstable',
-    'helpers:pinGitHubActionDigestsToSemver',
-    'antoine-bouteiller/recipe-organizer//.renovate/auto-merge.json5',
-    'antoine-bouteiller/recipe-organizer//.renovate/groups.json5',
-    'antoine-bouteiller/recipe-organizer//.renovate/semantic-commits.json5',
+  extends: ['github>antoine-bouteiller/renovate'],
+  packageRules: [
+    {
+      // Pinned to 1.0.0-rc.3: rc.4 broke `drizzle-kit migrate` on the d1-http driver.
+      // sqlite-proxy's `values` executor sends method "all" (hitting D1's /query, which
+      // returns keyed rows) while the migrations-table code reads rows positionally, so
+      // every applied migration looks unmatched. Re-enable once upstream ships a fix.
+      description: 'Drizzle Group',
+      enabled: false,
+      matchPackageNames: ['drizzle-orm', 'drizzle-kit'],
+    },
+    {
+      // vite-plus bundles an exact Vitest; `vp migrate` realigns vite, vitest and @vitest/* together.
+      description: 'Vite+ toolchain (updated via vp migrate)',
+      enabled: false,
+      matchPackageNames: ['vite-plus', 'vite', '@voidzero-dev/vite-plus-core', 'vitest', '@vitest/**'],
+    },
   ],
-  ignorePresets: ['mergeConfidence:all-badges'],
-  configMigration: true,
-  minimumReleaseAge: '1 day',
-  gitIgnoredAuthors: ['227055450+renohate[bot]@users.noreply.github.com', '41898282+github-actions[bot]@users.noreply.github.com'],
-  labels: ['renovate'],
-  'pre-commit': {
-    enabled: true,
-  },
-  vulnerabilityAlerts: {
-    enabled: true,
-    addLabels: ['security'],
-    semanticCommitType: 'fix',
-    semanticCommitScope: 'deps',
-    minimumReleaseAge: null,
-    schedule: ['at any time'],
-  },
 }
