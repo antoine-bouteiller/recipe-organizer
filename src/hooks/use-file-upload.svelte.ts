@@ -212,12 +212,6 @@ export const useFileUpload = (options: FileUploadOptions | (() => FileUploadOpti
     {
       getInputProps: () => ({
         accept: current().accept ?? '*',
-        onchange: (event) => {
-          if (event.currentTarget.files) {
-            addFiles(event.currentTarget.files)
-          }
-        },
-        type: 'file',
         [inputAttachment]: (element: HTMLInputElement) => {
           input = element
           return () => {
@@ -226,6 +220,12 @@ export const useFileUpload = (options: FileUploadOptions | (() => FileUploadOpti
             }
           }
         },
+        onchange: (event) => {
+          if (event.currentTarget.files) {
+            addFiles(event.currentTarget.files)
+          }
+        },
+        type: 'file',
       }),
       removeFile,
     },

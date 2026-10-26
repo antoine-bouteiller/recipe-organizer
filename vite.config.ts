@@ -10,7 +10,7 @@ import { voidPlugin } from 'void'
 const features = ['auth', 'ingredients', 'recipe', 'search', 'settings', 'shopping-list', 'users']
 const parentRestriction = {
   message: 'Imports must not traverse more than one parent directory. Use an alias instead.',
-  regex: '^\\.\\./\\.\\.(/|$)',
+  regex: String.raw`^\.\./\.\.(/|$)`,
 }
 const reactRestriction = {
   group: ['react', 'react/*', 'react-dom', 'react-dom/*', '@void/react', '@void/react/*'],
