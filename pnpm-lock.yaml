@@ -210,8 +210,8 @@ catalogs:
       specifier: 5.57.3
       version: 5.57.3
     svelte-check:
-      specifier: 4.7.7
-      version: 4.7.7
+      specifier: 4.7.8
+      version: 4.7.8
     svelte2tsx:
       specifier: 0.7.63
       version: 0.7.63
@@ -296,7 +296,7 @@ importers:
         version: 10.6.5(react@19.3.0)(vite-plus@1.4.0(@types/node@26.6.6)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(esbuild@0.28.2)(jiti@2.7.0)(playwright@1.64.1)(svelte@5.57.3)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1))
       svelte-check:
         specifier: 'catalog:'
-        version: 4.7.7(picomatch@4.0.7)(svelte@5.57.3)(typescript@6.0.3)
+        version: 4.7.8(picomatch@4.0.7)(svelte@5.57.3)(typescript@6.0.3)
       svelte2tsx:
         specifier: 'catalog:'
         version: 0.7.63(svelte@5.57.3)(typescript@6.0.3)
@@ -3694,8 +3694,8 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
 
-  svelte-check@4.7.7:
-    resolution: {integrity: sha512-Ge2IMdeTpbJuzNFGRiiMg0RWgbScysKQu7xwcyFJ22+DU9F5nPX51+Q3gHmGqRxYQMx2knreVWt5oCtfe0vf2g==}
+  svelte-check@4.7.8:
+    resolution: {integrity: sha512-laZ49GFHZ3b0z2PWinJWL0syehc/PTR8aHaUaTiBkWJ+4Y38nhxjmXsSz7CbGa3VdKopViVbrBH3bGNqIAI0bQ==}
     engines: {node: '>= 18.0.0'}
     hasBin: true
     peerDependencies:
@@ -6573,7 +6573,7 @@ snapshots:
       svelte: 5.57.3
       zimmerframe: 1.1.2
 
-  svelte-check@4.7.7(picomatch@4.0.7)(svelte@5.57.3)(typescript@6.0.3):
+  svelte-check@4.7.8(picomatch@4.0.7)(svelte@5.57.3)(typescript@6.0.3):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       '@sveltejs/load-config': 0.2.3
