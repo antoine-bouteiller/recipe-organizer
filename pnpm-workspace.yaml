@@ -17,7 +17,7 @@ catalog:
   '@storybook/addon-svelte-csf': 5.1.6
   '@sveltejs/vite-plugin-svelte': 7.3.1
   svelte: 5.57.3
-  svelte-check: 4.7.7
+  svelte-check: 4.7.8
   svelte2tsx: 0.7.63
   '@typescript/native': npm:typescript@7.0.2
   '@tanstack/svelte-query': 6.3.7
