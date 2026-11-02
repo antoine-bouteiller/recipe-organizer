@@ -177,8 +177,8 @@ catalogs:
       specifier: 7.3.1
       version: 7.3.1
     '@tanstack/svelte-query':
-      specifier: 6.3.6
-      version: 6.3.6
+      specifier: 6.3.7
+      version: 6.3.7
     '@types/node':
       specifier: 26.6.6
       version: 26.6.6
@@ -244,7 +244,7 @@ importers:
     dependencies:
       '@tanstack/svelte-query':
         specifier: 'catalog:'
-        version: 6.3.6(svelte@5.57.3)
+        version: 6.3.7(svelte@5.57.3)
       drizzle-orm:
         specifier: 'catalog:'
         version: 1.0.0-rc.3(@cloudflare/workers-types@5.20261022.1)(arktype@2.2.7)(better-sqlite3@13.0.3)(mysql2@3.24.6(@types/node@26.6.6))(pg@8.23.1)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -2156,11 +2156,11 @@ packages:
       svelte: ^5.46.4
       vite: ^8.0.0-beta.7 || ^8.0.0
 
-  '@tanstack/query-core@5.105.0':
-    resolution: {integrity: sha512-7p56vRmT/z4UJ6sctGIdl5WRUQyUv53IUpUwEKi2g97zMbO7zh8ZsCLffGAvCPBR4xD72e3VXsDyLwXHhoNTMQ==}
+  '@tanstack/query-core@5.105.1':
+    resolution: {integrity: sha512-B/rNlZoZ54w1dlddiUt9oEe1SLM+37c00SKLJEg9YH+7as3Y54P81o9Fh+2ujZ36tXPnQJ5oVe7AcyEWkyFhPg==}
 
-  '@tanstack/svelte-query@6.3.6':
-    resolution: {integrity: sha512-t00PjiCTrv2nB/Lb39pOb+TIwe80p+FpKzDCFy+6FZC6mz2j++b8lUITQ6O/JrZvkQn8eEEUvaju0nQ81vjorA==}
+  '@tanstack/svelte-query@6.3.7':
+    resolution: {integrity: sha512-yqw1xxx+nPQIoBpT9cEegm+MkQSF00WCklYv20cqOpmzoIDEiLKfEIoSwJOXZvOkp2yPbG2UD02GnpEPXLMDsQ==}
     peerDependencies:
       svelte: ^5.25.0
 
@@ -5186,11 +5186,11 @@ snapshots:
       - vue-tsc
       - yaml
 
-  '@tanstack/query-core@5.105.0': {}
+  '@tanstack/query-core@5.105.1': {}
 
-  '@tanstack/svelte-query@6.3.6(svelte@5.57.3)':
+  '@tanstack/svelte-query@6.3.7(svelte@5.57.3)':
     dependencies:
-      '@tanstack/query-core': 5.105.0
+      '@tanstack/query-core': 5.105.1
       svelte: 5.57.3
 
   '@testing-library/dom@10.4.2':
