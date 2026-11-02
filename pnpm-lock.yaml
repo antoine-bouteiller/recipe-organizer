@@ -213,8 +213,8 @@ catalogs:
       specifier: 4.7.7
       version: 4.7.7
     svelte2tsx:
-      specifier: 0.7.62
-      version: 0.7.62
+      specifier: 0.7.63
+      version: 0.7.63
     typescript:
       specifier: 6.0.3
       version: 6.0.3
@@ -299,7 +299,7 @@ importers:
         version: 4.7.7(picomatch@4.0.7)(svelte@5.57.3)(typescript@6.0.3)
       svelte2tsx:
         specifier: 'catalog:'
-        version: 0.7.62(svelte@5.57.3)(typescript@6.0.3)
+        version: 0.7.63(svelte@5.57.3)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -3702,8 +3702,8 @@ packages:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: ^5.0.0 || ^6.0.0
 
-  svelte2tsx@0.7.62:
-    resolution: {integrity: sha512-ZXfsmL0jzAs01ho0w5z5LSIC2WgSdpTF0QCwaXLq7oHgho4P9fTgHlLp1pKAx6/xtVYRSW5nGH5ZRpEHZCqliA==}
+  svelte2tsx@0.7.63:
+    resolution: {integrity: sha512-gRgz/V6wOx0NDZhm6OMD2VIh+/HrgZc3k6ibX93rkNPEkWNn/P3Uhb1fYCqOrimEUpQd8r65dhiHZIJXSQBeow==}
     peerDependencies:
       svelte: ^3.55 || ^4.0.0-next.0 || ^4.0 || ^5.0.0-next.0
       typescript: ^4.9.4 || ^5.0.0 || ^6.0.0
@@ -5138,7 +5138,7 @@ snapshots:
       magic-string: 1.4.3
       storybook: 10.6.5(react@19.3.0)(vite-plus@1.4.0(@types/node@26.6.6)(@vitest/browser-playwright@5.0.5)(@vitest/coverage-v8@5.0.5)(@vitest/ui@5.0.5)(esbuild@0.28.2)(jiti@2.7.0)(playwright@1.64.1)(svelte@5.57.3)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1))
       svelte: 5.57.3
-      svelte2tsx: 0.7.62(svelte@5.57.3)(typescript@5.9.3)
+      svelte2tsx: 0.7.63(svelte@5.57.3)(typescript@5.9.3)
       typescript: 5.9.3
       vite: '@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1)'
 
@@ -6586,14 +6586,14 @@ snapshots:
     transitivePeerDependencies:
       - picomatch
 
-  svelte2tsx@0.7.62(svelte@5.57.3)(typescript@5.9.3):
+  svelte2tsx@0.7.63(svelte@5.57.3)(typescript@5.9.3):
     dependencies:
       dedent-js: 1.0.1
       scule: 1.3.0
       svelte: 5.57.3
       typescript: 5.9.3
 
-  svelte2tsx@0.7.62(svelte@5.57.3)(typescript@6.0.3):
+  svelte2tsx@0.7.63(svelte@5.57.3)(typescript@6.0.3):
     dependencies:
       dedent-js: 1.0.1
       scule: 1.3.0
