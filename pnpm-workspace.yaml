@@ -20,7 +20,7 @@ catalog:
   svelte-check: 4.7.8
   svelte2tsx: 0.7.63
   '@typescript/native': npm:typescript@7.0.2
-  '@tanstack/svelte-query': 6.3.7
+  '@tanstack/svelte-query': 6.3.9
   storybook: 10.6.5
   '@storybook/addon-vitest': 10.6.5
   '@vitest/browser-playwright': 5.0.5
