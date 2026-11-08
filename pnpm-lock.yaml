@@ -177,8 +177,8 @@ catalogs:
       specifier: 7.3.1
       version: 7.3.1
     '@tanstack/svelte-query':
-      specifier: 6.3.11
-      version: 6.3.11
+      specifier: 6.4.1
+      version: 6.4.1
     '@types/node':
       specifier: 26.6.6
       version: 26.6.6
@@ -244,7 +244,7 @@ importers:
     dependencies:
       '@tanstack/svelte-query':
         specifier: 'catalog:'
-        version: 6.3.11(svelte@5.57.3)
+        version: 6.4.1(svelte@5.57.3)
       drizzle-orm:
         specifier: 'catalog:'
         version: 1.0.0-rc.5(@cloudflare/workers-types@5.20261104.1)(arktype@2.2.7)(better-sqlite3@13.0.3)(mysql2@3.24.6(@types/node@26.6.6))(pg@8.23.1)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -2198,11 +2198,11 @@ packages:
       svelte: ^5.46.4
       vite: ^8.0.0-beta.7 || ^8.0.0
 
-  '@tanstack/query-core@5.106.1':
-    resolution: {integrity: sha512-erYv/UACddcdgjOL2ixmFdK6tO/AVBeUcTCOtX2N51yZpDQ2U7KJ+xgB/bCNfsF3uoCDTqGHEEbDiFsIO9YUmQ==}
+  '@tanstack/query-core@5.107.1':
+    resolution: {integrity: sha512-PSyAik11oQBEVOiVy5hjZWHmoUqOXqK1WYy4v55mcxozEfKaQgpUMsgnXhWjuESzSht8JfzqMS1m6M/9CpNgvg==}
 
-  '@tanstack/svelte-query@6.3.11':
-    resolution: {integrity: sha512-xoYIHzDs6pqr7l5Xymzdv4fsG2fjny5l+6Hh4cXf/RVCc4hvoiE0kz42PNcYDNiucaorFTRs/vDoxBL56ZIv3A==}
+  '@tanstack/svelte-query@6.4.1':
+    resolution: {integrity: sha512-5j0PrXJOx8Ay6s13UamdLL6oc4stG84kVv0/WwFN74y5mkWDR20wNs9idYD4wb3etAI/slmKzPQzNkAzumKkMg==}
     peerDependencies:
       svelte: ^5.25.0
 
@@ -5319,11 +5319,11 @@ snapshots:
       vite: '@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1)'
       vitefu: 1.1.3(@voidzero-dev/vite-plus-core@1.4.0(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.9.1))
 
-  '@tanstack/query-core@5.106.1': {}
+  '@tanstack/query-core@5.107.1': {}
 
-  '@tanstack/svelte-query@6.3.11(svelte@5.57.3)':
+  '@tanstack/svelte-query@6.4.1(svelte@5.57.3)':
     dependencies:
-      '@tanstack/query-core': 5.106.1
+      '@tanstack/query-core': 5.107.1
       svelte: 5.57.3
 
   '@testing-library/dom@10.4.2':
